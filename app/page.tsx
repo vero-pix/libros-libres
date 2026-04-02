@@ -69,37 +69,63 @@ export default async function HomePage({ searchParams }: Props) {
 
       {!hasFilters && (
         <>
-          {/* Hero — Libros vivos circulando */}
+          {/* Hero — The Uber for Books */}
           <section className="relative overflow-hidden bg-ink min-h-[90vh] flex items-center">
-            {/* Abstract flowing lines — representing circulation */}
+            {/* Network nodes — representing the distributed bookshelf */}
             <div className="absolute inset-0 overflow-hidden">
-              <svg className="absolute w-full h-full opacity-[0.06]" viewBox="0 0 1200 800" fill="none">
-                <path d="M0 400 C300 100, 600 700, 900 300 S1200 500, 1500 200" stroke="#d4a017" strokeWidth="2" />
-                <path d="M-100 500 C200 200, 500 600, 800 200 S1100 400, 1400 100" stroke="#d4a017" strokeWidth="1.5" />
-                <path d="M0 600 C300 300, 700 500, 1000 200 S1200 300, 1500 100" stroke="#d4a017" strokeWidth="1" />
-                <path d="M-200 300 C100 600, 400 100, 700 500 S1000 200, 1300 400" stroke="#faf8f4" strokeWidth="1" />
+              <svg className="absolute w-full h-full opacity-[0.07]" viewBox="0 0 1200 800" fill="none">
+                {/* Network connections */}
+                <circle cx="200" cy="200" r="4" fill="#d4a017" />
+                <circle cx="450" cy="350" r="4" fill="#d4a017" />
+                <circle cx="300" cy="500" r="4" fill="#d4a017" />
+                <circle cx="700" cy="150" r="4" fill="#d4a017" />
+                <circle cx="900" cy="400" r="4" fill="#d4a017" />
+                <circle cx="600" cy="600" r="4" fill="#d4a017" />
+                <circle cx="1050" cy="250" r="4" fill="#d4a017" />
+                <circle cx="800" cy="650" r="4" fill="#d4a017" />
+                <circle cx="150" cy="650" r="4" fill="#d4a017" />
+                <circle cx="1000" cy="550" r="4" fill="#d4a017" />
+                <line x1="200" y1="200" x2="450" y2="350" stroke="#d4a017" strokeWidth="0.5" />
+                <line x1="450" y1="350" x2="300" y2="500" stroke="#d4a017" strokeWidth="0.5" />
+                <line x1="450" y1="350" x2="700" y2="150" stroke="#d4a017" strokeWidth="0.5" />
+                <line x1="700" y1="150" x2="900" y2="400" stroke="#d4a017" strokeWidth="0.5" />
+                <line x1="700" y1="150" x2="1050" y2="250" stroke="#d4a017" strokeWidth="0.5" />
+                <line x1="900" y1="400" x2="600" y2="600" stroke="#d4a017" strokeWidth="0.5" />
+                <line x1="900" y1="400" x2="1000" y2="550" stroke="#d4a017" strokeWidth="0.5" />
+                <line x1="600" y1="600" x2="800" y2="650" stroke="#d4a017" strokeWidth="0.5" />
+                <line x1="300" y1="500" x2="150" y2="650" stroke="#d4a017" strokeWidth="0.5" />
+                <line x1="300" y1="500" x2="600" y2="600" stroke="#d4a017" strokeWidth="0.5" />
+                <line x1="200" y1="200" x2="700" y2="150" stroke="#faf8f4" strokeWidth="0.3" />
+                <line x1="1050" y1="250" x2="1000" y2="550" stroke="#faf8f4" strokeWidth="0.3" />
               </svg>
             </div>
 
             <div className="relative max-w-7xl mx-auto px-6 sm:px-12 py-20 w-full">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                {/* Left — Message */}
+                {/* Left — The big idea */}
                 <div>
-                  <p className="text-brand-400 text-xs tracking-[0.4em] uppercase mb-8">
-                    Libros vivos &middot; Circulando &middot; Cerca de ti
-                  </p>
+                  <div className="inline-flex items-center gap-2 bg-brand-500/10 border border-brand-500/20 px-4 py-2 mb-8">
+                    <div className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
+                    <p className="text-brand-400 text-xs tracking-[0.3em] uppercase">
+                      Red activa en Chile
+                    </p>
+                  </div>
 
                   <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-cream leading-[1.05] tracking-tight">
-                    Los libros
+                    Cada estantería
                     <br />
-                    no se guardan.
-                    <br />
-                    <span className="italic text-brand-400">Circulan.</span>
+                    es una{" "}
+                    <span className="italic text-brand-400">librería.</span>
                   </h1>
 
-                  <p className="mt-8 text-lg text-cream/70 leading-relaxed max-w-lg">
-                    Alguien cerca tiene el libro que buscas. Y alguien cerca busca
-                    el libro que tú ya leíste. Libros Libres es el punto donde se encuentran.
+                  <p className="mt-6 font-display text-xl text-cream/50 italic">
+                    Solo faltaba hacerlas visibles.
+                  </p>
+
+                  <p className="mt-6 text-base text-cream/65 leading-relaxed max-w-lg">
+                    Uber convirtió cada auto en un taxi. Nosotros convertimos cada
+                    estantería en una librería. Geolocalización en tiempo real, pago
+                    seguro, despacho a tu puerta. La red de libros más grande de Chile.
                   </p>
 
                   <div className="mt-10 flex flex-wrap items-center gap-4">
@@ -107,72 +133,124 @@ export default async function HomePage({ searchParams }: Props) {
                       href="#tienda"
                       className="inline-flex items-center px-8 py-4 bg-brand-500 text-white font-semibold text-sm tracking-wide uppercase hover:bg-brand-600 transition-all duration-300"
                     >
-                      Encontrar libros
+                      Explorar la red
                     </a>
                     <Link
                       href="/publish"
                       className="inline-flex items-center px-8 py-4 border border-cream/30 text-cream font-semibold text-sm tracking-wide uppercase hover:bg-cream/5 hover:border-cream/50 transition-all duration-300"
                     >
-                      Liberar un libro
+                      Activar mi estantería
                     </Link>
                   </div>
                 </div>
 
-                {/* Right — The connection visual */}
-                <div className="hidden lg:flex flex-col items-center gap-6">
-                  <div className="bg-cream/5 border border-cream/10 p-6 w-full max-w-sm">
-                    <p className="text-xs text-brand-400 uppercase tracking-widest mb-2">Alguien busca</p>
-                    <p className="font-display text-xl text-cream italic">
-                      &ldquo;Necesito los libros de Ken Wilber&rdquo;
-                    </p>
-                    <p className="text-cream/40 text-sm mt-2">Santiago, a 2 km de ti</p>
-                  </div>
+                {/* Right — How the network works */}
+                <div className="hidden lg:flex flex-col gap-4">
+                  {/* Simulated real-time feed */}
+                  <p className="text-xs text-cream/40 uppercase tracking-[0.2em] mb-2">En la red ahora</p>
 
-                  {/* Connection line */}
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="w-px h-6 bg-brand-500/50" />
-                    <div className="w-8 h-8 rounded-full border-2 border-brand-500 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-brand-500" />
+                  <div className="bg-cream/[0.03] border border-cream/10 p-5 flex items-start gap-4">
+                    <div className="w-10 h-10 bg-brand-500/20 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                      </svg>
                     </div>
-                    <div className="w-px h-6 bg-brand-500/50" />
+                    <div>
+                      <p className="font-display text-cream text-sm font-semibold">Alguien busca Ken Wilber</p>
+                      <p className="text-cream/40 text-xs mt-1">Providencia &middot; hace 3 min</p>
+                    </div>
+                    <span className="ml-auto text-xs text-brand-400 font-medium">2 km</span>
                   </div>
 
-                  <div className="bg-cream/5 border border-cream/10 p-6 w-full max-w-sm">
-                    <p className="text-xs text-brand-400 uppercase tracking-widest mb-2">Alguien ofrece</p>
-                    <p className="font-display text-xl text-cream italic">
-                      &ldquo;Tengo 3 de Ken Wilber, los leí todos&rdquo;
-                    </p>
-                    <p className="text-cream/40 text-sm mt-2">Estación Central, a 4 km</p>
+                  <div className="bg-cream/[0.03] border border-cream/10 p-5 flex items-start gap-4">
+                    <div className="w-10 h-10 bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.331 0 4.473.89 6.074 2.356M12 6.042a8.968 8.968 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.356M12 6.042V20.356" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="font-display text-cream text-sm font-semibold">3 libros de Ken Wilber disponibles</p>
+                      <p className="text-cream/40 text-xs mt-1">Estación Central &middot; $10.000 c/u</p>
+                    </div>
+                    <span className="ml-auto text-xs text-green-400 font-medium">Match</span>
                   </div>
 
-                  <p className="text-brand-400 font-display italic text-sm mt-2">
-                    Libros Libres los conecta
+                  <div className="bg-brand-500/10 border border-brand-500/20 p-5 flex items-start gap-4">
+                    <div className="w-10 h-10 bg-brand-500/20 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="font-display text-cream text-sm font-semibold">Envío en camino</p>
+                      <p className="text-cream/40 text-xs mt-1">Rappi &middot; Llega en 2 horas</p>
+                    </div>
+                    <span className="ml-auto text-xs text-brand-400 font-medium">Rápido</span>
+                  </div>
+
+                  <p className="text-center text-cream/30 text-xs mt-2 italic">
+                    Geolocalización &middot; MercadoPago &middot; Despacho a domicilio
                   </p>
                 </div>
               </div>
 
               {/* Stats */}
-              <div className="mt-20 pt-10 border-t border-cream/10 flex flex-wrap items-center justify-center gap-12 text-cream/60 text-sm">
-                <div className="text-center">
-                  <span className="font-display text-3xl font-bold text-cream block">{totalListings}</span>
-                  libros circulando
+              <div className="mt-20 pt-10 border-t border-cream/10 grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+                {[
+                  { value: `${totalListings}`, label: "libros en la red" },
+                  { value: "GPS", label: "geolocalización real" },
+                  { value: "Gratis", label: "publicar siempre" },
+                  { value: "2hrs", label: "envío más rápido" },
+                ].map((stat) => (
+                  <div key={stat.label}>
+                    <span className="font-display text-3xl font-bold text-cream block">{stat.value}</span>
+                    <p className="text-cream/50 text-xs mt-1 uppercase tracking-wider">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* The tech pitch */}
+          <section className="bg-cream border-b border-cream-dark">
+            <div className="max-w-6xl mx-auto px-6 py-20">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                  <p className="text-xs font-medium tracking-[0.3em] uppercase text-brand-600 mb-4">
+                    La tecnología
+                  </p>
+                  <h2 className="font-display text-3xl sm:text-4xl font-bold text-ink leading-tight">
+                    Como Uber, pero
+                    <br />
+                    <span className="italic text-brand-600">para libros.</span>
+                  </h2>
+                  <p className="mt-6 text-ink-muted leading-relaxed">
+                    Uber hizo visible cada auto disponible en tu ciudad. Nosotros hacemos
+                    visible cada libro. Escaneas el código de barras, aparece en el mapa.
+                    Alguien a 500 metros lo necesita y ni lo sabía. La tecnología conecta
+                    oferta y demanda en tiempo real, con pago seguro y despacho a domicilio.
+                  </p>
                 </div>
-                <div className="w-px h-10 bg-cream/15 hidden sm:block" />
-                <div className="text-center">
-                  <span className="font-display text-3xl font-bold text-cream block">Gratis</span>
-                  publicar siempre
-                </div>
-                <div className="w-px h-10 bg-cream/15 hidden sm:block" />
-                <div className="text-center">
-                  <span className="font-display text-3xl font-bold text-cream block">Chile</span>
-                  envío a todo el país
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { icon: "📍", title: "Mapa en tiempo real", desc: "Ve qué libros hay cerca tuyo ahora mismo" },
+                    { icon: "📱", title: "Escanea y publica", desc: "Del código de barras al mapa en 10 segundos" },
+                    { icon: "💳", title: "Pago seguro", desc: "MercadoPago protege cada transacción" },
+                    { icon: "🚀", title: "Envío mismo día", desc: "Rappi, Chilexpress o Blue Express a tu puerta" },
+                  ].map((f) => (
+                    <div key={f.title} className="bg-cream-warm p-5 border border-cream-dark">
+                      <span className="text-2xl">{f.icon}</span>
+                      <h3 className="font-display font-bold text-ink text-sm mt-3 mb-1">{f.title}</h3>
+                      <p className="text-ink-muted text-xs leading-relaxed">{f.desc}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </section>
 
-          {/* The flow — buscar ↔ ofrecer */}
-          <section className="bg-cream-warm border-y border-cream-dark">
+          {/* How it works */}
+          <section className="bg-cream-warm border-b border-cream-dark">
             <div className="max-w-6xl mx-auto px-6 py-20">
               <p className="text-xs font-medium tracking-[0.3em] uppercase text-brand-600 text-center mb-3">
                 Así de simple
