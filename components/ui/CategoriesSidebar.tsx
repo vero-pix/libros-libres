@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { translateGenre } from "@/lib/genres";
 
 interface CategoryCount {
   genre: string;
@@ -39,7 +40,7 @@ export default function CategoriesSidebar({ categories, activeGenre }: Props) {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              {cat.genre}{" "}
+              {translateGenre(cat.genre)}{" "}
               <span className="text-gray-400">({cat.count})</span>
             </Link>
           </li>

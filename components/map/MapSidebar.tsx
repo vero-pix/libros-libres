@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
 import type { ListingWithBook } from "@/types";
+import { translateGenre } from "@/lib/genres";
 
 type SortMode = "distance" | "author" | "genre";
 
@@ -95,7 +95,7 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
           >
             <option value="">Todas</option>
             {genres.map((g) => (
-              <option key={g} value={g}>{g}</option>
+              <option key={g} value={g}>{translateGenre(g)}</option>
             ))}
           </select>
         </div>
@@ -144,7 +144,7 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
                       )}
                       {listing.book.genre && (
                         <span className="text-xs text-gray-400">
-                          {listing.book.genre}
+                          {translateGenre(listing.book.genre)}
                         </span>
                       )}
                       {dist != null && (
