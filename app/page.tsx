@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import Navbar from "@/components/ui/Navbar";
@@ -88,56 +89,63 @@ export default async function HomePage({ searchParams }: Props) {
       {/* Hero Section — only on unfiltered home */}
       {!hasFilters && (
         <>
-          <section className="relative overflow-hidden bg-gradient-to-br from-[#2d3436] via-[#363b3d] to-[#2d3436]">
-            {/* Decorative elements */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-10 left-10 w-72 h-72 bg-[#d4a017] rounded-full blur-3xl" />
-              <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#d4a017] rounded-full blur-3xl" />
-            </div>
+          <section className="relative overflow-hidden">
+            {/* Background image */}
+            <Image
+              src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1400&q=80"
+              alt="Biblioteca"
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
 
-            <div className="relative max-w-5xl mx-auto px-4 py-20 sm:py-28 text-center">
+            <div className="relative max-w-5xl mx-auto px-4 py-24 sm:py-32 text-center">
+              <p className="text-brand-400 font-semibold text-sm uppercase tracking-widest mb-4">
+                Libre, sin comisiones
+              </p>
+
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
-                Compra y vende libros de{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d4a017] to-[#f0c040]">
-                  segunda mano
-                </span>{" "}
-                cerca de ti
+                Cada libro merece{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-300">
+                  una segunda oportunidad
+                </span>
               </h1>
 
-              <p className="mt-6 text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                El marketplace de libros más grande de Chile. Publica gratis, paga seguro con MercadoPago, recibe en tu casa.
+              <p className="mt-6 text-lg sm:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
+                Conectamos personas que buscan y ofrecen libros cerca de ti. Publica gratis, encuentra lo que buscas, recibe en tu casa.
               </p>
 
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a
                   href="#tienda"
-                  className="inline-flex items-center px-8 py-3.5 rounded-lg text-base font-semibold bg-gradient-to-r from-[#d4a017] to-[#b8860b] text-white shadow-lg shadow-[#d4a017]/25 hover:shadow-[#d4a017]/40 hover:scale-105 transition-all duration-200"
+                  className="inline-flex items-center px-8 py-4 rounded-lg text-base font-semibold bg-white text-navy hover:bg-gray-100 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
                 >
                   Explorar libros
                 </a>
                 <Link
                   href="/publish"
-                  className="inline-flex items-center px-8 py-3.5 rounded-lg text-base font-semibold border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 transition-all duration-200"
+                  className="inline-flex items-center px-8 py-4 rounded-lg text-base font-semibold bg-brand-500 text-white hover:bg-brand-600 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
                 >
                   Publicar gratis
                 </Link>
               </div>
 
               {/* Stats */}
-              <div className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm text-gray-400">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-white">{totalListings}</span>
-                  <span>libros publicados</span>
+              <div className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12">
+                <div className="text-center">
+                  <span className="text-3xl font-extrabold text-white">{totalListings}</span>
+                  <p className="text-sm text-gray-300 mt-1">libros disponibles</p>
                 </div>
-                <div className="hidden sm:block w-px h-6 bg-gray-600" />
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">🚚</span>
-                  <span>Envío a todo Chile</span>
+                <div className="hidden sm:block w-px h-10 bg-white/20" />
+                <div className="text-center">
+                  <span className="text-3xl font-extrabold text-white">100%</span>
+                  <p className="text-sm text-gray-300 mt-1">gratis para vendedores</p>
                 </div>
-                <div className="hidden sm:block w-px h-6 bg-gray-600" />
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">✅</span>
-                  <span>Sin comisiones al vendedor</span>
+                <div className="hidden sm:block w-px h-10 bg-white/20" />
+                <div className="text-center">
+                  <span className="text-3xl font-extrabold text-white">Chile</span>
+                  <p className="text-sm text-gray-300 mt-1">envío a todo el país</p>
                 </div>
               </div>
             </div>
