@@ -20,7 +20,7 @@ export default async function PublishPage() {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Publicar libro</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Completá los datos para poner tu libro disponible en el mapa.
+            Completa los datos para poner tu libro disponible en el mapa.
           </p>
         </div>
         <PublishForm userId={user.id} />
