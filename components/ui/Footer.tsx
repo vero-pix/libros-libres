@@ -4,11 +4,11 @@ export default function Footer() {
   return (
     <footer className="mt-auto">
       {/* Newsletter */}
-      <div className="border-t border-gray-200 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="border-t-4 border-brand-500 bg-navy">
+        <div className="max-w-7xl mx-auto px-4 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h3 className="font-bold text-gray-900">Newsletter</h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <h3 className="font-bold text-white">Newsletter</h3>
+            <p className="text-sm text-gray-300 mt-1">
               Suscríbete para obtener guías, descuentos y novedades de Libros Libres
             </p>
           </div>
@@ -30,7 +30,7 @@ export default function Footer() {
 
       {/* Links */}
       <div className="bg-white border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+        <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
           <div>
             <h4 className="font-bold text-gray-900 mb-3">Categorías</h4>
             <ul className="space-y-2 text-gray-500">

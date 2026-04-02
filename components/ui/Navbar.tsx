@@ -25,12 +25,13 @@ export default async function Navbar() {
   }
 
   return (
-    <header className="shrink-0">
+    <header className="shrink-0 shadow-sm">
       {/* Row 1: Logo + Search + Auth */}
       <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center gap-4">
-          <Link href="/" className="font-bold text-xl text-navy tracking-tight whitespace-nowrap">
-            Libros Libres
+          <Link href="/" className="font-extrabold text-2xl tracking-tight whitespace-nowrap">
+            <span className="text-navy">Libros</span>{" "}
+            <span className="text-brand-500">Libres</span>
           </Link>
 
           <div className="hidden md:flex flex-1 justify-center px-4">

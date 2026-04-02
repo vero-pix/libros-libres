@@ -143,6 +143,35 @@ export default async function HomePage({ searchParams }: Props) {
             </div>
           </section>
 
+          {/* Preguntas reales */}
+          <section className="bg-white">
+            <div className="max-w-5xl mx-auto px-4 py-16">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-brand-600 text-center mb-3">
+                ¿Te ha pasado?
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+                {[
+                  "Necesito saber si alguien cerca tiene disponible los libros de Ken Wilber",
+                  "Tengo una colección de García Márquez que ya leí y quiero que alguien más la disfrute",
+                  "Busco un libro que ya no se edita y no lo encuentro en ninguna librería",
+                  "Quiero vender mis libros de la universidad pero no sé dónde publicarlos",
+                  "Me mudé y necesito deshacerme de cajas de libros sin botarlos",
+                  "Busco libros infantiles baratos para el colegio de mis hijos",
+                ].map((q, i) => (
+                  <div
+                    key={i}
+                    className="bg-gray-50 border border-gray-100 rounded-xl px-5 py-4 text-sm text-gray-700 leading-relaxed italic"
+                  >
+                    &ldquo;{q}&rdquo;
+                  </div>
+                ))}
+              </div>
+              <p className="text-center text-gray-500 text-sm mt-8">
+                Libros Libres conecta personas que buscan y ofrecen libros en tu ciudad.
+              </p>
+            </div>
+          </section>
+
           {/* Cómo funciona */}
           <section className="bg-gray-50 border-y border-gray-100">
             <div className="max-w-5xl mx-auto px-4 py-16">

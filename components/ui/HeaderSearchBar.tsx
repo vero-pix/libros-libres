@@ -22,7 +22,7 @@ export default function HeaderSearchBar() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Encuentra tu próximo libro, por autor, título o palabra clave"
-        className="flex-1 px-4 py-2.5 border border-gray-300 border-r-0 rounded-l-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-brand-400"
+        className="flex-1 px-4 py-2.5 border-2 border-gray-300 border-r-0 rounded-l-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-brand-400"
       />
       <button
         type="submit"
