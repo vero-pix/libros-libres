@@ -1,24 +1,31 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/ui/Footer";
 
-const inter = Inter({
-  variable: "--font-inter",
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tuslibros.cl"),
-  title: "Libros Libres — Marketplace de libros de segunda mano",
+  title: "Libros Libres — Donde los libros encuentran nuevos lectores",
   description:
-    "Compra, vende y presta libros usados cerca de ti. Publica gratis, paga seguro con MercadoPago, recibe en tu casa.",
+    "Compra, vende y presta libros cerca de ti. Publica gratis, paga seguro con MercadoPago, recibe en tu casa.",
   keywords: ["libros", "segunda mano", "marketplace", "préstamo", "Chile"],
-  themeColor: "#2d3436",
+  themeColor: "#1a1a2e",
   openGraph: {
-    title: "Libros Libres — Marketplace de libros de segunda mano",
+    title: "Libros Libres — Donde los libros encuentran nuevos lectores",
     description:
-      "Compra, vende y presta libros usados cerca de ti. Publica gratis, paga seguro con MercadoPago, recibe en tu casa.",
+      "Compra, vende y presta libros cerca de ti. Publica gratis, paga seguro con MercadoPago, recibe en tu casa.",
     url: "https://tuslibros.cl",
     siteName: "Libros Libres",
     type: "website",
@@ -28,15 +35,15 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Libros Libres — Marketplace de libros de segunda mano en Chile",
+        alt: "Libros Libres — Donde los libros encuentran nuevos lectores",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Libros Libres — Marketplace de libros de segunda mano",
+    title: "Libros Libres — Donde los libros encuentran nuevos lectores",
     description:
-      "Compra, vende y presta libros usados cerca de ti. Publica gratis, paga seguro con MercadoPago, recibe en tu casa.",
+      "Compra, vende y presta libros cerca de ti. Publica gratis, paga seguro con MercadoPago, recibe en tu casa.",
     images: ["/og-image.png"],
   },
 };
@@ -48,7 +55,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es-CL">
-      <body className={`${inter.variable} antialiased flex flex-col min-h-screen`}>
+      <body className={`${playfair.variable} ${dmSans.variable} font-sans antialiased flex flex-col min-h-screen bg-cream`}>
         {children}
         <Footer />
       </body>

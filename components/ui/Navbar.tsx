@@ -25,13 +25,17 @@ export default async function Navbar() {
   }
 
   return (
-    <header className="shrink-0 shadow-sm">
+    <header className="shrink-0">
       {/* Row 1: Logo + Search + Auth */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="max-w-7xl mx-auto flex items-center gap-4">
-          <Link href="/" className="font-extrabold text-2xl tracking-tight whitespace-nowrap">
-            <span className="text-navy">Libros</span>{" "}
-            <span className="text-brand-500">Libres</span>
+      <div className="bg-cream border-b border-cream-dark px-4 py-4">
+        <div className="max-w-7xl mx-auto flex items-center gap-6">
+          <Link href="/" className="group whitespace-nowrap">
+            <span className="font-display text-2xl font-bold text-ink tracking-tight">
+              Libros{" "}
+            </span>
+            <span className="font-display text-2xl font-bold text-brand-600 tracking-tight group-hover:text-brand-500 transition-colors">
+              Libres
+            </span>
           </Link>
 
           <div className="hidden md:flex flex-1 justify-center px-4">
@@ -46,50 +50,30 @@ export default async function Navbar() {
         </div>
       </div>
 
-      {/* Row 2: Navigation (navy bar) */}
-      <nav className="bg-navy text-white">
-        <div className="max-w-7xl mx-auto px-4 flex items-center gap-1 overflow-x-auto">
-          <Link
-            href="/"
-            className="text-xs font-semibold uppercase tracking-wider px-4 py-3 hover:bg-navy-light transition-colors whitespace-nowrap"
-          >
-            Inicio
-          </Link>
-          <Link
-            href="/publish"
-            className="text-xs font-semibold uppercase tracking-wider px-4 py-3 hover:bg-navy-light transition-colors whitespace-nowrap"
-          >
-            Vende tu libro
-          </Link>
-          <Link
-            href="/mis-pedidos"
-            className="text-xs font-semibold uppercase tracking-wider px-4 py-3 hover:bg-navy-light transition-colors whitespace-nowrap"
-          >
-            Pedidos
-          </Link>
-          <Link
-            href="/mapa"
-            className="text-xs font-semibold uppercase tracking-wider px-4 py-3 hover:bg-navy-light transition-colors whitespace-nowrap"
-          >
-            Mapa
-          </Link>
-          <Link
-            href="/como-funciona"
-            className="text-xs font-semibold uppercase tracking-wider px-4 py-3 hover:bg-navy-light transition-colors whitespace-nowrap"
-          >
-            Cómo funciona
-          </Link>
-          <Link
-            href="/faq"
-            className="text-xs font-semibold uppercase tracking-wider px-4 py-3 hover:bg-navy-light transition-colors whitespace-nowrap"
-          >
-            FAQ
-          </Link>
+      {/* Row 2: Navigation */}
+      <nav className="bg-ink text-cream-warm">
+        <div className="max-w-7xl mx-auto px-4 flex items-center gap-0 overflow-x-auto">
+          {[
+            { href: "/", label: "Inicio" },
+            { href: "/publish", label: "Vende tu libro" },
+            { href: "/mis-pedidos", label: "Pedidos" },
+            { href: "/mapa", label: "Mapa" },
+            { href: "/como-funciona", label: "Cómo funciona" },
+            { href: "/faq", label: "FAQ" },
+          ].map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-xs font-medium uppercase tracking-[0.15em] px-4 py-3.5 hover:bg-white/10 transition-colors whitespace-nowrap"
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
       </nav>
 
-      {/* Mobile search (visible only on small screens) */}
-      <div className="md:hidden bg-white border-b border-gray-200 px-4 py-2">
+      {/* Mobile search */}
+      <div className="md:hidden bg-cream border-b border-cream-dark px-4 py-2">
         <Suspense>
           <HeaderSearchBar />
         </Suspense>

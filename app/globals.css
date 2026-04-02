@@ -4,12 +4,18 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
+    --background: 40 33% 97%;
+    --foreground: 240 20% 14%;
   }
 
   body {
-    @apply text-gray-900 antialiased;
+    @apply text-ink antialiased;
+  }
+
+  /* Editorial selection color */
+  ::selection {
+    background-color: #d4a017;
+    color: white;
   }
 }
 
