@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, lazy, Suspense } from "react";
 import type { BookData } from "@/types";
+
+const BarcodeScanner = lazy(() => import("@/components/books/BarcodeScanner"));
 
 interface Props {
   onBookFound: (book: BookData) => void;
@@ -18,6 +20,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [showManual, setShowManual] = useState(false);
   const [manual, setManual] = useState<ManualForm>({ title: "", author: "" });
+  const [showScanner, setShowScanner] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   function formatISBN(raw: string) {
@@ -60,6 +63,37 @@ export default function ISBNSearch({ onBookFound }: Props) {
     }
   }
 
+  async function handleScanned(scannedIsbn: string) {
+    setShowScanner(false);
+    setIsbn(scannedIsbn);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`/api/books/isbn?isbn=${scannedIsbn}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 404) {
+          setError("No encontramos ese ISBN en Google Books.");
+          setShowManual(true);
+        } else {
+          setError(data.error ?? "Error al consultar el servicio.");
+        }
+        return;
+      }
+
+      onBookFound(data);
+      setIsbn("");
+      setError(null);
+      setShowManual(false);
+    } catch {
+      setError("Sin conexión. Verifica tu internet e intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function handleManualSubmit() {
     if (!manual.title.trim() || !manual.author.trim()) return;
     onBookFound({
@@ -75,6 +109,40 @@ export default function ISBNSearch({ onBookFound }: Props) {
 
   return (
     <div className="space-y-3">
+      {/* Barcode scanner overlay */}
+      {showScanner && (
+        <Suspense fallback={null}>
+          <BarcodeScanner
+            onDetected={handleScanned}
+            onClose={() => setShowScanner(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Scan button */}
+      <button
+        type="button"
+        onClick={() => setShowScanner(true)}
+        className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-brand-300 hover:border-brand-500 hover:bg-brand-50 text-brand-600 hover:text-brand-700 font-medium rounded-xl text-sm transition-all"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+          <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+          <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+          <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+          <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+          <line x1="7" y1="12" x2="7" y2="12.01"/>
+          <line x1="12" y1="7" x2="12" y2="17"/>
+          <line x1="17" y1="12" x2="17" y2="12.01"/>
+        </svg>
+        Escanear código de barras
+      </button>
+
+      <div className="flex items-center gap-2 text-xs text-gray-300">
+        <span className="flex-1 border-t border-gray-200" />
+        o ingresa el ISBN manualmente
+        <span className="flex-1 border-t border-gray-200" />
+      </div>
+
       {/* ISBN input */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">

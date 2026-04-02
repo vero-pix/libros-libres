@@ -26,6 +26,15 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-inter)", "sans-serif"],
       },
+      keyframes: {
+        "animate-scan": {
+          "0%": { top: "0%" },
+          "100%": { top: "100%" },
+        },
+      },
+      animation: {
+        scan: "animate-scan 2s ease-in-out infinite",
+      },
     },
   },
   plugins: [],
