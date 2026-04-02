@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useZxing } from "react-zxing";
 
 interface Props {
@@ -56,7 +56,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       {/* Video */}
       <div className="flex-1 relative overflow-hidden">
         <video
-          ref={ref}
+          ref={ref as React.RefObject<HTMLVideoElement>}
           className="absolute inset-0 w-full h-full object-cover"
           autoPlay
           playsInline
