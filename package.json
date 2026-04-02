@@ -23,6 +23,7 @@
     "react-zxing": "^2.1.0"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
     "@types/mapbox-gl": "^3.4.1",
     "@types/node": "^20.17.30",
     "@types/react": "^18.3.20",
