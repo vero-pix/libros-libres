@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import type { ListingWithBook } from "@/types";
 
@@ -34,13 +33,14 @@ export default function BookMapPopup({ listing, onClose }: Props) {
         ✕
       </button>
       <div className="flex gap-3">
-        {book.cover_url ? (
-          <Image
-            src={book.cover_url}
+        {(listing.cover_image_url ?? book.cover_url) ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={(listing.cover_image_url ?? book.cover_url)!}
             alt={book.title}
             width={56}
             height={80}
-            className="rounded-lg object-cover flex-shrink-0"
+            className="rounded-lg object-cover flex-shrink-0 w-14 h-20"
           />
         ) : (
           <div className="w-14 h-20 bg-gray-100 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
@@ -61,7 +61,7 @@ export default function BookMapPopup({ listing, onClose }: Props) {
           </span>
           {listing.price != null && (
             <p className="text-sm font-bold text-gray-900 mt-1">
-              ${listing.price.toLocaleString("es-AR")}
+              ${listing.price.toLocaleString("es-CL")}
             </p>
           )}
         </div>

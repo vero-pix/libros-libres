@@ -8,17 +8,35 @@ import BookMapPopup from "./BookMapPopup";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 
-// Default center: Santiago de Chile
 const DEFAULT_CENTER: [number, number] = [-70.6693, -33.4489];
 const DEFAULT_ZOOM = 12;
+const SOURCE_ID = "books";
+
+function buildGeoJSON(listings: ListingWithBook[]): GeoJSON.FeatureCollection {
+  return {
+    type: "FeatureCollection",
+    features: listings
+      .filter((l) => l.latitude != null && l.longitude != null)
+      .map((l) => ({
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [l.longitude!, l.latitude!],
+        },
+        properties: { id: l.id },
+      })),
+  };
+}
 
 export default function BookMap() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
-  const [selectedListing, setSelectedListing] = useState<ListingWithBook | null>(null);
+  const listingsRef = useRef<ListingWithBook[]>([]);
+  const [mapLoaded, setMapLoaded] = useState(false);
   const [listings, setListings] = useState<ListingWithBook[]>([]);
+  const [selectedListing, setSelectedListing] = useState<ListingWithBook | null>(null);
 
+  // 1. Initialize map once
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
@@ -38,55 +56,126 @@ export default function BookMap() {
       "top-right"
     );
 
-    mapRef.current = map;
+    map.on("load", () => {
+      // GeoJSON source con clustering habilitado
+      map.addSource(SOURCE_ID, {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+        cluster: true,
+        clusterMaxZoom: 15,
+        clusterRadius: 50,
+      });
 
+      // Círculos de cluster (fondo naranja, tamaño según cantidad)
+      map.addLayer({
+        id: "clusters",
+        type: "circle",
+        source: SOURCE_ID,
+        filter: ["has", "point_count"],
+        paint: {
+          "circle-color": [
+            "step", ["get", "point_count"],
+            "#f0890f",   // 1–9
+            10,  "#e16e08",  // 10–49
+            50,  "#bb530a",  // 50+
+          ],
+          "circle-radius": [
+            "step", ["get", "point_count"],
+            22,   // 1–9
+            10, 30,   // 10–49
+            50, 38,   // 50+
+          ],
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#fff",
+        },
+      });
+
+      // Número dentro del cluster
+      map.addLayer({
+        id: "cluster-count",
+        type: "symbol",
+        source: SOURCE_ID,
+        filter: ["has", "point_count"],
+        layout: {
+          "text-field": "{point_count_abbreviated}",
+          "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+          "text-size": 13,
+        },
+        paint: { "text-color": "#fff" },
+      });
+
+      // Pin individual (sin cluster)
+      map.addLayer({
+        id: "unclustered",
+        type: "circle",
+        source: SOURCE_ID,
+        filter: ["!", ["has", "point_count"]],
+        paint: {
+          "circle-color": "#f0890f",
+          "circle-radius": 9,
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#fff",
+        },
+      });
+
+      // Click en cluster → zoom para expandir
+      map.on("click", "clusters", (e) => {
+        const features = map.queryRenderedFeatures(e.point, { layers: ["clusters"] });
+        if (!features.length) return;
+        const clusterId = features[0].properties?.cluster_id as number;
+        const coords = (features[0].geometry as GeoJSON.Point).coordinates as [number, number];
+        (map.getSource(SOURCE_ID) as mapboxgl.GeoJSONSource).getClusterExpansionZoom(
+          clusterId,
+          (err, zoom) => {
+            if (err) return;
+            map.easeTo({ center: coords, zoom: (zoom ?? DEFAULT_ZOOM) + 1 });
+          }
+        );
+      });
+
+      // Click en pin individual → mostrar popup
+      map.on("click", "unclustered", (e) => {
+        const id = e.features?.[0]?.properties?.id as string | undefined;
+        if (!id) return;
+        const listing = listingsRef.current.find((l) => l.id === id);
+        if (listing) setSelectedListing(listing);
+      });
+
+      // Cursores
+      map.on("mouseenter", "clusters", () => { map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", "clusters", () => { map.getCanvas().style.cursor = ""; });
+      map.on("mouseenter", "unclustered", () => { map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", "unclustered", () => { map.getCanvas().style.cursor = ""; });
+
+      setMapLoaded(true);
+    });
+
+    mapRef.current = map;
     return () => {
       map.remove();
       mapRef.current = null;
     };
   }, []);
 
-  // Fetch listings and add markers
+  // 2. Fetch listings
   useEffect(() => {
     async function fetchListings() {
       const res = await fetch("/api/listings");
       if (!res.ok) return;
       const data: ListingWithBook[] = await res.json();
       setListings(data);
+      listingsRef.current = data;
     }
     fetchListings();
   }, []);
 
+  // 3. Actualizar source cuando cambien listings o el mapa esté listo
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    // Remove existing markers
-    markersRef.current.forEach((m) => m.remove());
-    markersRef.current = [];
-
-    listings.forEach((listing) => {
-      if (!listing.latitude || !listing.longitude) return;
-
-      const el = document.createElement("div");
-      el.className =
-        "w-9 h-9 rounded-full bg-brand-500 border-2 border-white shadow-lg cursor-pointer flex items-center justify-center text-white font-bold text-xs hover:scale-110 transition-transform";
-      el.innerHTML =
-        listing.modality === "loan"
-          ? "📖"
-          : listing.modality === "sale"
-          ? "🏷️"
-          : "📚";
-
-      const marker = new mapboxgl.Marker({ element: el })
-        .setLngLat([listing.longitude, listing.latitude])
-        .addTo(map);
-
-      el.addEventListener("click", () => setSelectedListing(listing));
-
-      markersRef.current.push(marker);
-    });
-  }, [listings]);
+    if (!mapLoaded || !mapRef.current) return;
+    const source = mapRef.current.getSource(SOURCE_ID) as mapboxgl.GeoJSONSource | undefined;
+    if (!source) return;
+    source.setData(buildGeoJSON(listings));
+  }, [listings, mapLoaded]);
 
   return (
     <div className="relative w-full h-full">

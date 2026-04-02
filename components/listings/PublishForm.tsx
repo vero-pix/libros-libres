@@ -18,7 +18,7 @@ interface LocationData {
 }
 
 const MODALITY_OPTIONS: { value: Modality; label: string; icon: string; desc: string }[] = [
-  { value: "sale",  label: "Venta",            icon: "🏷️", desc: "Querés vender el libro" },
+  { value: "sale",  label: "Venta",            icon: "🏷️", desc: "Quieres vender el libro" },
   { value: "loan",  label: "Préstamo",          icon: "📖", desc: "Lo prestas y te lo devuelven" },
   { value: "both",  label: "Venta o préstamo",  icon: "📚", desc: "Cualquiera de las dos" },
 ];
@@ -32,9 +32,10 @@ const CONDITION_OPTIONS: { value: Condition; label: string; color: string }[] = 
 
 interface Props {
   userId: string;
+  existingPhone?: string | null;
 }
 
-export default function PublishForm({ userId }: Props) {
+export default function PublishForm({ userId, existingPhone }: Props) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -43,7 +44,7 @@ export default function PublishForm({ userId }: Props) {
   const [price, setPrice] = useState("");
   const [condition, setCondition] = useState<Condition>("good");
   const [notes, setNotes] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(existingPhone ?? "");
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [location, setLocation] = useState<LocationData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -141,7 +142,7 @@ export default function PublishForm({ userId }: Props) {
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
           <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">1</span>
-            ¿Qué libro querés publicar?
+            ¿Qué libro quieres publicar?
           </h2>
         </div>
         <div className="px-6 py-5">
@@ -158,7 +159,7 @@ export default function PublishForm({ userId }: Props) {
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
           <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">2</span>
-            ¿Cómo lo querés ofrecer?
+            ¿Cómo lo quieres ofrecer?
           </h2>
         </div>
         <div className="px-6 py-5 space-y-4">
@@ -259,9 +260,16 @@ export default function PublishForm({ userId }: Props) {
             <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">4</span>
             Tu WhatsApp
             <span className="text-gray-400 font-normal">(opcional)</span>
+            {existingPhone && (
+              <span className="ml-auto text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">
+                Guardado en tu perfil
+              </span>
+            )}
           </h2>
           <p className="text-xs text-gray-400 mt-1 ml-7">
-            Los compradores podrán contactarte directamente por WhatsApp.
+            {existingPhone
+              ? "Tu número está pre-rellenado. Puedes cambiarlo solo para esta publicación o actualízalo en tu perfil."
+              : "Los compradores podrán contactarte directamente por WhatsApp."}
           </p>
         </div>
         <div className="px-6 py-5">
@@ -272,7 +280,7 @@ export default function PublishForm({ userId }: Props) {
               setPhone(e.target.value.trim());
               setPhoneError(null);
             }}
-            placeholder="+56 9 1234 5678"
+            placeholder="+56912345678"
             className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 transition-colors ${
               phoneError ? "border-red-300 bg-red-50" : "border-gray-200"
             }`}

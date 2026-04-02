@@ -28,6 +28,9 @@ Schema en: supabase/schema.sql
 - [x] Contacto por WhatsApp (botón directo con mensaje pre-armado)
 - [x] Escáner de código de barras ISBN (react-zxing, cámara trasera, EAN-13)
 - [x] Formulario de publicación unificado en /publish (ruta /listings/new redirige ahí)
+- [x] Teléfono guardado en perfil: primera publicación guarda phone, las siguientes lo pre-rellenan
+- [x] Página /perfil para editar nombre y teléfono
+- [x] Clustering nativo Mapbox GL en el mapa (agrupa pins, click para expandir)
 
 ## Pendiente Fase 1
 - [ ] Flujo de contacto entre comprador y vendedor (más allá de WhatsApp)
