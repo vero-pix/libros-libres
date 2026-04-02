@@ -53,38 +53,50 @@ export default function PublishForm({ userId }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!book) { setError("Buscá un libro por ISBN primero."); return; }
-    if (!location) { setError("Marcá la ubicación del libro en el mapa."); return; }
+    if (!book) { setError("Busca un libro por ISBN primero."); return; }
+    if (!location) { setError("Marca la ubicación del libro en el mapa."); return; }
     if (modality !== "loan" && !price) { setError("Ingresa el precio de venta."); return; }
 
     setLoading(true);
     setError(null);
 
     try {
-      // Upsert book en catálogo
-      const { data: bookRow, error: bookErr } = await supabase
-        .from("books")
-        .upsert(
-          {
-            isbn: book.isbn ?? null,
-            title: book.title,
-            author: book.author,
-            description: book.description ?? null,
-            cover_url: book.cover_url ?? null,
-            genre: book.genre ?? null,
-            published_year: book.published_year ?? null,
-            created_by: userId,
-          },
-          { onConflict: "isbn", ignoreDuplicates: false }
-        )
-        .select("id")
-        .single();
+      // Si el libro tiene ISBN, hacer upsert para evitar duplicados.
+      // Si no tiene ISBN (ingreso manual), hacer insert directo.
+      const bookPayload = {
+        isbn: book.isbn ?? null,
+        title: book.title,
+        author: book.author,
+        description: book.description ?? null,
+        cover_url: book.cover_url ?? null,
+        genre: book.genre ?? null,
+        published_year: book.published_year ?? null,
+        created_by: userId,
+      };
 
-      if (bookErr) throw bookErr;
+      let bookId: string;
+
+      if (book.isbn) {
+        const { data: bookRow, error: bookErr } = await supabase
+          .from("books")
+          .upsert(bookPayload, { onConflict: "isbn", ignoreDuplicates: false })
+          .select("id")
+          .single();
+        if (bookErr) throw bookErr;
+        bookId = bookRow.id;
+      } else {
+        const { data: bookRow, error: bookErr } = await supabase
+          .from("books")
+          .insert(bookPayload)
+          .select("id")
+          .single();
+        if (bookErr) throw bookErr;
+        bookId = bookRow.id;
+      }
 
       // Insertar publicación
       const { error: listingErr } = await supabase.from("listings").insert({
-        book_id: bookRow.id,
+        book_id: bookId,
         seller_id: userId,
         modality,
         price: modality !== "loan" ? parseFloat(price) : null,
