@@ -23,6 +23,7 @@ create table if not exists public.users (
   email       text,
   full_name   text,
   avatar_url  text,
+  city        text,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
@@ -36,12 +37,13 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.users (id, email, full_name, avatar_url)
+  insert into public.users (id, email, full_name, avatar_url, city)
   values (
     new.id,
     new.email,
     new.raw_user_meta_data ->> 'full_name',
-    new.raw_user_meta_data ->> 'avatar_url'
+    new.raw_user_meta_data ->> 'avatar_url',
+    new.raw_user_meta_data ->> 'city'
   );
   return new;
 end;

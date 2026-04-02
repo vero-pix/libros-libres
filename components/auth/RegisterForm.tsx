@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function RegisterForm() {
-  const router = useRouter();
   const supabase = createClient();
   const [fullName, setFullName] = useState("");
+  const [city, setCity] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,19 +19,34 @@ export default function RegisterForm() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signUp({
+    // 1. Crear usuario en Supabase Auth
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, city },
         emailRedirectTo: `${window.location.origin}/api/auth/callback`,
       },
     });
 
-    if (error) {
-      setError(error.message);
+    if (signUpError) {
+      const msg =
+        signUpError.message === "User already registered"
+          ? "Ya existe una cuenta con ese correo."
+          : signUpError.message;
+      setError(msg);
       setLoading(false);
       return;
+    }
+
+    // 2. Upsert perfil en public.users (complementa el trigger del schema)
+    if (data.user) {
+      await supabase.from("users").upsert({
+        id: data.user.id,
+        email,
+        full_name: fullName,
+        city,
+      });
     }
 
     setSuccess(true);
@@ -41,14 +55,20 @@ export default function RegisterForm() {
 
   if (success) {
     return (
-      <div className="text-center space-y-3">
-        <div className="text-4xl">📬</div>
-        <h2 className="font-semibold text-gray-900">Revisá tu correo</h2>
-        <p className="text-sm text-gray-500">
-          Te enviamos un link de confirmación a <strong>{email}</strong>.
+      <div className="text-center space-y-4 py-4">
+        <div className="text-5xl">📬</div>
+        <h2 className="text-lg font-semibold text-gray-900">¡Revisá tu correo!</h2>
+        <p className="text-sm text-gray-500 leading-relaxed">
+          Te enviamos un link de confirmación a{" "}
+          <strong className="text-gray-800">{email}</strong>.
+          <br />
+          Hacé clic en el link para activar tu cuenta.
         </p>
-        <Link href="/login" className="text-sm text-brand-600 hover:underline">
-          Volver al inicio
+        <Link
+          href="/login"
+          className="inline-block mt-2 text-sm text-brand-600 hover:underline font-medium"
+        >
+          Ir a iniciar sesión
         </Link>
       </div>
     );
@@ -65,9 +85,27 @@ export default function RegisterForm() {
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           required
+          placeholder="Ej: María García"
+          autoComplete="name"
           className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
         />
       </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Ciudad
+        </label>
+        <input
+          type="text"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          required
+          placeholder="Ej: Buenos Aires"
+          autoComplete="address-level2"
+          className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+        />
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Correo electrónico
@@ -77,10 +115,12 @@ export default function RegisterForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          placeholder="tu@correo.com"
           autoComplete="email"
           className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
         />
       </div>
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Contraseña
@@ -91,14 +131,16 @@ export default function RegisterForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={8}
+          placeholder="Mínimo 8 caracteres"
           autoComplete="new-password"
           className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
         />
-        <p className="text-xs text-gray-400 mt-1">Mínimo 8 caracteres</p>
       </div>
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
+        <p className="text-sm text-red-600 bg-red-50 border border-red-100 px-3 py-2 rounded-xl">
+          {error}
+        </p>
       )}
 
       <button

@@ -30,6 +30,7 @@ export interface UserProfile {
   full_name: string | null;
   avatar_url: string | null;
   email: string | null;
+  city: string | null;
   created_at: string;
 }
 
