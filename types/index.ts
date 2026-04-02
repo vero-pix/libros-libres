@@ -35,6 +35,7 @@ export interface UserProfile {
   created_at: string;
 }
 
+
 export interface Listing {
   id: string;
   book_id: string;
@@ -46,6 +47,7 @@ export interface Listing {
   latitude: number | null;
   longitude: number | null;
   address: string | null;
+  cover_image_url: string | null;
   status: ListingStatus;
   created_at: string;
   updated_at: string;

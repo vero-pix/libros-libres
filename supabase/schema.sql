@@ -24,6 +24,7 @@ create table if not exists public.users (
   full_name   text,
   avatar_url  text,
   city        text,
+  phone       text,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
@@ -112,6 +113,7 @@ create table if not exists public.listings (
       else null
     end
   ) stored,
+  cover_image_url text,
   status      listing_status not null default 'active',
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()

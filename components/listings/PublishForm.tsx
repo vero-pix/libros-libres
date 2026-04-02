@@ -113,6 +113,7 @@ export default function PublishForm({ userId }: Props) {
         latitude: location.lat,
         longitude: location.lng,
         address: location.address,
+        cover_image_url: book.cover_url ?? null,
         status: "active",
       });
 

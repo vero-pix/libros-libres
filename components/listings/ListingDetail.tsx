@@ -57,9 +57,10 @@ export default function ListingDetail({ listing }: Props) {
       <div className="flex flex-col sm:flex-row gap-6 p-6">
         {/* Cover */}
         <div className="flex-shrink-0 flex justify-center">
-          {book.cover_url ? (
-            <Image
-              src={book.cover_url}
+          {(listing.cover_image_url ?? book.cover_url) ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={(listing.cover_image_url ?? book.cover_url)!}
               alt={book.title}
               width={120}
               height={170}
