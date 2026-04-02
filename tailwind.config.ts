@@ -27,13 +27,13 @@ const config: Config = {
         sans: ["var(--font-inter)", "sans-serif"],
       },
       keyframes: {
-        "animate-scan": {
+        scan: {
           "0%": { top: "0%" },
           "100%": { top: "100%" },
         },
       },
       animation: {
-        scan: "animate-scan 2s ease-in-out infinite",
+        scan: "scan 2s ease-in-out infinite",
       },
     },
   },
