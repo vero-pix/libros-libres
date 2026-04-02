@@ -19,14 +19,17 @@ create type book_condition as enum ('new', 'good', 'fair', 'poor');
 -- Espeja auth.users y agrega datos de perfil
 -- ─────────────────────────────────────────────
 create table if not exists public.users (
-  id          uuid primary key references auth.users(id) on delete cascade,
-  email       text,
-  full_name   text,
-  avatar_url  text,
-  city        text,
-  phone       text,
-  created_at  timestamptz not null default now(),
-  updated_at  timestamptz not null default now()
+  id                uuid primary key references auth.users(id) on delete cascade,
+  email             text,
+  full_name         text,
+  avatar_url        text,
+  city              text,
+  phone             text,
+  default_latitude  double precision,
+  default_longitude double precision,
+  default_address   text,
+  created_at        timestamptz not null default now(),
+  updated_at        timestamptz not null default now()
 );
 
 comment on table public.users is 'Perfiles de usuario públicos, sincronizados con auth.users';

@@ -15,9 +15,18 @@ export default async function PublishPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("phone")
+    .select("phone, default_latitude, default_longitude, default_address")
     .eq("id", user.id)
     .single();
+
+  const defaultLocation =
+    profile?.default_latitude != null && profile?.default_longitude != null
+      ? {
+          lat: profile.default_latitude as number,
+          lng: profile.default_longitude as number,
+          address: (profile.default_address as string | null) ?? "",
+        }
+      : null;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -29,7 +38,11 @@ export default async function PublishPage() {
             Completa los datos para poner tu libro disponible en el mapa.
           </p>
         </div>
-        <PublishForm userId={user.id} existingPhone={profile?.phone ?? null} />
+        <PublishForm
+          userId={user.id}
+          existingPhone={profile?.phone ?? null}
+          defaultLocation={defaultLocation}
+        />
       </main>
     </div>
   );

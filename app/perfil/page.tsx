@@ -15,7 +15,7 @@ export default async function PerfilPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("full_name, email, phone, city")
+    .select("full_name, email, phone, default_latitude, default_longitude, default_address")
     .eq("id", user.id)
     .single();
 
@@ -26,7 +26,7 @@ export default async function PerfilPage() {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Mi perfil</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Actualiza tus datos de contacto.
+            Actualiza tus datos de contacto y ubicación.
           </p>
         </div>
         <ProfileForm
@@ -34,6 +34,9 @@ export default async function PerfilPage() {
           initialFullName={profile?.full_name ?? ""}
           initialPhone={profile?.phone ?? ""}
           email={profile?.email ?? user.email ?? ""}
+          defaultLat={profile?.default_latitude ?? null}
+          defaultLng={profile?.default_longitude ?? null}
+          defaultAddress={profile?.default_address ?? null}
         />
       </main>
     </div>

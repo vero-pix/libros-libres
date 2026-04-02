@@ -31,6 +31,9 @@ Schema en: supabase/schema.sql
 - [x] Teléfono guardado en perfil: primera publicación guarda phone, las siguientes lo pre-rellenan
 - [x] Página /perfil para editar nombre y teléfono
 - [x] Clustering nativo Mapbox GL en el mapa (agrupa pins, click para expandir)
+- [x] Geolocalización automática: GPS guarda ubicación en perfil, publicaciones siguientes la pre-rellenan
+- [x] DraggableLocationPicker con botón GPS, búsqueda de dirección (Mapbox geocoding) y soporte initial location
+- [x] /perfil incluye sección para actualizar ubicación (GPS o texto)
 
 ## Pendiente Fase 1
 - [ ] Flujo de contacto entre comprador y vendedor (más allá de WhatsApp)

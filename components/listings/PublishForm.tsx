@@ -4,18 +4,12 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import ISBNSearch from "@/components/books/ISBNSearch";
-import DraggableLocationPicker from "@/components/map/DraggableLocationPicker";
+import DraggableLocationPicker, { type LocationData } from "@/components/map/DraggableLocationPicker";
 import type { BookData } from "@/types";
 import Image from "next/image";
 
 type Modality = "sale" | "loan" | "both";
 type Condition = "new" | "good" | "fair" | "poor";
-
-interface LocationData {
-  lat: number;
-  lng: number;
-  address: string;
-}
 
 const MODALITY_OPTIONS: { value: Modality; label: string; icon: string; desc: string }[] = [
   { value: "sale",  label: "Venta",            icon: "🏷️", desc: "Quieres vender el libro" },
@@ -30,12 +24,19 @@ const CONDITION_OPTIONS: { value: Condition; label: string; color: string }[] = 
   { value: "poor", label: "Con detalles",  color: "text-red-700 bg-red-50 border-red-200" },
 ];
 
+interface DefaultLocation {
+  lat: number;
+  lng: number;
+  address: string;
+}
+
 interface Props {
   userId: string;
   existingPhone?: string | null;
+  defaultLocation?: DefaultLocation | null;
 }
 
-export default function PublishForm({ userId, existingPhone }: Props) {
+export default function PublishForm({ userId, existingPhone, defaultLocation }: Props) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -46,7 +47,9 @@ export default function PublishForm({ userId, existingPhone }: Props) {
   const [notes, setNotes] = useState("");
   const [phone, setPhone] = useState(existingPhone ?? "");
   const [phoneError, setPhoneError] = useState<string | null>(null);
-  const [location, setLocation] = useState<LocationData | null>(null);
+  const [location, setLocation] = useState<LocationData | null>(
+    defaultLocation ?? null
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,6 +58,16 @@ export default function PublishForm({ userId, existingPhone }: Props) {
   const handleLocationChange = useCallback((loc: LocationData) => {
     setLocation(loc);
   }, []);
+
+  // Se llama solo cuando el usuario usa GPS — guarda la ubicación en su perfil
+  const handleGeolocated = useCallback(async (loc: LocationData) => {
+    await supabase.from("users").update({
+      default_latitude: loc.lat,
+      default_longitude: loc.lng,
+      default_address: loc.address,
+    }).eq("id", userId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -303,13 +316,26 @@ export default function PublishForm({ userId, existingPhone }: Props) {
           <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">5</span>
             ¿Dónde está el libro?
+            {defaultLocation && (
+              <span className="ml-auto text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">
+                Guardada en tu perfil
+              </span>
+            )}
           </h2>
           <p className="text-xs text-gray-400 mt-1 ml-7">
-            Arrastra el pin naranja para marcar la ubicación exacta.
+            {defaultLocation
+              ? "Usando tu ubicación guardada. Puedes moverla para esta publicación."
+              : "Usa GPS, busca una dirección o arrastra el pin en el mapa."}
           </p>
         </div>
         <div className="px-6 py-5">
-          <DraggableLocationPicker onLocationChange={handleLocationChange} />
+          <DraggableLocationPicker
+            onLocationChange={handleLocationChange}
+            onGeolocated={handleGeolocated}
+            initialLat={defaultLocation?.lat}
+            initialLng={defaultLocation?.lng}
+            initialAddress={defaultLocation?.address}
+          />
         </div>
       </section>
 
