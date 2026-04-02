@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       title: volumeInfo.title ?? "",
       author: volumeInfo.authors?.join(", ") ?? "",
       description: volumeInfo.description ?? "",
-      cover_url: volumeInfo.imageLinks?.thumbnail ?? null,
+      cover_url: volumeInfo.imageLinks?.thumbnail?.replace("http://", "https://") ?? null,
       genre: volumeInfo.categories?.[0] ?? null,
       published_year: volumeInfo.publishedDate
         ? parseInt(volumeInfo.publishedDate.substring(0, 4))

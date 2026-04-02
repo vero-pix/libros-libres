@@ -50,7 +50,7 @@ export default function NavbarClient({ user, displayName }: Props) {
         </span>
       )}
       <Link
-        href="/listings/new"
+        href="/publish"
         className="text-sm bg-brand-500 hover:bg-brand-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors"
       >
         + Publicar libro
