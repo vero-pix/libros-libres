@@ -22,21 +22,18 @@ export default async function SearchPage({ searchParams }: Props) {
       seller:users(id, full_name, avatar_url)
     `
     )
-    .eq("status", "active");
+    .eq("status", "active")
+    .order("created_at", { ascending: false });
 
   if (q) {
-    query = query.or(
-      `book.title.ilike.%${q}%,book.author.ilike.%${q}%`
-    );
-  }
-  if (genre) {
-    query = query.eq("book.genre", genre);
+    query = query.or(`title.ilike.%${q}%,author.ilike.%${q}%`, { foreignTable: "books" });
   }
   if (modality) {
     query = query.eq("modality", modality);
   }
 
-  const { data: listings } = await query.order("created_at", { ascending: false });
+  const { data: rawListings } = await query;
+  const listings = rawListings as unknown as ListingWithBook[];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -51,7 +48,7 @@ export default async function SearchPage({ searchParams }: Props) {
         {listings && listings.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {listings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing as ListingWithBook} />
+              <ListingCard key={listing.id} listing={listing} />
             ))}
           </div>
         ) : (

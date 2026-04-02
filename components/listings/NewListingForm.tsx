@@ -40,10 +40,7 @@ export default function NewListingForm({ userId }: Props) {
       // Upsert book
       const { data: bookRow, error: bookErr } = await supabase
         .from("books")
-        .upsert(
-          { ...book, created_by: userId },
-          { onConflict: "isbn", ignoreDuplicates: false }
-        )
+        .upsert({ ...book, created_by: userId }, { onConflict: "isbn", ignoreDuplicates: false })
         .select()
         .single();
 
