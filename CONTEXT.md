@@ -23,11 +23,14 @@ Schema en: supabase/schema.sql
 - [x] Publicar libro con ISBN autocomplete (Google Books API)
 - [x] Selector de ubicación con pin draggable
 - [x] Listings guardados en Supabase con coordenadas
-
-## Pendiente Fase 1
 - [x] Pins de libros en el mapa desde Supabase
 - [x] Página de detalle del libro
-- [ ] Flujo de contacto entre comprador y vendedor
+- [x] Contacto por WhatsApp (botón directo con mensaje pre-armado)
+- [x] Escáner de código de barras ISBN (react-zxing, cámara trasera, EAN-13)
+- [x] Formulario de publicación unificado en /publish (ruta /listings/new redirige ahí)
+
+## Pendiente Fase 1
+- [ ] Flujo de contacto entre comprador y vendedor (más allá de WhatsApp)
 
 ## Pendiente Fase 2
 - [ ] Cotización despacho en tiempo real (Uber Direct API)
