@@ -20,23 +20,22 @@ export default function NavbarClient({ user, displayName }: Props) {
     router.refresh();
   }
 
-  // Mostrar solo el primer nombre
   const firstName = displayName?.split(" ")[0] ?? null;
 
   if (!user) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <Link
           href="/login"
-          className="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+          className="text-sm text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap"
         >
-          Ingresar
+          Entrar
         </Link>
         <Link
           href="/register"
-          className="text-sm bg-brand-500 hover:bg-brand-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors"
+          className="text-sm text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap"
         >
-          Registrarse
+          Regístrate
         </Link>
       </div>
     );
@@ -51,20 +50,20 @@ export default function NavbarClient({ user, displayName }: Props) {
       )}
       <Link
         href="/publish"
-        className="text-sm bg-brand-500 hover:bg-brand-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors"
+        className="text-sm bg-brand-500 hover:bg-brand-600 text-white font-medium px-3 py-1.5 rounded-md transition-colors whitespace-nowrap"
       >
         + Publicar libro
       </Link>
       <Link
         href="/perfil"
-        className="text-sm text-gray-500 hover:text-gray-700 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+        className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
         title="Mi perfil"
       >
         Perfil
       </Link>
       <button
         onClick={handleSignOut}
-        className="text-sm text-gray-400 hover:text-gray-600 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+        className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
         title="Cerrar sesión"
       >
         Salir

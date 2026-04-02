@@ -28,7 +28,13 @@ function buildGeoJSON(listings: ListingWithBook[]): GeoJSON.FeatureCollection {
   };
 }
 
-export default function BookMap() {
+interface BookMapProps {
+  onListingsLoaded?: (listings: ListingWithBook[]) => void;
+  onUserLocation?: (loc: { lat: number; lng: number }) => void;
+  flyToListing?: ListingWithBook | null;
+}
+
+export default function BookMap({ onListingsLoaded, onUserLocation, flyToListing }: BookMapProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const listingsRef = useRef<ListingWithBook[]>([]);
@@ -48,13 +54,14 @@ export default function BookMap() {
     });
 
     map.addControl(new mapboxgl.NavigationControl(), "top-right");
-    map.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: true,
-      }),
-      "top-right"
-    );
+    const geolocate = new mapboxgl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true },
+      trackUserLocation: true,
+    });
+    map.addControl(geolocate, "top-right");
+    geolocate.on("geolocate", (e: GeolocationPosition) => {
+      onUserLocation?.({ lat: e.coords.latitude, lng: e.coords.longitude });
+    });
 
     map.on("load", () => {
       // GeoJSON source con clustering habilitado
@@ -75,9 +82,9 @@ export default function BookMap() {
         paint: {
           "circle-color": [
             "step", ["get", "point_count"],
-            "#f0890f",   // 1–9
-            10,  "#e16e08",  // 10–49
-            50,  "#bb530a",  // 50+
+            "#d4a017",   // 1–9
+            10,  "#b8860b",  // 10–49
+            50,  "#966d09",  // 50+
           ],
           "circle-radius": [
             "step", ["get", "point_count"],
@@ -111,7 +118,7 @@ export default function BookMap() {
         source: SOURCE_ID,
         filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-color": "#f0890f",
+          "circle-color": "#d4a017",
           "circle-radius": 9,
           "circle-stroke-width": 2,
           "circle-stroke-color": "#fff",
@@ -165,11 +172,24 @@ export default function BookMap() {
       const data: ListingWithBook[] = await res.json();
       setListings(data);
       listingsRef.current = data;
+      onListingsLoaded?.(data);
     }
     fetchListings();
   }, []);
 
-  // 3. Actualizar source cuando cambien listings o el mapa esté listo
+  // 3. Fly to listing when sidebar item is clicked
+  useEffect(() => {
+    if (!flyToListing || !mapRef.current || !mapLoaded) return;
+    if (flyToListing.latitude && flyToListing.longitude) {
+      mapRef.current.flyTo({
+        center: [flyToListing.longitude, flyToListing.latitude],
+        zoom: 15,
+      });
+      setSelectedListing(flyToListing);
+    }
+  }, [flyToListing, mapLoaded]);
+
+  // 4. Actualizar source cuando cambien listings o el mapa esté listo
   useEffect(() => {
     if (!mapLoaded || !mapRef.current) return;
     const source = mapRef.current.getSource(SOURCE_ID) as mapboxgl.GeoJSONSource | undefined;

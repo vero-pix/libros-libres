@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { ListingWithBook } from "@/types";
 
 function WhatsAppButton({ phone, title }: { phone: string | null; title: string }) {
@@ -117,6 +118,18 @@ export default function ListingDetail({ listing }: Props) {
           <p className="text-sm text-gray-600 leading-relaxed line-clamp-4">
             {book.description}
           </p>
+        </div>
+      )}
+
+      {/* Buy CTA */}
+      {listing.price != null && listing.modality !== "loan" && (
+        <div className="border-t border-gray-100 px-6 py-4 bg-gray-50">
+          <Link
+            href={`/checkout/${listing.id}`}
+            className="flex items-center justify-center gap-2 w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-colors"
+          >
+            Comprar — ${listing.price.toLocaleString("es-CL")}
+          </Link>
         </div>
       )}
 
