@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef, lazy, Suspense } from "react";
+import { useState, useRef } from "react";
+import dynamic from "next/dynamic";
 import type { BookData } from "@/types";
 
-const BarcodeScanner = lazy(() => import("@/components/books/BarcodeScanner"));
+const BarcodeScanner = dynamic(() => import("@/components/books/BarcodeScanner"), { ssr: false });
 
 interface Props {
   onBookFound: (book: BookData) => void;
@@ -111,12 +112,10 @@ export default function ISBNSearch({ onBookFound }: Props) {
     <div className="space-y-3">
       {/* Barcode scanner overlay */}
       {showScanner && (
-        <Suspense fallback={null}>
-          <BarcodeScanner
-            onDetected={handleScanned}
-            onClose={() => setShowScanner(false)}
-          />
-        </Suspense>
+        <BarcodeScanner
+          onDetected={handleScanned}
+          onClose={() => setShowScanner(false)}
+        />
       )}
 
       {/* Scan button */}
