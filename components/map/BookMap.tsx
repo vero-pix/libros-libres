@@ -8,8 +8,8 @@ import BookMapPopup from "./BookMapPopup";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 
-// Default center: Buenos Aires
-const DEFAULT_CENTER: [number, number] = [-58.3816, -34.6037];
+// Default center: Santiago de Chile
+const DEFAULT_CENTER: [number, number] = [-70.6693, -33.4489];
 const DEFAULT_ZOOM = 12;
 
 export default function BookMap() {

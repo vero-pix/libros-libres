@@ -6,7 +6,8 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 
-const DEFAULT_CENTER: [number, number] = [-58.3816, -34.6037];
+// Default center: Santiago de Chile
+const DEFAULT_CENTER: [number, number] = [-70.6693, -33.4489];
 
 interface LocationData {
   lat: number;
