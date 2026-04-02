@@ -82,7 +82,7 @@ export default function LocationPicker({ onLocationChange }: Props) {
           <span>📍</span> {address}
         </p>
       ) : (
-        <p className="text-xs text-gray-400">Hacé clic en el mapa para indicar la ubicación</p>
+        <p className="text-xs text-gray-400">Haz clic en el mapa para indicar la ubicación</p>
       )}
     </div>
   );

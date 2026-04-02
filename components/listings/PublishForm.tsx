@@ -19,7 +19,7 @@ interface LocationData {
 
 const MODALITY_OPTIONS: { value: Modality; label: string; icon: string; desc: string }[] = [
   { value: "sale",  label: "Venta",            icon: "🏷️", desc: "Querés vender el libro" },
-  { value: "loan",  label: "Préstamo",          icon: "📖", desc: "Lo prestás y te lo devuelven" },
+  { value: "loan",  label: "Préstamo",          icon: "📖", desc: "Lo prestas y te lo devuelven" },
   { value: "both",  label: "Venta o préstamo",  icon: "📚", desc: "Cualquiera de las dos" },
 ];
 
@@ -55,7 +55,7 @@ export default function PublishForm({ userId }: Props) {
     e.preventDefault();
     if (!book) { setError("Buscá un libro por ISBN primero."); return; }
     if (!location) { setError("Marcá la ubicación del libro en el mapa."); return; }
-    if (modality !== "loan" && !price) { setError("Ingresá el precio de venta."); return; }
+    if (modality !== "loan" && !price) { setError("Ingresa el precio de venta."); return; }
 
     setLoading(true);
     setError(null);
@@ -234,7 +234,7 @@ export default function PublishForm({ userId }: Props) {
             ¿Dónde está el libro?
           </h2>
           <p className="text-xs text-gray-400 mt-1 ml-7">
-            Arrastrá el pin naranja para marcar la ubicación exacta.
+            Arrastra el pin naranja para marcar la ubicación exacta.
           </p>
         </div>
         <div className="px-6 py-5">

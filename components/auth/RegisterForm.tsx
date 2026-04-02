@@ -57,12 +57,12 @@ export default function RegisterForm() {
     return (
       <div className="text-center space-y-4 py-4">
         <div className="text-5xl">📬</div>
-        <h2 className="text-lg font-semibold text-gray-900">¡Revisá tu correo!</h2>
+        <h2 className="text-lg font-semibold text-gray-900">¡Revisa tu correo!</h2>
         <p className="text-sm text-gray-500 leading-relaxed">
           Te enviamos un link de confirmación a{" "}
           <strong className="text-gray-800">{email}</strong>.
           <br />
-          Hacé clic en el link para activar tu cuenta.
+          Haz clic en el link para activar tu cuenta.
         </p>
         <Link
           href="/login"
@@ -152,9 +152,9 @@ export default function RegisterForm() {
       </button>
 
       <p className="text-center text-sm text-gray-500">
-        ¿Ya tenés cuenta?{" "}
+        ¿Ya tienes cuenta?{" "}
         <Link href="/login" className="text-brand-600 hover:underline font-medium">
-          Ingresá
+          Inicia sesión
         </Link>
       </p>
     </form>

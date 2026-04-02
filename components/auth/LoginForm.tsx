@@ -77,9 +77,9 @@ export default function LoginForm() {
       </button>
 
       <p className="text-center text-sm text-gray-500">
-        ¿No tenés cuenta?{" "}
+        ¿No tienes cuenta?{" "}
         <Link href="/register" className="text-brand-600 hover:underline font-medium">
-          Registrate gratis
+          Regístrate gratis
         </Link>
       </p>
     </form>

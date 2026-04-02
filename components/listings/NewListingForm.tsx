@@ -29,9 +29,9 @@ export default function NewListingForm({ userId }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!book) { setError("Seleccioná un libro"); return; }
-    if (!location) { setError("Indicá la ubicación del libro"); return; }
-    if (modality !== "loan" && !price) { setError("Ingresá el precio"); return; }
+    if (!book) { setError("Selecciona un libro"); return; }
+    if (!location) { setError("Indica la ubicación del libro"); return; }
+    if (modality !== "loan" && !price) { setError("Ingresa el precio"); return; }
 
     setLoading(true);
     setError(null);

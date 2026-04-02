@@ -116,7 +116,7 @@ export default function DraggableLocationPicker({ onLocationChange }: Props) {
             <span>{address}</span>
           </p>
         ) : (
-          <p className="text-xs text-gray-400">Arrastrá el pin o hacé clic para elegir la ubicación.</p>
+          <p className="text-xs text-gray-400">Arrastra el pin o haz clic para elegir la ubicación.</p>
         )}
       </div>
     </div>

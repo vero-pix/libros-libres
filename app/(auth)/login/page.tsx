@@ -19,7 +19,7 @@ export default function LoginPage() {
             {/* Card header */}
             <div className="bg-brand-500 px-8 py-6 text-white text-center">
               <h1 className="text-2xl font-bold">Bienvenido</h1>
-              <p className="text-brand-100 text-sm mt-1">Ingresá a tu cuenta para continuar</p>
+              <p className="text-brand-100 text-sm mt-1">Inicia sesión para continuar</p>
             </div>
 
             {/* Form */}
@@ -31,7 +31,7 @@ export default function LoginPage() {
           </div>
 
           <p className="text-center text-xs text-gray-400 mt-6">
-            Al ingresar aceptás los{" "}
+            Al ingresar aceptas los{" "}
             <span className="underline cursor-pointer">términos de uso</span>
           </p>
         </div>

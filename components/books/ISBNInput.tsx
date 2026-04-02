@@ -15,7 +15,7 @@ export default function ISBNInput({ onBookFound }: Props) {
   async function handleLookup() {
     const clean = isbn.replace(/[-\s]/g, "");
     if (clean.length < 10) {
-      setError("Ingresá un ISBN válido (10 o 13 dígitos)");
+      setError("Ingresa un ISBN válido (10 o 13 dígitos).");
       return;
     }
 
