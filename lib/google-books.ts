@@ -8,6 +8,16 @@ export interface GoogleBookResult {
   isbn: string;
 }
 
+/** Try Open Library for a cover image */
+async function fetchOpenLibraryCover(isbn: string): Promise<string | null> {
+  const url = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`;
+  try {
+    const res = await fetch(url, { method: "HEAD", next: { revalidate: 86400 } });
+    if (res.ok) return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+  } catch { /* ignore */ }
+  return null;
+}
+
 export async function fetchBookByISBN(isbn: string): Promise<GoogleBookResult | null> {
   const clean = isbn.replace(/[-\s]/g, "");
   const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
@@ -22,12 +32,18 @@ export async function fetchBookByISBN(isbn: string): Promise<GoogleBookResult | 
   if (!data.items?.length) return null;
 
   const v = data.items[0].volumeInfo;
+  let cover = v.imageLinks?.thumbnail?.replace("http://", "https://") ?? null;
+
+  // Fallback to Open Library if no Google cover
+  if (!cover) {
+    cover = await fetchOpenLibraryCover(clean);
+  }
 
   return {
     title: v.title ?? "",
     author: v.authors?.join(", ") ?? "",
     description: v.description ?? "",
-    cover_url: v.imageLinks?.thumbnail?.replace("http://", "https://") ?? null,
+    cover_url: cover,
     genre: v.categories?.[0] ?? null,
     published_year: v.publishedDate ? parseInt(v.publishedDate.substring(0, 4)) : null,
     isbn: clean,
