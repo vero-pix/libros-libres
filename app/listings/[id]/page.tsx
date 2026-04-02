@@ -16,7 +16,7 @@ export default async function ListingPage({ params }: Props) {
       `
       *,
       book:books(*),
-      seller:users(id, full_name, avatar_url)
+      seller:users(id, full_name, avatar_url, phone)
     `
     )
     .eq("id", params.id)

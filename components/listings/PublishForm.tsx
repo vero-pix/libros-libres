@@ -43,9 +43,13 @@ export default function PublishForm({ userId }: Props) {
   const [price, setPrice] = useState("");
   const [condition, setCondition] = useState<Condition>("good");
   const [notes, setNotes] = useState("");
+  const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [location, setLocation] = useState<LocationData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const PHONE_REGEX = /^\+56[0-9]{9}$/;
 
   const handleLocationChange = useCallback((loc: LocationData) => {
     setLocation(loc);
@@ -56,6 +60,10 @@ export default function PublishForm({ userId }: Props) {
     if (!book) { setError("Busca un libro por ISBN primero."); return; }
     if (!location) { setError("Marca la ubicación del libro en el mapa."); return; }
     if (modality !== "loan" && !price) { setError("Ingresa el precio de venta."); return; }
+    if (phone && !PHONE_REGEX.test(phone)) {
+      setPhoneError("Formato inválido. Usa +56 seguido de 9 dígitos. Ej: +56912345678");
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -109,6 +117,11 @@ export default function PublishForm({ userId }: Props) {
       });
 
       if (listingErr) throw listingErr;
+
+      // Guardar teléfono en el perfil del usuario si fue ingresado
+      if (phone) {
+        await supabase.from("users").update({ phone }).eq("id", userId);
+      }
 
       router.push("/");
       router.refresh();
@@ -238,11 +251,48 @@ export default function PublishForm({ userId }: Props) {
         </div>
       </section>
 
-      {/* ── Sección 4: Ubicación ── */}
+      {/* ── Sección 4: Teléfono WhatsApp ── */}
       <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
           <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">4</span>
+            Tu WhatsApp
+            <span className="text-gray-400 font-normal">(opcional)</span>
+          </h2>
+          <p className="text-xs text-gray-400 mt-1 ml-7">
+            Los compradores podrán contactarte directamente por WhatsApp.
+          </p>
+        </div>
+        <div className="px-6 py-5">
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => {
+              setPhone(e.target.value.trim());
+              setPhoneError(null);
+            }}
+            placeholder="+56 9 1234 5678"
+            className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 transition-colors ${
+              phoneError ? "border-red-300 bg-red-50" : "border-gray-200"
+            }`}
+          />
+          {phoneError ? (
+            <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1">
+              <span>⚠</span> {phoneError}
+            </p>
+          ) : (
+            <p className="text-xs text-gray-400 mt-1.5">
+              Formato: +56912345678 (sin espacios ni guiones)
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* ── Sección 5: Ubicación ── */}
+      <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+          <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+            <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">5</span>
             ¿Dónde está el libro?
           </h2>
           <p className="text-xs text-gray-400 mt-1 ml-7">

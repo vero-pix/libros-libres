@@ -31,6 +31,7 @@ export interface UserProfile {
   avatar_url: string | null;
   email: string | null;
   city: string | null;
+  phone: string | null;
   created_at: string;
 }
 
@@ -52,5 +53,5 @@ export interface Listing {
 
 export interface ListingWithBook extends Listing {
   book: Book;
-  seller?: Pick<UserProfile, "id" | "full_name" | "avatar_url">;
+  seller?: Pick<UserProfile, "id" | "full_name" | "avatar_url" | "phone">;
 }
