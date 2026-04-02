@@ -241,7 +241,7 @@ export default function DraggableLocationPicker({
           </p>
         ) : (
           <p className="text-xs text-gray-400">
-            Arrastra el pin, haz clic en el mapa o usa "Mi ubicación".
+            Arrastra el pin, haz clic en el mapa o usa &quot;Mi ubicación&quot;.
           </p>
         )}
       </div>
