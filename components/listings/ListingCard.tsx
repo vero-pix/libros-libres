@@ -63,7 +63,6 @@ export default function ListingCard({ listing }: Props) {
           <Link
             href={`/vendedor/${listing.seller_id}`}
             className="text-[10px] text-ink-muted uppercase tracking-wider hover:text-brand-600 transition-colors"
-            onClick={(e) => e.stopPropagation()}
           >
             {sellerName}
           </Link>
