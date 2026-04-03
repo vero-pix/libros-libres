@@ -45,7 +45,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
 
       if (!res.ok) {
         if (res.status === 404) {
-          setError("No encontramos ese ISBN en Google Books.");
+          setError("No encontramos ese ISBN. Puedes ingresar los datos manualmente.");
           setShowManual(true);
         } else {
           setError(data.error ?? "Error al consultar el servicio.");
@@ -76,7 +76,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
 
       if (!res.ok) {
         if (res.status === 404) {
-          setError("No encontramos ese ISBN en Google Books.");
+          setError("No encontramos ese ISBN. Puedes ingresar los datos manualmente.");
           setShowManual(true);
         } else {
           setError(data.error ?? "Error al consultar el servicio.");
