@@ -63,9 +63,16 @@
 ## Próximos pasos
 
 ### Inmediato (esta semana)
+- [x] Subir foto de portada manual (Supabase Storage + CoverUpload component)
+- [x] Selector de categoría manual en formulario de publicación
+- [x] Ficha del libro mejorada (responsive mobile, sinopsis completa, nombre vendedor)
+- [x] Búsqueda arreglada (query en 2 pasos: books → listings)
+- [x] Gestión de stock vendedor (/mis-libros: editar, pausar, reactivar, marcar vendido, eliminar)
+- [x] Panel admin (/admin: pedidos, publicaciones, usuarios con edición inline)
+- [x] Tienda del vendedor (/vendedor/[id]: perfil, stats, libros disponibles)
+- [x] Cada libro enlaza al perfil/tienda del vendedor
 - [ ] Cápsulas LinkedIn (5 posts planificados)
 - [ ] OAuth Google/Apple
-- [ ] Subir foto de portada manual
 - [ ] Imagen OG para redes sociales
 
 ### Corto plazo

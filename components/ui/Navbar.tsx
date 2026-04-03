@@ -56,6 +56,7 @@ export default async function Navbar() {
           {[
             { href: "/", label: "Inicio" },
             { href: "/publish", label: "Vende tu libro" },
+            { href: "/mis-libros", label: "Mis libros" },
             { href: "/mis-pedidos", label: "Pedidos" },
             { href: "/mapa", label: "Mapa" },
             { href: "/como-funciona", label: "Cómo funciona" },

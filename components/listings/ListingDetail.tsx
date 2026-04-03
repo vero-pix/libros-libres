@@ -52,24 +52,25 @@ interface Props {
 
 export default function ListingDetail({ listing }: Props) {
   const { book } = listing;
+  const coverUrl = listing.cover_image_url ?? book.cover_url;
+  const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-      <div className="flex flex-col sm:flex-row gap-8 p-8">
+      {/* Cover + Info — mobile: imagen arriba centrada, desktop: lado a lado */}
+      <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 p-5 sm:p-8">
         {/* Cover */}
-        <div className="flex-shrink-0 flex justify-center">
-          {(listing.cover_image_url ?? book.cover_url) ? (
+        <div className="flex-shrink-0 flex justify-center sm:justify-start">
+          {coverUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={(listing.cover_image_url ?? book.cover_url)!}
+              src={coverUrl}
               alt={book.title}
-              width={200}
-              height={280}
-              className="rounded-lg shadow-md object-cover"
+              className="rounded-lg shadow-md object-cover w-[160px] h-[224px] sm:w-[200px] sm:h-[280px]"
             />
           ) : (
-            <div className="w-[200px] h-[280px] bg-gradient-to-br from-brand-100 to-brand-50 rounded-lg flex flex-col items-center justify-center gap-3">
-              <svg className="w-16 h-16 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="w-[160px] h-[224px] sm:w-[200px] sm:h-[280px] bg-gradient-to-br from-brand-100 to-brand-50 rounded-lg flex flex-col items-center justify-center gap-3">
+              <svg className="w-12 h-12 sm:w-16 sm:h-16 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.331 0 4.473.89 6.074 2.356M12 6.042a8.968 8.968 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.356M12 6.042V20.356" />
               </svg>
               <span className="text-sm text-brand-500 font-medium">Sin portada</span>
@@ -79,46 +80,66 @@ export default function ListingDetail({ listing }: Props) {
 
         {/* Info */}
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-gray-900">{book.title}</h1>
-          <p className="text-gray-600 mt-1">{book.author}</p>
-          {book.genre && (
-            <p className="text-sm text-gray-400 mt-0.5">{book.genre}</p>
-          )}
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{book.title}</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">{book.author}</p>
 
-          <div className="flex flex-wrap gap-2 mt-4">
-            <span className="text-sm font-medium px-3 py-1.5 rounded-full bg-gray-200 text-gray-800 border border-gray-300">
+          <div className="flex flex-wrap gap-2 mt-3">
+            {book.genre && (
+              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-brand-50 text-brand-600 border border-brand-100">
+                {book.genre}
+              </span>
+            )}
+            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-200">
               {CONDITION_LABELS[listing.condition] ?? listing.condition}
             </span>
-            <span className="text-sm font-medium px-3 py-1.5 rounded-full bg-brand-100 text-brand-700 border border-brand-200">
+            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-brand-100 text-brand-700 border border-brand-200">
               {MODALITY_LABELS[listing.modality]}
             </span>
           </div>
 
           {listing.price != null && listing.modality !== "loan" && (
-            <p className="text-3xl font-extrabold text-gray-900 mt-5">
+            <p className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-4">
               ${listing.price.toLocaleString("es-CL")}
             </p>
           )}
 
           {listing.notes && (
-            <p className="text-sm text-gray-600 mt-4 bg-gray-50 rounded-xl p-3">
-              {listing.notes}
-            </p>
+            <div className="mt-4 bg-gray-50 rounded-xl p-3">
+              <p className="text-xs font-semibold text-gray-500 mb-1">Notas del vendedor</p>
+              <p className="text-sm text-gray-600">{listing.notes}</p>
+            </div>
           )}
 
           {listing.address && (
-            <p className="text-sm text-gray-500 mt-3 flex items-center gap-1">
-              <span>📍</span> {listing.address}
+            <p className="text-sm text-gray-500 mt-3 flex items-start gap-1">
+              <span className="mt-0.5">📍</span>
+              <span>{listing.address}</span>
             </p>
           )}
+
+          {/* Vendedor */}
+          <Link
+            href={`/vendedor/${listing.seller_id}`}
+            className="inline-flex items-center gap-2 mt-4 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+          >
+            <div className="w-7 h-7 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
+              {sellerName[0].toUpperCase()}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-700 group-hover:text-brand-600 transition-colors">
+                {sellerName}
+              </p>
+              <p className="text-[10px] text-gray-400">Ver todos sus libros</p>
+            </div>
+          </Link>
         </div>
       </div>
 
-      {/* Book description */}
+      {/* Book description — expandible */}
       {book.description && (
-        <div className="border-t border-gray-100 px-6 py-4">
+        <div className="border-t border-gray-100 px-5 sm:px-6 py-4">
           <h2 className="text-sm font-semibold text-gray-700 mb-2">Sinopsis</h2>
-          <p className="text-sm text-gray-600 leading-relaxed line-clamp-4">
+          <p className="text-sm text-gray-600 leading-relaxed">
             {book.description}
           </p>
         </div>

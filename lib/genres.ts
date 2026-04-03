@@ -44,3 +44,43 @@ const GENRE_ES: Record<string, string> = {
 export function translateGenre(genre: string): string {
   return GENRE_ES[genre] ?? genre;
 }
+
+/** Categorías en español para selector manual */
+export const CATEGORY_OPTIONS = [
+  "Ficción",
+  "No ficción",
+  "Ciencia",
+  "Ciencias Sociales",
+  "Historia",
+  "Biografía",
+  "Filosofía",
+  "Psicología",
+  "Religión",
+  "Poesía",
+  "Teatro",
+  "Arte",
+  "Música",
+  "Cocina",
+  "Educación",
+  "Negocios",
+  "Computación",
+  "Tecnología",
+  "Medicina",
+  "Derecho",
+  "Política",
+  "Matemáticas",
+  "Naturaleza",
+  "Viajes",
+  "Deportes",
+  "Infantil",
+  "Juvenil",
+  "Cómics",
+  "Autoayuda",
+  "Espiritualidad",
+  "Familia",
+  "Salud",
+  "Humor",
+  "Novela",
+  "Cuentos",
+  "Ensayo",
+] as const;

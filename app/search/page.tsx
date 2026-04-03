@@ -22,16 +22,36 @@ export default async function SearchPage({ searchParams }: Props) {
   const supabase = await createClient();
   const { q, genre, sort, price_min, price_max, condition, modality } = searchParams;
 
+  // Si hay búsqueda de texto, primero encontrar los book IDs que coincidan
+  let matchingBookIds: string[] | null = null;
+  if (q) {
+    const term = `%${q}%`;
+    const { data: matchedBooks } = await supabase
+      .from("books")
+      .select("id")
+      .or(`title.ilike.${term},author.ilike.${term}`);
+    matchingBookIds = matchedBooks?.map((b) => b.id) ?? [];
+  }
+
   let query = supabase
     .from("listings")
     .select(
       `
       *,
       book:books(*),
-      seller:users(id, full_name, avatar_url)
+      seller:users(id, full_name, avatar_url, phone)
     `
     )
     .eq("status", "active");
+
+  // Filtrar por book IDs encontrados en la búsqueda de texto
+  if (matchingBookIds !== null) {
+    if (matchingBookIds.length === 0) {
+      // No hay resultados, devolvemos vacío
+      matchingBookIds = ["00000000-0000-0000-0000-000000000000"];
+    }
+    query = query.in("book_id", matchingBookIds);
+  }
 
   if (condition) {
     query = query.eq("condition", condition);
@@ -54,10 +74,6 @@ export default async function SearchPage({ searchParams }: Props) {
     query = query.order("created_at", { ascending: false });
   }
 
-  if (q) {
-    query = query.or(`title.ilike.%${q}%,author.ilike.%${q}%`, { foreignTable: "books" });
-  }
-
   const { data: rawListings } = await query;
   let listings = (rawListings as unknown as ListingWithBook[]) ?? [];
 
@@ -67,7 +83,7 @@ export default async function SearchPage({ searchParams }: Props) {
     );
   }
 
-  // Build category counts
+  // Build category counts from all results (before genre filter)
   const allListings = (rawListings as unknown as ListingWithBook[]) ?? [];
   const genreMap = new Map<string, number>();
   for (const l of allListings) {

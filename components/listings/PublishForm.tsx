@@ -7,6 +7,8 @@ import ISBNSearch from "@/components/books/ISBNSearch";
 import DraggableLocationPicker, { type LocationData } from "@/components/map/DraggableLocationPicker";
 import type { BookData } from "@/types";
 import Image from "next/image";
+import { CATEGORY_OPTIONS } from "@/lib/genres";
+import CoverUpload from "@/components/books/CoverUpload";
 
 type Modality = "sale" | "loan" | "both";
 type Condition = "new" | "good" | "fair" | "poor";
@@ -41,6 +43,8 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
   const supabase = createClient();
 
   const [book, setBook] = useState<BookData | null>(null);
+  const [genre, setGenre] = useState("");
+  const [customCoverUrl, setCustomCoverUrl] = useState<string | null>(null);
   const [modality, setModality] = useState<Modality>("sale");
   const [price, setPrice] = useState("");
   const [condition, setCondition] = useState<Condition>("good");
@@ -90,8 +94,8 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
         title: book.title,
         author: book.author,
         description: book.description ?? null,
-        cover_url: book.cover_url ?? null,
-        genre: book.genre ?? null,
+        cover_url: customCoverUrl ?? book.cover_url ?? null,
+        genre: genre || book.genre || null,
         published_year: book.published_year ?? null,
         created_by: userId,
       };
@@ -127,7 +131,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
         latitude: location.lat,
         longitude: location.lng,
         address: location.address,
-        cover_image_url: book.cover_url ?? null,
+        cover_image_url: customCoverUrl ?? book.cover_url ?? null,
         status: "active",
       });
 
@@ -160,12 +164,49 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
         </div>
         <div className="px-6 py-5">
           {book ? (
-            <BookCard book={book} onClear={() => setBook(null)} />
+            <div className="flex gap-4 items-start">
+              <CoverUpload
+                currentUrl={customCoverUrl ?? book.cover_url}
+                onUploaded={setCustomCoverUrl}
+              />
+              <div className="flex-1 min-w-0">
+                <BookCard book={book} onClear={() => { setBook(null); setGenre(""); setCustomCoverUrl(null); }} />
+              </div>
+            </div>
           ) : (
-            <ISBNSearch onBookFound={setBook} />
+            <ISBNSearch onBookFound={(b) => { setBook(b); setGenre(b.genre ?? ""); }} />
           )}
         </div>
       </section>
+
+      {/* ── Sección 1b: Categoría ── */}
+      {book && (
+        <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+            <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+              Categoría
+              <span className="text-gray-400 font-normal">(opcional)</span>
+            </h2>
+          </div>
+          <div className="px-6 py-5">
+            <select
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+            >
+              <option value="">Sin categoría</option>
+              {CATEGORY_OPTIONS.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+            {book.genre && genre !== book.genre && (
+              <p className="text-xs text-gray-400 mt-1.5">
+                Categoría original: {book.genre}
+              </p>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* ── Sección 2: Modalidad y precio ── */}
       <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -363,21 +404,6 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
 function BookCard({ book, onClear }: { book: BookData; onClear: () => void }) {
   return (
     <div className="flex gap-4">
-      {book.cover_url ? (
-        <div className="flex-shrink-0">
-          <Image
-            src={book.cover_url}
-            alt={book.title}
-            width={72}
-            height={100}
-            className="rounded-lg object-cover shadow-sm border border-gray-100"
-          />
-        </div>
-      ) : (
-        <div className="w-[72px] h-[100px] bg-gray-100 rounded-lg flex items-center justify-center text-3xl flex-shrink-0 border border-gray-200">
-          📚
-        </div>
-      )}
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-gray-900 leading-tight">{book.title}</p>
         <p className="text-sm text-gray-500 mt-0.5">{book.author}</p>
