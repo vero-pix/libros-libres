@@ -65,7 +65,21 @@ async function searchOpenLibrary(query: string) {
       : null;
 
     const genre = doc.subject?.[0] ? translateGenre(doc.subject[0]) : null;
-    const description = doc.first_sentence?.[0] ?? null;
+
+    // Try to get full description from the work page
+    let description = doc.first_sentence?.[0] ?? null;
+    if (doc.key) {
+      try {
+        const workRes = await fetch(`https://openlibrary.org${doc.key}.json`);
+        if (workRes.ok) {
+          const work = await workRes.json();
+          const fullDesc = work.description?.value ?? work.description;
+          if (fullDesc && typeof fullDesc === "string") {
+            description = fullDesc;
+          }
+        }
+      } catch { /* keep first_sentence */ }
+    }
 
     return { cover_url, description, genre, source: "Open Library" };
   } catch {
