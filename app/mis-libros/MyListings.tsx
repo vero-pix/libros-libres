@@ -297,7 +297,41 @@ function EditForm({
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
 
   const [saving, setSaving] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [fetchMsg, setFetchMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  async function handleAutocomplete() {
+    setFetching(true);
+    setFetchMsg(null);
+    try {
+      const params = new URLSearchParams({ title, author });
+      const res = await fetch(`/api/books/search?${params}`);
+      if (!res.ok) {
+        setFetchMsg("No se encontraron datos para este libro.");
+        return;
+      }
+      const data = await res.json();
+      let filled = 0;
+      if (data.cover_url && !coverUrl && !listing.cover_image_url && !book.cover_url) {
+        setCoverUrl(data.cover_url);
+        filled++;
+      }
+      if (data.description && !description) {
+        setDescription(data.description);
+        filled++;
+      }
+      if (data.genre && !genre) {
+        setGenre(data.genre);
+        filled++;
+      }
+      setFetchMsg(filled > 0 ? `${filled} campo${filled > 1 ? "s" : ""} completado${filled > 1 ? "s" : ""} desde ${data.source}` : "No se encontraron datos nuevos.");
+    } catch {
+      setFetchMsg("Error al buscar datos.");
+    } finally {
+      setFetching(false);
+    }
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -366,12 +400,23 @@ function EditForm({
       {/* Book info section */}
       <div>
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Datos del libro</p>
-        <div className="flex gap-4 mb-3">
+        <div className="flex items-start gap-4 mb-3">
           <CoverUpload
             currentUrl={coverUrl ?? listing.cover_image_url ?? book.cover_url}
             onUploaded={setCoverUrl}
           />
-          <p className="text-[10px] text-gray-400 self-end">Sube o cambia la portada del libro (max 5 MB)</p>
+          <div className="flex flex-col gap-2 self-center">
+            <button
+              type="button"
+              onClick={handleAutocomplete}
+              disabled={fetching}
+              className="text-xs text-brand-600 hover:bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors disabled:opacity-50"
+            >
+              {fetching ? "Buscando..." : "Autocompletar desde API"}
+            </button>
+            <p className="text-[10px] text-gray-400">Busca portada, sinopsis y categoría automáticamente</p>
+            {fetchMsg && <p className="text-[10px] text-green-600">{fetchMsg}</p>}
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
