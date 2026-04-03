@@ -45,13 +45,20 @@ export async function updateSession(request: NextRequest) {
 
   // Protect admin routes — check role in users table
   if (user && request.nextUrl.pathname.startsWith("/admin")) {
-    const { data: profile } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    try {
+      const { data: profile } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", user.id)
+        .single();
 
-    if (profile?.role !== "admin") {
+      if (profile?.role !== "admin") {
+        const url = request.nextUrl.clone();
+        url.pathname = "/";
+        return NextResponse.redirect(url);
+      }
+    } catch {
+      // If role column doesn't exist yet, redirect to home
       const url = request.nextUrl.clone();
       url.pathname = "/";
       return NextResponse.redirect(url);
