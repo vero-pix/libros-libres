@@ -1,11 +1,30 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { fetchBookByISBN } from "@/lib/google-books";
+
+async function fetchCoverUrl(isbn: string): Promise<string | null> {
+  // Try Open Library first (free, no rate limits)
+  try {
+    const olRes = await fetch(`https://openlibrary.org/isbn/${isbn}.json`);
+    if (olRes.ok) {
+      const olData = await olRes.json();
+      const coverId = olData.covers?.[0];
+      if (coverId) return `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`;
+    }
+  } catch { /* continue */ }
+
+  // Fallback: direct Open Library cover URL (returns 1x1 if not found)
+  try {
+    const directUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`;
+    const headRes = await fetch(directUrl, { method: "HEAD" });
+    if (headRes.ok) return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+  } catch { /* continue */ }
+
+  return null;
+}
 
 export async function GET() {
   const supabase = await createClient();
 
-  // Basic auth check
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -13,7 +32,6 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Fetch books missing cover_url but having an isbn
   const { data: books, error } = await supabase
     .from("books")
     .select("id, isbn")
@@ -29,38 +47,24 @@ export async function GET() {
   const errors: { id: string; isbn: string; reason: string }[] = [];
 
   for (const book of books ?? []) {
-    try {
-      const result = await fetchBookByISBN(book.isbn);
-      if (result?.cover_url) {
-        const { error: updateError } = await supabase
-          .from("books")
-          .update({ cover_url: result.cover_url })
-          .eq("id", book.id);
+    const coverUrl = await fetchCoverUrl(book.isbn);
+    if (coverUrl) {
+      const { error: updateError } = await supabase
+        .from("books")
+        .update({ cover_url: coverUrl })
+        .eq("id", book.id);
 
-        if (updateError) {
-          failed++;
-          errors.push({ id: book.id, isbn: book.isbn, reason: updateError.message });
-        } else {
-          updated++;
-        }
-      } else {
+      if (updateError) {
         failed++;
-        errors.push({ id: book.id, isbn: book.isbn, reason: "No cover found in Google Books" });
+        errors.push({ id: book.id, isbn: book.isbn, reason: updateError.message });
+      } else {
+        updated++;
       }
-    } catch (err) {
+    } else {
       failed++;
-      errors.push({
-        id: book.id,
-        isbn: book.isbn,
-        reason: err instanceof Error ? err.message : "Unknown error",
-      });
+      errors.push({ id: book.id, isbn: book.isbn, reason: "No cover found" });
     }
   }
 
-  return NextResponse.json({
-    total: books?.length ?? 0,
-    updated,
-    failed,
-    errors,
-  });
+  return NextResponse.json({ total: books?.length ?? 0, updated, failed, errors });
 }
