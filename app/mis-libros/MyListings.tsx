@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import type { ListingWithBook, ListingStatus } from "@/types";
+import { CATEGORY_OPTIONS } from "@/lib/genres";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   active: { label: "Activo", color: "bg-green-100 text-green-700" },
@@ -279,10 +280,20 @@ function EditForm({
   onCancel: () => void;
 }) {
   const supabase = createClient();
+  const { book } = listing;
+
+  // Listing fields
   const [price, setPrice] = useState(listing.price?.toString() ?? "");
   const [condition, setCondition] = useState(listing.condition);
   const [modality, setModality] = useState(listing.modality);
   const [notes, setNotes] = useState(listing.notes ?? "");
+
+  // Book fields
+  const [title, setTitle] = useState(book.title);
+  const [author, setAuthor] = useState(book.author);
+  const [genre, setGenre] = useState(book.genre ?? "");
+  const [description, setDescription] = useState(book.description ?? "");
+
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -290,105 +301,136 @@ function EditForm({
     setSaving(true);
     setError(null);
 
-    const updates: Record<string, unknown> = {
+    // Update book data
+    const bookUpdates = {
+      title: title.trim(),
+      author: author.trim(),
+      genre: genre || null,
+      description: description.trim() || null,
+    };
+
+    const { error: bookErr } = await supabase
+      .from("books")
+      .update(bookUpdates)
+      .eq("id", book.id);
+
+    if (bookErr) {
+      setError(bookErr.message);
+      setSaving(false);
+      return;
+    }
+
+    // Update listing data
+    const listingUpdates: Record<string, unknown> = {
       condition,
       modality,
       notes: notes.trim() || null,
       price: modality !== "loan" ? parseFloat(price) || null : null,
     };
 
-    const { error: err } = await supabase
+    const { error: listingErr } = await supabase
       .from("listings")
-      .update(updates)
+      .update(listingUpdates)
       .eq("id", listing.id);
 
-    if (err) {
-      setError(err.message);
+    if (listingErr) {
+      setError(listingErr.message);
       setSaving(false);
       return;
     }
 
     onUpdated({
       ...listing,
-      ...updates,
-      price: updates.price as number | null,
-      condition: updates.condition as typeof listing.condition,
-      modality: updates.modality as typeof listing.modality,
-      notes: updates.notes as string | null,
+      ...listingUpdates,
+      price: listingUpdates.price as number | null,
+      condition: listingUpdates.condition as typeof listing.condition,
+      modality: listingUpdates.modality as typeof listing.modality,
+      notes: listingUpdates.notes as string | null,
+      book: { ...book, ...bookUpdates },
     });
     setSaving(false);
   }
 
+  const inputClass = "w-full px-2.5 py-2 border border-gray-200 rounded-lg text-sm bg-white";
+
   return (
-    <div className="border-t border-gray-100 px-4 py-4 bg-gray-50 space-y-3">
-      <div className="grid grid-cols-2 gap-3">
-        {/* Modality */}
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Modalidad</label>
-          <select
-            value={modality}
-            onChange={(e) => setModality(e.target.value as typeof modality)}
-            className="w-full px-2.5 py-2 border border-gray-200 rounded-lg text-sm bg-white"
-          >
-            <option value="sale">Venta</option>
-            <option value="loan">Préstamo</option>
-            <option value="both">Venta y préstamo</option>
-          </select>
-        </div>
-
-        {/* Price */}
-        {modality !== "loan" && (
+    <div className="border-t border-gray-100 px-4 py-4 bg-gray-50 space-y-4">
+      {/* Book info section */}
+      <div>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Datos del libro</p>
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">Precio</label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-2.5 flex items-center text-gray-400 text-sm pointer-events-none">$</span>
-              <input
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                min="0"
-                step="100"
-                className="w-full pl-6 pr-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
-              />
-            </div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Título</label>
+            <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputClass} />
           </div>
-        )}
-
-        {/* Condition */}
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Estado</label>
-          <select
-            value={condition}
-            onChange={(e) => setCondition(e.target.value as typeof condition)}
-            className="w-full px-2.5 py-2 border border-gray-200 rounded-lg text-sm bg-white"
-          >
-            <option value="new">Como nuevo</option>
-            <option value="good">Buen estado</option>
-            <option value="fair">Estado regular</option>
-            <option value="poor">Con detalles</option>
-          </select>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Autor</label>
+            <input value={author} onChange={(e) => setAuthor(e.target.value)} className={inputClass} />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
+            <select value={genre} onChange={(e) => setGenre(e.target.value)} className={inputClass}>
+              <option value="">Sin categoría</option>
+              {CATEGORY_OPTIONS.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="mt-3">
+          <label className="block text-xs font-medium text-gray-500 mb-1">Descripción / Sinopsis</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={3}
+            maxLength={2000}
+            placeholder="Describe de qué trata el libro..."
+            className={`${inputClass} resize-none`}
+          />
         </div>
       </div>
 
-      {/* Notes */}
+      {/* Listing info section */}
       <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1">Notas</label>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          rows={2}
-          maxLength={500}
-          className="w-full px-2.5 py-2 border border-gray-200 rounded-lg text-sm bg-white resize-none"
-        />
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Datos de la publicación</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Modalidad</label>
+            <select value={modality} onChange={(e) => setModality(e.target.value as typeof modality)} className={inputClass}>
+              <option value="sale">Venta</option>
+              <option value="loan">Préstamo</option>
+              <option value="both">Venta y préstamo</option>
+            </select>
+          </div>
+          {modality !== "loan" && (
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Precio</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-2.5 flex items-center text-gray-400 text-sm pointer-events-none">$</span>
+                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} min="0" step="100" className={`${inputClass} pl-6`} />
+              </div>
+            </div>
+          )}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Estado</label>
+            <select value={condition} onChange={(e) => setCondition(e.target.value as typeof condition)} className={inputClass}>
+              <option value="new">Como nuevo</option>
+              <option value="good">Buen estado</option>
+              <option value="fair">Estado regular</option>
+              <option value="poor">Con detalles</option>
+            </select>
+          </div>
+        </div>
+        <div className="mt-3">
+          <label className="block text-xs font-medium text-gray-500 mb-1">Notas del vendedor</label>
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} maxLength={500} className={`${inputClass} resize-none`} />
+        </div>
       </div>
 
       {error && <p className="text-xs text-red-600">{error}</p>}
 
       <div className="flex gap-2 justify-end">
-        <button
-          onClick={onCancel}
-          className="text-xs text-gray-500 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-white transition-colors"
-        >
+        <button onClick={onCancel} className="text-xs text-gray-500 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-white transition-colors">
           Cancelar
         </button>
         <button
