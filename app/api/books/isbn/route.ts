@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { translateGenre } from "@/lib/genres";
 
 /**
  * Try Google Books first, then fall back to Open Library.
@@ -23,7 +24,7 @@ async function searchGoogleBooks(isbn: string) {
       author: v.authors?.join(", ") ?? "",
       description: v.description ?? "",
       cover_url: v.imageLinks?.thumbnail?.replace("http://", "https://") ?? null,
-      genre: v.categories?.[0] ?? null,
+      genre: v.categories?.[0] ? translateGenre(v.categories[0]) : null,
       published_year: v.publishedDate
         ? parseInt(v.publishedDate.substring(0, 4))
         : null,
@@ -71,7 +72,7 @@ async function searchOpenLibrary(isbn: string) {
       : `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
 
     // Get subject/genre
-    const genre = data.subjects?.[0] ?? null;
+    const genre = data.subjects?.[0] ? translateGenre(data.subjects[0]) : null;
 
     // Get publish year
     const published_year = data.publish_date
