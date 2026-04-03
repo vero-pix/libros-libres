@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import type { ListingWithBook, ListingStatus } from "@/types";
 import { CATEGORY_OPTIONS } from "@/lib/genres";
+import CoverUpload from "@/components/books/CoverUpload";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   active: { label: "Activo", color: "bg-green-100 text-green-700" },
@@ -293,6 +294,7 @@ function EditForm({
   const [author, setAuthor] = useState(book.author);
   const [genre, setGenre] = useState(book.genre ?? "");
   const [description, setDescription] = useState(book.description ?? "");
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -302,12 +304,15 @@ function EditForm({
     setError(null);
 
     // Update book data
-    const bookUpdates = {
+    const bookUpdates: Record<string, unknown> = {
       title: title.trim(),
       author: author.trim(),
       genre: genre || null,
       description: description.trim() || null,
     };
+    if (coverUrl) {
+      bookUpdates.cover_url = coverUrl;
+    }
 
     const { error: bookErr } = await supabase
       .from("books")
@@ -327,6 +332,9 @@ function EditForm({
       notes: notes.trim() || null,
       price: modality !== "loan" ? parseFloat(price) || null : null,
     };
+    if (coverUrl) {
+      listingUpdates.cover_image_url = coverUrl;
+    }
 
     const { error: listingErr } = await supabase
       .from("listings")
@@ -358,6 +366,13 @@ function EditForm({
       {/* Book info section */}
       <div>
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Datos del libro</p>
+        <div className="flex gap-4 mb-3">
+          <CoverUpload
+            currentUrl={coverUrl ?? listing.cover_image_url ?? book.cover_url}
+            onUploaded={setCoverUrl}
+          />
+          <p className="text-[10px] text-gray-400 self-end">Sube o cambia la portada del libro (max 5 MB)</p>
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">Título</label>
