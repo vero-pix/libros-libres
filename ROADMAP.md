@@ -1,6 +1,6 @@
 # Libros Libres — Roadmap
 
-Última actualización: 2 abril 2026
+Última actualización: 2 abril 2026, 21:00
 
 ---
 
@@ -14,13 +14,15 @@
 - [x] Sistema páginas editables (MDX)
 - [x] Navegación completa
 
-### Fase 2 — Rediseño UI (estilo Martfury)
-- [x] Header de 2 filas (búsqueda + nav navy)
+### Fase 2 — Rediseño UI (estilo editorial/magazine)
+- [x] Tipografía: Playfair Display + DM Sans
+- [x] Paleta: ink, cream, brand dorado
+- [x] Header de 2 filas (búsqueda + nav ink)
 - [x] Home con grid de libros + sidebar categorías
-- [x] Mapa movido a /mapa (lazy-loaded, -450KB JS en home)
-- [x] Cards estilo marketplace (cover tall, badge, vendedor)
-- [x] Footer con newsletter + links organizados
-- [x] Paleta dorada (#d4a017)
+- [x] Cards editoriales (hover scale, sin bordes)
+- [x] Mapa movido a /mapa con sidebar (cercanía, autor, categoría)
+- [x] Footer con newsletter fondo ink
+- [x] Categorías traducidas al español
 
 ### Fase 3 — Flujo de pagos
 - [x] Tabla `orders` en Supabase
@@ -29,41 +31,61 @@
 - [x] Webhook IPN para actualizar estado de pago
 - [x] Página post-pago (éxito/fallo/pendiente)
 - [x] Botón "Comprar" en detalle del libro
+- [x] Notificaciones WhatsApp al vendedor
+
+### Fase 4 — Features adicionales
+- [x] Mis Pedidos (tabs compras/ventas)
+- [x] Búsqueda avanzada (precio, condición, modalidad)
+- [x] Open Library como fallback ISBN (Google Books cuota agotada)
+- [x] API backfill portadas
+
+### Fase 5 — Landing y lanzamiento
+- [x] Hero: "Cada estantería es una librería" + red de nodos + feed simulado
+- [x] Sección tech: "Como Uber, pero para libros"
+- [x] Voces reales (quotes busca/ofrece)
+- [x] Páginas contenido con hero images Unsplash
+- [x] Página /historia (case study para LinkedIn)
+- [x] OG tags para LinkedIn
+- [x] Dominio tuslibros.cl configurado (NIC Chile → Vercel)
+- [x] Supabase auth URL actualizada
 
 ---
 
-## Pendiente activación (requiere acción manual)
+## Pendiente activación
 
-- [ ] Ejecutar migration SQL de orders en Supabase
-- [ ] Configurar MERCADOPAGO_ACCESS_TOKEN en env
-- [ ] Configurar SUPABASE_SERVICE_ROLE_KEY en env
-- [ ] Registrar webhook en panel MercadoPago
+- [ ] MERCADOPAGO_ACCESS_TOKEN en Vercel
+- [ ] SUPABASE_SERVICE_ROLE_KEY en Vercel
+- [ ] Webhook MercadoPago registrado
+- [ ] Imagen og-image.png en /public
 
 ---
 
 ## Próximos pasos
 
-### Corto plazo
+### Inmediato (esta semana)
+- [ ] Cápsulas LinkedIn (5 posts planificados)
 - [ ] OAuth Google/Apple
-- [ ] Mis pedidos (comprador y vendedor)
-- [ ] Notificaciones al vendedor (email o WhatsApp)
-- [ ] Búsqueda avanzada (precio, condición, distancia)
+- [ ] Subir foto de portada manual
+- [ ] Imagen OG para redes sociales
 
-### Mediano plazo
+### Corto plazo
 - [ ] API real de couriers (Chilexpress, Rappi, Blue Express)
-- [ ] Cotización envío en tiempo real según distancia
+- [ ] Cotización envío en tiempo real
 - [ ] Panel vendedor (ventas, historial, ganancias)
 - [ ] Reviews/valoraciones entre usuarios
 
-### Largo plazo
-- [ ] App móvil (PWA o React Native)
+### Mediano plazo
+- [ ] PWA (instalable en celular)
 - [ ] Sistema de recomendaciones
 - [ ] Programa de fidelización
 
 ---
 
 ## Métricas
-- Tiempo publicar libro: ~11 segundos
-- JS en home: 163KB (antes 609KB con mapa)
-- Libros publicados: [actualizar]
-- Usuarios registrados: [actualizar]
+- JS en home: 165KB (sin Mapbox)
+- JS en mapa: 162KB (Mapbox lazy-loaded)
+- Libros publicados: 5
+- Usuarios registrados: 2
+- Commits en la sesión: 12
+- Archivos creados/modificados: 40+
+- Líneas de código: 2,500+
