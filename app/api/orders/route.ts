@@ -99,21 +99,21 @@ export async function POST(req: NextRequest) {
             id: listing_id,
             title: `${book.title} — ${book.author}`,
             quantity: 1,
-            unit_price: bookPrice,
+            unit_price: Math.round(bookPrice),
             currency_id: "CLP",
           },
           {
             id: `shipping-${order.id}`,
             title: `Envío ${shipping_speed === "express" ? "rápido" : "estándar"} (${courier})`,
             quantity: 1,
-            unit_price: shippingCost,
+            unit_price: Math.round(shippingCost),
             currency_id: "CLP",
           },
           {
             id: `fee-${order.id}`,
             title: "Cargo por servicio",
             quantity: 1,
-            unit_price: serviceFee,
+            unit_price: Math.round(serviceFee),
             currency_id: "CLP",
           },
         ],
@@ -138,10 +138,15 @@ export async function POST(req: NextRequest) {
       order_id: order.id,
       init_point: preference.init_point,
     });
-  } catch (err) {
+  } catch (err: unknown) {
     // Clean up the order if MP fails
     await supabase.from("orders").delete().eq("id", order.id);
-    const message = err instanceof Error ? err.message : "Error de MercadoPago";
+    let message = "Error de MercadoPago";
+    if (err instanceof Error) {
+      message = err.message;
+    }
+    // Log full error for debugging
+    console.error("MercadoPago error:", JSON.stringify(err, null, 2));
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
