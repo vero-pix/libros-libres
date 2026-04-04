@@ -5,12 +5,12 @@ import { notifySeller } from "@/lib/notifications";
 
 /**
  * MercadoPago IPN webhook.
- * Uses service_role key to bypass RLS and update order status.
+ * Handles both orders and rentals (distinguished by external_reference prefix).
+ * Uses service_role key to bypass RLS.
  */
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
-  // MercadoPago sends { action: "payment.created", data: { id: "123" } }
   if (body.type !== "payment" && body.action !== "payment.created") {
     return NextResponse.json({ received: true });
   }
@@ -20,67 +20,94 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No payment ID" }, { status: 400 });
   }
 
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { cookies: { getAll: () => [], setAll: () => {} } }
+  );
+
   try {
     const payment = await paymentClient.get({ id: paymentId });
 
-    const orderId = payment.external_reference;
-    if (!orderId) {
+    const externalRef = payment.external_reference;
+    if (!externalRef) {
       return NextResponse.json({ error: "No external_reference" }, { status: 400 });
     }
 
-    // Map MP status to our order status
-    let orderStatus: string;
+    // Map MP status
+    let status: string;
     switch (payment.status) {
       case "approved":
-        orderStatus = "paid";
+        status = "paid";
         break;
       case "rejected":
       case "cancelled":
-        orderStatus = "cancelled";
+        status = "cancelled";
         break;
       default:
-        // pending, in_process, etc.
-        orderStatus = "pending";
+        status = "pending";
     }
 
-    // Use service role to update (bypasses RLS)
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { cookies: { getAll: () => [], setAll: () => {} } }
-    );
-
-    await supabase
+    // Determine if this is an order or rental by checking both tables
+    const { data: order } = await supabase
       .from("orders")
-      .update({
-        status: orderStatus,
-        mercadopago_payment_id: String(paymentId),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", orderId);
+      .select("id, listing_id")
+      .eq("id", externalRef)
+      .single();
 
-    // If paid, mark listing as completed
-    if (orderStatus === "paid") {
-      const { data: order } = await supabase
+    if (order) {
+      // ── ORDER ──
+      await supabase
         .from("orders")
-        .select("listing_id")
-        .eq("id", orderId)
-        .single();
+        .update({
+          status,
+          mercadopago_payment_id: String(paymentId),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", order.id);
 
-      if (order) {
+      if (status === "paid") {
         await supabase
           .from("listings")
           .update({ status: "completed" })
           .eq("id", order.listing_id);
-      }
 
-      // Notify seller about the sale (non-blocking)
-      notifySeller(orderId, supabase).catch((err) =>
-        console.error("[webhook] notifySeller error:", err)
-      );
+        notifySeller(order.id, supabase).catch((err) =>
+          console.error("[webhook] notifySeller error:", err)
+        );
+      }
+    } else {
+      // ── RENTAL ──
+      const { data: rental } = await supabase
+        .from("rentals")
+        .select("id, listing_id")
+        .eq("id", externalRef)
+        .single();
+
+      if (rental) {
+        await supabase
+          .from("rentals")
+          .update({
+            status,
+            mercadopago_payment_id: String(paymentId),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", rental.id);
+
+        if (status === "paid") {
+          // Mark listing as rented (not completed — it'll return)
+          await supabase
+            .from("listings")
+            .update({ status: "rented" })
+            .eq("id", rental.listing_id);
+        }
+      } else {
+        console.error("[webhook] No order or rental found for ref:", externalRef);
+        return NextResponse.json({ error: "Reference not found" }, { status: 404 });
+      }
     }
 
-    return NextResponse.json({ received: true, status: orderStatus });
+    return NextResponse.json({ received: true, status });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Webhook error";
     console.error("MercadoPago webhook error:", message);

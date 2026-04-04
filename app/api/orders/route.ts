@@ -8,6 +8,7 @@ import {
   COURIER_BY_SPEED,
 } from "@/lib/mercadopago";
 import { calculateCommission } from "@/lib/commissions";
+import { refreshSellerToken } from "@/lib/mercadopago-oauth";
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -157,18 +158,33 @@ export async function POST(req: NextRequest) {
       // ── SPLIT PAYMENT ──
       // La preferencia se crea con el token del vendedor.
       // marketplace_fee es lo que retiene tuslibros.cl (comisión + envío).
-      const sellerPref = sellerPreferenceClient(seller.mercadopago_access_token!);
-      preference = await sellerPref.create({
-        body: {
-          items,
-          marketplace_fee: commission + shippingCost,
-          marketplace: process.env.MERCADOPAGO_APP_ID,
-          back_urls: backUrls,
-          auto_return: "approved",
-          external_reference: order.id,
-          notification_url: `${siteUrl}/api/webhooks/mercadopago`,
-        },
-      });
+      let sellerToken = seller.mercadopago_access_token!;
+      const splitBody = {
+        items,
+        marketplace_fee: commission + shippingCost,
+        marketplace: process.env.MERCADOPAGO_COLLECTOR_ID,
+        back_urls: backUrls,
+        auto_return: "approved" as const,
+        external_reference: order.id,
+        notification_url: `${siteUrl}/api/webhooks/mercadopago`,
+      };
+
+      try {
+        const sellerPref = sellerPreferenceClient(sellerToken);
+        preference = await sellerPref.create({ body: splitBody });
+      } catch (splitErr) {
+        // Token expirado — intentar refresh
+        const freshToken = await refreshSellerToken(
+          seller.id,
+          // Need refresh token from DB
+          (await supabase.from("users").select("mercadopago_refresh_token").eq("id", seller.id).single()).data?.mercadopago_refresh_token ?? ""
+        );
+        if (!freshToken) throw splitErr;
+
+        sellerToken = freshToken;
+        const sellerPref = sellerPreferenceClient(sellerToken);
+        preference = await sellerPref.create({ body: splitBody });
+      }
     } else {
       // ── SIN SPLIT (vendedor sin MP conectado) ──
       // Todo llega a tuslibros, se transfiere manualmente después.

@@ -5,6 +5,7 @@ import {
   preferenceClient,
 } from "@/lib/mercadopago";
 import { calculateCommission } from "@/lib/commissions";
+import { refreshSellerToken } from "@/lib/mercadopago-oauth";
 
 /**
  * POST /api/rentals — Crear un arriendo
@@ -147,18 +148,31 @@ export async function POST(req: NextRequest) {
     let preference;
 
     if (useSplit) {
-      const sellerPref = sellerPreferenceClient(seller.mercadopago_access_token!);
-      preference = await sellerPref.create({
-        body: {
-          items,
-          marketplace_fee: commission,
-          marketplace: process.env.MERCADOPAGO_APP_ID,
-          back_urls: backUrls,
-          auto_return: "approved",
-          external_reference: rental.id,
-          notification_url: `${siteUrl}/api/webhooks/mercadopago`,
-        },
-      });
+      let sellerToken = seller.mercadopago_access_token!;
+      const splitBody = {
+        items,
+        marketplace_fee: commission,
+        marketplace: process.env.MERCADOPAGO_COLLECTOR_ID,
+        back_urls: backUrls,
+        auto_return: "approved" as const,
+        external_reference: rental.id,
+        notification_url: `${siteUrl}/api/webhooks/mercadopago`,
+      };
+
+      try {
+        const sellerPref = sellerPreferenceClient(sellerToken);
+        preference = await sellerPref.create({ body: splitBody });
+      } catch (splitErr) {
+        const freshToken = await refreshSellerToken(
+          seller.id,
+          (await supabase.from("users").select("mercadopago_refresh_token").eq("id", seller.id).single()).data?.mercadopago_refresh_token ?? ""
+        );
+        if (!freshToken) throw splitErr;
+
+        sellerToken = freshToken;
+        const sellerPref = sellerPreferenceClient(sellerToken);
+        preference = await sellerPref.create({ body: splitBody });
+      }
     } else {
       preference = await preferenceClient.create({
         body: {
