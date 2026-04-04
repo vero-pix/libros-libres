@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/ui/Navbar";
 import ProfileForm from "@/components/ui/ProfileForm";
+import MercadoPagoConnect from "@/components/ui/MercadoPagoConnect";
 
 export default async function PerfilPage() {
   const supabase = await createClient();
@@ -15,7 +16,7 @@ export default async function PerfilPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("full_name, email, phone, default_latitude, default_longitude, default_address")
+    .select("full_name, email, phone, default_latitude, default_longitude, default_address, mercadopago_user_id, mercadopago_connected_at")
     .eq("id", user.id)
     .single();
 
@@ -38,6 +39,12 @@ export default async function PerfilPage() {
           defaultLng={profile?.default_longitude ?? null}
           defaultAddress={profile?.default_address ?? null}
         />
+        <div className="mt-4">
+          <MercadoPagoConnect
+            isConnected={!!profile?.mercadopago_user_id}
+            connectedAt={profile?.mercadopago_connected_at ?? null}
+          />
+        </div>
       </main>
     </div>
   );

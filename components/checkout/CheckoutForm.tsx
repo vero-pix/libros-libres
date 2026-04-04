@@ -1,32 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import type { ListingWithBook, ShippingSpeed } from "@/types";
+import type { ListingWithBook } from "@/types";
+
+interface ShippingQuote {
+  service: string;
+  serviceCode: number;
+  deliveryTime: string;
+  price: number;
+}
 
 const SERVICE_FEE = 1500;
-const SHIPPING_COSTS: Record<ShippingSpeed, number> = {
-  standard: 2900,
-  express: 4500,
-};
 
-const SHIPPING_OPTIONS: {
-  value: ShippingSpeed;
-  label: string;
-  description: string;
-  courier: string;
-}[] = [
+// Fallback cuando no hay API de Chilexpress o falla la cotización
+const FALLBACK_OPTIONS: ShippingQuote[] = [
   {
-    value: "standard",
-    label: "Estándar",
-    description: "24-48 horas",
-    courier: "Chilexpress",
-  },
-  {
-    value: "express",
-    label: "Rápido",
-    description: "2-4 horas (Santiago)",
-    courier: "Rappi",
+    service: "Estándar",
+    serviceCode: 0,
+    deliveryTime: "3-5 días hábiles",
+    price: 2900,
   },
 ];
 
@@ -37,18 +30,84 @@ interface Props {
 }
 
 export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props) {
-  const [shippingSpeed, setShippingSpeed] = useState<ShippingSpeed>("standard");
   const [address, setAddress] = useState(buyerAddress);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Shipping quotes
+  const [quotes, setQuotes] = useState<ShippingQuote[]>([]);
+  const [selectedService, setSelectedService] = useState<number | null>(null);
+  const [quoting, setQuoting] = useState(false);
+  const [quoteError, setQuoteError] = useState<string | null>(null);
+
   const { book } = listing;
   const bookPrice = listing.price ?? 0;
-  const shippingCost = SHIPPING_COSTS[shippingSpeed];
+
+  const selectedQuote = quotes.find((q) => q.serviceCode === selectedService);
+  const shippingCost = selectedQuote?.price ?? 0;
   const total = bookPrice + shippingCost + SERVICE_FEE;
+
+  const fetchQuotes = useCallback(
+    async (addr: string) => {
+      if (!addr.trim() || addr.trim().length < 5) return;
+
+      setQuoting(true);
+      setQuoteError(null);
+
+      try {
+        const res = await fetch("/api/shipping/quote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            listing_id: listing.id,
+            buyer_address: addr,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          setQuoteError(data.error ?? "Error al cotizar envío");
+          setQuotes(FALLBACK_OPTIONS);
+          setSelectedService(FALLBACK_OPTIONS[0].serviceCode);
+          return;
+        }
+
+        const q = data.quotes as ShippingQuote[];
+        setQuotes(q);
+        // Seleccionar el más barato por defecto
+        if (q.length > 0) {
+          const cheapest = q.reduce((a, b) => (a.price < b.price ? a : b));
+          setSelectedService(cheapest.serviceCode);
+        }
+      } catch {
+        setQuoteError("Error de conexión al cotizar");
+        setQuotes(FALLBACK_OPTIONS);
+        setSelectedService(FALLBACK_OPTIONS[0].serviceCode);
+      } finally {
+        setQuoting(false);
+      }
+    },
+    [listing.id]
+  );
+
+  // Cotizar al cargar si ya tenemos dirección
+  useEffect(() => {
+    if (buyerAddress) {
+      fetchQuotes(buyerAddress);
+    }
+  }, [buyerAddress, fetchQuotes]);
+
+  // Debounce: cotizar cuando el usuario deja de escribir
+  useEffect(() => {
+    if (!address || address === buyerAddress) return;
+    const timer = setTimeout(() => fetchQuotes(address), 800);
+    return () => clearTimeout(timer);
+  }, [address, buyerAddress, fetchQuotes]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!selectedQuote) return;
     setLoading(true);
     setError(null);
 
@@ -58,7 +117,9 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           listing_id: listing.id,
-          shipping_speed: shippingSpeed,
+          shipping_speed: "standard", // TODO: mapear serviceCode a speed
+          shipping_cost_override: selectedQuote.price,
+          shipping_service: selectedQuote.service,
           buyer_address: address,
         }),
       });
@@ -70,7 +131,6 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
         return;
       }
 
-      // Redirect to MercadoPago
       if (data.init_point) {
         window.location.href = data.init_point;
       }
@@ -124,44 +184,59 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
           required
           className="w-full px-4 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
         />
+        {quoting && (
+          <p className="text-xs text-gray-400 mt-2 flex items-center gap-1.5">
+            <span className="w-3 h-3 border-2 border-gray-300 border-t-brand-500 rounded-full animate-spin" />
+            Cotizando envío con Chilexpress...
+          </p>
+        )}
       </div>
 
-      {/* Shipping speed */}
-      <div className="bg-white rounded-lg border border-gray-200 p-5">
-        <h2 className="font-semibold text-gray-900 mb-4">Velocidad de envío</h2>
-        <div className="space-y-3">
-          {SHIPPING_OPTIONS.map((opt) => (
-            <label
-              key={opt.value}
-              className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-colors ${
-                shippingSpeed === opt.value
-                  ? "border-brand-500 bg-brand-50"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <input
-                  type="radio"
-                  name="shipping"
-                  value={opt.value}
-                  checked={shippingSpeed === opt.value}
-                  onChange={() => setShippingSpeed(opt.value)}
-                  className="accent-brand-500"
-                />
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">{opt.label}</p>
-                  <p className="text-xs text-gray-500">
-                    {opt.description} — {opt.courier}
-                  </p>
+      {/* Shipping options */}
+      {quotes.length > 0 && (
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <h2 className="font-semibold text-gray-900 mb-4">Opciones de envío</h2>
+          {quoteError && (
+            <p className="text-xs text-amber-600 mb-3">
+              {quoteError} — mostrando precio estimado.
+            </p>
+          )}
+          <div className="space-y-3">
+            {quotes.map((q) => (
+              <label
+                key={q.serviceCode}
+                className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-colors ${
+                  selectedService === q.serviceCode
+                    ? "border-brand-500 bg-brand-50"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value={q.serviceCode}
+                    checked={selectedService === q.serviceCode}
+                    onChange={() => setSelectedService(q.serviceCode)}
+                    className="accent-brand-500"
+                  />
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">
+                      {q.service}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {q.deliveryTime} — Chilexpress
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <span className="font-semibold text-gray-900 text-sm">
-                ${SHIPPING_COSTS[opt.value].toLocaleString("es-CL")}
-              </span>
-            </label>
-          ))}
+                <span className="font-semibold text-gray-900 text-sm">
+                  ${q.price.toLocaleString("es-CL")}
+                </span>
+              </label>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Price breakdown */}
       <div className="bg-white rounded-lg border border-gray-200 p-5">
@@ -172,8 +247,14 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
             <span className="text-gray-900">${bookPrice.toLocaleString("es-CL")}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Envío</span>
-            <span className="text-gray-900">${shippingCost.toLocaleString("es-CL")}</span>
+            <span className="text-gray-600">
+              Envío{selectedQuote ? ` (${selectedQuote.service})` : ""}
+            </span>
+            <span className="text-gray-900">
+              {selectedQuote
+                ? `$${shippingCost.toLocaleString("es-CL")}`
+                : "Ingresa dirección"}
+            </span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Cargo por servicio</span>
@@ -181,7 +262,11 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
           </div>
           <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between font-bold">
             <span className="text-gray-900">Total</span>
-            <span className="text-gray-900">${total.toLocaleString("es-CL")}</span>
+            <span className="text-gray-900">
+              {selectedQuote
+                ? `$${total.toLocaleString("es-CL")}`
+                : "—"}
+            </span>
           </div>
         </div>
       </div>
@@ -194,10 +279,14 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
 
       <button
         type="submit"
-        disabled={loading || !address}
+        disabled={loading || !address || !selectedQuote}
         className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white font-semibold py-3 rounded-lg text-sm transition-colors"
       >
-        {loading ? "Procesando..." : `Pagar $${total.toLocaleString("es-CL")} con MercadoPago`}
+        {loading
+          ? "Procesando..."
+          : selectedQuote
+            ? `Pagar $${total.toLocaleString("es-CL")} con MercadoPago`
+            : "Ingresa dirección para cotizar envío"}
       </button>
 
       <p className="text-xs text-gray-400 text-center">

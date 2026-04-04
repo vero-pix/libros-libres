@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import type { ListingWithBook } from "@/types";
 
 function WhatsAppButton({ phone, title }: { phone: string | null; title: string }) {
@@ -45,6 +48,12 @@ const CONDITION_LABELS: Record<string, string> = {
   fair: "Estado regular",
   poor: "Con detalles",
 };
+
+interface ListingWithRentalFields extends ListingWithBook {
+  rental_price?: number | null;
+  rental_deposit?: number | null;
+  rental_period_days?: number | null;
+}
 
 interface Props {
   listing: ListingWithBook;
@@ -100,6 +109,17 @@ export default function ListingDetail({ listing }: Props) {
           {listing.price != null && listing.modality !== "loan" && (
             <p className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-4">
               ${listing.price.toLocaleString("es-CL")}
+            </p>
+          )}
+
+          {(listing as ListingWithRentalFields).rental_price != null && listing.modality !== "sale" && (
+            <p className="text-sm text-brand-600 font-semibold mt-1">
+              Arriendo: ${Number((listing as ListingWithRentalFields).rental_price).toLocaleString("es-CL")} / {(listing as ListingWithRentalFields).rental_period_days ?? 14} días
+              {(listing as ListingWithRentalFields).rental_deposit != null && (
+                <span className="text-gray-400 font-normal">
+                  {" "}+ ${Number((listing as ListingWithRentalFields).rental_deposit).toLocaleString("es-CL")} garantía
+                </span>
+              )}
             </p>
           )}
 
@@ -160,6 +180,11 @@ export default function ListingDetail({ listing }: Props) {
         </div>
       )}
 
+      {/* Rental CTA */}
+      {(listing as ListingWithRentalFields).rental_price != null && listing.modality !== "sale" && (
+        <RentalSection listing={listing as ListingWithRentalFields} />
+      )}
+
       {/* Contact CTA */}
       <div className="border-t border-gray-100 px-6 py-4 bg-gray-50">
         <WhatsAppButton
@@ -167,6 +192,140 @@ export default function ListingDetail({ listing }: Props) {
           title={book.title}
         />
       </div>
+    </div>
+  );
+}
+
+function RentalSection({ listing }: { listing: ListingWithRentalFields }) {
+  const [periodDays, setPeriodDays] = useState<7 | 14 | 30>(
+    (listing.rental_period_days as 7 | 14 | 30) ?? 14
+  );
+  const [deliveryMethod, setDeliveryMethod] = useState<"in_person" | "pickup_point" | "courier">("in_person");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const rentalPrice = Number(listing.rental_price);
+  const deposit = Number(listing.rental_deposit ?? 0);
+
+  const deliveryOptions = [
+    { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis", icon: "🤝" },
+    { value: "pickup_point" as const, label: "Punto de retiro", desc: "Acuerdan un lugar", icon: "📍" },
+    { value: "courier" as const, label: "Envío courier", desc: "Costo adicional", icon: "📦" },
+  ];
+
+  async function handleRent() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/rentals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          listing_id: listing.id,
+          period_days: periodDays,
+          delivery_method: deliveryMethod,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Error al crear arriendo");
+        return;
+      }
+      if (data.init_point) {
+        window.location.href = data.init_point;
+      }
+    } catch {
+      setError("Error de conexión");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="border-t border-gray-100 px-6 py-5 bg-brand-50/50">
+      <h3 className="font-semibold text-gray-900 mb-3">Arrendar este libro</h3>
+
+      {/* Período */}
+      <div className="mb-3">
+        <p className="text-xs font-medium text-gray-500 mb-2">Período</p>
+        <div className="grid grid-cols-3 gap-2">
+          {([7, 14, 30] as const).map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => setPeriodDays(d)}
+              className={`py-2 rounded-lg border text-sm font-medium transition-all ${
+                periodDays === d
+                  ? "border-brand-500 bg-white text-brand-700 ring-1 ring-brand-400"
+                  : "border-gray-200 text-gray-600 bg-white hover:border-gray-300"
+              }`}
+            >
+              {d} días
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Entrega */}
+      <div className="mb-4">
+        <p className="text-xs font-medium text-gray-500 mb-2">Forma de entrega</p>
+        <div className="space-y-2">
+          {deliveryOptions.map((opt) => (
+            <label
+              key={opt.value}
+              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                deliveryMethod === opt.value
+                  ? "border-brand-500 bg-white"
+                  : "border-gray-200 bg-white hover:border-gray-300"
+              }`}
+            >
+              <input
+                type="radio"
+                name="delivery"
+                value={opt.value}
+                checked={deliveryMethod === opt.value}
+                onChange={() => setDeliveryMethod(opt.value)}
+                className="accent-brand-500"
+              />
+              <span className="text-lg">{opt.icon}</span>
+              <div>
+                <p className="text-sm font-medium text-gray-800">{opt.label}</p>
+                <p className="text-xs text-gray-400">{opt.desc}</p>
+              </div>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Desglose */}
+      <div className="bg-white rounded-lg border border-gray-200 p-3 mb-4 text-sm space-y-1">
+        <div className="flex justify-between">
+          <span className="text-gray-500">Arriendo ({periodDays} días)</span>
+          <span className="text-gray-900">${rentalPrice.toLocaleString("es-CL")}</span>
+        </div>
+        {deposit > 0 && (
+          <div className="flex justify-between">
+            <span className="text-gray-500">Garantía (reembolsable)</span>
+            <span className="text-gray-900">${deposit.toLocaleString("es-CL")}</span>
+          </div>
+        )}
+        <div className="flex justify-between font-bold border-t border-gray-100 pt-1">
+          <span>Total</span>
+          <span>${(rentalPrice + deposit).toLocaleString("es-CL")}</span>
+        </div>
+      </div>
+
+      {error && (
+        <p className="text-sm text-red-600 mb-3">{error}</p>
+      )}
+
+      <button
+        onClick={handleRent}
+        disabled={loading}
+        className="w-full bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors"
+      >
+        {loading ? "Procesando..." : `Arrendar — $${(rentalPrice + deposit).toLocaleString("es-CL")}`}
+      </button>
     </div>
   );
 }

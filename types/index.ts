@@ -33,6 +33,9 @@ export interface UserProfile {
   city: string | null;
   phone: string | null;
   created_at: string;
+  mercadopago_user_id: string | null;
+  mercadopago_connected_at: string | null;
+  plan: "free" | "librero" | "libreria";
 }
 
 
