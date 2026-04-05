@@ -64,7 +64,14 @@ export default function ShelfTransformation() {
         </span>
       </div>
 
-      <div className="relative h-72 sm:h-80 rounded-2xl overflow-hidden bg-gradient-to-br from-cream-warm to-cream border border-cream-dark/30">
+      <div className="relative h-72 sm:h-80 rounded-2xl overflow-hidden border border-cream-dark/30">
+        {/* Background photo */}
+        <img
+          src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=75&auto=format"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-cream/85 backdrop-blur-[2px]" />
         {/* ── PHASE 1: DUSTY BOOKSHELF ── */}
         <div className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-1000 ${
           phase === "shelf" ? "opacity-100 scale-100" : phase === "transform" ? "opacity-50 scale-95 blur-[2px]" : "opacity-0 scale-90 blur-sm"
