@@ -15,13 +15,16 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
+export const viewport = {
+  themeColor: "#1a1a2e",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://tuslibros.cl"),
   title: "Libros Libres — Donde los libros encuentran nuevos lectores",
   description:
     "Compra, vende y presta libros cerca de ti. Publica gratis, paga seguro con MercadoPago, recibe en tu casa.",
   keywords: ["libros", "segunda mano", "marketplace", "préstamo", "Chile"],
-  themeColor: "#1a1a2e",
   openGraph: {
     title: "Libros Libres — Donde los libros encuentran nuevos lectores",
     description:
