@@ -53,39 +53,39 @@ export default function RentalSection() {
   }, []);
 
   return (
-    <section id="arriendos" className="bg-ink text-cream scroll-mt-20">
+    <section id="arriendos" className="bg-cream-warm border-t border-cream-dark scroll-mt-20">
       <div className="max-w-6xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left — value prop */}
           <div>
-            <div className="inline-flex items-center gap-2 bg-brand-500/10 border border-brand-500/20 px-4 py-1.5 rounded-full mb-6">
-              <svg className="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="inline-flex items-center gap-2 bg-brand-50 border border-brand-200 px-4 py-1.5 rounded-full mb-6">
+              <svg className="w-4 h-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
               </svg>
-              <span className="text-xs font-semibold text-brand-400 uppercase tracking-wider">Nuevo</span>
+              <span className="text-xs font-semibold text-brand-600 uppercase tracking-wider">Nuevo</span>
             </div>
 
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-cream leading-tight mb-4">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-ink leading-tight mb-4">
               No compres.
               <br />
-              <span className="italic text-brand-400">Arrienda.</span>
+              <span className="italic text-brand-600">Arrienda.</span>
             </h2>
 
-            <p className="text-cream/60 leading-relaxed mb-6 max-w-lg">
+            <p className="text-ink-muted leading-relaxed mb-6 max-w-lg">
               Lee lo que quieras sin acumular libros. Pagas solo lo que necesitas,
               devuelves cuando terminas, y recuperas tu garantía. Así de simple.
             </p>
 
             {/* Price comparison */}
             <div className="flex gap-4 mb-8">
-              <div className="bg-cream/[0.05] border border-cream/10 rounded-lg p-4 flex-1">
-                <p className="text-cream/40 text-xs uppercase tracking-wider mb-1">Comprar</p>
-                <p className="font-display text-2xl font-bold text-cream/30 line-through">$12.000</p>
+              <div className="bg-cream border border-cream-dark/30 rounded-lg p-4 flex-1">
+                <p className="text-ink-muted text-xs uppercase tracking-wider mb-1">Comprar</p>
+                <p className="font-display text-2xl font-bold text-ink-muted line-through">$12.000</p>
               </div>
-              <div className="bg-brand-500/10 border border-brand-500/20 rounded-lg p-4 flex-1">
-                <p className="text-brand-400 text-xs uppercase tracking-wider mb-1">Arrendar 14 días</p>
-                <p className="font-display text-2xl font-bold text-brand-400">$3.000</p>
-                <p className="text-brand-400/60 text-[11px] mt-0.5">+ garantía reembolsable</p>
+              <div className="bg-brand-50 border border-brand-200 rounded-lg p-4 flex-1">
+                <p className="text-brand-600 text-xs uppercase tracking-wider mb-1">Arrendar 14 días</p>
+                <p className="font-display text-2xl font-bold text-brand-600">$3.000</p>
+                <p className="text-brand-600/60 text-[11px] mt-0.5">+ garantía reembolsable</p>
               </div>
             </div>
 
@@ -105,25 +105,25 @@ export default function RentalSection() {
                 onClick={() => setActiveStep(i)}
                 className={`w-full flex items-start gap-4 p-5 rounded-lg text-left transition-all duration-500 ${
                   i === activeStep
-                    ? "bg-cream/[0.08] border border-cream/15"
-                    : "hover:bg-cream/[0.03]"
+                    ? "bg-white border border-cream-dark/40"
+                    : "hover:bg-white/50"
                 }`}
               >
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500 ${
                   i === activeStep
                     ? "bg-brand-500 text-white"
-                    : "bg-cream/[0.06] text-cream/30"
+                    : "bg-cream-dark/30 text-ink-muted"
                 }`}>
                   {step.icon}
                 </div>
                 <div>
                   <h3 className={`font-display font-bold text-sm transition-colors duration-500 ${
-                    i === activeStep ? "text-cream" : "text-cream/40"
+                    i === activeStep ? "text-ink" : "text-ink-muted"
                   }`}>
                     {step.title}
                   </h3>
                   <p className={`text-xs mt-1 transition-colors duration-500 ${
-                    i === activeStep ? "text-cream/60" : "text-cream/20"
+                    i === activeStep ? "text-ink-muted" : "text-ink/20"
                   }`}>
                     {step.desc}
                   </p>

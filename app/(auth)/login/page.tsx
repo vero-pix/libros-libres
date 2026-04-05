@@ -4,36 +4,86 @@ import LoginForm from "@/components/auth/LoginForm";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header mínimo */}
-      <div className="py-6 text-center">
-        <Link href="/" className="inline-flex items-center gap-2 text-brand-600 font-bold text-xl">
-          <span>📚</span> Libros Libres
-        </Link>
+    <div className="min-h-screen flex">
+      {/* Left — branding panel */}
+      <div className="hidden lg:flex lg:w-1/2 bg-cream-warm relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1200&q=75')] bg-cover bg-center opacity-10" />
+        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+          <Link href="/" className="group">
+            <span className="font-display text-2xl font-bold text-ink tracking-tight">
+              Libros{" "}
+            </span>
+            <span className="font-display text-2xl font-bold text-brand-600 tracking-tight group-hover:text-brand-500 transition-colors">
+              Libres
+            </span>
+          </Link>
+
+          <div className="max-w-md">
+            <h2 className="font-display text-3xl font-bold text-ink leading-tight">
+              Donde los libros encuentran{" "}
+              <span className="italic text-brand-600">nuevos lectores.</span>
+            </h2>
+            <p className="text-ink-muted mt-4 leading-relaxed">
+              Compra, vende y arrienda libros cerca de ti.
+              Más de 500 libros disponibles en todo Chile.
+            </p>
+          </div>
+
+          <div className="flex gap-8 text-ink-muted text-sm">
+            <div>
+              <p className="text-2xl font-bold text-brand-600">500+</p>
+              <p>libros</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-brand-600">150+</p>
+              <p>vendedores</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-brand-600">100%</p>
+              <p>seguro</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Card central */}
-      <div className="flex-1 flex items-center justify-center px-4 pb-16">
-        <div className="w-full max-w-sm">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-            {/* Card header */}
-            <div className="bg-brand-500 px-8 py-6 text-white text-center">
-              <h1 className="text-2xl font-bold">Bienvenido</h1>
-              <p className="text-brand-100 text-sm mt-1">Inicia sesión para continuar</p>
+      {/* Right — form */}
+      <div className="flex-1 flex flex-col bg-cream">
+        {/* Mobile logo */}
+        <div className="lg:hidden py-6 px-6">
+          <Link href="/" className="group">
+            <span className="font-display text-xl font-bold text-ink tracking-tight">
+              Libros{" "}
+            </span>
+            <span className="font-display text-xl font-bold text-brand-600 tracking-tight">
+              Libres
+            </span>
+          </Link>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center px-6 pb-12">
+          <div className="w-full max-w-sm">
+            <div className="mb-8">
+              <h1 className="font-display text-2xl font-bold text-ink">
+                Bienvenido de vuelta
+              </h1>
+              <p className="text-ink-muted text-sm mt-2">
+                Inicia sesión para acceder a tu cuenta
+              </p>
             </div>
 
-            {/* Form */}
-            <div className="px-8 py-7">
+            <div className="bg-white rounded-2xl border border-cream-dark/30 p-7">
               <Suspense>
                 <LoginForm />
               </Suspense>
             </div>
-          </div>
 
-          <p className="text-center text-xs text-gray-400 mt-6">
-            Al ingresar aceptas los{" "}
-            <span className="underline cursor-pointer">términos de uso</span>
-          </p>
+            <p className="text-center text-xs text-ink-muted mt-8">
+              Al ingresar aceptas los{" "}
+              <Link href="/terminos" className="underline hover:text-ink">
+                términos de uso
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
