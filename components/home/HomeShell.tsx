@@ -7,6 +7,7 @@ import ScanAnimation from "./ScanAnimation";
 import PaymentAnimation from "./PaymentAnimation";
 import ShippingAnimation from "./ShippingAnimation";
 import RentalSection from "./RentalSection";
+import ShelfTransformation from "./ShelfTransformation";
 
 interface Props {
   totalListings: number;
@@ -30,21 +31,34 @@ export default function HomeShell({ totalListings, hasFilters, children }: Props
       {/* Manifiesto — el "por qué" */}
       {!hasFilters && (
         <section id="manifiesto" className="bg-cream-warm border-b border-cream-dark scroll-mt-20">
-          <div className="max-w-4xl mx-auto px-6 py-12 text-center">
-            <p className="text-xs font-medium tracking-[0.3em] uppercase text-brand-600 mb-4">
-              Por qué existimos
-            </p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-ink leading-tight mb-4">
-              Uber liberó el transporte.
-              <br />
-              <span className="italic text-brand-600">Nosotros liberamos las estanterías.</span>
-            </h2>
-            <p className="text-ink-muted leading-relaxed max-w-2xl mx-auto">
-              Hay millones de libros acumulando polvo en casas de Chile. Uber hizo visible
-              cada auto disponible en tu ciudad. Nosotros hacemos visible cada libro.
-              Geolocalización en tiempo real, pago seguro, despacho a tu puerta.
-              La red de libros más grande de Chile.
-            </p>
+          <div className="max-w-6xl mx-auto px-6 py-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Left — message */}
+              <div className="text-center lg:text-left">
+                <p className="text-xs font-medium tracking-[0.3em] uppercase text-brand-600 mb-4">
+                  Por qué existimos
+                </p>
+                <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-ink leading-tight mb-4">
+                  Uber liberó el transporte.
+                  <br />
+                  <span className="italic text-brand-600">Nosotros liberamos las estanterías.</span>
+                </h2>
+                <p className="text-ink-muted leading-relaxed max-w-lg mx-auto lg:mx-0">
+                  Hay millones de libros acumulando polvo en casas de Chile.
+                  Cada estantería es una librería que nadie puede ver.
+                  Nosotros la hacemos visible: geolocalización en tiempo real,
+                  pago seguro, despacho a tu puerta.
+                </p>
+                <p className="text-ink-muted leading-relaxed mt-4 max-w-lg mx-auto lg:mx-0">
+                  Tu experiencia es personal. Tu estantería se transforma
+                  en una vitrina para lectores cerca de ti. Cada libro que
+                  publicas es un libro que encuentra un nuevo lector.
+                </p>
+              </div>
+
+              {/* Right — animated illustration */}
+              <ShelfTransformation />
+            </div>
           </div>
         </section>
       )}
