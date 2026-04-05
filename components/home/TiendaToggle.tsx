@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, type ReactNode } from "react";
+import { useState, useCallback, useEffect, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import MapSidebar from "@/components/map/MapSidebar";
 import type { ListingWithBook } from "@/types";
@@ -12,10 +12,19 @@ const BookMap = dynamic(() => import("@/components/map/BookMap"), {
 
 interface Props {
   children: ReactNode;
+  forceMap?: boolean;
+  onForceMapConsumed?: () => void;
 }
 
-export default function TiendaToggle({ children }: Props) {
+export default function TiendaToggle({ children, forceMap, onForceMapConsumed }: Props) {
   const [view, setView] = useState<"grid" | "map">("grid");
+
+  useEffect(() => {
+    if (forceMap) {
+      setView("map");
+      onForceMapConsumed?.();
+    }
+  }, [forceMap, onForceMapConsumed]);
   const [listings, setListings] = useState<ListingWithBook[]>([]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [flyTo, setFlyTo] = useState<ListingWithBook | null>(null);
