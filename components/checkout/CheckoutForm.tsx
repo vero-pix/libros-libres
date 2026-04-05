@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import type { ListingWithBook } from "@/types";
+import { SERVICE_FEE } from "@/lib/mercadopago";
 
 interface ShippingQuote {
   service: string;
@@ -10,8 +11,6 @@ interface ShippingQuote {
   deliveryTime: string;
   price: number;
 }
-
-const SERVICE_FEE = 1500;
 
 // Fallback cuando no hay API de Chilexpress o falla la cotización
 const FALLBACK_OPTIONS: ShippingQuote[] = [

@@ -148,25 +148,35 @@ export async function POST(req: NextRequest) {
     let preference;
 
     if (useSplit) {
+      const collectorId = process.env.MERCADOPAGO_COLLECTOR_ID;
+      if (!collectorId) {
+        await supabase.from("rentals").delete().eq("id", rental.id);
+        return NextResponse.json({ error: "Configuración de marketplace incompleta" }, { status: 500 });
+      }
       let sellerToken = seller.mercadopago_access_token!;
       const splitBody = {
         items,
         marketplace_fee: commission,
-        marketplace: process.env.MERCADOPAGO_COLLECTOR_ID,
+        marketplace: collectorId,
         back_urls: backUrls,
         auto_return: "approved" as const,
         external_reference: rental.id,
         notification_url: `${siteUrl}/api/webhooks/mercadopago`,
       };
 
+      const { data: sellerTokenData } = await supabase
+        .from("users")
+        .select("mercadopago_refresh_token")
+        .eq("id", seller.id)
+        .single();
+      const refreshToken = sellerTokenData?.mercadopago_refresh_token ?? "";
+
       try {
         const sellerPref = sellerPreferenceClient(sellerToken);
         preference = await sellerPref.create({ body: splitBody });
       } catch (splitErr) {
-        const freshToken = await refreshSellerToken(
-          seller.id,
-          (await supabase.from("users").select("mercadopago_refresh_token").eq("id", seller.id).single()).data?.mercadopago_refresh_token ?? ""
-        );
+        if (!refreshToken) throw splitErr;
+        const freshToken = await refreshSellerToken(seller.id, refreshToken);
         if (!freshToken) throw splitErr;
 
         sellerToken = freshToken;

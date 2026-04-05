@@ -1,7 +1,9 @@
 const API_KEY_COVERAGE = process.env.CHILEXPRESS_API_KEY_COVERAGE ?? "";
 const API_KEY_RATING = process.env.CHILEXPRESS_API_KEY_RATING ?? "";
 // const API_KEY_SHIPPING = process.env.CHILEXPRESS_API_KEY_SHIPPING ?? ""; // para crear envíos (futuro)
-const BASE_URL = "https://testservices.wschilexpress.com"; // cambiar a services.wschilexpress.com en prod
+const BASE_URL = process.env.CHILEXPRESS_ENV === "test"
+  ? "https://testservices.wschilexpress.com"
+  : "https://services.wschilexpress.com";
 
 interface CoverageResult {
   coverageCityId: number;

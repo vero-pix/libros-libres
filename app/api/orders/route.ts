@@ -156,29 +156,36 @@ export async function POST(req: NextRequest) {
 
     if (useSplit) {
       // ── SPLIT PAYMENT ──
-      // La preferencia se crea con el token del vendedor.
-      // marketplace_fee es lo que retiene tuslibros.cl (comisión + envío).
+      const collectorId = process.env.MERCADOPAGO_COLLECTOR_ID;
+      if (!collectorId) {
+        await supabase.from("orders").delete().eq("id", order.id);
+        return NextResponse.json({ error: "Configuración de marketplace incompleta" }, { status: 500 });
+      }
       let sellerToken = seller.mercadopago_access_token!;
       const splitBody = {
         items,
         marketplace_fee: commission + shippingCost,
-        marketplace: process.env.MERCADOPAGO_COLLECTOR_ID,
+        marketplace: collectorId,
         back_urls: backUrls,
         auto_return: "approved" as const,
         external_reference: order.id,
         notification_url: `${siteUrl}/api/webhooks/mercadopago`,
       };
 
+      // Get refresh token upfront
+      const { data: sellerTokenData } = await supabase
+        .from("users")
+        .select("mercadopago_refresh_token")
+        .eq("id", seller.id)
+        .single();
+      const refreshToken = sellerTokenData?.mercadopago_refresh_token ?? "";
+
       try {
         const sellerPref = sellerPreferenceClient(sellerToken);
         preference = await sellerPref.create({ body: splitBody });
       } catch (splitErr) {
-        // Token expirado — intentar refresh
-        const freshToken = await refreshSellerToken(
-          seller.id,
-          // Need refresh token from DB
-          (await supabase.from("users").select("mercadopago_refresh_token").eq("id", seller.id).single()).data?.mercadopago_refresh_token ?? ""
-        );
+        if (!refreshToken) throw splitErr;
+        const freshToken = await refreshSellerToken(seller.id, refreshToken);
         if (!freshToken) throw splitErr;
 
         sellerToken = freshToken;

@@ -2,14 +2,62 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { paymentClient } from "@/lib/mercadopago";
 import { notifySeller } from "@/lib/notifications";
+import crypto from "crypto";
+
+/**
+ * Verify MercadoPago webhook signature (x-signature header).
+ * See: https://www.mercadopago.cl/developers/es/docs/your-integrations/notifications/webhooks
+ */
+function verifySignature(req: NextRequest, body: Record<string, unknown>): boolean {
+  const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
+  if (!secret) {
+    console.warn("[webhook] MERCADOPAGO_WEBHOOK_SECRET not set — skipping verification");
+    return true; // Allow in dev, but log warning
+  }
+
+  const xSignature = req.headers.get("x-signature");
+  const xRequestId = req.headers.get("x-request-id");
+  if (!xSignature || !xRequestId) return false;
+
+  // Parse ts and v1 from x-signature header
+  const parts = Object.fromEntries(
+    xSignature.split(",").map((p) => {
+      const [key, ...val] = p.trim().split("=");
+      return [key, val.join("=")];
+    })
+  );
+
+  const ts = parts["ts"];
+  const v1 = parts["v1"];
+  if (!ts || !v1) return false;
+
+  // Build manifest string
+  const dataId = (body as Record<string, unknown>).data
+    ? ((body as Record<string, unknown>).data as Record<string, unknown>).id ?? ""
+    : "";
+  const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+
+  const hmac = crypto
+    .createHmac("sha256", secret)
+    .update(manifest)
+    .digest("hex");
+
+  return hmac === v1;
+}
 
 /**
  * MercadoPago IPN webhook.
- * Handles both orders and rentals (distinguished by external_reference prefix).
+ * Handles both orders and rentals (distinguished by external_reference).
  * Uses service_role key to bypass RLS.
  */
 export async function POST(req: NextRequest) {
   const body = await req.json();
+
+  // Verify signature
+  if (!verifySignature(req, body)) {
+    console.error("[webhook] Invalid signature");
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+  }
 
   if (body.type !== "payment" && body.action !== "payment.created") {
     return NextResponse.json({ received: true });
@@ -95,7 +143,6 @@ export async function POST(req: NextRequest) {
           .eq("id", rental.id);
 
         if (status === "paid") {
-          // Mark listing as rented (not completed — it'll return)
           await supabase
             .from("listings")
             .update({ status: "rented" })
