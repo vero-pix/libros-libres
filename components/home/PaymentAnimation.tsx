@@ -20,7 +20,7 @@ export default function PaymentAnimation() {
   }, []);
 
   return (
-    <section id="pago-seguro" className="bg-cream border-b border-cream-dark scroll-mt-20">
+    <section id="pago-seguro" className="bg-cream border-b border-cream-dark scroll-mt-20 overflow-hidden">
       <div className="max-w-6xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <p className="text-xs font-medium tracking-[0.3em] uppercase text-brand-600 mb-3">
@@ -38,7 +38,7 @@ export default function PaymentAnimation() {
         <div className="max-w-3xl mx-auto">
           <div className="grid grid-cols-4 gap-2 sm:gap-4">
             {STEPS.map((s, i) => (
-              <div key={i} className="flex flex-col items-center text-center">
+              <div key={i} className="relative flex flex-col items-center text-center">
                 {/* Icon circle */}
                 <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-700 ${
                   i <= step
