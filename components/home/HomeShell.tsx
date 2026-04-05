@@ -3,6 +3,9 @@
 import { useState, useCallback, type ReactNode } from "react";
 import HeroBar from "./HeroBar";
 import TiendaToggle from "./TiendaToggle";
+import ScanAnimation from "./ScanAnimation";
+import PaymentAnimation from "./PaymentAnimation";
+import ShippingAnimation from "./ShippingAnimation";
 
 interface Props {
   totalListings: number;
@@ -50,6 +53,15 @@ export default function HomeShell({ totalListings, hasFilters, children }: Props
           {children}
         </TiendaToggle>
       </main>
+
+      {/* Feature sections — below the store */}
+      {!hasFilters && (
+        <>
+          <ScanAnimation />
+          <PaymentAnimation />
+          <ShippingAnimation />
+        </>
+      )}
     </>
   );
 }
