@@ -1,5 +1,5 @@
 export type Modality = "sale" | "loan" | "both";
-export type ListingStatus = "active" | "paused" | "completed";
+export type ListingStatus = "active" | "paused" | "rented" | "completed";
 export type BookCondition = "new" | "good" | "fair" | "poor";
 
 export interface BookData {

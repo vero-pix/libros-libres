@@ -11,7 +11,7 @@ create extension if not exists "postgis";  -- Para consultas geoespaciales
 -- Tipos enumerados
 -- ─────────────────────────────────────────────
 create type modality as enum ('sale', 'loan', 'both');
-create type listing_status as enum ('active', 'paused', 'completed');
+create type listing_status as enum ('active', 'paused', 'rented', 'completed');
 create type book_condition as enum ('new', 'good', 'fair', 'poor');
 
 -- ─────────────────────────────────────────────

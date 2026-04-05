@@ -27,7 +27,7 @@ export default async function Navbar() {
   return (
     <header className="shrink-0">
       {/* Row 1: Logo + Search + Auth */}
-      <div className="bg-cream border-b border-cream-dark px-4 py-4">
+      <div className="bg-cream px-4 py-4">
         <div className="max-w-7xl mx-auto flex items-center gap-6">
           <Link href="/" className="group whitespace-nowrap">
             <span className="font-display text-2xl font-bold text-ink tracking-tight">
@@ -58,6 +58,7 @@ export default async function Navbar() {
             { href: "/publish", label: "Vende tu libro" },
             { href: "/mis-libros", label: "Mis libros" },
             { href: "/mis-pedidos", label: "Pedidos" },
+            { href: "/mis-ventas", label: "Ventas" },
             { href: "/mis-arriendos", label: "Arriendos" },
             { href: "/mapa", label: "Mapa" },
             { href: "/como-funciona", label: "Cómo funciona" },
