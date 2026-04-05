@@ -25,9 +25,9 @@ export default async function Navbar() {
   }
 
   return (
-    <header className="shrink-0 bg-ink text-[0px]">
+    <header className="shrink-0 bg-ink flex flex-col">
       {/* Row 1: Logo + Search + Auth */}
-      <div className="bg-cream px-4 py-4 text-base relative z-0 -mb-[1px]">
+      <div className="bg-cream px-4 py-4">
         <div className="max-w-7xl mx-auto flex items-center gap-6">
           <Link href="/" className="group whitespace-nowrap">
             <span className="font-display text-2xl font-bold text-ink tracking-tight">
@@ -51,7 +51,7 @@ export default async function Navbar() {
       </div>
 
       {/* Row 2: Navigation */}
-      <nav className="text-cream-warm text-base relative z-10">
+      <nav className="text-cream-warm">
         <div className="max-w-7xl mx-auto px-4 flex items-center gap-0 overflow-x-auto">
           {[
             { href: "/", label: "Inicio" },
