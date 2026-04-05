@@ -6,6 +6,7 @@ import TiendaToggle from "./TiendaToggle";
 import ScanAnimation from "./ScanAnimation";
 import PaymentAnimation from "./PaymentAnimation";
 import ShippingAnimation from "./ShippingAnimation";
+import RentalSection from "./RentalSection";
 
 interface Props {
   totalListings: number;
@@ -60,6 +61,7 @@ export default function HomeShell({ totalListings, hasFilters, children }: Props
           <ScanAnimation />
           <PaymentAnimation />
           <ShippingAnimation />
+          <RentalSection />
         </>
       )}
     </>

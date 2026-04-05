@@ -159,11 +159,11 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-6">
 
       {/* ── Sección 1: Libro ── */}
-      <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <section className="bg-white rounded-2xl border border-cream-dark shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-cream-dark bg-cream-warm">
           <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">1</span>
             ¿Qué libro quieres publicar?
@@ -188,8 +188,8 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
 
       {/* ── Sección 1b: Categoría ── */}
       {book && (
-        <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <section className="bg-white rounded-2xl border border-cream-dark shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-cream-dark bg-cream-warm">
             <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
               Categoría
               <span className="text-gray-400 font-normal">(opcional)</span>
@@ -216,8 +216,8 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
       )}
 
       {/* ── Sección 2: Modalidad y precio ── */}
-      <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <section className="bg-white rounded-2xl border border-cream-dark shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-cream-dark bg-cream-warm">
           <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">2</span>
             ¿Cómo lo quieres ofrecer?
@@ -356,8 +356,8 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
       </section>
 
       {/* ── Sección 3: Descripción adicional ── */}
-      <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <section className="bg-white rounded-2xl border border-cream-dark shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-cream-dark bg-cream-warm">
           <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">3</span>
             Descripción adicional
@@ -378,8 +378,8 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
       </section>
 
       {/* ── Sección 4: Teléfono WhatsApp ── */}
-      <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <section className="bg-white rounded-2xl border border-cream-dark shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-cream-dark bg-cream-warm">
           <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">4</span>
             Tu WhatsApp
@@ -422,8 +422,8 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
       </section>
 
       {/* ── Sección 5: Ubicación ── */}
-      <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <section className="bg-white rounded-2xl border border-cream-dark shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-cream-dark bg-cream-warm">
           <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">5</span>
             ¿Dónde está el libro?
