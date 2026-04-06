@@ -63,7 +63,7 @@ export default async function ListingPage({ params }: Props) {
         />
         <ListingDetail listing={listing} images={(images ?? []) as any} />
 
-        <div className="mt-6 bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div id="reviews" className="mt-6 bg-white rounded-2xl border border-gray-200 overflow-hidden">
           <ReviewSection listingId={params.id} />
         </div>
 

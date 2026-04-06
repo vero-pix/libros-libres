@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { OrderWithDetails } from "@/types";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -58,6 +59,14 @@ function OrderCard({ order }: { order: OrderWithDetails }) {
             <span>Tracking: {order.tracking_code}</span>
           )}
         </div>
+        {["paid", "shipped", "delivered"].includes(order.status) && (
+          <Link
+            href={`/listings/${order.listing_id}#reviews`}
+            className="mt-2 inline-block text-xs font-semibold text-brand-500 hover:text-brand-600 transition-colors"
+          >
+            Dejar valoración
+          </Link>
+        )}
       </div>
     </div>
   );

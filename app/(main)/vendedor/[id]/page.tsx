@@ -45,6 +45,27 @@ export default async function SellerStorePage({ params }: Props) {
 
   const listings = (data as unknown as ListingWithBook[]) ?? [];
 
+  // Seller reviews: reviews for all listings owned by this seller
+  const listingIds = listings.map((l) => l.id);
+  let sellerReviews: { id: string; rating: number; comment: string | null; created_at: string; reviewer: { full_name: string | null } | null; listing: { id: string; book: { title: string } } | null }[] = [];
+  let avgRating = 0;
+  let totalReviews = 0;
+
+  if (listingIds.length > 0) {
+    const { data: reviewsData } = await supabase
+      .from("reviews")
+      .select("id, rating, comment, created_at, reviewer:users!reviewer_id(full_name), listing:listings!listing_id(id, book:books(title))")
+      .in("listing_id", listingIds)
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    sellerReviews = (reviewsData as any) ?? [];
+    totalReviews = sellerReviews.length;
+    if (totalReviews > 0) {
+      avgRating = sellerReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews;
+    }
+  }
+
   // Stats
   const totalListings = listings.length;
   const avgPrice =
@@ -89,6 +110,17 @@ export default async function SellerStorePage({ params }: Props) {
                   {totalListings === 1 ? "libro publicado" : "libros publicados"}
                 </p>
               </div>
+              {totalReviews > 0 && (
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {"★".repeat(Math.round(avgRating))}{"☆".repeat(5 - Math.round(avgRating))}{" "}
+                    <span className="text-base font-normal text-gray-500">{avgRating.toFixed(1)}</span>
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {totalReviews} {totalReviews === 1 ? "reseña" : "reseñas"}
+                  </p>
+                </div>
+              )}
               {avgPrice && (
                 <div>
                   <p className="text-2xl font-bold text-gray-900">
@@ -139,6 +171,39 @@ export default async function SellerStorePage({ params }: Props) {
           <div className="text-center py-16 text-gray-400">
             <p className="text-lg">Este vendedor no tiene libros disponibles actualmente.</p>
           </div>
+        )}
+
+        {/* Seller reviews */}
+        {sellerReviews.length > 0 && (
+          <section className="mt-10 pt-8 border-t border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Reseñas recientes
+            </h2>
+            <div className="space-y-3">
+              {sellerReviews.map((r) => (
+                <div key={r.id} className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-yellow-400 text-sm">
+                      {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {new Date(r.created_at).toLocaleDateString("es-CL")}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    {(r.reviewer as any)?.full_name?.split(" ")[0] ?? "Usuario"}{" "}
+                    sobre{" "}
+                    <span className="font-medium text-gray-700">
+                      {(r.listing as any)?.book?.title ?? "Libro"}
+                    </span>
+                  </p>
+                  {r.comment && (
+                    <p className="text-sm text-gray-600 mt-1">{r.comment}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
         )}
       </main>
     </div>
