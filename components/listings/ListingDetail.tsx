@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { ListingWithBook } from "@/types";
+import AddToCartButton from "@/components/ui/AddToCartButton";
 
 function WhatsAppButton({ phone, title }: { phone: string | null; title: string }) {
   if (!phone) {
@@ -167,7 +168,7 @@ export default function ListingDetail({ listing }: Props) {
 
       {/* Buy CTA */}
       {listing.price != null && listing.modality !== "loan" && (
-        <div className="border-t border-gray-100 px-6 py-4 bg-gray-50">
+        <div className="border-t border-gray-100 px-6 py-4 bg-gray-50 space-y-3">
           <Link
             href={`/checkout/${listing.id}`}
             className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold py-4 rounded-xl transition-all text-lg shadow-md hover:shadow-lg"
@@ -177,6 +178,7 @@ export default function ListingDetail({ listing }: Props) {
             </svg>
             Comprar — ${listing.price.toLocaleString("es-CL")}
           </Link>
+          <AddToCartButton listingId={listing.id} />
         </div>
       )}
 
