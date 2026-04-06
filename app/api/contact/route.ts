@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { sendEmail } from "@/lib/email";
 
 /**
  * POST /api/contact
@@ -32,6 +33,23 @@ export async function POST(req: NextRequest) {
   if (error) {
     console.error("Contact form error:", error.message);
     return NextResponse.json({ error: "Error al enviar" }, { status: 500 });
+  }
+
+  // Send notification email (don't fail the request if this errors)
+  try {
+    await sendEmail({
+      to: "vero@economics.cl",
+      subject: "Nuevo mensaje de contacto — tuslibros.cl",
+      html: `
+        <h2>Nuevo mensaje de contacto</h2>
+        <p><strong>Nombre:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Mensaje:</strong></p>
+        <p>${message.replace(/\n/g, "<br>")}</p>
+      `,
+    });
+  } catch (emailErr) {
+    console.error("Contact email notification failed:", emailErr);
   }
 
   return NextResponse.json({ ok: true });

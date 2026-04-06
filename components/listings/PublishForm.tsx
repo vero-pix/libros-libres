@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import ISBNSearch from "@/components/books/ISBNSearch";
@@ -10,6 +10,7 @@ import Image from "next/image";
 import { CATEGORY_OPTIONS } from "@/lib/genres";
 import CoverUpload from "@/components/books/CoverUpload";
 import ImageUploadMultiple from "@/components/listings/ImageUploadMultiple";
+import { compressImage } from "@/lib/image-compress";
 import Link from "next/link";
 
 type Modality = "sale" | "loan" | "both";
@@ -59,6 +60,9 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
   const [location, setLocation] = useState<LocationData | null>(
     defaultLocation ?? null
   );
+  const [pendingImages, setPendingImages] = useState<File[]>([]);
+  const [pendingPreviews, setPendingPreviews] = useState<string[]>([]);
+  const pendingInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [publishSuccess, setPublishSuccess] = useState(false);
@@ -79,6 +83,55 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
     }).eq("id", userId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
+
+  function handlePendingFiles(files: FileList) {
+    const newFiles: File[] = [];
+    const newPreviews: string[] = [];
+    for (const f of Array.from(files)) {
+      if (!f.type.startsWith("image/")) continue;
+      if (f.size > 10 * 1024 * 1024) continue;
+      if (pendingImages.length + newFiles.length >= 5) break;
+      newFiles.push(f);
+      newPreviews.push(URL.createObjectURL(f));
+    }
+    setPendingImages((prev) => [...prev, ...newFiles]);
+    setPendingPreviews((prev) => [...prev, ...newPreviews]);
+  }
+
+  function removePendingImage(index: number) {
+    URL.revokeObjectURL(pendingPreviews[index]);
+    setPendingImages((prev) => prev.filter((_, i) => i !== index));
+    setPendingPreviews((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  async function uploadPendingImages(listingId: string) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || pendingImages.length === 0) return;
+
+    for (let i = 0; i < pendingImages.length; i++) {
+      try {
+        const file = await compressImage(pendingImages[i]);
+        const path = `${user.id}/${listingId}/${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
+
+        const { error: uploadErr } = await supabase.storage
+          .from("covers")
+          .upload(path, file, { upsert: true });
+        if (uploadErr) continue;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from("covers")
+          .getPublicUrl(path);
+
+        await supabase.from("listing_images").insert({
+          listing_id: listingId,
+          image_url: publicUrl,
+          sort_order: i,
+        });
+      } catch {
+        console.error("Failed to upload pending image", i);
+      }
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -151,6 +204,11 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
       // Guardar teléfono en el perfil del usuario si fue ingresado
       if (phone) {
         await supabase.from("users").update({ phone }).eq("id", userId);
+      }
+
+      // Upload pending additional images
+      if (newListing?.id && pendingImages.length > 0) {
+        await uploadPendingImages(newListing.id);
       }
 
       setPublishedListingId(newListing?.id ?? null);
@@ -424,6 +482,56 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
             className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
           />
           <p className="text-xs text-gray-400 mt-1 text-right">{notes.length}/500</p>
+        </div>
+      </section>
+
+      {/* ── Sección 3b: Fotos adicionales ── */}
+      <section className="bg-white rounded-2xl border border-cream-dark shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-cream-dark bg-cream-warm">
+          <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+            Fotos adicionales
+            <span className="text-gray-400 font-normal">(opcional)</span>
+          </h2>
+          <p className="text-xs text-gray-400 mt-1">
+            Contraportada, estado del lomo, detalles. Se suben al publicar.
+          </p>
+        </div>
+        <div className="px-6 py-5">
+          <div className="flex flex-wrap gap-2">
+            {pendingPreviews.map((src, i) => (
+              <div key={i} className="relative w-16 h-20 rounded overflow-hidden border border-gray-200">
+                <img src={src} alt="" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removePendingImage(i)}
+                  className="absolute top-0.5 right-0.5 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
+                >
+                  x
+                </button>
+              </div>
+            ))}
+            {pendingImages.length < 5 && (
+              <button
+                type="button"
+                onClick={() => pendingInputRef.current?.click()}
+                className="w-16 h-20 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center hover:border-brand-400 transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                <span className="text-[9px] text-gray-400">Foto</span>
+              </button>
+            )}
+          </div>
+          <p className="text-[10px] text-gray-400 mt-1">{pendingImages.length}/5 fotos adicionales</p>
+          <input
+            ref={pendingInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={(e) => e.target.files && handlePendingFiles(e.target.files)}
+          />
         </div>
       </section>
 
