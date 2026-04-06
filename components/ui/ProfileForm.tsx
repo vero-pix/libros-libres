@@ -134,14 +134,21 @@ export default function ProfileForm({
     setSaved(false);
     setError(null);
 
+    const updateData: Record<string, string | null> = {
+      full_name: fullName.trim() || null,
+      phone: phone.trim() || null,
+      bio: bio.trim() || null,
+    };
+
+    // Use upsert to handle users that don't have a row in public.users yet
     const { error: updateError } = await supabase
       .from("users")
-      .update({ full_name: fullName.trim() || null, phone: phone.trim() || null, bio: bio.trim() || null })
+      .upsert({ id: userId, email, ...updateData })
       .eq("id", userId);
 
     setLoading(false);
     if (updateError) {
-      setError("No se pudieron guardar los cambios. Intenta de nuevo.");
+      setError("No se pudieron guardar los cambios: " + updateError.message);
     } else {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
