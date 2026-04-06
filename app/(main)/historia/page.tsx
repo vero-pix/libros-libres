@@ -65,7 +65,7 @@ const techStack = [
   { name: "Mapbox", color: "bg-indigo-600 text-white" },
   { name: "MercadoPago", color: "bg-sky-500 text-white" },
   { name: "Vercel", color: "bg-ink text-white" },
-  { name: "Claude Code", color: "bg-brand-600 text-white" },
+  { name: "Inteligencia Artificial", color: "bg-brand-600 text-white" },
 ];
 
 const stats = [
@@ -109,7 +109,7 @@ export default async function HistoriaPage() {
             tuslibros.cl nació como un sitio WordPress con el theme Martfury.
             Funcionaba, pero era lento, difícil de personalizar y costoso de
             mantener. En abril de 2026, decidí reconstruirlo desde cero usando{" "}
-            <strong>Claude Code</strong> como mi copiloto de desarrollo. El
+            inteligencia artificial como copiloto de desarrollo. El
             resultado: un marketplace moderno, rápido y completamente
             personalizado — en solo 7 días.
           </p>
@@ -223,12 +223,10 @@ export default async function HistoriaPage() {
               Explorar tuslibros.cl
             </Link>
             <a
-              href="https://docs.anthropic.com/en/docs/claude-code"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block border-2 border-ink text-ink hover:bg-ink hover:text-white font-bold px-8 py-4 rounded-lg text-lg transition-colors"
+              href="https://tuslibros.cl"
+              className="inline-block border-2 border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white font-bold px-8 py-4 rounded-lg text-lg transition-colors"
             >
-              Conocer Claude Code
+              Explorar tuslibros.cl
             </a>
           </div>
           <p className="text-ink-muted text-sm mt-8">
