@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { ListingWithBook } from "@/types";
 import AddToCartButton from "@/components/ui/AddToCartButton";
 import AdSlot from "@/components/ui/AdSlot";
+import ImageGallery from "./ImageGallery";
 
 function WhatsAppButton({ phone, title }: { phone: string | null; title: string }) {
   if (!phone) {
@@ -59,9 +60,10 @@ interface ListingWithRentalFields extends ListingWithBook {
 
 interface Props {
   listing: ListingWithBook;
+  images?: { id: string; image_url: string }[];
 }
 
-export default function ListingDetail({ listing }: Props) {
+export default function ListingDetail({ listing, images = [] }: Props) {
   const { book } = listing;
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
@@ -70,23 +72,13 @@ export default function ListingDetail({ listing }: Props) {
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
       {/* Cover + Info — mobile: imagen arriba centrada, desktop: lado a lado */}
       <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 p-5 sm:p-8">
-        {/* Cover */}
+        {/* Cover / Gallery */}
         <div className="flex-shrink-0 flex justify-center sm:justify-start">
-          {coverUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={coverUrl}
-              alt={book.title}
-              className="rounded-lg shadow-md object-cover w-[160px] h-[224px] sm:w-[200px] sm:h-[280px]"
-            />
-          ) : (
-            <div className="w-[160px] h-[224px] sm:w-[200px] sm:h-[280px] bg-gradient-to-br from-brand-100 to-brand-50 rounded-lg flex flex-col items-center justify-center gap-3">
-              <svg className="w-12 h-12 sm:w-16 sm:h-16 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.331 0 4.473.89 6.074 2.356M12 6.042a8.968 8.968 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.356M12 6.042V20.356" />
-              </svg>
-              <span className="text-sm text-brand-500 font-medium">Sin portada</span>
-            </div>
-          )}
+          <ImageGallery
+            mainImage={coverUrl}
+            images={images}
+            alt={book.title}
+          />
         </div>
 
         {/* Info */}

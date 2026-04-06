@@ -25,10 +25,17 @@ export default async function ListingPage({ params }: Props) {
     notFound();
   }
 
+  // Fetch additional images
+  const { data: images } = await supabase
+    .from("listing_images")
+    .select("id, image_url")
+    .eq("listing_id", params.id)
+    .order("sort_order", { ascending: true });
+
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-3xl mx-auto px-4 py-10">
-        <ListingDetail listing={listing} />
+        <ListingDetail listing={listing} images={(images ?? []) as any} />
       </main>
     </div>
   );
