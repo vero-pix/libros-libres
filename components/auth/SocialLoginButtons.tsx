@@ -54,13 +54,13 @@ export default function SocialLoginButtons() {
       {/* LinkedIn */}
       <button
         type="button"
-        disabled
-        className="w-full flex items-center justify-center gap-3 py-2.5 border border-cream-dark/40 rounded-xl text-sm font-medium text-ink-muted cursor-not-allowed opacity-60"
+        onClick={() => handleOAuth("linkedin_oidc")}
+        className="w-full flex items-center justify-center gap-3 py-2.5 border border-cream-dark/40 rounded-xl text-sm font-medium text-ink hover:bg-cream-warm transition-colors"
       >
         <svg width="18" height="18" viewBox="0 0 18 18" fill="#0A66C2">
           <path d="M15.34 0H2.66A2.66 2.66 0 0 0 0 2.66v12.68A2.66 2.66 0 0 0 2.66 18h12.68A2.66 2.66 0 0 0 18 15.34V2.66A2.66 2.66 0 0 0 15.34 0zM5.34 15.34H2.66V6.75h2.68v8.59zM4 5.68a1.55 1.55 0 1 1 0-3.1 1.55 1.55 0 0 1 0 3.1zm11.34 9.66h-2.68V11.1c0-1.01-.02-2.32-1.41-2.32-1.42 0-1.63 1.1-1.63 2.24v4.32H6.94V6.75h2.57v1.17h.04a2.82 2.82 0 0 1 2.54-1.4c2.72 0 3.22 1.79 3.22 4.12v4.7z" />
         </svg>
-        LinkedIn <span className="text-[10px] text-ink-muted ml-1">pronto</span>
+        LinkedIn
       </button>
     </div>
   );
