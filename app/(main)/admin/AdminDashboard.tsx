@@ -92,29 +92,31 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
   const [orders, setOrders] = useState(initOrders);
   const [listings, setListings] = useState(initListings);
   const [users, setUsers] = useState(initUsers);
+  const [msgs, setMsgs] = useState(messages);
+  const [subs, setSubs] = useState(subscribers);
+
+  const unreadMessages = msgs.filter((m) => !m.read).length;
+  const totalRevenue = orders
+    .filter((o) => o.status === "paid" || o.status === "shipped" || o.status === "delivered")
+    .reduce((sum, o) => sum + (o.service_fee ?? 0), 0);
 
   const tabs: { key: Tab; label: string; count: number }[] = [
     { key: "orders", label: "Pedidos", count: orders.length },
     { key: "listings", label: "Publicaciones", count: listings.length },
     { key: "users", label: "Usuarios", count: users.length },
-    { key: "messages", label: "Mensajes", count: messages.length },
-    { key: "subscribers", label: "Newsletter", count: subscribers.length },
+    { key: "messages", label: "Mensajes", count: msgs.length },
+    { key: "subscribers", label: "Newsletter", count: subs.length },
   ];
 
   return (
     <div>
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <Stat label="Pedidos" value={orders.length} />
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+        <Stat label="Ingresos totales" value={`$${totalRevenue.toLocaleString("es-CL")}`} />
         <Stat label="Publicaciones activas" value={listings.filter((l) => l.status === "active").length} />
-        <Stat label="Usuarios" value={users.length} />
-        <Stat
-          label="Ingresos (fee)"
-          value={`$${orders
-            .filter((o) => o.status !== "cancelled")
-            .reduce((sum, o) => sum + (o.service_fee ?? 0), 0)
-            .toLocaleString("es-CL")}`}
-        />
+        <Stat label="Usuarios registrados" value={users.length} />
+        <Stat label="Mensajes sin leer" value={unreadMessages} />
+        <Stat label="Suscriptores newsletter" value={subs.length} />
       </div>
 
       {/* Tabs */}
@@ -133,7 +135,7 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
       </div>
 
       {tab === "orders" && (
-        <OrdersTab orders={orders} onUpdate={(updated) => setOrders((prev) => prev.map((o) => (o.id === updated.id ? updated : o)))} />
+        <OrdersTab orders={orders} onUpdate={(updated) => setOrders((prev) => prev.map((o) => (o.id === updated.id ? updated : o)))} onDelete={(ids) => setOrders((prev) => prev.filter((o) => !ids.includes(o.id)))} />
       )}
       {tab === "listings" && (
         <ListingsTab listings={listings} onUpdate={setListings} />
@@ -143,10 +145,10 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
       )}
       {tab === "messages" && (
         <div className="space-y-3">
-          {messages.length === 0 ? (
+          {msgs.length === 0 ? (
             <EmptyState text="Sin mensajes de contacto" />
           ) : (
-            messages.map((m) => (
+            msgs.map((m) => (
               <div key={m.id} className="bg-white rounded-xl border border-gray-200 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -165,7 +167,7 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
       )}
       {tab === "subscribers" && (
         <div>
-          {subscribers.length === 0 ? (
+          {subs.length === 0 ? (
             <EmptyState text="Sin suscriptores al newsletter" />
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -177,7 +179,7 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {subscribers.map((s) => (
+                  {subs.map((s) => (
                     <tr key={s.id}>
                       <td className="px-4 py-3 text-gray-900">{s.email}</td>
                       <td className="px-4 py-3 text-gray-400 text-xs">
@@ -217,12 +219,44 @@ const ORDER_STATUS_LABELS: Record<string, { label: string; color: string }> = {
   cancelled: { label: "Cancelado", color: "bg-red-100 text-red-600" },
 };
 
-function OrdersTab({ orders, onUpdate }: { orders: AdminOrder[]; onUpdate: (o: AdminOrder) => void }) {
+function OrdersTab({ orders, onUpdate, onDelete }: { orders: AdminOrder[]; onUpdate: (o: AdminOrder) => void; onDelete: (ids: string[]) => void }) {
   const supabase = createClient();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
+  const allSelected = filtered.length > 0 && filtered.every((o) => selected.has(o.id));
+
+  function toggleAll() {
+    if (allSelected) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(filtered.map((o) => o.id)));
+    }
+  }
+
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  async function deleteOrder(id: string) {
+    if (!window.confirm("¿Eliminar este pedido?")) return;
+    const { error } = await supabase.from("orders").delete().eq("id", id);
+    if (!error) { onDelete([id]); setSelected((prev) => { const n = new Set(prev); n.delete(id); return n; }); }
+  }
+
+  async function deleteSelected() {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    if (!window.confirm(`¿Eliminar ${ids.length} pedido(s)?`)) return;
+    const { error } = await supabase.from("orders").delete().in("id", ids);
+    if (!error) { onDelete(ids); setSelected(new Set()); }
+  }
 
   async function updateOrder(id: string, updates: Record<string, unknown>) {
     const { error } = await supabase.from("orders").update(updates).eq("id", id);
@@ -245,19 +279,35 @@ function OrdersTab({ orders, onUpdate }: { orders: AdminOrder[]; onUpdate: (o: A
         ))}
       </div>
 
+      {/* Bulk actions */}
+      <div className="flex items-center gap-3">
+        <label className="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
+          <input type="checkbox" checked={allSelected} onChange={toggleAll} className="rounded border-gray-300" />
+          Seleccionar todos
+        </label>
+        {selected.size > 0 && (
+          <button onClick={deleteSelected} className="text-xs text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg">
+            Eliminar seleccionados ({selected.size})
+          </button>
+        )}
+      </div>
+
       {filtered.length === 0 && <EmptyState text="No hay pedidos con este filtro." />}
 
       {filtered.map((order) => (
         <div key={order.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="p-4">
             <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="font-semibold text-sm text-gray-900 truncate">
-                  {order.listing?.book?.title ?? "Libro eliminado"}
-                </p>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Comprador: {order.buyer?.full_name ?? order.buyer?.email ?? "—"} · Vendedor: {order.listing?.seller?.full_name ?? "—"}
-                </p>
+              <div className="flex items-start gap-3 min-w-0">
+                <input type="checkbox" checked={selected.has(order.id)} onChange={() => toggleOne(order.id)} className="mt-1 rounded border-gray-300" />
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm text-gray-900 truncate">
+                    {order.listing?.book?.title ?? "Libro eliminado"}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Comprador: {order.buyer?.full_name ?? order.buyer?.email ?? "—"} · Vendedor: {order.listing?.seller?.full_name ?? "—"}
+                  </p>
+                </div>
               </div>
               <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${ORDER_STATUS_LABELS[order.status]?.color}`}>
                 {ORDER_STATUS_LABELS[order.status]?.label}
@@ -297,6 +347,12 @@ function OrdersTab({ orders, onUpdate }: { orders: AdminOrder[]; onUpdate: (o: A
                 className="text-xs text-gray-500 hover:bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-200"
               >
                 {editingId === order.id ? "Cancelar" : "Editar"}
+              </button>
+              <button
+                onClick={() => deleteOrder(order.id)}
+                className="text-xs text-red-500 hover:bg-red-50 px-2.5 py-1 rounded-lg border border-red-200"
+              >
+                Eliminar
               </button>
             </div>
           </div>
@@ -352,17 +408,34 @@ function OrderEditForm({ order, onSave, onCancel }: { order: AdminOrder; onSave:
    LISTINGS TAB
    ════════════════════════════════════════════════ */
 
+const LISTING_STATUSES = ["active", "paused", "completed", "rented"] as const;
 const LISTING_STATUS_LABELS: Record<string, { label: string; color: string }> = {
   active: { label: "Activo", color: "bg-green-100 text-green-700" },
   paused: { label: "Pausado", color: "bg-yellow-100 text-yellow-700" },
   completed: { label: "Vendido", color: "bg-gray-100 text-gray-500" },
+  rented: { label: "Arrendado", color: "bg-blue-100 text-blue-700" },
 };
 
 function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdate: (l: AdminListing[]) => void }) {
   const supabase = createClient();
   const [filter, setFilter] = useState("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const filtered = filter === "all" ? listings : listings.filter((l) => l.status === filter);
+  const allSelected = filtered.length > 0 && filtered.every((l) => selected.has(l.id));
+
+  function toggleAll() {
+    if (allSelected) setSelected(new Set());
+    else setSelected(new Set(filtered.map((l) => l.id)));
+  }
+
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
 
   async function updateStatus(id: string, status: string) {
     const { error } = await supabase.from("listings").update({ status }).eq("id", id);
@@ -372,10 +445,22 @@ function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdat
   }
 
   async function deleteListing(id: string) {
-    if (!confirm("¿Eliminar esta publicación?")) return;
+    if (!window.confirm("¿Eliminar esta publicación?")) return;
     const { error } = await supabase.from("listings").delete().eq("id", id);
     if (!error) {
       onUpdate(listings.filter((l) => l.id !== id));
+      setSelected((prev) => { const n = new Set(prev); n.delete(id); return n; });
+    }
+  }
+
+  async function deleteSelected() {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    if (!window.confirm(`¿Eliminar ${ids.length} publicación(es)?`)) return;
+    const { error } = await supabase.from("listings").delete().in("id", ids);
+    if (!error) {
+      onUpdate(listings.filter((l) => !ids.includes(l.id)));
+      setSelected(new Set());
     }
   }
 
@@ -383,11 +468,24 @@ function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdat
     <div className="space-y-3">
       <div className="flex gap-1 flex-wrap">
         <FilterBtn active={filter === "all"} onClick={() => setFilter("all")}>Todas ({listings.length})</FilterBtn>
-        {["active", "paused", "completed"].map((s) => (
+        {LISTING_STATUSES.map((s) => (
           <FilterBtn key={s} active={filter === s} onClick={() => setFilter(s)}>
             {LISTING_STATUS_LABELS[s].label} ({listings.filter((l) => l.status === s).length})
           </FilterBtn>
         ))}
+      </div>
+
+      {/* Bulk actions */}
+      <div className="flex items-center gap-3">
+        <label className="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
+          <input type="checkbox" checked={allSelected} onChange={toggleAll} className="rounded border-gray-300" />
+          Seleccionar todos
+        </label>
+        {selected.size > 0 && (
+          <button onClick={deleteSelected} className="text-xs text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg">
+            Eliminar seleccionados ({selected.size})
+          </button>
+        )}
       </div>
 
       {filtered.length === 0 && <EmptyState text="No hay publicaciones con este filtro." />}
@@ -395,6 +493,9 @@ function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdat
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
         {filtered.map((listing) => (
           <div key={listing.id} className="flex items-center gap-3 p-3">
+            {/* Checkbox */}
+            <input type="checkbox" checked={selected.has(listing.id)} onChange={() => toggleOne(listing.id)} className="rounded border-gray-300" />
+
             {/* Cover */}
             <div className="flex-shrink-0 w-10 h-14 rounded overflow-hidden bg-gray-100">
               {(listing.cover_image_url ?? listing.book?.cover_url) ? (
@@ -413,8 +514,8 @@ function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdat
             </div>
 
             {/* Status */}
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${LISTING_STATUS_LABELS[listing.status]?.color}`}>
-              {LISTING_STATUS_LABELS[listing.status]?.label}
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${LISTING_STATUS_LABELS[listing.status]?.color ?? "bg-gray-100 text-gray-500"}`}>
+              {LISTING_STATUS_LABELS[listing.status]?.label ?? listing.status}
             </span>
 
             {/* Actions */}
@@ -441,6 +542,22 @@ function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdat
 function UsersTab({ users, onUpdate }: { users: AdminUser[]; onUpdate: (u: AdminUser[]) => void }) {
   const supabase = createClient();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const allSelected = users.length > 0 && users.every((u) => selected.has(u.id));
+
+  function toggleAll() {
+    if (allSelected) setSelected(new Set());
+    else setSelected(new Set(users.map((u) => u.id)));
+  }
+
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
 
   async function updateUser(id: string, updates: Record<string, unknown>) {
     const { error } = await supabase.from("users").update(updates).eq("id", id);
@@ -450,42 +567,86 @@ function UsersTab({ users, onUpdate }: { users: AdminUser[]; onUpdate: (u: Admin
     }
   }
 
+  async function deleteUser(id: string) {
+    if (!window.confirm("¿Eliminar este usuario?")) return;
+    const { error } = await supabase.from("users").delete().eq("id", id);
+    if (!error) {
+      onUpdate(users.filter((u) => u.id !== id));
+      setSelected((prev) => { const n = new Set(prev); n.delete(id); return n; });
+    }
+  }
+
+  async function deleteSelected() {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    if (!window.confirm(`¿Eliminar ${ids.length} usuario(s)?`)) return;
+    const { error } = await supabase.from("users").delete().in("id", ids);
+    if (!error) {
+      onUpdate(users.filter((u) => !ids.includes(u.id)));
+      setSelected(new Set());
+    }
+  }
+
   return (
-    <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-      {users.map((user) => (
-        <div key={user.id}>
-          <div className="flex items-center gap-3 p-3">
-            {/* Avatar placeholder */}
-            <div className="w-9 h-9 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
-              {(user.full_name ?? user.email ?? "?")[0].toUpperCase()}
+    <div className="space-y-3">
+      {/* Bulk actions */}
+      <div className="flex items-center gap-3">
+        <label className="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
+          <input type="checkbox" checked={allSelected} onChange={toggleAll} className="rounded border-gray-300" />
+          Seleccionar todos
+        </label>
+        {selected.size > 0 && (
+          <button onClick={deleteSelected} className="text-xs text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg">
+            Eliminar seleccionados ({selected.size})
+          </button>
+        )}
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+        {users.map((user) => (
+          <div key={user.id}>
+            <div className="flex items-center gap-3 p-3">
+              {/* Checkbox */}
+              <input type="checkbox" checked={selected.has(user.id)} onChange={() => toggleOne(user.id)} className="rounded border-gray-300" />
+
+              {/* Avatar placeholder */}
+              <div className="w-9 h-9 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                {(user.full_name ?? user.email ?? "?")[0].toUpperCase()}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">{user.full_name ?? "Sin nombre"}</p>
+                <p className="text-xs text-gray-500 truncate">{user.email} · {user.phone ?? "sin teléfono"}</p>
+              </div>
+
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${user.role === "admin" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-500"}`}>
+                {user.role === "admin" ? "Admin" : "Usuario"}
+              </span>
+
+              <span className="text-[10px] text-gray-400 flex-shrink-0">
+                {new Date(user.created_at).toLocaleDateString("es-CL")}
+              </span>
+
+              <button
+                onClick={() => setEditingId(editingId === user.id ? null : user.id)}
+                className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded border border-gray-200"
+              >
+                Editar
+              </button>
+              <button
+                onClick={() => deleteUser(user.id)}
+                className="text-xs text-red-500 hover:bg-red-50 px-2 py-1 rounded border border-red-200"
+              >
+                Eliminar
+              </button>
             </div>
 
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{user.full_name ?? "Sin nombre"}</p>
-              <p className="text-xs text-gray-500 truncate">{user.email} · {user.phone ?? "sin teléfono"}</p>
-            </div>
-
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${user.role === "admin" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-500"}`}>
-              {user.role === "admin" ? "Admin" : "Usuario"}
-            </span>
-
-            <span className="text-[10px] text-gray-400 flex-shrink-0">
-              {new Date(user.created_at).toLocaleDateString("es-CL")}
-            </span>
-
-            <button
-              onClick={() => setEditingId(editingId === user.id ? null : user.id)}
-              className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded border border-gray-200"
-            >
-              Editar
-            </button>
+            {editingId === user.id && (
+              <UserEditForm user={user} onSave={updateUser} onCancel={() => setEditingId(null)} />
+            )}
           </div>
-
-          {editingId === user.id && (
-            <UserEditForm user={user} onSave={updateUser} onCancel={() => setEditingId(null)} />
-          )}
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
