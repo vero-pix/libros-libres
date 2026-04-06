@@ -60,17 +60,34 @@ interface AdminOrder {
   buyer: { id: string; full_name: string | null; email: string | null; phone: string | null } | null;
 }
 
+interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  read: boolean;
+  created_at: string;
+}
+
+interface Subscriber {
+  id: string;
+  email: string;
+  subscribed_at: string;
+}
+
 interface Props {
   orders: AdminOrder[];
   listings: AdminListing[];
   users: AdminUser[];
+  messages?: ContactMessage[];
+  subscribers?: Subscriber[];
 }
 
 /* ── Tabs ── */
 
-type Tab = "orders" | "listings" | "users";
+type Tab = "orders" | "listings" | "users" | "messages" | "subscribers";
 
-export default function AdminDashboard({ orders: initOrders, listings: initListings, users: initUsers }: Props) {
+export default function AdminDashboard({ orders: initOrders, listings: initListings, users: initUsers, messages = [], subscribers = [] }: Props) {
   const [tab, setTab] = useState<Tab>("orders");
   const [orders, setOrders] = useState(initOrders);
   const [listings, setListings] = useState(initListings);
@@ -80,6 +97,8 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
     { key: "orders", label: "Pedidos", count: orders.length },
     { key: "listings", label: "Publicaciones", count: listings.length },
     { key: "users", label: "Usuarios", count: users.length },
+    { key: "messages", label: "Mensajes", count: messages.length },
+    { key: "subscribers", label: "Newsletter", count: subscribers.length },
   ];
 
   return (
@@ -121,6 +140,56 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
       )}
       {tab === "users" && (
         <UsersTab users={users} onUpdate={setUsers} />
+      )}
+      {tab === "messages" && (
+        <div className="space-y-3">
+          {messages.length === 0 ? (
+            <EmptyState text="Sin mensajes de contacto" />
+          ) : (
+            messages.map((m) => (
+              <div key={m.id} className="bg-white rounded-xl border border-gray-200 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">{m.name}</p>
+                    <p className="text-xs text-gray-500">{m.email}</p>
+                  </div>
+                  <span className="text-xs text-gray-400">
+                    {new Date(m.created_at).toLocaleDateString("es-CL")}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mt-2 whitespace-pre-wrap">{m.message}</p>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+      {tab === "subscribers" && (
+        <div>
+          {subscribers.length === 0 ? (
+            <EmptyState text="Sin suscriptores al newsletter" />
+          ) : (
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 text-left text-xs text-gray-500 uppercase">
+                    <th className="px-4 py-3">Email</th>
+                    <th className="px-4 py-3">Fecha</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {subscribers.map((s) => (
+                    <tr key={s.id}>
+                      <td className="px-4 py-3 text-gray-900">{s.email}</td>
+                      <td className="px-4 py-3 text-gray-400 text-xs">
+                        {new Date(s.subscribed_at).toLocaleDateString("es-CL")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

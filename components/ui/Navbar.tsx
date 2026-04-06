@@ -61,6 +61,7 @@ export default async function Navbar() {
             { href: "/mis-ventas", label: "Ventas" },
             { href: "/mis-arriendos", label: "Arriendos" },
             { href: "/mapa", label: "Mapa" },
+            { href: "/planes", label: "Planes" },
             { href: "/como-funciona", label: "Cómo funciona" },
             { href: "/faq", label: "FAQ" },
           ].map((link) => (
