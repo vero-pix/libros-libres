@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import CategoriesMobileDrawer from "@/components/ui/CategoriesMobileDrawer";
+import AdSlot from "@/components/ui/AdSlot";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
 import HomeShell from "@/components/home/HomeShell";
@@ -87,6 +88,13 @@ export default async function HomePage({ searchParams }: Props) {
                 <p className="text-sm text-ink-muted mt-2">Sé el primero en publicar un libro.</p>
               </div>
             )}
+          </div>
+
+          {/* Ad slot — sidebar right */}
+          <div className="hidden xl:block w-40 shrink-0">
+            <div className="sticky top-4">
+              <AdSlot slot="sidebar-right" format="vertical" />
+            </div>
           </div>
         </div>
       </HomeShell>

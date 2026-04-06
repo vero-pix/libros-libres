@@ -15,7 +15,7 @@ export default async function PerfilPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("full_name, email, phone, default_latitude, default_longitude, default_address, mercadopago_user_id, mercadopago_connected_at")
+    .select("full_name, email, phone, bio, default_latitude, default_longitude, default_address, mercadopago_user_id, mercadopago_connected_at")
     .eq("id", user.id)
     .single();
 
@@ -32,6 +32,7 @@ export default async function PerfilPage() {
           userId={user.id}
           initialFullName={profile?.full_name ?? ""}
           initialPhone={profile?.phone ?? ""}
+          initialBio={profile?.bio ?? ""}
           email={profile?.email ?? user.email ?? ""}
           defaultLat={profile?.default_latitude ?? null}
           defaultLng={profile?.default_longitude ?? null}

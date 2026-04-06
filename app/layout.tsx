@@ -58,6 +58,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es-CL">
+      <head>
+        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT}`}
+            crossOrigin="anonymous"
+          />
+        )}
+      </head>
       <body className={`${playfair.variable} ${dmSans.variable} font-sans antialiased flex flex-col min-h-screen bg-cream`}>
         {children}
         <Footer />

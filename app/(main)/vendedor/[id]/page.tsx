@@ -28,7 +28,7 @@ export default async function SellerStorePage({ params }: Props) {
   // Seller profile
   const { data: seller } = await supabase
     .from("users")
-    .select("id, full_name, avatar_url, city, created_at")
+    .select("id, full_name, avatar_url, city, bio, created_at")
     .eq("id", params.id)
     .single();
 
@@ -113,6 +113,14 @@ export default async function SellerStorePage({ params }: Props) {
             )}
           </div>
         </div>
+
+        {/* Bio */}
+        {(seller as any).bio && (
+          <div className="mb-8 bg-cream-warm rounded-xl p-5 border border-cream-dark/30">
+            <h2 className="text-sm font-semibold text-ink mb-2">Sobre esta tienda</h2>
+            <p className="text-sm text-ink-muted leading-relaxed">{(seller as any).bio}</p>
+          </div>
+        )}
 
         {/* Listings grid */}
         {listings.length > 0 ? (

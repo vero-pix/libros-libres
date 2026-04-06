@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import SocialLoginButtons from "./SocialLoginButtons";
+import { COMUNAS_CHILE } from "@/lib/comunas";
 
 export default function RegisterForm() {
   const supabase = createClient();
@@ -93,17 +95,19 @@ export default function RegisterForm() {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Ciudad
+          Comuna
         </label>
-        <input
-          type="text"
+        <select
           value={city}
           onChange={(e) => setCity(e.target.value)}
           required
-          placeholder="Ej: Buenos Aires"
-          autoComplete="address-level2"
-          className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
-        />
+          className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+        >
+          <option value="">Selecciona tu comuna</option>
+          {COMUNAS_CHILE.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
       </div>
 
       <div>
@@ -157,6 +161,8 @@ export default function RegisterForm() {
           Inicia sesión
         </Link>
       </p>
+
+      <SocialLoginButtons />
     </form>
   );
 }

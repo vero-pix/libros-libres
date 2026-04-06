@@ -7,6 +7,7 @@ interface Props {
   userId: string;
   initialFullName: string;
   initialPhone: string;
+  initialBio?: string;
   email: string;
   defaultLat?: number | null;
   defaultLng?: number | null;
@@ -47,6 +48,7 @@ export default function ProfileForm({
   userId,
   initialFullName,
   initialPhone,
+  initialBio,
   email,
   defaultLat,
   defaultLng,
@@ -57,6 +59,7 @@ export default function ProfileForm({
   // Datos personales
   const [fullName, setFullName] = useState(initialFullName);
   const [phone, setPhone] = useState(initialPhone);
+  const [bio, setBio] = useState(initialBio ?? "");
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -133,7 +136,7 @@ export default function ProfileForm({
 
     const { error: updateError } = await supabase
       .from("users")
-      .update({ full_name: fullName.trim() || null, phone: phone.trim() || null })
+      .update({ full_name: fullName.trim() || null, phone: phone.trim() || null, bio: bio.trim() || null })
       .eq("id", userId);
 
     setLoading(false);
@@ -200,6 +203,23 @@ export default function ProfileForm({
                   Formato: +56912345678 — visible para compradores en tus publicaciones.
                 </p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Descripción de tu tienda
+              </label>
+              <textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Cuéntales a los compradores qué tipo de libros vendes, tu especialidad, etc."
+                rows={3}
+                maxLength={500}
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                {bio.length}/500 — Aparece en tu tienda de vendedor.
+              </p>
             </div>
           </div>
         </div>
