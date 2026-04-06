@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   pending:    { label: "Pendiente de pago", color: "bg-yellow-100 text-yellow-800" },
@@ -42,9 +42,31 @@ interface Props {
   userId: string;
 }
 
-export default function RentalsList({ asRenter, asOwner }: Props) {
+export default function RentalsList({ asRenter, asOwner, userId }: Props) {
   const [tab, setTab] = useState<"renter" | "owner">("renter");
-  const rentals = tab === "renter" ? asRenter : asOwner;
+  const [renterList, setRenterList] = useState(asRenter);
+  const [ownerList, setOwnerList] = useState(asOwner);
+  const rentals = tab === "renter" ? renterList : ownerList;
+  const [updating, setUpdating] = useState<string | null>(null);
+
+  const updateStatus = useCallback(async (rentalId: string, newStatus: string) => {
+    if (!window.confirm(`¿Cambiar estado a "${newStatus}"?`)) return;
+    setUpdating(rentalId);
+    try {
+      const res = await fetch(`/api/rentals/${rentalId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        const updateList = (list: RentalItem[]) =>
+          list.map((r) => r.id === rentalId ? { ...r, status: newStatus } : r);
+        setRenterList(updateList);
+        setOwnerList(updateList);
+      }
+    } catch { /* ignore */ }
+    setUpdating(null);
+  }, []);
 
   return (
     <div>
@@ -120,6 +142,21 @@ export default function RentalsList({ asRenter, asOwner }: Props) {
                       </p>
                     )}
 
+                    {/* Countdown for active rentals */}
+                    {r.status === "active" && r.end_date && (() => {
+                      const days = Math.ceil((new Date(r.end_date).getTime() - Date.now()) / 86400000);
+                      const color = days > 3 ? "text-green-600" : days > 0 ? "text-yellow-600" : "text-red-600";
+                      return (
+                        <p className={`text-xs font-medium mt-1 ${color}`}>
+                          {days > 0 ? `${days} día${days !== 1 ? "s" : ""} restante${days !== 1 ? "s" : ""}` : "Plazo vencido"}
+                        </p>
+                      );
+                    })()}
+
+                    {r.status === "completed" && r.deposit > 0 && (
+                      <p className="text-xs text-green-600 font-medium mt-1">Garantía liberada</p>
+                    )}
+
                     {otherPerson && (
                       <p className="text-xs text-gray-400 mt-1">
                         {tab === "renter" ? "Dueño" : "Arrendatario"}: {otherPerson.full_name ?? "Sin nombre"}
@@ -135,6 +172,34 @@ export default function RentalsList({ asRenter, asOwner }: Props) {
                         )}
                       </p>
                     )}
+
+                    {/* Action buttons */}
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {tab === "owner" && r.status === "paid" && (
+                        <button onClick={() => updateStatus(r.id, "active")} disabled={updating === r.id}
+                          className="text-xs px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50">
+                          {updating === r.id ? "..." : "Confirmar entrega"}
+                        </button>
+                      )}
+                      {tab === "owner" && r.status === "active" && r.end_date && new Date(r.end_date) < new Date() && (
+                        <button onClick={() => updateStatus(r.id, "overdue")} disabled={updating === r.id}
+                          className="text-xs px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50">
+                          {updating === r.id ? "..." : "Marcar como vencido"}
+                        </button>
+                      )}
+                      {tab === "owner" && r.status === "returning" && (
+                        <button onClick={() => updateStatus(r.id, "completed")} disabled={updating === r.id}
+                          className="text-xs px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50">
+                          {updating === r.id ? "..." : "Confirmar devolución"}
+                        </button>
+                      )}
+                      {tab === "renter" && r.status === "active" && (
+                        <button onClick={() => updateStatus(r.id, "returning")} disabled={updating === r.id}
+                          className="text-xs px-3 py-1.5 bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:opacity-50">
+                          {updating === r.id ? "..." : "Iniciar devolución"}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
