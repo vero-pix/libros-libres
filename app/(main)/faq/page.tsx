@@ -67,7 +67,7 @@ const faqSections = [
       },
       {
         q: "¿Cómo elimino una publicación?",
-        a: "Por ahora puedes pausar o eliminar publicaciones desde tu perfil. Si necesitas ayuda, escríbenos a hola@tuslibros.cl",
+        a: "Por ahora puedes pausar o eliminar publicaciones desde tu perfil. Si necesitas ayuda, escríbenos por WhatsApp al +56 9 9458 3067.",
       },
     ],
   },
