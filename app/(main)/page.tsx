@@ -77,11 +77,23 @@ export default async function HomePage({ searchParams }: Props) {
             </Suspense>
 
             {listings.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-5">
-                {listings.map((listing) => (
-                  <ListingCard key={listing.id} listing={listing} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-5">
+                  {listings.slice(0, 10).map((listing) => (
+                    <ListingCard key={listing.id} listing={listing} />
+                  ))}
+                </div>
+                {listings.length > 10 && (
+                  <>
+                    <AdSlot slot="in-feed" format="horizontal" className="my-6" />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-5">
+                      {listings.slice(10).map((listing) => (
+                        <ListingCard key={listing.id} listing={listing} />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
             ) : (
               <div className="text-center py-20">
                 <p className="font-display text-2xl text-ink-light">No hay libros disponibles todavía.</p>

@@ -8,6 +8,7 @@ import PaymentAnimation from "./PaymentAnimation";
 import ShippingAnimation from "./ShippingAnimation";
 import RentalSection from "./RentalSection";
 import ShelfTransformation from "./ShelfTransformation";
+import AdSlot from "@/components/ui/AdSlot";
 
 interface Props {
   totalListings: number;
@@ -68,6 +69,13 @@ export default function HomeShell({ totalListings, hasFilters, children }: Props
           {children}
         </TiendaToggle>
       </main>
+
+      {/* Ad between store and features */}
+      {!hasFilters && (
+        <div className="max-w-5xl mx-auto px-6 py-4">
+          <AdSlot slot="between-sections" format="horizontal" />
+        </div>
+      )}
 
       {/* Feature sections — below the store */}
       {!hasFilters && (

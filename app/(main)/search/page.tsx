@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
+import AdSlot from "@/components/ui/AdSlot";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
 import type { ListingWithBook } from "@/types";
@@ -122,6 +123,13 @@ export default async function SearchPage({ searchParams }: Props) {
                 <p className="text-sm mt-1">Prueba con otra búsqueda o explora el mapa.</p>
               </div>
             )}
+          </div>
+
+          {/* Ad slot — sidebar right */}
+          <div className="hidden xl:block w-40 shrink-0">
+            <div className="sticky top-4">
+              <AdSlot slot="search-sidebar" format="vertical" />
+            </div>
           </div>
         </div>
       </main>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { ListingWithBook } from "@/types";
 import AddToCartButton from "@/components/ui/AddToCartButton";
+import AdSlot from "@/components/ui/AdSlot";
 
 function WhatsAppButton({ phone, title }: { phone: string | null; title: string }) {
   if (!phone) {
@@ -193,6 +194,11 @@ export default function ListingDetail({ listing }: Props) {
           phone={listing.seller?.phone ?? null}
           title={book.title}
         />
+      </div>
+
+      {/* Ad */}
+      <div className="border-t border-gray-100 px-6 py-4">
+        <AdSlot slot="listing-detail" format="horizontal" />
       </div>
     </div>
   );
