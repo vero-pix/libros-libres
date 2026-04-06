@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { compressImage } from "@/lib/image-compress";
 
 interface Props {
   userId: string;
   initialFullName: string;
   initialPhone: string;
   initialBio?: string;
+  initialAvatarUrl?: string | null;
   email: string;
   defaultLat?: number | null;
   defaultLng?: number | null;
@@ -49,6 +51,7 @@ export default function ProfileForm({
   initialFullName,
   initialPhone,
   initialBio,
+  initialAvatarUrl,
   email,
   defaultLat,
   defaultLng,
@@ -60,6 +63,9 @@ export default function ProfileForm({
   const [fullName, setFullName] = useState(initialFullName);
   const [phone, setPhone] = useState(initialPhone);
   const [bio, setBio] = useState(initialBio ?? "");
+  const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl ?? "");
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -155,6 +161,69 @@ export default function ProfileForm({
 
   return (
     <div className="space-y-4">
+      {/* ── Logo / Avatar de tienda ── */}
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+          <h2 className="text-sm font-semibold text-gray-700">Logo de tu tienda</h2>
+          <p className="text-xs text-gray-400 mt-1">Aparece en tu tienda de vendedor y en tus publicaciones.</p>
+        </div>
+        <div className="px-6 py-5 flex items-center gap-4">
+          <div className="relative">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Logo" className="w-20 h-20 rounded-full object-cover border-2 border-cream-dark" />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-2xl font-bold border-2 border-cream-dark">
+                {(fullName || "T")[0].toUpperCase()}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => avatarInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="absolute -bottom-1 -right-1 w-7 h-7 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-sm hover:bg-gray-50"
+            >
+              {uploadingAvatar ? (
+                <span className="w-3 h-3 border-2 border-gray-300 border-t-brand-500 rounded-full animate-spin" />
+              ) : (
+                <svg className="w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                </svg>
+              )}
+            </button>
+          </div>
+          <div className="text-xs text-gray-400">
+            <p>JPG o PNG, máximo 2MB</p>
+            <p>Recomendado: cuadrado, mínimo 200x200px</p>
+          </div>
+          <input
+            ref={avatarInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              if (file.size > 2 * 1024 * 1024) return;
+              setUploadingAvatar(true);
+              try {
+                const compressed = await compressImage(file, 400, 400, 0.85);
+                const ext = "jpg";
+                const path = `avatars/${userId}.${ext}`;
+                const { error: upErr } = await supabase.storage.from("covers").upload(path, compressed, { upsert: true });
+                if (upErr) throw upErr;
+                const { data: { publicUrl } } = supabase.storage.from("covers").getPublicUrl(path);
+                setAvatarUrl(publicUrl);
+                await supabase.from("users").update({ avatar_url: publicUrl }).eq("id", userId);
+              } catch (err) {
+                console.error("Avatar upload error:", err);
+              }
+              setUploadingAvatar(false);
+            }}
+          />
+        </div>
+      </div>
+
       {/* ── Datos personales ── */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">

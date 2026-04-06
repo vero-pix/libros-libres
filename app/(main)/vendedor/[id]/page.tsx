@@ -29,7 +29,7 @@ export default async function SellerStorePage({ params }: Props) {
   // Seller profile
   const { data: seller } = await supabase
     .from("users")
-    .select("id, full_name, avatar_url, city, bio, created_at")
+    .select("id, full_name, avatar_url, city, bio, created_at, phone")
     .eq("id", params.id)
     .single();
 
@@ -86,9 +86,17 @@ export default async function SellerStorePage({ params }: Props) {
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Seller header */}
         <div className="flex items-start gap-5 mb-8 pb-8 border-b border-gray-100">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-2xl sm:text-3xl font-bold flex-shrink-0">
-            {(seller.full_name ?? "?")[0].toUpperCase()}
-          </div>
+          {seller.avatar_url ? (
+            <img
+              src={seller.avatar_url}
+              alt={seller.full_name ?? "Vendedor"}
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-cream-dark flex-shrink-0"
+            />
+          ) : (
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-2xl sm:text-3xl font-bold flex-shrink-0">
+              {(seller.full_name ?? "?")[0].toUpperCase()}
+            </div>
+          )}
           <div className="flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               {seller.full_name ?? "Vendedor"}
