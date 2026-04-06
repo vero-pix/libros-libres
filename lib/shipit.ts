@@ -2,6 +2,13 @@ const SHIPIT_EMAIL = process.env.SHIPIT_EMAIL ?? "";
 const SHIPIT_TOKEN = process.env.SHIPIT_TOKEN ?? "";
 const BASE_URL = "https://api.shipit.cl/v";
 
+const HEADERS = {
+  "Content-Type": "application/json",
+  "Accept": "application/vnd.shipit.v4",
+  "X-Shipit-Email": SHIPIT_EMAIL,
+  "X-Shipit-Access-Token": SHIPIT_TOKEN,
+};
+
 export interface ShippingQuote {
   service: string;
   serviceCode: number;
@@ -10,9 +17,46 @@ export interface ShippingQuote {
   courier: string;
 }
 
+// Cache communes in memory (loaded once per cold start)
+let communesCache: { id: number; name: string }[] | null = null;
+
+/** Load all Shipit communes and cache them */
+async function loadCommunes(): Promise<{ id: number; name: string }[]> {
+  if (communesCache) return communesCache;
+
+  try {
+    const res = await fetch(`${BASE_URL}/communes`, { headers: HEADERS });
+    if (!res.ok) return [];
+    const data = await res.json();
+    communesCache = (data as any[]).map((c) => ({
+      id: c.id,
+      name: (c.name as string).toUpperCase(),
+    }));
+    return communesCache;
+  } catch {
+    return [];
+  }
+}
+
+/** Find commune ID by name (fuzzy match) */
+async function findCommuneId(communeName: string): Promise<number | null> {
+  const communes = await loadCommunes();
+  const upper = communeName.toUpperCase().trim();
+
+  // Exact match
+  const exact = communes.find((c) => c.name === upper);
+  if (exact) return exact.id;
+
+  // Partial match
+  const partial = communes.find((c) => c.name.includes(upper) || upper.includes(c.name));
+  if (partial) return partial.id;
+
+  return null;
+}
+
 /**
- * Get shipping quotes from Shipit (multiple couriers).
- * Uses commune names directly — no coverage codes needed.
+ * Get shipping quotes from Shipit.
+ * Requires commune names — resolves to commune_id internally.
  */
 export async function getShipitQuotes(
   originCommune: string,
@@ -27,50 +71,54 @@ export async function getShipitQuotes(
     return [];
   }
 
+  // Resolve commune IDs
+  const [originId, destId] = await Promise.all([
+    findCommuneId(originCommune),
+    findCommuneId(destCommune),
+  ]);
+
+  if (!originId) {
+    console.error(`[shipit] Origin commune not found: ${originCommune}`);
+    return [];
+  }
+  if (!destId) {
+    console.error(`[shipit] Destination commune not found: ${destCommune}`);
+    return [];
+  }
+
   try {
-    const res = await fetch(`${BASE_URL}/quotation`, {
+    const res = await fetch(`${BASE_URL}/rates`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/vnd.shipit.v4",
-        "X-Shipit-Email": SHIPIT_EMAIL,
-        "X-Shipit-Access-Token": SHIPIT_TOKEN,
-      },
+      headers: HEADERS,
       body: JSON.stringify({
-        parcel: {
-          width,
-          height,
-          length,
-          weight,
-        },
-        origin: {
-          commune_name: originCommune,
-        },
-        destiny: {
-          commune_name: destCommune,
-        },
+        parcel: { width, height, length, weight },
+        origin: { commune_id: originId },
+        destiny: { commune_id: destId },
       }),
     });
 
     if (!res.ok) {
       const text = await res.text();
-      console.error("[shipit] Quote error:", res.status, text);
+      console.error("[shipit] Rates error:", res.status, text);
       return [];
     }
 
     const data = await res.json();
+    const prices = data.prices ?? [];
 
-    // Shipit returns array of courier options
-    const options = Array.isArray(data) ? data : data.quotations ?? data.results ?? [];
+    if (!prices.length) {
+      console.warn("[shipit] No prices returned:", data.message ?? "unknown");
+      return [];
+    }
 
-    return options
-      .filter((q: any) => q.total_price > 0 || q.price > 0)
-      .map((q: any, i: number) => ({
-        service: q.courier?.name ?? q.service_type ?? q.name ?? `Servicio ${i + 1}`,
-        serviceCode: q.id ?? i,
-        deliveryTime: q.days ? `${q.days} día${q.days > 1 ? "s" : ""} hábil${q.days > 1 ? "es" : ""}` : q.delivery_time ?? "3-5 días hábiles",
-        price: Math.round(q.total_price ?? q.price ?? 0),
-        courier: q.courier?.name ?? q.carrier ?? "Courier",
+    return prices
+      .filter((p: any) => p.price > 0)
+      .map((p: any, i: number) => ({
+        service: p.name ?? p.courier ?? `Servicio ${i + 1}`,
+        serviceCode: p.id ?? i,
+        deliveryTime: p.days ? `${p.days} día${p.days > 1 ? "s" : ""} hábil${p.days > 1 ? "es" : ""}` : "3-5 días hábiles",
+        price: Math.round(p.price ?? p.total ?? 0),
+        courier: p.courier ?? p.name ?? "Courier",
       }))
       .sort((a: ShippingQuote, b: ShippingQuote) => a.price - b.price);
   } catch (err) {
