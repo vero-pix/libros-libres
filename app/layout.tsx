@@ -59,6 +59,10 @@ export default function RootLayout({
   return (
     <html lang="es-CL">
       <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Libros Libres" />
         {process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
           <script
             async
