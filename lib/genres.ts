@@ -84,3 +84,31 @@ export const CATEGORY_OPTIONS = [
   "Cuentos",
   "Ensayo",
 ] as const;
+
+/** Agrupación de categorías para el sidebar */
+export const CATEGORY_GROUPS: { label: string; genres: string[] }[] = [
+  {
+    label: "Literatura",
+    genres: ["Ficción", "No ficción", "Novela", "Cuentos", "Poesía", "Teatro", "Ensayo", "Humor", "Cómics", "Crítica Literaria"],
+  },
+  {
+    label: "Desarrollo personal",
+    genres: ["Autoayuda", "Espiritualidad", "Psicología", "Filosofía", "Salud", "Familia"],
+  },
+  {
+    label: "Ciencias y tecnología",
+    genres: ["Ciencia", "Ciencias Sociales", "Matemáticas", "Computación", "Tecnología", "Medicina", "Naturaleza"],
+  },
+  {
+    label: "Sociedad",
+    genres: ["Historia", "Biografía", "Política", "Derecho", "Educación", "Negocios", "Religión"],
+  },
+  {
+    label: "Arte y cultura",
+    genres: ["Arte", "Música", "Cocina", "Viajes", "Deportes"],
+  },
+  {
+    label: "Infantil y juvenil",
+    genres: ["Infantil", "Juvenil"],
+  },
+];

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { translateGenre } from "@/lib/genres";
+import { translateGenre, CATEGORY_GROUPS } from "@/lib/genres";
 
 interface CategoryCount {
   genre: string;
@@ -76,24 +76,42 @@ export default function CategoriesMobileDrawer({ categories, activeGenre }: Prop
                 Todos
               </Link>
             </li>
-            {categories.map((cat) => (
-              <li key={cat.genre}>
-                <Link
-                  href={`/?genre=${encodeURIComponent(cat.genre)}`}
-                  onClick={() => setOpen(false)}
-                  className={`flex items-center justify-between text-sm py-3 px-4 rounded-xl transition-colors ${
-                    activeGenre === cat.genre
-                      ? "bg-brand-50 text-brand-600 font-medium"
-                      : "text-ink-muted active:bg-cream-warm"
-                  }`}
-                >
-                  <span>{translateGenre(cat.genre)}</span>
-                  <span className="text-xs text-ink-light bg-cream-warm rounded-full px-2 py-0.5">
-                    {cat.count}
-                  </span>
-                </Link>
-              </li>
-            ))}
+            {(() => {
+              const countMap = new Map(categories.map((c) => [c.genre, c.count]));
+              const groupedGenres = new Set(CATEGORY_GROUPS.flatMap((g) => g.genres));
+              const groups = CATEGORY_GROUPS
+                .map((group) => ({
+                  ...group,
+                  items: group.genres.filter((g) => countMap.has(g)).map((g) => ({ genre: g, count: countMap.get(g)! })),
+                }))
+                .filter((g) => g.items.length > 0);
+              const ungrouped = categories.filter((c) => !groupedGenres.has(c.genre));
+
+              return [...groups.map((group) => (
+                <li key={group.label}>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-muted/50 px-4 pt-3 pb-1">{group.label}</p>
+                  <ul className="space-y-0.5">
+                    {group.items.map((cat) => (
+                      <li key={cat.genre}>
+                        <Link href={`/?genre=${encodeURIComponent(cat.genre)}`} onClick={() => setOpen(false)}
+                          className={`flex items-center justify-between text-sm py-2.5 px-4 rounded-xl transition-colors ${activeGenre === cat.genre ? "bg-brand-50 text-brand-600 font-medium" : "text-ink-muted active:bg-cream-warm"}`}>
+                          <span>{translateGenre(cat.genre)}</span>
+                          <span className="text-xs text-ink-light bg-cream-warm rounded-full px-2 py-0.5">{cat.count}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              )), ...ungrouped.map((cat) => (
+                <li key={cat.genre}>
+                  <Link href={`/?genre=${encodeURIComponent(cat.genre)}`} onClick={() => setOpen(false)}
+                    className={`flex items-center justify-between text-sm py-2.5 px-4 rounded-xl transition-colors ${activeGenre === cat.genre ? "bg-brand-50 text-brand-600 font-medium" : "text-ink-muted active:bg-cream-warm"}`}>
+                    <span>{translateGenre(cat.genre)}</span>
+                    <span className="text-xs text-ink-light bg-cream-warm rounded-full px-2 py-0.5">{cat.count}</span>
+                  </Link>
+                </li>
+              ))];
+            })()}
           </ul>
         </div>
       </div>
