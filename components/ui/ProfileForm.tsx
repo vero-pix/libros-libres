@@ -112,6 +112,7 @@ export default function ProfileForm({
 
   async function handleAddressSearch(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter" || !addressQuery.trim()) return;
+    e.preventDefault();
     setSearching(true);
     setLocationError(null);
     const result = await forwardGeocode(addressQuery.trim());
@@ -277,18 +278,35 @@ export default function ProfileForm({
           </button>
 
           {/* Búsqueda por dirección */}
-          <div className="relative">
+          <div className="flex gap-2">
             <input
               type="text"
               value={addressQuery}
               onChange={(e) => { setAddressQuery(e.target.value); setLocationError(null); }}
               onKeyDown={handleAddressSearch}
-              placeholder="O escribe una dirección y presiona Enter..."
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 pr-8"
+              placeholder="Escribe una dirección completa..."
+              className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
             />
-            {searching && (
-              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 border-2 border-gray-300 border-t-brand-500 rounded-full animate-spin" />
-            )}
+            <button
+              type="button"
+              onClick={async () => {
+                if (!addressQuery.trim()) return;
+                setSearching(true);
+                setLocationError(null);
+                const result = await forwardGeocode(addressQuery.trim());
+                setSearching(false);
+                if (!result) {
+                  setLocationError("No encontramos esa dirección. Intenta ser más específico (ej: Del Mirador 2070, Providencia).");
+                  return;
+                }
+                await saveLocation(result.lat, result.lng, result.address);
+                setAddressQuery("");
+              }}
+              disabled={searching || !addressQuery.trim()}
+              className="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors whitespace-nowrap"
+            >
+              {searching ? "..." : "Buscar"}
+            </button>
           </div>
 
           {locationError && (
