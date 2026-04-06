@@ -37,17 +37,40 @@ async function searchGoogleBooks(isbn: string) {
 
 async function searchOpenLibrary(isbn: string) {
   try {
-    const res = await fetch(
-      `https://openlibrary.org/isbn/${isbn}.json`,
+    // Use the books API which is more reliable than /isbn/ endpoint
+    const booksRes = await fetch(
+      `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`,
       { next: { revalidate: 86400 } }
     );
-    if (!res.ok) return null;
-    const data = await res.json();
+    if (!booksRes.ok) return null;
+    const booksData = await booksRes.json();
+    const bookInfo = booksData[`ISBN:${isbn}`];
 
-    // Get author name(s)
+    // Also try the edition endpoint for more details
+    const res = await fetch(
+      `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=details`,
+      { next: { revalidate: 86400 } }
+    );
+    const detailsData = res.ok ? await res.json() : {};
+    const details = detailsData[`ISBN:${isbn}`]?.details ?? {};
+
+    // Merge data from both endpoints
+    const data = {
+      title: bookInfo?.title ?? details?.title ?? "",
+      authors: details?.authors ?? bookInfo?.authors?.map((a: any) => ({ key: a.url?.replace("https://openlibrary.org", "") ?? "" })) ?? [],
+      covers: details?.covers ?? [],
+      subjects: bookInfo?.subjects?.map((s: any) => s.name) ?? details?.subjects ?? [],
+      description: details?.description ?? "",
+      publish_date: bookInfo?.publish_date ?? details?.publish_date ?? "",
+      works: details?.works ?? [],
+    };
+
+    // Get author name(s) — try bookInfo first (has names), fallback to API
     let author = "";
-    if (data.authors?.length) {
-      const authorKeys = data.authors.map((a: { key: string }) => a.key);
+    if (bookInfo?.authors?.length) {
+      author = bookInfo.authors.map((a: any) => a.name).filter(Boolean).join(", ");
+    } else if (data.authors?.length) {
+      const authorKeys = data.authors.map((a: { key: string }) => a.key).filter(Boolean);
       const authorNames = await Promise.all(
         authorKeys.slice(0, 3).map(async (key: string) => {
           try {
