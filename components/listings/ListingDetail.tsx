@@ -109,9 +109,12 @@ export default function ListingDetail({ listing }: Props) {
           </div>
 
           {listing.price != null && listing.modality !== "loan" && (
-            <p className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-4">
-              ${listing.price.toLocaleString("es-CL")}
-            </p>
+            <div className="mt-4 inline-flex items-center gap-2">
+              <span className="bg-brand-500 text-white font-bold text-lg sm:text-xl px-4 py-1.5 rounded-lg">
+                ${listing.price.toLocaleString("es-CL")}
+              </span>
+              <span className="text-xs text-gray-400 uppercase tracking-wider">Precio de venta</span>
+            </div>
           )}
 
           {(listing as ListingWithRentalFields).rental_price != null && listing.modality !== "sale" && (
@@ -135,7 +138,7 @@ export default function ListingDetail({ listing }: Props) {
           {listing.address && (
             <p className="text-sm text-gray-500 mt-3 flex items-start gap-1">
               <span className="mt-0.5">📍</span>
-              <span>{listing.address}</span>
+              <span>{listing.address.split(",").slice(1, 2).join("").trim() || listing.address.split(",")[0]}</span>
             </p>
           )}
 
@@ -157,15 +160,19 @@ export default function ListingDetail({ listing }: Props) {
         </div>
       </div>
 
-      {/* Book description — expandible */}
-      {book.description && (
-        <div className="border-t border-gray-100 px-5 sm:px-6 py-4">
-          <h2 className="text-sm font-semibold text-gray-700 mb-2">Sinopsis</h2>
+      {/* Book description */}
+      <div className="border-t border-gray-100 px-5 sm:px-6 py-4">
+        <h2 className="text-sm font-semibold text-gray-700 mb-2">Sinopsis</h2>
+        {book.description ? (
           <p className="text-sm text-gray-600 leading-relaxed">
             {book.description}
           </p>
-        </div>
-      )}
+        ) : (
+          <p className="text-sm text-gray-400 italic">
+            Sin sinopsis disponible. Consulta al vendedor por más detalles.
+          </p>
+        )}
+      </div>
 
       {/* Buy CTA */}
       {listing.price != null && listing.modality !== "loan" && (
