@@ -9,6 +9,8 @@ import type { BookData } from "@/types";
 import Image from "next/image";
 import { CATEGORY_OPTIONS } from "@/lib/genres";
 import CoverUpload from "@/components/books/CoverUpload";
+import ImageUploadMultiple from "@/components/listings/ImageUploadMultiple";
+import Link from "next/link";
 
 type Modality = "sale" | "loan" | "both";
 type Condition = "new" | "good" | "fair" | "poor";
@@ -59,6 +61,8 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [publishSuccess, setPublishSuccess] = useState(false);
+  const [publishedListingId, setPublishedListingId] = useState<string | null>(null);
 
   const PHONE_REGEX = /^\+56[0-9]{9}$/;
 
@@ -125,7 +129,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
       }
 
       // Insertar publicación
-      const { error: listingErr } = await supabase.from("listings").insert({
+      const { data: newListing, error: listingErr } = await supabase.from("listings").insert({
         book_id: bookId,
         seller_id: userId,
         modality,
@@ -140,7 +144,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
         address: location.address,
         cover_image_url: customCoverUrl ?? book.cover_url ?? null,
         status: "active",
-      });
+      }).select("id").single();
 
       if (listingErr) throw listingErr;
 
@@ -149,13 +153,59 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
         await supabase.from("users").update({ phone }).eq("id", userId);
       }
 
-      router.push("/");
-      router.refresh();
+      setPublishedListingId(newListing?.id ?? null);
+      setPublishSuccess(true);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Ocurrió un error al publicar.");
     } finally {
       setLoading(false);
     }
+  }
+
+  if (publishSuccess) {
+    return (
+      <div className="max-w-md mx-auto text-center py-8 space-y-6">
+        <div className="text-5xl">🎉</div>
+        <h2 className="font-display text-2xl font-bold text-ink">¡Libro publicado!</h2>
+        <p className="text-ink-muted text-sm">
+          Tu libro ya está visible en la tienda y en el mapa.
+        </p>
+
+        {/* Upload additional images */}
+        {publishedListingId && (
+          <div className="bg-white rounded-xl border border-cream-dark/30 p-5 text-left">
+            <ImageUploadMultiple
+              listingId={publishedListingId}
+              existingImages={[]}
+              onImagesChanged={() => {}}
+            />
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          {publishedListingId && (
+            <Link
+              href={`/listings/${publishedListingId}`}
+              className="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl text-sm transition-colors"
+            >
+              Ver publicación
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setPublishSuccess(false);
+              setPublishedListingId(null);
+              // Reset form would go here
+              window.location.href = "/publish";
+            }}
+            className="px-6 py-3 border border-cream-dark/40 text-ink font-semibold rounded-xl text-sm hover:bg-cream-warm transition-colors"
+          >
+            Publicar otro libro
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (

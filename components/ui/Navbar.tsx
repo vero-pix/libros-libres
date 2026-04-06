@@ -25,7 +25,7 @@ export default async function Navbar() {
   }
 
   return (
-    <header className="shrink-0 bg-ink flex flex-col">
+    <header className="shrink-0 bg-ink flex flex-col sticky top-0 z-50">
       {/* Row 1: Logo + Search + Auth */}
       <div className="bg-cream px-4 py-4">
         <div className="max-w-7xl mx-auto flex items-center gap-6">

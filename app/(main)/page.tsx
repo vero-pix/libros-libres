@@ -16,14 +16,15 @@ interface Props {
     price_max?: string;
     condition?: string;
     modality?: string;
+    author?: string;
   };
 }
 
 export default async function HomePage({ searchParams }: Props) {
   const supabase = await createClient();
-  const { genre, sort, price_min, price_max, condition, modality } = searchParams;
+  const { genre, sort, price_min, price_max, condition, modality, author } = searchParams;
 
-  const hasFilters = !!(genre || sort || price_min || price_max || condition || modality);
+  const hasFilters = !!(genre || sort || price_min || price_max || condition || modality || author);
 
   let query = supabase
     .from("listings")
@@ -49,6 +50,12 @@ export default async function HomePage({ searchParams }: Props) {
   if (genre) {
     listings = listings.filter(
       (l) => l.book.genre?.toLowerCase() === genre.toLowerCase()
+    );
+  }
+
+  if (author) {
+    listings = listings.filter(
+      (l) => l.book.author?.toLowerCase().includes(author.toLowerCase())
     );
   }
 

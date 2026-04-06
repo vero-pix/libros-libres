@@ -70,6 +70,16 @@ export default function ListingToolbar() {
         </div>
       </div>
 
+      {/* Author filter */}
+      <input
+        type="text"
+        placeholder="Filtrar por autor..."
+        defaultValue={searchParams.get("author") ?? ""}
+        onBlur={(e) => updateParam("author", e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+        className="text-sm border border-gray-200 rounded-md px-3 py-2 w-40 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-400"
+      />
+
       {/* Condition */}
       <select
         onChange={handleChange("condition")}

@@ -79,10 +79,37 @@ async function searchOpenLibrary(isbn: string) {
       ? parseInt(data.publish_date.match(/\d{4}/)?.[0] ?? "0") || null
       : null;
 
+    // Description: try edition first, then fetch the "work" for richer data
+    let description = data.description?.value ?? data.description ?? "";
+    if (!description && data.works?.[0]?.key) {
+      try {
+        const workRes = await fetch(`https://openlibrary.org${data.works[0].key}.json`, {
+          next: { revalidate: 86400 },
+        });
+        if (workRes.ok) {
+          const workData = await workRes.json();
+          description = workData.description?.value ?? workData.description ?? "";
+          // Also grab subjects from work if edition didn't have them
+          if (!genre && workData.subjects?.length) {
+            const workGenre = translateGenre(workData.subjects[0]);
+            return {
+              title: data.title ?? "",
+              author,
+              description,
+              cover_url,
+              genre: workGenre,
+              published_year,
+              isbn,
+            };
+          }
+        }
+      } catch { /* fallback gracefully */ }
+    }
+
     return {
       title: data.title ?? "",
       author,
-      description: data.description?.value ?? data.description ?? "",
+      description,
       cover_url,
       genre,
       published_year,
