@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 
 interface Props {

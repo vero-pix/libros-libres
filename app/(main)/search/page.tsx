@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import AdSlot from "@/components/ui/AdSlot";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
 import type { ListingWithBook } from "@/types";
@@ -97,6 +98,12 @@ export default async function SearchPage({ searchParams }: Props) {
   return (
     <div className="min-h-screen bg-white">
       <main className="max-w-7xl mx-auto px-4 py-6">
+        <Breadcrumbs
+          items={[
+            { label: "Inicio", href: "/" },
+            { label: q ? `Resultados para "${q}"` : "Búsqueda" },
+          ]}
+        />
         {q && (
           <h1 className="text-2xl font-bold text-gray-900 mb-6">
             Resultados para &ldquo;{q}&rdquo;

@@ -11,7 +11,7 @@ const faqSections = [
       {
         q: "¿Cómo compro un libro?",
         a: (
-          <ol className="list-decimal list-inside space-y-1 text-gray-600">
+          <ol className="list-decimal list-inside space-y-1 text-ink-muted">
             <li>Busca el libro en el mapa o usa la barra de búsqueda</li>
             <li>Haz clic en el pin del libro que te interesa</li>
             <li>Contacta al vendedor directamente por WhatsApp</li>
@@ -47,7 +47,7 @@ const faqSections = [
       {
         q: "¿Cómo publico un libro?",
         a: (
-          <ol className="list-decimal list-inside space-y-1 text-gray-600">
+          <ol className="list-decimal list-inside space-y-1 text-ink-muted">
             <li>Inicia sesión en tu cuenta</li>
             <li>Haz clic en <strong>Publicar libro</strong></li>
             <li>Escanea el código de barras o ingresa el ISBN</li>
@@ -100,7 +100,7 @@ const faqSections = [
 
 export default function FAQPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cream">
 
       {/* Hero */}
       <div className="relative h-64 overflow-hidden">
@@ -111,10 +111,10 @@ export default function FAQPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 bg-cream/70" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-4xl font-bold text-white mb-2">Preguntas Frecuentes</h1>
-          <p className="text-gray-200 text-lg max-w-xl">Resolvemos tus dudas sobre Libros Libres</p>
+          <h1 className="text-4xl font-bold text-ink mb-2">Preguntas Frecuentes</h1>
+          <p className="text-ink-muted text-lg max-w-xl">Resolvemos tus dudas sobre Libros Libres</p>
         </div>
       </div>
 
@@ -122,19 +122,19 @@ export default function FAQPage() {
       <main className="max-w-3xl mx-auto px-4 py-12">
         {faqSections.map((section) => (
           <div key={section.title} className="mb-10">
-            <h2 className="text-2xl font-bold text-[#2d3436] mb-4 border-b-2 border-[#d4a017] pb-2 inline-block">
+            <h2 className="text-2xl font-bold text-ink mb-4 border-b-2 border-brand-600 pb-2 inline-block">
               {section.title}
             </h2>
             <div className="space-y-4">
               {section.questions.map((item) => (
                 <div
                   key={item.q}
-                  className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+                  className="bg-white rounded-xl shadow-sm border border-cream-dark overflow-hidden"
                 >
-                  <div className="bg-[#2d3436] px-5 py-3">
-                    <h3 className="font-semibold text-white text-base">{item.q}</h3>
+                  <div className="bg-cream-warm px-5 py-3">
+                    <h3 className="font-semibold text-brand-600 text-base">{item.q}</h3>
                   </div>
-                  <div className="px-5 py-4 text-gray-700 leading-relaxed">
+                  <div className="px-5 py-4 text-ink-muted leading-relaxed">
                     {typeof item.a === "string" ? <p>{item.a}</p> : item.a}
                   </div>
                 </div>

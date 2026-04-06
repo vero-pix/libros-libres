@@ -58,14 +58,14 @@ const timeline = [
 ];
 
 const techStack = [
-  { name: "Next.js 14", color: "bg-black text-white" },
+  { name: "Next.js 14", color: "bg-ink text-white" },
   { name: "TypeScript", color: "bg-blue-600 text-white" },
   { name: "Tailwind CSS", color: "bg-cyan-500 text-white" },
   { name: "Supabase", color: "bg-emerald-600 text-white" },
   { name: "Mapbox", color: "bg-indigo-600 text-white" },
   { name: "MercadoPago", color: "bg-sky-500 text-white" },
-  { name: "Vercel", color: "bg-black text-white" },
-  { name: "Claude Code", color: "bg-[#d4a017] text-white" },
+  { name: "Vercel", color: "bg-ink text-white" },
+  { name: "Claude Code", color: "bg-brand-600 text-white" },
 ];
 
 const stats = [
@@ -77,26 +77,26 @@ const stats = [
 
 export default async function HistoriaPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-cream">
 
       {/* Hero */}
-      <section className="bg-[#2d3436] text-white py-24 px-4">
+      <section className="bg-cream-warm border-b border-cream-dark py-24 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-[#d4a017] font-semibold tracking-widest uppercase text-sm mb-4">
+          <p className="text-brand-600 font-semibold tracking-widest uppercase text-sm mb-4">
             Case Study
           </p>
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
+          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-ink">
             De WordPress a Next.js
             <br />
-            <span className="text-[#d4a017]">en 1 semana</span>
+            <span className="text-brand-600">en 1 semana</span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+          <p className="text-lg md:text-xl text-ink-muted max-w-2xl mx-auto mb-8">
             Cómo reconstruí un marketplace de libros usados usando inteligencia
             artificial — sin escribir una sola línea de código manualmente.
           </p>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-ink-muted">
             Por{" "}
-            <span className="text-white font-medium">Verónica Velásquez</span>{" "}
+            <span className="text-ink font-medium">Verónica Velásquez</span>{" "}
             · Fundadora de tuslibros.cl
           </p>
         </div>
@@ -105,7 +105,7 @@ export default async function HistoriaPage() {
       {/* Intro */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <p className="text-lg text-ink-muted leading-relaxed">
             tuslibros.cl nació como un sitio WordPress con el theme Martfury.
             Funcionaba, pero era lento, difícil de personalizar y costoso de
             mantener. En abril de 2026, decidí reconstruirlo desde cero usando{" "}
@@ -117,14 +117,14 @@ export default async function HistoriaPage() {
       </section>
 
       {/* Timeline */}
-      <section className="bg-gray-50 py-20 px-4">
+      <section className="bg-cream-warm py-20 px-4">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-[#2d3436] mb-16">
+          <h2 className="text-3xl font-bold text-center text-ink mb-16">
             La semana que cambió todo
           </h2>
           <div className="relative">
             {/* Vertical line */}
-            <div className="absolute left-6 md:left-1/2 md:-translate-x-px top-0 bottom-0 w-0.5 bg-[#d4a017]/30" />
+            <div className="absolute left-6 md:left-1/2 md:-translate-x-px top-0 bottom-0 w-0.5 bg-brand-600/30" />
 
             <div className="space-y-12">
               {timeline.map((item, i) => {
@@ -135,7 +135,7 @@ export default async function HistoriaPage() {
                     className="relative flex items-start md:items-center"
                   >
                     {/* Dot */}
-                    <div className="absolute left-6 md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#d4a017] border-4 border-white shadow z-10" />
+                    <div className="absolute left-6 md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-brand-600 border-4 border-cream-warm shadow z-10" />
 
                     {/* Card — mobile always right, desktop alternates */}
                     <div
@@ -145,13 +145,13 @@ export default async function HistoriaPage() {
                           : "md:ml-auto md:pl-12"
                       }`}
                     >
-                      <span className="inline-block text-xs font-bold tracking-widest uppercase text-[#d4a017] mb-1">
+                      <span className="inline-block text-xs font-bold tracking-widest uppercase text-brand-600 mb-1">
                         {item.day}
                       </span>
-                      <h3 className="text-xl font-bold text-[#2d3436] mb-2">
+                      <h3 className="text-xl font-bold text-ink mb-2">
                         {item.title}
                       </h3>
-                      <p className="text-gray-600 leading-relaxed text-sm">
+                      <p className="text-ink-muted leading-relaxed text-sm">
                         {item.description}
                       </p>
                     </div>
@@ -166,10 +166,10 @@ export default async function HistoriaPage() {
       {/* Tech Stack */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-[#2d3436] mb-4">
+          <h2 className="text-3xl font-bold text-ink mb-4">
             Stack tecnológico
           </h2>
-          <p className="text-gray-500 mb-12">
+          <p className="text-ink-muted mb-12">
             Cada pieza elegida por rendimiento, developer experience y costo
             cero en etapa inicial.
           </p>
@@ -187,22 +187,22 @@ export default async function HistoriaPage() {
       </section>
 
       {/* Stats */}
-      <section className="bg-[#2d3436] py-20 px-4">
+      <section className="bg-cream-warm border-y border-cream-dark py-20 px-4">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-white mb-16">
+          <h2 className="text-3xl font-bold text-center text-ink mb-16">
             Los números
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
-                <p className="text-5xl md:text-6xl font-extrabold text-[#d4a017]">
+                <p className="text-5xl md:text-6xl font-extrabold text-brand-600">
                   {stat.value}
                 </p>
-                <p className="text-gray-300 mt-2 text-sm">{stat.label}</p>
+                <p className="text-ink-muted mt-2 text-sm">{stat.label}</p>
               </div>
             ))}
           </div>
-          <p className="text-center text-gray-500 text-xs mt-10">
+          <p className="text-center text-ink-muted text-xs mt-10">
             * Bueno, tal vez unas pocas líneas para ajustes finales. Pero el
             punto se entiende.
           </p>
@@ -212,13 +212,13 @@ export default async function HistoriaPage() {
       {/* CTA */}
       <section className="py-24 px-4">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-[#2d3436] mb-12">
+          <h2 className="text-3xl font-bold text-ink mb-12">
             ¿Quieres ver el resultado?
           </h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/"
-              className="inline-block bg-[#d4a017] hover:bg-[#b8891a] text-white font-bold px-8 py-4 rounded-lg text-lg transition-colors shadow-lg"
+              className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-bold px-8 py-4 rounded-lg text-lg transition-colors shadow-lg"
             >
               Explorar tuslibros.cl
             </Link>
@@ -226,18 +226,18 @@ export default async function HistoriaPage() {
               href="https://docs.anthropic.com/en/docs/claude-code"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block border-2 border-[#2d3436] text-[#2d3436] hover:bg-[#2d3436] hover:text-white font-bold px-8 py-4 rounded-lg text-lg transition-colors"
+              className="inline-block border-2 border-ink text-ink hover:bg-ink hover:text-white font-bold px-8 py-4 rounded-lg text-lg transition-colors"
             >
               Conocer Claude Code
             </a>
           </div>
-          <p className="text-gray-400 text-sm mt-8">
+          <p className="text-ink-muted text-sm mt-8">
             ¿Tienes un proyecto similar en mente?{" "}
             <a
               href="https://www.linkedin.com/in/veronicavelasquez"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#2b6cb0] hover:underline"
+              className="text-brand-600 hover:underline"
             >
               Conversemos en LinkedIn
             </a>

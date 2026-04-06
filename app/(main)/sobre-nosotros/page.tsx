@@ -21,7 +21,7 @@ const steps = [
 
 export default function SobreNosotrosPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cream">
 
       {/* Hero */}
       <div className="relative h-64 overflow-hidden">
@@ -32,10 +32,10 @@ export default function SobreNosotrosPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 bg-cream/70" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-4xl font-bold text-white mb-2">Sobre Libros Libres</h1>
-          <p className="text-gray-200 text-lg max-w-xl">La historia detrás de Libros Libres</p>
+          <h1 className="text-4xl font-bold text-ink mb-2">Sobre Libros Libres</h1>
+          <p className="text-ink-muted text-lg max-w-xl">La historia detrás de Libros Libres</p>
         </div>
       </div>
 
@@ -43,9 +43,9 @@ export default function SobreNosotrosPage() {
       <main className="max-w-3xl mx-auto px-4 py-12">
         {/* Mission Card */}
         <section className="mb-12">
-          <div className="bg-[#2d3436] rounded-xl p-8 text-center border-l-4 border-[#d4a017]">
-            <h2 className="text-sm uppercase tracking-widest text-[#d4a017] font-semibold mb-3">Nuestra misión</h2>
-            <p className="text-white text-xl leading-relaxed font-light">
+          <div className="bg-cream-warm rounded-xl p-8 text-center border border-cream-dark border-l-4 border-l-brand-600">
+            <h2 className="text-sm uppercase tracking-widest text-brand-600 font-semibold mb-3">Nuestra misión</h2>
+            <p className="text-ink text-xl leading-relaxed font-light">
               Facilitar el acceso a libros usados conectando lectores cercanos de forma simple y directa, sin intermediarios.
             </p>
           </div>
@@ -53,14 +53,14 @@ export default function SobreNosotrosPage() {
 
         {/* Origin Story */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-[#2d3436] mb-4 border-b-2 border-[#d4a017] pb-2 inline-block">
+          <h2 className="text-2xl font-bold text-ink mb-4 border-b-2 border-brand-600 pb-2 inline-block">
             Cómo empezó
           </h2>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <p className="text-gray-700 leading-relaxed mb-4">
+          <div className="bg-white rounded-xl shadow-sm border border-cream-dark p-6">
+            <p className="text-ink-muted leading-relaxed mb-4">
               Libros Libres nació de una necesidad simple: encontrar libros usados cerca de casa sin pasar por plataformas complicadas, sin comisiones abusivas y sin esperar días de despacho.
             </p>
-            <p className="text-gray-700 leading-relaxed">
+            <p className="text-ink-muted leading-relaxed">
               La idea es sencilla: si alguien en tu barrio tiene el libro que buscas, ¿por qué no conectarlos directamente?
             </p>
           </div>
@@ -68,16 +68,16 @@ export default function SobreNosotrosPage() {
 
         {/* How it works */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-[#2d3436] mb-4 border-b-2 border-[#d4a017] pb-2 inline-block">
+          <h2 className="text-2xl font-bold text-ink mb-4 border-b-2 border-brand-600 pb-2 inline-block">
             Cómo funciona
           </h2>
           <div className="space-y-3">
             {steps.map((step, i) => (
-              <div key={i} className="flex items-start gap-4 bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#d4a017] text-white flex items-center justify-center text-sm font-bold">
+              <div key={i} className="flex items-start gap-4 bg-white rounded-xl shadow-sm border border-cream-dark p-4">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center text-sm font-bold">
                   {i + 1}
                 </div>
-                <p className="text-gray-700 leading-relaxed pt-1">{step}</p>
+                <p className="text-ink-muted leading-relaxed pt-1">{step}</p>
               </div>
             ))}
           </div>
@@ -85,15 +85,15 @@ export default function SobreNosotrosPage() {
 
         {/* Values */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-[#2d3436] mb-6 border-b-2 border-[#d4a017] pb-2 inline-block">
+          <h2 className="text-2xl font-bold text-ink mb-6 border-b-2 border-brand-600 pb-2 inline-block">
             Nuestros valores
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {values.map((v) => (
-              <div key={v.title} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-center">
+              <div key={v.title} className="bg-white rounded-xl shadow-sm border border-cream-dark p-5 text-center">
                 <div className="text-3xl mb-2">{v.icon}</div>
-                <h3 className="font-bold text-[#2d3436] mb-1">{v.title}</h3>
-                <p className="text-gray-600 text-sm">{v.description}</p>
+                <h3 className="font-bold text-ink mb-1">{v.title}</h3>
+                <p className="text-ink-muted text-sm">{v.description}</p>
               </div>
             ))}
           </div>
@@ -101,11 +101,11 @@ export default function SobreNosotrosPage() {
 
         {/* Who is it for */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-[#2d3436] mb-4 border-b-2 border-[#d4a017] pb-2 inline-block">
+          <h2 className="text-2xl font-bold text-ink mb-4 border-b-2 border-brand-600 pb-2 inline-block">
             ¿Para quién es?
           </h2>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white rounded-xl shadow-sm border border-cream-dark p-6">
+            <p className="text-ink-muted leading-relaxed">
               Para cualquier persona en Chile que quiera darle una segunda vida a sus libros o encontrar lecturas a buen precio cerca de su casa.
             </p>
           </div>
