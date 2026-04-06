@@ -83,12 +83,13 @@ export async function POST(req: NextRequest) {
 
   // Calcular comisión según plan del vendedor
   const useSplit = !!seller.mercadopago_access_token;
+  const isInPerson = shipping_service === "Entrega en persona" || shipping_service === "Punto de retiro";
   const { rate: commissionRate, commission } = useSplit
     ? calculateCommission(bookPrice, seller.plan ?? "free", "sale")
     : { rate: 0, commission: 0 };
 
-  // Sin split: fee fijo. Con split: comisión sobre precio del libro
-  const serviceFee = useSplit ? commission : SERVICE_FEE;
+  // In-person/pickup: no service fee. Courier: split → commission, no split → fixed fee
+  const serviceFee = isInPerson ? 0 : useSplit ? commission : SERVICE_FEE;
   const total = bookPrice + shippingCost + serviceFee;
 
   // Create order in Supabase

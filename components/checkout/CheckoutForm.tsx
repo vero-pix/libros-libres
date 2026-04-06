@@ -54,7 +54,8 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
   const isCourier = deliveryMethod === "courier";
   const selectedQuote = isCourier ? quotes.find((q) => q.serviceCode === selectedService) : null;
   const shippingCost = selectedQuote?.price ?? 0;
-  const total = bookPrice + shippingCost + SERVICE_FEE;
+  const serviceFee = isCourier ? SERVICE_FEE : 0;
+  const total = bookPrice + shippingCost + serviceFee;
 
   const fetchQuotes = useCallback(
     async (addr: string) => {
@@ -293,24 +294,32 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">
-              Envío{selectedQuote ? ` (${selectedQuote.service})` : ""}
+              {isCourier
+                ? `Envío${selectedQuote ? ` (${selectedQuote.service})` : ""}`
+                : "Entrega"}
             </span>
             <span className="text-gray-900">
-              {selectedQuote
-                ? `$${shippingCost.toLocaleString("es-CL")}`
-                : "Ingresa dirección"}
+              {isCourier
+                ? selectedQuote
+                  ? `$${shippingCost.toLocaleString("es-CL")}`
+                  : "Ingresa dirección"
+                : "Gratis"}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Cargo por servicio</span>
-            <span className="text-gray-900">${SERVICE_FEE.toLocaleString("es-CL")}</span>
-          </div>
+          {serviceFee > 0 && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">Cargo por servicio</span>
+              <span className="text-gray-900">${serviceFee.toLocaleString("es-CL")}</span>
+            </div>
+          )}
           <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between font-bold">
             <span className="text-gray-900">Total</span>
             <span className="text-gray-900">
-              {selectedQuote
-                ? `$${total.toLocaleString("es-CL")}`
-                : "—"}
+              {isCourier
+                ? selectedQuote
+                  ? `$${total.toLocaleString("es-CL")}`
+                  : "—"
+                : `$${total.toLocaleString("es-CL")}`}
             </span>
           </div>
         </div>
@@ -330,7 +339,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
         {loading
           ? "Procesando..."
           : !isCourier
-            ? `Pagar $${(bookPrice + SERVICE_FEE).toLocaleString("es-CL")} con MercadoPago`
+            ? `Pagar $${(bookPrice + serviceFee).toLocaleString("es-CL")} con MercadoPago`
             : selectedQuote
               ? `Pagar $${total.toLocaleString("es-CL")} con MercadoPago`
               : "Ingresa dirección para cotizar envío"}

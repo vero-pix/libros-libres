@@ -207,11 +207,15 @@ export default function ListingDetail({ listing, images = [] }: Props) {
       )}
 
       {/* Contact CTA */}
-      <div className="border-t border-gray-100 px-6 py-4 bg-gray-50">
+      <div className="border-t border-gray-100 px-6 py-5 bg-green-50/50">
+        <p className="text-xs font-semibold text-gray-500 mb-2 text-center">Coordinar sin MercadoPago — gratis, sin comisiones</p>
         <WhatsAppButton
           phone={listing.seller?.phone ?? null}
           title={book.title}
         />
+        <p className="text-[11px] text-gray-400 text-center mt-2">
+          Contacta al vendedor directamente. Sin comisiones para ninguna de las partes.
+        </p>
       </div>
 
       {/* Ad */}
