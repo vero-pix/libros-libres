@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import ListingDetail from "@/components/listings/ListingDetail";
 import ListingCard from "@/components/listings/ListingCard";
+import ReviewSection from "@/components/listings/ReviewSection";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 
@@ -61,6 +62,10 @@ export default async function ListingPage({ params }: Props) {
           ]}
         />
         <ListingDetail listing={listing} images={(images ?? []) as any} />
+
+        <div className="mt-6 bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <ReviewSection listingId={params.id} />
+        </div>
 
         {relatedListings.length > 0 && (
           <section className="mt-10">

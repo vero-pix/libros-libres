@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { paymentClient } from "@/lib/mercadopago";
 import { notifySeller } from "@/lib/notifications";
+import { sendEmail } from "@/lib/email";
 import crypto from "crypto";
 
 /**
@@ -123,6 +124,67 @@ export async function POST(req: NextRequest) {
         notifySeller(order.id, supabase).catch((err) =>
           console.error("[webhook] notifySeller error:", err)
         );
+
+        // ── Transactional emails ──
+        try {
+          const { data: fullOrder } = await supabase
+            .from("orders")
+            .select("*, listing:listings(*, book:books(*)), buyer:users!orders_buyer_id_fkey(id, full_name, email), seller:users!orders_seller_id_fkey(id, full_name, email)")
+            .eq("id", order.id)
+            .single();
+
+          if (fullOrder) {
+            const bookTitle = fullOrder.listing?.book?.title ?? "Libro";
+            const price = fullOrder.total ?? fullOrder.book_price ?? 0;
+            const buyerName = fullOrder.buyer?.full_name ?? "Comprador";
+            const sellerName = fullOrder.seller?.full_name ?? "Vendedor";
+            const buyerEmail = fullOrder.buyer?.email;
+            const sellerEmail = fullOrder.seller?.email;
+            const deliveryMethod = fullOrder.courier ?? fullOrder.shipping_speed ?? "Por coordinar";
+            const buyerAddress = fullOrder.buyer_address ?? "No especificada";
+
+            if (buyerEmail) {
+              await sendEmail({
+                to: buyerEmail,
+                subject: "Confirmación de compra — tuslibros.cl",
+                html: `
+                  <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
+                    <h2 style="color:#1a1a1a">¡Compra confirmada!</h2>
+                    <p>Tu pago fue recibido correctamente.</p>
+                    <table style="width:100%;border-collapse:collapse;margin:16px 0">
+                      <tr><td style="padding:8px 0;color:#666">Libro</td><td style="padding:8px 0;font-weight:600">${bookTitle}</td></tr>
+                      <tr><td style="padding:8px 0;color:#666">Total</td><td style="padding:8px 0;font-weight:600">$${Number(price).toLocaleString("es-CL")}</td></tr>
+                      <tr><td style="padding:8px 0;color:#666">Vendedor</td><td style="padding:8px 0">${sellerName}</td></tr>
+                      <tr><td style="padding:8px 0;color:#666">Entrega</td><td style="padding:8px 0">${deliveryMethod}</td></tr>
+                    </table>
+                    <p style="color:#888;font-size:13px">Gracias por usar tuslibros.cl</p>
+                  </div>
+                `,
+              });
+            }
+
+            if (sellerEmail) {
+              await sendEmail({
+                to: sellerEmail,
+                subject: "Nueva venta — tuslibros.cl",
+                html: `
+                  <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
+                    <h2 style="color:#1a1a1a">¡Tienes una nueva venta!</h2>
+                    <table style="width:100%;border-collapse:collapse;margin:16px 0">
+                      <tr><td style="padding:8px 0;color:#666">Libro</td><td style="padding:8px 0;font-weight:600">${bookTitle}</td></tr>
+                      <tr><td style="padding:8px 0;color:#666">Total</td><td style="padding:8px 0;font-weight:600">$${Number(price).toLocaleString("es-CL")}</td></tr>
+                      <tr><td style="padding:8px 0;color:#666">Comprador</td><td style="padding:8px 0">${buyerName}</td></tr>
+                      <tr><td style="padding:8px 0;color:#666">Dirección de entrega</td><td style="padding:8px 0">${buyerAddress}</td></tr>
+                    </table>
+                    <p style="color:#888;font-size:13px">Prepara el libro para el envío. tuslibros.cl</p>
+                  </div>
+                `,
+              });
+            }
+          }
+        } catch (emailErr) {
+          console.error("[webhook] Email send error (order):", emailErr);
+        }
       }
     } else {
       // ── RENTAL ──
@@ -147,6 +209,64 @@ export async function POST(req: NextRequest) {
             .from("listings")
             .update({ status: "rented" })
             .eq("id", rental.listing_id);
+
+          // ── Transactional emails (rental) ──
+          try {
+            const { data: fullRental } = await supabase
+              .from("rentals")
+              .select("*, listing:listings(*, book:books(*)), renter:users!rentals_renter_id_fkey(id, full_name, email), owner:users!rentals_owner_id_fkey(id, full_name, email)")
+              .eq("id", rental.id)
+              .single();
+
+            if (fullRental) {
+              const bookTitle = fullRental.listing?.book?.title ?? "Libro";
+              const rentalPrice = fullRental.rental_price ?? fullRental.total ?? 0;
+              const renterName = fullRental.renter?.full_name ?? "Arrendatario";
+              const ownerName = fullRental.owner?.full_name ?? "Propietario";
+              const renterEmail = fullRental.renter?.email;
+              const ownerEmail = fullRental.owner?.email;
+              const deliveryMethod = fullRental.delivery_method ?? "Por coordinar";
+
+              if (renterEmail) {
+                await sendEmail({
+                  to: renterEmail,
+                  subject: "Confirmación de arriendo — tuslibros.cl",
+                  html: `
+                    <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
+                      <h2 style="color:#1a1a1a">¡Arriendo confirmado!</h2>
+                      <table style="width:100%;border-collapse:collapse;margin:16px 0">
+                        <tr><td style="padding:8px 0;color:#666">Libro</td><td style="padding:8px 0;font-weight:600">${bookTitle}</td></tr>
+                        <tr><td style="padding:8px 0;color:#666">Monto</td><td style="padding:8px 0;font-weight:600">$${Number(rentalPrice).toLocaleString("es-CL")}</td></tr>
+                        <tr><td style="padding:8px 0;color:#666">Propietario</td><td style="padding:8px 0">${ownerName}</td></tr>
+                        <tr><td style="padding:8px 0;color:#666">Entrega</td><td style="padding:8px 0">${deliveryMethod}</td></tr>
+                      </table>
+                      <p style="color:#888;font-size:13px">Gracias por usar tuslibros.cl</p>
+                    </div>
+                  `,
+                });
+              }
+
+              if (ownerEmail) {
+                await sendEmail({
+                  to: ownerEmail,
+                  subject: "Nuevo arriendo — tuslibros.cl",
+                  html: `
+                    <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
+                      <h2 style="color:#1a1a1a">¡Tu libro fue arrendado!</h2>
+                      <table style="width:100%;border-collapse:collapse;margin:16px 0">
+                        <tr><td style="padding:8px 0;color:#666">Libro</td><td style="padding:8px 0;font-weight:600">${bookTitle}</td></tr>
+                        <tr><td style="padding:8px 0;color:#666">Monto</td><td style="padding:8px 0;font-weight:600">$${Number(rentalPrice).toLocaleString("es-CL")}</td></tr>
+                        <tr><td style="padding:8px 0;color:#666">Arrendatario</td><td style="padding:8px 0">${renterName}</td></tr>
+                      </table>
+                      <p style="color:#888;font-size:13px">Coordina la entrega con el arrendatario. tuslibros.cl</p>
+                    </div>
+                  `,
+                });
+              }
+            }
+          } catch (emailErr) {
+            console.error("[webhook] Email send error (rental):", emailErr);
+          }
         }
       } else {
         console.error("[webhook] No order or rental found for ref:", externalRef);

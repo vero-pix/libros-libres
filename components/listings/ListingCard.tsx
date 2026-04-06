@@ -76,9 +76,17 @@ export default function ListingCard({ listing }: Props) {
 
         <div className="flex items-baseline justify-between mt-3">
           {listing.price != null && (
-            <p className="font-display font-bold text-ink text-lg">
-              ${listing.price.toLocaleString("es-CL")}
-            </p>
+            <div className="flex items-baseline gap-1.5">
+              {(listing as unknown as Record<string, unknown>).original_price != null &&
+                Number((listing as unknown as Record<string, unknown>).original_price) > listing.price && (
+                <span className="text-sm text-gray-400 line-through">
+                  ${Number((listing as unknown as Record<string, unknown>).original_price).toLocaleString("es-CL")}
+                </span>
+              )}
+              <p className="font-display font-bold text-ink text-lg">
+                ${listing.price.toLocaleString("es-CL")}
+              </p>
+            </div>
           )}
           <Link
             href={`/vendedor/${listing.seller_id}`}

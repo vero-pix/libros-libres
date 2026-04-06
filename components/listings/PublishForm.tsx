@@ -49,6 +49,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
   const [genre, setGenre] = useState("");
   const [customCoverUrl, setCustomCoverUrl] = useState<string | null>(null);
   const [modality, setModality] = useState<Modality>("sale");
+  const [originalPrice, setOriginalPrice] = useState("");
   const [price, setPrice] = useState("");
   const [rentalPrice, setRentalPrice] = useState("");
   const [rentalDeposit, setRentalDeposit] = useState("");
@@ -187,6 +188,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
         seller_id: userId,
         modality,
         price: modality !== "loan" ? parseFloat(price) : null,
+        original_price: modality !== "loan" && originalPrice ? parseFloat(originalPrice) : null,
         rental_price: modality !== "sale" ? parseFloat(rentalPrice) : null,
         rental_deposit: modality !== "sale" && rentalDeposit ? parseFloat(rentalDeposit) : null,
         rental_period_days: modality !== "sale" ? rentalPeriod : null,
@@ -354,27 +356,53 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
             ))}
           </div>
 
-          {/* Precio */}
+          {/* Precio original + Precio */}
           {modality !== "loan" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Precio <span className="text-gray-400 font-normal">(CLP)</span>
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm font-medium pointer-events-none">
-                  $
-                </span>
-                <input
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="0"
-                  min="0"
-                  step="100"
-                  className="w-full pl-7 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
-                />
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Precio original <span className="text-gray-400 font-normal">(opcional, se muestra tachado)</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm font-medium pointer-events-none">
+                    $
+                  </span>
+                  <input
+                    type="number"
+                    value={originalPrice}
+                    onChange={(e) => setOriginalPrice(e.target.value)}
+                    placeholder="Ej: 15000"
+                    min="0"
+                    step="100"
+                    className="w-full pl-7 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+                  />
+                </div>
+                {originalPrice && price && parseFloat(originalPrice) > parseFloat(price) && (
+                  <p className="text-xs text-green-600 mt-1">
+                    Descuento: {Math.round(((parseFloat(originalPrice) - parseFloat(price)) / parseFloat(originalPrice)) * 100)}%
+                  </p>
+                )}
               </div>
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Precio <span className="text-gray-400 font-normal">(CLP)</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm font-medium pointer-events-none">
+                    $
+                  </span>
+                  <input
+                    type="number"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder="0"
+                    min="0"
+                    step="100"
+                    className="w-full pl-7 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+                  />
+                </div>
+              </div>
+            </>
           )}
 
           {/* Arriendo: precio, garantía, período */}

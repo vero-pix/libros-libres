@@ -110,14 +110,34 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             </span>
           </div>
 
-          {listing.price != null && listing.modality !== "loan" && (
-            <div className="mt-4 inline-flex items-center gap-2">
-              <span className="bg-brand-500 text-white font-bold text-lg sm:text-xl px-4 py-1.5 rounded-lg">
-                ${listing.price.toLocaleString("es-CL")}
-              </span>
-              <span className="text-xs text-gray-400 uppercase tracking-wider">Precio de venta</span>
-            </div>
-          )}
+          {listing.price != null && listing.modality !== "loan" && (() => {
+            const originalPrice = (listing as unknown as Record<string, unknown>).original_price != null
+              ? Number((listing as unknown as Record<string, unknown>).original_price)
+              : null;
+            const hasDiscount = originalPrice != null && originalPrice > listing.price;
+            const discountPct = hasDiscount
+              ? Math.round(((originalPrice - listing.price) / originalPrice) * 100)
+              : 0;
+
+            return (
+              <div className="mt-4 inline-flex items-center gap-2 flex-wrap">
+                {hasDiscount && (
+                  <span className="text-base sm:text-lg text-gray-400 line-through">
+                    ${originalPrice.toLocaleString("es-CL")}
+                  </span>
+                )}
+                <span className="bg-brand-500 text-white font-bold text-lg sm:text-xl px-4 py-1.5 rounded-lg">
+                  ${listing.price.toLocaleString("es-CL")}
+                </span>
+                {hasDiscount && (
+                  <span className="text-xs font-bold px-2 py-1 rounded-full bg-red-100 text-red-600">
+                    -{discountPct}%
+                  </span>
+                )}
+                <span className="text-xs text-gray-400 uppercase tracking-wider">Precio de venta</span>
+              </div>
+            );
+          })()}
 
           {(listing as ListingWithRentalFields).rental_price != null && listing.modality !== "sale" && (
             <p className="text-sm text-brand-600 font-semibold mt-1">
