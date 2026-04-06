@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ListingWithBook } from "@/types";
+import { addRecentlyViewed } from "./RecentlyViewed";
 import AddToCartButton from "@/components/ui/AddToCartButton";
 import AdSlot from "@/components/ui/AdSlot";
 import ImageGallery from "./ImageGallery";
@@ -67,6 +68,15 @@ export default function ListingDetail({ listing, images = [] }: Props) {
   const { book } = listing;
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
+
+  useEffect(() => {
+    addRecentlyViewed({
+      id: listing.id,
+      title: book.title,
+      cover_url: coverUrl,
+      price: listing.price,
+    });
+  }, [listing.id, book.title, coverUrl, listing.price]);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -152,19 +162,8 @@ export default function ListingDetail({ listing, images = [] }: Props) {
         </div>
       </div>
 
-      {/* Book description */}
-      <div className="border-t border-gray-100 px-5 sm:px-6 py-4">
-        <h2 className="text-sm font-semibold text-gray-700 mb-2">Sinopsis</h2>
-        {book.description ? (
-          <p className="text-sm text-gray-600 leading-relaxed">
-            {book.description}
-          </p>
-        ) : (
-          <p className="text-sm text-gray-400 italic">
-            Sin sinopsis disponible. Consulta al vendedor por más detalles.
-          </p>
-        )}
-      </div>
+      {/* Tabs */}
+      <DetailTabs listing={listing} />
 
       {/* Buy CTA */}
       {listing.price != null && listing.modality !== "loan" && (
@@ -198,6 +197,70 @@ export default function ListingDetail({ listing, images = [] }: Props) {
       {/* Ad */}
       <div className="border-t border-gray-100 px-6 py-4">
         <AdSlot slot="listing-detail" format="horizontal" />
+      </div>
+    </div>
+  );
+}
+
+function DetailTabs({ listing }: { listing: ListingWithBook }) {
+  const [activeTab, setActiveTab] = useState<"descripcion" | "ubicacion" | "vendedor">("descripcion");
+  const { book } = listing;
+  const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
+
+  const tabs = [
+    { key: "descripcion" as const, label: "Descripción" },
+    { key: "ubicacion" as const, label: "Ubicación" },
+    { key: "vendedor" as const, label: "Vendedor" },
+  ];
+
+  return (
+    <div className="border-t border-gray-100">
+      <div className="flex border-b border-gray-100">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`flex-1 py-3 text-sm font-medium transition-colors ${
+              activeTab === tab.key
+                ? "text-brand-600 border-b-2 border-brand-500"
+                : "text-ink-muted hover:text-ink"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      <div className="px-5 sm:px-6 py-4">
+        {activeTab === "descripcion" && (
+          book.description ? (
+            <p className="text-sm text-gray-600 leading-relaxed">{book.description}</p>
+          ) : (
+            <p className="text-sm text-gray-400 italic">Sin sinopsis disponible. Consulta al vendedor por más detalles.</p>
+          )
+        )}
+        {activeTab === "ubicacion" && (
+          <p className="text-sm text-gray-600">
+            {listing.address
+              ? listing.address.split(",").slice(0, 2).join(",").trim()
+              : "Ubicación no especificada"}
+          </p>
+        )}
+        {activeTab === "vendedor" && (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center font-bold flex-shrink-0">
+              {sellerName[0].toUpperCase()}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-700">{sellerName}</p>
+              <Link
+                href={`/vendedor/${listing.seller_id}`}
+                className="text-xs text-brand-600 hover:text-brand-700 transition-colors"
+              >
+                Ver tienda del vendedor
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

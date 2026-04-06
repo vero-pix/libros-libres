@@ -5,8 +5,13 @@ import CategoriesMobileDrawer from "@/components/ui/CategoriesMobileDrawer";
 import AdSlot from "@/components/ui/AdSlot";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
+import ListingCardList from "@/components/listings/ListingCardList";
+import RecentlyViewed from "@/components/listings/RecentlyViewed";
+import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
 import type { ListingWithBook } from "@/types";
+
+const ITEMS_PER_PAGE = 20;
 
 interface Props {
   searchParams: {
@@ -17,12 +22,16 @@ interface Props {
     condition?: string;
     modality?: string;
     author?: string;
+    page?: string;
+    view?: string;
   };
 }
 
 export default async function HomePage({ searchParams }: Props) {
   const supabase = await createClient();
-  const { genre, sort, price_min, price_max, condition, modality, author } = searchParams;
+  const { genre, sort, price_min, price_max, condition, modality, author, page, view } = searchParams;
+  const currentPage = Math.max(1, parseInt(page ?? "1", 10) || 1);
+  const viewMode = view === "list" ? "list" : "grid";
 
   const hasFilters = !!(genre || sort || price_min || price_max || condition || modality || author);
 
@@ -83,23 +92,59 @@ export default async function HomePage({ searchParams }: Props) {
               <ListingToolbar />
             </Suspense>
 
+            <RecentlyViewed />
+
             {listings.length > 0 ? (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-5">
-                  {listings.slice(0, 10).map((listing) => (
-                    <ListingCard key={listing.id} listing={listing} />
-                  ))}
-                </div>
-                {listings.length > 10 && (
-                  <>
-                    <AdSlot slot="in-feed" format="horizontal" className="my-6" />
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-5">
-                      {listings.slice(10).map((listing) => (
-                        <ListingCard key={listing.id} listing={listing} />
-                      ))}
-                    </div>
-                  </>
-                )}
+                {(() => {
+                  const totalPages = Math.ceil(listings.length / ITEMS_PER_PAGE);
+                  const start = (currentPage - 1) * ITEMS_PER_PAGE;
+                  const pageListings = listings.slice(start, start + ITEMS_PER_PAGE);
+                  const firstHalf = pageListings.slice(0, 10);
+                  const secondHalf = pageListings.slice(10);
+
+                  const buildHref = (p: number) => {
+                    const params = new URLSearchParams();
+                    if (genre) params.set("genre", genre);
+                    if (sort) params.set("sort", sort);
+                    if (price_min) params.set("price_min", price_min);
+                    if (price_max) params.set("price_max", price_max);
+                    if (condition) params.set("condition", condition);
+                    if (modality) params.set("modality", modality);
+                    if (author) params.set("author", author);
+                    if (viewMode === "list") params.set("view", "list");
+                    if (p > 1) params.set("page", String(p));
+                    const qs = params.toString();
+                    return qs ? `/?${qs}` : "/";
+                  };
+
+                  const gridClass = viewMode === "list"
+                    ? "flex flex-col gap-3"
+                    : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-5";
+
+                  const CardComponent = viewMode === "list" ? ListingCardList : ListingCard;
+
+                  return (
+                    <>
+                      <div className={gridClass}>
+                        {firstHalf.map((listing) => (
+                          <CardComponent key={listing.id} listing={listing} />
+                        ))}
+                      </div>
+                      {secondHalf.length > 0 && (
+                        <>
+                          <AdSlot slot="in-feed" format="horizontal" className="my-6" />
+                          <div className={gridClass}>
+                            {secondHalf.map((listing) => (
+                              <CardComponent key={listing.id} listing={listing} />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                      <Pagination currentPage={currentPage} totalPages={totalPages} buildHref={buildHref} />
+                    </>
+                  );
+                })()}
               </>
             ) : (
               <div className="text-center py-20">
