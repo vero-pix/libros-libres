@@ -55,14 +55,17 @@
 
 ### Inmediato (resolver esta semana)
 - [ ] Chilexpress: obtener endpoints de producción correctos
-- [ ] Google OAuth: configurar provider en Supabase Dashboard
+- [x] Google OAuth: código + Supabase configurado
+- [ ] Apple OAuth: configurar en Supabase (necesita Apple Developer account)
+- [ ] LinkedIn OAuth: configurar en Supabase (necesita LinkedIn App)
 - [ ] Confirmación email: configurar SMTP con Resend en Supabase
 - [ ] AdSense: obtener ID y agregar NEXT_PUBLIC_ADSENSE_CLIENT
 - [ ] Webhook MP: registrar URL https://tuslibros.cl/api/webhooks/mercadopago
 - [ ] Carga masiva de 500+ libros
+- [ ] Verificar app Google OAuth (publicar en Google Console)
 
 ### Corto plazo
-- [ ] Página de planes vendedor (Libre/Librero/Librería)
+- [ ] Carrito persistente (agregar libros, checkout múltiple)
 - [ ] Mejorar admin panel (limpieza, mejor UX)
 - [ ] Email transaccional (Resend): confirmación compra, arriendo
 - [ ] Tracking de envíos
@@ -70,9 +73,11 @@
 - [ ] Liberación garantía arriendos
 
 ### Mediano plazo
+- [ ] OAuth Facebook / Instagram
 - [ ] PWA (instalable en celular)
 - [ ] Sistema de recomendaciones
 - [ ] Cápsulas LinkedIn
+- [ ] Dominio personalizado Supabase (para que OAuth muestre tuslibros.cl)
 
 ---
 
