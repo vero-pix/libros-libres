@@ -11,9 +11,9 @@ const COURIERS = [
     bg: "bg-red-50",
   },
   {
-    name: "Rappi",
-    time: "2 horas",
-    desc: "Mismo día en tu ciudad",
+    name: "Punto de retiro",
+    time: "Acuerdan lugar",
+    desc: "Coordinas un punto de encuentro",
     color: "text-orange-500",
     bg: "bg-orange-50",
   },

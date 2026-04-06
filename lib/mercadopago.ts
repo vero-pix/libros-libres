@@ -27,5 +27,5 @@ export const SHIPPING_COSTS: Record<string, number> = {
 /** Courier by speed */
 export const COURIER_BY_SPEED: Record<string, string> = {
   standard: "Chilexpress",
-  express: "Rappi",
+  express: "Express",
 };

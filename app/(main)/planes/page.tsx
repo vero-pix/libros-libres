@@ -69,8 +69,13 @@ export default function PlanesPage() {
             Vende más, paga menos
           </h1>
           <p className="text-ink-muted mt-3 max-w-lg mx-auto">
-            Todos los planes incluyen publicación ilimitada y pagos seguros con MercadoPago.
-            La diferencia está en la comisión por venta.
+            Libros Libres es libre por naturaleza. Publica, contacta compradores por WhatsApp
+            y coordina la entrega como quieras — sin costo, sin comisiones, sin restricciones.
+          </p>
+          <p className="text-ink-muted mt-2 max-w-lg mx-auto">
+            Los planes con comisión existen porque nuestros usuarios nos lo pidieron:
+            pagos seguros con MercadoPago, despacho con courier, y protección para ambas partes.
+            Si quieres usar estas herramientas pro, aquí están tus opciones.
           </p>
         </div>
 
