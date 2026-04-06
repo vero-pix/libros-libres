@@ -28,7 +28,16 @@ interface Props {
   buyerName: string;
 }
 
+type DeliveryMethod = "courier" | "in_person" | "pickup_point";
+
+const DELIVERY_OPTIONS = [
+  { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis — coordinas con el vendedor", icon: "🤝" },
+  { value: "pickup_point" as const, label: "Punto de retiro", desc: "Gratis — acuerdan un lugar", icon: "📍" },
+  { value: "courier" as const, label: "Envío por courier", desc: "Chilexpress u otro — se cotiza al ingresar dirección", icon: "📦" },
+];
+
 export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props) {
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("courier");
   const [address, setAddress] = useState(buyerAddress);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +51,8 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
   const { book } = listing;
   const bookPrice = listing.price ?? 0;
 
-  const selectedQuote = quotes.find((q) => q.serviceCode === selectedService);
+  const isCourier = deliveryMethod === "courier";
+  const selectedQuote = isCourier ? quotes.find((q) => q.serviceCode === selectedService) : null;
   const shippingCost = selectedQuote?.price ?? 0;
   const total = bookPrice + shippingCost + SERVICE_FEE;
 
@@ -106,7 +116,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!selectedQuote) return;
+    if (isCourier && !selectedQuote) return;
     setLoading(true);
     setError(null);
 
@@ -116,10 +126,10 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           listing_id: listing.id,
-          shipping_speed: "standard", // TODO: mapear serviceCode a speed
-          shipping_cost_override: selectedQuote.price,
-          shipping_service: selectedQuote.service,
-          buyer_address: address,
+          shipping_speed: "standard",
+          shipping_cost_override: isCourier ? selectedQuote!.price : 0,
+          shipping_service: isCourier ? selectedQuote!.service : deliveryMethod === "in_person" ? "Entrega en persona" : "Punto de retiro",
+          buyer_address: isCourier ? address : deliveryMethod,
         }),
       });
 
@@ -172,27 +182,60 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
         </div>
       </div>
 
-      {/* Shipping address */}
+      {/* Delivery method */}
       <div className="bg-white rounded-lg border border-gray-200 p-5">
-        <h2 className="font-semibold text-gray-900 mb-4">Dirección de envío</h2>
-        <input
-          type="text"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          placeholder="Dirección completa (calle, número, comuna, ciudad)"
-          required
-          className="w-full px-4 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
-        />
-        {quoting && (
-          <p className="text-xs text-gray-400 mt-2 flex items-center gap-1.5">
-            <span className="w-3 h-3 border-2 border-gray-300 border-t-brand-500 rounded-full animate-spin" />
-            Cotizando envío con Chilexpress...
-          </p>
-        )}
+        <h2 className="font-semibold text-gray-900 mb-4">Forma de entrega</h2>
+        <div className="space-y-2">
+          {DELIVERY_OPTIONS.map((opt) => (
+            <label
+              key={opt.value}
+              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                deliveryMethod === opt.value
+                  ? "border-brand-500 bg-brand-50"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <input
+                type="radio"
+                name="delivery"
+                value={opt.value}
+                checked={deliveryMethod === opt.value}
+                onChange={() => setDeliveryMethod(opt.value)}
+                className="accent-brand-500"
+              />
+              <span className="text-lg">{opt.icon}</span>
+              <div>
+                <p className="text-sm font-medium text-gray-800">{opt.label}</p>
+                <p className="text-xs text-gray-400">{opt.desc}</p>
+              </div>
+            </label>
+          ))}
+        </div>
       </div>
 
-      {/* Shipping options */}
-      {quotes.length > 0 && (
+      {/* Shipping address — only for courier */}
+      {isCourier && (
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <h2 className="font-semibold text-gray-900 mb-4">Dirección de envío</h2>
+          <input
+            type="text"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Dirección completa (calle, número, comuna, ciudad)"
+            required
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+          />
+          {quoting && (
+            <p className="text-xs text-gray-400 mt-2 flex items-center gap-1.5">
+              <span className="w-3 h-3 border-2 border-gray-300 border-t-brand-500 rounded-full animate-spin" />
+              Cotizando envío con Chilexpress...
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Shipping options — only for courier */}
+      {isCourier && quotes.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <h2 className="font-semibold text-gray-900 mb-4">Opciones de envío</h2>
           {quoteError && (
@@ -278,14 +321,16 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
 
       <button
         type="submit"
-        disabled={loading || !address || !selectedQuote}
+        disabled={loading || (isCourier && (!address || !selectedQuote))}
         className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white font-semibold py-3 rounded-lg text-sm transition-colors"
       >
         {loading
           ? "Procesando..."
-          : selectedQuote
-            ? `Pagar $${total.toLocaleString("es-CL")} con MercadoPago`
-            : "Ingresa dirección para cotizar envío"}
+          : !isCourier
+            ? `Pagar $${(bookPrice + SERVICE_FEE).toLocaleString("es-CL")} con MercadoPago`
+            : selectedQuote
+              ? `Pagar $${total.toLocaleString("es-CL")} con MercadoPago`
+              : "Ingresa dirección para cotizar envío"}
       </button>
 
       <p className="text-xs text-gray-400 text-center">
