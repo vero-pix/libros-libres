@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { compressImage } from "@/lib/image-compress";
 
 interface Props {
   listingId: string;
@@ -29,11 +30,12 @@ export default function ImageUploadMultiple({ listingId, existingImages, onImage
 
     const newImages: { id: string; image_url: string }[] = [];
 
-    for (const file of Array.from(files)) {
-      if (!file.type.startsWith("image/")) continue;
-      if (file.size > 5 * 1024 * 1024) continue;
+    for (const rawFile of Array.from(files)) {
+      if (!rawFile.type.startsWith("image/")) continue;
+      if (rawFile.size > 10 * 1024 * 1024) continue; // 10MB raw max, will compress
 
-      const ext = file.name.split(".").pop() ?? "jpg";
+      const file = await compressImage(rawFile);
+      const ext = "jpg";
       const path = `${user.id}/${listingId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
       const { error: uploadErr } = await supabase.storage

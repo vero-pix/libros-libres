@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
+import { compressImage } from "@/lib/image-compress";
 
 interface Props {
   currentUrl: string | null | undefined;
@@ -31,11 +32,15 @@ export default function CoverUpload({ currentUrl, onUploaded }: Props) {
     setError(null);
     setUploading(true);
 
+    // Compress before upload
+    const compressed = await compressImage(file);
+
     // Preview local
-    const localUrl = URL.createObjectURL(file);
+    const localUrl = URL.createObjectURL(compressed);
     setPreview(localUrl);
 
     try {
+      const file = compressed;
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Debes iniciar sesión.");
 
