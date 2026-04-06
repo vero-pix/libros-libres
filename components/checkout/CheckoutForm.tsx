@@ -33,7 +33,7 @@ type DeliveryMethod = "courier" | "in_person" | "pickup_point";
 const DELIVERY_OPTIONS = [
   { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis — coordinas con el vendedor", icon: "🤝" },
   { value: "pickup_point" as const, label: "Punto de retiro", desc: "Gratis — acuerdan un lugar", icon: "📍" },
-  { value: "courier" as const, label: "Envío por courier", desc: "Chilexpress u otro — se cotiza al ingresar dirección", icon: "📦" },
+  { value: "courier" as const, label: "Envío por courier", desc: "Múltiples couriers — se cotiza al ingresar dirección", icon: "📦" },
 ];
 
 export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props) {
@@ -228,7 +228,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
           {quoting && (
             <p className="text-xs text-gray-400 mt-2 flex items-center gap-1.5">
               <span className="w-3 h-3 border-2 border-gray-300 border-t-brand-500 rounded-full animate-spin" />
-              Cotizando envío con Chilexpress...
+              Cotizando opciones de envío...
             </p>
           )}
         </div>
@@ -267,7 +267,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
                       {q.service}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {q.deliveryTime} — Chilexpress
+                      {q.deliveryTime}{(q as any).courier ? ` — ${(q as any).courier}` : ""}
                     </p>
                   </div>
                 </div>
