@@ -134,16 +134,13 @@ export default function ProfileForm({
     setSaved(false);
     setError(null);
 
-    const updateData: Record<string, string | null> = {
-      full_name: fullName.trim() || null,
-      phone: phone.trim() || null,
-      bio: bio.trim() || null,
-    };
-
-    // Use upsert to handle users that don't have a row in public.users yet
     const { error: updateError } = await supabase
       .from("users")
-      .upsert({ id: userId, email, ...updateData })
+      .update({
+        full_name: fullName.trim() || null,
+        phone: phone.trim() || null,
+        bio: bio.trim() || null,
+      })
       .eq("id", userId);
 
     setLoading(false);
