@@ -40,9 +40,9 @@ export default function HomeShell({ totalListings, hasFilters, children }: Props
                   Por qué existimos
                 </p>
                 <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-ink leading-tight mb-4">
-                  Uber liberó el transporte.
+                  Tus libros merecen circular.
                   <br />
-                  <span className="italic text-brand-600">Nosotros liberamos las estanterías.</span>
+                  <span className="italic text-brand-600">Nosotros los conectamos.</span>
                 </h2>
                 <p className="text-ink-muted leading-relaxed max-w-lg mx-auto lg:mx-0">
                   Hay millones de libros acumulando polvo en casas de Chile.

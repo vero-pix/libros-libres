@@ -10,7 +10,7 @@ interface Props {
 export default function HeroBar({ totalListings, onToggleMap }: Props) {
   return (
     <section className="bg-cream-warm border-b border-cream-dark overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 py-6 flex items-center gap-8">
+      <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
         {/* Tagline — links to manifesto */}
         <a href="#manifiesto" className="flex-shrink-0 group">
           <h1 className="font-display text-xl sm:text-2xl font-bold text-ink leading-tight group-hover:text-brand-600 transition-colors">
@@ -114,7 +114,7 @@ export default function HeroBar({ totalListings, onToggleMap }: Props) {
         {/* CTA */}
         <Link
           href="/publish"
-          className="flex-shrink-0 hidden sm:inline-flex items-center px-5 py-2.5 bg-brand-500 text-white text-xs font-semibold uppercase tracking-wide rounded-md hover:bg-brand-600 transition-colors shadow-sm"
+          className="flex-shrink-0 hidden lg:inline-flex items-center px-5 py-2.5 bg-brand-500 text-white text-xs font-semibold uppercase tracking-wide rounded-md hover:bg-brand-600 transition-colors shadow-sm"
         >
           Publicar gratis
         </Link>
