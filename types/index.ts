@@ -58,7 +58,7 @@ export interface Listing {
 
 export interface ListingWithBook extends Listing {
   book: Book;
-  seller?: Pick<UserProfile, "id" | "full_name" | "avatar_url" | "phone">;
+  seller?: Pick<UserProfile, "id" | "full_name" | "avatar_url" | "phone" | "mercadopago_user_id">;
 }
 
 /* ── Orders & Payments ── */

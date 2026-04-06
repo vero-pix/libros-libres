@@ -16,13 +16,13 @@
     "@supabase/ssr": "^0.10.0",
     "@supabase/supabase-js": "^2.101.1",
     "gray-matter": "^4.0.3",
+    "html5-qrcode": "^2.3.8",
     "mapbox-gl": "^3.10.0",
     "mercadopago": "^2.12.0",
     "next": "14.2.35",
     "next-mdx-remote": "^6.0.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-zxing": "^2.1.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",

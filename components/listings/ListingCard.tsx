@@ -49,6 +49,14 @@ export default function ListingCard({ listing }: Props) {
               Nuevo
             </span>
           )}
+          {listing.seller?.mercadopago_user_id && (
+            <span className="absolute bottom-3 left-3 w-4 h-4" title="Pago seguro con MercadoPago">
+              <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 drop-shadow">
+                <path d="M12 2L3 7v6c0 5.25 3.83 10.16 9 11.25C17.17 23.16 21 18.25 21 13V7l-9-5z" fill="#D4A017"/>
+                <path d="M10 15.5l-3-3 1.4-1.4L10 12.7l5.6-5.6L17 8.5l-7 7z" fill="#fff"/>
+              </svg>
+            </span>
+          )}
         </div>
       </Link>
 

@@ -37,7 +37,7 @@ export default async function HomePage({ searchParams }: Props) {
 
   let query = supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url)`)
+    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, mercadopago_user_id)`)
     .eq("status", "active");
 
   if (condition) query = query.eq("condition", condition);

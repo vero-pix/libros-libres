@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { useZxing } from "react-zxing";
+import React, { useEffect, useRef, useCallback } from "react";
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 
 interface Props {
   onDetected: (isbn: string) => void;
@@ -10,24 +10,57 @@ interface Props {
 
 export default function BarcodeScanner({ onDetected, onClose }: Props) {
   const detectedRef = useRef(false);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const { ref } = useZxing({
-    onDecodeResult(result) {
-      if (detectedRef.current) return;
-      const text = result.getText();
-      // Aceptar solo EAN-13 con largo 13 (ISBNs modernos) o EAN-10
-      if (!/^\d{10}(\d{3})?$/.test(text)) return;
-      detectedRef.current = true;
-      onDetected(text);
-    },
-    constraints: {
-      video: {
-        facingMode: "environment", // cámara trasera en móvil
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-      },
-    },
-  });
+  const stop = useCallback(async () => {
+    try {
+      const s = scannerRef.current;
+      if (s) {
+        scannerRef.current = null;
+        if (s.isScanning) await s.stop();
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    const id = "barcode-reader";
+    const scanner = new Html5Qrcode(id, {
+      formatsToSupport: [
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.CODE_128,
+      ],
+      verbose: false,
+    });
+    scannerRef.current = scanner;
+
+    scanner
+      .start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 288, height: 128 },
+        },
+        (decodedText) => {
+          if (detectedRef.current) return;
+          if (!/^\d{10}(\d{3})?$/.test(decodedText)) return;
+          detectedRef.current = true;
+          stop().then(() => onDetected(decodedText));
+        },
+        () => {
+          // ignore scan failures
+        }
+      )
+      .catch(() => {
+        // camera permission denied or not available
+      });
+
+    return () => {
+      stop();
+    };
+  }, [onDetected, stop]);
 
   // Cerrar con Escape en desktop
   useEffect(() => {
@@ -45,7 +78,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
         <span className="text-sm font-medium">Apunta al código de barras del libro</span>
         <button
           type="button"
-          onClick={onClose}
+          onClick={() => { stop(); onClose(); }}
           className="text-white/70 hover:text-white text-2xl leading-none px-2"
           aria-label="Cerrar escáner"
         >
@@ -54,14 +87,8 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       </div>
 
       {/* Video */}
-      <div className="flex-1 relative overflow-hidden">
-        <video
-          ref={ref as React.RefObject<HTMLVideoElement>}
-          className="absolute inset-0 w-full h-full object-cover"
-          autoPlay
-          playsInline
-          muted
-        />
+      <div className="flex-1 relative overflow-hidden" ref={containerRef}>
+        <div id="barcode-reader" className="absolute inset-0 w-full h-full [&>video]:!object-cover [&>video]:!w-full [&>video]:!h-full" />
 
         {/* Visor de encuadre */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
