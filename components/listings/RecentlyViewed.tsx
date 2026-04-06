@@ -9,6 +9,8 @@ export interface RecentItem {
   title: string;
   cover_url: string | null;
   price: number | null;
+  genre?: string | null;
+  author?: string | null;
 }
 
 const STORAGE_KEY = "tuslibros_recently_viewed";

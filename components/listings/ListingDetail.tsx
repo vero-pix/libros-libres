@@ -75,8 +75,10 @@ export default function ListingDetail({ listing, images = [] }: Props) {
       title: book.title,
       cover_url: coverUrl,
       price: listing.price,
+      genre: book.genre,
+      author: book.author,
     });
-  }, [listing.id, book.title, coverUrl, listing.price]);
+  }, [listing.id, book.title, coverUrl, listing.price, book.genre, book.author]);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">

@@ -7,6 +7,7 @@ import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
 import ListingCardList from "@/components/listings/ListingCardList";
 import RecentlyViewed from "@/components/listings/RecentlyViewed";
+import Recommendations from "@/components/listings/Recommendations";
 import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
 import type { ListingWithBook } from "@/types";
@@ -160,6 +161,7 @@ export default async function HomePage({ searchParams }: Props) {
           </div>
         </div>
 
+        <Recommendations />
         <RecentlyViewed />
       </HomeShell>
     </div>
