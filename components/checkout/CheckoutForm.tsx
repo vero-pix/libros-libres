@@ -31,9 +31,9 @@ interface Props {
 type DeliveryMethod = "courier" | "in_person" | "pickup_point";
 
 const DELIVERY_OPTIONS = [
-  { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis — coordinas con el vendedor", icon: "🤝" },
-  { value: "pickup_point" as const, label: "Punto de retiro", desc: "Gratis — acuerdan un lugar", icon: "📍" },
-  { value: "courier" as const, label: "Envío por courier", desc: "Múltiples couriers — se cotiza al ingresar dirección", icon: "📦" },
+  { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis — coordinas con el vendedor", icon: "🤝", enabled: true },
+  { value: "pickup_point" as const, label: "Punto de retiro", desc: "Gratis — acuerdan un lugar", icon: "📍", enabled: true },
+  { value: "courier" as const, label: "Envío por courier con etiqueta", desc: "Próximamente — estamos integrando couriers", icon: "📦", enabled: false },
 ];
 
 export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props) {
@@ -189,10 +189,12 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
           {DELIVERY_OPTIONS.map((opt) => (
             <label
               key={opt.value}
-              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                deliveryMethod === opt.value
-                  ? "border-brand-500 bg-brand-50"
-                  : "border-gray-200 hover:border-gray-300"
+              className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                !opt.enabled
+                  ? "opacity-50 cursor-not-allowed border-gray-200"
+                  : deliveryMethod === opt.value
+                    ? "border-brand-500 bg-brand-50 cursor-pointer"
+                    : "border-gray-200 hover:border-gray-300 cursor-pointer"
               }`}
             >
               <input
@@ -200,7 +202,8 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
                 name="delivery"
                 value={opt.value}
                 checked={deliveryMethod === opt.value}
-                onChange={() => setDeliveryMethod(opt.value)}
+                onChange={() => opt.enabled && setDeliveryMethod(opt.value)}
+                disabled={!opt.enabled}
                 className="accent-brand-500"
               />
               <span className="text-lg">{opt.icon}</span>
