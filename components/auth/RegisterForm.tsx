@@ -4,11 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import SocialLoginButtons from "./SocialLoginButtons";
-import { COMUNAS_CHILE } from "@/lib/comunas";
+import { REGIONES_CHILE } from "@/lib/comunas";
 
 export default function RegisterForm() {
   const supabase = createClient();
   const [fullName, setFullName] = useState("");
+  const [country, setCountry] = useState("Chile");
+  const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -94,21 +96,63 @@ export default function RegisterForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Comuna
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">País</label>
         <select
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          required
+          value={country}
+          onChange={(e) => { setCountry(e.target.value); setRegion(""); setCity(""); }}
           className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
         >
-          <option value="">Selecciona tu comuna</option>
-          {COMUNAS_CHILE.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
+          <option value="Chile">Chile</option>
+          <option value="Otro">Otro país</option>
         </select>
       </div>
+
+      {country === "Chile" ? (
+        <>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Región</label>
+            <select
+              value={region}
+              onChange={(e) => { setRegion(e.target.value); setCity(""); }}
+              required
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+            >
+              <option value="">Selecciona región</option>
+              {Object.keys(REGIONES_CHILE).map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+          {region && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Comuna</label>
+              <select
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                required
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+              >
+                <option value="">Selecciona comuna</option>
+                {REGIONES_CHILE[region].map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </>
+      ) : (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
+          <input
+            type="text"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            required
+            placeholder="Tu ciudad"
+            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+          />
+        </div>
+      )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
