@@ -92,8 +92,6 @@ export default async function HomePage({ searchParams }: Props) {
               <ListingToolbar />
             </Suspense>
 
-            <RecentlyViewed />
-
             {listings.length > 0 ? (
               <>
                 {(() => {
@@ -161,6 +159,8 @@ export default async function HomePage({ searchParams }: Props) {
             </div>
           </div>
         </div>
+
+        <RecentlyViewed />
       </HomeShell>
     </div>
   );
