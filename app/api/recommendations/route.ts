@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
 
     if (matched.length > 0) {
       return NextResponse.json(matched, {
-        headers: { "Cache-Control": "no-store" },
+        headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" },
       });
     }
   }
@@ -89,6 +89,6 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json(fallbackData ?? [], {
-    headers: { "Cache-Control": "no-store" },
+    headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" },
   });
 }
