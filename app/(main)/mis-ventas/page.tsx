@@ -103,6 +103,9 @@ export default async function MisVentasPage() {
           <div className="text-right">
             <span className="text-xs uppercase tracking-wider text-ink-muted">Plan</span>
             <p className="text-sm font-semibold text-brand-600">{PLAN_LABELS[plan]}</p>
+            <p className="text-[11px] text-ink-muted mt-1 bg-green-50 text-green-700 px-2 py-0.5 rounded-full inline-block">
+              Comisión solo con MercadoPago · WhatsApp es gratis
+            </p>
           </div>
         </div>
 
