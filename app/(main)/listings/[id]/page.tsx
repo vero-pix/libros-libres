@@ -56,28 +56,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ListingPage({ params }: Props) {
   const supabase = await createClient();
 
-  const { data: listing } = await supabase
-    .from("listings")
-    .select(
-      `
-      *,
-      book:books(*),
-      seller:users(id, full_name, avatar_url, phone)
-    `
-    )
-    .eq("id", params.id)
-    .single();
+  // Fetch listing + images in parallel
+  const [{ data: listing }, { data: images }] = await Promise.all([
+    supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone)`)
+      .eq("id", params.id)
+      .single(),
+    supabase
+      .from("listing_images")
+      .select("id, image_url")
+      .eq("listing_id", params.id)
+      .order("sort_order", { ascending: true }),
+  ]);
 
   if (!listing) {
     notFound();
   }
-
-  // Fetch additional images
-  const { data: images } = await supabase
-    .from("listing_images")
-    .select("id, image_url")
-    .eq("listing_id", params.id)
-    .order("sort_order", { ascending: true });
 
   // Related books: same genre, exclude current
   let relatedListings: ListingWithBook[] = [];

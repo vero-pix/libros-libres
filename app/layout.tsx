@@ -68,7 +68,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Libros Libres" />
         <script
           dangerouslySetInnerHTML={{
-            __html: `if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("/sw.js")})}`,
+            __html: `if("serviceWorker" in navigator){setTimeout(()=>{navigator.serviceWorker.register("/sw.js")},3000)}`,
           }}
         />
         {process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (

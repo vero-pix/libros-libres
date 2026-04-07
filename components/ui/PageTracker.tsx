@@ -21,20 +21,27 @@ export default function PageTracker() {
     if (pathname === lastPath.current) return;
     lastPath.current = pathname;
 
-    // Extract listing_id if on a listing page
     const listingMatch = pathname.match(/^\/listings\/([a-f0-9-]+)$/);
     const listing_id = listingMatch?.[1] || null;
 
-    fetch("/api/analytics", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        path: pathname,
-        referrer: document.referrer || null,
-        listing_id,
-        session_id: getSessionId(),
-      }),
-    }).catch(() => {});
+    const data = JSON.stringify({
+      path: pathname,
+      referrer: document.referrer || null,
+      listing_id,
+      session_id: getSessionId(),
+    });
+
+    // Use sendBeacon for non-blocking fire-and-forget
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon("/api/analytics", new Blob([data], { type: "application/json" }));
+    } else {
+      fetch("/api/analytics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: data,
+        keepalive: true,
+      }).catch(() => {});
+    }
   }, [pathname]);
 
   return null;
