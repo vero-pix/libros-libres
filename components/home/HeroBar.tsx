@@ -39,7 +39,7 @@ export default function HeroBar({ totalListings, onToggleMap }: Props) {
                 Explorar catálogo
               </h3>
               <p className="text-ink-muted text-[11px] mt-1 leading-snug">
-                {totalListings} libros disponibles
+                Venta y arriendo
               </p>
             </button>
 

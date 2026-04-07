@@ -132,6 +132,10 @@
 - [ ] Tracking envíos (cuando Shipit active tarifas)
 - [ ] Cotización envío en tiempo real (cuando Shipit active tarifas)
 - [ ] OAuth Facebook/Instagram
+- [ ] Compartir en Instagram Stories al publicar libro (abre app con imagen pre-cargada)
+- [ ] Buscador en página del vendedor (/vendedor/[id]) para filtrar sus libros
+- [ ] Buscador en /mis-libros para encontrar publicaciones propias rápido
+- [ ] Subir múltiples fotos al editar libro en /mis-libros (agregar ImageUploadMultiple al EditForm)
 - [ ] Dominio personalizado Supabase
 - [ ] Cápsulas LinkedIn (videos cortos)
 - [ ] Panel analytics para vendedores Pro (basado en admin analytics)
