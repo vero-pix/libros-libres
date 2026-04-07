@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/ui/Footer";
+import BackToTop from "@/components/ui/BackToTop";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -74,6 +75,7 @@ export default function RootLayout({
       <body className={`${playfair.variable} ${dmSans.variable} font-sans antialiased flex flex-col min-h-screen bg-cream`}>
         {children}
         <Footer />
+        <BackToTop />
       </body>
     </html>
   );

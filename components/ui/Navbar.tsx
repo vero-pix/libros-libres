@@ -53,7 +53,7 @@ export default async function Navbar() {
 
       {/* Row 2: Navigation */}
       <nav className="text-cream-warm">
-        <div className="max-w-7xl mx-auto px-4 flex items-center gap-0 overflow-x-auto">
+        <div className="max-w-7xl mx-auto px-4 flex items-center gap-0 flex-wrap">
           <NavLink href="/">Inicio</NavLink>
           <NavLink href="/#tienda">Explorar</NavLink>
           <NavLink href="/publish">Vender</NavLink>
