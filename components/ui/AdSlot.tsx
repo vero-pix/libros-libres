@@ -27,7 +27,8 @@ export default function AdSlot({ slot, format = "auto", className = "" }: Props)
   }, [client]);
 
   if (!client) {
-    // Placeholder in development
+    // No ad client configured — render nothing in production, placeholder in dev
+    if (process.env.NODE_ENV === "production") return null;
     return (
       <div className={`bg-cream-warm border border-dashed border-cream-dark/40 rounded-lg flex items-center justify-center text-xs text-ink-muted py-8 ${className}`}>
         Espacio publicitario

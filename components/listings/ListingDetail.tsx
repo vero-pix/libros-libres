@@ -220,10 +220,12 @@ export default function ListingDetail({ listing, images = [] }: Props) {
         </p>
       </div>
 
-      {/* Ad */}
-      <div className="border-t border-gray-100 px-6 py-4">
-        <AdSlot slot="listing-detail" format="horizontal" />
-      </div>
+      {/* Ad — only render wrapper if AdSense is configured */}
+      {process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
+        <div className="border-t border-gray-100 px-6 py-4">
+          <AdSlot slot="listing-detail" format="horizontal" />
+        </div>
+      )}
     </div>
   );
 }
