@@ -72,8 +72,6 @@ export default async function Navbar() {
             />
           )}
 
-          <NavLink href="/planes">Planes</NavLink>
-
           <NavDropdown
             label="Ayuda"
             items={[

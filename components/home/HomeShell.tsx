@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useCallback, type ReactNode } from "react";
+import dynamic from "next/dynamic";
 import HeroBar from "./HeroBar";
 import TiendaToggle from "./TiendaToggle";
-import ScanAnimation from "./ScanAnimation";
-import PaymentAnimation from "./PaymentAnimation";
-import ShippingAnimation from "./ShippingAnimation";
-import RentalSection from "./RentalSection";
-import ShelfTransformation from "./ShelfTransformation";
 import AdSlot from "@/components/ui/AdSlot";
+
+const ScanAnimation = dynamic(() => import("./ScanAnimation"));
+const PaymentAnimation = dynamic(() => import("./PaymentAnimation"));
+const ShippingAnimation = dynamic(() => import("./ShippingAnimation"));
+const RentalSection = dynamic(() => import("./RentalSection"));
+const ShelfTransformation = dynamic(() => import("./ShelfTransformation"));
 
 interface Props {
   totalListings: number;
@@ -73,7 +75,7 @@ export default function HomeShell({ totalListings, hasFilters, children }: Props
       </main>
 
       {/* Ad between store and features */}
-      {!hasFilters && (
+      {!hasFilters && process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
         <div className="max-w-5xl mx-auto px-6 py-4">
           <AdSlot slot="between-sections" format="horizontal" />
         </div>
