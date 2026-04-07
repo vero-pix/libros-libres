@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
       ? new Date(record.created_at).toLocaleString("es-CL", { timeZone: "America/Santiago" })
       : "Ahora";
 
+    // Email to admin
     await sendEmail({
       to: ADMIN_EMAIL,
       subject: `Nuevo usuario en tuslibros.cl — ${name}`,
@@ -52,6 +53,49 @@ export async function POST(req: NextRequest) {
         </div>
       `,
     });
+
+    // Welcome email to user
+    if (email && email !== "Sin email") {
+      await sendEmail({
+        to: email,
+        subject: "Bienvenido a tuslibros.cl — Tu estantería te espera",
+        html: `
+          <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
+            <h1 style="color:#1a1a1a;font-size:24px;margin-bottom:4px">Libros Libres</h1>
+            <p style="color:#888;font-size:14px;margin-top:0">Cada estantería es una librería</p>
+
+            <h2 style="color:#1a1a1a;font-size:18px;margin-top:24px">Hola ${name.split(" ")[0]}, bienvenido/a</h2>
+
+            <p style="color:#333;font-size:15px;line-height:1.6">
+              Ya eres parte de la comunidad de lectores de tuslibros.cl. Esto es lo que puedes hacer ahora:
+            </p>
+
+            <div style="margin:20px 0">
+              <div style="background:#f5f0e8;padding:16px;border-radius:12px;margin-bottom:12px">
+                <p style="margin:0;font-weight:600;color:#1a1a1a">1. Publica tu primer libro</p>
+                <p style="margin:4px 0 0;color:#666;font-size:14px">Escanea el ISBN o ingresa los datos manualmente. Es gratis y toma 1 minuto.</p>
+              </div>
+              <div style="background:#f5f0e8;padding:16px;border-radius:12px;margin-bottom:12px">
+                <p style="margin:0;font-weight:600;color:#1a1a1a">2. Explora el catálogo</p>
+                <p style="margin:4px 0 0;color:#666;font-size:14px">Busca por título, autor o categoría. Filtra por cercanía para encontrar libros cerca de ti.</p>
+              </div>
+              <div style="background:#f5f0e8;padding:16px;border-radius:12px">
+                <p style="margin:0;font-weight:600;color:#1a1a1a">3. Compra o arrienda</p>
+                <p style="margin:4px 0 0;color:#666;font-size:14px">Coordina por WhatsApp (gratis) o paga seguro con MercadoPago.</p>
+              </div>
+            </div>
+
+            <a href="https://tuslibros.cl/publish" style="display:inline-block;background:#d4a017;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Publicar mi primer libro</a>
+
+            <p style="color:#888;font-size:13px;margin-top:24px">
+              ¿Dudas? Visita nuestras <a href="https://tuslibros.cl/faq" style="color:#d4a017">Preguntas Frecuentes</a> o escríbenos por <a href="https://wa.me/56994583067" style="color:#d4a017">WhatsApp</a>.
+            </p>
+
+            <p style="color:#aaa;font-size:12px;margin-top:16px">— El equipo de tuslibros.cl</p>
+          </div>
+        `,
+      }).catch((err) => console.error("[new-user] Welcome email error:", err));
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {

@@ -13,14 +13,27 @@ export async function generateMetadata({ params }: Props) {
   const supabase = await createClient();
   const { data: seller } = await supabase
     .from("users")
-    .select("full_name")
+    .select("full_name, comuna, bio")
     .eq("id", params.id)
     .single();
 
   const name = seller?.full_name ?? "Vendedor";
+  const location = seller?.comuna ? ` en ${seller.comuna}` : "";
+  const bio = seller?.bio ? ` ${seller.bio.slice(0, 100)}` : "";
+  const title = `${name} — Libros usados${location} | tuslibros.cl`;
+  const description = `Compra libros de ${name}${location}.${bio} Envío seguro con MercadoPago o coordinación por WhatsApp.`;
+
   return {
-    title: `${name} — tuslibros.cl`,
-    description: `Libros publicados por ${name} en tuslibros.cl`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://tuslibros.cl/vendedor/${params.id}`,
+      siteName: "Libros Libres",
+      type: "profile",
+      locale: "es_CL",
+    },
   };
 }
 

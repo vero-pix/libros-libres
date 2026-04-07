@@ -8,6 +8,7 @@ import { addRecentlyViewed } from "./RecentlyViewed";
 import AddToCartButton from "@/components/ui/AddToCartButton";
 import AdSlot from "@/components/ui/AdSlot";
 import ImageGallery from "./ImageGallery";
+import ShareButtons from "./ShareButtons";
 
 function WhatsAppButton({ phone, title }: { phone: string | null; title: string }) {
   if (!phone) {
@@ -181,6 +182,16 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               <p className="text-[10px] text-gray-400">Ver todos sus libros</p>
             </div>
           </Link>
+
+          {/* Share */}
+          <div className="mt-4">
+            <ShareButtons
+              title={book.title}
+              author={book.author}
+              url={`https://tuslibros.cl/listings/${listing.id}`}
+              price={listing.price}
+            />
+          </div>
         </div>
       </div>
 
