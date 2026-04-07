@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import ListingDetail from "@/components/listings/ListingDetail";
 import ListingCard from "@/components/listings/ListingCard";
 import ReviewSection from "@/components/listings/ReviewSection";
+import QuestionSection from "@/components/listings/QuestionSection";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
@@ -144,6 +145,10 @@ export default async function ListingPage({ params }: Props) {
           ]}
         />
         <ListingDetail listing={listing} images={(images ?? []) as any} />
+
+        <div id="questions" className="mt-6 bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <QuestionSection listingId={params.id} sellerId={listing.seller_id} />
+        </div>
 
         <div id="reviews" className="mt-6 bg-white rounded-2xl border border-gray-200 overflow-hidden">
           <ReviewSection listingId={params.id} />
