@@ -77,10 +77,11 @@ Estética editorial/magazine inspirada en revista literaria:
 - [ ] Imagen OG para compartir en LinkedIn
 
 ## Modelo de negocio
-- Publicar: gratis ("Libre, sin comisiones" para vendedores)
-- Fee fijo de servicio: $1.500 CLP al comprador
-- Envío estándar (Chilexpress): $2.900 / Rápido (Rappi): $4.500
-- Ingreso neto por transacción: ~$423-480 después de comisión MercadoPago
+- Publicar: siempre gratis
+- No hay fee fijo — nunca se cobra tarifa fija al comprador ni al vendedor
+- Comisión solo cuando el vendedor cobra por MercadoPago (Libre 8%, Librero 5%, Librería 3%)
+- Costo envío solo cuando se despacha por courier de la plataforma (Shipit, cuando esté operativo)
+- WhatsApp + entrega en persona/retiro = 100% gratis
 
 ## Decisiones técnicas
 - Idioma: español chileno (tú, no vos)

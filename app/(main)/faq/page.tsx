@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export const metadata = {
   title: "Preguntas Frecuentes — Libros Libres",
@@ -12,16 +13,16 @@ const faqSections = [
         q: "¿Cómo compro un libro?",
         a: (
           <ol className="list-decimal list-inside space-y-1 text-ink-muted">
-            <li>Busca el libro en el mapa o usa la barra de búsqueda</li>
-            <li>Haz clic en el pin del libro que te interesa</li>
-            <li>Contacta al vendedor directamente por WhatsApp</li>
-            <li>Coordina la entrega o el retiro con el vendedor</li>
+            <li>Busca el libro en el catálogo, mapa o barra de búsqueda</li>
+            <li>Haz clic en el libro que te interesa</li>
+            <li>Contacta al vendedor por WhatsApp o compra directamente con MercadoPago</li>
+            <li>Coordina la entrega en persona, retiro, o recibe por courier</li>
           </ol>
         ),
       },
       {
         q: "¿Cuánto cuesta comprar?",
-        a: "Libros Libres no cobra comisión. Pagas solo el precio acordado con el vendedor.",
+        a: "El precio que ves es el precio que pagas. En ventas directas por WhatsApp no hay ningún costo adicional. Si compras con MercadoPago, la comisión la asume el vendedor, no tú.",
       },
       {
         q: "¿Puedo negociar el precio?",
@@ -42,7 +43,7 @@ const faqSections = [
     questions: [
       {
         q: "¿Cuánto cuesta publicar?",
-        a: "Publicar es 100% gratis. No cobramos comisiones en ventas directas entre usuarios.",
+        a: "Publicar es 100% gratis, siempre. Sin límite de publicaciones.",
       },
       {
         q: "¿Cómo publico un libro?",
@@ -53,13 +54,13 @@ const faqSections = [
             <li>Escanea el código de barras o ingresa el ISBN</li>
             <li>Completa precio y estado del libro</li>
             <li>Marca la ubicación en el mapa</li>
-            <li>Tu libro aparece en el mapa al instante</li>
+            <li>Tu libro aparece en el catálogo al instante</li>
           </ol>
         ),
       },
       {
         q: "¿Cómo me contactan los compradores?",
-        a: "Los compradores te escriben directamente por WhatsApp al número que registraste en tu perfil.",
+        a: "Los compradores te escriben directamente por WhatsApp al número que registraste en tu perfil. También pueden comprarte directamente con MercadoPago sin necesidad de coordinarse contigo.",
       },
       {
         q: "¿Puedo publicar muchos libros?",
@@ -67,7 +68,53 @@ const faqSections = [
       },
       {
         q: "¿Cómo elimino una publicación?",
-        a: "Por ahora puedes pausar o eliminar publicaciones desde tu perfil. Si necesitas ayuda, escríbenos por WhatsApp al +56 9 9458 3067.",
+        a: "Puedes pausar o eliminar publicaciones desde tu perfil en la sección Mis Libros.",
+      },
+    ],
+  },
+  {
+    title: "Planes y comisiones",
+    questions: [
+      {
+        q: "¿Qué son los planes?",
+        a: "Los planes definen las herramientas que usas para vender. Con el plan Libre publicas gratis y coordinas todo por WhatsApp, sin comisiones ni costo mensual. Los planes Librero y Librería agregan pago seguro con MercadoPago, despacho con courier, y comisiones reducidas a cambio de una suscripción mensual.",
+      },
+      {
+        q: "¿Cuándo me conviene subir de plan?",
+        a: "Si vendes más de 5 libros al mes usando MercadoPago, el plan Librero ($9.990/mes) te ahorra dinero por la diferencia de comisiones (5% vs 8%). Si eres librería o vendes volumen alto, el plan Librería ($29.990/mes) reduce la comisión al 3% y agrega carga masiva por Excel.",
+      },
+      {
+        q: "¿Puedo vender sin pagar comisión?",
+        a: "Sí. Con el plan Libre puedes publicar y coordinar ventas directamente por WhatsApp sin ningún costo. La comisión solo aplica cuando usas nuestro sistema de pago integrado (MercadoPago).",
+      },
+      {
+        q: "¿Cómo se cobran las comisiones?",
+        a: "Se descuentan automáticamente del monto de cada venta antes de transferir a tu cuenta de MercadoPago. No hay cobros sorpresa ni costos ocultos.",
+      },
+      {
+        q: "¿Puedo cambiar de plan?",
+        a: "Sí, puedes subir o bajar de plan en cualquier momento desde tu perfil. El cambio aplica desde el siguiente período.",
+      },
+    ],
+  },
+  {
+    title: "Arriendos de libros",
+    questions: [
+      {
+        q: "¿Cómo funciona el arriendo?",
+        a: "El vendedor activa la opción de arriendo al publicar. El comprador paga el arriendo (por 7, 14 o 30 días) más una garantía reembolsable. Al devolver el libro en buen estado, recupera la garantía.",
+      },
+      {
+        q: "¿Cuánto cuesta arrendar un libro?",
+        a: "El precio lo fija el vendedor. Típicamente es una fracción del precio de venta. Ejemplo: un libro de $12.000 puede arrendarse por $3.000 + garantía reembolsable.",
+      },
+      {
+        q: "¿Qué pasa si no devuelvo el libro a tiempo?",
+        a: "Si no devuelves dentro del plazo, se retiene la garantía como compensación al vendedor.",
+      },
+      {
+        q: "¿La garantía es reembolsable?",
+        a: "Sí. Si devuelves el libro dentro del plazo y en buen estado, tu garantía se devuelve completa a tu cuenta de MercadoPago.",
       },
     ],
   },
@@ -92,7 +139,7 @@ const faqSections = [
       },
       {
         q: "¿Puedo usar Libros Libres sin cuenta?",
-        a: "Puedes ver el mapa y buscar libros sin cuenta. Para publicar o contactar vendedores necesitas registrarte.",
+        a: "Puedes ver el catálogo y buscar libros sin cuenta. Para publicar o contactar vendedores necesitas registrarte.",
       },
     ],
   },
@@ -142,6 +189,14 @@ export default function FAQPage() {
             </div>
           </div>
         ))}
+
+        {/* CTA a planes */}
+        <div className="text-center mt-10">
+          <p className="text-ink-muted mb-2">¿Quieres vender más?</p>
+          <Link href="/planes" className="text-brand-600 font-semibold hover:underline text-lg">
+            Conoce nuestros planes para vendedores &rarr;
+          </Link>
+        </div>
       </main>
     </div>
   );
