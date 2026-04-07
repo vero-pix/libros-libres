@@ -232,7 +232,7 @@ export default async function HistoriaPage() {
           <p className="text-ink-muted text-sm mt-8">
             ¿Tienes un proyecto similar en mente?{" "}
             <a
-              href="https://www.linkedin.com/in/veronicavelasquez"
+              href="https://www.linkedin.com/in/economista-veronica-velasquez/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-brand-600 hover:underline"

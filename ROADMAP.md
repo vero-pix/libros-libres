@@ -88,6 +88,8 @@
 - [ ] Flujo emails comprador↔vendedor (notificaciones de estado, coordinación entrega)
 - [ ] Valoraciones y comentarios mejorados (reviews visibles en cards, promedio estrellas)
 - [ ] Preguntas públicas al vendedor (estilo MercadoLibre — visibles para todos)
+- [ ] Páginas newsletter: testimonios ("Uber de libros"), historia García Márquez, voces reales
+- [ ] Sección "Voces reales" en home o landing (quotes busca/ofrece)
 - [ ] Checkout múltiple carrito (pagar varios libros)
 - [ ] Tracking envíos (cuando Shipit funcione)
 - [ ] Primer newsletter a suscriptores
