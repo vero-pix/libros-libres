@@ -4,6 +4,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import Footer from "@/components/ui/Footer";
 import BackToTop from "@/components/ui/BackToTop";
+import PageTracker from "@/components/ui/PageTracker";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -98,6 +99,7 @@ export default function RootLayout({
         <Footer />
         <BackToTop />
         <Analytics />
+        <PageTracker />
       </body>
     </html>
   );

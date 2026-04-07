@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import AnalyticsTab from "@/components/admin/AnalyticsTab";
 
 /* ── Types ── */
 
@@ -86,7 +87,7 @@ interface Props {
 
 /* ── Tabs ── */
 
-type Tab = "orders" | "listings" | "users" | "messages" | "subscribers";
+type Tab = "orders" | "listings" | "users" | "messages" | "subscribers" | "analytics";
 
 export default function AdminDashboard({ orders: initOrders, listings: initListings, users: initUsers, messages = [], subscribers = [] }: Props) {
   const [tab, setTab] = useState<Tab>("orders");
@@ -107,6 +108,7 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
     { key: "users", label: "Usuarios", count: users.length },
     { key: "messages", label: "Mensajes", count: msgs.length },
     { key: "subscribers", label: "Newsletter", count: subs.length },
+    { key: "analytics", label: "Analytics", count: 0 },
   ];
 
   return (
@@ -195,6 +197,9 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
 
           {subs.length > 0 && <NewsletterSender subscriberCount={subs.length} />}
         </div>
+      )}
+      {tab === "analytics" && (
+        <AnalyticsTab />
       )}
     </div>
   );
