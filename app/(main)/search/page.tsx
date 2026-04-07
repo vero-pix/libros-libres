@@ -5,6 +5,7 @@ import AdSlot from "@/components/ui/AdSlot";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
+import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 
 interface Props {
@@ -17,6 +18,21 @@ interface Props {
     condition?: string;
     modality?: string;
   };
+}
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const q = searchParams.q;
+  const genre = searchParams.genre;
+  const title = q
+    ? `Resultados para "${q}" — Libros Libres`
+    : genre
+      ? `${genre} — Libros Libres`
+      : "Buscar libros — Libros Libres";
+  const description = q
+    ? `Encuentra "${q}" en tuslibros.cl. Libros usados cerca de ti, pago seguro con MercadoPago.`
+    : "Busca libros usados cerca de ti en tuslibros.cl. Compra, vende y presta libros de forma segura.";
+
+  return { title, description };
 }
 
 export default async function SearchPage({ searchParams }: Props) {

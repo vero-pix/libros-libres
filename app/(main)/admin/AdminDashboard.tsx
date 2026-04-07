@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
 /* ── Types ── */
@@ -499,9 +500,9 @@ function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdat
             <input type="checkbox" checked={selected.has(listing.id)} onChange={() => toggleOne(listing.id)} className="rounded border-gray-300" />
 
             {/* Cover */}
-            <div className="flex-shrink-0 w-10 h-14 rounded overflow-hidden bg-gray-100">
+            <div className="relative flex-shrink-0 w-10 h-14 rounded overflow-hidden bg-gray-100">
               {(listing.cover_image_url ?? listing.book?.cover_url) ? (
-                <img src={(listing.cover_image_url ?? listing.book.cover_url)!} alt="" className="w-full h-full object-cover" />
+                <Image src={(listing.cover_image_url ?? listing.book.cover_url)!} alt={listing.book?.title || "Portada"} fill className="object-cover" sizes="40px" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-300 text-lg">📚</div>
               )}

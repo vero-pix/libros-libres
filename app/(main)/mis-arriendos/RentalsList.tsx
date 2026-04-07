@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Image from "next/image";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   pending:    { label: "Pendiente de pago", color: "bg-yellow-100 text-yellow-800" },
@@ -109,10 +110,9 @@ export default function RentalsList({ asRenter, asOwner, userId }: Props) {
               <div key={r.id} className="bg-white rounded-xl border border-gray-200 p-4">
                 <div className="flex gap-3">
                   {/* Cover */}
-                  <div className="w-12 h-16 bg-gray-50 rounded flex-shrink-0 overflow-hidden flex items-center justify-center">
+                  <div className="relative w-12 h-16 bg-gray-50 rounded flex-shrink-0 overflow-hidden flex items-center justify-center">
                     {book.cover_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={book.cover_url} alt={book.title} className="object-cover w-full h-full" />
+                      <Image src={book.cover_url} alt={book.title} fill className="object-cover" sizes="48px" />
                     ) : (
                       <span className="text-lg">📚</span>
                     )}

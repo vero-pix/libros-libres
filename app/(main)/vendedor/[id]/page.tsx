@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -87,9 +88,11 @@ export default async function SellerStorePage({ params }: Props) {
         {/* Seller header */}
         <div className="flex items-start gap-5 mb-8 pb-8 border-b border-gray-100">
           {seller.avatar_url ? (
-            <img
+            <Image
               src={seller.avatar_url}
               alt={seller.full_name ?? "Vendedor"}
+              width={80}
+              height={80}
               className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-cream-dark flex-shrink-0"
             />
           ) : (

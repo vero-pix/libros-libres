@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 interface CartItem {
@@ -96,9 +97,9 @@ export default function CartView({ items: initialItems }: { items: CartItem[] })
           >
             <div className="flex gap-4">
               {/* Cover */}
-              <div className="w-14 h-20 bg-cream-warm rounded flex-shrink-0 overflow-hidden flex items-center justify-center">
+              <div className="relative w-14 h-20 bg-cream-warm rounded flex-shrink-0 overflow-hidden flex items-center justify-center">
                 {cover ? (
-                  <img src={cover} alt="" className="w-full h-full object-cover" />
+                  <Image src={cover} alt={item.listing.book.title} fill className="object-cover" sizes="56px" />
                 ) : (
                   <svg className="w-8 h-8 text-brand-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.331 0 4.473.89 6.074 2.356M12 6.042a8.968 8.968 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.356M12 6.042V20.356" />

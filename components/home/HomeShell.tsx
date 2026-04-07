@@ -25,8 +25,10 @@ export default function HomeShell({ totalListings, hasFilters, children }: Props
 
   return (
     <>
-      {!hasFilters && (
+      {!hasFilters ? (
         <HeroBar totalListings={totalListings} onToggleMap={handleToggleMap} />
+      ) : (
+        <h1 className="sr-only">Libros usados cerca de ti — tuslibros.cl</h1>
       )}
 
       {/* Manifiesto — el "por qué" */}

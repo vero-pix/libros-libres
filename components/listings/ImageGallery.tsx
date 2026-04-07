@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface Props {
   mainImage: string | null;
@@ -32,11 +33,13 @@ export default function ImageGallery({ mainImage, images, alt }: Props) {
   return (
     <div className="flex flex-col items-center gap-3">
       {/* Main image */}
-      <div className="relative w-full max-w-[280px]">
-        <img
+      <div className="relative w-full max-w-[280px] aspect-[3/4]">
+        <Image
           src={current.image_url}
           alt={`${alt} - foto ${activeIdx + 1}`}
-          className="w-full aspect-[3/4] object-cover rounded-lg shadow-md"
+          fill
+          className="object-cover rounded-lg shadow-md"
+          sizes="280px"
         />
 
         {/* Navigation arrows */}
@@ -44,6 +47,7 @@ export default function ImageGallery({ mainImage, images, alt }: Props) {
           <>
             <button
               type="button"
+              aria-label="Foto anterior"
               onClick={() => setActiveIdx((i) => (i > 0 ? i - 1 : allImages.length - 1))}
               className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center shadow hover:bg-white transition-colors"
             >
@@ -53,6 +57,7 @@ export default function ImageGallery({ mainImage, images, alt }: Props) {
             </button>
             <button
               type="button"
+              aria-label="Foto siguiente"
               onClick={() => setActiveIdx((i) => (i < allImages.length - 1 ? i + 1 : 0))}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center shadow hover:bg-white transition-colors"
             >
@@ -77,11 +82,11 @@ export default function ImageGallery({ mainImage, images, alt }: Props) {
               key={img.id}
               type="button"
               onClick={() => setActiveIdx(i)}
-              className={`flex-shrink-0 w-12 h-16 rounded overflow-hidden border-2 transition-colors ${
+              className={`relative flex-shrink-0 w-12 h-16 rounded overflow-hidden border-2 transition-colors ${
                 i === activeIdx ? "border-brand-500" : "border-transparent opacity-60 hover:opacity-100"
               }`}
             >
-              <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+              <Image src={img.image_url} alt={`${alt} - miniatura ${i + 1}`} fill className="object-cover" sizes="48px" />
             </button>
           ))}
         </div>
