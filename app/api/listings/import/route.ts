@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   // Get user profile for location
   const { data: profile } = await supabase
     .from("users")
-    .select("full_name, comuna, region")
+    .select("full_name, comuna, region, default_latitude, default_longitude, default_address")
     .eq("id", user.id)
     .single();
 
@@ -150,7 +150,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create listing
-    const address = [profile?.comuna, profile?.region].filter(Boolean).join(", ") || "Chile";
+    const address = profile?.default_address || [profile?.comuna, profile?.region].filter(Boolean).join(", ") || "Chile";
     const coverUrl = buildCoverUrl(isbn);
 
     const { error: listErr } = await supabase.from("listings").insert({
@@ -161,6 +161,8 @@ export async function POST(req: NextRequest) {
       modality,
       cover_image_url: coverUrl,
       address,
+      latitude: profile?.default_latitude || null,
+      longitude: profile?.default_longitude || null,
       status: "active",
     });
 
