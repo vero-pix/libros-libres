@@ -61,6 +61,7 @@
 - [x] Open Library API corregida
 - [x] Libros destacados por plan (badge "Destacado", prioridad en grilla)
 - [x] Filtro "Cerca de mí" (geolocalización navegador + haversine)
+- [x] Sistema de recomendaciones (por género/autor, con cache)
 
 ### Emails
 - [x] Confirmación registro
@@ -80,6 +81,14 @@
 - [x] Post lanzamiento tuslibros.cl redactado
 - [x] URL LinkedIn corregida en /historia (/in/economista-veronica-velasquez/)
 
+### SEO & Performance (auditoría 7 abril — 16/16 items)
+- [x] Metadata dinámica en listing detail + search (generateMetadata)
+- [x] JSON-LD schemas (Product, BreadcrumbList, Organization)
+- [x] Lazy load mapbox en formularios de publicación
+- [x] next/image en todos los componentes + alt descriptivos + aria-labels
+- [x] h1 en home, ISR en listing detail, Suspense skeletons
+- [x] Vercel Analytics + Service worker PWA + placeholder blur + cache API
+
 ---
 
 ## En progreso
@@ -97,25 +106,19 @@
 - [ ] Carga masiva 500 libros (script listo, preparar CSV grande)
 - [ ] Recontactar 150+ vendedores históricos de tuslibros.cl
 
-### SEO & Performance
-- [ ] Auditoría SEO completa (pendiente revisión)
-- [ ] Bundle size / lazy loading componentes pesados (mapa, QR scanner)
-- [ ] Metadata por página (title, description dinámicos)
-
 ### Features futuros
-- [ ] Flujo emails comprador↔vendedor (notificaciones estado, coordinación entrega)
-- [ ] Preguntas públicas al vendedor (estilo MercadoLibre — visibles para todos)
+- [x] Flujo emails comprador↔vendedor (ya implementado en webhook MP) ✅
+- [x] Preguntas públicas al vendedor (estilo MercadoLibre — visibles para todos) ✅
 - [ ] Páginas newsletter: testimonios, historia García Márquez, voces reales
 - [ ] Sección "Voces reales" en home o landing
 - [ ] Checkout múltiple carrito (pagar varios libros de distintos vendedores)
 - [ ] Tracking envíos (cuando Shipit active tarifas)
 - [ ] OAuth Facebook/Instagram
-- [ ] Sistema de recomendaciones
 - [ ] Dominio personalizado Supabase
 - [ ] Cápsulas LinkedIn (videos cortos)
 - [ ] Cotización envío en tiempo real según distancia
 - [ ] Infinite scroll como alternativa a paginación
-- [ ] Carga masiva Excel como feature de pago (Plan Librería)
+- [x] Importador masivo CSV desde la web (gratis por ahora) ✅
 
 ---
 
@@ -125,10 +128,11 @@
 - 3 suscriptores newsletter
 - Split payment MercadoPago verificado en producción
 - 7+ emails transaccionales + newsletter funcionando
-- PWA instalable
+- PWA instalable + service worker offline
 - Filtro geolocalización activo
 - Planes con diferenciación real (destacados en grilla)
-- Stack: Next.js 14, Supabase, MercadoPago, Mapbox, Resend, Shipit (pendiente tarifas)
+- SEO score ~10/10 (metadata, JSON-LD, ISR, analytics)
+- Stack: Next.js 14, Supabase, MercadoPago, Mapbox, Resend, Vercel Analytics, Shipit (pendiente tarifas)
 
 ---
 
