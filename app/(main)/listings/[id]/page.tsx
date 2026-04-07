@@ -7,6 +7,8 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 
+export const revalidate = 60;
+
 interface Props {
   params: { id: string };
 }

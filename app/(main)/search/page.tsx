@@ -130,7 +130,7 @@ export default async function SearchPage({ searchParams }: Props) {
           <CategoriesSidebar categories={categories} activeGenre={genre} />
 
           <div className="flex-1 min-w-0">
-            <Suspense>
+            <Suspense fallback={<div className="h-10 bg-gray-100 rounded-lg animate-pulse mb-4" />}>
               <ListingToolbar />
             </Suspense>
 
