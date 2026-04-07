@@ -13,6 +13,11 @@ function getSessionId(): string {
   return sid;
 }
 
+/**
+ * Lightweight page tracker.
+ * Only tracks listing views (for "libros más vistos" and seller analytics).
+ * General traffic (pageviews, browsers, OS) is handled by Vercel Analytics.
+ */
 export default function PageTracker() {
   const pathname = usePathname();
   const lastPath = useRef("");
@@ -21,17 +26,20 @@ export default function PageTracker() {
     if (pathname === lastPath.current) return;
     lastPath.current = pathname;
 
+    // Only track listing detail pages and home
     const listingMatch = pathname.match(/^\/listings\/([a-f0-9-]+)$/);
-    const listing_id = listingMatch?.[1] || null;
+    const isHome = pathname === "/";
+    const isSearch = pathname === "/search";
+
+    if (!listingMatch && !isHome && !isSearch) return;
 
     const data = JSON.stringify({
       path: pathname,
       referrer: document.referrer || null,
-      listing_id,
+      listing_id: listingMatch?.[1] || null,
       session_id: getSessionId(),
     });
 
-    // Use sendBeacon for non-blocking fire-and-forget
     if (navigator.sendBeacon) {
       navigator.sendBeacon("/api/analytics", new Blob([data], { type: "application/json" }));
     } else {
