@@ -84,10 +84,12 @@
 - [ ] Estilos Martfury seleccionados
 
 ### Features futuros
+- [ ] Libros destacados (feature de pago por plan — cumplir propuesta de valor planes)
+- [ ] Flujo emails comprador↔vendedor (notificaciones de estado, coordinación entrega)
+- [ ] Valoraciones y comentarios mejorados (reviews visibles en cards, promedio estrellas)
 - [ ] Checkout múltiple carrito (pagar varios libros)
 - [ ] Tracking envíos (cuando Shipit funcione)
 - [ ] Primer newsletter a suscriptores
-- [ ] Reviews accesibles (link claro en pedidos + reviews del vendedor)
 - [ ] OAuth Facebook/Instagram
 - [ ] Sistema de recomendaciones
 - [ ] Dominio personalizado Supabase

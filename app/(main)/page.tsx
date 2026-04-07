@@ -14,6 +14,18 @@ import type { ListingWithBook } from "@/types";
 
 const ITEMS_PER_PAGE = 20;
 
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
 interface Props {
   searchParams: {
     genre?: string;
@@ -25,14 +37,18 @@ interface Props {
     author?: string;
     page?: string;
     view?: string;
+    lat?: string;
+    lng?: string;
   };
 }
 
 export default async function HomePage({ searchParams }: Props) {
   const supabase = await createClient();
-  const { genre, sort, price_min, price_max, condition, modality, author, page, view } = searchParams;
+  const { genre, sort, price_min, price_max, condition, modality, author, page, view, lat, lng } = searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10) || 1);
   const viewMode = view === "list" ? "list" : "grid";
+  const userLat = lat ? parseFloat(lat) : null;
+  const userLng = lng ? parseFloat(lng) : null;
 
   const hasFilters = !!(genre || sort || price_min || price_max || condition || modality || author);
 
@@ -67,6 +83,18 @@ export default async function HomePage({ searchParams }: Props) {
     listings = listings.filter(
       (l) => l.book.author?.toLowerCase().includes(author.toLowerCase())
     );
+  }
+
+  // Sort by distance when user shares location
+  if (sort === "distance" && userLat != null && userLng != null) {
+    listings = listings
+      .map((l) => {
+        const dist = l.latitude != null && l.longitude != null
+          ? haversineKm(userLat, userLng, l.latitude, l.longitude)
+          : Infinity;
+        return { ...l, _distance: dist };
+      })
+      .sort((a, b) => (a as any)._distance - (b as any)._distance);
   }
 
   const allListings = (rawListings as unknown as ListingWithBook[]) ?? [];
@@ -111,6 +139,8 @@ export default async function HomePage({ searchParams }: Props) {
                     if (condition) params.set("condition", condition);
                     if (modality) params.set("modality", modality);
                     if (author) params.set("author", author);
+                    if (lat) params.set("lat", lat);
+                    if (lng) params.set("lng", lng);
                     if (viewMode === "list") params.set("view", "list");
                     if (p > 1) params.set("page", String(p));
                     const qs = params.toString();

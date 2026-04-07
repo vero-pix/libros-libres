@@ -64,7 +64,7 @@ export default function HomeShell({ totalListings, hasFilters, children }: Props
         </section>
       )}
 
-      <main id="tienda" className="max-w-7xl mx-auto px-6 py-10 scroll-mt-4">
+      <main id="tienda" className="max-w-7xl mx-auto px-6 py-10 scroll-mt-32">
         <TiendaToggle forceMap={forceMap} onForceMapConsumed={() => setForceMap(false)}>
           {children}
         </TiendaToggle>

@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ListingToolbar() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [locating, setLocating] = useState(false);
+  const isNearMe = !!searchParams.get("lat");
 
   function updateParam(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -14,6 +17,34 @@ export default function ListingToolbar() {
       params.delete(key);
     }
     router.push(`?${params.toString()}`);
+  }
+
+  function handleNearMe() {
+    if (isNearMe) {
+      // Desactivar
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("lat");
+      params.delete("lng");
+      params.delete("sort");
+      router.push(`?${params.toString()}`);
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("lat", pos.coords.latitude.toFixed(6));
+        params.set("lng", pos.coords.longitude.toFixed(6));
+        params.set("sort", "distance");
+        router.push(`?${params.toString()}`);
+        setLocating(false);
+      },
+      () => {
+        setLocating(false);
+        alert("No pudimos obtener tu ubicación. Activa la geolocalización en tu navegador.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   }
 
   function handleChange(key: string) {
@@ -33,35 +64,22 @@ export default function ListingToolbar() {
 
   return (
     <div className="flex flex-wrap items-center gap-3 border-b border-gray-200 pb-3 mb-4">
-      {/* View toggle */}
-      <div className="flex border border-gray-200 rounded-md overflow-hidden">
-        <button
-          onClick={() => updateParam("view", "grid")}
-          className={`p-2 transition-colors ${
-            (searchParams.get("view") ?? "grid") === "grid"
-              ? "bg-brand-500 text-white"
-              : "bg-white text-gray-500 hover:text-ink"
-          }`}
-          title="Vista grilla"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-          </svg>
-        </button>
-        <button
-          onClick={() => updateParam("view", "list")}
-          className={`p-2 transition-colors ${
-            searchParams.get("view") === "list"
-              ? "bg-brand-500 text-white"
-              : "bg-white text-gray-500 hover:text-ink"
-          }`}
-          title="Vista lista"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-          </svg>
-        </button>
-      </div>
+      {/* Near me */}
+      <button
+        onClick={handleNearMe}
+        disabled={locating}
+        className={`flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-md border transition-colors ${
+          isNearMe
+            ? "bg-brand-500 text-white border-brand-500"
+            : "bg-white text-gray-700 border-gray-200 hover:border-brand-400"
+        }`}
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+        </svg>
+        {locating ? "Buscando..." : isNearMe ? "Cerca de mí ✕" : "Cerca de mí"}
+      </button>
 
       <select
         onChange={handleChange("sort")}
