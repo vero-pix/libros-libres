@@ -71,11 +71,12 @@ export default function RootLayout({
             __html: `if("serviceWorker" in navigator){setTimeout(()=>{navigator.serviceWorker.register("/sw.js")},3000)}`,
           }}
         />
+        {/* AdSense: defer loading until after page is interactive */}
         {process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
           <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT}`}
-            crossOrigin="anonymous"
+            dangerouslySetInnerHTML={{
+              __html: `setTimeout(function(){var s=document.createElement("script");s.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT}";s.async=true;s.crossOrigin="anonymous";document.head.appendChild(s)},5000)`,
+            }}
           />
         )}
       </head>
