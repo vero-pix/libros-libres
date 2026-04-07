@@ -1,6 +1,6 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 7 abril 2026
+Última actualización: 7 abril 2026, 13:00
 
 ---
 
@@ -15,12 +15,13 @@
 - [x] Confirmación email
 - [x] Google OAuth ✅ funcionando
 - [x] LinkedIn OAuth ✅ funcionando
-- [x] AdSense + ads.txt
-- [x] Sitemap + robots.txt + SEO redirects (WordPress legacy → Next.js)
+- [x] AdSense + ads.txt (esperando aprobación Google — estado "Preparando")
+- [x] Sitemap + robots.txt + SEO redirects (WordPress legacy → Next.js + /libro/:slug)
 - [x] Compresión imágenes
-- [x] PWA instalable (manifest + iconos)
-- [x] Env vars producción actualizadas (SUPABASE_SERVICE_ROLE_KEY formato nuevo sb_secret_)
+- [x] PWA instalable (manifest + iconos + service worker offline)
+- [x] Env vars producción actualizadas
 - [x] RESEND_API_KEY configurada en Vercel ✅
+- [x] Primera venta real completada (6 abril 2026) — split payment funciona ✅
 
 ### UI/UX — Estilo Martfury
 - [x] Paleta cream unificada todas las páginas
@@ -37,65 +38,82 @@
 - [x] Bio vendedor + placeholder cards
 - [x] OG image + planes + contacto WhatsApp
 - [x] Precios con descuento (tachado + badge)
-- [x] ListingCard: badges "Nuevo"/"Oferta", hover con quickview + comprar, avatar vendedor
-- [x] Footer: link /mapa→/planes, tagline, hover dorado
-- [x] HeroBar: "Explorar catálogo" con contador, cards rounded-xl, gradiente card Arrienda
-- [x] Página detalle: fondo bg-cream consistente
-- [x] Back to top button
-- [x] Sidebar categorías sticky con scroll propio
+- [x] ListingCard: badges, hover, avatar vendedor, placeholder blur
+- [x] Footer, HeroBar, Back to top, Sidebar sticky
+- [x] Fix espacio en blanco iOS Safari (AdSlot)
 
 ### Marketplace
-- [x] Split Payment producción ✅ verificado
+- [x] Split Payment producción ✅ verificado con venta real
 - [x] Comisiones por plan (Libre 8%, Librero 5%, Librería 3%)
 - [x] Checkout 3 formas entrega (courier "próximamente")
-- [x] Sin fee en entrega persona/retiro
-- [x] WhatsApp como alternativa sin MP
+- [x] WhatsApp como alternativa sin MP (gratis, sin comisión)
 - [x] Arriendos completos con flujo devolución
 - [x] Dashboard ventas + carrito persistente
 - [x] Galería imágenes (publicación + post)
-- [x] Reviews/valoraciones
-- [x] Estrellas en cards (promedio + count server-side)
+- [x] Reviews/valoraciones + estrellas en cards
 - [x] Marcar como vendido
-- [x] Script carga masiva CSV (bulk-upload-csv.ts)
-- [x] 60+ libros publicados (15 originales + 49 carga masiva)
-- [x] Open Library API corregida
 - [x] Libros destacados por plan (badge "Destacado", prioridad en grilla)
 - [x] Filtro "Cerca de mí" (geolocalización navegador + haversine)
 - [x] Sistema de recomendaciones (por género/autor, con cache)
-
-### Emails
-- [x] Confirmación registro
-- [x] Bienvenida newsletter
-- [x] Notificación contacto → vero@economics.cl
-- [x] Confirmación compra/arriendo → comprador
-- [x] Notificación venta/arriendo → vendedor
-- [x] Cambios estado arriendo (entrega, devolución, vencido)
-- [x] Newsletter sender (admin panel + template "El Uber de los libros") ✅ funciona
-
-### Admin
-- [x] Panel con stats, delete individual/masivo, filtros por status
-- [x] Tab Newsletter con preview y botón enviar
-
-### LinkedIn / Marketing
-- [x] 3 posts certificados Anthropic (AI Fluency, Claude Cowork, Claude Code in Action)
-- [x] Post lanzamiento tuslibros.cl redactado
-- [x] URL LinkedIn corregida en /historia (/in/economista-veronica-velasquez/)
+- [x] Preguntas públicas al vendedor (estilo MercadoLibre + emails)
+- [x] Importador masivo CSV desde la web (gratis, con preview y portadas automáticas)
+- [x] Botones compartir en redes (WhatsApp, Facebook, X, copiar link)
 
 ### SEO & Performance (auditoría 7 abril — 16/16 items)
-- [x] Metadata dinámica en listing detail + search (generateMetadata)
+- [x] Metadata dinámica en listing detail + search + vendedor (generateMetadata + OG tags)
 - [x] JSON-LD schemas (Product, BreadcrumbList, Organization)
 - [x] Lazy load mapbox en formularios de publicación
 - [x] next/image en todos los componentes + alt descriptivos + aria-labels
 - [x] h1 en home, ISR en listing detail, Suspense skeletons
-- [x] Vercel Analytics + Service worker PWA + placeholder blur + cache API
+- [x] Vercel Analytics + placeholder blur + cache API recommendations
+
+### Emails (10+ transaccionales)
+- [x] Confirmación registro
+- [x] Bienvenida newsletter
+- [x] Bienvenida nuevo usuario (3 pasos + CTA publicar)
+- [x] Notificación admin cuando se registra usuario nuevo
+- [x] Notificación contacto → vero@economics.cl
+- [x] Confirmación compra/arriendo → comprador
+- [x] Notificación venta/arriendo → vendedor
+- [x] Cambios estado arriendo (entrega, devolución, vencido)
+- [x] Nueva pregunta → vendedor
+- [x] Pregunta respondida → comprador
+- [x] Newsletter sender (admin panel + template)
+
+### Contenido UX (7 abril)
+- [x] FAQ reescrito: 5 secciones (compradores, vendedores, planes/comisiones, arriendos, cuenta)
+- [x] Planes: comparador visual Modo Libre vs Modo Pro
+- [x] Cómo Funciona: 3 flujos reales (directa, MercadoPago, arriendo) + 5 beneficios
+- [x] CONTEXT.md + MODELO-NEGOCIO.md corregidos (nunca fee fijo)
+
+### Admin
+- [x] Panel con stats, delete individual/masivo, filtros por status
+- [x] Tab Newsletter con preview y botón enviar
+- [x] Tab Analytics: visitas/día, navegadores, OS, dispositivos, páginas top, libros más vistos
+- [x] PageTracker invisible (registra cada visita en Supabase)
+- [x] Webhook notificación nuevo usuario → admin
+
+### LinkedIn / Marketing
+- [x] 3 posts certificados Anthropic
+- [x] Post lanzamiento tuslibros.cl redactado
+- [x] URL LinkedIn corregida en /historia
+
+### Datos y carga
+- [x] 60+ libros publicados (15 originales + 49 carga masiva)
+- [x] Script bulk-upload-csv.ts
+- [x] Open Library API corregida
 
 ---
 
 ## En progreso
 
 ### Shipit courier
-- [x] Integración código lista
-- [ ] Email enviado a ayuda@shipit.cl para activar tarifas — esperando respuesta
+- [x] Integración código lista (lib/shipit.ts + /api/shipping/quote)
+- [ ] Tarifas no configuradas — Shipit debe activar couriers en la cuenta (email enviado)
+
+### AdSense
+- [x] ads.txt autorizado
+- [ ] Sitio en estado "Preparando" — esperando aprobación de Google
 
 ---
 
@@ -105,20 +123,31 @@
 - [ ] Apple OAuth ($99/año) — decidir si vale la pena
 - [ ] Carga masiva 500 libros (script listo, preparar CSV grande)
 - [ ] Recontactar 150+ vendedores históricos de tuslibros.cl
+- [ ] Configurar webhook Supabase para notificación nuevo usuario
+- [ ] WhatsApp Business para tuslibros.cl (perfil verificado)
 
 ### Features futuros
-- [x] Flujo emails comprador↔vendedor (ya implementado en webhook MP) ✅
-- [x] Preguntas públicas al vendedor (estilo MercadoLibre — visibles para todos) ✅
 - [ ] Páginas newsletter: testimonios, historia García Márquez, voces reales
 - [ ] Sección "Voces reales" en home o landing
-- [ ] Checkout múltiple carrito (pagar varios libros de distintos vendedores)
 - [ ] Tracking envíos (cuando Shipit active tarifas)
+- [ ] Cotización envío en tiempo real (cuando Shipit active tarifas)
 - [ ] OAuth Facebook/Instagram
 - [ ] Dominio personalizado Supabase
 - [ ] Cápsulas LinkedIn (videos cortos)
-- [ ] Cotización envío en tiempo real según distancia
-- [ ] Infinite scroll como alternativa a paginación
-- [x] Importador masivo CSV desde la web (gratis por ahora) ✅
+- [ ] Panel analytics para vendedores Pro (basado en admin analytics)
+
+### Descartados
+- ~~Checkout múltiple carrito~~ — split payment MP no soporta múltiples vendedores
+- ~~Infinite scroll~~ — paginación numérica es mejor para SEO
+- ~~Suscripciones mensuales~~ — no atractivas en esta etapa, foco en comisiones por venta
+- ~~Fee fijo~~ — nunca habrá fee fijo
+
+---
+
+## Monetización actual
+- **Comisiones MP**: 3-8% por venta/arriendo (ya funcionando, primera venta real 6 abril)
+- **AdSense**: esperando aprobación Google (ads.txt listo, AdSlots posicionados)
+- **Suscripciones**: descartadas por ahora
 
 ---
 
@@ -126,17 +155,18 @@
 - 60+ libros publicados
 - 5+ usuarios registrados
 - 3 suscriptores newsletter
-- Split payment MercadoPago verificado en producción
-- 7+ emails transaccionales + newsletter funcionando
+- 1 venta real completada con split payment
+- 10+ emails transaccionales funcionando
 - PWA instalable + service worker offline
-- Filtro geolocalización activo
-- Planes con diferenciación real (destacados en grilla)
-- SEO score ~10/10 (metadata, JSON-LD, ISR, analytics)
-- Stack: Next.js 14, Supabase, MercadoPago, Mapbox, Resend, Vercel Analytics, Shipit (pendiente tarifas)
+- Analytics propias con tracking de visitas
+- SEO score ~10/10
+- Stack: Next.js 14, Supabase, MercadoPago, Mapbox, Resend, Vercel Analytics
 
 ---
 
 ## Documentos de referencia
 - `MODELO-NEGOCIO.md` — flujos de pago, planes, comisiones, ciclo arriendo
 - `MARTFURY_TO_NEXTJS_SPEC.md` — spec migración tema WP, mapping componentes
-- `CONTEXT.md` — contexto técnico del proyecto (desactualizado, consolidado aquí)
+- `CONTEXT.md` — contexto técnico del proyecto
+- `docs/INSTRUCCIONES_CARGA_MASIVA.md` — formato CSV para vendedores
+- `docs/PROMPT_CLAUDE_CODE_CONTENIDO_UX.md` — spec overhaul contenido UX
