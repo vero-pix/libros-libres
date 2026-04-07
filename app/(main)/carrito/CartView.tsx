@@ -160,9 +160,17 @@ export default function CartView({ items: initialItems }: { items: CartItem[] })
             Total: ${total.toLocaleString("es-CL")}
           </span>
         </div>
-        <p className="text-xs text-ink-muted">
-          Cada libro se compra por separado al vendedor correspondiente.
+        <p className="text-xs text-ink-muted mb-4">
+          Cada libro se compra por separado al vendedor correspondiente. Después de pagar uno, vuelve aquí para comprar el siguiente.
         </p>
+        {activeItems.length > 0 && (
+          <Link
+            href={`/checkout/${activeItems[0].listing.id}?next=/carrito`}
+            className="block w-full text-center bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold py-3.5 rounded-xl transition-all text-base shadow-md hover:shadow-lg"
+          >
+            Comprar siguiente — ${(activeItems[0].listing.price ?? 0).toLocaleString("es-CL")}
+          </Link>
+        )}
       </div>
     </div>
   );

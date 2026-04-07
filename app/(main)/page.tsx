@@ -54,7 +54,7 @@ export default async function HomePage({ searchParams }: Props) {
 
   let query = supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, mercadopago_user_id)`)
+    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, mercadopago_user_id, plan), reviews:reviews(rating)`)
     .eq("status", "active");
 
   if (condition) query = query.eq("condition", condition);
@@ -71,7 +71,22 @@ export default async function HomePage({ searchParams }: Props) {
   }
 
   const { data: rawListings } = await query;
-  let listings = (rawListings as unknown as ListingWithBook[]) ?? [];
+  let listings = ((rawListings ?? []) as unknown as (ListingWithBook & { reviews?: { rating: number }[] })[]).map((l) => {
+    const reviews = l.reviews ?? [];
+    return {
+      ...l,
+      _avg_rating: reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0,
+      _review_count: reviews.length,
+      _featured: l.seller?.plan === "librero" || l.seller?.plan === "libreria",
+    };
+  });
+
+  // Featured listings first (paid plans)
+  listings.sort((a, b) => {
+    if (a._featured && !b._featured) return -1;
+    if (!a._featured && b._featured) return 1;
+    return 0;
+  });
 
   if (genre) {
     listings = listings.filter(

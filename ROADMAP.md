@@ -87,6 +87,7 @@
 - [ ] Libros destacados (feature de pago por plan — cumplir propuesta de valor planes)
 - [ ] Flujo emails comprador↔vendedor (notificaciones de estado, coordinación entrega)
 - [ ] Valoraciones y comentarios mejorados (reviews visibles en cards, promedio estrellas)
+- [ ] Preguntas públicas al vendedor (estilo MercadoLibre — visibles para todos)
 - [ ] Checkout múltiple carrito (pagar varios libros)
 - [ ] Tracking envíos (cuando Shipit funcione)
 - [ ] Primer newsletter a suscriptores
