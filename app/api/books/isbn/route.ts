@@ -10,29 +10,36 @@ async function searchGoogleBooks(isbn: string) {
   const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
   if (apiKey === "AIza..." || !apiKey) return null; // skip if placeholder
 
-  const url = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}${apiKey ? `&key=${apiKey}` : ""}`;
+  // Try Spanish edition first, then any language
+  for (const lang of ["es", ""]) {
+    const langParam = lang ? `&langRestrict=${lang}` : "";
+    const url = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}${langParam}${apiKey ? `&key=${apiKey}` : ""}`;
 
-  try {
-    const res = await fetch(url, { next: { revalidate: 86400 } });
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (!data.items?.length) return null;
+    try {
+      const res = await fetch(url, { next: { revalidate: 86400 } });
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (!data.items?.length) continue;
 
-    const v = data.items[0].volumeInfo;
-    return {
-      title: v.title ?? "",
-      author: v.authors?.join(", ") ?? "",
-      description: v.description ?? "",
-      cover_url: v.imageLinks?.thumbnail?.replace("http://", "https://") ?? null,
-      genre: v.categories?.[0] ? translateGenre(v.categories[0]) : null,
-      published_year: v.publishedDate
-        ? parseInt(v.publishedDate.substring(0, 4))
-        : null,
-      isbn,
-    };
-  } catch {
-    return null;
+      const v = data.items[0].volumeInfo;
+      if (v.description || lang === "") {
+        return {
+          title: v.title ?? "",
+          author: v.authors?.join(", ") ?? "",
+          description: v.description ?? "",
+          cover_url: v.imageLinks?.thumbnail?.replace("http://", "https://") ?? null,
+          genre: v.categories?.[0] ? translateGenre(v.categories[0]) : null,
+          published_year: v.publishedDate
+            ? parseInt(v.publishedDate.substring(0, 4))
+            : null,
+          isbn,
+        };
+      }
+    } catch {
+      continue;
+    }
   }
+  return null;
 }
 
 async function searchOpenLibrary(isbn: string) {

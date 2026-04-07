@@ -428,6 +428,8 @@ function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdat
   const supabase = createClient();
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [backfilling, setBackfilling] = useState(false);
+  const [backfillResult, setBackfillResult] = useState<string | null>(null);
 
   const filtered = filter === "all" ? listings : listings.filter((l) => l.status === filter);
   const allSelected = filtered.length > 0 && filtered.every((l) => selected.has(l.id));
@@ -474,14 +476,35 @@ function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdat
 
   return (
     <div className="space-y-3">
-      <div className="flex gap-1 flex-wrap">
-        <FilterBtn active={filter === "all"} onClick={() => setFilter("all")}>Todas ({listings.length})</FilterBtn>
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex gap-1 flex-wrap flex-1">
+          <FilterBtn active={filter === "all"} onClick={() => setFilter("all")}>Todas ({listings.length})</FilterBtn>
         {LISTING_STATUSES.map((s) => (
           <FilterBtn key={s} active={filter === s} onClick={() => setFilter(s)}>
             {LISTING_STATUS_LABELS[s].label} ({listings.filter((l) => l.status === s).length})
           </FilterBtn>
         ))}
+        </div>
+        <button
+          onClick={async () => {
+            setBackfilling(true);
+            setBackfillResult(null);
+            try {
+              const res = await fetch("/api/admin/backfill-descriptions", { method: "POST" });
+              const data = await res.json();
+              setBackfillResult(`${data.updated} sinopsis encontradas, ${data.failed} sin resultado`);
+            } catch { setBackfillResult("Error"); }
+            setBackfilling(false);
+          }}
+          disabled={backfilling}
+          className="text-xs font-medium text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
+        >
+          {backfilling ? "Buscando sinopsis..." : "Completar sinopsis"}
+        </button>
       </div>
+      {backfillResult && (
+        <p className="text-xs text-gray-500 bg-gray-50 px-3 py-2 rounded-lg">{backfillResult}</p>
+      )}
 
       {/* Bulk actions */}
       <div className="flex items-center gap-3">
