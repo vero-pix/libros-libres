@@ -30,23 +30,35 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
     const scanner = new Html5Qrcode(id, {
       formatsToSupport: [
         Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
         Html5QrcodeSupportedFormats.CODE_128,
+        Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.UPC_A,
       ],
       verbose: false,
     });
     scannerRef.current = scanner;
 
+    // Use wider scan area for better detection on large screens
+    const screenW = window.innerWidth;
+    const boxW = Math.min(screenW - 48, 340);
+    const boxH = Math.round(boxW * 0.44);
+
     scanner
       .start(
         { facingMode: "environment" },
         {
-          fps: 10,
-          qrbox: { width: 288, height: 128 },
+          fps: 15,
+          qrbox: { width: boxW, height: boxH },
+          aspectRatio: 1.777,
+          disableFlip: true,
         },
         (decodedText) => {
           if (detectedRef.current) return;
           if (!/^\d{10}(\d{3})?$/.test(decodedText)) return;
           detectedRef.current = true;
+          // Vibrate on detection (mobile)
+          if (navigator.vibrate) navigator.vibrate(100);
           stop().then(() => onDetected(decodedText));
         },
         () => {
@@ -62,7 +74,6 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
     };
   }, [onDetected, stop]);
 
-  // Cerrar con Escape en desktop
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -92,7 +103,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
 
         {/* Visor de encuadre */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="relative w-72 h-32">
+          <div className="relative" style={{ width: Math.min(window?.innerWidth - 48 || 288, 340), height: Math.round(Math.min(window?.innerWidth - 48 || 288, 340) * 0.44) }}>
             {/* Línea de escaneo animada */}
             <div className="absolute inset-0 overflow-hidden rounded">
               <div className="absolute left-0 right-0 h-0.5 bg-brand-400 opacity-80 animate-scan" />
@@ -109,7 +120,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       {/* Hint inferior */}
       <div className="px-4 py-4 bg-black/80 text-center">
         <p className="text-white/60 text-xs">
-          Mantén el código de barras dentro del recuadro
+          Acerca el código de barras al centro del recuadro
         </p>
       </div>
     </div>
