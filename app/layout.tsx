@@ -73,6 +73,21 @@ export default function RootLayout({
         )}
       </head>
       <body className={`${playfair.variable} ${dmSans.variable} font-sans antialiased flex flex-col min-h-screen bg-cream`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Libros Libres",
+              alternateName: "tuslibros.cl",
+              url: "https://tuslibros.cl",
+              logo: "https://tuslibros.cl/og-image.png",
+              description: "Compra, vende y presta libros cerca de ti. El Uber de los libros.",
+              sameAs: ["https://www.linkedin.com/in/economista-veronica-velasquez/"],
+            }),
+          }}
+        />
         {children}
         <Footer />
         <BackToTop />

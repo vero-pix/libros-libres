@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import ISBNInput from "@/components/books/ISBNInput";
 import BookPreview from "@/components/books/BookPreview";
-import LocationPicker from "@/components/map/LocationPicker";
+import dynamic from "next/dynamic";
+const LocationPicker = dynamic(
+  () => import("@/components/map/LocationPicker"),
+  { ssr: false, loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded-xl" /> }
+);
 import type { BookData } from "@/types";
 
 interface Props {

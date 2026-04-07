@@ -4,7 +4,12 @@ import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import ISBNSearch from "@/components/books/ISBNSearch";
-import DraggableLocationPicker, { type LocationData } from "@/components/map/DraggableLocationPicker";
+import dynamic from "next/dynamic";
+import type { LocationData } from "@/components/map/DraggableLocationPicker";
+const DraggableLocationPicker = dynamic(
+  () => import("@/components/map/DraggableLocationPicker"),
+  { ssr: false, loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded-xl" /> }
+);
 import type { BookData } from "@/types";
 import Image from "next/image";
 import { CATEGORY_OPTIONS } from "@/lib/genres";
