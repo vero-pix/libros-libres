@@ -114,6 +114,8 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user || pendingImages.length === 0) return;
 
+    let firstUploadedUrl: string | null = null;
+
     for (let i = 0; i < pendingImages.length; i++) {
       try {
         const file = await compressImage(pendingImages[i]);
@@ -133,8 +135,26 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
           image_url: publicUrl,
           sort_order: i,
         });
+
+        if (!firstUploadedUrl) firstUploadedUrl = publicUrl;
       } catch {
         console.error("Failed to upload pending image", i);
+      }
+    }
+
+    // If the listing has no cover image, use the first uploaded image
+    if (firstUploadedUrl) {
+      const { data: listing } = await supabase
+        .from("listings")
+        .select("cover_image_url")
+        .eq("id", listingId)
+        .single();
+
+      if (listing && !listing.cover_image_url) {
+        await supabase
+          .from("listings")
+          .update({ cover_image_url: firstUploadedUrl })
+          .eq("id", listingId);
       }
     }
   }

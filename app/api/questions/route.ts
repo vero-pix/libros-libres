@@ -75,21 +75,30 @@ export async function POST(req: NextRequest) {
   const sellerEmail = (listing.seller as any)?.email;
   const bookTitle = (listing.book as any)?.title ?? "tu libro";
   if (sellerEmail) {
-    sendEmail({
-      to: sellerEmail,
-      subject: `Nueva pregunta sobre "${bookTitle}" — tuslibros.cl`,
-      html: `
-        <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
-          <h2 style="color:#1a1a1a">Tienes una nueva pregunta</h2>
-          <p><strong>${bookTitle}</strong></p>
-          <div style="background:#f5f0e8;padding:12px 16px;border-radius:8px;margin:16px 0">
-            <p style="margin:0;color:#333">"${question.trim()}"</p>
+    try {
+      const emailResult = await sendEmail({
+        to: sellerEmail,
+        subject: `Nueva pregunta sobre "${bookTitle}" — tuslibros.cl`,
+        html: `
+          <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
+            <h2 style="color:#1a1a1a">Tienes una nueva pregunta</h2>
+            <p><strong>${bookTitle}</strong></p>
+            <div style="background:#f5f0e8;padding:12px 16px;border-radius:8px;margin:16px 0">
+              <p style="margin:0;color:#333">"${question.trim()}"</p>
+            </div>
+            <a href="https://tuslibros.cl/listings/${listing_id}" style="display:inline-block;background:#d4a017;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">Responder</a>
+            <p style="color:#888;font-size:13px;margin-top:16px">tuslibros.cl</p>
           </div>
-          <a href="https://tuslibros.cl/listings/${listing_id}" style="display:inline-block;background:#d4a017;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">Responder</a>
-          <p style="color:#888;font-size:13px;margin-top:16px">tuslibros.cl</p>
-        </div>
-      `,
-    }).catch((err) => console.error("[questions] Email error:", err));
+        `,
+      });
+      if (!emailResult) {
+        console.error("[questions] Email to seller failed (null result) for listing:", listing_id);
+      } else {
+        console.log("[questions] Email sent to seller for listing:", listing_id);
+      }
+    } catch (err) {
+      console.error("[questions] Email error:", err);
+    }
   }
 
   return NextResponse.json({ id: newQ.id });
@@ -138,22 +147,31 @@ export async function PATCH(req: NextRequest) {
   const askerEmail = (q.asker as any)?.email;
   const bookTitle = (q.listing as any)?.book?.title ?? "un libro";
   if (askerEmail) {
-    sendEmail({
-      to: askerEmail,
-      subject: `Respondieron tu pregunta sobre "${bookTitle}" — tuslibros.cl`,
-      html: `
-        <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
-          <h2 style="color:#1a1a1a">Tu pregunta fue respondida</h2>
-          <p><strong>${bookTitle}</strong></p>
-          <div style="background:#f5f0e8;padding:12px 16px;border-radius:8px;margin:16px 0">
-            <p style="margin:0;color:#888;font-size:13px">Tu pregunta:</p>
-            <p style="margin:4px 0 0;color:#333">"${answer.trim()}"</p>
+    try {
+      const emailResult = await sendEmail({
+        to: askerEmail,
+        subject: `Respondieron tu pregunta sobre "${bookTitle}" — tuslibros.cl`,
+        html: `
+          <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
+            <h2 style="color:#1a1a1a">Tu pregunta fue respondida</h2>
+            <p><strong>${bookTitle}</strong></p>
+            <div style="background:#f5f0e8;padding:12px 16px;border-radius:8px;margin:16px 0">
+              <p style="margin:0;color:#888;font-size:13px">Tu pregunta:</p>
+              <p style="margin:4px 0 0;color:#333">"${answer.trim()}"</p>
+            </div>
+            <a href="https://tuslibros.cl/listings/${q.listing_id}" style="display:inline-block;background:#d4a017;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">Ver respuesta</a>
+            <p style="color:#888;font-size:13px;margin-top:16px">tuslibros.cl</p>
           </div>
-          <a href="https://tuslibros.cl/listings/${q.listing_id}" style="display:inline-block;background:#d4a017;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">Ver respuesta</a>
-          <p style="color:#888;font-size:13px;margin-top:16px">tuslibros.cl</p>
-        </div>
-      `,
-    }).catch((err) => console.error("[questions] Email error:", err));
+        `,
+      });
+      if (!emailResult) {
+        console.error("[questions] Email to asker failed (null result) for question:", question_id);
+      } else {
+        console.log("[questions] Email sent to asker for question:", question_id);
+      }
+    } catch (err) {
+      console.error("[questions] Email error:", err);
+    }
   }
 
   return NextResponse.json({ ok: true });

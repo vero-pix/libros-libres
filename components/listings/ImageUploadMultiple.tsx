@@ -61,6 +61,23 @@ export default function ImageUploadMultiple({ listingId, existingImages, onImage
       if (row) newImages.push(row);
     }
 
+    // If the listing has no cover image, set it to the first uploaded image
+    if (newImages.length > 0) {
+      const { data: listing } = await supabase
+        .from("listings")
+        .select("cover_image_url")
+        .eq("id", listingId)
+        .single();
+
+      if (listing && !listing.cover_image_url) {
+        const firstUrl = images.length > 0 ? images[0].image_url : newImages[0].image_url;
+        await supabase
+          .from("listings")
+          .update({ cover_image_url: firstUrl })
+          .eq("id", listingId);
+      }
+    }
+
     const updated = [...images, ...newImages];
     setImages(updated);
     onImagesChanged(updated);
