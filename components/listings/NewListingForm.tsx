@@ -103,7 +103,7 @@ export default function NewListingForm({ userId }: Props) {
                   : "bg-white text-gray-700 border-gray-200 hover:border-brand-300"
               }`}
             >
-              {{ sale: "Venta", loan: "Préstamo", both: "Venta y préstamo" }[m]}
+              {{ sale: "Venta", loan: "Arriendo", both: "Venta y arriendo" }[m]}
             </button>
           ))}
         </div>

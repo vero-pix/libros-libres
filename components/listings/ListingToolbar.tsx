@@ -149,8 +149,8 @@ export default function ListingToolbar() {
       >
         <option value="">Modalidad: Todos</option>
         <option value="sale">Venta</option>
-        <option value="loan">Préstamo</option>
-        <option value="both">Venta y préstamo</option>
+        <option value="loan">Arriendo</option>
+        <option value="both">Venta y arriendo</option>
       </select>
     </div>
   );

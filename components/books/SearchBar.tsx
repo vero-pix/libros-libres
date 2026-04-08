@@ -6,8 +6,8 @@ import { useState } from "react";
 const MODALITY_OPTIONS = [
   { value: "", label: "Todos" },
   { value: "sale", label: "Venta" },
-  { value: "loan", label: "Préstamo" },
-  { value: "both", label: "Venta y préstamo" },
+  { value: "loan", label: "Arriendo" },
+  { value: "both", label: "Venta y arriendo" },
 ];
 
 export default function SearchBar() {

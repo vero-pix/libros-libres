@@ -1,0 +1,11 @@
+num,titulo,autor,isbn,condicion,tipo,descripcion,cover_openlibrary,cover_google,year,pages,categoria
+1,Los Idus de Marzo,Valerio Massimo Manfredi,9788499086651,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788499086651-L.jpg,,,,Novela Historica
+2,Los fantasmas de Kraven,Alan Isler,9788433969149,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788433969149-L.jpg,,,,Ficcion Literaria
+3,Griego Busca Griega,Friedrich Durrenmatt,9788483106174,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788483106174-L.jpg,,,,Ficcion
+4,Libertad,Jonathan Franzen,9788498384789,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788498384789-L.jpg,,,,Ficcion Contemporanea
+5,Ordenes sagradas,Benjamin Black,9788420418834,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788420418834-L.jpg,,,,Novela Negra
+6,Luna de locos,Manfredo Kempff,9789505113620,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9789505113620-L.jpg,,,,Ficcion Latinoamericana
+7,Excesos,Mauricio Wacquez,9788432025129,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788432025129-L.jpg,,,,Narrativa Chilena
+8,Diana o la cazadora solitaria,Carlos Fuentes,9788420481531,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788420481531-L.jpg,,,,Ficcion Literaria
+9,La verdad esta en otra parte,E.A. Dal Maschio,9788447130566,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788447130566-L.jpg,,,,Filosofia
+10,Garbo,Movie Icons - Taschen,9783822822098,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9783822822098-L.jpg,,,,Cine y Fotografia

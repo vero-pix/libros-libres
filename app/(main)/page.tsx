@@ -65,7 +65,7 @@ export default async function HomePage({ searchParams }: Props) {
     .eq("status", "active");
 
   if (condition) query = query.eq("condition", condition);
-  if (modality) query = query.eq("modality", modality);
+  if (modality) query = query.in("modality", modality === "both" ? ["both"] : [modality, "both"]);
   if (price_min) query = query.gte("price", Number(price_min));
   if (price_max) query = query.lte("price", Number(price_max));
 
@@ -187,7 +187,9 @@ export default async function HomePage({ searchParams }: Props) {
                       </div>
                       {secondHalf.length > 0 && (
                         <>
-                          <AdSlot slot="in-feed" format="horizontal" className="my-6" />
+                          {process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
+                            <AdSlot slot="in-feed" format="horizontal" className="my-6" />
+                          )}
                           <div className={gridClass}>
                             {secondHalf.map((listing) => (
                               <CardComponent key={listing.id} listing={listing} />

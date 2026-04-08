@@ -540,7 +540,7 @@ function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdat
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">{listing.book?.title}</p>
               <p className="text-xs text-gray-500 truncate">
-                {listing.seller?.full_name ?? listing.seller?.email ?? "—"} · {listing.price != null ? `$${listing.price.toLocaleString("es-CL")}` : "Préstamo"}
+                {listing.seller?.full_name ?? listing.seller?.email ?? "—"} · {listing.price != null ? `$${listing.price.toLocaleString("es-CL")}` : "Arriendo"}
               </p>
             </div>
 

@@ -6,7 +6,7 @@ import Image from "next/image";
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   pending:    { label: "Pendiente de pago", color: "bg-yellow-100 text-yellow-800" },
   paid:       { label: "Pagado",            color: "bg-blue-100 text-blue-800" },
-  active:     { label: "En préstamo",       color: "bg-green-100 text-green-800" },
+  active:     { label: "En arriendo",       color: "bg-green-100 text-green-800" },
   returning:  { label: "En devolución",     color: "bg-purple-100 text-purple-800" },
   completed:  { label: "Completado",        color: "bg-gray-100 text-gray-800" },
   overdue:    { label: "Vencido",           color: "bg-red-100 text-red-800" },

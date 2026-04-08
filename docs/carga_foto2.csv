@@ -1,0 +1,13 @@
+num,titulo,autor,isbn,condicion,tipo,descripcion,cover_openlibrary,cover_google,year,pages,categoria
+1,El Arado de Oro,James Buchan,9788483100868,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788483100868-L.jpg,,,,Novela de Espionaje
+2,El desfile del amor,Sergio Pitol,9788433917133,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788433917133-L.jpg,,,,Ficcion Latinoamericana
+3,La transparencia del tiempo,Leonardo Padura,9788490664797,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788490664797-L.jpg,,,,Novela Negra
+4,La Cuarentena,J.M.G. Le Clezio,9788483100714,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788483100714-L.jpg,,,,Ficcion Literaria
+5,El Urogallo,Michel Tournier,9789870401544,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9789870401544-L.jpg,,,,Ficcion Literaria
+6,Literati,Barry McCrea,9788423338092,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788423338092-L.jpg,,,,Novela Contemporanea
+7,La Casa Rusia,John le Carre,9788401323041,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788401323041-L.jpg,,,,Novela de Espionaje
+8,Quinteto de Buenos Aires,Manuel Vazquez Montalban,9788408205579,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788408205579-L.jpg,,,,Novela Negra
+9,El mito de la revolucion masonica,Eduardo R. Callaey,9788497633710,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788497633710-L.jpg,,,,Ensayo
+10,El instinto musical,Philip Ball,9788475069241,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788475069241-L.jpg,,,,Divulgacion
+11,El Cementerio de Praga,Umberto Eco,9788426410733,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788426410733-L.jpg,,,,Novela Historica
+12,Las huellas imborrables,Camilla Lackberg,9788415120292,buen_estado,both,,https://covers.openlibrary.org/b/isbn/9788415120292-L.jpg,,,,Novela Negra

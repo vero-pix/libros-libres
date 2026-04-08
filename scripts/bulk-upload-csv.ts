@@ -2,6 +2,9 @@
  * Carga masiva desde CSV con formato:
  * num,titulo,autor,isbn,condicion,tipo,descripcion,cover_openlibrary,cover_google,year,pages,categoria
  *
+ * Auto-completa sinopsis, portada, género y año desde Google Books API
+ * cuando el CSV no los trae.
+ *
  * Usage:
  *   npx tsx scripts/bulk-upload-csv.ts docs/carga_masiva_libros.csv
  */
@@ -23,7 +26,11 @@ for (const line of envContent.split("\n")) {
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const SELLER_ID = "2201d163-4423-4971-91f0-f6cebd00d1bd";
-const DEFAULT_PRICE = 5000;
+// CLI overrides: npx tsx scripts/bulk-upload-csv.ts file.csv --price 6500 --notes "Sin marcas de uso"
+const priceIdx = process.argv.indexOf("--price");
+const DEFAULT_PRICE = priceIdx > -1 ? parseInt(process.argv[priceIdx + 1], 10) : 5000;
+const notesIdx = process.argv.indexOf("--notes");
+const DEFAULT_NOTES = notesIdx > -1 ? process.argv[notesIdx + 1] : null;
 const SELLER_LAT = -33.4489;
 const SELLER_LNG = -70.6693;
 
@@ -33,6 +40,44 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+interface BookMeta {
+  description: string | null;
+  cover_url: string | null;
+  genre: string | null;
+  published_year: number | null;
+}
+
+async function fetchBookMeta(isbn: string, title: string, author: string): Promise<BookMeta> {
+  const clean = isbn.replace(/[-\s]/g, "");
+  const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
+
+  // Try by ISBN first
+  for (const query of [`isbn:${clean}`, `${title} ${author}`]) {
+    try {
+      const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1${apiKey ? `&key=${apiKey}` : ""}`;
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (!data.items?.length) continue;
+
+      const v = data.items[0].volumeInfo;
+      const cover = v.imageLinks?.thumbnail?.replace("http://", "https://") ?? null;
+      const desc = v.description ?? null;
+
+      if (desc || cover) {
+        return {
+          description: desc,
+          cover_url: cover,
+          genre: v.categories?.[0] ?? null,
+          published_year: v.publishedDate ? parseInt(v.publishedDate.substring(0, 4)) : null,
+        };
+      }
+    } catch { /* continue to next query */ }
+  }
+
+  return { description: null, cover_url: null, genre: null, published_year: null };
+}
 
 function parseCsvLine(line: string): string[] {
   const fields: string[] = [];
@@ -75,18 +120,30 @@ async function main() {
     const title = row.titulo;
     const author = row.autor;
     const isbn = row.isbn;
-    const description = row.descripcion;
-    const coverUrl = row.cover_google || row.cover_openlibrary || null;
-    const genre = row.categoria || "Literatura";
-    const year = row.year ? parseInt(row.year, 10) || null : null;
+    let description = row.descripcion || null;
+    let coverUrl = row.cover_google || row.cover_openlibrary || null;
+    let genre = row.categoria || null;
+    let year = row.year ? parseInt(row.year, 10) || null : null;
     const condition = row.condicion === "buen_estado" ? "good" : row.condicion || "good";
-    const modality = row.tipo === "venta" ? "sale" : row.tipo || "sale";
+    const modality = row.tipo === "venta" ? "sale" : row.tipo === "both" ? "both" : row.tipo || "sale";
+    const rentalPrice = modality !== "sale" ? Math.round(DEFAULT_PRICE * 0.4) : null;
 
     if (!title || !author) {
       console.log(`  Skip row ${i}: missing title/author`);
       skipped++;
       continue;
     }
+
+    // Auto-complete missing data from Google Books
+    if (isbn && (!description || !coverUrl || !genre || !year)) {
+      console.log(`  Buscando datos de "${title}"...`);
+      const meta = await fetchBookMeta(isbn, title, author);
+      if (!description && meta.description) description = meta.description;
+      if (!coverUrl && meta.cover_url) coverUrl = meta.cover_url;
+      if (!genre && meta.genre) genre = meta.genre;
+      if (!year && meta.published_year) year = meta.published_year;
+    }
+    genre = genre || "Literatura";
 
     // Check if book with this ISBN already exists
     let bookId: string;
@@ -165,7 +222,8 @@ async function main() {
       price: DEFAULT_PRICE,
       condition,
       modality,
-      notes: null,
+      rental_price: rentalPrice,
+      notes: DEFAULT_NOTES,
       cover_image_url: coverUrl,
       latitude: SELLER_LAT,
       longitude: SELLER_LNG,

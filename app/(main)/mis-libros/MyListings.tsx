@@ -22,8 +22,8 @@ const CONDITION_LABELS: Record<string, string> = {
 
 const MODALITY_LABELS: Record<string, string> = {
   sale: "Venta",
-  loan: "Préstamo",
-  both: "Venta y préstamo",
+  loan: "Arriendo",
+  both: "Venta y arriendo",
 };
 
 interface Props {
@@ -458,8 +458,8 @@ function EditForm({
             <label className="block text-xs font-medium text-gray-500 mb-1">Modalidad</label>
             <select value={modality} onChange={(e) => setModality(e.target.value as typeof modality)} className={inputClass}>
               <option value="sale">Venta</option>
-              <option value="loan">Préstamo</option>
-              <option value="both">Venta y préstamo</option>
+              <option value="loan">Arriendo</option>
+              <option value="both">Venta y arriendo</option>
             </select>
           </div>
           {modality !== "loan" && (

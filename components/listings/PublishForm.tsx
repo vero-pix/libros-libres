@@ -23,8 +23,8 @@ type Condition = "new" | "good" | "fair" | "poor";
 
 const MODALITY_OPTIONS: { value: Modality; label: string; icon: string; desc: string }[] = [
   { value: "sale",  label: "Venta",            icon: "🏷️", desc: "Quieres vender el libro" },
-  { value: "loan",  label: "Préstamo",          icon: "📖", desc: "Lo prestas y te lo devuelven" },
-  { value: "both",  label: "Venta o préstamo",  icon: "📚", desc: "Cualquiera de las dos" },
+  { value: "loan",  label: "Arriendo",           icon: "📖", desc: "Lo arriendas y te lo devuelven" },
+  { value: "both",  label: "Venta o arriendo",  icon: "📚", desc: "Cualquiera de las dos" },
 ];
 
 const CONDITION_OPTIONS: { value: Condition; label: string; color: string }[] = [

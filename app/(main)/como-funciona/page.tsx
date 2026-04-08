@@ -19,7 +19,7 @@ const mpSteps = [
 ];
 
 const rentalSteps = [
-  { number: 1, icon: "📚", title: "Busca libros para arriendo", description: "Filtra por modalidad «Préstamo» en el catálogo." },
+  { number: 1, icon: "📚", title: "Busca libros para arriendo", description: "Filtra por modalidad «Arriendo» en el catálogo." },
   { number: 2, icon: "📅", title: "Elige plazo y paga", description: "7, 14 o 30 días. Pagas arriendo + garantía reembolsable con MercadoPago." },
   { number: 3, icon: "📖", title: "Lee y disfruta", description: "Recibe el libro por courier o retíralo en persona." },
   { number: 4, icon: "🔄", title: "Devuelve y recupera tu garantía", description: "Devuelves en buen estado, tu garantía vuelve completa a tu cuenta." },

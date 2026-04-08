@@ -1,0 +1,13 @@
+num,titulo,autor,isbn,condicion,tipo,descripcion,cover_openlibrary,cover_google,year,pages,categoria
+1,Muerte en verano,Benjamin Black,9788420400938,new,both,,https://covers.openlibrary.org/b/isbn/9788420400938-L.jpg,,,,Novela Negra
+2,Ripley Bogle,Robert McLiam Wilson,9788483101285,new,both,,https://covers.openlibrary.org/b/isbn/9788483101285-L.jpg,,,,Ficcion Literaria
+3,El otro nombre de Laura,Benjamin Black,9788420473802,new,both,,https://covers.openlibrary.org/b/isbn/9788420473802-L.jpg,,,,Novela Negra
+4,Las sombras de Quirke,Benjamin Black,9788420419480,new,both,,https://covers.openlibrary.org/b/isbn/9788420419480-L.jpg,,,,Novela Negra
+5,La maleta,Sergei Dovlatov,9788495799005,new,both,,https://covers.openlibrary.org/b/isbn/9788495799005-L.jpg,,,,Ficcion Literaria
+6,No soy Stiller,Max Frisch,9788432227943,new,both,,https://covers.openlibrary.org/b/isbn/9788432227943-L.jpg,,,,Ficcion Literaria
+7,El secreto de Christine,Benjamin Black,9788420471907,new,both,,https://covers.openlibrary.org/b/isbn/9788420471907-L.jpg,,,,Novela Negra
+8,La Presidencia Imperial,Enrique Krauze,9788483100424,new,both,,https://covers.openlibrary.org/b/isbn/9788483100424-L.jpg,,,,Ensayo
+9,El tiempo entre costuras,Maria Duenas,9788484607915,new,both,,https://covers.openlibrary.org/b/isbn/9788484607915-L.jpg,,,,Ficcion Historica
+10,Lecciones para una liebre muerta,Mario Bellatin,9788433968715,new,both,,https://covers.openlibrary.org/b/isbn/9788433968715-L.jpg,,,,Ficcion Literaria
+11,Kassel no invita a la logica,Enrique Vila-Matas,9788432221132,new,both,,https://covers.openlibrary.org/b/isbn/9788432221132-L.jpg,,,,Ficcion Literaria
+12,Los romanticos,Pankaj Mishra,9788433969255,new,both,,https://covers.openlibrary.org/b/isbn/9788433969255-L.jpg,,,,Ficcion Literaria

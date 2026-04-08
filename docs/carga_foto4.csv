@@ -1,0 +1,16 @@
+num,titulo,autor,isbn,condicion,tipo,descripcion,cover_openlibrary,cover_google,year,pages,categoria
+1,El sastre de Panama,John le Carre,9789500417655,new,both,,https://covers.openlibrary.org/b/isbn/9789500417655-L.jpg,,,,Novela de Espionaje
+2,El vuelo de la reina,Tomas Eloy Martinez,9788420464237,new,both,,https://covers.openlibrary.org/b/isbn/9788420464237-L.jpg,,,,Ficcion Literaria
+3,El Balneario,Manuel Vazquez Montalban,9788408083887,new,both,,https://covers.openlibrary.org/b/isbn/9788408083887-L.jpg,,,,Novela Negra
+4,A proposito de Truman Capote y su obra,Color Local,,new,both,,,,,,Ensayo
+5,El pensamiento de Prigogine,Arnaud Spire,9789561316539,new,both,,https://covers.openlibrary.org/b/isbn/9789561316539-L.jpg,,,,Divulgacion
+6,Los mares del Sur,Manuel Vazquez Montalban,9788408069966,new,both,,https://covers.openlibrary.org/b/isbn/9788408069966-L.jpg,,,,Novela Negra
+7,Filosofia a destiempo,Carla Cordua,9789562840880,new,both,,https://covers.openlibrary.org/b/isbn/9789562840880-L.jpg,,,,Filosofia
+8,Los Idus de Marzo,Thornton Wilder,9789500423977,new,both,,https://covers.openlibrary.org/b/isbn/9789500423977-L.jpg,,,,Ficcion Historica
+9,Una temporada con Lacan,Pierre Rey,9788432246456,new,both,,https://covers.openlibrary.org/b/isbn/9788432246456-L.jpg,,,,Ensayo
+10,Los pajaros de Bangkok,Manuel Vazquez Montalban,9788432069185,new,both,,https://covers.openlibrary.org/b/isbn/9788432069185-L.jpg,,,,Novela Negra
+11,Agosto,Rubem Fonseca,9789580479505,new,both,,https://covers.openlibrary.org/b/isbn/9789580479505-L.jpg,,,,Novela Negra
+12,Sangre en la luna,James Ellroy,9788466627894,new,both,,https://covers.openlibrary.org/b/isbn/9788466627894-L.jpg,,,,Novela Negra
+13,Uniones,Robert Musil,9788432231285,new,both,,https://covers.openlibrary.org/b/isbn/9788432231285-L.jpg,,,,Ficcion Literaria
+14,Historia del Siglo XX,Eric Hobsbawm,9788484320425,new,both,,https://covers.openlibrary.org/b/isbn/9788484320425-L.jpg,,,,Historia
+15,El fantasma de Canterville y otros cuentos,Oscar Wilde,9789875505643,new,both,,https://covers.openlibrary.org/b/isbn/9789875505643-L.jpg,,,,Ficcion Clasica

@@ -44,8 +44,8 @@ function WhatsAppButton({ phone, title }: { phone: string | null; title: string 
 
 const MODALITY_LABELS = {
   sale: "Venta",
-  loan: "Préstamo",
-  both: "Venta y préstamo",
+  loan: "Arriendo",
+  both: "Venta y arriendo",
 };
 
 const CONDITION_LABELS: Record<string, string> = {

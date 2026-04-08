@@ -5,8 +5,8 @@ import type { ListingWithBook } from "@/types";
 
 const MODALITY_LABELS = {
   sale: "Venta",
-  loan: "Préstamo",
-  both: "Venta y préstamo",
+  loan: "Arriendo",
+  both: "Venta y arriendo",
 };
 
 const MODALITY_COLORS = {
