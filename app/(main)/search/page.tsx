@@ -32,7 +32,17 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     ? `Encuentra "${q}" en tuslibros.cl. Libros usados cerca de ti, pago seguro con MercadoPago.`
     : "Busca libros usados cerca de ti en tuslibros.cl. Compra, vende y presta libros de forma segura.";
 
-  return { title, description };
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: q
+        ? `https://tuslibros.cl/search?q=${encodeURIComponent(q)}`
+        : genre
+          ? `https://tuslibros.cl/search?genre=${encodeURIComponent(genre)}`
+          : "https://tuslibros.cl/search",
+    },
+  };
 }
 
 export default async function SearchPage({ searchParams }: Props) {

@@ -15,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/faq`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.5 },
     { url: `${baseUrl}/sobre-nosotros`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.5 },
     { url: `${baseUrl}/historia`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.4 },
+    { url: `${baseUrl}/novedades`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.6 },
     { url: `${baseUrl}/terminos`, lastModified: new Date(), changeFrequency: "yearly" as const, priority: 0.3 },
     { url: `${baseUrl}/privacidad`, lastModified: new Date(), changeFrequency: "yearly" as const, priority: 0.3 },
   ];
@@ -45,5 +46,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Sitemap still works without dynamic pages
   }
 
-  return [...staticPages, ...listingPages];
+  // Seller store pages
+  let sellerPages: MetadataRoute.Sitemap = [];
+  try {
+    const supabaseForSellers = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { cookies: { getAll: () => [], setAll: () => {} } }
+    );
+
+    const { data: sellers } = await supabaseForSellers
+      .from("users")
+      .select("id, updated_at")
+      .order("updated_at", { ascending: false })
+      .limit(200);
+
+    sellerPages = (sellers ?? []).map((s) => ({
+      url: `${baseUrl}/vendedor/${s.id}`,
+      lastModified: new Date(s.updated_at),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+  } catch {
+    // Continue without seller pages
+  }
+
+  return [...staticPages, ...listingPages, ...sellerPages];
 }

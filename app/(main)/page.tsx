@@ -11,6 +11,13 @@ import Recommendations from "@/components/listings/Recommendations";
 import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
 import type { ListingWithBook } from "@/types";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "https://tuslibros.cl",
+  },
+};
 
 const ITEMS_PER_PAGE = 20;
 
