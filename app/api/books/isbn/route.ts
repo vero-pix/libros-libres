@@ -95,11 +95,20 @@ async function searchOpenLibrary(isbn: string) {
       author = authorNames.filter(Boolean).join(", ");
     }
 
-    // Get cover
+    // Get cover — verify it exists (Open Library returns 1x1 transparent for invalid ISBNs)
+    let cover_url: string | null = null;
     const coverId = data.covers?.[0];
-    const cover_url = coverId
-      ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`
-      : `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+    if (coverId) {
+      cover_url = `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`;
+    } else {
+      const testUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`;
+      try {
+        const headRes = await fetch(testUrl, { method: "HEAD" });
+        if (headRes.ok) {
+          cover_url = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+        }
+      } catch { /* no cover available */ }
+    }
 
     // Get subject/genre
     const genre = data.subjects?.[0] ? translateGenre(data.subjects[0]) : null;

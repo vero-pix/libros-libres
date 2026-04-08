@@ -9,6 +9,7 @@ import AddToCartButton from "@/components/ui/AddToCartButton";
 import AdSlot from "@/components/ui/AdSlot";
 import ImageGallery from "./ImageGallery";
 import ShareButtons from "./ShareButtons";
+import ContactSellerButton from "@/components/messages/ContactSellerButton";
 
 function WhatsAppButton({ phone, title }: { phone: string | null; title: string }) {
   if (!phone) {
@@ -218,6 +219,16 @@ export default function ListingDetail({ listing, images = [] }: Props) {
       {(listing as ListingWithRentalFields).rental_price != null && listing.modality !== "sale" && (
         <RentalSection listing={listing as ListingWithRentalFields} />
       )}
+
+      {/* Messaging CTA */}
+      <div className="border-t border-gray-100 px-6 py-5 bg-brand-50/30">
+        <p className="text-xs font-semibold text-gray-500 mb-2 text-center">Envía un mensaje al vendedor</p>
+        <ContactSellerButton
+          sellerId={listing.seller_id}
+          listingId={listing.id}
+          sellerName={sellerName}
+        />
+      </div>
 
       {/* Contact CTA */}
       <div className="border-t border-gray-100 px-6 py-5 bg-green-50/50">

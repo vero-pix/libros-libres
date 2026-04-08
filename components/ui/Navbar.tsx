@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import NavbarClient from "./NavbarClient";
 import NavDropdown from "./NavDropdown";
 import HeaderSearchBar from "./HeaderSearchBar";
+import UnreadBadge from "@/components/messages/UnreadBadge";
 
 export default async function Navbar() {
   const supabase = await createClient();
@@ -57,8 +58,17 @@ export default async function Navbar() {
           <NavLink href="/">Inicio</NavLink>
           <NavLink href="/#tienda">Explorar</NavLink>
           <NavLink href="/publish">Vender</NavLink>
+          <NavLink href="/novedades">Novedades</NavLink>
 
           {user && (
+            <>
+            <Link
+              href="/mensajes"
+              className="text-xs font-medium uppercase tracking-[0.15em] px-4 py-3.5 hover:bg-white/10 transition-colors whitespace-nowrap flex items-center"
+            >
+              Mensajes
+              <UnreadBadge />
+            </Link>
             <NavDropdown
               label="Mi cuenta"
               items={[
@@ -69,7 +79,7 @@ export default async function Navbar() {
                 { href: "/carrito", label: "Carrito" },
                 { href: "/perfil", label: "Perfil" },
               ]}
-            />
+            /></>
           )}
 
           <NavDropdown
