@@ -36,6 +36,7 @@ export default function Footer() {
               <li><Link href="/como-funciona" className="hover:text-brand-600 transition-colors">Cómo funciona</Link></li>
               <li><Link href="/faq" className="hover:text-brand-600 transition-colors">FAQ</Link></li>
               <li><Link href="/historia" className="hover:text-brand-600 transition-colors">Nuestra historia</Link></li>
+              <li><a href="mailto:vero@economics.cl" className="hover:text-brand-600 transition-colors">Contacto</a></li>
             </ul>
           </div>
           <div>
@@ -60,7 +61,7 @@ export default function Footer() {
       <div className="border-t border-cream-dark bg-cream-warm">
         <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-ink-muted">
           <span>© {new Date().getFullYear()} Libros Libres — tuslibros.cl</span>
-          <span className="font-display italic">Donde los libros encuentran nuevos lectores</span>
+          <a href="mailto:vero@economics.cl" className="hover:text-brand-600 transition-colors">¿Dudas? vero@economics.cl</a>
         </div>
       </div>
     </footer>
