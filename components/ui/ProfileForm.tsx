@@ -10,6 +10,8 @@ interface Props {
   initialPhone: string;
   initialBio?: string;
   initialAvatarUrl?: string | null;
+  initialPublicEmail?: string;
+  initialInstagram?: string;
   email: string;
   defaultLat?: number | null;
   defaultLng?: number | null;
@@ -52,6 +54,8 @@ export default function ProfileForm({
   initialPhone,
   initialBio,
   initialAvatarUrl,
+  initialPublicEmail,
+  initialInstagram,
   email,
   defaultLat,
   defaultLng,
@@ -64,6 +68,8 @@ export default function ProfileForm({
   const [phone, setPhone] = useState(initialPhone);
   const [bio, setBio] = useState(initialBio ?? "");
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl ?? "");
+  const [publicEmail, setPublicEmail] = useState(initialPublicEmail ?? "");
+  const [instagram, setInstagram] = useState(initialInstagram ?? "");
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [phoneError, setPhoneError] = useState<string | null>(null);
@@ -147,6 +153,8 @@ export default function ProfileForm({
         full_name: fullName.trim() || null,
         phone: phone.trim() || null,
         bio: bio.trim() || null,
+        public_email: publicEmail.trim() || null,
+        instagram: instagram.trim().replace(/^@/, "") || null,
       })
       .eq("id", userId);
 
@@ -293,6 +301,41 @@ export default function ProfileForm({
               />
               <p className="text-xs text-gray-400 mt-1">
                 {bio.length}/500 — Aparece en tu tienda de vendedor.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Email público de contacto
+              </label>
+              <input
+                type="email"
+                value={publicEmail}
+                onChange={(e) => setPublicEmail(e.target.value)}
+                placeholder="tienda@ejemplo.cl"
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 transition-colors"
+              />
+              <p className="text-xs text-gray-400 mt-1.5">
+                Opcional — visible para compradores como canal de contacto alternativo.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Instagram
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">@</span>
+                <input
+                  type="text"
+                  value={instagram}
+                  onChange={(e) => setInstagram(e.target.value.replace(/^@/, ""))}
+                  placeholder="tu_usuario"
+                  className="w-full pl-7 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 transition-colors"
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-1.5">
+                Opcional — se mostrará en tus publicaciones y tu tienda.
               </p>
             </div>
           </div>

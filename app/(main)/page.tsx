@@ -81,11 +81,14 @@ export default async function HomePage({ searchParams }: Props) {
     };
   });
 
-  // Featured listings first (paid plans)
+  // Featured listings first (paid plans), then by trending score
   listings.sort((a, b) => {
     if (a._featured && !b._featured) return -1;
     if (!a._featured && b._featured) return 1;
-    return 0;
+    // Within same tier, rank by trending_score descending
+    const aScore = (a as any).trending_score ?? 0;
+    const bScore = (b as any).trending_score ?? 0;
+    return bScore - aScore;
   });
 
   if (genre) {
