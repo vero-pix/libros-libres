@@ -1,14 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import SocialLoginButtons from "./SocialLoginButtons";
 import { REGIONES_CHILE } from "@/lib/comunas";
 
 export default function RegisterForm() {
   const supabase = createClient();
+  const searchParams = useSearchParams();
+  const [refCode, setRefCode] = useState("");
   const [fullName, setFullName] = useState("");
+
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref) setRefCode(ref);
+  }, [searchParams]);
   const [country, setCountry] = useState("Chile");
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
@@ -51,6 +59,19 @@ export default function RegisterForm() {
         full_name: fullName,
         city,
       });
+
+      // 3. Register referral if code present
+      if (refCode.trim()) {
+        try {
+          await fetch("/api/referrals", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ referral_code: refCode.trim() }),
+          });
+        } catch {
+          // Don't block registration if referral fails
+        }
+      }
     }
 
     setSuccess(true);
@@ -182,6 +203,19 @@ export default function RegisterForm() {
           placeholder="Mínimo 8 caracteres"
           autoComplete="new-password"
           className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Código de referido <span className="text-gray-400 font-normal">(opcional)</span>
+        </label>
+        <input
+          type="text"
+          value={refCode}
+          onChange={(e) => setRefCode(e.target.value)}
+          placeholder="Ej: MARI-A1B2"
+          className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 font-mono"
         />
       </div>
 

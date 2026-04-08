@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import RegisterForm from "@/components/auth/RegisterForm";
 
 export default function RegisterPage() {
@@ -70,7 +71,9 @@ export default function RegisterPage() {
             </div>
 
             <div className="bg-white rounded-2xl border border-cream-dark/30 p-7">
-              <RegisterForm />
+              <Suspense>
+                <RegisterForm />
+              </Suspense>
             </div>
 
             <p className="text-center text-xs text-ink-muted mt-8">

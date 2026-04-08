@@ -17,6 +17,7 @@ export default function robots(): MetadataRoute.Robots {
           "/carrito/",
           "/checkout/",
           "/mensajes/",
+          "/referidos/",
           "/login",
           "/register",
           // Block filtered/sorted URLs to prevent crawl of thousands of param combos

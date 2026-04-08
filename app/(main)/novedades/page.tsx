@@ -5,6 +5,24 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "8 abril 2026",
+    title: "Programa de referidos",
+    description:
+      "Invita vendedores a tuslibros.cl con tu código personal. Cuando publiquen su primer libro, ganas un descuento en tu próximo despacho.",
+    link: "/referidos",
+    linkText: "Ver mi código",
+    tag: "Nueva herramienta",
+  },
+  {
+    date: "8 abril 2026",
+    title: "Alianzas institucionales",
+    description:
+      "Universidades, bibliotecas y centros de alumnos pueden aliarse con tuslibros.cl para complementar su catálogo. Sin costo, con comisión por referido.",
+    link: "/alianzas",
+    linkText: "Ver propuesta",
+    tag: "Lanzamiento",
+  },
+  {
+    date: "8 abril 2026",
     title: "Mensajería interna",
     description:
       "Ahora puedes enviar mensajes directos a vendedores y compradores dentro de la plataforma. Cada conversación queda vinculada al libro, con bandeja de entrada y notificaciones por email.",

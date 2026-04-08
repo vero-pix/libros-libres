@@ -77,6 +77,7 @@ export default async function Navbar() {
                 { href: "/mis-ventas", label: "Mis ventas" },
                 { href: "/mis-arriendos", label: "Mis arriendos" },
                 { href: "/carrito", label: "Carrito" },
+                { href: "/referidos", label: "Invita y gana" },
                 { href: "/perfil", label: "Perfil" },
               ]}
             /></>
@@ -88,6 +89,7 @@ export default async function Navbar() {
               { href: "/como-funciona", label: "Cómo funciona" },
               { href: "/faq", label: "FAQ" },
               { href: "/sobre-nosotros", label: "Sobre nosotros" },
+              { href: "/alianzas", label: "Alianzas institucionales" },
               { href: "/historia", label: "Nuestra historia" },
             ]}
           />
