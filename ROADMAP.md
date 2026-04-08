@@ -1,6 +1,6 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 7 abril 2026, 13:00
+Última actualización: 8 abril 2026, 23:00
 
 ---
 
@@ -41,6 +41,11 @@
 - [x] ListingCard: badges, hover, avatar vendedor, placeholder blur
 - [x] Footer, HeroBar, Back to top, Sidebar sticky
 - [x] Fix espacio en blanco iOS Safari (AdSlot)
+- [x] Terminología unificada: "Arriendo" en toda la app (antes "Préstamo")
+- [x] Filtro modalidad: "Arriendo" muestra loan + both
+- [x] Portada generada con título+autor cuando no hay imagen
+- [x] Etiquetas género clickeables en perfil vendedor
+- [x] Botón Instagram en ShareButtons
 
 ### Marketplace
 - [x] Split Payment producción ✅ verificado con venta real
@@ -57,7 +62,7 @@
 - [x] Sistema de recomendaciones (por género/autor, con cache)
 - [x] Preguntas públicas al vendedor (estilo MercadoLibre + emails)
 - [x] Importador masivo CSV desde la web (gratis, con preview y portadas automáticas)
-- [x] Botones compartir en redes (WhatsApp, Facebook, X, copiar link)
+- [x] Botones compartir en redes (WhatsApp, Facebook, Instagram, X, copiar link)
 
 ### SEO & Performance (auditoría 7 abril — 16/16 items)
 - [x] Metadata dinámica en listing detail + search + vendedor (generateMetadata + OG tags)
@@ -66,6 +71,7 @@
 - [x] next/image en todos los componentes + alt descriptivos + aria-labels
 - [x] h1 en home, ISR en listing detail, Suspense skeletons
 - [x] Vercel Analytics + placeholder blur + cache API recommendations
+- [x] Scanner ISBN: timeout 3s Google Books → fallback rápido Open Library
 
 ### Emails (10+ transaccionales)
 - [x] Confirmación registro
@@ -93,15 +99,12 @@
 - [x] PageTracker invisible (registra cada visita en Supabase)
 - [x] Webhook notificación nuevo usuario → admin
 
-### LinkedIn / Marketing
-- [x] 3 posts certificados Anthropic
-- [x] Post lanzamiento tuslibros.cl redactado
-- [x] URL LinkedIn corregida en /historia
-
 ### Datos y carga
-- [x] 60+ libros publicados (15 originales + 49 carga masiva)
-- [x] Script bulk-upload-csv.ts
+- [x] 95+ libros publicados (históricos + 63 carga masiva sesión 8 abril)
+- [x] Script bulk-upload-csv.ts mejorado (auto-enriquece, precios individuales, notas, --price/--notes CLI)
+- [x] Script enrich-listings.ts (audita y completa datos faltantes desde Open Library)
 - [x] Open Library API corregida
+- [x] Precios investigados por mercado para libros raros (Biblioteca de Babel, ediciones antiguas)
 
 ---
 
@@ -115,13 +118,44 @@
 - [x] ads.txt autorizado
 - [ ] Sitio en estado "Preparando" — esperando aprobación de Google
 
+### Revisión catálogo (a cargo de Verónica)
+- [ ] Revisar libros que quedaron con datos incorrectos (portadas, sinopsis, categorías)
+- [ ] Corregir manualmente los que el enrich automático no pudo completar (14 sin descripción)
+
 ---
 
 ## Pendiente
 
+### 🔴 Distribución y redes sociales (PRIORIDAD)
+
+**Fase 1 — Presencia (semana 9-13 abril)**
+- [ ] Crear cuenta Instagram @tuslibros.cl (perfil profesional, bio, link)
+- [ ] Publicar 3 stories con banners Canva (acumulando polvo, publicar, pago seguro)
+- [ ] Publicar post feed Instagram: carrusel "Qué es tuslibros.cl" (5 slides)
+- [ ] Publicar post LinkedIn: lanzamiento tuslibros.cl (ya redactado)
+- [ ] Enviar newsletter de lanzamiento a suscriptores (template listo)
+
+**Fase 2 — Tracción (semana 14-20 abril)**
+- [ ] Publicar 2-3 posts/semana en Instagram (libros nuevos, colecciones, tips)
+- [ ] Ejecutar kit metralleta en canales universitarios (mensajes listos)
+- [ ] Compartir en grupos Facebook de lectura/libros Chile
+- [ ] Publicar post LinkedIn: "Cómo construí tuslibros.cl con Claude" (vincular cursos)
+- [ ] Contactar 20 vendedores históricos con mensaje personalizado
+
+**Fase 3 — Escala (semana 21+ abril)**
+- [ ] Evaluar herramienta automatización (Buffer/Later) si volumen lo justifica
+- [ ] Contenido recurrente: "Libro de la semana", "Colección destacada"
+- [ ] Cápsulas video cortas para Instagram Reels / LinkedIn
+- [ ] Recontactar resto de 150+ vendedores históricos
+- [ ] WhatsApp Business para tuslibros.cl (perfil verificado)
+
+### Fotos reales como portadas
+- [ ] Implementar recorte de fotos grupales → portadas individuales
+- [ ] Subir a Supabase Storage y actualizar listings
+- [ ] Alternativa: permitir upload individual desde "Mis libros" (ya existe el componente)
+
 ### Requiere acción de Verónica
 - [ ] Apple OAuth ($99/año) — decidir si vale la pena
-- [ ] Carga masiva 500 libros (script listo, preparar CSV grande)
 - [ ] Recontactar 150+ vendedores históricos de tuslibros.cl
 - [ ] Configurar webhook Supabase para notificación nuevo usuario
 - [ ] WhatsApp Business para tuslibros.cl (perfil verificado)
@@ -140,6 +174,7 @@
 - [ ] Dominio personalizado Supabase
 - [ ] Cápsulas LinkedIn (videos cortos)
 - [ ] Panel analytics para vendedores Pro (basado en admin analytics)
+- [ ] Foto-a-catálogo completo: IA identifica libros de foto grupal → publicación masiva
 
 ### Descartados
 - ~~Checkout múltiple carrito~~ — split payment MP no soporta múltiples vendedores
@@ -156,8 +191,8 @@
 
 ---
 
-## Datos actuales (7 abril 2026)
-- 60+ libros publicados
+## Datos actuales (8 abril 2026)
+- 95+ libros publicados (incluyendo piezas de colección $40.000+)
 - 5+ usuarios registrados
 - 3 suscriptores newsletter
 - 1 venta real completada con split payment
@@ -165,6 +200,7 @@
 - PWA instalable + service worker offline
 - Analytics propias con tracking de visitas
 - SEO score ~10/10
+- 5 banners marketing en Canva (con brand kit)
 - Stack: Next.js 14, Supabase, MercadoPago, Mapbox, Resend, Vercel Analytics
 
 ---
@@ -175,3 +211,5 @@
 - `CONTEXT.md` — contexto técnico del proyecto
 - `docs/INSTRUCCIONES_CARGA_MASIVA.md` — formato CSV para vendedores
 - `docs/PROMPT_CLAUDE_CODE_CONTENIDO_UX.md` — spec overhaul contenido UX
+- `docs/tuslibros_gtm.html` — Go-to-market strategy completa
+- `docs/tuslibros_kit_metralleta.html` — Kit táctico de mensajes listos para distribución
