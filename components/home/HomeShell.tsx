@@ -4,6 +4,7 @@ import { useState, useCallback, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import HeroBar from "./HeroBar";
 import TiendaToggle from "./TiendaToggle";
+import CollectionBanners from "./CollectionBanners";
 import AdSlot from "@/components/ui/AdSlot";
 
 const ScanAnimation = dynamic(() => import("./ScanAnimation"));
@@ -66,6 +67,13 @@ export default function HomeShell({ totalListings, hasFilters, children }: Props
             </div>
           </div>
         </section>
+      )}
+
+      {/* Collection banners */}
+      {!hasFilters && (
+        <div className="max-w-7xl mx-auto px-6 pt-6">
+          <CollectionBanners />
+        </div>
       )}
 
       <main id="tienda" className="max-w-7xl mx-auto px-6 py-10 scroll-mt-32">
