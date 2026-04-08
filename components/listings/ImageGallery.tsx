@@ -10,14 +10,18 @@ interface Props {
 }
 
 export default function ImageGallery({ mainImage, images, alt }: Props) {
+  // Filter out empty/invalid URLs
   const allImages = [
-    ...(mainImage ? [{ id: "main", image_url: mainImage }] : []),
-    ...images,
+    ...(mainImage && mainImage.trim() ? [{ id: "main", image_url: mainImage }] : []),
+    ...images.filter((img) => img.image_url && img.image_url.trim()),
   ];
 
   const [activeIdx, setActiveIdx] = useState(0);
+  const [errorIds, setErrorIds] = useState<Set<string>>(new Set());
 
-  if (allImages.length === 0) {
+  const visibleImages = allImages.filter((img) => !errorIds.has(img.id));
+
+  if (visibleImages.length === 0) {
     return (
       <div className="w-full aspect-[3/4] max-w-[280px] bg-gradient-to-br from-brand-100 to-brand-50 rounded-lg flex flex-col items-center justify-center gap-3">
         <svg className="w-12 h-12 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -28,27 +32,33 @@ export default function ImageGallery({ mainImage, images, alt }: Props) {
     );
   }
 
-  const current = allImages[activeIdx];
+  const safeIdx = activeIdx < visibleImages.length ? activeIdx : 0;
+  const current = visibleImages[safeIdx];
 
   return (
     <div className="flex flex-col items-center gap-3">
       {/* Main image */}
       <div className="relative w-full max-w-[280px] aspect-[3/4]">
         <Image
+          key={current.id}
           src={current.image_url}
-          alt={`${alt} - foto ${activeIdx + 1}`}
+          alt={`${alt} - foto ${safeIdx + 1}`}
           fill
           className="object-cover rounded-lg shadow-md"
           sizes="280px"
+          onError={() => {
+            setErrorIds((prev) => new Set(prev).add(current.id));
+            setActiveIdx(0);
+          }}
         />
 
         {/* Navigation arrows */}
-        {allImages.length > 1 && (
+        {visibleImages.length > 1 && (
           <>
             <button
               type="button"
               aria-label="Foto anterior"
-              onClick={() => setActiveIdx((i) => (i > 0 ? i - 1 : allImages.length - 1))}
+              onClick={() => setActiveIdx((i) => (i > 0 ? i - 1 : visibleImages.length - 1))}
               className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center shadow hover:bg-white transition-colors"
             >
               <svg className="w-4 h-4 text-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -58,7 +68,7 @@ export default function ImageGallery({ mainImage, images, alt }: Props) {
             <button
               type="button"
               aria-label="Foto siguiente"
-              onClick={() => setActiveIdx((i) => (i < allImages.length - 1 ? i + 1 : 0))}
+              onClick={() => setActiveIdx((i) => (i < visibleImages.length - 1 ? i + 1 : 0))}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center shadow hover:bg-white transition-colors"
             >
               <svg className="w-4 h-4 text-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -68,22 +78,22 @@ export default function ImageGallery({ mainImage, images, alt }: Props) {
 
             {/* Counter */}
             <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">
-              {activeIdx + 1}/{allImages.length}
+              {safeIdx + 1}/{visibleImages.length}
             </div>
           </>
         )}
       </div>
 
       {/* Thumbnails */}
-      {allImages.length > 1 && (
+      {visibleImages.length > 1 && (
         <div className="flex gap-2 overflow-x-auto max-w-[280px] pb-1">
-          {allImages.map((img, i) => (
+          {visibleImages.map((img, i) => (
             <button
               key={img.id}
               type="button"
               onClick={() => setActiveIdx(i)}
               className={`relative flex-shrink-0 w-12 h-16 rounded overflow-hidden border-2 transition-colors ${
-                i === activeIdx ? "border-brand-500" : "border-transparent opacity-60 hover:opacity-100"
+                i === safeIdx ? "border-brand-500" : "border-transparent opacity-60 hover:opacity-100"
               }`}
             >
               <Image src={img.image_url} alt={`${alt} - miniatura ${i + 1}`} fill className="object-cover" sizes="48px" />
