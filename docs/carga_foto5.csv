@@ -1,0 +1,16 @@
+num,titulo,autor,isbn,condicion,tipo,precio,descripcion,cover_openlibrary,cover_google,year,pages,categoria
+1,El General en su Laberinto,Gabriel Garcia Marquez,9789500705516,good,both,5000,,https://covers.openlibrary.org/b/isbn/9789500705516-L.jpg,,,,Novela Historica
+2,Retratos de la antiguedad romana y la primera cristiandad,Gerardo Vidal Guzman,9789561120501,good,both,6000,,https://covers.openlibrary.org/b/isbn/9789561120501-L.jpg,,,,Historia
+3,El equilibrio de la balanza,Anne Perry,9788466303637,good,both,3500,,https://covers.openlibrary.org/b/isbn/9788466303637-L.jpg,,,,Novela Negra
+4,Elogio de la madrastra,Mario Vargas Llosa,9788472233614,good,both,6000,,https://covers.openlibrary.org/b/isbn/9788472233614-L.jpg,,,,Ficcion Literaria
+5,El Aleph,Jorge Luis Borges,9788420613093,good,both,5000,,https://covers.openlibrary.org/b/isbn/9788420613093-L.jpg,,,,Ficcion Literaria
+6,Euforia y Utopia,Arthur Koestler,,good,both,8000,,,,,,Ensayo
+7,Las huellas de los dioses,Graham Hancock,9788440676177,good,both,7000,,https://covers.openlibrary.org/b/isbn/9788440676177-L.jpg,,,,Historia
+8,La vida esta en otra parte,Milan Kundera,9788432219757,good,both,5000,,https://covers.openlibrary.org/b/isbn/9788432219757-L.jpg,,,,Ficcion Literaria
+9,La puerta en el muro (Biblioteca de Babel),H.G. Wells,9788485876211,good,both,40000,,https://covers.openlibrary.org/b/isbn/9788485876211-L.jpg,,,,Ficcion Fantastica
+10,Bartleby el escribiente (Biblioteca de Babel),Herman Melville,9788485876181,good,both,45000,,https://covers.openlibrary.org/b/isbn/9788485876181-L.jpg,,,,Ficcion Literaria
+11,El cardenal Napellus (Biblioteca de Babel),Gustav Meyrink,9788485876112,good,both,40000,,https://covers.openlibrary.org/b/isbn/9788485876112-L.jpg,,,,Ficcion Fantastica
+12,Maximas y Aforismos,Khalil Gibran,9788476728468,good,both,3000,,https://covers.openlibrary.org/b/isbn/9788476728468-L.jpg,,,,Filosofia
+13,La letra e,Augusto Monterroso,9788420429267,good,both,5000,,https://covers.openlibrary.org/b/isbn/9788420429267-L.jpg,,,,Ensayo
+14,Locos egregios,Juan Antonio Vallejo-Nagera,9788423703739,good,both,4000,,https://covers.openlibrary.org/b/isbn/9788423703739-L.jpg,,,,Ensayo
+15,Conversacion en la Catedral Vol. 1,Mario Vargas Llosa,9788432204777,good,both,15000,,https://covers.openlibrary.org/b/isbn/9788432204777-L.jpg,,,,Ficcion Literaria

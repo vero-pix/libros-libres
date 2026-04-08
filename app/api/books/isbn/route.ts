@@ -16,7 +16,10 @@ async function searchGoogleBooks(isbn: string) {
     const url = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}${langParam}${apiKey ? `&key=${apiKey}` : ""}`;
 
     try {
-      const res = await fetch(url, { next: { revalidate: 86400 } });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+      const res = await fetch(url, { next: { revalidate: 86400 }, signal: controller.signal });
+      clearTimeout(timeout);
       if (!res.ok) continue;
       const data = await res.json();
       if (!data.items?.length) continue;

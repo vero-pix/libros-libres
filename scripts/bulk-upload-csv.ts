@@ -126,7 +126,8 @@ async function main() {
     let year = row.year ? parseInt(row.year, 10) || null : null;
     const condition = row.condicion === "buen_estado" ? "good" : row.condicion || "good";
     const modality = row.tipo === "venta" ? "sale" : row.tipo === "both" ? "both" : row.tipo || "sale";
-    const rentalPrice = modality !== "sale" ? Math.round(DEFAULT_PRICE * 0.4) : null;
+    const rowPrice = row.precio ? parseInt(row.precio, 10) : DEFAULT_PRICE;
+    const rentalPrice = modality !== "sale" ? Math.round(rowPrice * 0.4) : null;
 
     if (!title || !author) {
       console.log(`  Skip row ${i}: missing title/author`);
@@ -219,7 +220,7 @@ async function main() {
     const { error: listErr } = await supabase.from("listings").insert({
       book_id: bookId,
       seller_id: SELLER_ID,
-      price: DEFAULT_PRICE,
+      price: rowPrice,
       condition,
       modality,
       rental_price: rentalPrice,

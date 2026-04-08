@@ -151,12 +151,13 @@ export default async function SellerStorePage({ params }: Props) {
             {genres.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {genres.map((g) => (
-                  <span
+                  <a
                     key={g}
-                    className="text-xs bg-brand-50 text-brand-600 px-2 py-0.5 rounded-full border border-brand-100"
+                    href={`/?genre=${encodeURIComponent(g!)}`}
+                    className="text-xs bg-brand-50 text-brand-600 px-2 py-0.5 rounded-full border border-brand-100 hover:bg-brand-100 hover:border-brand-200 transition-colors"
                   >
                     {g}
-                  </span>
+                  </a>
                 ))}
               </div>
             )}

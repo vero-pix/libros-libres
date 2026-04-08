@@ -92,6 +92,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             mainImage={coverUrl}
             images={images}
             alt={book.title}
+            author={book.author}
           />
         </div>
 

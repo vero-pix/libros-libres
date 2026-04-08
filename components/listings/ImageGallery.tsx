@@ -7,9 +7,10 @@ interface Props {
   mainImage: string | null;
   images: { id: string; image_url: string }[];
   alt: string;
+  author?: string;
 }
 
-export default function ImageGallery({ mainImage, images, alt }: Props) {
+export default function ImageGallery({ mainImage, images, alt, author }: Props) {
   // Filter out empty/invalid URLs
   const allImages = [
     ...(mainImage && mainImage.trim() ? [{ id: "main", image_url: mainImage }] : []),
@@ -22,12 +23,30 @@ export default function ImageGallery({ mainImage, images, alt }: Props) {
   const visibleImages = allImages.filter((img) => !errorIds.has(img.id));
 
   if (visibleImages.length === 0) {
+    // Parse title and author from alt (format: "Title")
+    const title = alt;
     return (
-      <div className="w-full aspect-[3/4] max-w-[280px] bg-gradient-to-br from-brand-100 to-brand-50 rounded-lg flex flex-col items-center justify-center gap-3">
-        <svg className="w-12 h-12 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <div className="w-full aspect-[3/4] max-w-[280px] bg-gradient-to-br from-amber-50 via-cream to-brand-50 rounded-lg flex flex-col items-center justify-center p-6 border border-brand-100 relative overflow-hidden">
+        {/* Decorative top bar */}
+        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-brand-500 via-amber-500 to-brand-600" />
+        {/* Decorative lines */}
+        <div className="absolute top-8 left-6 right-6 border-t border-brand-200/50" />
+        <div className="absolute bottom-8 left-6 right-6 border-t border-brand-200/50" />
+        {/* Book icon */}
+        <svg className="w-8 h-8 text-brand-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.331 0 4.473.89 6.074 2.356M12 6.042a8.968 8.968 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.356M12 6.042V20.356" />
         </svg>
-        <span className="text-sm text-brand-500 font-medium">Sin portada</span>
+        {/* Title & Author */}
+        <h3 className="font-display text-base font-bold text-ink text-center leading-tight line-clamp-4">
+          {title}
+        </h3>
+        {author && (
+          <p className="text-xs text-ink-muted mt-2 text-center italic">{author}</p>
+        )}
+        {/* Brand watermark */}
+        <span className="absolute bottom-3 text-[9px] tracking-widest uppercase text-brand-300 font-medium">
+          tuslibros.cl
+        </span>
       </div>
     );
   }
