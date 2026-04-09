@@ -1,93 +1,178 @@
-# Libros Libres — Contexto del proyecto
+# tuslibros.cl — Contexto técnico del proyecto
+
+Última actualización: 9 abril 2026
 
 ## Producto
-"El Uber de los libros" — cada estantería es una librería. Geolocalización en tiempo real,
-pago seguro, despacho a domicilio. Publicar siempre gratis, sin comisiones al vendedor.
-URL producción: **tuslibros.cl** (dominio definitivo, DNS configurados en NIC Chile → Vercel)
-Repo: github.com/vero-pix/libros-libres
+
+Marketplace de libros usados en Chile. Compra, venta y arriendo entre personas, con cercanía geográfica como diferenciador. Publicar siempre gratis. Pago seguro con MercadoPago (split payment) o coordinación directa por WhatsApp sin comisión.
+
+- URL producción: **tuslibros.cl**
+- Repo: github.com/vero-pix/libros-libres
+- Deploy: Vercel (automático desde main)
+- Dominio: NIC Chile → Vercel nameservers
+
+---
 
 ## Stack
-- Next.js 14 App Router + TypeScript + Tailwind CSS
-- Supabase (DB + Auth + RLS + PostGIS) — project ID: tfaqvnsdasaegkcahaal
-- Mapbox GL — centrado en Santiago (-70.6693, -33.4489)
-- MercadoPago Checkout Pro — pasarela de pagos
-- Open Library API — búsqueda ISBN + portadas (fallback de Google Books)
-- Vercel — deploy automático desde main
-- Tipografía: Playfair Display (display) + DM Sans (body)
 
-## Base de datos
-Tablas: users, books, listings (con PostGIS), orders
-Schema en: supabase/schema.sql
-Migration de orders: supabase/migrations/20260402_create_orders.sql
-API keys: nuevo formato Supabase (`sb_publishable_`, no `eyJ`)
+- **Framework**: Next.js 14 App Router + TypeScript + Tailwind CSS
+- **Base de datos**: Supabase (PostgreSQL + Auth + RLS + Storage)
+- **Pagos**: MercadoPago Checkout Pro con Split Payment
+- **Mapas**: Mapbox GL (centrado en Santiago)
+- **Datos libros**: Google Books API + Open Library API (ISBN, portadas, metadata)
+- **Email**: Resend (SMTP + API, noreply@tuslibros.cl)
+- **Courier**: Shipit API v4 (en integración)
+- **Analytics**: Vercel Analytics + PageTracker propio (Supabase)
+- **Tipografía**: Playfair Display (headings) + DM Sans (body)
+- **PWA**: manifest + iconos + service worker offline
 
-## Diseño
-Estética editorial/magazine inspirada en revista literaria:
-- Paleta: ink (#1a1a2e), cream (#faf8f4), brand dorado (#d4a017)
-- Tipografía serif (Playfair Display) para títulos, sans (DM Sans) para body
-- Hero: "Cada estantería es una librería" con red de nodos SVG + feed simulado
-- Sección tech: "Como Uber, pero para libros"
-- Cards sin bordes, hover scale, placeholders con gradiente
-- Footer newsletter fondo ink
+---
 
-## Estado actual — 2 abril 2026
+## Base de datos (Supabase)
 
-### En producción (tuslibros.cl)
-- [x] Auth completo (registro, login, logout)
-- [x] Publicar libro con ISBN scanner (react-zxing) + búsqueda ISBN (Open Library + Google Books)
-- [x] Ingreso manual cuando ISBN no se encuentra en bases de datos
-- [x] Mapa interactivo con clustering + sidebar con filtros (cercanía, autor, categoría)
-- [x] Geolocalización automática GPS
-- [x] Contacto por WhatsApp
-- [x] Flujo de pagos MercadoPago Checkout Pro
-- [x] Checkout con envío estándar ($2.900 Chilexpress) / rápido ($4.500 Rappi)
-- [x] Webhook IPN para confirmar pagos + marcar listing como completado
-- [x] Notificaciones al vendedor (WhatsApp)
-- [x] Mis Pedidos (tabs compras/ventas)
-- [x] Búsqueda avanzada (precio, condición, modalidad)
-- [x] Categorías traducidas al español (desde inglés de Google Books)
-- [x] Landing page editorial: hero "Uber de libros", feed simulado, pitch tech
-- [x] Sección "Voces reales" con quotes busca/ofrece
-- [x] Páginas de contenido con hero images (FAQ, Cómo Funciona, Sobre Nosotros, Términos, Privacidad)
-- [x] Página /historia (case study para LinkedIn)
-- [x] OG tags optimizados para LinkedIn
-- [x] Footer multi-sección con newsletter
-- [x] API backfill portadas (/api/admin/backfill-covers)
-- [x] Dominio tuslibros.cl configurado (NIC Chile → Vercel nameservers)
-- [x] Supabase: tabla orders creada, RLS activo, URL auth actualizada
+### Tablas principales
+- **users** — perfil, plan (free/librero/libreria), OAuth (Google, LinkedIn), avatar, ciudad, teléfono, mercadopago_user_id
+- **books** — título, autor, ISBN, descripción, portada, género, editorial, páginas, encuadernación, año
+- **listings** — publicación de un libro por un vendedor. Slug único para URLs amigables. Precio venta, precio original (oferta), precio arriendo, garantía, modalidad (sale/loan/both), condición, ubicación (lat/lng), status, featured
+- **orders** — pedidos con split payment MP, estado, tracking, dirección
+- **reviews** — valoraciones con estrellas
+- **questions** — preguntas públicas al vendedor (estilo MercadoLibre)
+- **listing_images** — fotos adicionales por publicación
+- **cart_items** — carrito persistente por usuario
+- **messages** — mensajería interna entre compradores y vendedores
+- **newsletter_subscribers** — suscriptores
+- **contact_messages** — formulario de contacto
+- **page_views** — analytics propias (visitas, browser, OS, dispositivo)
+- **webhook_logs** — logs de webhooks entrantes
 
-### Pendiente activación
-- [ ] MERCADOPAGO_ACCESS_TOKEN en Vercel env vars (para pagos reales)
-- [ ] SUPABASE_SERVICE_ROLE_KEY en Vercel env vars (para webhook)
-- [ ] Webhook URL en MercadoPago: https://tuslibros.cl/api/webhooks/mercadopago
-- [ ] Google Books API key válida (actualmente placeholder, Open Library cubre como fallback)
-- [ ] Imagen og-image.png (1200x630) en /public
+---
 
-### Bugs conocidos
-- ISBNs de editoriales chilenas locales no se encuentran en Google Books ni Open Library → flujo manual funciona
-- Portadas: 2 de 5 libros sin cover (ediciones locales sin datos en APIs externas)
+## Arquitectura de páginas
 
-### Próximos pasos
-- [ ] OAuth Google/Apple (después de confirmar dominio definitivo)
-- [ ] Subir foto de portada manualmente (para libros sin cover en APIs)
-- [ ] Integración real con couriers (API Chilexpress, Rappi)
-- [ ] Cotización envío en tiempo real según distancia
-- [ ] Panel vendedor (mis ventas, historial)
-- [ ] Cápsulas de contenido para LinkedIn (5 posts planificados)
-- [ ] Imagen OG para compartir en LinkedIn
+### Públicas
+- `/` — Home: hero, banners colección, grilla de libros con sidebar categorías, paginación
+- `/libro/[slug]` — Ficha del libro (URLs amigables, JSON-LD, tabs descripción/preguntas/reseñas)
+- `/search` — Búsqueda con filtros (precio, condición, modalidad, género, autor)
+- `/vendedor/[id]` — Perfil público del vendedor con sorting
+- `/mapa` — Mapa interactivo con clustering
+- `/sobre-nosotros`, `/faq`, `/como-funciona`, `/terminos`, `/privacidad`
+
+### Autenticadas
+- `/publish` — Publicar libro (scanner ISBN + manual + fotos + ubicación)
+- `/mis-libros` — Gestión de publicaciones propias + edición inline
+- `/mis-pedidos` — Compras y ventas con tabs
+- `/carrito` — Carrito persistente
+- `/checkout/[id]` — Pago (MP si vendedor tiene cuenta, WhatsApp si no)
+- `/perfil` — Editar perfil
+- `/mensajes` — Mensajería interna
+
+### Admin
+- `/admin` — Panel con tabs: Pedidos, Publicaciones, Usuarios, Mensajes, Suscriptores, Analytics, Herramientas
+- Herramientas: buscar portadas, auditar portadas, enriquecer sinopsis, enriquecer metadata (filtrable por vendedor)
+- Toggle de destacados (estrella) por publicación
+
+---
+
+## Features principales
+
+### Marketplace
+- Split Payment MercadoPago en producción (comisiones: Libre 8%, Librero 5%, Librería 3%)
+- WhatsApp como alternativa sin comisión
+- Checkout condicional: botón MP solo si el vendedor tiene MP conectado
+- Arriendos completos con flujo de devolución
+- Precios con descuento (precio original tachado + badge oferta)
+- Libros destacados (toggle admin, escudo dorado en card, fila en home)
+
+### Publicación
+- Scanner ISBN con timeout 3s Google Books → fallback Open Library
+- Autocompletado datos desde APIs (título, autor, portada, género, editorial, páginas)
+- Fotos múltiples (portada + adicionales), primera foto extra = portada si no hay cover
+- CoverUpload mobile: galería + cámara + eliminar portada
+- Slug URL generado automáticamente desde título
+- Campos: precio venta, precio original, precio arriendo, garantía, editorial, páginas, encuadernación
+
+### Búsqueda y navegación
+- Autocompletado en barra de búsqueda → navega directo al libro
+- Búsqueda por título, autor, ISBN (strip paréntesis para PostgREST)
+- Filtro "Cerca de mí" (geolocalización + haversine)
+- Categorías agrupadas en sidebar + drawer mobile
+- Paginación numérica
+- Vista grilla y lista
+- Quickview modal
+- Vistos recientemente (localStorage)
+- Recomendaciones por género/autor (con cache)
+
+### Ficha del libro
+- Tabs integrados: Descripción / Preguntas / Reseñas
+- Galería de imágenes (ancho fijo 280px)
+- ISBN, autor clickeable, editorial, páginas, encuadernación
+- Botón Editar para el dueño
+- Breadcrumbs + JSON-LD (Product, BreadcrumbList)
+- Libros relacionados por género
+- Botones compartir (WhatsApp, Facebook, Instagram, X, copiar link)
+
+### SEO
+- URLs amigables: `/libro/[slug]` con redirect desde `/listings/[uuid]`
+- Metadata dinámica en todas las páginas
+- JSON-LD schemas (Product, BreadcrumbList, Organization)
+- Sitemap + robots.txt
+- Canonical URLs
+- OG images + Twitter cards
+- ISR en fichas de libros
+
+### Emails (10+ transaccionales via Resend)
+- Confirmación registro, bienvenida
+- Confirmación compra/arriendo → comprador
+- Notificación venta/arriendo → vendedor
+- Cambios estado arriendo
+- Preguntas → vendedor / respondidas → comprador
+- Newsletter (admin panel + template)
+- Notificaciones admin (nuevo usuario, contacto)
+
+### UI/UX
+- Estilo Martfury: paleta cream (#faf8f4), ink (#1a1a2e), brand dorado (#d4a017)
+- Navbar sticky con dropdowns
+- Banners de colecciones en home
+- Login split + OAuth social (Google, LinkedIn)
+- Registro con País/Región/Comuna
+- Back to top, sidebar sticky, footer multi-sección
+- PWA instalable
+
+---
 
 ## Modelo de negocio
-- Publicar: siempre gratis
-- No hay fee fijo — nunca se cobra tarifa fija al comprador ni al vendedor
-- Comisión solo cuando el vendedor cobra por MercadoPago (Libre 8%, Librero 5%, Librería 3%)
-- Costo envío solo cuando se despacha por courier de la plataforma (Shipit, cuando esté operativo)
-- WhatsApp + entrega en persona/retiro = 100% gratis
+
+- Publicar: siempre gratis, nunca habrá fee fijo
+- Comisión solo por venta con MercadoPago (split payment):
+  - Plan Libre: 8%
+  - Plan Librero: 5%
+  - Plan Librería: 3%
+- WhatsApp + entrega en persona = 100% gratis, sin comisión
+- Courier (Shipit): costo envío a cargo del comprador (en integración)
+- Primeros 50 vendedores: panel analytics gratis de por vida
+
+---
 
 ## Decisiones técnicas
+
 - Idioma: español chileno (tú, no vos)
-- Publicar siempre gratis, fee fijo al comprador
 - ISBN como eje central — Open Library + Google Books como fuentes
-- Mapa como feature secundario (/mapa), home es grid editorial
-- MercadoPago Checkout Pro (redirect, no embed)
-- Estética editorial/magazine (Playfair Display + DM Sans)
-- Concepto: "Cada estantería es una librería" — distributed bookshelf network
+- Mapa como feature secundario (/mapa), home es grilla editorial
+- MercadoPago Checkout Pro (redirect, no embed) con split payment
+- Cercanía geográfica como diferenciador vs otros marketplaces
+- Arriendo como feature único en Chile
+- No hay checkout múltiple (split payment MP no soporta múltiples vendedores)
+- Paginación numérica (mejor para SEO que infinite scroll)
+- No AdSense (eliminado, generaba errores sin aprobación)
+
+---
+
+## Datos actuales (9 abril 2026)
+
+- 116+ libros publicados activos
+- 92 libros enriquecidos con metadata (editorial, páginas, sinopsis)
+- 5+ usuarios registrados
+- 3 suscriptores newsletter
+- 1 venta real completada con split payment (6 abril 2026)
+- 30 categorías actuales (pendiente reorganización/taxonomía)
+- 111 slugs generados para URLs amigables
