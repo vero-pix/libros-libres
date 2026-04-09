@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ListingWithBook } from "@/types";
+import { libroUrl } from "@/lib/urls";
 
 const MODALITY_LABELS = {
   sale: "Venta",
@@ -67,7 +68,7 @@ export default function BookMapPopup({ listing, onClose }: Props) {
         </div>
       </div>
       <Link
-        href={`/listings/${listing.id}`}
+        href={libroUrl(listing)}
         className="mt-3 block w-full text-center bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium py-2 rounded-xl transition-colors"
       >
         Ver publicación

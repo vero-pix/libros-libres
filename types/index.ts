@@ -51,6 +51,7 @@ export interface Listing {
   id: string;
   book_id: string;
   seller_id: string;
+  slug: string | null;
   modality: Modality;
   price: number | null;
   condition: BookCondition;

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { ListingWithBook } from "@/types";
+import { libroUrl } from "@/lib/urls";
 import QuickViewModal from "./QuickViewModal";
 
 function isNew(createdAt: string) {
@@ -41,7 +42,7 @@ export default function ListingCard({ listing }: Props) {
   return (
     <>
     <div className="group bg-white overflow-hidden hover:shadow-xl transition-all duration-300 relative border border-cream-dark/30 rounded-lg">
-      <Link href={`/listings/${listing.id}`} className="block">
+      <Link href={libroUrl(listing)} className="block">
         <div className="relative aspect-[3/4] bg-cream-warm flex items-center justify-center overflow-hidden">
           {coverUrl && !imgError ? (
             <Image
@@ -108,7 +109,7 @@ export default function ListingCard({ listing }: Props) {
       </div>
 
       <div className="p-4">
-        <Link href={`/listings/${listing.id}`}>
+        <Link href={libroUrl(listing)}>
           <h3 className="text-sm font-semibold text-ink leading-tight line-clamp-2 group-hover:text-brand-700 transition-colors">
             {book.title}
           </h3>

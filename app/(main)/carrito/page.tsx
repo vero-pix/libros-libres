@@ -16,7 +16,7 @@ export default async function CarritoPage() {
     .from("cart_items")
     .select(`
       id, listing_id, added_at,
-      listing:listings(id, price, status, cover_image_url,
+      listing:listings(id, slug, price, status, cover_image_url,
         book:books(title, author, cover_url),
         seller:users(id, full_name)
       )

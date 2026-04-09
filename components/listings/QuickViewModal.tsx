@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
 import type { ListingWithBook } from "@/types";
+import { libroUrl } from "@/lib/urls";
 
 const CONDITION_LABELS: Record<string, string> = {
   new: "Como nuevo",
@@ -116,7 +117,7 @@ export default function QuickViewModal({ listing, onClose }: Props) {
                 </Link>
               )}
               <Link
-                href={`/listings/${listing.id}`}
+                href={libroUrl(listing)}
                 className="flex-1 flex items-center justify-center gap-2 border-2 border-ink/10 hover:border-brand-500 text-ink hover:text-brand-600 font-semibold py-2.5 rounded-xl transition-colors text-sm"
               >
                 Ver detalle

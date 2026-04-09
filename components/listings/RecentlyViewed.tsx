@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 export interface RecentItem {
   id: string;
+  slug?: string | null;
   title: string;
   cover_url: string | null;
   price: number | null;
@@ -53,7 +54,7 @@ export default function RecentlyViewed() {
         {items.map((item) => (
           <Link
             key={item.id}
-            href={`/listings/${item.id}`}
+            href={item.slug ? `/libro/${item.slug}` : `/listings/${item.id}`}
             className="flex-shrink-0 w-28 group"
           >
             <div className="relative aspect-[3/4] bg-cream-warm rounded-lg overflow-hidden">

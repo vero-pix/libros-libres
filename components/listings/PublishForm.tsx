@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { slugify } from "@/lib/slugify";
 import ISBNSearch from "@/components/books/ISBNSearch";
 import dynamic from "next/dynamic";
 import type { LocationData } from "@/components/map/DraggableLocationPicker";
@@ -74,6 +75,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
   const [error, setError] = useState<string | null>(null);
   const [publishSuccess, setPublishSuccess] = useState(false);
   const [publishedListingId, setPublishedListingId] = useState<string | null>(null);
+  const [publishedSlug, setPublishedSlug] = useState<string | null>(null);
 
   const PHONE_REGEX = /^\+56[0-9]{9}$/;
 
@@ -214,9 +216,16 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
       }
 
       // Insertar publicación
+      // Generate unique slug
+      const baseSlug = slugify(book.title || "libro");
+      let slug = baseSlug;
+      const { count } = await supabase.from("listings").select("id", { count: "exact", head: true }).eq("slug", baseSlug);
+      if (count && count > 0) slug = `${baseSlug}-${Date.now().toString(36).slice(-4)}`;
+
       const { data: newListing, error: listingErr } = await supabase.from("listings").insert({
         book_id: bookId,
         seller_id: userId,
+        slug,
         modality,
         price: modality !== "loan" ? parseFloat(price) : null,
         original_price: modality !== "loan" && originalPrice ? parseFloat(originalPrice) : null,
@@ -230,7 +239,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
         address: location.address,
         cover_image_url: customCoverUrl ?? book.cover_url ?? null,
         status: "active",
-      }).select("id").single();
+      }).select("id, slug").single();
 
       if (listingErr) throw listingErr;
 
@@ -245,6 +254,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
       }
 
       setPublishedListingId(newListing?.id ?? null);
+      setPublishedSlug(newListing?.slug ?? null);
       setPublishSuccess(true);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Ocurrió un error al publicar.");
@@ -276,7 +286,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           {publishedListingId && (
             <Link
-              href={`/listings/${publishedListingId}`}
+              href={publishedSlug ? `/libro/${publishedSlug}` : `/listings/${publishedListingId}`}
               className="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl text-sm transition-colors"
             >
               Ver publicación

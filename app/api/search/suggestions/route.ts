@@ -15,13 +15,14 @@ export async function GET(req: NextRequest) {
 
   const { data: listings } = await supabase
     .from("listings")
-    .select("id, book:books!inner(id, title, author, cover_url)")
+    .select("id, slug, book:books!inner(id, title, author, cover_url)")
     .eq("status", "active")
     .or(`title.ilike.${term},author.ilike.${term}`, { referencedTable: "books" })
     .limit(8);
 
   const suggestions = (listings ?? []).map((l: any) => ({
     id: l.id,
+    slug: l.slug,
     title: l.book.title,
     author: l.book.author,
     cover_url: l.book.cover_url,

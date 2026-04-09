@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from("listings")
       .select(
-        `id, price, condition, modality, cover_image_url, status, created_at,
+        `id, slug, price, condition, modality, cover_image_url, status, created_at,
          book:books(id, title, author, cover_url, genre),
          seller:users(id, full_name, avatar_url, mercadopago_user_id)`
       )

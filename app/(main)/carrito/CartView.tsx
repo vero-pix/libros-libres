@@ -10,6 +10,7 @@ interface CartItem {
   added_at: string;
   listing: {
     id: string;
+    slug: string | null;
     price: number | null;
     status: string;
     cover_image_url: string | null;
@@ -109,7 +110,7 @@ export default function CartView({ items: initialItems }: { items: CartItem[] })
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <Link href={`/listings/${listing.id}`} className="hover:text-brand-600">
+                <Link href={listing.slug ? `/libro/${listing.slug}` : `/listings/${listing.id}`} className="hover:text-brand-600">
                   <h3 className="font-medium text-ink text-sm truncate">{listing.book.title}</h3>
                 </Link>
                 <p className="text-xs text-ink-muted">{listing.book.author}</p>

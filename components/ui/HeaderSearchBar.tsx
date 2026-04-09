@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 
 interface Suggestion {
   id: string;
+  slug: string | null;
   title: string;
   author: string;
   cover_url: string | null;
@@ -80,7 +81,7 @@ export default function HeaderSearchBar() {
   function selectSuggestion(s: Suggestion) {
     setQuery(s.title);
     setOpen(false);
-    router.push(`/listings/${s.id}`);
+    router.push(s.slug ? `/libro/${s.slug}` : `/listings/${s.id}`);
   }
 
   return (

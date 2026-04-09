@@ -169,7 +169,7 @@ function ListingRow({
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       <div className="flex gap-4 p-4">
         {/* Cover */}
-        <Link href={`/listings/${listing.id}`} className="flex-shrink-0">
+        <Link href={listing.slug ? `/libro/${listing.slug}` : `/listings/${listing.id}`} className="flex-shrink-0">
           {coverUrl ? (
             <img
               src={coverUrl}

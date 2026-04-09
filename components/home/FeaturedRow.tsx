@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { ListingWithBook } from "@/types";
+import { libroUrl } from "@/lib/urls";
 
 interface FeaturedSeller {
   id: string;
@@ -35,7 +36,7 @@ export default function FeaturedRow({ featuredListings, featuredSellers }: Props
               return (
                 <Link
                   key={listing.id}
-                  href={`/listings/${listing.id}`}
+                  href={libroUrl(listing)}
                   className="flex-shrink-0 w-36 group"
                 >
                   <div className="relative w-36 h-48 rounded-lg overflow-hidden bg-cream-warm border border-cream-dark/30 shadow-sm group-hover:shadow-md transition-shadow">

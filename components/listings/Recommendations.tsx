@@ -9,6 +9,7 @@ const STORAGE_KEY = "tuslibros_recently_viewed";
 
 interface RecommendedListing {
   id: string;
+  slug: string | null;
   price: number | null;
   cover_image_url: string | null;
   book: {
@@ -77,7 +78,7 @@ export default function Recommendations() {
           return (
             <Link
               key={listing.id}
-              href={`/listings/${listing.id}`}
+              href={listing.slug ? `/libro/${listing.slug}` : `/listings/${listing.id}`}
               className="group bg-white overflow-hidden hover:shadow-xl transition-all duration-300"
             >
               <div className="relative aspect-[3/4] bg-cream-warm flex items-center justify-center overflow-hidden">

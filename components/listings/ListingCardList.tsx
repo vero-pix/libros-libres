@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { ListingWithBook } from "@/types";
+import { libroUrl } from "@/lib/urls";
 import QuickViewModal from "./QuickViewModal";
 
 const CONDITION_LABELS: Record<string, string> = {
@@ -27,7 +28,7 @@ export default function ListingCardList({ listing }: Props) {
     <>
       <div className="group bg-white overflow-hidden hover:shadow-xl transition-all duration-300 flex">
         {/* Cover */}
-        <Link href={`/listings/${listing.id}`} className="relative w-32 sm:w-40 flex-shrink-0 bg-cream-warm flex items-center justify-center overflow-hidden">
+        <Link href={libroUrl(listing)} className="relative w-32 sm:w-40 flex-shrink-0 bg-cream-warm flex items-center justify-center overflow-hidden">
           {coverUrl ? (
             <Image
               src={coverUrl}
@@ -53,7 +54,7 @@ export default function ListingCardList({ listing }: Props) {
         {/* Info */}
         <div className="flex-1 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="flex-1 min-w-0">
-            <Link href={`/listings/${listing.id}`}>
+            <Link href={libroUrl(listing)}>
               <h3 className="text-sm font-semibold text-ink leading-tight line-clamp-2 group-hover:text-brand-700 transition-colors">
                 {book.title}
               </h3>
