@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code — Guía de Referencia Completa</title>
+<style>
+  @media print {
+    body { font-size: 10pt; }
+    .page-break { page-break-before: always; }
+    h1 { page-break-after: avoid; }
+    h2 { page-break-after: avoid; }
+    table { page-break-inside: avoid; }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    color: #1a1a2e;
+    background: #fff;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  h1 {
+    font-size: 2rem;
+    color: #d4622b;
+    border-bottom: 3px solid #d4622b;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  h2 {
+    font-size: 1.4rem;
+    color: #1a1a2e;
+    margin-top: 2rem;
+    margin-bottom: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    background: #f0ebe3;
+    border-left: 4px solid #d4622b;
+  }
+  h3 {
+    font-size: 1.1rem;
+    color: #444;
+    margin-top: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+  p, li { margin-bottom: 0.4rem; }
+  ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.8rem 0 1.2rem;
+    font-size: 0.9rem;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    padding: 0.5rem 0.6rem;
+    text-align: left;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid #e0d9cf;
+  }
+  tr:nth-child(even) { background: #faf8f5; }
+  code {
+    background: #f0ebe3;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.85em;
+    color: #d4622b;
+  }
+  pre {
+    background: #1a1a2e;
+    color: #e8e6e3;
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 0.8rem 0 1.2rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+  }
+  .cover {
+    text-align: center;
+    padding: 4rem 2rem;
+    margin-bottom: 2rem;
+  }
+  .cover h1 {
+    font-size: 2.5rem;
+    border: none;
+    margin-bottom: 0.5rem;
+  }
+  .cover .subtitle {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 2rem;
+  }
+  .cover .meta {
+    font-size: 0.9rem;
+    color: #888;
+  }
+  .tip {
+    background: #fff8e1;
+    border-left: 4px solid #ffb300;
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .danger {
+    background: #fce4ec;
+    border-left: 4px solid #e53935;
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .toc {
+    background: #faf8f5;
+    padding: 1.5rem 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+  }
+  .toc ol { counter-reset: toc; list-style: none; padding-left: 0; }
+  .toc li { counter-increment: toc; margin-bottom: 0.3rem; }
+  .toc li::before {
+    content: counter(toc) ". ";
+    font-weight: 700;
+    color: #d4622b;
+  }
+  .toc a { color: #1a1a2e; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .emergency {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .emergency-card {
+    background: #f0ebe3;
+    padding: 0.8rem;
+    border-radius: 6px;
+  }
+  .emergency-card h4 {
+    font-size: 0.9rem;
+    color: #d4622b;
+    margin-bottom: 0.4rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Claude Code</h1>
+  <div class="subtitle">Guia de Referencia Completa</div>
+  <p>Todos los comandos, atajos, configuraciones y funcionalidades</p>
+  <div class="meta">
+    Generado para tuslibros.cl — Abril 2026<br>
+    Claude Code v2.1+
+  </div>
+</div>
+
+<div class="toc">
+  <h3>Contenido</h3>
+  <ol>
+    <li><a href="#comandos">Slash Commands (Comandos)</a></li>
+    <li><a href="#atajos">Atajos de Teclado</a></li>
+    <li><a href="#config">Configuracion y Settings</a></li>
+    <li><a href="#permisos">Sistema de Permisos</a></li>
+    <li><a href="#hooks">Hooks (Automatizacion)</a></li>
+    <li><a href="#memoria">Sistema de Memoria</a></li>
+    <li><a href="#skills">Skills (Habilidades)</a></li>
+    <li><a href="#sesiones">Sesiones</a></li>
+    <li><a href="#plugins">Plugins</a></li>
+    <li><a href="#mcp">MCP (Servidores Externos)</a></li>
+    <li><a href="#ide">Integraciones IDE</a></li>
+    <li><a href="#avanzado">Funciones Avanzadas</a></li>
+    <li><a href="#env">Variables de Entorno</a></li>
+    <li><a href="#troubleshoot">Solucion de Problemas</a></li>
+  </ol>
+</div>
+
+<!-- ============================================ -->
+<h1 id="comandos">1. Slash Commands</h1>
+<p>Escribe <code>/</code> para ver todos los comandos disponibles.</p>
+
+<h3>Navegacion y Control</h3>
+<table>
+  <tr><th>Comando</th><th>Que hace</th><th>Notas</th></tr>
+  <tr><td><code>/help</code></td><td>Muestra ayuda y comandos</td><td></td></tr>
+  <tr><td><code>/clear</code></td><td>Limpia conversacion (libera contexto)</td><td>Alias: <code>/reset</code>, <code>/new</code></td></tr>
+  <tr><td><code>/exit</code></td><td>Salir de Claude Code</td><td>Alias: <code>/quit</code></td></tr>
+  <tr><td><code>/config</code></td><td>Abrir configuracion</td><td>Alias: <code>/settings</code></td></tr>
+  <tr><td><code>/status</code></td><td>Version, modelo, cuenta</td><td>Funciona mientras responde</td></tr>
+</table>
+
+<h3>Modelo y Rendimiento</h3>
+<table>
+  <tr><th>Comando</th><th>Que hace</th><th>Notas</th></tr>
+  <tr><td><code>/model [modelo]</code></td><td>Cambiar modelo de IA</td><td>opus, sonnet, haiku</td></tr>
+  <tr><td><code>/effort [nivel]</code></td><td>Nivel de esfuerzo: low, medium, high, max, auto</td><td><code>max</code> requiere Opus 4.6</td></tr>
+  <tr><td><code>/fast [on|off]</code></td><td>Modo rapido (mismo modelo, mas veloz)</td><td>Solo Opus 4.6</td></tr>
+  <tr><td><code>/cost</code></td><td>Estadisticas de uso de tokens</td><td></td></tr>
+  <tr><td><code>/usage</code></td><td>Limites del plan y rate limits</td><td></td></tr>
+</table>
+
+<h3>Sesiones</h3>
+<table>
+  <tr><th>Comando</th><th>Que hace</th><th>Notas</th></tr>
+  <tr><td><code>/resume [sesion]</code></td><td>Retomar conversacion</td><td>Alias: <code>/continue</code></td></tr>
+  <tr><td><code>/branch [nombre]</code></td><td>Crear rama de conversacion</td><td>Variante aislada</td></tr>
+  <tr><td><code>/rewind</code></td><td>Deshacer hasta punto anterior</td><td>Alias: <code>/checkpoint</code></td></tr>
+  <tr><td><code>/rename [nombre]</code></td><td>Renombrar sesion actual</td><td></td></tr>
+  <tr><td><code>/diff</code></td><td>Ver cambios hechos en archivos</td><td>Navegable por turnos</td></tr>
+  <tr><td><code>/export [archivo]</code></td><td>Exportar conversacion como texto</td><td></td></tr>
+  <tr><td><code>/compact [foco]</code></td><td>Comprimir conversacion</td><td>Libera espacio de contexto</td></tr>
+</table>
+
+<h3>Contexto y Memoria</h3>
+<table>
+  <tr><th>Comando</th><th>Que hace</th><th>Notas</th></tr>
+  <tr><td><code>/context</code></td><td>Visualizar uso de contexto (grafico)</td><td>Muestra sugerencias</td></tr>
+  <tr><td><code>/memory</code></td><td>Editar archivos de memoria</td><td>CLAUDE.md, auto-memory</td></tr>
+  <tr><td><code>/init</code></td><td>Inicializar proyecto con CLAUDE.md</td><td></td></tr>
+  <tr><td><code>/insights</code></td><td>Analizar patrones de tus sesiones</td><td></td></tr>
+</table>
+
+<h3>Permisos</h3>
+<table>
+  <tr><th>Comando</th><th>Que hace</th></tr>
+  <tr><td><code>/permissions</code></td><td>Gestionar reglas allow/ask/deny</td></tr>
+  <tr><td><code>/add-dir &lt;ruta&gt;</code></td><td>Agregar directorio de trabajo</td></tr>
+</table>
+
+<h3>Integraciones</h3>
+<table>
+  <tr><th>Comando</th><th>Que hace</th></tr>
+  <tr><td><code>/ide</code></td><td>Conectar con VS Code / JetBrains</td></tr>
+  <tr><td><code>/mcp</code></td><td>Gestionar servidores MCP</td></tr>
+  <tr><td><code>/plugin</code></td><td>Gestionar plugins</td></tr>
+  <tr><td><code>/keybindings</code></td><td>Configurar atajos de teclado</td></tr>
+  <tr><td><code>/chrome</code></td><td>Integrar con Chrome</td></tr>
+</table>
+
+<h3>Trabajo y Codigo</h3>
+<table>
+  <tr><th>Comando</th><th>Que hace</th><th>Notas</th></tr>
+  <tr><td><code>/plan [desc]</code></td><td>Entrar en modo planificacion</td><td>Solo analiza, no ejecuta</td></tr>
+  <tr><td><code>/simplify [foco]</code></td><td>Revisar calidad del codigo cambiado</td><td>3 agentes en paralelo</td></tr>
+  <tr><td><code>/batch &lt;instruccion&gt;</code></td><td>Cambios masivos en paralelo</td><td>5-30 agentes con worktrees</td></tr>
+  <tr><td><code>/debug [desc]</code></td><td>Activar debug logging</td><td></td></tr>
+  <tr><td><code>/loop [intervalo] &lt;prompt&gt;</code></td><td>Ejecutar repetidamente</td><td>Ej: <code>/loop 5m revisar deploy</code></td></tr>
+  <tr><td><code>/security-review</code></td><td>Analizar vulnerabilidades en cambios</td><td></td></tr>
+  <tr><td><code>/autofix-pr [prompt]</code></td><td>Monitorear PR y corregir en CI fails</td><td>Requiere gh CLI</td></tr>
+</table>
+
+<h3>Servicios Externos</h3>
+<table>
+  <tr><th>Comando</th><th>Que hace</th></tr>
+  <tr><td><code>/schedule [desc]</code></td><td>Crear tareas programadas en la nube</td></tr>
+  <tr><td><code>/remote-control</code></td><td>Habilitar control remoto desde claude.ai</td></tr>
+  <tr><td><code>/teleport</code></td><td>Traer sesion web al terminal</td></tr>
+  <tr><td><code>/ultraplan &lt;prompt&gt;</code></td><td>Planificar en navegador, ejecutar remoto</td></tr>
+  <tr><td><code>/desktop</code></td><td>Continuar en app de escritorio</td></tr>
+</table>
+
+<h3>Utilidades</h3>
+<table>
+  <tr><th>Comando</th><th>Que hace</th></tr>
+  <tr><td><code>/copy [N]</code></td><td>Copiar respuesta al portapapeles</td></tr>
+  <tr><td><code>/btw &lt;pregunta&gt;</code></td><td>Pregunta rapida sin ensuciar historial</td></tr>
+  <tr><td><code>/doctor</code></td><td>Diagnosticar instalacion</td></tr>
+  <tr><td><code>/stats</code></td><td>Estadisticas de uso diario</td></tr>
+  <tr><td><code>/voice</code></td><td>Dictado por voz push-to-talk</td></tr>
+  <tr><td><code>/color [color]</code></td><td>Color de barra del prompt</td></tr>
+  <tr><td><code>/theme</code></td><td>Tema visual (dark, light, daltonized)</td></tr>
+</table>
+
+<!-- ============================================ -->
+<div class="page-break"></div>
+<h1 id="atajos">2. Atajos de Teclado</h1>
+
+<h3>Globales (siempre activos)</h3>
+<table>
+  <tr><th>Atajo</th><th>Accion</th></tr>
+  <tr><td><code>Ctrl+C</code></td><td>Cancelar/interrumpir operacion</td></tr>
+  <tr><td><code>Ctrl+D</code></td><td>Salir de Claude Code</td></tr>
+  <tr><td><code>Ctrl+T</code></td><td>Mostrar/ocultar lista de tareas</td></tr>
+  <tr><td><code>Ctrl+O</code></td><td>Transcript detallado</td></tr>
+</table>
+
+<h3>Chat (area de entrada)</h3>
+<table>
+  <tr><th>Atajo</th><th>Accion</th></tr>
+  <tr><td><code>Enter</code></td><td>Enviar mensaje</td></tr>
+  <tr><td><code>Shift+Enter</code></td><td>Nueva linea</td></tr>
+  <tr><td><code>Ctrl+L</code></td><td>Limpiar input</td></tr>
+  <tr><td><code>Ctrl+G</code></td><td>Abrir en editor externo</td></tr>
+  <tr><td><code>Ctrl+S</code></td><td>Guardar prompt actual (stash)</td></tr>
+  <tr><td><code>Ctrl+V</code></td><td>Pegar imagen</td></tr>
+  <tr><td><code>Shift+Tab</code></td><td>Cambiar modo de permisos</td></tr>
+  <tr><td><code>Cmd+P</code></td><td>Selector de modelo</td></tr>
+  <tr><td><code>Meta+O</code></td><td>Alternar modo rapido</td></tr>
+  <tr><td><code>Cmd+T</code></td><td>Alternar pensamiento extendido</td></tr>
+  <tr><td><code>Ctrl+_</code></td><td>Deshacer ultima accion</td></tr>
+  <tr><td><code>Up / Down</code></td><td>Navegar historial</td></tr>
+  <tr><td><code>Ctrl+R</code></td><td>Buscar en historial</td></tr>
+  <tr><td><code>Ctrl+B</code></td><td>Enviar tarea al fondo (background)</td></tr>
+</table>
+
+<h3>Confirmaciones</h3>
+<table>
+  <tr><th>Atajo</th><th>Accion</th></tr>
+  <tr><td><code>Y</code> o <code>Enter</code></td><td>Confirmar</td></tr>
+  <tr><td><code>N</code> o <code>Escape</code></td><td>Rechazar</td></tr>
+  <tr><td><code>Ctrl+E</code></td><td>Ver explicacion del permiso</td></tr>
+</table>
+
+<h3>Personalizar atajos</h3>
+<p>Ejecuta <code>/keybindings</code> para editar <code>~/.claude/keybindings.json</code>:</p>
+<pre><code>{
+  "bindings": [
+    {
+      "context": "Chat",
+      "bindings": {
+        "ctrl+e": "chat:externalEditor",
+        "meta+k": "chat:submit"
+      }
+    }
+  ]
+}</code></pre>
+
+<!-- ============================================ -->
+<div class="page-break"></div>
+<h1 id="config">3. Configuracion</h1>
+
+<h3>Archivos de configuracion (por prioridad)</h3>
+<table>
+  <tr><th>Alcance</th><th>Ubicacion</th><th>Compartido?</th></tr>
+  <tr><td>Managed (IT)</td><td>Sistema / <code>/etc/claude-code/</code></td><td>Si</td></tr>
+  <tr><td>Local proyecto</td><td><code>.claude/settings.local.json</code></td><td>No (gitignored)</td></tr>
+  <tr><td>Proyecto</td><td><code>.claude/settings.json</code></td><td>Si (git)</td></tr>
+  <tr><td>Usuario</td><td><code>~/.claude/settings.json</code></td><td>No</td></tr>
+</table>
+
+<h3>Ejemplo de settings.json</h3>
+<pre><code>{
+  "model": "claude-opus-4",
+  "effort": "medium",
+  "theme": "dark",
+  "defaultMode": "default",
+  "permissions": {
+    "allow": ["Bash(npm *)", "Read"],
+    "ask": ["Bash(rm *)"],
+    "deny": ["Bash(sudo *)"]
+  },
+  "autoMemoryEnabled": true,
+  "env": {
+    "CUSTOM_VAR": "value"
+  }
+}</code></pre>
+
+<h3>Opciones principales</h3>
+<table>
+  <tr><th>Setting</th><th>Valores</th><th>Descripcion</th></tr>
+  <tr><td><code>model</code></td><td>claude-opus-4, claude-sonnet, etc.</td><td>Modelo de IA</td></tr>
+  <tr><td><code>effort</code></td><td>low, medium, high, max, auto</td><td>Nivel de esfuerzo</td></tr>
+  <tr><td><code>theme</code></td><td>dark, light, colorblind-daltonized, ansi</td><td>Tema visual</td></tr>
+  <tr><td><code>defaultMode</code></td><td>default, acceptEdits, plan, auto, etc.</td><td>Modo de permisos inicial</td></tr>
+  <tr><td><code>autoMemoryEnabled</code></td><td>true/false</td><td>Memoria automatica</td></tr>
+  <tr><td><code>additionalDirectories</code></td><td>array de rutas</td><td>Dirs extra accesibles</td></tr>
+</table>
+
+<!-- ============================================ -->
+<div class="page-break"></div>
+<h1 id="permisos">4. Sistema de Permisos</h1>
+
+<h3>Modos de permiso</h3>
+<table>
+  <tr><th>Modo</th><th>Comportamiento</th><th>Cuando usarlo</th></tr>
+  <tr><td><code>default</code></td><td>Pide permiso en primer uso</td><td>Trabajo general seguro</td></tr>
+  <tr><td><code>acceptEdits</code></td><td>Auto-acepta ediciones de archivos</td><td>Iteracion rapida</td></tr>
+  <tr><td><code>plan</code></td><td>Solo lectura, no modifica nada</td><td>Revision de codigo</td></tr>
+  <tr><td><code>auto</code></td><td>Auto-aprueba con clasificador de seguridad</td><td>Entornos confiables</td></tr>
+  <tr><td><code>dontAsk</code></td><td>Deniega todo excepto lo pre-aprobado</td><td>Entornos restringidos</td></tr>
+  <tr><td><code>bypassPermissions</code></td><td>Salta prompts (excepto dirs protegidos)</td><td>Solo VMs aisladas</td></tr>
+</table>
+
+<div class="tip">
+  <strong>Tip:</strong> Usa <code>Shift+Tab</code> para cambiar rapidamente entre modos durante la sesion.
+</div>
+
+<h3>Sintaxis de reglas</h3>
+<pre><code>"permissions": {
+  "allow": [
+    "Bash(npm run *)",        // Cualquier npm run
+    "Read",                   // Toda lectura
+    "WebFetch(domain:github.com)"  // Solo github
+  ],
+  "deny": [
+    "Bash(sudo *)",           // Bloquear sudo
+    "Edit(.env)"              // No editar .env
+  ]
+}</code></pre>
+
+<h3>Directorios protegidos (siempre piden permiso)</h3>
+<ul>
+  <li><code>.git/</code></li>
+  <li><code>.claude/</code> (excepto commands/, agents/, skills/)</li>
+  <li><code>.vscode/</code>, <code>.idea/</code>, <code>.husky/</code></li>
+</ul>
+
+<!-- ============================================ -->
+<div class="page-break"></div>
+<h1 id="hooks">5. Hooks (Automatizacion)</h1>
+<p>Los hooks ejecutan acciones automaticas en respuesta a eventos.</p>
+
+<h3>Tipos de hook</h3>
+<table>
+  <tr><th>Tipo</th><th>Como funciona</th></tr>
+  <tr><td><code>command</code></td><td>Ejecuta script shell</td></tr>
+  <tr><td><code>http</code></td><td>Envia POST a webhook</td></tr>
+  <tr><td><code>prompt</code></td><td>Evaluacion con LLM (si/no)</td></tr>
+  <tr><td><code>agent</code></td><td>Subagente para verificacion compleja</td></tr>
+</table>
+
+<h3>Eventos disponibles</h3>
+<table>
+  <tr><th>Evento</th><th>Bloquea?</th><th>Cuando se dispara</th></tr>
+  <tr><td><code>PreToolUse</code></td><td>Si</td><td>Antes de ejecutar herramienta</td></tr>
+  <tr><td><code>PostToolUse</code></td><td>No</td><td>Despues de ejecutar herramienta</td></tr>
+  <tr><td><code>UserPromptSubmit</code></td><td>Si</td><td>Al enviar mensaje</td></tr>
+  <tr><td><code>SessionStart</code></td><td>No</td><td>Al iniciar sesion</td></tr>
+  <tr><td><code>Notification</code></td><td>No</td><td>Alertas</td></tr>
+  <tr><td><code>FileChanged</code></td><td>No</td><td>Cambio detectado en archivo</td></tr>
+  <tr><td><code>Stop</code></td><td>Si</td><td>Antes de detenerse</td></tr>
+</table>
+
+<h3>Ejemplo: bloquear comandos destructivos</h3>
+<pre><code>{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Bash",
+      "hooks": [{
+        "type": "command",
+        "command": "/ruta/a/validar.sh"
+      }]
+    }]
+  }
+}</code></pre>
+
+<!-- ============================================ -->
+<div class="page-break"></div>
+<h1 id="memoria">6. Sistema de Memoria</h1>
+
+<h3>CLAUDE.md — Instrucciones del proyecto</h3>
+<table>
+  <tr><th>Archivo</th><th>Alcance</th><th>Compartido?</th></tr>
+  <tr><td><code>./CLAUDE.md</code></td><td>Equipo, este repo</td><td>Si (git)</td></tr>
+  <tr><td><code>./CLAUDE.local.md</code></td><td>Tu, solo este repo</td><td>No</td></tr>
+  <tr><td><code>~/.claude/CLAUDE.md</code></td><td>Tu, todos los proyectos</td><td>No</td></tr>
+  <tr><td><code>.claude/rules/*.md</code></td><td>Reglas por tema</td><td>Si (git)</td></tr>
+</table>
+
+<div class="tip">
+  <strong>Tip:</strong> Manten CLAUDE.md bajo 200 lineas. Usa encabezados y bullets. Se especifica: "Usar 2 espacios de indentacion" en vez de "Formatear bien el codigo".
+</div>
+
+<h3>Importar archivos en CLAUDE.md</h3>
+<pre><code>Ver @README para resumen y @package.json para scripts.
+Reglas adicionales: @docs/guia-git.md</code></pre>
+
+<h3>Auto Memory — Notas entre sesiones</h3>
+<p>Claude guarda notas automaticamente en <code>~/.claude/projects/&lt;proyecto&gt;/memory/</code></p>
+<ul>
+  <li><code>MEMORY.md</code> — Indice (se carga al inicio, max 200 lineas)</li>
+  <li>Archivos por tema — Se cargan bajo demanda</li>
+  <li>Edita con <code>/memory</code> o directamente los archivos</li>
+</ul>
+
+<h3>Reglas con scope (paths)</h3>
+<pre><code>---
+paths:
+  - "src/api/**/*.ts"
+---
+
+# Reglas API
+- Validar input en todos los endpoints
+- Usar formato de error estandar</code></pre>
+
+<!-- ============================================ -->
+<div class="page-break"></div>
+<h1 id="skills">7. Skills (Habilidades)</h1>
+<p>Las skills extienden a Claude con capacidades especializadas.</p>
+
+<h3>Crear un skill</h3>
+<pre><code>mkdir -p .claude/skills/mi-skill
+# Crear .claude/skills/mi-skill/SKILL.md</code></pre>
+
+<pre><code>---
+name: mi-skill
+description: Descripcion de cuando usarlo
+allowed-tools: ["Bash", "Read", "Edit"]
+---
+
+Instrucciones para Claude cuando se active este skill...</code></pre>
+
+<h3>Opciones de frontmatter</h3>
+<table>
+  <tr><th>Campo</th><th>Descripcion</th></tr>
+  <tr><td><code>name</code></td><td>Nombre del slash command</td></tr>
+  <tr><td><code>description</code></td><td>Cuando auto-activar</td></tr>
+  <tr><td><code>allowed-tools</code></td><td>Herramientas pre-aprobadas</td></tr>
+  <tr><td><code>model</code></td><td>Modelo a usar</td></tr>
+  <tr><td><code>effort</code></td><td>Nivel de esfuerzo</td></tr>
+  <tr><td><code>context: fork</code></td><td>Ejecutar como subagente</td></tr>
+  <tr><td><code>paths</code></td><td>Glob patterns para auto-cargar</td></tr>
+</table>
+
+<h3>Variables disponibles en skills</h3>
+<table>
+  <tr><th>Variable</th><th>Valor</th></tr>
+  <tr><td><code>$ARGUMENTS</code></td><td>Todos los argumentos</td></tr>
+  <tr><td><code>$ARGUMENTS[0]</code>, <code>$0</code></td><td>Primer argumento</td></tr>
+  <tr><td><code>${CLAUDE_SESSION_ID}</code></td><td>ID de sesion actual</td></tr>
+  <tr><td><code>${CLAUDE_SKILL_DIR}</code></td><td>Directorio del skill</td></tr>
+</table>
+
+<!-- ============================================ -->
+<div class="page-break"></div>
+<h1 id="sesiones">8. Sesiones</h1>
+
+<table>
+  <tr><th>Accion</th><th>Comando</th></tr>
+  <tr><td>Retomar sesion anterior</td><td><code>/resume</code> (abre selector)</td></tr>
+  <tr><td>Crear variante</td><td><code>/branch nombre</code></td></tr>
+  <tr><td>Deshacer</td><td><code>/rewind</code></td></tr>
+  <tr><td>Renombrar</td><td><code>/rename nombre</code></td></tr>
+  <tr><td>Ver uso de contexto</td><td><code>/context</code></td></tr>
+  <tr><td>Comprimir</td><td><code>/compact</code></td></tr>
+  <tr><td>Exportar</td><td><code>/export archivo.txt</code></td></tr>
+</table>
+
+<div class="tip">
+  <strong>Tip:</strong> Si el contexto se llena, usa <code>/compact</code> con instrucciones de foco: <code>/compact enfocarse en la API</code>
+</div>
+
+<!-- ============================================ -->
+<h1 id="plugins">9. Plugins</h1>
+
+<h3>Estructura de un plugin</h3>
+<pre><code>mi-plugin/
+  .claude-plugin/
+    plugin.json       # Manifiesto
+  skills/             # Skills del plugin
+  agents/             # Agentes
+  hooks/              # Hooks
+  .mcp.json           # Servidores MCP
+  settings.json       # Config</code></pre>
+
+<h3>Comandos</h3>
+<table>
+  <tr><th>Comando</th><th>Accion</th></tr>
+  <tr><td><code>/plugin</code></td><td>Gestionar plugins</td></tr>
+  <tr><td><code>/reload-plugins</code></td><td>Recargar sin reiniciar</td></tr>
+  <tr><td><code>claude --plugin-dir ./mi-plugin</code></td><td>Testear localmente</td></tr>
+</table>
+
+<!-- ============================================ -->
+<h1 id="mcp">10. MCP (Model Context Protocol)</h1>
+<p>MCP conecta herramientas externas a Claude Code.</p>
+
+<h3>Configurar servidor MCP</h3>
+<p>En <code>~/.claude/mcp.json</code> o <code>.claude/mcp.json</code>:</p>
+<pre><code>{
+  "mcpServers": {
+    "mi-servidor": {
+      "command": "npx",
+      "args": ["@ejemplo/mcp-server"],
+      "env": {
+        "API_KEY": "${MI_API_KEY}"
+      }
+    }
+  }
+}</code></pre>
+
+<h3>Gestionar</h3>
+<p>Usa <code>/mcp</code> para agregar, eliminar, testear servidores OAuth.</p>
+
+<h3>Permisos MCP</h3>
+<pre><code>"allow": [
+  "mcp__servidor",                 // Todas las herramientas
+  "mcp__servidor__herramienta"    // Herramienta especifica
+]</code></pre>
+
+<!-- ============================================ -->
+<div class="page-break"></div>
+<h1 id="ide">11. Integraciones IDE</h1>
+
+<h3>VS Code</h3>
+<ul>
+  <li>Instalar extension desde marketplace</li>
+  <li><code>Cmd+Shift+L</code> — Compartir seleccion con Claude</li>
+  <li>Cambios se muestran en diff de VS Code</li>
+  <li>Resaltado de sintaxis inline</li>
+</ul>
+
+<h3>JetBrains (IntelliJ, WebStorm, etc.)</h3>
+<ul>
+  <li>Instalar plugin "Claude Code" desde marketplace</li>
+  <li><code>Cmd+Esc</code> (Mac) / <code>Ctrl+Esc</code> (Windows) — Abrir Claude</li>
+  <li><code>Cmd+Option+K</code> — Insertar referencias a archivos</li>
+  <li>Diagnosticos automaticamente compartidos</li>
+</ul>
+
+<p>Usa <code>/ide</code> para verificar estado de conexion.</p>
+
+<!-- ============================================ -->
+<h1 id="avanzado">12. Funciones Avanzadas</h1>
+
+<h3>Pensamiento extendido</h3>
+<p>Activa con <code>Cmd+T</code> o <code>/config</code>. Claude "piensa" mas profundo antes de responder.</p>
+
+<h3>Subagentes</h3>
+<p>Claude puede lanzar agentes especializados en paralelo. Crea en <code>.claude/agents/</code>:</p>
+<pre><code>---
+description: Agente especializado en testing
+model: claude-opus-4
+---
+
+Instrucciones del agente...</code></pre>
+
+<h3>Batch (cambios masivos)</h3>
+<p><code>/batch migrar todos los componentes a TypeScript</code> — Lanza 5-30 agentes en worktrees paralelos.</p>
+
+<h3>Dictado por voz</h3>
+<p><code>/voice</code> — Push-to-talk. Requiere cuenta claude.ai.</p>
+
+<h3>Sandbox (aislamiento)</h3>
+<pre><code>{
+  "sandbox": {
+    "enabled": true,
+    "allowedDomains": ["github.com"],
+    "filesystem": {
+      "allowRead": ["/home/projects"],
+      "denyRead": ["/home/secrets"]
+    }
+  }
+}</code></pre>
+
+<!-- ============================================ -->
+<div class="page-break"></div>
+<h1 id="env">13. Variables de Entorno</h1>
+
+<table>
+  <tr><th>Variable</th><th>Efecto</th></tr>
+  <tr><td><code>CLAUDE_CODE_DISABLE_AUTO_MEMORY=1</code></td><td>Desactivar auto-memoria</td></tr>
+  <tr><td><code>CLAUDE_CODE_NEW_INIT=1</code></td><td>Flujo interactivo de /init</td></tr>
+  <tr><td><code>CLAUDE_CODE_USE_BEDROCK=1</code></td><td>Usar Amazon Bedrock</td></tr>
+  <tr><td><code>CLAUDE_CODE_DEBUG=1</code></td><td>Modo debug</td></tr>
+</table>
+
+<!-- ============================================ -->
+<h1 id="troubleshoot">14. Solucion de Problemas</h1>
+
+<table>
+  <tr><th>Problema</th><th>Solucion</th></tr>
+  <tr><td>Claude no sigue CLAUDE.md</td><td><code>/memory</code> para verificar. Hacer instrucciones mas especificas.</td></tr>
+  <tr><td>Auto-memory no funciona</td><td>Verificar <code>autoMemoryEnabled: true</code>. Revisar con <code>/memory</code>.</td></tr>
+  <tr><td>Permisos piden mucho</td><td><code>/permissions</code> para agregar allow rules.</td></tr>
+  <tr><td>Skill no se activa</td><td>Hacer description mas especifica. Invocar con <code>/nombre</code>.</td></tr>
+  <tr><td>IDE no conecta</td><td>Reiniciar IDE. Verificar plugin. Ejecutar <code>/ide</code>.</td></tr>
+  <tr><td>Contexto lleno</td><td><code>/compact</code>. Revisar que CLAUDE.md tenga &lt; 200 lineas.</td></tr>
+  <tr><td>Plugin no carga</td><td>Verificar plugin.json. Ejecutar <code>/reload-plugins</code>.</td></tr>
+</table>
+
+<!-- ============================================ -->
+<div class="page-break"></div>
+<h1>Tarjetas de Referencia Rapida</h1>
+
+<div class="emergency">
+  <div class="emergency-card">
+    <h4>Emergencia</h4>
+    <code>Ctrl+C</code> — Cancelar<br>
+    <code>/clear</code> — Limpiar<br>
+    <code>/exit</code> — Salir<br>
+    <code>/rewind</code> — Deshacer
+  </div>
+  <div class="emergency-card">
+    <h4>Rendimiento</h4>
+    <code>/context</code> — Ver uso<br>
+    <code>/compact</code> — Liberar<br>
+    <code>/effort high</code> — Mas potencia<br>
+    <code>/fast on</code> — Mas rapido
+  </div>
+  <div class="emergency-card">
+    <h4>Sesion</h4>
+    <code>/resume</code> — Retomar<br>
+    <code>/branch</code> — Bifurcar<br>
+    <code>/export</code> — Guardar<br>
+    <code>/rename</code> — Renombrar
+  </div>
+  <div class="emergency-card">
+    <h4>Desarrollo</h4>
+    <code>/debug</code> — Depurar<br>
+    <code>/simplify</code> — Revisar calidad<br>
+    <code>/security-review</code> — Seguridad<br>
+    <code>/batch</code> — Cambios masivos
+  </div>
+</div>
+
+<hr style="margin: 2rem 0;">
+<p style="text-align: center; color: #888; font-size: 0.85rem;">
+  Claude Code — Guia de Referencia Completa<br>
+  Generado para Veronica Velasquez / tuslibros.cl — Abril 2026
+</p>
+
+</body>
+</html>

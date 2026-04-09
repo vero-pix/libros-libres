@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Libros Libres — Brand Kit para Canva</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #f5f0e8; color: #1a1a2e; padding: 40px 20px; }
+  .page { max-width: 800px; margin: 0 auto; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #1a1a2e; padding-bottom: 16px; margin-bottom: 40px; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; }
+  .header .meta { font-size: 10px; letter-spacing: 2px; color: #6b6b7b; text-transform: uppercase; text-align: right; line-height: 1.8; }
+
+  .section { margin-bottom: 48px; }
+  .section-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #d4a017; font-weight: 700; margin-bottom: 8px; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+
+  /* Logo */
+  .logo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .logo-box { padding: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+  .logo-box.light { background: #faf8f4; border: 1px solid #ede7db; }
+  .logo-box.dark { background: #1a1a2e; }
+  .logo-text { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 900; }
+  .logo-text .libros { color: #1a1a2e; }
+  .logo-text .libres { color: #d4a017; }
+  .logo-box.dark .logo-text .libros { color: #faf8f4; }
+  .logo-caption { text-align: center; font-size: 11px; color: #6b6b7b; margin-top: 8px; }
+
+  /* Colors */
+  .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .color-card { border-radius: 12px; overflow: hidden; border: 1px solid #ede7db; background: white; }
+  .color-swatch { height: 80px; display: flex; align-items: flex-end; padding: 8px 12px; }
+  .color-swatch span { font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+  .color-info { padding: 12px; }
+  .color-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .color-hex { font-size: 12px; color: #6b6b7b; font-family: monospace; }
+  .color-use { font-size: 10px; color: #999; margin-top: 4px; }
+
+  /* Fonts */
+  .font-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .font-card { background: white; border: 1px solid #ede7db; border-radius: 12px; padding: 24px; }
+  .font-name { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6b6b7b; margin-bottom: 12px; }
+  .font-preview-display { font-family: 'Playfair Display', serif; }
+  .font-preview-sans { font-family: 'DM Sans', sans-serif; }
+  .font-big { font-size: 36px; font-weight: 900; line-height: 1.1; margin-bottom: 8px; }
+  .font-medium { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .font-small { font-size: 14px; color: #6b6b7b; line-height: 1.5; }
+  .font-weights { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .font-weight-item { font-size: 12px; color: #999; }
+
+  /* Tagline */
+  .tagline-box { background: white; border: 1px solid #ede7db; border-radius: 12px; padding: 24px; }
+  .tagline-item { padding: 12px 0; border-bottom: 1px solid #f5f0e8; }
+  .tagline-item:last-child { border-bottom: none; }
+  .tagline-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #6b6b7b; margin-bottom: 4px; }
+  .tagline-text { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; }
+  .tagline-text em { font-style: italic; color: #d4a017; }
+
+  /* Tone */
+  .tone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .tone-card { background: white; border: 1px solid #ede7db; border-radius: 12px; padding: 20px; }
+  .tone-do { border-left: 3px solid #059669; }
+  .tone-dont { border-left: 3px solid #dc2626; }
+  .tone-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; }
+  .tone-do .tone-label { color: #059669; }
+  .tone-dont .tone-label { color: #dc2626; }
+  .tone-list { list-style: none; }
+  .tone-list li { font-size: 13px; color: #333; padding: 4px 0; line-height: 1.4; }
+
+  /* Canva codes */
+  .canva-box { background: #1a1a2e; color: white; border-radius: 12px; padding: 28px; }
+  .canva-box h3 { font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 16px; }
+  .canva-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .canva-item { background: rgba(255,255,255,0.08); border-radius: 8px; padding: 16px; }
+  .canva-item-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #d4a017; margin-bottom: 6px; }
+  .canva-item-value { font-family: monospace; font-size: 14px; color: white; }
+
+  @media print {
+    body { background: white; padding: 20px; }
+    .color-swatch { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  @media (max-width: 600px) {
+    .logo-grid, .font-grid, .tone-grid, .canva-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>Brand Kit</h1>
+    <div class="meta">LIBROS LIBRES<br>TUSLIBROS.CL<br>ABRIL 2026</div>
+  </div>
+
+  <!-- Logo -->
+  <div class="section">
+    <div class="section-label">Logotipo</div>
+    <div class="section-title">Marca verbal en dos pesos.</div>
+    <div class="logo-grid">
+      <div>
+        <div class="logo-box light">
+          <div class="logo-text"><span class="libros">Libros </span><span class="libres">Libres</span></div>
+        </div>
+        <div class="logo-caption">Fondo claro (cream)</div>
+      </div>
+      <div>
+        <div class="logo-box dark">
+          <div class="logo-text"><span class="libros">Libros </span><span class="libres">Libres</span></div>
+        </div>
+        <div class="logo-caption">Fondo oscuro (ink)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colors -->
+  <div class="section">
+    <div class="section-label">Paleta de colores</div>
+    <div class="section-title">Colores para usar en Canva.</div>
+    <div class="color-grid">
+      <div class="color-card">
+        <div class="color-swatch" style="background:#d4a017"><span style="color:white">#d4a017</span></div>
+        <div class="color-info">
+          <div class="color-name">Dorado (Brand 500)</div>
+          <div class="color-hex">RGB: 212, 160, 23</div>
+          <div class="color-use">Botones, CTAs, acentos principales</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#b8860b"><span style="color:white">#b8860b</span></div>
+        <div class="color-info">
+          <div class="color-name">Dorado oscuro (Brand 600)</div>
+          <div class="color-hex">RGB: 184, 134, 11</div>
+          <div class="color-use">Hover, enlaces, énfasis</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#1a1a2e"><span style="color:white">#1a1a2e</span></div>
+        <div class="color-info">
+          <div class="color-name">Ink (Navy)</div>
+          <div class="color-hex">RGB: 26, 26, 46</div>
+          <div class="color-use">Textos, headers, fondos oscuros</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#faf8f4"><span style="color:#999">#faf8f4</span></div>
+        <div class="color-info">
+          <div class="color-name">Cream</div>
+          <div class="color-hex">RGB: 250, 248, 244</div>
+          <div class="color-use">Fondo principal del sitio</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#f5f0e8"><span style="color:#999">#f5f0e8</span></div>
+        <div class="color-info">
+          <div class="color-name">Cream warm</div>
+          <div class="color-hex">RGB: 245, 240, 232</div>
+          <div class="color-use">Fondos secundarios, cards</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#fdf5e0"><span style="color:#999">#fdf5e0</span></div>
+        <div class="color-info">
+          <div class="color-name">Dorado claro (Brand 100)</div>
+          <div class="color-hex">RGB: 253, 245, 224</div>
+          <div class="color-use">Badges, fondos destacados</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#6b6b7b"><span style="color:white">#6b6b7b</span></div>
+        <div class="color-info">
+          <div class="color-name">Ink muted</div>
+          <div class="color-hex">RGB: 107, 107, 123</div>
+          <div class="color-use">Texto secundario, captions</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#8b5e3c"><span style="color:white">#8b5e3c</span></div>
+        <div class="color-info">
+          <div class="color-name">Link (marrón)</div>
+          <div class="color-hex">RGB: 139, 94, 60</div>
+          <div class="color-use">Enlaces de texto</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fonts -->
+  <div class="section">
+    <div class="section-label">Tipografías</div>
+    <div class="section-title">Dos familias de Google Fonts.</div>
+    <div class="font-grid">
+      <div class="font-card">
+        <div class="font-name">Display — Títulos</div>
+        <div class="font-preview-display font-big">Playfair Display</div>
+        <div class="font-preview-display font-medium">Libros Libres</div>
+        <div class="font-preview-display font-small">Donde los libros encuentran nuevos lectores</div>
+        <div class="font-weights">
+          <span class="font-weight-item" style="font-family:'Playfair Display';font-weight:400">Regular</span>
+          <span class="font-weight-item" style="font-family:'Playfair Display';font-weight:700">Bold</span>
+          <span class="font-weight-item" style="font-family:'Playfair Display';font-weight:900">Black</span>
+          <span class="font-weight-item" style="font-family:'Playfair Display';font-style:italic">Italic</span>
+        </div>
+      </div>
+      <div class="font-card">
+        <div class="font-name">Body — Texto general</div>
+        <div class="font-preview-sans font-big">DM Sans</div>
+        <div class="font-preview-sans font-medium">Compra, vende y arrienda</div>
+        <div class="font-preview-sans font-small">Publica gratis, paga seguro con MercadoPago, recibe en tu casa o coordina por WhatsApp.</div>
+        <div class="font-weights">
+          <span class="font-weight-item" style="font-family:'DM Sans';font-weight:300">Light</span>
+          <span class="font-weight-item" style="font-family:'DM Sans';font-weight:400">Regular</span>
+          <span class="font-weight-item" style="font-family:'DM Sans';font-weight:500">Medium</span>
+          <span class="font-weight-item" style="font-family:'DM Sans';font-weight:700">Bold</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Taglines -->
+  <div class="section">
+    <div class="section-label">Frases de marca</div>
+    <div class="section-title">Taglines aprobados.</div>
+    <div class="tagline-box">
+      <div class="tagline-item">
+        <div class="tagline-label">Principal</div>
+        <div class="tagline-text">Donde los libros encuentran <em>nuevos lectores</em></div>
+      </div>
+      <div class="tagline-item">
+        <div class="tagline-label">Corto</div>
+        <div class="tagline-text">El <em>Uber</em> de los libros</div>
+      </div>
+      <div class="tagline-item">
+        <div class="tagline-label">Vendedor</div>
+        <div class="tagline-text">Publica gratis. Vende <em>cerca.</em></div>
+      </div>
+      <div class="tagline-item">
+        <div class="tagline-label">Comprador</div>
+        <div class="tagline-text">El libro más <em>cercano</em> a ti.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tone -->
+  <div class="section">
+    <div class="section-label">Tono de voz</div>
+    <div class="section-title">Cómo hablamos.</div>
+    <div class="tone-grid">
+      <div class="tone-card tone-do">
+        <div class="tone-label">Sí</div>
+        <ul class="tone-list">
+          <li>Directo, sin relleno</li>
+          <li>Cercano, como un amigo lector</li>
+          <li>Chileno pero no forzado</li>
+          <li>Confiable, simple</li>
+          <li>"Publica gratis"</li>
+          <li>"Cerca de ti"</li>
+        </ul>
+      </div>
+      <div class="tone-card tone-dont">
+        <div class="tone-label">No</div>
+        <ul class="tone-list">
+          <li>Corporativo, frío</li>
+          <li>Tecnicismos innecesarios</li>
+          <li>Promesas exageradas</li>
+          <li>Jerga startup gringa</li>
+          <li>"Disrupción en el sector editorial"</li>
+          <li>"Solución end-to-end"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Canva quick reference -->
+  <div class="section">
+    <div class="canva-box">
+      <h3>Referencia rápida para Canva</h3>
+      <div class="canva-grid">
+        <div class="canva-item">
+          <div class="canva-item-label">Color primario</div>
+          <div class="canva-item-value">#d4a017</div>
+        </div>
+        <div class="canva-item">
+          <div class="canva-item-label">Color secundario</div>
+          <div class="canva-item-value">#b8860b</div>
+        </div>
+        <div class="canva-item">
+          <div class="canva-item-label">Texto oscuro</div>
+          <div class="canva-item-value">#1a1a2e</div>
+        </div>
+        <div class="canva-item">
+          <div class="canva-item-label">Fondo claro</div>
+          <div class="canva-item-value">#faf8f4</div>
+        </div>
+        <div class="canva-item">
+          <div class="canva-item-label">Font títulos</div>
+          <div class="canva-item-value">Playfair Display</div>
+        </div>
+        <div class="canva-item">
+          <div class="canva-item-label">Font cuerpo</div>
+          <div class="canva-item-value">DM Sans</div>
+        </div>
+        <div class="canva-item">
+          <div class="canva-item-label">URL</div>
+          <div class="canva-item-value">tuslibros.cl</div>
+        </div>
+        <div class="canva-item">
+          <div class="canva-item-label">Contacto</div>
+          <div class="canva-item-value">vero@economics.cl</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

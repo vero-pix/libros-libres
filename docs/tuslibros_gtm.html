@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tuslibros.cl — Go-to-Market</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0f0e0c;
+    --paper: #f5f0e8;
+    --accent: #c8401a;
+    --gold: #d4a843;
+    --muted: #8a8070;
+    --line: #d0c8b8;
+    --phase1: #1a3a2a;
+    --phase2: #1a2a3a;
+    --phase3: #3a1a1a;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 48px 24px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Grain texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 8px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--ink); }
+
+  .tagline {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, var(--ink) 0%, var(--line) 60%, transparent 100%);
+    margin-bottom: 40px;
+    animation: expandWidth 0.8s ease both 0.2s;
+  }
+
+  .title-block {
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease both 0.1s;
+  }
+
+  .title-block h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -1px;
+  }
+
+  .title-block h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    margin-top: 12px;
+  }
+
+  /* Problem box */
+  .problem-box {
+    border: 1.5px solid var(--ink);
+    padding: 20px 24px;
+    margin-bottom: 48px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    align-items: center;
+    animation: fadeUp 0.6s ease both 0.2s;
+    background: rgba(15,14,12,0.03);
+  }
+
+  .problem-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  .problem-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+
+  .problem-text strong { font-weight: 500; }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Vertical line */
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 32px;
+    top: 40px;
+    bottom: 40px;
+    width: 1px;
+    background: linear-gradient(180deg, var(--phase1) 0%, var(--phase2) 50%, var(--phase3) 100%);
+    opacity: 0.3;
+  }
+
+  .phase {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 0 24px;
+    margin-bottom: 40px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .phase:nth-child(1) { animation-delay: 0.3s; }
+  .phase:nth-child(2) { animation-delay: 0.45s; }
+  .phase:nth-child(3) { animation-delay: 0.6s; }
+
+  .phase-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 4px;
+  }
+
+  .node-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .phase-1 .node-dot { background: var(--phase1); }
+  .phase-2 .node-dot { background: var(--phase2); }
+  .phase-3 .node-dot { background: var(--phase3); }
+
+  .node-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-align: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    height: 60px;
+  }
+
+  .phase-content {
+    border-left: none;
+    padding: 0;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .phase-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .phase-goal {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border: 1px solid var(--line);
+  }
+
+  .phase-kpi {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    margin-left: auto;
+  }
+
+  .phase-1 .phase-kpi { background: var(--phase1); color: #7abf9a; }
+  .phase-2 .phase-kpi { background: var(--phase2); color: #7a9abf; }
+  .phase-3 .phase-kpi { background: var(--phase3); color: #bf9a7a; }
+
+  .tactics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .tactic {
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    background: white;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .tactic:hover {
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 0 var(--line);
+  }
+
+  .tactic-icon {
+    font-size: 18px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .tactic-title {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .tactic-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .tactic-tag {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  /* Connector arrow */
+  .connector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 64px;
+    margin-bottom: 24px;
+    opacity: 0.4;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .connector:nth-child(2) { animation-delay: 0.38s; }
+  .connector:nth-child(4) { animation-delay: 0.53s; }
+
+  .connector-line {
+    flex: 1;
+    height: 1px;
+    background: var(--muted);
+    max-width: 120px;
+  }
+
+  .connector-arrow {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .connector-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* Side-ladder: two-sided market */
+  .market-sides {
+    margin-top: 48px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease both 0.7s;
+  }
+
+  .market-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .sides-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .side {
+    border: 1.5px solid var(--ink);
+    padding: 20px;
+  }
+
+  .side-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .side-left .side-label { color: var(--phase1); }
+  .side-right .side-label { color: var(--phase2); }
+
+  .side-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .side-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .side-items li {
+    font-size: 12px;
+    color: var(--muted);
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.4;
+  }
+
+  .side-items li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 10px;
+  }
+
+  .sides-middle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    gap: 8px;
+  }
+
+  .sides-middle .platform-badge {
+    background: var(--accent);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 6px 12px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    letter-spacing: 3px;
+  }
+
+  .sides-arrows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .arrow-line {
+    font-size: 14px;
+    color: var(--line);
+  }
+
+  /* Critical path */
+  .critical {
+    border: 1.5px solid var(--accent);
+    padding: 20px 24px;
+    margin-top: 48px;
+    animation: fadeUp 0.6s ease both 0.8s;
+    background: rgba(200, 64, 26, 0.03);
+  }
+
+  .critical-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .critical-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .critical-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .critical-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .critical-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* Footer note */
+  .footer-note {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    animation: fadeUp 0.4s ease both 0.9s;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes expandWidth {
+    from { transform: scaleX(0); transform-origin: left; }
+    to { transform: scaleX(1); transform-origin: left; }
+  }
+
+  /* Timing marker */
+  .timing-bar {
+    display: flex;
+    margin-bottom: 32px;
+    border: 1px solid var(--line);
+    overflow: hidden;
+    animation: fadeUp 0.6s ease both 0.25s;
+  }
+
+  .timing-seg {
+    flex: 1;
+    padding: 8px 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-align: center;
+    color: white;
+  }
+
+  .timing-seg:nth-child(1) { background: var(--phase1); flex: 2; }
+  .timing-seg:nth-child(2) { background: var(--phase2); flex: 2; }
+  .timing-seg:nth-child(3) { background: var(--phase3); flex: 1.5; }
+
+  .timing-label { opacity: 0.7; font-size: 9px; display: block; margin-top: 2px; }
+
+  @media (max-width: 600px) {
+    .sides-grid { grid-template-columns: 1fr; }
+    .sides-middle { flex-direction: row; padding: 12px 0; }
+    .sides-middle .platform-badge { writing-mode: horizontal-tb; transform: none; }
+    .node-time { writing-mode: horizontal-tb; transform: none; height: auto; font-size: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="logo">tus<span>libros</span>.cl</div>
+    <div class="tagline">Estrategia de Lanzamiento · 2026</div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="title-block">
+    <h1>Cómo construir<br>el <em>marketplace</em><br>desde cero.</h1>
+    <div class="subtitle">MODELO DE DOS LADOS · FOCO UNIVERSITARIO · SANTIAGO PRIMERO</div>
+  </div>
+
+  <!-- Problem -->
+  <div class="problem-box">
+    <div class="problem-label">El problema</div>
+    <div class="problem-text">
+      El mercado de libros usados en Chile existe y es activo — pero está <strong>atomizado, sin infraestructura logística y sin checkout</strong>. Nadie ha resuelto simultáneamente: descubrimiento por mapa + ISBN + dispatch integrado + pago unificado. Esa es la oportunidad.
+    </div>
+  </div>
+
+  <!-- Timing bar -->
+  <div class="timing-bar">
+    <div class="timing-seg">Semanas 1–8<span class="timing-label">CARGA DE OFERTA</span></div>
+    <div class="timing-seg">Semanas 8–16<span class="timing-label">ACTIVACIÓN DEMANDA</span></div>
+    <div class="timing-seg">Mes 4+<span class="timing-label">MONETIZACIÓN</span></div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline">
+
+    <!-- Phase 1 -->
+    <div class="phase phase-1">
+      <div class="phase-node">
+        <div class="node-dot">01</div>
+        <div class="node-time">SEM 1–8</div>
+      </div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-name">Carga de oferta</div>
+          <div class="phase-goal">Lado vendedor primero</div>
+          <div class="phase-kpi">META: 500–1.000 libros</div>
+        </div>
+        <div class="tactics">
+          <div class="tactic">
+            <span class="tactic-icon">🎓</span>
+            <div class="tactic-tag">CANAL</div>
+            <div class="tactic-title">Grupos universitarios</div>
+            <div class="tactic-desc">Facebook, WhatsApp, Discord de carreras. Mensaje: "publica gratis, nosotros te conectamos"</div>
+          </div>
+          <div class="tactic">
+            <span class="tactic-icon">🤝</span>
+            <div class="tactic-tag">ALIANZA</div>
+            <div class="tactic-title">Centros de alumnos</div>
+            <div class="tactic-desc">UAI, UDP, USACH, UChile. Difunden a cambio de visibilidad o comisión referral</div>
+          </div>
+          <div class="tactic">
+            <span class="tactic-icon">🛠</span>
+            <div class="tactic-tag">OPERACIÓN</div>
+            <div class="tactic-title">Onboarding manual</div>
+            <div class="tactic-desc">Primeros 100 vendedores asistidos. Convierte el proceso en aprendizaje de UX real</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector">
+      <div class="connector-line"></div>
+      <div class="connector-arrow">↓</div>
+      <div class="connector-label">con oferta cargada, se activa demanda</div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase phase-2">
+      <div class="phase-node">
+        <div class="node-dot">02</div>
+        <div class="node-time">SEM 8–16</div>
+      </div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-name">Activación compradores</div>
+          <div class="phase-goal">El mapa como gancho visual</div>
+          <div class="phase-kpi">META: primeras 200 transacciones</div>
+        </div>
+        <div class="tactics">
+          <div class="tactic">
+            <span class="tactic-icon">📍</span>
+            <div class="tactic-tag">CONTENIDO</div>
+            <div class="tactic-title">Mapa como viral</div>
+            <div class="tactic-desc">Instagram/TikTok: "mira qué libros hay cerca tuyo en Ñuñoa". El pin en el mapa es el diferenciador visual</div>
+          </div>
+          <div class="tactic">
+            <span class="tactic-icon">📰</span>
+            <div class="tactic-tag">PR</div>
+            <div class="tactic-title">Medios universitarios</div>
+            <div class="tactic-desc">El Definido, radios universitarias, newsletters de centros de alumnos</div>
+          </div>
+          <div class="tactic">
+            <span class="tactic-icon">🔁</span>
+            <div class="tactic-tag">REFERRAL</div>
+            <div class="tactic-title">Descuento por referido</div>
+            <div class="tactic-desc">Comprador trae un vendedor → descuento en dispatch. Flywheel mínimo viable</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector">
+      <div class="connector-line"></div>
+      <div class="connector-arrow">↓</div>
+      <div class="connector-label">con volumen probado, se extrae valor</div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase phase-3">
+      <div class="phase-node">
+        <div class="node-dot">03</div>
+        <div class="node-time">MES 4+</div>
+      </div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <div class="phase-name">Monetización</div>
+          <div class="phase-goal">Comisión post-venta + fee logístico</div>
+          <div class="phase-kpi">META: break-even mes 8–10</div>
+        </div>
+        <div class="tactics">
+          <div class="tactic">
+            <span class="tactic-icon">💸</span>
+            <div class="tactic-tag">REVENUE</div>
+            <div class="tactic-title">12% comisión vendedor</div>
+            <div class="tactic-desc">Cobrado vía MercadoPago al momento de la venta. Invisible hasta que el libro se vende</div>
+          </div>
+          <div class="tactic">
+            <span class="tactic-icon">📦</span>
+            <div class="tactic-tag">LOGÍSTICA</div>
+            <div class="tactic-title">Fee de coordinación</div>
+            <div class="tactic-desc">$200–500 por envío sobre costo real de Chilexpress. Uber Direct solo para ticket alto (+$25K)</div>
+          </div>
+          <div class="tactic">
+            <span class="tactic-icon">⭐</span>
+            <div class="tactic-tag">V2</div>
+            <div class="tactic-title">Listing destacado</div>
+            <div class="tactic-desc">$990–1.990/mes para vendedores recurrentes y librerías de segunda mano</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /timeline -->
+
+  <!-- Two-sided market -->
+  <div class="market-sides">
+    <div class="market-label">Modelo de dos lados — secuencia de activación</div>
+    <div class="sides-grid">
+      <div class="side side-left">
+        <div class="side-label">Lado 1 — Primero</div>
+        <div class="side-name">Vendedor</div>
+        <ul class="side-items">
+          <li>Tiene libros parados con valor dormido</li>
+          <li>Listing gratuito = barrera cero</li>
+          <li>Perfil universitario: 18–26 años</li>
+          <li>Activado vía grupos y centros de alumnos</li>
+          <li>Paga solo cuando vende (12%)</li>
+        </ul>
+      </div>
+      <div class="sides-middle">
+        <div class="platform-badge">PLATAFORMA</div>
+        <div class="sides-arrows">
+          <div class="arrow-line">⇄</div>
+        </div>
+      </div>
+      <div class="side side-right">
+        <div class="side-label">Lado 2 — Segundo</div>
+        <div class="side-name">Comprador</div>
+        <ul class="side-items">
+          <li>Busca por mapa, ISBN o título</li>
+          <li>Perfil universitario: necesita texto ya</li>
+          <li>Paga dispatch a costo real + fee</li>
+          <li>Activado por contenido y PR</li>
+          <li>Referral: trae vendedores a cambio de descuento</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Critical metrics -->
+  <div class="critical">
+    <div class="critical-label">Variables críticas de éxito</div>
+    <div class="critical-grid">
+      <div class="critical-item">
+        <div class="critical-num">500</div>
+        <div class="critical-desc">Libros publicados antes de abrir al comprador. Sin esto, el mapa está vacío.</div>
+      </div>
+      <div class="critical-item">
+        <div class="critical-num">4</div>
+        <div class="critical-desc">Universidades ancla en Santiago para la fase 1. Masa crítica geográfica.</div>
+      </div>
+      <div class="critical-num" style="display:none"></div>
+      <div class="critical-item">
+        <div class="critical-num">12%</div>
+        <div class="critical-desc">Comisión sobre precio del libro, cobrada al vendedor post-venta vía MercadoPago.</div>
+      </div>
+      <div class="critical-item">
+        <div class="critical-num">$25K</div>
+        <div class="critical-desc">Ticket mínimo para activar Uber Direct. Bajo eso, solo Chilexpress o retiro.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    tuslibros.cl · Go-to-Market Strategy · Abril 2026 · Stack: Next.js + Supabase + Mapbox + MercadoPago
+  </div>
+
+</div>
+</body>
+</html>
