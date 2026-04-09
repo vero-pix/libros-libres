@@ -48,6 +48,8 @@ interface BookMeta {
   cover_url: string | null;
   genre: string | null;
   published_year: number | null;
+  publisher: string | null;
+  pages: number | null;
 }
 
 async function fetchBookMeta(isbn: string, title: string, author: string): Promise<BookMeta> {
@@ -73,12 +75,14 @@ async function fetchBookMeta(isbn: string, title: string, author: string): Promi
           cover_url: cover,
           genre: v.categories?.[0] ?? null,
           published_year: v.publishedDate ? parseInt(v.publishedDate.substring(0, 4)) : null,
+          publisher: v.publisher ?? null,
+          pages: v.pageCount ?? null,
         };
       }
     } catch { /* continue to next query */ }
   }
 
-  return { description: null, cover_url: null, genre: null, published_year: null };
+  return { description: null, cover_url: null, genre: null, published_year: null, publisher: null, pages: null };
 }
 
 function parseCsvLine(line: string): string[] {
@@ -143,6 +147,9 @@ async function main() {
     let coverUrl = row.cover_google || row.cover_openlibrary || null;
     let genre = row.categoria || null;
     let year = row.year ? parseInt(row.year, 10) || null : null;
+    let publisher = row.editorial || null;
+    let pages = row.pages ? parseInt(row.pages, 10) || null : null;
+    const binding = row.encuadernacion || null;
     const condition = row.condicion === "buen_estado" ? "good" : row.condicion || "good";
     const modality = row.tipo === "venta" ? "sale" : row.tipo === "both" ? "both" : row.tipo || "sale";
     const rowPrice = row.precio ? parseInt(row.precio, 10) : DEFAULT_PRICE;
@@ -162,6 +169,8 @@ async function main() {
       if (!coverUrl && meta.cover_url) coverUrl = meta.cover_url;
       if (!genre && meta.genre) genre = meta.genre;
       if (!year && meta.published_year) year = meta.published_year;
+      if (!publisher && meta.publisher) publisher = meta.publisher;
+      if (!pages && meta.pages) pages = meta.pages;
     }
     genre = genre || "Literatura";
 
@@ -200,6 +209,9 @@ async function main() {
             cover_url: coverUrl,
             genre,
             published_year: year,
+            publisher,
+            pages,
+            binding,
             created_by: SELLER_ID,
           })
           .select("id")
@@ -222,6 +234,9 @@ async function main() {
           cover_url: coverUrl,
           genre,
           published_year: year,
+          publisher,
+          pages,
+          binding,
           created_by: SELLER_ID,
         })
         .select("id")

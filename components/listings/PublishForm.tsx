@@ -52,6 +52,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
 
   const [book, setBook] = useState<BookData | null>(null);
   const [genre, setGenre] = useState("");
+  const [binding, setBinding] = useState<string>("");
   const [customCoverUrl, setCustomCoverUrl] = useState<string | null>(null);
   const [modality, setModality] = useState<Modality>("sale");
   const [originalPrice, setOriginalPrice] = useState("");
@@ -184,6 +185,9 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
         cover_url: customCoverUrl ?? book.cover_url ?? null,
         genre: genre || book.genre || null,
         published_year: book.published_year ?? null,
+        publisher: book.publisher ?? null,
+        pages: book.pages ?? null,
+        binding: binding || null,
         created_by: userId,
       };
 
@@ -347,6 +351,48 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
               </p>
             )}
           </div>
+
+          {/* Encuadernación */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Encuadernación <span className="text-gray-400 font-normal">(opcional)</span>
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { value: "hardcover", label: "Tapa dura" },
+                { value: "softcover", label: "Tapa blanda" },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setBinding(binding === opt.value ? "" : opt.value)}
+                  className={`py-2 px-3 rounded-xl border text-sm font-medium transition-all ${
+                    binding === opt.value
+                      ? "border-brand-500 bg-brand-50 text-brand-700 ring-1 ring-brand-400"
+                      : "border-gray-200 text-gray-600 bg-white hover:border-gray-300"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Info auto-completada */}
+          {(book.publisher || book.pages) && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {book.publisher && (
+                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                  {book.publisher}
+                </span>
+              )}
+              {book.pages && (
+                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                  {book.pages} páginas
+                </span>
+              )}
+            </div>
+          )}
         </section>
       )}
 

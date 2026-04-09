@@ -10,6 +10,9 @@ export interface BookData {
   genre?: string | null;
   published_year?: number | null;
   isbn?: string;
+  publisher?: string | null;
+  pages?: number | null;
+  binding?: string | null;
 }
 
 export interface Book {
@@ -21,6 +24,9 @@ export interface Book {
   genre: string | null;
   published_year: number | null;
   isbn: string | null;
+  publisher: string | null;
+  pages: number | null;
+  binding: string | null;
   created_by: string | null;
   created_at: string;
 }

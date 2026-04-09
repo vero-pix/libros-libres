@@ -36,6 +36,8 @@ async function searchGoogleBooks(isbn: string) {
             ? parseInt(v.publishedDate.substring(0, 4))
             : null,
           isbn,
+          publisher: v.publisher ?? null,
+          pages: v.pageCount ?? null,
         };
       }
     } catch {
@@ -73,6 +75,8 @@ async function searchOpenLibrary(isbn: string) {
       description: details?.description ?? "",
       publish_date: bookInfo?.publish_date ?? details?.publish_date ?? "",
       works: details?.works ?? [],
+      publishers: bookInfo?.publishers?.map((p: any) => p.name) ?? details?.publishers ?? [],
+      pages: details?.number_of_pages ?? bookInfo?.number_of_pages ?? null,
     };
 
     // Get author name(s) — try bookInfo first (has names), fallback to API
@@ -142,6 +146,8 @@ async function searchOpenLibrary(isbn: string) {
               genre: workGenre,
               published_year,
               isbn,
+              publisher: data.publishers?.[0] ?? null,
+              pages: data.pages ?? null,
             };
           }
         }
@@ -156,6 +162,8 @@ async function searchOpenLibrary(isbn: string) {
       genre,
       published_year,
       isbn,
+      publisher: data.publishers?.[0] ?? null,
+      pages: data.pages ?? null,
     };
   } catch {
     return null;

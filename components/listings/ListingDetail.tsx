@@ -113,7 +113,27 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-brand-100 text-brand-700 border border-brand-200">
               {MODALITY_LABELS[listing.modality]}
             </span>
+            {(book as any).binding && (
+              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-200">
+                {(book as any).binding === "hardcover" ? "Tapa dura" : "Tapa blanda"}
+              </span>
+            )}
           </div>
+
+          {/* Detalles bibliográficos */}
+          {((book as any).publisher || (book as any).pages || book.published_year) && (
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-gray-500">
+              {(book as any).publisher && (
+                <span>Editorial: <span className="text-gray-700">{(book as any).publisher}</span></span>
+              )}
+              {(book as any).pages && (
+                <span>{(book as any).pages} páginas</span>
+              )}
+              {book.published_year && (
+                <span>Año: {book.published_year}</span>
+              )}
+            </div>
+          )}
 
           {listing.price != null && listing.modality !== "loan" && (() => {
             const originalPrice = (listing as unknown as Record<string, unknown>).original_price != null
