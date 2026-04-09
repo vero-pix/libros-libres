@@ -61,11 +61,6 @@ export default function ListingCard({ listing }: Props) {
           ) : (
             placeholder
           )}
-          {listing._featured && (
-            <span className="absolute top-3 left-3 text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm bg-amber-500 text-white z-10">
-              Destacado
-            </span>
-          )}
           <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
             {isNew(listing.created_at) && (
               <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm bg-brand-500 text-white">
@@ -78,9 +73,9 @@ export default function ListingCard({ listing }: Props) {
               </span>
             )}
           </div>
-          {listing.seller?.mercadopago_user_id && (
-            <span className="absolute bottom-3 left-3 w-4 h-4" title="Pago seguro con MercadoPago">
-              <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 drop-shadow">
+          {listing._featured && (
+            <span className="absolute bottom-3 left-3 w-5 h-5" title="Libro destacado">
+              <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 drop-shadow">
                 <path d="M12 2L3 7v6c0 5.25 3.83 10.16 9 11.25C17.17 23.16 21 18.25 21 13V7l-9-5z" fill="#D4A017"/>
                 <path d="M10 15.5l-3-3 1.4-1.4L10 12.7l5.6-5.6L17 8.5l-7 7z" fill="#fff"/>
               </svg>

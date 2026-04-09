@@ -16,6 +16,8 @@ export async function POST(req: NextRequest) {
   const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
   if (profile?.role !== "admin") return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
+  const sellerId = req.nextUrl.searchParams.get("seller_id");
+
   // Use service role for updates
   const adminDb = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,11 +26,19 @@ export async function POST(req: NextRequest) {
   );
 
   // Get books without description
-  const { data: books } = await adminDb
+  let booksQuery = adminDb
     .from("books")
     .select("id, title, author, isbn, description")
-    .or("description.is.null,description.eq.")
-    .limit(50);
+    .or("description.is.null,description.eq.");
+
+  if (sellerId) {
+    const { data: listings } = await adminDb.from("listings").select("book_id").eq("seller_id", sellerId).eq("status", "active");
+    const bookIds = listings?.map((l) => l.book_id) ?? [];
+    if (bookIds.length === 0) return NextResponse.json({ message: "Este vendedor no tiene libros activos.", updated: 0 });
+    booksQuery = booksQuery.in("id", bookIds);
+  }
+
+  const { data: books } = await booksQuery.limit(50);
 
   if (!books?.length) {
     return NextResponse.json({ message: "Todos los libros tienen sinopsis", updated: 0 });

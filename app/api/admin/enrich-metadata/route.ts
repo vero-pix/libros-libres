@@ -49,7 +49,7 @@ async function fetchFromOpenLibrary(isbn: string): Promise<Meta | null> {
   return null;
 }
 
-export async function POST() {
+export async function POST(req: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
@@ -57,15 +57,26 @@ export async function POST() {
   const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
   if (profile?.role !== "admin") return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
+  const sellerId = new URL(req.url).searchParams.get("seller_id");
+
   const adminDb = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { cookies: { getAll: () => [], setAll: () => {} } },
   );
 
-  const { data: books } = await adminDb
-    .from("books")
-    .select("id, isbn, title, author, publisher, pages, description");
+  let books: any[] | null;
+  if (sellerId) {
+    // Get book IDs for this seller's active listings
+    const { data: listings } = await adminDb.from("listings").select("book_id").eq("seller_id", sellerId).eq("status", "active");
+    const bookIds = listings?.map((l) => l.book_id) ?? [];
+    if (bookIds.length === 0) return NextResponse.json({ summary: "Este vendedor no tiene libros activos." });
+    const { data } = await adminDb.from("books").select("id, isbn, title, author, publisher, pages, description").in("id", bookIds);
+    books = data;
+  } else {
+    const { data } = await adminDb.from("books").select("id, isbn, title, author, publisher, pages, description");
+    books = data;
+  }
 
   if (!books?.length) return NextResponse.json({ summary: "No hay libros en la base de datos." });
 

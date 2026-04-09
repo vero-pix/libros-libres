@@ -8,19 +8,23 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = await createClient();
-  const term = `%${q}%`;
+  // Strip parentheses that break PostgREST or() syntax
+  const clean = q.replace(/[()]/g, "").trim();
+  if (!clean) return NextResponse.json([]);
+  const term = `%${clean}%`;
 
-  const { data: books } = await supabase
-    .from("books")
-    .select("id, title, author, cover_url")
-    .or(`title.ilike.${term},author.ilike.${term}`)
+  const { data: listings } = await supabase
+    .from("listings")
+    .select("id, book:books!inner(id, title, author, cover_url)")
+    .eq("status", "active")
+    .or(`title.ilike.${term},author.ilike.${term}`, { referencedTable: "books" })
     .limit(8);
 
-  const suggestions = (books ?? []).map((b) => ({
-    id: b.id,
-    title: b.title,
-    author: b.author,
-    cover_url: b.cover_url,
+  const suggestions = (listings ?? []).map((l: any) => ({
+    id: l.id,
+    title: l.book.title,
+    author: l.book.author,
+    cover_url: l.book.cover_url,
   }));
 
   return NextResponse.json(suggestions);

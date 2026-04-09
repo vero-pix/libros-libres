@@ -37,6 +37,7 @@ interface AdminListing {
   address: string | null;
   cover_image_url: string | null;
   status: string;
+  featured: boolean;
   created_at: string;
   book: AdminBook;
   seller: { id: string; full_name: string | null; email: string | null; phone: string | null } | null;
@@ -203,7 +204,7 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
         <AnalyticsTab />
       )}
       {tab === "tools" && (
-        <ToolsTab />
+        <ToolsTab users={users} />
       )}
     </div>
   );
@@ -211,13 +212,16 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
 
 /* ── Tools Tab ── */
 
-function ToolsTab() {
+function ToolsTab({ users }: { users: AdminUser[] }) {
   const [results, setResults] = useState<Record<string, { loading: boolean; result: string | null; error: string | null }>>({});
+  const [sellerId, setSellerId] = useState<string>("");
 
   async function runTool(key: string, url: string, method: "GET" | "POST" = "POST") {
     setResults((prev) => ({ ...prev, [key]: { loading: true, result: null, error: null } }));
     try {
-      const res = await fetch(url, { method });
+      const sep = url.includes("?") ? "&" : "?";
+      const finalUrl = sellerId ? `${url}${sep}seller_id=${sellerId}` : url;
+      const res = await fetch(finalUrl, { method });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error desconocido");
       const summary = typeof data.summary === "string" ? data.summary : JSON.stringify(data, null, 2);
@@ -228,15 +232,37 @@ function ToolsTab() {
   }
 
   const tools = [
-    { key: "covers", label: "Buscar portadas faltantes", desc: "Busca portadas en Open Library y Google Books para libros sin imagen", url: "/api/admin/backfill-covers", method: "POST" as const },
+    { key: "covers", label: "Buscar portadas faltantes", desc: "Busca portadas en Open Library y Google Books para libros sin imagen", url: "/api/admin/backfill-covers", method: "GET" as const },
     { key: "audit", label: "Auditar portadas rotas", desc: "Verifica que las URLs de portada existentes realmente funcionen", url: "/api/admin/audit-covers", method: "GET" as const },
     { key: "descriptions", label: "Enriquecer sinopsis", desc: "Busca sinopsis en español para libros sin descripción", url: "/api/admin/backfill-descriptions", method: "POST" as const },
     { key: "metadata", label: "Enriquecer metadata", desc: "Busca editorial, páginas y sinopsis en Google Books y Open Library", url: "/api/admin/enrich-metadata", method: "POST" as const },
   ];
 
+  // Sellers: users who have at least one listing (simplified: show all users)
+  const sellerOptions = users
+    .filter((u) => u.full_name)
+    .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? ""));
+
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-500">Herramientas de mantenimiento de la tienda. Cada acción consulta APIs externas y puede tardar unos minutos.</p>
+
+      <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <label className="block text-xs font-medium text-gray-600 mb-1.5">Aplicar sobre</label>
+        <select
+          value={sellerId}
+          onChange={(e) => setSellerId(e.target.value)}
+          className="w-full max-w-sm px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+        >
+          <option value="">Toda la tienda</option>
+          {sellerOptions.map((u) => (
+            <option key={u.id} value={u.id}>
+              {u.full_name} ({u.email})
+            </option>
+          ))}
+        </select>
+      </div>
+
       {tools.map((tool) => {
         const state = results[tool.key];
         return (
@@ -517,6 +543,13 @@ function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdat
     }
   }
 
+  async function toggleFeatured(id: string, current: boolean) {
+    const { error } = await supabase.from("listings").update({ featured: !current }).eq("id", id);
+    if (!error) {
+      onUpdate(listings.map((l) => (l.id === id ? { ...l, featured: !current } : l)));
+    }
+  }
+
   async function deleteListing(id: string) {
     if (!window.confirm("¿Eliminar esta publicación?")) return;
     const { error } = await supabase.from("listings").delete().eq("id", id);
@@ -611,6 +644,17 @@ function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdat
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${LISTING_STATUS_LABELS[listing.status]?.color ?? "bg-gray-100 text-gray-500"}`}>
               {LISTING_STATUS_LABELS[listing.status]?.label ?? listing.status}
             </span>
+
+            {/* Featured toggle */}
+            <button
+              onClick={() => toggleFeatured(listing.id, listing.featured)}
+              title={listing.featured ? "Quitar destacado" : "Destacar"}
+              className={`flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full transition-colors ${listing.featured ? "bg-amber-100 text-amber-500" : "bg-gray-100 text-gray-300 hover:text-amber-400"}`}
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </button>
 
             {/* Actions */}
             <div className="flex gap-1 flex-shrink-0">

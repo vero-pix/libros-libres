@@ -22,7 +22,7 @@ async function fetchCoverUrl(isbn: string): Promise<string | null> {
   return null;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   const supabase = await createClient();
 
   const {
@@ -32,11 +32,22 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data: books, error } = await supabase
+  const sellerId = new URL(req.url).searchParams.get("seller_id");
+
+  let booksQuery = supabase
     .from("books")
     .select("id, isbn")
     .is("cover_url", null)
     .not("isbn", "is", null);
+
+  if (sellerId) {
+    const { data: listings } = await supabase.from("listings").select("book_id").eq("seller_id", sellerId).eq("status", "active");
+    const bookIds = listings?.map((l) => l.book_id) ?? [];
+    if (bookIds.length === 0) return NextResponse.json({ total: 0, updated: 0, failed: 0, errors: [] });
+    booksQuery = booksQuery.in("id", bookIds);
+  }
+
+  const { data: books, error } = await booksQuery;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

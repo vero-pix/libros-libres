@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
  * Checks if the cover actually exists (HEAD with ?default=false).
  * Nullifies invalid covers so the UI shows a proper placeholder.
  */
-export async function GET() {
+export async function GET(req: Request) {
   const supabase = await createClient();
 
   const {
@@ -16,28 +16,35 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const sellerId = new URL(req.url).searchParams.get("seller_id");
+  let sellerBookIds: string[] | null = null;
+  let sellerListingIds: string[] | null = null;
+
+  if (sellerId) {
+    const { data: sellerListings } = await supabase.from("listings").select("id, book_id").eq("seller_id", sellerId).eq("status", "active");
+    sellerBookIds = sellerListings?.map((l) => l.book_id) ?? [];
+    sellerListingIds = sellerListings?.map((l) => l.id) ?? [];
+    if (sellerBookIds.length === 0) return NextResponse.json({ scanned: 0, valid: 0, cleaned: 0, details: [] });
+  }
+
   // Check books with Open Library ISBN-based covers
-  const { data: books } = await supabase
-    .from("books")
-    .select("id, isbn, cover_url")
-    .like("cover_url", "%covers.openlibrary.org/b/isbn%");
+  let booksQ = supabase.from("books").select("id, isbn, cover_url").like("cover_url", "%covers.openlibrary.org/b/isbn%");
+  if (sellerBookIds) booksQ = booksQ.in("id", sellerBookIds);
+  const { data: books } = await booksQ;
 
   // Check listings with Open Library ISBN-based covers
-  const { data: listings } = await supabase
-    .from("listings")
-    .select("id, cover_image_url")
-    .like("cover_image_url", "%covers.openlibrary.org/b/isbn%");
+  let listingsQ = supabase.from("listings").select("id, cover_image_url").like("cover_image_url", "%covers.openlibrary.org/b/isbn%");
+  if (sellerListingIds) listingsQ = listingsQ.in("id", sellerListingIds);
+  const { data: listings } = await listingsQ;
 
   // Also check Google Books covers that might 404
-  const { data: googleBooks } = await supabase
-    .from("books")
-    .select("id, isbn, cover_url")
-    .like("cover_url", "%books.google.com%");
+  let gBooksQ = supabase.from("books").select("id, isbn, cover_url").like("cover_url", "%books.google.com%");
+  if (sellerBookIds) gBooksQ = gBooksQ.in("id", sellerBookIds);
+  const { data: googleBooks } = await gBooksQ;
 
-  const { data: googleListings } = await supabase
-    .from("listings")
-    .select("id, cover_image_url")
-    .like("cover_image_url", "%books.google.com%");
+  let gListingsQ = supabase.from("listings").select("id, cover_image_url").like("cover_image_url", "%books.google.com%");
+  if (sellerListingIds) gListingsQ = gListingsQ.in("id", sellerListingIds);
+  const { data: googleListings } = await gListingsQ;
 
   let cleaned = 0;
   let valid = 0;

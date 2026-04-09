@@ -80,7 +80,7 @@ export default function HeaderSearchBar() {
   function selectSuggestion(s: Suggestion) {
     setQuery(s.title);
     setOpen(false);
-    router.push(`/search?q=${encodeURIComponent(s.title)}`);
+    router.push(`/listings/${s.id}`);
   }
 
   return (

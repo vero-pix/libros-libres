@@ -21,7 +21,7 @@ export default async function CheckoutPage({ params }: Props) {
   const { data: listing } = await supabase
     .from("listings")
     .select(
-      `*, book:books(*), seller:users(id, full_name, avatar_url, phone)`
+      `*, book:books(*), seller:users(id, full_name, avatar_url, phone, mercadopago_user_id)`
     )
     .eq("id", params.id)
     .eq("status", "active")

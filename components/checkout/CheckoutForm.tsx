@@ -332,29 +332,38 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
         </div>
       )}
 
-      {/* MercadoPago button */}
-      <button
-        type="submit"
-        disabled={loading || (isCourier && (!address || !selectedQuote))}
-        className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white font-semibold py-3 rounded-lg text-sm transition-colors"
-      >
-        {loading
-          ? "Procesando..."
-          : isCourier
-            ? selectedQuote
-              ? `Pagar $${total.toLocaleString("es-CL")} con MercadoPago`
-              : "Ingresa dirección para cotizar envío"
-            : `Pagar $${bookPrice.toLocaleString("es-CL")} con MercadoPago`}
-      </button>
+      {/* MercadoPago button — only if seller has MP connected */}
+      {(listing.seller as any)?.mercadopago_user_id && (
+        <>
+          <button
+            type="submit"
+            disabled={loading || (isCourier && (!address || !selectedQuote))}
+            className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white font-semibold py-3 rounded-lg text-sm transition-colors"
+          >
+            {loading
+              ? "Procesando..."
+              : isCourier
+                ? selectedQuote
+                  ? `Pagar $${total.toLocaleString("es-CL")} con MercadoPago`
+                  : "Ingresa dirección para cotizar envío"
+                : `Pagar $${bookPrice.toLocaleString("es-CL")} con MercadoPago`}
+          </button>
+          <p className="text-xs text-gray-400 text-center">
+            Serás redirigido a MercadoPago para completar el pago de forma segura.
+          </p>
+        </>
+      )}
 
-      {/* WhatsApp button — only for in-person / pickup (no commission) */}
+      {/* WhatsApp button */}
       {!isCourier && listing.seller?.phone && (
         <>
-          <div className="flex items-center gap-3 text-xs text-gray-400">
-            <span className="flex-1 border-t border-gray-200" />
-            o
-            <span className="flex-1 border-t border-gray-200" />
-          </div>
+          {(listing.seller as any)?.mercadopago_user_id && (
+            <div className="flex items-center gap-3 text-xs text-gray-400">
+              <span className="flex-1 border-t border-gray-200" />
+              o
+              <span className="flex-1 border-t border-gray-200" />
+            </div>
+          )}
           <a
             href={`https://wa.me/${listing.seller.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
               `Hola! Me interesa "${book.title}" a $${bookPrice.toLocaleString("es-CL")} en tuslibros.cl. ¿Podemos coordinar la entrega?`
@@ -372,11 +381,12 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
         </>
       )}
 
-      {(!isCourier && !listing.seller?.phone) || isCourier ? (
-        <p className="text-xs text-gray-400 text-center">
-          Serás redirigido a MercadoPago para completar el pago de forma segura.
+      {/* No payment method available */}
+      {!(listing.seller as any)?.mercadopago_user_id && !listing.seller?.phone && (
+        <p className="text-sm text-gray-500 text-center bg-gray-50 rounded-lg p-4">
+          Este vendedor aún no tiene métodos de pago configurados. Puedes contactarlo a través de las preguntas en la ficha del libro.
         </p>
-      ) : null}
+      )}
     </form>
   );
 }

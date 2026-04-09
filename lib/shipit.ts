@@ -54,6 +54,15 @@ async function findCommuneId(communeName: string): Promise<number | null> {
   return null;
 }
 
+export interface ShipitDestination {
+  street?: string;
+  number?: number;
+  commune_name: string;
+  full_name?: string;
+  email?: string;
+  phone?: string;
+}
+
 /**
  * Get shipping quotes from Shipit.
  * Requires commune names — resolves to commune_id internally.
@@ -65,6 +74,7 @@ export async function getShipitQuotes(
   height: number = 5,
   width: number = 15,
   length: number = 22,
+  dest?: Partial<ShipitDestination>,
 ): Promise<ShippingQuote[]> {
   if (!SHIPIT_EMAIL || !SHIPIT_TOKEN) {
     console.error("[shipit] Missing SHIPIT_EMAIL or SHIPIT_TOKEN");
@@ -87,13 +97,27 @@ export async function getShipitQuotes(
   }
 
   try {
+    const ref = `TL-${Date.now().toString(36).slice(-8)}`.slice(0, 15);
     const res = await fetch(`${BASE_URL}/rates`, {
       method: "POST",
       headers: HEADERS,
       body: JSON.stringify({
-        parcel: { width, height, length, weight },
-        origin: { commune_id: originId },
-        destiny: { commune_id: destId },
+        parcel: {
+          kind: 0,
+          platform: 2,
+          reference: ref,
+          items: 1,
+          sizes: { width, height, length, weight },
+          destiny: {
+            commune_id: destId,
+            commune_name: destCommune.toUpperCase(),
+            street: dest?.street ?? "Por confirmar",
+            number: dest?.number ?? 0,
+            full_name: dest?.full_name ?? "Comprador",
+            email: dest?.email ?? "",
+            phone: dest?.phone ?? "",
+          },
+        },
       }),
     });
 

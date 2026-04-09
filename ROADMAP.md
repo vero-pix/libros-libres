@@ -183,10 +183,10 @@
 - [ ] Sorting en /mis-libros (precio, título, fecha)
 
 ### Features futuros
-- [ ] Mensajería interna entre compradores y vendedores
+- [x] Mensajería interna entre compradores y vendedores
 - [ ] Filtros por encuadernación, editorial, páginas en la tienda
 - [ ] Buscador en página del vendedor (/vendedor/[id])
-- [ ] Foto-a-catálogo completo: IA identifica libros de foto grupal → publicación masiva
+- [x] Foto-a-catálogo completo: IA identifica libros de foto grupal → publicación masiva
 - [ ] Tracking envíos (cuando Shipit active)
 - [ ] OAuth Facebook/Instagram
 - [ ] Compartir en Instagram Stories al publicar
