@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { ListingWithBook, ListingStatus } from "@/types";
 import { CATEGORY_OPTIONS } from "@/lib/genres";
 import CoverUpload from "@/components/books/CoverUpload";
+import ImageUploadMultiple from "@/components/listings/ImageUploadMultiple";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   active: { label: "Activo", color: "bg-green-100 text-green-700" },
@@ -296,10 +297,25 @@ function EditForm({
   const [description, setDescription] = useState(book.description ?? "");
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
 
+  // Additional images
+  const [extraImages, setExtraImages] = useState<{ id: string; image_url: string }[]>([]);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+
   const [saving, setSaving] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [fetchMsg, setFetchMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Load existing additional images on mount
+  if (!imagesLoaded) {
+    setImagesLoaded(true);
+    supabase
+      .from("listing_images")
+      .select("id, image_url")
+      .eq("listing_id", listing.id)
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => { if (data) setExtraImages(data); });
+  }
 
   async function handleAutocomplete() {
     setFetching(true);
@@ -418,6 +434,12 @@ function EditForm({
             {fetchMsg && <p className="text-[10px] text-green-600">{fetchMsg}</p>}
           </div>
         </div>
+        {/* Additional photos */}
+        <ImageUploadMultiple
+          listingId={listing.id}
+          existingImages={extraImages}
+          onImagesChanged={setExtraImages}
+        />
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">Título</label>
