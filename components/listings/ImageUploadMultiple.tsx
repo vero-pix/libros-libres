@@ -61,15 +61,16 @@ export default function ImageUploadMultiple({ listingId, existingImages, onImage
       if (row) newImages.push(row);
     }
 
-    // If the listing has no cover image, set it to the first uploaded image
+    // If the listing has no cover, use the first uploaded image as cover
     if (newImages.length > 0) {
       const { data: listing } = await supabase
         .from("listings")
-        .select("cover_image_url")
+        .select("cover_image_url, book:books(cover_url)")
         .eq("id", listingId)
         .single();
 
-      if (listing && !listing.cover_image_url) {
+      const hasCover = listing?.cover_image_url || (listing?.book as any)?.cover_url;
+      if (!hasCover) {
         const firstUrl = images.length > 0 ? images[0].image_url : newImages[0].image_url;
         await supabase
           .from("listings")
