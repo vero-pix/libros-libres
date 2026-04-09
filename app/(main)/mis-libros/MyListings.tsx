@@ -305,6 +305,9 @@ function EditForm({
   const [author, setAuthor] = useState(book.author);
   const [genre, setGenre] = useState(book.genre ?? "");
   const [description, setDescription] = useState(book.description ?? "");
+  const [publisher, setPublisher] = useState((book as any).publisher ?? "");
+  const [pages, setPages] = useState(((book as any).pages ?? "").toString());
+  const [binding, setBinding] = useState((book as any).binding ?? "");
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
 
   // Additional images
@@ -369,6 +372,9 @@ function EditForm({
       author: author.trim(),
       genre: genre || null,
       description: description.trim() || null,
+      publisher: publisher.trim() || null,
+      pages: pages ? parseInt(pages) : null,
+      binding: binding || null,
     };
     if (coverUrl) {
       bookUpdates.cover_url = coverUrl;
@@ -469,6 +475,22 @@ function EditForm({
               {CATEGORY_OPTIONS.map((cat) => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Editorial</label>
+            <input value={publisher} onChange={(e) => setPublisher(e.target.value)} placeholder="Ej: Tusquets" className={inputClass} />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Páginas</label>
+            <input type="number" value={pages} onChange={(e) => setPages(e.target.value)} placeholder="Ej: 320" className={inputClass} />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Encuadernación</label>
+            <select value={binding} onChange={(e) => setBinding(e.target.value)} className={inputClass}>
+              <option value="">Sin especificar</option>
+              <option value="softcover">Tapa blanda</option>
+              <option value="hardcover">Tapa dura</option>
             </select>
           </div>
         </div>
