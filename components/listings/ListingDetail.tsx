@@ -307,7 +307,6 @@ function DetailTabs({ listing }: { listing: ListingWithBook }) {
 
   const tabs = [
     { key: "descripcion" as const, label: "Descripción" },
-    { key: "ubicacion" as const, label: "Ubicación" },
     { key: "vendedor" as const, label: "Vendedor" },
   ];
 
@@ -336,14 +335,7 @@ function DetailTabs({ listing }: { listing: ListingWithBook }) {
             <p className="text-sm text-gray-400 italic">Sin sinopsis disponible. Consulta al vendedor por más detalles.</p>
           )
         )}
-        {activeTab === "ubicacion" && (
-          <p className="text-sm text-gray-600">
-            {listing.address
-              ? listing.address.split(",").slice(0, 2).join(",").trim()
-              : "Ubicación no especificada"}
-          </p>
-        )}
-        {activeTab === "vendedor" && (
+{activeTab === "vendedor" && (
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center font-bold flex-shrink-0">
               {sellerName[0].toUpperCase()}

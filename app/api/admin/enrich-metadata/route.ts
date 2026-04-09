@@ -92,7 +92,12 @@ export async function POST() {
     const updates: Record<string, unknown> = {};
     if (!book.publisher && meta.publisher) updates.publisher = meta.publisher;
     if (!book.pages && meta.pages) updates.pages = meta.pages;
-    if (!book.description && meta.description) updates.description = meta.description;
+    if (!book.description && meta.description) {
+      const d = meta.description;
+      const isEnglish = /\b(the|you|this|have|will|that|from|your|with)\b/i.test(d) && !/\b(el|la|los|las|del|por|una|con|que)\b/i.test(d);
+      const isSpam = d.includes("13-digit number") || d.includes("ISBN Handbook");
+      if (!isEnglish && !isSpam) updates.description = d;
+    }
 
     if (Object.keys(updates).length > 0) {
       await adminDb.from("books").update(updates).eq("id", book.id);
