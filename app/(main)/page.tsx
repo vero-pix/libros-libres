@@ -101,9 +101,13 @@ export default async function HomePage({ searchParams }: Props) {
   });
 
   if (genre) {
-    listings = listings.filter(
-      (l) => l.book.genre?.toLowerCase() === genre.toLowerCase()
-    );
+    if (genre === "sin-categoria") {
+      listings = listings.filter((l) => !l.book.genre);
+    } else {
+      listings = listings.filter(
+        (l) => l.book.genre?.toLowerCase() === genre.toLowerCase()
+      );
+    }
   }
 
   if (author) {
@@ -127,9 +131,11 @@ export default async function HomePage({ searchParams }: Props) {
   const allListings = (rawListings as unknown as ListingWithBook[]) ?? [];
   const totalListings = allListings.length;
   const genreMap = new Map<string, number>();
+  let uncategorizedCount = 0;
   for (const l of allListings) {
     const g = l.book.genre;
     if (g) genreMap.set(g, (genreMap.get(g) ?? 0) + 1);
+    else uncategorizedCount++;
   }
   const categories = Array.from(genreMap.entries())
     .map(([genre, count]) => ({ genre, count }))
@@ -142,11 +148,11 @@ export default async function HomePage({ searchParams }: Props) {
         <Breadcrumbs items={[
           { label: "Inicio", href: "/" },
           { label: "Tienda", href: genre ? "/" : undefined },
-          ...(genre ? [{ label: translateGenre(genre) }] : []),
+          ...(genre ? [{ label: genre === "sin-categoria" ? "Sin categoría" : translateGenre(genre) }] : []),
         ]} />
         <CategoriesMobileDrawer categories={categories} activeGenre={genre} />
         <div className="flex gap-10">
-          <CategoriesSidebar categories={categories} activeGenre={genre} />
+          <CategoriesSidebar categories={categories} activeGenre={genre} uncategorizedCount={uncategorizedCount} />
 
           <div className="flex-1 min-w-0">
             <Suspense fallback={<div className="h-10 bg-gray-100 rounded-lg animate-pulse mb-4" />}>
