@@ -4,6 +4,27 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 
 const novedades = [
   {
+    date: "9 abril 2026",
+    title: "Ficha bibliográfica completa",
+    description:
+      "Ahora cada libro muestra editorial, cantidad de páginas, año de publicación y tipo de encuadernación (tapa dura o blanda). Los datos se auto-completan al buscar por ISBN.",
+    tag: "Mejora",
+  },
+  {
+    date: "9 abril 2026",
+    title: "Navegación mejorada",
+    description:
+      "Sidebar de categorías visible en toda la tienda, incluyendo la ficha de cada libro. Breadcrumbs para nunca perder el camino. Tipografía de precios más clara y legible.",
+    tag: "Mejora",
+  },
+  {
+    date: "9 abril 2026",
+    title: "Portadas restauradas",
+    description:
+      "Corrimos un barrido automático y restauramos las portadas de 41 libros que estaban sin imagen. Ahora el catálogo se ve mucho mejor.",
+    tag: "Mejora",
+  },
+  {
     date: "8 abril 2026",
     title: "Programa de referidos",
     description:
