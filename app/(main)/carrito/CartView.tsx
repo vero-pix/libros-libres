@@ -15,7 +15,7 @@ interface CartItem {
     status: string;
     cover_image_url: string | null;
     book: { title: string; author: string; cover_url: string | null };
-    seller: { id: string; full_name: string | null } | null;
+    seller: { id: string; full_name: string | null; username: string | null } | null;
   };
 }
 

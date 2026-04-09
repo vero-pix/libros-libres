@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       .select(
         `id, slug, price, condition, modality, cover_image_url, status, created_at,
          book:books(id, title, author, cover_url, genre),
-         seller:users(id, full_name, avatar_url, mercadopago_user_id)`
+         seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`
       )
       .eq("status", "active")
       .order("created_at", { ascending: false })
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
     .select(
       `id, price, condition, modality, cover_image_url, status, created_at,
        book:books(id, title, author, cover_url, genre),
-       seller:users(id, full_name, avatar_url, mercadopago_user_id)`
+       seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`
     )
     .eq("status", "active")
     .order("created_at", { ascending: false })

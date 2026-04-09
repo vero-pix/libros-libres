@@ -47,6 +47,7 @@ export interface UserProfile {
   plan: "free" | "librero" | "libreria";
   public_email: string | null;
   instagram: string | null;
+  username: string | null;
 }
 
 
@@ -70,7 +71,7 @@ export interface Listing {
 
 export interface ListingWithBook extends Listing {
   book: Book;
-  seller?: Pick<UserProfile, "id" | "full_name" | "avatar_url" | "phone" | "mercadopago_user_id" | "plan" | "public_email" | "instagram">;
+  seller?: Pick<UserProfile, "id" | "full_name" | "avatar_url" | "phone" | "mercadopago_user_id" | "plan" | "public_email" | "instagram" | "username">;
   _avg_rating?: number;
   _review_count?: number;
   _featured?: boolean;
