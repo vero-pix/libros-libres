@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import type { ListingWithBook } from "@/types";
 import { addRecentlyViewed } from "./RecentlyViewed";
+import { createClient } from "@/lib/supabase/client";
 import AddToCartButton from "@/components/ui/AddToCartButton";
 import ImageGallery from "./ImageGallery";
 import ShareButtons from "./ShareButtons";
@@ -69,6 +70,13 @@ export default function ListingDetail({ listing, images = [] }: Props) {
   const { book } = listing;
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
+  const [isOwner, setIsOwner] = useState(false);
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      if (data.user?.id === listing.seller_id) setIsOwner(true);
+    });
+  }, [listing.seller_id]);
 
   useEffect(() => {
     addRecentlyViewed({
@@ -97,7 +105,17 @@ export default function ListingDetail({ listing, images = [] }: Props) {
 
         {/* Info */}
         <div className="flex-1">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{book.title}</h1>
+          <div className="flex items-start justify-between gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{book.title}</h1>
+            {isOwner && (
+              <Link
+                href="/mis-libros"
+                className="flex-shrink-0 text-xs text-brand-600 hover:bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors"
+              >
+                Editar
+              </Link>
+            )}
+          </div>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">{book.author}</p>
 
           <div className="flex flex-wrap gap-2 mt-3">
