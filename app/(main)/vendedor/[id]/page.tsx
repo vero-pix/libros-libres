@@ -53,7 +53,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
   // Seller's active listings
   const { data } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram)`)
+    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram, username)`)
     .eq("seller_id", params.id)
     .eq("status", "active")
     .order("created_at", { ascending: false });

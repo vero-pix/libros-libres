@@ -67,7 +67,7 @@ export default async function HomePage({ searchParams }: Props) {
   const [featuredListingsRes, featuredSellersRes] = await Promise.all([
     supabase
       .from("listings")
-      .select(`*, book:books(*), seller:users(id, full_name, avatar_url)`)
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username)`)
       .eq("status", "active")
       .eq("featured", true)
       .limit(10),
@@ -94,7 +94,7 @@ export default async function HomePage({ searchParams }: Props) {
 
   let query = supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, mercadopago_user_id, plan), reviews:reviews(rating)`)
+    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`)
     .eq("status", "active");
 
   if (condition) query = query.eq("condition", condition);

@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
   let query = supabase
     .from("listings")
     .select(
-      `*, book:books!inner(*), seller:users(id, full_name, avatar_url)`,
+      `*, book:books!inner(*), seller:users(id, full_name, avatar_url, username)`,
       { count: "exact" }
     )
     .eq("status", "active");

@@ -11,21 +11,33 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 60;
 
 interface Props {
-  params: { slug: string };
+  params: { username: string; slug: string };
 }
 
-async function getListingBySlug(slug: string) {
+async function getListing(username: string, slug: string) {
   const supabase = await createClient();
+
+  // Find seller by username
+  const { data: seller } = await supabase
+    .from("users")
+    .select("id")
+    .eq("username", username)
+    .single();
+
+  if (!seller) return null;
+
   const { data } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram)`)
+    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram, username)`)
     .eq("slug", slug)
+    .eq("seller_id", seller.id)
     .single();
+
   return data;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const listing = await getListingBySlug(params.slug);
+  const listing = await getListing(params.username, params.slug);
 
   if (!listing) {
     return { title: "Libro no encontrado — tuslibros.cl" };
@@ -36,17 +48,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? listing.book.description.slice(0, 160)
     : `${listing.modality === "loan" ? "Arrienda" : "Compra"} "${listing.book.title}" de ${listing.book.author} en tuslibros.cl. ${listing.price ? `$${listing.price.toLocaleString("es-CL")} CLP.` : ""} Publicado por ${listing.seller?.full_name || "un vendedor"}.`;
   const image = listing.book.cover_url || "/og-image.png";
+  const url = `https://tuslibros.cl/libro/${params.username}/${params.slug}`;
 
   return {
     title,
     description,
-    alternates: {
-      canonical: `https://tuslibros.cl/libro/${params.slug}`,
-    },
+    alternates: { canonical: url },
     openGraph: {
       title,
       description,
-      url: `https://tuslibros.cl/libro/${params.slug}`,
+      url,
       siteName: "tuslibros.cl",
       type: "article",
       locale: "es_CL",
@@ -63,8 +74,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function LibroPage({ params }: Props) {
   const supabase = await createClient();
-
-  const listing = await getListingBySlug(params.slug);
+  const listing = await getListing(params.username, params.slug);
 
   if (!listing) {
     notFound();
@@ -76,19 +86,18 @@ export default async function LibroPage({ params }: Props) {
     .eq("listing_id", listing.id)
     .order("sort_order", { ascending: true });
 
-  // Related books + categories for sidebar — in parallel
   const [relatedResult, allActiveResult] = await Promise.all([
     listing.book?.genre
       ? supabase
           .from("listings")
-          .select(`*, book:books(*), seller:users(id, full_name, avatar_url)`)
+          .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username)`)
           .eq("status", "active")
           .neq("id", listing.id)
           .limit(20)
       : Promise.resolve({ data: null }),
     supabase
       .from("listings")
-      .select("book:books(genre)")
+      .select("book:books(genre, category, subcategory)")
       .eq("status", "active"),
   ]);
 
@@ -99,6 +108,8 @@ export default async function LibroPage({ params }: Props) {
     : [];
 
   const categoryTree = await buildCategoryTree(supabase, (allActiveResult.data ?? []) as any);
+
+  const canonicalUrl = `https://tuslibros.cl/libro/${params.username}/${params.slug}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -112,13 +123,9 @@ export default async function LibroPage({ params }: Props) {
       "@type": "Offer",
       price: listing.price,
       priceCurrency: "CLP",
-      availability: listing.status === "active"
-        ? "https://schema.org/InStock"
-        : "https://schema.org/SoldOut",
-      seller: {
-        "@type": "Person",
-        name: listing.seller?.full_name,
-      },
+      availability: listing.status === "active" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+      seller: { "@type": "Person", name: listing.seller?.full_name },
+      url: canonicalUrl,
     },
   };
 
@@ -127,26 +134,20 @@ export default async function LibroPage({ params }: Props) {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Inicio", item: "https://tuslibros.cl" },
-      { "@type": "ListItem", position: 2, name: listing.book.genre || "Libros", item: `https://tuslibros.cl/?genre=${encodeURIComponent(listing.book.genre || "")}` },
-      { "@type": "ListItem", position: 3, name: listing.book.title },
+      { "@type": "ListItem", position: 2, name: listing.seller?.full_name || "Vendedor", item: `https://tuslibros.cl/vendedor/${listing.seller_id}` },
+      { "@type": "ListItem", position: 3, name: listing.book.title, item: canonicalUrl },
     ],
   };
 
   return (
     <div className="min-h-screen bg-cream">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <main className="max-w-7xl mx-auto px-6 py-10">
         <Breadcrumbs
           items={[
             { label: "Inicio", href: "/" },
-            { label: listing.book.genre || "Libros", href: listing.book.genre ? `/?genre=${encodeURIComponent(listing.book.genre)}` : "/" },
+            { label: listing.seller?.full_name || "Vendedor", href: `/vendedor/${listing.seller_id}` },
             { label: listing.book.title },
           ]}
         />

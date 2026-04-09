@@ -68,7 +68,7 @@ export default async function SearchPage({ searchParams }: Props) {
       `
       *,
       book:books(*),
-      seller:users(id, full_name, avatar_url, phone, mercadopago_user_id)
+      seller:users(id, full_name, avatar_url, phone, username, mercadopago_user_id)
     `
     )
     .eq("status", "active");
