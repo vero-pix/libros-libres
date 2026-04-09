@@ -172,17 +172,27 @@
 - [ ] Newsletter automático semanal
 - [ ] Limpieza listings inactivos >90 días
 
+### Comparador de precios (inteligencia competitiva)
+- [ ] Scraping automático Buscalibre/MercadoLibre (requiere Puppeteer o Browserless)
+- [ ] Búsqueda internacional: detectar joyas que fuera de Chile valen mucho más (AbeBooks, Amazon, IberLibro)
+- [ ] Dashboard: "tus libros más baratos que la competencia" como argumento de venta
+- [x] Comparador manual: HTML con links directos a BL/ML para 109 libros (docs/comparador_precios.html)
+
+### Mis Libros (gestión vendedor)
+- [ ] Buscador/filtro en /mis-libros para encontrar publicaciones propias rápido
+- [ ] Sorting en /mis-libros (precio, título, fecha)
+
 ### Features futuros
 - [ ] Mensajería interna entre compradores y vendedores
-- [ ] Filtros por encuadernación, editorial, páginas
-- [ ] Buscador en página del vendedor
-- [ ] Buscador en /mis-libros
+- [ ] Filtros por encuadernación, editorial, páginas en la tienda
+- [ ] Buscador en página del vendedor (/vendedor/[id])
 - [ ] Foto-a-catálogo completo: IA identifica libros de foto grupal → publicación masiva
 - [ ] Tracking envíos (cuando Shipit active)
 - [ ] OAuth Facebook/Instagram
 - [ ] Compartir en Instagram Stories al publicar
 - [ ] Newsletter semanal — elegir día estratégico
 - [ ] Dominio personalizado Supabase
+- [ ] Fix INP issue (botón bloqueó UI 6.2s según Vercel Toolbar)
 
 ### Requiere acción de Verónica
 - [ ] Apple OAuth ($99/año) — decidir si vale la pena
