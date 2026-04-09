@@ -53,6 +53,14 @@ export default function ISBNSearch({ onBookFound }: Props) {
         return;
       }
 
+      // Si la API encontró el ISBN pero sin título, pedir datos manuales
+      if (!data.title?.trim()) {
+        setError("Encontramos el ISBN pero sin título. Completa los datos manualmente.");
+        setShowManual(true);
+        setManual({ title: data.title || "", author: data.author || "" });
+        return;
+      }
+
       onBookFound(data);
       setIsbn("");
       setError(null);

@@ -163,6 +163,8 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!book) { setError("Busca un libro por ISBN primero."); return; }
+    if (!book.title.trim()) { setError("El libro necesita un título. Complétalo antes de publicar."); return; }
+    if (!book.author.trim()) { setError("El libro necesita un autor. Complétalo antes de publicar."); return; }
     if (!location) { setError("Marca la ubicación del libro en el mapa."); return; }
     if (modality !== "loan" && !price) { setError("Ingresa el precio de venta."); return; }
     if (modality !== "sale" && !rentalPrice) { setError("Ingresa el precio de arriendo."); return; }
