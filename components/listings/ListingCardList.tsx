@@ -54,7 +54,7 @@ export default function ListingCardList({ listing }: Props) {
         <div className="flex-1 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="flex-1 min-w-0">
             <Link href={`/listings/${listing.id}`}>
-              <h3 className="font-display text-sm font-semibold text-ink leading-tight line-clamp-2 group-hover:text-brand-700 transition-colors">
+              <h3 className="text-sm font-semibold text-ink leading-tight line-clamp-2 group-hover:text-brand-700 transition-colors">
                 {book.title}
               </h3>
             </Link>

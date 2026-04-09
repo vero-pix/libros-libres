@@ -160,6 +160,13 @@
 - [ ] Configurar webhook Supabase para notificación nuevo usuario
 - [ ] WhatsApp Business para tuslibros.cl (perfil verificado)
 
+### Marketplace & descubrimiento
+- [ ] Filtro por vendedor en la tienda
+- [ ] Vendedores destacados (sección en home o página dedicada)
+- [ ] Filtros por encuadernación, editorial, páginas
+- [ ] Newsletter semanal — elegir día estratégico de envío
+- [ ] Enriquecer libros existentes con publisher/pages (correr enrich-books-metadata.ts cuando se resetee cuota Google Books)
+
 ### Features futuros
 - [ ] Páginas newsletter: testimonios, historia García Márquez, voces reales
 - [ ] Sección "Voces reales" en home o landing

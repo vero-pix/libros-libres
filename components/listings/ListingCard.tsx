@@ -110,7 +110,7 @@ export default function ListingCard({ listing }: Props) {
 
       <div className="p-4">
         <Link href={`/listings/${listing.id}`}>
-          <h3 className="font-display text-sm font-semibold text-ink leading-tight line-clamp-2 group-hover:text-brand-700 transition-colors">
+          <h3 className="text-sm font-semibold text-ink leading-tight line-clamp-2 group-hover:text-brand-700 transition-colors">
             {book.title}
           </h3>
         </Link>
@@ -144,7 +144,7 @@ export default function ListingCard({ listing }: Props) {
                   ${Number((listing as unknown as Record<string, unknown>).original_price).toLocaleString("es-CL")}
                 </span>
               )}
-              <p className="font-semibold text-ink text-lg tracking-tight">
+              <p className="font-semibold text-ink text-base tracking-tight">
                 ${listing.price.toLocaleString("es-CL")}
               </p>
             </div>
