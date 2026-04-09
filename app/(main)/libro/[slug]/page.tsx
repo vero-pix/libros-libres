@@ -4,6 +4,7 @@ import ListingDetail from "@/components/listings/ListingDetail";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
+import { buildCategoryTree } from "@/lib/categoryTree";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 
@@ -97,15 +98,7 @@ export default async function LibroPage({ params }: Props) {
         .slice(0, 5)
     : [];
 
-  // Build category counts for sidebar
-  const genreMap = new Map<string, number>();
-  for (const l of (allActiveResult.data ?? []) as any[]) {
-    const g = l.book?.genre;
-    if (g) genreMap.set(g, (genreMap.get(g) ?? 0) + 1);
-  }
-  const categories = Array.from(genreMap.entries())
-    .map(([genre, count]) => ({ genre, count }))
-    .sort((a, b) => b.count - a.count);
+  const categoryTree = await buildCategoryTree(supabase, (allActiveResult.data ?? []) as any);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -158,7 +151,7 @@ export default async function LibroPage({ params }: Props) {
           ]}
         />
         <div className="flex gap-10">
-          <CategoriesSidebar categories={categories} activeGenre={listing.book.genre} />
+          <CategoriesSidebar categoryTree={categoryTree} activeCategory={(listing.book as any).category} activeSubcategory={(listing.book as any).subcategory} />
 
           <div className="flex-1 min-w-0">
             <ListingDetail listing={listing} images={(images ?? []) as any} />

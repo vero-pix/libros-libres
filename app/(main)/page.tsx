@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
-import CategoriesMobileDrawer from "@/components/ui/CategoriesMobileDrawer";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
 import ListingCardList from "@/components/listings/ListingCardList";
@@ -9,9 +8,9 @@ import RecentlyViewed from "@/components/listings/RecentlyViewed";
 import Recommendations from "@/components/listings/Recommendations";
 import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
+import { buildCategoryTree } from "@/lib/categoryTree";
 import FeaturedRow from "@/components/home/FeaturedRow";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { translateGenre } from "@/lib/genres";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
 
@@ -38,6 +37,9 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): nu
 interface Props {
   searchParams: {
     genre?: string;
+    category?: string;
+    subcategory?: string;
+    tag?: string;
     sort?: string;
     price_min?: string;
     price_max?: string;
@@ -53,13 +55,13 @@ interface Props {
 
 export default async function HomePage({ searchParams }: Props) {
   const supabase = await createClient();
-  const { genre, sort, price_min, price_max, condition, modality, author, page, view, lat, lng } = searchParams;
+  const { genre, category, subcategory, tag, sort, price_min, price_max, condition, modality, author, page, view, lat, lng } = searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10) || 1);
   const viewMode = view === "list" ? "list" : "grid";
   const userLat = lat ? parseFloat(lat) : null;
   const userLng = lng ? parseFloat(lng) : null;
 
-  const hasFilters = !!(genre || sort || price_min || price_max || condition || modality || author);
+  const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author);
 
   // Featured queries in parallel with main query
   const [featuredListingsRes, featuredSellersRes] = await Promise.all([
@@ -129,7 +131,17 @@ export default async function HomePage({ searchParams }: Props) {
     return bScore - aScore;
   });
 
-  if (genre) {
+  // Filter by new taxonomy
+  if (subcategory) {
+    listings = listings.filter((l) => (l.book as any).subcategory === subcategory);
+  } else if (category) {
+    listings = listings.filter((l) => (l.book as any).category === category);
+  }
+  if (tag) {
+    listings = listings.filter((l) => ((l.book as any).tags ?? []).includes(tag));
+  }
+  // Legacy genre filter (backwards compat)
+  if (genre && !category && !subcategory) {
     if (genre === "sin-categoria") {
       listings = listings.filter((l) => !l.book.genre);
     } else {
@@ -159,16 +171,8 @@ export default async function HomePage({ searchParams }: Props) {
 
   const allListings = (rawListings as unknown as ListingWithBook[]) ?? [];
   const totalListings = allListings.length;
-  const genreMap = new Map<string, number>();
-  let uncategorizedCount = 0;
-  for (const l of allListings) {
-    const g = l.book.genre;
-    if (g) genreMap.set(g, (genreMap.get(g) ?? 0) + 1);
-    else uncategorizedCount++;
-  }
-  const categories = Array.from(genreMap.entries())
-    .map(([genre, count]) => ({ genre, count }))
-    .sort((a, b) => b.count - a.count);
+
+  const categoryTree = await buildCategoryTree(supabase, allListings as any);
 
   return (
     <div className="min-h-screen bg-cream">
@@ -176,12 +180,13 @@ export default async function HomePage({ searchParams }: Props) {
       <HomeShell totalListings={totalListings} hasFilters={hasFilters}>
         <Breadcrumbs items={[
           { label: "Inicio", href: "/" },
-          { label: "Tienda", href: genre ? "/" : undefined },
-          ...(genre ? [{ label: genre === "sin-categoria" ? "Sin categoría" : translateGenre(genre) }] : []),
+          { label: "Tienda", href: (category || subcategory || tag) ? "/" : undefined },
+          ...(category ? [{ label: categoryTree.find((c) => c.slug === category)?.name ?? category, href: subcategory ? `/?category=${category}` : undefined }] : []),
+          ...(subcategory ? [{ label: categoryTree.flatMap((c) => c.children).find((c) => c.slug === subcategory)?.name ?? subcategory }] : []),
+          ...(tag ? [{ label: `#${tag}` }] : []),
         ]} />
-        <CategoriesMobileDrawer categories={categories} activeGenre={genre} />
         <div className="flex gap-10">
-          <CategoriesSidebar categories={categories} activeGenre={genre} uncategorizedCount={uncategorizedCount} />
+          <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalListings} />
 
           <div className="flex-1 min-w-0">
             {!hasFilters && (featuredListings.length > 0 || featuredSellers.length > 0) && (
@@ -203,6 +208,9 @@ export default async function HomePage({ searchParams }: Props) {
 
                   const buildHref = (p: number) => {
                     const params = new URLSearchParams();
+                    if (category) params.set("category", category);
+                    if (subcategory) params.set("subcategory", subcategory);
+                    if (tag) params.set("tag", tag);
                     if (genre) params.set("genre", genre);
                     if (sort) params.set("sort", sort);
                     if (price_min) params.set("price_min", price_min);

@@ -120,6 +120,21 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             {book.author}
           </Link>
 
+          {/* Tags */}
+          {((book as any).tags ?? []).length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {((book as any).tags as string[]).map((tag: string) => (
+                <Link
+                  key={tag}
+                  href={`/?tag=${tag}`}
+                  className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-cream-warm text-ink-muted hover:bg-brand-50 hover:text-brand-600 transition-colors"
+                >
+                  #{tag}
+                </Link>
+              ))}
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2 mt-3">
             {book.genre && (
               <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-brand-50 text-brand-600 border border-brand-100">

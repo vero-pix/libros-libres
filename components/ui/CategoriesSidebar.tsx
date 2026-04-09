@@ -2,43 +2,46 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { translateGenre, CATEGORY_GROUPS } from "@/lib/genres";
 
-interface CategoryCount {
-  genre: string;
+interface CategoryNode {
+  slug: string;
+  name: string;
   count: number;
+  children: CategoryNode[];
 }
+
+const FEATURED_TAGS = [
+  { tag: "Coleccionable", label: "Coleccionable" },
+  { tag: "BibliotecaDeBabel", label: "Biblioteca de Babel" },
+  { tag: "Clasico", label: "Clásico" },
+  { tag: "PrimeraEdicion", label: "Primera edición" },
+  { tag: "Borges", label: "Borges" },
+  { tag: "NovelaNegra", label: "Novela negra" },
+];
 
 interface Props {
-  categories: CategoryCount[];
-  activeGenre?: string;
-  uncategorizedCount?: number;
+  categoryTree: CategoryNode[];
+  activeCategory?: string;
+  activeSubcategory?: string;
+  activeTag?: string;
+  totalCount?: number;
 }
 
-export default function CategoriesSidebar({ categories, activeGenre, uncategorizedCount }: Props) {
-  const countMap = new Map(categories.map((c) => [c.genre, c.count]));
-
-  const groups = CATEGORY_GROUPS
-    .map((group) => ({
-      ...group,
-      items: group.genres
-        .filter((g) => countMap.has(g))
-        .map((g) => ({ genre: g, count: countMap.get(g)! })),
-    }))
-    .filter((group) => group.items.length > 0);
-
-  const groupedGenres = new Set(CATEGORY_GROUPS.flatMap((g) => g.genres));
-  const ungrouped = categories.filter((c) => !groupedGenres.has(c.genre));
-
-  // Determine which group is initially open (the one containing active genre, or first)
-  const activeGroupIdx = activeGenre
-    ? groups.findIndex((g) => g.items.some((i) => i.genre === activeGenre))
-    : 0;
+export default function CategoriesSidebar({
+  categoryTree,
+  activeCategory,
+  activeSubcategory,
+  activeTag,
+  totalCount,
+}: Props) {
+  // Open the group that contains the active subcategory
+  const activeGroupIdx = activeCategory
+    ? categoryTree.findIndex((c) => c.slug === activeCategory)
+    : -1;
 
   const [openGroups, setOpenGroups] = useState<Set<number>>(() => {
     const initial = new Set<number>();
     if (activeGroupIdx >= 0) initial.add(activeGroupIdx);
-    else if (groups.length > 0) initial.add(0);
     return initial;
   });
 
@@ -56,35 +59,44 @@ export default function CategoriesSidebar({ categories, activeGenre, uncategoriz
       <h2 className="font-display font-bold text-base text-ink mb-4 tracking-tight">
         Categorías
       </h2>
+
       <ul className="space-y-0.5">
         <li>
           <Link
             href="/"
             className={`block text-sm py-2 px-3 rounded-lg transition-colors ${
-              !activeGenre
+              !activeCategory && !activeTag
                 ? "bg-brand-50 text-brand-600 font-medium"
                 : "text-ink-muted hover:bg-cream-warm hover:text-ink"
             }`}
           >
-            Todos
+            Todos {totalCount != null && <span className="text-ink-light text-xs">({totalCount})</span>}
           </Link>
         </li>
       </ul>
 
-      {groups.map((group, idx) => {
+      {categoryTree.map((group, idx) => {
+        if (group.count === 0) return null;
         const isOpen = openGroups.has(idx);
-        const groupCount = group.items.reduce((sum, i) => sum + i.count, 0);
         return (
-          <div key={group.label} className="mt-3">
+          <div key={group.slug} className="mt-3">
             <button
               onClick={() => toggleGroup(idx)}
               className="w-full flex items-center justify-between px-3 py-1.5 group"
             >
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-ink-muted/60 group-hover:text-ink-muted transition-colors">
-                {group.label}
-              </span>
+              <Link
+                href={`/?category=${group.slug}`}
+                onClick={(e) => e.stopPropagation()}
+                className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${
+                  activeCategory === group.slug && !activeSubcategory
+                    ? "text-brand-600"
+                    : "text-ink-muted/60 group-hover:text-ink-muted"
+                }`}
+              >
+                {group.name}
+              </Link>
               <span className="flex items-center gap-1.5">
-                <span className="text-[10px] text-ink-muted/40">{groupCount}</span>
+                <span className="text-[10px] text-ink-muted/40">{group.count}</span>
                 <svg
                   className={`w-3 h-3 text-ink-muted/40 transition-transform ${isOpen ? "rotate-180" : ""}`}
                   fill="none"
@@ -96,73 +108,53 @@ export default function CategoriesSidebar({ categories, activeGenre, uncategoriz
                 </svg>
               </span>
             </button>
-            {isOpen && (
+            {isOpen && group.children.length > 0 && (
               <ul className="space-y-0.5 mt-0.5">
-                {group.items.map((cat) => (
-                  <li key={cat.genre}>
-                    <Link
-                      href={`/?genre=${encodeURIComponent(cat.genre)}`}
-                      className={`block text-sm py-1.5 px-3 rounded-lg transition-colors ${
-                        activeGenre === cat.genre
-                          ? "bg-brand-50 text-brand-600 font-medium"
-                          : "text-ink-muted hover:bg-cream-warm hover:text-ink"
-                      }`}
-                    >
-                      {translateGenre(cat.genre)}{" "}
-                      <span className="text-ink-light text-xs">({cat.count})</span>
-                    </Link>
-                  </li>
-                ))}
+                {group.children.map((sub) => {
+                  if (sub.count === 0) return null;
+                  return (
+                    <li key={sub.slug}>
+                      <Link
+                        href={`/?category=${group.slug}&subcategory=${sub.slug}`}
+                        className={`block text-sm py-1.5 px-3 rounded-lg transition-colors ${
+                          activeSubcategory === sub.slug
+                            ? "bg-brand-50 text-brand-600 font-medium"
+                            : "text-ink-muted hover:bg-cream-warm hover:text-ink"
+                        }`}
+                      >
+                        {sub.name}{" "}
+                        <span className="text-ink-light text-xs">({sub.count})</span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
         );
       })}
 
-      {ungrouped.length > 0 && (
-        <div className="mt-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-muted/60 px-3 mb-1">
-            Otros
-          </p>
-          <ul className="space-y-0.5">
-            {ungrouped.map((cat) => (
-              <li key={cat.genre}>
-                <Link
-                  href={`/?genre=${encodeURIComponent(cat.genre)}`}
-                  className={`block text-sm py-1.5 px-3 rounded-lg transition-colors ${
-                    activeGenre === cat.genre
-                      ? "bg-brand-50 text-brand-600 font-medium"
-                      : "text-ink-muted hover:bg-cream-warm hover:text-ink"
-                  }`}
-                >
-                  {translateGenre(cat.genre)}{" "}
-                  <span className="text-ink-light text-xs">({cat.count})</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+      {/* Tags destacados */}
+      <div className="mt-6 pt-4 border-t border-cream-dark/20">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-muted/60 px-3 mb-2">
+          Tags destacados
+        </p>
+        <div className="flex flex-wrap gap-1.5 px-3">
+          {FEATURED_TAGS.map((t) => (
+            <Link
+              key={t.tag}
+              href={`/?tag=${t.tag}`}
+              className={`text-[11px] px-2.5 py-1 rounded-full transition-colors ${
+                activeTag === t.tag
+                  ? "bg-brand-500 text-white"
+                  : "bg-cream-warm text-ink-muted hover:bg-brand-50 hover:text-brand-600"
+              }`}
+            >
+              #{t.label}
+            </Link>
+          ))}
         </div>
-      )}
-
-      {(uncategorizedCount ?? 0) > 0 && (
-        <div className="mt-3">
-          <ul className="space-y-0.5">
-            <li>
-              <Link
-                href="/?genre=sin-categoria"
-                className={`block text-sm py-1.5 px-3 rounded-lg transition-colors ${
-                  activeGenre === "sin-categoria"
-                    ? "bg-brand-50 text-brand-600 font-medium"
-                    : "text-ink-muted hover:bg-cream-warm hover:text-ink"
-                }`}
-              >
-                Sin categoría{" "}
-                <span className="text-ink-light text-xs">({uncategorizedCount})</span>
-              </Link>
-            </li>
-          </ul>
-        </div>
-      )}
+      </div>
     </aside>
   );
 }

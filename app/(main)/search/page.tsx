@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
+import { buildCategoryTree } from "@/lib/categoryTree";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
@@ -111,16 +112,8 @@ export default async function SearchPage({ searchParams }: Props) {
     );
   }
 
-  // Build category counts from all results (before genre filter)
   const allListings = (rawListings as unknown as ListingWithBook[]) ?? [];
-  const genreMap = new Map<string, number>();
-  for (const l of allListings) {
-    const g = l.book.genre;
-    if (g) genreMap.set(g, (genreMap.get(g) ?? 0) + 1);
-  }
-  const categories = Array.from(genreMap.entries())
-    .map(([genre, count]) => ({ genre, count }))
-    .sort((a, b) => b.count - a.count);
+  const categoryTree = await buildCategoryTree(supabase, allListings as any);
 
   return (
     <div className="min-h-screen bg-white">
@@ -138,7 +131,7 @@ export default async function SearchPage({ searchParams }: Props) {
         )}
 
         <div className="flex gap-8">
-          <CategoriesSidebar categories={categories} activeGenre={genre} />
+          <CategoriesSidebar categoryTree={categoryTree} />
 
           <div className="flex-1 min-w-0">
             <Suspense fallback={<div className="h-10 bg-gray-100 rounded-lg animate-pulse mb-4" />}>

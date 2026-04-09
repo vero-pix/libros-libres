@@ -4,6 +4,8 @@ import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { slugify } from "@/lib/slugify";
+import { normalizeGenre } from "@/lib/genreNormalizer";
+import { suggestTags } from "@/lib/tagSuggester";
 import ISBNSearch from "@/components/books/ISBNSearch";
 import dynamic from "next/dynamic";
 import type { LocationData } from "@/components/map/DraggableLocationPicker";
@@ -181,6 +183,16 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
     try {
       // Si el libro tiene ISBN, hacer upsert para evitar duplicados.
       // Si no tiene ISBN (ingreso manual), hacer insert directo.
+      const rawGenre = genre || book.genre || "";
+      const normalized = normalizeGenre(rawGenre, book.title, book.description);
+      const tags = suggestTags({
+        title: book.title,
+        author: book.author,
+        category: normalized.category,
+        subcategory: normalized.subcategory,
+        description: book.description,
+      });
+
       const bookPayload = {
         isbn: book.isbn ?? null,
         title: book.title,
@@ -188,6 +200,9 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
         description: book.description ?? null,
         cover_url: customCoverUrl ?? book.cover_url ?? null,
         genre: genre || book.genre || null,
+        category: normalized.category,
+        subcategory: normalized.subcategory,
+        tags,
         published_year: book.published_year ?? null,
         publisher: book.publisher ?? null,
         pages: book.pages ?? null,

@@ -22,6 +22,9 @@ export interface Book {
   description: string | null;
   cover_url: string | null;
   genre: string | null;
+  category: string | null;
+  subcategory: string | null;
+  tags: string[];
   published_year: number | null;
   isbn: string | null;
   publisher: string | null;
