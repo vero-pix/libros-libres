@@ -98,6 +98,9 @@
 - [x] Tab Herramientas: botones para portadas, auditoría, sinopsis, metadata
 - [x] API /api/admin/enrich-metadata (ejecuta enriquecimiento desde panel)
 - [x] PageTracker invisible (registra cada visita en Supabase)
+- [x] Selector de vendedor en herramientas (filtrar operaciones por vendedor)
+- [x] Toggle featured (estrella) por publicación
+- [x] Escudo dorado solo en libros destacados (no en todos con MP)
 
 ### Datos y calidad (sesión 9 abril)
 - [x] 116+ libros publicados activos
@@ -109,6 +112,9 @@
 - [x] Validación título/autor obligatorios al publicar
 - [x] Detección imágenes placeholder en cards (onLoad size check)
 - [x] Búsqueda: strip paréntesis para evitar romper PostgREST or()
+- [x] Buscador: sugerencias navegan directo al libro (no re-buscan por título)
+- [x] Checkout: botón MercadoPago solo si vendedor tiene MP conectado
+- [x] CONTEXT.md reescrito como referencia técnica completa
 - [x] AdSense eliminado (generaba errores 403/400 sin estar aprobado)
 - [x] Tab Ubicación eliminado (redundante con pin de comuna)
 
@@ -118,7 +124,9 @@
 
 ### Shipit courier
 - [x] Webhook endpoint preparado (/api/webhooks/shipit)
-- [ ] Esperando respuesta de Camila (Shipit) con formato del payload
+- [x] Formato API corregido según docs oficiales (kind, platform, sizes, destiny)
+- [x] Respuesta enviada a Camila (Shipit) con detalle de integración
+- [ ] Esperando confirmación de Camila sobre couriers activos y tarifas
 - [ ] Tarifas no configuradas — Shipit debe activar couriers en la cuenta
 
 ### Revisión catálogo (a cargo de Verónica)
@@ -130,17 +138,22 @@
 
 ## Pendiente
 
-### 🔴 Reorganización de categorías (PRIORIDAD)
-- [ ] Definir taxonomía nueva: agrupar duplicadas (Ficción/Ficcion Literaria/Ficcion Clasica → Ficción)
-- [ ] Agregar categorías: Escolares, Universitarios, Técnicos
-- [ ] Migrar libros existentes a nuevas categorías
-- [ ] Selector de categorías unificado: mismo en publicación y sidebar
-- [ ] Eliminar scroll infinito de categorías sueltas en sidebar
+### ✅ Reorganización de categorías (COMPLETADO 9 abril)
+- [x] Tabla categories con árbol: 5 raíces, 32 subcategorías
+- [x] Taxonomía: Ficción, No ficción, Infantil/juvenil, Académicos, Coleccionables
+- [x] 160 libros migrados automáticamente con genreNormalizer
+- [x] Tags controlados (Clásico, Borges, BibliotecaDeBabel, Coleccionable, etc.)
+- [x] Sidebar reescrito: categorías desplegables + tags destacados clickeables
+- [x] Categorización automática al publicar (genreNormalizer + tagSuggester)
+- [x] API /api/books con filtros por category, subcategory, tag, precio
+- [x] Tags como chips clickeables en ficha del libro
 
-### 🔴 URLs amigables
-- [ ] Cambiar /listings/uuid por /libro/slug-del-titulo
-- [ ] Generar slugs automáticos desde títulos
-- [ ] Redirects de URLs antiguas
+### ✅ URLs amigables (COMPLETADO 9 abril)
+- [x] Ruta /libro/[slug] con metadata, JSON-LD, breadcrumbs
+- [x] 111 slugs generados desde títulos
+- [x] Slug autogenerado al publicar (con dedup)
+- [x] Redirect permanente /listings/[uuid] → /libro/[slug]
+- [x] 13 componentes actualizados (cards, mapa, carrito, buscador, recomendaciones)
 
 ### 🔴 Distribución y redes sociales (PRIORIDAD)
 
@@ -216,7 +229,10 @@
 
 ## Datos actuales (9 abril 2026)
 - 116+ libros publicados activos
+- 160 libros con taxonomía (category/subcategory/tags)
+- 111 URLs amigables (/libro/slug)
 - 92 libros enriquecidos con metadata
+- 5 categorías principales, 32 subcategorías
 - 5+ usuarios registrados
 - 3 suscriptores newsletter
 - 1 venta real completada con split payment
