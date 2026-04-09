@@ -1,0 +1,106 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
+
+interface Meta {
+  publisher: string | null;
+  pages: number | null;
+  description: string | null;
+}
+
+async function fetchFromGoogle(isbn: string, title: string, author: string): Promise<Meta | null> {
+  const clean = isbn.replace(/[-\s]/g, "");
+  const queries = clean ? [`isbn:${clean}`, `${title} ${author}`] : [`${title} ${author}`];
+  for (const query of queries) {
+    try {
+      const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1`;
+      const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (data.error || !data.items?.length) continue;
+      const v = data.items[0].volumeInfo;
+      if (v.publisher || v.pageCount || v.description) {
+        return { publisher: v.publisher ?? null, pages: v.pageCount ?? null, description: v.description ?? null };
+      }
+    } catch { continue; }
+  }
+  return null;
+}
+
+async function fetchFromOpenLibrary(isbn: string): Promise<Meta | null> {
+  const clean = isbn.replace(/[-\s]/g, "");
+  if (!clean) return null;
+  try {
+    const [dataRes, detailsRes] = await Promise.all([
+      fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${clean}&format=json&jscmd=data`, { signal: AbortSignal.timeout(5000) }),
+      fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${clean}&format=json&jscmd=details`, { signal: AbortSignal.timeout(5000) }),
+    ]);
+    const dataJson = dataRes.ok ? await dataRes.json() : {};
+    const bookData = dataJson[`ISBN:${clean}`];
+    const detailsJson = detailsRes.ok ? await detailsRes.json() : {};
+    const details = detailsJson[`ISBN:${clean}`]?.details ?? {};
+
+    const publisher = bookData?.publishers?.[0]?.name ?? details?.publishers?.[0] ?? null;
+    const pages = details?.number_of_pages ?? bookData?.number_of_pages ?? null;
+    const description = details?.description?.value ?? details?.description ?? null;
+
+    if (publisher || pages || description) return { publisher, pages, description: typeof description === "string" ? description : null };
+  } catch { /* ok */ }
+  return null;
+}
+
+export async function POST() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+
+  const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
+  if (profile?.role !== "admin") return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+
+  const adminDb = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { cookies: { getAll: () => [], setAll: () => {} } },
+  );
+
+  const { data: books } = await adminDb
+    .from("books")
+    .select("id, isbn, title, author, publisher, pages, description");
+
+  if (!books?.length) return NextResponse.json({ summary: "No hay libros en la base de datos." });
+
+  const needsEnrich = books.filter((b) => !b.publisher || !b.pages || !b.description);
+  let enriched = 0;
+  const details: string[] = [];
+
+  for (const book of needsEnrich) {
+    // Rate limit
+    await new Promise((r) => setTimeout(r, 400));
+
+    let meta: Meta | null = null;
+    const google = await fetchFromGoogle(book.isbn ?? "", book.title, book.author ?? "");
+    const ol = book.isbn ? await fetchFromOpenLibrary(book.isbn) : null;
+
+    if (google && ol) {
+      meta = { publisher: google.publisher ?? ol.publisher, pages: google.pages ?? ol.pages, description: google.description ?? ol.description };
+    } else {
+      meta = google ?? ol;
+    }
+
+    if (!meta) continue;
+
+    const updates: Record<string, unknown> = {};
+    if (!book.publisher && meta.publisher) updates.publisher = meta.publisher;
+    if (!book.pages && meta.pages) updates.pages = meta.pages;
+    if (!book.description && meta.description) updates.description = meta.description;
+
+    if (Object.keys(updates).length > 0) {
+      await adminDb.from("books").update(updates).eq("id", book.id);
+      enriched++;
+      details.push(`${book.title}: ${Object.keys(updates).join(", ")}`);
+    }
+  }
+
+  const summary = `Enriquecidos: ${enriched} de ${needsEnrich.length} libros pendientes (${books.length} total).\n\n${details.join("\n")}`;
+  return NextResponse.json({ summary });
+}

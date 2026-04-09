@@ -35,7 +35,8 @@ async function fetchFromGoogle(isbn: string, title: string, author: string): Pro
   const clean = isbn.replace(/[-\s]/g, "");
   for (const query of [`isbn:${clean}`, `${title} ${author}`]) {
     try {
-      const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1${apiKey ? `&key=${apiKey}` : ""}`;
+      // No usar API key — la guardada está inválida y sin key funciona bien
+      const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1`;
       const res = await fetch(url);
       if (!res.ok) continue;
       const data = await res.json();
@@ -146,6 +147,9 @@ async function main() {
 
   for (const book of needsEnrich) {
     console.log(`  ${book.title} — ${book.author}...`);
+
+    // Rate limit: 500ms between books to avoid throttling without API key
+    await new Promise(r => setTimeout(r, 500));
 
     let meta: Meta | null = null;
     if (book.isbn) {
