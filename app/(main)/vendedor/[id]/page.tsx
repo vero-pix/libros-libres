@@ -6,6 +6,7 @@ import type { ListingWithBook } from "@/types";
 
 interface Props {
   params: { id: string };
+  searchParams: { sort?: string };
 }
 
 export async function generateMetadata({ params }: Props) {
@@ -36,7 +37,8 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-export default async function SellerStorePage({ params }: Props) {
+export default async function SellerStorePage({ params, searchParams }: Props) {
+  const sort = searchParams.sort;
   const supabase = await createClient();
 
   // Seller profile
@@ -56,7 +58,13 @@ export default async function SellerStorePage({ params }: Props) {
     .eq("status", "active")
     .order("created_at", { ascending: false });
 
-  const listings = (data as unknown as ListingWithBook[]) ?? [];
+  let listings = (data as unknown as ListingWithBook[]) ?? [];
+
+  // Sort
+  if (sort === "price_asc") listings = [...listings].sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+  else if (sort === "price_desc") listings = [...listings].sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+  else if (sort === "title") listings = [...listings].sort((a, b) => a.book.title.localeCompare(b.book.title));
+  else if (sort === "author") listings = [...listings].sort((a, b) => (a.book.author ?? "").localeCompare(b.book.author ?? ""));
 
   // Seller reviews: reviews for all listings owned by this seller
   const listingIds = listings.map((l) => l.id);
@@ -222,9 +230,32 @@ export default async function SellerStorePage({ params }: Props) {
         {/* Listings grid */}
         {listings.length > 0 ? (
           <>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Libros disponibles
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Libros disponibles
+              </h2>
+              <div className="flex gap-1.5 text-xs">
+                {[
+                  { key: "", label: "Recientes" },
+                  { key: "price_asc", label: "Precio ↑" },
+                  { key: "price_desc", label: "Precio ↓" },
+                  { key: "title", label: "Título" },
+                  { key: "author", label: "Autor" },
+                ].map((s) => (
+                  <a
+                    key={s.key}
+                    href={`/vendedor/${params.id}${s.key ? `?sort=${s.key}` : ""}`}
+                    className={`px-2.5 py-1.5 rounded-lg transition-colors ${
+                      (sort ?? "") === s.key
+                        ? "bg-brand-500 text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {s.label}
+                  </a>
+                ))}
+              </div>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
               {listings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />

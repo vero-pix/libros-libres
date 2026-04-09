@@ -109,7 +109,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{book.title}</h1>
             {isOwner && (
               <Link
-                href="/mis-libros"
+                href={`/mis-libros?edit=${listing.id}`}
                 className="flex-shrink-0 text-xs text-brand-600 hover:bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors"
               >
                 Editar
@@ -312,16 +312,49 @@ export default function ListingDetail({ listing, images = [] }: Props) {
 }
 
 function DetailTabs({ listing }: { listing: ListingWithBook }) {
+  const [activeTab, setActiveTab] = useState<"descripcion" | "preguntas" | "resenas">("descripcion");
   const { book } = listing;
+
+  // Lazy-load question and review components
+  const QuestionSection = activeTab === "preguntas" ? require("@/components/listings/QuestionSection").default : null;
+  const ReviewSection = activeTab === "resenas" ? require("@/components/listings/ReviewSection").default : null;
+
+  const tabs = [
+    { key: "descripcion" as const, label: "Descripción" },
+    { key: "preguntas" as const, label: "Preguntas" },
+    { key: "resenas" as const, label: "Reseñas" },
+  ];
 
   return (
     <div className="border-t border-gray-100">
-      <div className="px-5 sm:px-6 py-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-2">Descripción</h3>
-        {book.description ? (
-          <p className="text-sm text-gray-600 leading-relaxed">{book.description}</p>
-        ) : (
-          <p className="text-sm text-gray-400 italic">Sin sinopsis disponible. Consulta al vendedor por más detalles.</p>
+      <div className="flex border-b border-gray-100">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`flex-1 py-3 text-sm font-medium transition-colors ${
+              activeTab === tab.key
+                ? "text-brand-600 border-b-2 border-brand-500"
+                : "text-ink-muted hover:text-ink"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      <div className="px-5 sm:px-6 py-4 min-h-[120px]">
+        {activeTab === "descripcion" && (
+          book.description ? (
+            <p className="text-sm text-gray-600 leading-relaxed">{book.description}</p>
+          ) : (
+            <p className="text-sm text-gray-400 italic">Sin sinopsis disponible. Consulta al vendedor por más detalles.</p>
+          )
+        )}
+        {activeTab === "preguntas" && QuestionSection && (
+          <QuestionSection listingId={listing.id} sellerId={listing.seller_id} />
+        )}
+        {activeTab === "resenas" && ReviewSection && (
+          <ReviewSection listingId={listing.id} />
         )}
       </div>
     </div>

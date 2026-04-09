@@ -2,8 +2,6 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import ListingDetail from "@/components/listings/ListingDetail";
 import ListingCard from "@/components/listings/ListingCard";
-import ReviewSection from "@/components/listings/ReviewSection";
-import QuestionSection from "@/components/listings/QuestionSection";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import type { Metadata } from "next";
@@ -162,14 +160,6 @@ export default async function ListingPage({ params }: Props) {
 
           <div className="flex-1 min-w-0">
             <ListingDetail listing={listing} images={(images ?? []) as any} />
-
-            <div id="questions" className="mt-6 bg-white rounded-2xl border border-gray-200 overflow-hidden">
-              <QuestionSection listingId={params.id} sellerId={listing.seller_id} />
-            </div>
-
-            <div id="reviews" className="mt-6 bg-white rounded-2xl border border-gray-200 overflow-hidden">
-              <ReviewSection listingId={params.id} />
-            </div>
 
             {relatedListings.length > 0 && (
               <section className="mt-10">

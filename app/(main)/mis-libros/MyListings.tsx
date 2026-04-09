@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import type { ListingWithBook, ListingStatus } from "@/types";
@@ -33,7 +34,13 @@ interface Props {
 
 export default function MyListings({ listings: initial }: Props) {
   const [listings, setListings] = useState(initial);
+  const searchParams = useSearchParams();
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const editParam = searchParams.get("edit");
+    if (editParam) setEditingId(editParam);
+  }, [searchParams]);
   const [loading, setLoading] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | ListingStatus>("all");
   const supabase = createClient();

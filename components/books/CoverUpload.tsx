@@ -77,6 +77,16 @@ export default function CoverUpload({ currentUrl, onUploaded }: Props) {
           />
           <button
             type="button"
+            onClick={() => { setPreview(null); onUploaded(""); }}
+            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-sm hover:bg-red-600 text-xs"
+            title="Eliminar portada"
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <button
+            type="button"
             onClick={() => inputRef.current?.click()}
             className="absolute -bottom-2 -right-2 w-7 h-7 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-sm hover:bg-gray-50 text-xs"
             title="Cambiar foto"
@@ -112,7 +122,6 @@ export default function CoverUpload({ currentUrl, onUploaded }: Props) {
         ref={inputRef}
         type="file"
         accept="image/*"
-        capture="environment"
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
