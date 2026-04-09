@@ -1,6 +1,6 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 8 abril 2026, 23:00
+Última actualización: 9 abril 2026, 13:00
 
 ---
 
@@ -15,7 +15,6 @@
 - [x] Confirmación email
 - [x] Google OAuth ✅ funcionando
 - [x] LinkedIn OAuth ✅ funcionando
-- [x] AdSense + ads.txt (esperando aprobación Google — estado "Preparando")
 - [x] Sitemap + robots.txt + SEO redirects (WordPress legacy → Next.js + /libro/:slug)
 - [x] Compresión imágenes
 - [x] PWA instalable (manifest + iconos + service worker offline)
@@ -26,10 +25,10 @@
 ### UI/UX — Estilo Martfury
 - [x] Paleta cream unificada todas las páginas
 - [x] Navbar sticky + fix dropdowns (Mi cuenta, Ayuda)
-- [x] Categorías agrupadas (6 grupos) + mobile drawer
+- [x] Categorías agrupadas (6 grupos) + mobile drawer + colapsables
 - [x] Autocompletado + filtro autor
 - [x] Paginación numérica
-- [x] Tabs detalle libro
+- [x] Ficha libro: tabs Descripción / Preguntas / Reseñas (integrados)
 - [x] Libros relacionados + breadcrumbs
 - [x] Quickview modal + vista lista
 - [x] Vistos recientemente
@@ -40,12 +39,12 @@
 - [x] Precios con descuento (tachado + badge)
 - [x] ListingCard: badges, hover, avatar vendedor, placeholder blur
 - [x] Footer, HeroBar, Back to top, Sidebar sticky
-- [x] Fix espacio en blanco iOS Safari (AdSlot)
-- [x] Terminología unificada: "Arriendo" en toda la app (antes "Préstamo")
+- [x] Terminología unificada: "Arriendo" en toda la app
 - [x] Filtro modalidad: "Arriendo" muestra loan + both
 - [x] Portada generada con título+autor cuando no hay imagen
 - [x] Etiquetas género clickeables en perfil vendedor
 - [x] Botón Instagram en ShareButtons
+- [x] Galería imágenes con ancho fijo (fix colapso w-full → w-[280px])
 
 ### Marketplace
 - [x] Split Payment producción ✅ verificado con venta real
@@ -54,18 +53,27 @@
 - [x] WhatsApp como alternativa sin MP (gratis, sin comisión)
 - [x] Arriendos completos con flujo devolución
 - [x] Dashboard ventas + carrito persistente
-- [x] Galería imágenes (publicación + post)
+- [x] Galería imágenes (publicación + post + edición)
 - [x] Reviews/valoraciones + estrellas en cards
 - [x] Marcar como vendido
 - [x] Libros destacados por plan (badge "Destacado", prioridad en grilla)
 - [x] Filtro "Cerca de mí" (geolocalización navegador + haversine)
 - [x] Sistema de recomendaciones (por género/autor, con cache)
 - [x] Preguntas públicas al vendedor (estilo MercadoLibre + emails)
-- [x] Importador masivo CSV desde la web (gratis, con preview y portadas automáticas)
+- [x] Importador masivo CSV desde la web
 - [x] Botones compartir en redes (WhatsApp, Facebook, Instagram, X, copiar link)
+- [x] Botón Editar en ficha propia (va directo al libro con ?edit=ID)
+- [x] Fotos adicionales al editar libro (ImageUploadMultiple en EditForm)
+- [x] Primera foto extra se asigna como portada si no hay cover
+- [x] CoverUpload mobile: galería + cámara (sin capture forzado) + eliminar portada
+
+### Página vendedor
+- [x] Perfil: avatar, nombre, ciudad, bio, miembro desde, stats
+- [x] Canales contacto: WhatsApp, Instagram, Email
+- [x] Sorting: Recientes, Precio ↑↓, Título, Autor
 
 ### SEO & Performance (auditoría 7 abril — 16/16 items)
-- [x] Metadata dinámica en listing detail + search + vendedor (generateMetadata + OG tags)
+- [x] Metadata dinámica en listing detail + search + vendedor
 - [x] JSON-LD schemas (Product, BreadcrumbList, Organization)
 - [x] Lazy load mapbox en formularios de publicación
 - [x] next/image en todos los componentes + alt descriptivos + aria-labels
@@ -75,166 +83,143 @@
 
 ### Emails (10+ transaccionales)
 - [x] Confirmación registro
-- [x] Bienvenida newsletter
-- [x] Bienvenida nuevo usuario (3 pasos + CTA publicar)
-- [x] Notificación admin cuando se registra usuario nuevo
-- [x] Notificación contacto → vero@economics.cl
+- [x] Bienvenida newsletter + nuevo usuario
+- [x] Notificaciones admin (nuevo usuario, contacto)
 - [x] Confirmación compra/arriendo → comprador
 - [x] Notificación venta/arriendo → vendedor
-- [x] Cambios estado arriendo (entrega, devolución, vencido)
-- [x] Nueva pregunta → vendedor
-- [x] Pregunta respondida → comprador
+- [x] Cambios estado arriendo
+- [x] Preguntas → vendedor / respondidas → comprador
 - [x] Newsletter sender (admin panel + template)
-
-### Contenido UX (7 abril)
-- [x] FAQ reescrito: 5 secciones (compradores, vendedores, planes/comisiones, arriendos, cuenta)
-- [x] Planes: comparador visual Modo Libre vs Modo Pro
-- [x] Cómo Funciona: 3 flujos reales (directa, MercadoPago, arriendo) + 5 beneficios
-- [x] CONTEXT.md + MODELO-NEGOCIO.md corregidos (nunca fee fijo)
 
 ### Admin
 - [x] Panel con stats, delete individual/masivo, filtros por status
 - [x] Tab Newsletter con preview y botón enviar
-- [x] Tab Analytics: visitas/día, navegadores, OS, dispositivos, páginas top, libros más vistos
+- [x] Tab Analytics: visitas/día, navegadores, OS, dispositivos, páginas top
+- [x] Tab Herramientas: botones para portadas, auditoría, sinopsis, metadata
+- [x] API /api/admin/enrich-metadata (ejecuta enriquecimiento desde panel)
 - [x] PageTracker invisible (registra cada visita en Supabase)
-- [x] Webhook notificación nuevo usuario → admin
 
-### Datos y carga
-- [x] 95+ libros publicados (históricos + 63 carga masiva sesión 8 abril)
-- [x] Script bulk-upload-csv.ts mejorado (auto-enriquece, precios individuales, notas, --price/--notes CLI)
-- [x] Script enrich-listings.ts (audita y completa datos faltantes desde Open Library)
-- [x] Open Library API corregida
-- [x] Precios investigados por mercado para libros raros (Biblioteca de Babel, ediciones antiguas)
+### Datos y calidad (sesión 9 abril)
+- [x] 116+ libros publicados activos
+- [x] 92 libros enriquecidos con metadata (editorial, páginas, sinopsis) via Google Books + Open Library
+- [x] 47 portadas arregladas con script fix-covers + 8 de Open Library + 4 recortadas de fotos reales
+- [x] 13 sinopsis spam/inglés eliminadas + filtro: solo acepta sinopsis en español
+- [x] 13 editoriales falsas ("ISBN Handbook") eliminadas
+- [x] Google Books API key inválida → script funciona sin key
+- [x] Validación título/autor obligatorios al publicar
+- [x] Detección imágenes placeholder en cards (onLoad size check)
+- [x] Búsqueda: strip paréntesis para evitar romper PostgREST or()
+- [x] AdSense eliminado (generaba errores 403/400 sin estar aprobado)
+- [x] Tab Ubicación eliminado (redundante con pin de comuna)
 
 ---
 
 ## En progreso
 
 ### Shipit courier
-- [x] Integración código lista (lib/shipit.ts + /api/shipping/quote)
-- [ ] Tarifas no configuradas — Shipit debe activar couriers en la cuenta (email enviado)
-
-### AdSense
-- [x] ads.txt autorizado
-- [ ] Sitio en estado "Preparando" — esperando aprobación de Google
+- [x] Webhook endpoint preparado (/api/webhooks/shipit)
+- [ ] Esperando respuesta de Camila (Shipit) con formato del payload
+- [ ] Tarifas no configuradas — Shipit debe activar couriers en la cuenta
 
 ### Revisión catálogo (a cargo de Verónica)
-- [ ] Revisar libros que quedaron con datos incorrectos (portadas, sinopsis, categorías)
-- [ ] Corregir manualmente los que el enrich automático no pudo completar (14 sin descripción)
+- [ ] Revisar portadas que no corresponden a la edición real
+- [ ] Subir fotos faltantes manualmente (7 libros sin portada)
+- [ ] Corregir sinopsis incorrectas restantes
 
 ---
 
 ## Pendiente
 
+### 🔴 Reorganización de categorías (PRIORIDAD)
+- [ ] Definir taxonomía nueva: agrupar duplicadas (Ficción/Ficcion Literaria/Ficcion Clasica → Ficción)
+- [ ] Agregar categorías: Escolares, Universitarios, Técnicos
+- [ ] Migrar libros existentes a nuevas categorías
+- [ ] Selector de categorías unificado: mismo en publicación y sidebar
+- [ ] Eliminar scroll infinito de categorías sueltas en sidebar
+
+### 🔴 URLs amigables
+- [ ] Cambiar /listings/uuid por /libro/slug-del-titulo
+- [ ] Generar slugs automáticos desde títulos
+- [ ] Redirects de URLs antiguas
+
 ### 🔴 Distribución y redes sociales (PRIORIDAD)
 
 **Fase 1 — Presencia (semana 9-13 abril)**
-- [ ] Crear cuenta Instagram @tuslibros.cl (perfil profesional, bio, link)
-- [ ] Publicar 3 stories con banners Canva (acumulando polvo, publicar, pago seguro)
-- [ ] Publicar post feed Instagram: carrusel "Qué es tuslibros.cl" (5 slides)
-- [ ] Publicar post LinkedIn: lanzamiento tuslibros.cl (ya redactado)
-- [ ] Enviar newsletter de lanzamiento a suscriptores (template listo)
+- [ ] Crear cuenta Instagram @tuslibros.cl
+- [ ] Publicar 3 stories con banners Canva
+- [ ] Publicar post feed Instagram: carrusel "Qué es tuslibros.cl"
+- [ ] Publicar post LinkedIn: lanzamiento tuslibros.cl
+- [ ] Enviar newsletter de lanzamiento a suscriptores
 
 **Fase 2 — Tracción (semana 14-20 abril)**
-- [ ] Publicar 2-3 posts/semana en Instagram (libros nuevos, colecciones, tips)
-- [ ] Ejecutar kit metralleta en canales universitarios (mensajes listos)
+- [ ] Publicar 2-3 posts/semana en Instagram
+- [ ] Ejecutar kit metralleta en canales universitarios
 - [ ] Compartir en grupos Facebook de lectura/libros Chile
-- [ ] Publicar post LinkedIn: "Cómo construí tuslibros.cl con Claude" (vincular cursos)
 - [ ] Contactar 20 vendedores históricos con mensaje personalizado
 
 **Fase 3 — Escala (semana 21+ abril)**
-- [ ] Evaluar herramienta automatización (Buffer/Later) si volumen lo justifica
+- [ ] Evaluar herramienta automatización (Buffer/Later)
 - [ ] Contenido recurrente: "Libro de la semana", "Colección destacada"
-- [ ] Cápsulas video cortas para Instagram Reels / LinkedIn
 - [ ] Recontactar resto de 150+ vendedores históricos
-- [ ] WhatsApp Business para tuslibros.cl (perfil verificado)
-
-### Fotos reales como portadas
-- [ ] Implementar recorte de fotos grupales → portadas individuales
-- [ ] Subir a Supabase Storage y actualizar listings
-- [ ] Alternativa: permitir upload individual desde "Mis libros" (ya existe el componente)
-
-### Requiere acción de Verónica
-- [ ] Apple OAuth ($99/año) — decidir si vale la pena
-- [ ] Recontactar 150+ vendedores históricos de tuslibros.cl
-- [ ] Configurar webhook Supabase para notificación nuevo usuario
-- [ ] WhatsApp Business para tuslibros.cl (perfil verificado)
-
-### Marketplace & descubrimiento
-- [ ] Fila de libros destacados en home (marca estrella, manejados por admin)
-- [ ] Vendedores destacados en home (marca estrella, manejados por admin)
-- [ ] Filtro por vendedor en la tienda
-- [ ] Filtros por encuadernación, editorial, páginas
-- [ ] Newsletter semanal — elegir día estratégico de envío
-- [ ] Fusionar "Punto de retiro" y "Encuentro en persona" en una sola opción
 
 ### Panel analytics vendedores
 - [ ] Dashboard por vendedor: visitas, mensajes, ventas, libros publicados
-- [ ] Primeros 50 vendedores registrados: panel gratis de por vida
-- [ ] Después de los 50: feature de plan Librero/Librería
+- [ ] Primeros 50 vendedores: panel gratis de por vida
+- [ ] Después: feature de plan Librero/Librería
 
-### Botón actualizador de tienda (solo admin)
-- [ ] Botón que corre enriquecimiento masivo: metadata + portadas + sinopsis
-- [ ] No visible para vendedores, solo para admin (Verónica)
-- [ ] Después evaluar si ofrecer como feature de pago
-
-### Cron jobs (Claude /schedule)
-- [x] **Enriquecer metadata libros** — enrich-books-metadata.ts (pendiente: agregar Open Library como fallback)
-- [x] **Auditoría portadas** — fix-covers.ts (43 arregladas, 2 pendientes manuales)
-- [ ] **Google Trends ranking** — ya existe cron diario 6am (trending_score)
-- [ ] **Newsletter automático** — envío semanal con novedades (pendiente definir día)
-- [ ] **Limpieza listings inactivos** — avisar vendedores con libros >90 días sin actividad
+### Cron jobs
+- [ ] Google Trends ranking (trending_score)
+- [ ] Newsletter automático semanal
+- [ ] Limpieza listings inactivos >90 días
 
 ### Features futuros
-- [ ] Páginas newsletter: testimonios, historia García Márquez, voces reales
-- [ ] Sección "Voces reales" en home o landing
-- [ ] Tracking envíos (cuando Shipit active tarifas)
-- [ ] Cotización envío en tiempo real (cuando Shipit active tarifas)
-- [ ] OAuth Facebook/Instagram
-- [ ] Compartir en Instagram Stories al publicar libro (abre app con imagen pre-cargada)
-- [ ] Buscador en página del vendedor (/vendedor/[id]) para filtrar sus libros
-- [ ] Buscador en /mis-libros para encontrar publicaciones propias rápido
-- [ ] Subir múltiples fotos al editar libro en /mis-libros (agregar ImageUploadMultiple al EditForm)
-- [ ] Mensajería interna entre compradores y vendedores (bandeja de entrada en la plataforma)
-- [ ] Dominio personalizado Supabase
-- [ ] Cápsulas LinkedIn (videos cortos)
-- [ ] Panel analytics para vendedores Pro (basado en admin analytics)
+- [ ] Mensajería interna entre compradores y vendedores
+- [ ] Filtros por encuadernación, editorial, páginas
+- [ ] Buscador en página del vendedor
+- [ ] Buscador en /mis-libros
 - [ ] Foto-a-catálogo completo: IA identifica libros de foto grupal → publicación masiva
+- [ ] Tracking envíos (cuando Shipit active)
+- [ ] OAuth Facebook/Instagram
+- [ ] Compartir en Instagram Stories al publicar
+- [ ] Newsletter semanal — elegir día estratégico
+- [ ] Dominio personalizado Supabase
+
+### Requiere acción de Verónica
+- [ ] Apple OAuth ($99/año) — decidir si vale la pena
+- [ ] Recontactar 150+ vendedores históricos
+- [ ] WhatsApp Business para tuslibros.cl
 
 ### Descartados
 - ~~Checkout múltiple carrito~~ — split payment MP no soporta múltiples vendedores
 - ~~Infinite scroll~~ — paginación numérica es mejor para SEO
-- ~~Suscripciones mensuales~~ — no atractivas en esta etapa, foco en comisiones por venta
+- ~~Suscripciones mensuales~~ — foco en comisiones por venta
 - ~~Fee fijo~~ — nunca habrá fee fijo
+- ~~AdSense~~ — eliminado, generaba errores sin aprobación
 
 ---
 
 ## Monetización actual
-- **Comisiones MP**: 3-8% por venta/arriendo (ya funcionando, primera venta real 6 abril)
-- **AdSense**: esperando aprobación Google (ads.txt listo, AdSlots posicionados)
+- **Comisiones MP**: 3-8% por venta/arriendo (funcionando desde 6 abril)
 - **Suscripciones**: descartadas por ahora
 
 ---
 
-## Datos actuales (8 abril 2026)
-- 95+ libros publicados (incluyendo piezas de colección $40.000+)
+## Datos actuales (9 abril 2026)
+- 116+ libros publicados activos
+- 92 libros enriquecidos con metadata
 - 5+ usuarios registrados
 - 3 suscriptores newsletter
 - 1 venta real completada con split payment
 - 10+ emails transaccionales funcionando
 - PWA instalable + service worker offline
 - Analytics propias con tracking de visitas
-- SEO score ~10/10
-- 5 banners marketing en Canva (con brand kit)
 - Stack: Next.js 14, Supabase, MercadoPago, Mapbox, Resend, Vercel Analytics
 
 ---
 
 ## Documentos de referencia
 - `MODELO-NEGOCIO.md` — flujos de pago, planes, comisiones, ciclo arriendo
-- `MARTFURY_TO_NEXTJS_SPEC.md` — spec migración tema WP, mapping componentes
 - `CONTEXT.md` — contexto técnico del proyecto
 - `docs/INSTRUCCIONES_CARGA_MASIVA.md` — formato CSV para vendedores
-- `docs/PROMPT_CLAUDE_CODE_CONTENIDO_UX.md` — spec overhaul contenido UX
 - `docs/tuslibros_gtm.html` — Go-to-market strategy completa
-- `docs/tuslibros_kit_metralleta.html` — Kit táctico de mensajes listos para distribución
+- `docs/tuslibros_kit_metralleta.html` — Kit táctico de mensajes listos
