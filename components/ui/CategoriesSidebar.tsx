@@ -76,7 +76,6 @@ export default function CategoriesSidebar({
       </ul>
 
       {categoryTree.map((group, idx) => {
-        if (group.count === 0) return null;
         const isOpen = openGroups.has(idx);
         return (
           <div key={group.slug} className="mt-3">
@@ -110,9 +109,7 @@ export default function CategoriesSidebar({
             </button>
             {isOpen && group.children.length > 0 && (
               <ul className="space-y-0.5 mt-0.5">
-                {group.children.map((sub) => {
-                  if (sub.count === 0) return null;
-                  return (
+                {group.children.map((sub) => (
                     <li key={sub.slug}>
                       <Link
                         href={`/?category=${group.slug}&subcategory=${sub.slug}`}
@@ -126,8 +123,7 @@ export default function CategoriesSidebar({
                         <span className="text-ink-light text-xs">({sub.count})</span>
                       </Link>
                     </li>
-                  );
-                })}
+                ))}
               </ul>
             )}
           </div>
