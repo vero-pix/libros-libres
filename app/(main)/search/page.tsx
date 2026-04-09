@@ -51,7 +51,9 @@ export default async function SearchPage({ searchParams }: Props) {
   // Si hay búsqueda de texto, primero encontrar los book IDs que coincidan
   let matchingBookIds: string[] | null = null;
   if (q) {
-    const term = `%${q}%`;
+    // Strip parentheses and special chars that break PostgREST or() syntax
+    const clean = q.replace(/[()]/g, "").trim();
+    const term = `%${clean}%`;
     const { data: matchedBooks } = await supabase
       .from("books")
       .select("id")
