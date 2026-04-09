@@ -95,7 +95,7 @@ export default function QuickViewModal({ listing, onClose }: Props) {
             </div>
 
             {listing.price != null && (
-              <p className="font-display font-bold text-2xl text-ink mt-4">
+              <p className="font-semibold text-2xl text-ink mt-4 tracking-tight">
                 ${listing.price.toLocaleString("es-CL")}
               </p>
             )}

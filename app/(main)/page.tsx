@@ -10,6 +10,8 @@ import RecentlyViewed from "@/components/listings/RecentlyViewed";
 import Recommendations from "@/components/listings/Recommendations";
 import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import { translateGenre } from "@/lib/genres";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
 
@@ -137,6 +139,11 @@ export default async function HomePage({ searchParams }: Props) {
     <div className="min-h-screen bg-cream">
 
       <HomeShell totalListings={totalListings} hasFilters={hasFilters}>
+        <Breadcrumbs items={[
+          { label: "Inicio", href: "/" },
+          { label: "Tienda", href: genre ? "/" : undefined },
+          ...(genre ? [{ label: translateGenre(genre) }] : []),
+        ]} />
         <CategoriesMobileDrawer categories={categories} activeGenre={genre} />
         <div className="flex gap-10">
           <CategoriesSidebar categories={categories} activeGenre={genre} />

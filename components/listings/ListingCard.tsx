@@ -144,7 +144,7 @@ export default function ListingCard({ listing }: Props) {
                   ${Number((listing as unknown as Record<string, unknown>).original_price).toLocaleString("es-CL")}
                 </span>
               )}
-              <p className="font-display font-bold text-ink text-lg">
+              <p className="font-semibold text-ink text-lg tracking-tight">
                 ${listing.price.toLocaleString("es-CL")}
               </p>
             </div>

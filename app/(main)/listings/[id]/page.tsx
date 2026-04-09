@@ -5,6 +5,7 @@ import ListingCard from "@/components/listings/ListingCard";
 import ReviewSection from "@/components/listings/ReviewSection";
 import QuestionSection from "@/components/listings/QuestionSection";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 
@@ -74,20 +75,37 @@ export default async function ListingPage({ params }: Props) {
     notFound();
   }
 
-  // Related books: same genre, exclude current
-  let relatedListings: ListingWithBook[] = [];
-  if (listing.book?.genre) {
-    const { data: allRelated } = await supabase
+  // Related books + categories for sidebar — in parallel
+  const [relatedResult, allActiveResult] = await Promise.all([
+    listing.book?.genre
+      ? supabase
+          .from("listings")
+          .select(`*, book:books(*), seller:users(id, full_name, avatar_url)`)
+          .eq("status", "active")
+          .neq("id", params.id)
+          .limit(20)
+      : Promise.resolve({ data: null }),
+    supabase
       .from("listings")
-      .select(`*, book:books(*), seller:users(id, full_name, avatar_url)`)
-      .eq("status", "active")
-      .neq("id", params.id)
-      .limit(20);
+      .select("book:books(genre)")
+      .eq("status", "active"),
+  ]);
 
-    relatedListings = ((allRelated as unknown as ListingWithBook[]) ?? [])
-      .filter((l) => l.book.genre?.toLowerCase() === listing.book.genre.toLowerCase())
-      .slice(0, 5);
+  const relatedListings: ListingWithBook[] = listing.book?.genre
+    ? ((relatedResult.data as unknown as ListingWithBook[]) ?? [])
+        .filter((l) => l.book.genre?.toLowerCase() === listing.book.genre.toLowerCase())
+        .slice(0, 5)
+    : [];
+
+  // Build category counts for sidebar
+  const genreMap = new Map<string, number>();
+  for (const l of (allActiveResult.data ?? []) as any[]) {
+    const g = l.book?.genre;
+    if (g) genreMap.set(g, (genreMap.get(g) ?? 0) + 1);
   }
+  const categories = Array.from(genreMap.entries())
+    .map(([genre, count]) => ({ genre, count }))
+    .sort((a, b) => b.count - a.count);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -131,7 +149,7 @@ export default async function ListingPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <main className="max-w-3xl mx-auto px-4 py-10">
+      <main className="max-w-7xl mx-auto px-6 py-10">
         <Breadcrumbs
           items={[
             { label: "Inicio", href: "/" },
@@ -139,26 +157,32 @@ export default async function ListingPage({ params }: Props) {
             { label: listing.book.title },
           ]}
         />
-        <ListingDetail listing={listing} images={(images ?? []) as any} />
+        <div className="flex gap-10">
+          <CategoriesSidebar categories={categories} activeGenre={listing.book.genre} />
 
-        <div id="questions" className="mt-6 bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <QuestionSection listingId={params.id} sellerId={listing.seller_id} />
-        </div>
+          <div className="flex-1 min-w-0">
+            <ListingDetail listing={listing} images={(images ?? []) as any} />
 
-        <div id="reviews" className="mt-6 bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <ReviewSection listingId={params.id} />
-        </div>
-
-        {relatedListings.length > 0 && (
-          <section className="mt-10">
-            <h2 className="font-display text-xl font-bold text-ink mb-4">Libros similares</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-              {relatedListings.map((l) => (
-                <ListingCard key={l.id} listing={l} />
-              ))}
+            <div id="questions" className="mt-6 bg-white rounded-2xl border border-gray-200 overflow-hidden">
+              <QuestionSection listingId={params.id} sellerId={listing.seller_id} />
             </div>
-          </section>
-        )}
+
+            <div id="reviews" className="mt-6 bg-white rounded-2xl border border-gray-200 overflow-hidden">
+              <ReviewSection listingId={params.id} />
+            </div>
+
+            {relatedListings.length > 0 && (
+              <section className="mt-10">
+                <h2 className="font-display text-xl font-bold text-ink mb-4">Libros similares</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {relatedListings.map((l) => (
+                    <ListingCard key={l.id} listing={l} />
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        </div>
       </main>
     </div>
   );

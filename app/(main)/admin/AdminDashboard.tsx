@@ -392,7 +392,7 @@ function OrderEditForm({ order, onSave, onCancel }: { order: AdminOrder; onSave:
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-500 mb-1">Courier</label>
-          <input value={courier} onChange={(e) => setCourier(e.target.value)} placeholder="Chilexpress, Rappi..." className="w-full px-2.5 py-2 border border-gray-200 rounded-lg text-sm bg-white" />
+          <input value={courier} onChange={(e) => setCourier(e.target.value)} placeholder="Starken, Rappi..." className="w-full px-2.5 py-2 border border-gray-200 rounded-lg text-sm bg-white" />
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-500 mb-1">Tracking</label>

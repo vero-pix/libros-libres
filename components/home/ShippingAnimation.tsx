@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 
 const COURIERS = [
   {
-    name: "Chilexpress",
-    time: "1-3 días",
-    desc: "Envío estándar a todo Chile",
-    color: "text-red-500",
-    bg: "bg-red-50",
+    name: "Envío a domicilio",
+    time: "2-5 días",
+    desc: "Despacho a tu puerta",
+    color: "text-blue-500",
+    bg: "bg-blue-50",
   },
   {
     name: "Punto de retiro",

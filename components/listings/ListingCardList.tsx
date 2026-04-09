@@ -75,7 +75,7 @@ export default function ListingCardList({ listing }: Props) {
 
           <div className="flex items-center gap-4 sm:flex-col sm:items-end sm:gap-2">
             {listing.price != null && (
-              <p className="font-display font-bold text-ink text-lg">
+              <p className="font-semibold text-ink text-lg tracking-tight">
                 ${listing.price.toLocaleString("es-CL")}
               </p>
             )}

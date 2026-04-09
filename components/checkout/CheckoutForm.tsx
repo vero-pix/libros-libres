@@ -12,7 +12,7 @@ interface ShippingQuote {
   price: number;
 }
 
-// Fallback cuando no hay API de Chilexpress o falla la cotización
+// Fallback cuando no hay API de courier o falla la cotización
 const FALLBACK_OPTIONS: ShippingQuote[] = [
   {
     service: "Estándar",
@@ -37,7 +37,7 @@ const DELIVERY_OPTIONS = [
 ];
 
 export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props) {
-  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("courier");
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("in_person");
   const [address, setAddress] = useState(buyerAddress);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

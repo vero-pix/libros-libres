@@ -352,13 +352,16 @@ function RentalSection({ listing }: { listing: ListingWithRentalFields }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const rentalPrice = Number(listing.rental_price);
+  const basePrice = Number(listing.rental_price);
+  const basePeriod = listing.rental_period_days ?? 14;
+  // Precio proporcional al período seleccionado
+  const rentalPrice = Math.round((basePrice / basePeriod) * periodDays);
   const deposit = Number(listing.rental_deposit ?? 0);
 
   const deliveryOptions = [
-    { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis", icon: "🤝" },
-    { value: "pickup_point" as const, label: "Punto de retiro", desc: "Acuerdan un lugar", icon: "📍" },
-    { value: "courier" as const, label: "Envío courier", desc: "Costo adicional", icon: "📦" },
+    { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis", icon: "🤝", disabled: false },
+    { value: "pickup_point" as const, label: "Punto de retiro", desc: "Acuerdan un lugar", icon: "📍", disabled: false },
+    { value: "courier" as const, label: "Envío courier", desc: "Próximamente", icon: "📦", disabled: true },
   ];
 
   async function handleRent() {
@@ -421,10 +424,12 @@ function RentalSection({ listing }: { listing: ListingWithRentalFields }) {
           {deliveryOptions.map((opt) => (
             <label
               key={opt.value}
-              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                deliveryMethod === opt.value
-                  ? "border-brand-500 bg-white"
-                  : "border-gray-200 bg-white hover:border-gray-300"
+              className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                opt.disabled
+                  ? "border-gray-100 bg-gray-50 cursor-not-allowed opacity-60"
+                  : deliveryMethod === opt.value
+                    ? "border-brand-500 bg-white cursor-pointer"
+                    : "border-gray-200 bg-white hover:border-gray-300 cursor-pointer"
               }`}
             >
               <input
@@ -432,12 +437,13 @@ function RentalSection({ listing }: { listing: ListingWithRentalFields }) {
                 name="delivery"
                 value={opt.value}
                 checked={deliveryMethod === opt.value}
-                onChange={() => setDeliveryMethod(opt.value)}
+                onChange={() => !opt.disabled && setDeliveryMethod(opt.value)}
+                disabled={opt.disabled}
                 className="accent-brand-500"
               />
               <span className="text-lg">{opt.icon}</span>
               <div>
-                <p className="text-sm font-medium text-gray-800">{opt.label}</p>
+                <p className={`text-sm font-medium ${opt.disabled ? "text-gray-400" : "text-gray-800"}`}>{opt.label}</p>
                 <p className="text-xs text-gray-400">{opt.desc}</p>
               </div>
             </label>

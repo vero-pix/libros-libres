@@ -77,9 +77,9 @@ export async function POST(req: NextRequest) {
   };
 
   const bookPrice = listing.price ?? 0;
-  // Usar precio real de Chilexpress si viene, sino fallback fijo
+  // Usar precio real del courier si viene, sino fallback fijo
   const shippingCost = shipping_cost_override ?? SHIPPING_COSTS[shipping_speed] ?? SHIPPING_COSTS.standard;
-  const courier = shipping_service ?? COURIER_BY_SPEED[shipping_speed] ?? "Chilexpress";
+  const courier = shipping_service ?? COURIER_BY_SPEED[shipping_speed] ?? "Envío estándar";
 
   // Calcular comisión según plan del vendedor
   const useSplit = !!seller.mercadopago_access_token;

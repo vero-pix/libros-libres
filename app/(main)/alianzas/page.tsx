@@ -37,7 +37,7 @@ const BENEFITS = [
   {
     icon: "📦",
     title: "Despacho integrado",
-    desc: "Coordinamos el envío vía Chilexpress a todo Chile. El estudiante recibe en su casa o punto de retiro.",
+    desc: "Coordinamos el envío a todo Chile. El estudiante recibe en su casa o punto de retiro.",
   },
 ];
 

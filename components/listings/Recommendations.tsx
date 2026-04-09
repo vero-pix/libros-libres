@@ -120,7 +120,7 @@ export default function Recommendations() {
                   </p>
                 )}
                 {listing.price != null && (
-                  <p className="font-display font-bold text-ink text-base mt-2">
+                  <p className="font-semibold text-ink text-base mt-2 tracking-tight">
                     ${listing.price.toLocaleString("es-CL")}
                   </p>
                 )}

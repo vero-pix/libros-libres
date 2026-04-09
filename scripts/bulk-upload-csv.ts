@@ -31,8 +31,10 @@ const priceIdx = process.argv.indexOf("--price");
 const DEFAULT_PRICE = priceIdx > -1 ? parseInt(process.argv[priceIdx + 1], 10) : 5000;
 const notesIdx = process.argv.indexOf("--notes");
 const DEFAULT_NOTES = notesIdx > -1 ? process.argv[notesIdx + 1] : null;
-const SELLER_LAT = -33.4489;
-const SELLER_LNG = -70.6693;
+// Coordenadas se resuelven desde el perfil del vendedor en Supabase
+let SELLER_LAT = -33.4489;
+let SELLER_LNG = -70.6693;
+let SELLER_ADDRESS = "Santiago, Chile";
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env.local");
@@ -102,6 +104,23 @@ async function main() {
   if (!filePath) {
     console.error("Usage: npx tsx scripts/bulk-upload-csv.ts <csv-file>");
     process.exit(1);
+  }
+
+  // Resolver ubicación del vendedor desde su perfil
+  const { data: seller } = await supabase
+    .from("users")
+    .select("default_latitude, default_longitude, default_address, comuna")
+    .eq("id", SELLER_ID)
+    .single();
+
+  if (seller?.default_latitude && seller?.default_longitude) {
+    SELLER_LAT = seller.default_latitude;
+    SELLER_LNG = seller.default_longitude;
+    SELLER_ADDRESS = seller.default_address || seller.comuna || "Santiago, Chile";
+    console.log(`📍 Ubicación del vendedor: ${SELLER_ADDRESS} (${SELLER_LAT}, ${SELLER_LNG})`);
+  } else {
+    console.warn(`⚠️  Vendedor sin ubicación guardada. Usando Santiago centro como fallback.`);
+    console.warn(`   Para corregir: actualiza default_latitude/longitude en el perfil del vendedor.`);
   }
 
   const csv = readFileSync(filePath, "utf-8");
@@ -228,7 +247,7 @@ async function main() {
       cover_image_url: coverUrl,
       latitude: SELLER_LAT,
       longitude: SELLER_LNG,
-      address: "Santiago, Chile",
+      address: SELLER_ADDRESS,
       status: "active",
     });
 
