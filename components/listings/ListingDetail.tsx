@@ -379,8 +379,9 @@ function RentalSection({ listing }: { listing: ListingWithRentalFields }) {
   const deposit = Number(listing.rental_deposit ?? 0);
 
   const deliveryOptions = [
-    { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis", icon: "🤝", disabled: false },
-    { value: "pickup_point" as const, label: "Punto de retiro", desc: "Acuerdan un lugar", icon: "📍", disabled: false },
+    { value: "in_person" as const, label: "Encuentro en persona", desc: "Coordina lugar y hora con el vendedor — gratis", icon: "🤝", disabled: false },
+    // Punto de retiro: reactivar cuando haya convenios con lugares específicos
+    // { value: "pickup_point" as const, label: "Punto de retiro", desc: "Retira en un punto convenido", icon: "📍", disabled: false },
     { value: "courier" as const, label: "Envío courier", desc: "Próximamente", icon: "📦", disabled: true },
   ];
 

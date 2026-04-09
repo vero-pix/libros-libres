@@ -31,9 +31,10 @@ interface Props {
 type DeliveryMethod = "courier" | "in_person" | "pickup_point";
 
 const DELIVERY_OPTIONS = [
-  { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis — coordinas con el vendedor", icon: "🤝", enabled: true },
-  { value: "pickup_point" as const, label: "Punto de retiro", desc: "Gratis — acuerdan un lugar", icon: "📍", enabled: true },
-  { value: "courier" as const, label: "Envío por courier con etiqueta", desc: "Próximamente — estamos integrando couriers", icon: "📦", enabled: false },
+  { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis — coordina lugar y hora con el vendedor", icon: "🤝", enabled: true },
+  // Punto de retiro: reactivar cuando haya convenios con lugares específicos
+  // { value: "pickup_point" as const, label: "Punto de retiro", desc: "Retira en un punto convenido", icon: "📍", enabled: true },
+  { value: "courier" as const, label: "Envío courier", desc: "Próximamente", icon: "📦", enabled: false },
 ];
 
 export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props) {

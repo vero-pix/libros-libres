@@ -161,14 +161,26 @@
 - [ ] WhatsApp Business para tuslibros.cl (perfil verificado)
 
 ### Marketplace & descubrimiento
+- [ ] Fila de libros destacados en home (marca estrella, manejados por admin)
+- [ ] Vendedores destacados en home (marca estrella, manejados por admin)
 - [ ] Filtro por vendedor en la tienda
-- [ ] Vendedores destacados (sección en home o página dedicada)
 - [ ] Filtros por encuadernación, editorial, páginas
 - [ ] Newsletter semanal — elegir día estratégico de envío
+- [ ] Fusionar "Punto de retiro" y "Encuentro en persona" en una sola opción
+
+### Panel analytics vendedores
+- [ ] Dashboard por vendedor: visitas, mensajes, ventas, libros publicados
+- [ ] Primeros 50 vendedores registrados: panel gratis de por vida
+- [ ] Después de los 50: feature de plan Librero/Librería
+
+### Botón actualizador de tienda (solo admin)
+- [ ] Botón que corre enriquecimiento masivo: metadata + portadas + sinopsis
+- [ ] No visible para vendedores, solo para admin (Verónica)
+- [ ] Después evaluar si ofrecer como feature de pago
 
 ### Cron jobs (Claude /schedule)
-- [ ] **Enriquecer metadata libros** — correr enrich-books-metadata.ts + fix-covers.ts (una vez, mañana 10 abril)
-- [ ] **Auditoría portadas** — semanal, detectar y reparar portadas rotas
+- [x] **Enriquecer metadata libros** — enrich-books-metadata.ts (pendiente: agregar Open Library como fallback)
+- [x] **Auditoría portadas** — fix-covers.ts (43 arregladas, 2 pendientes manuales)
 - [ ] **Google Trends ranking** — ya existe cron diario 6am (trending_score)
 - [ ] **Newsletter automático** — envío semanal con novedades (pendiente definir día)
 - [ ] **Limpieza listings inactivos** — avisar vendedores con libros >90 días sin actividad

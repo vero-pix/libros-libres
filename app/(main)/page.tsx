@@ -10,6 +10,7 @@ import RecentlyViewed from "@/components/listings/RecentlyViewed";
 import Recommendations from "@/components/listings/Recommendations";
 import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
+import FeaturedRow from "@/components/home/FeaturedRow";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { translateGenre } from "@/lib/genres";
 import type { ListingWithBook } from "@/types";
@@ -60,6 +61,35 @@ export default async function HomePage({ searchParams }: Props) {
   const userLng = lng ? parseFloat(lng) : null;
 
   const hasFilters = !!(genre || sort || price_min || price_max || condition || modality || author);
+
+  // Featured queries in parallel with main query
+  const [featuredListingsRes, featuredSellersRes] = await Promise.all([
+    supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url)`)
+      .eq("status", "active")
+      .eq("featured", true)
+      .limit(10),
+    supabase
+      .from("users")
+      .select("id, full_name, avatar_url")
+      .eq("featured", true)
+      .limit(10),
+  ]);
+
+  const featuredListings = (featuredListingsRes.data as unknown as ListingWithBook[]) ?? [];
+
+  // Count listings per featured seller
+  const featuredSellers = await Promise.all(
+    (featuredSellersRes.data ?? []).map(async (seller) => {
+      const { count } = await supabase
+        .from("listings")
+        .select("id", { count: "exact", head: true })
+        .eq("seller_id", seller.id)
+        .eq("status", "active");
+      return { ...seller, _listing_count: count ?? 0 };
+    })
+  );
 
   let query = supabase
     .from("listings")
@@ -155,6 +185,10 @@ export default async function HomePage({ searchParams }: Props) {
           <CategoriesSidebar categories={categories} activeGenre={genre} uncategorizedCount={uncategorizedCount} />
 
           <div className="flex-1 min-w-0">
+            {!hasFilters && (featuredListings.length > 0 || featuredSellers.length > 0) && (
+              <FeaturedRow featuredListings={featuredListings} featuredSellers={featuredSellers} />
+            )}
+
             <Suspense fallback={<div className="h-10 bg-gray-100 rounded-lg animate-pulse mb-4" />}>
               <ListingToolbar />
             </Suspense>
