@@ -57,7 +57,7 @@ export default async function SearchPage({ searchParams }: Props) {
     const { data: matchedBooks } = await supabase
       .from("books")
       .select("id")
-      .or(`title.ilike.${term},author.ilike.${term}`);
+      .or(`title.ilike.${term},author.ilike.${term},isbn.ilike.${term}`);
     matchingBookIds = matchedBooks?.map((b) => b.id) ?? [];
   }
 

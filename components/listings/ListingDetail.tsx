@@ -116,7 +116,9 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               </Link>
             )}
           </div>
-          <p className="text-gray-600 mt-1 text-sm sm:text-base">{book.author}</p>
+          <Link href={`/search?author=${encodeURIComponent(book.author)}`} className="text-gray-600 mt-1 text-sm sm:text-base hover:text-brand-600 transition-colors">
+            {book.author}
+          </Link>
 
           <div className="flex flex-wrap gap-2 mt-3">
             {book.genre && (
@@ -138,7 +140,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
           </div>
 
           {/* Detalles bibliográficos */}
-          {((book as any).publisher || (book as any).pages || book.published_year) && (
+          {((book as any).publisher || (book as any).pages || book.published_year || book.isbn) && (
             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-gray-500">
               {(book as any).publisher && (
                 <span>Editorial: <span className="text-gray-700">{(book as any).publisher}</span></span>
@@ -148,6 +150,9 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               )}
               {book.published_year && (
                 <span>Año: {book.published_year}</span>
+              )}
+              {book.isbn && (
+                <span>ISBN: <span className="text-gray-700 font-mono">{book.isbn}</span></span>
               )}
             </div>
           )}

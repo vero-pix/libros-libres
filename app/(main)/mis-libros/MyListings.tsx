@@ -293,6 +293,9 @@ function EditForm({
 
   // Listing fields
   const [price, setPrice] = useState(listing.price?.toString() ?? "");
+  const [originalPrice, setOriginalPrice] = useState(((listing as any).original_price ?? "").toString());
+  const [rentalPrice, setRentalPrice] = useState(((listing as any).rental_price ?? "").toString());
+  const [rentalDeposit, setRentalDeposit] = useState(((listing as any).rental_deposit ?? "").toString());
   const [condition, setCondition] = useState(listing.condition);
   const [modality, setModality] = useState(listing.modality);
   const [notes, setNotes] = useState(listing.notes ?? "");
@@ -388,6 +391,9 @@ function EditForm({
       modality,
       notes: notes.trim() || null,
       price: modality !== "loan" ? parseFloat(price) || null : null,
+      original_price: originalPrice ? parseFloat(originalPrice) : null,
+      rental_price: (modality === "loan" || modality === "both") && rentalPrice ? parseFloat(rentalPrice) : null,
+      rental_deposit: (modality === "loan" || modality === "both") && rentalDeposit ? parseFloat(rentalDeposit) : null,
     };
     if (coverUrl) {
       listingUpdates.cover_image_url = coverUrl;
@@ -492,13 +498,40 @@ function EditForm({
             </select>
           </div>
           {modality !== "loan" && (
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Precio</label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-2.5 flex items-center text-gray-400 text-sm pointer-events-none">$</span>
-                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} min="0" step="100" className={`${inputClass} pl-6`} />
+            <>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Precio venta</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-2.5 flex items-center text-gray-400 text-sm pointer-events-none">$</span>
+                  <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} min="0" step="100" className={`${inputClass} pl-6`} />
+                </div>
               </div>
-            </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Precio original <span className="text-gray-400 font-normal">(opcional, para oferta)</span></label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-2.5 flex items-center text-gray-400 text-sm pointer-events-none">$</span>
+                  <input type="number" value={originalPrice} onChange={(e) => setOriginalPrice(e.target.value)} min="0" step="100" placeholder="Si es mayor, se muestra tachado" className={`${inputClass} pl-6`} />
+                </div>
+              </div>
+            </>
+          )}
+          {(modality === "loan" || modality === "both") && (
+            <>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Precio arriendo (14 días)</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-2.5 flex items-center text-gray-400 text-sm pointer-events-none">$</span>
+                  <input type="number" value={rentalPrice} onChange={(e) => setRentalPrice(e.target.value)} min="0" step="100" className={`${inputClass} pl-6`} />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Garantía arriendo</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-2.5 flex items-center text-gray-400 text-sm pointer-events-none">$</span>
+                  <input type="number" value={rentalDeposit} onChange={(e) => setRentalDeposit(e.target.value)} min="0" step="100" className={`${inputClass} pl-6`} />
+                </div>
+              </div>
+            </>
           )}
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">Estado</label>
