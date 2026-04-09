@@ -165,7 +165,13 @@
 - [ ] Vendedores destacados (sección en home o página dedicada)
 - [ ] Filtros por encuadernación, editorial, páginas
 - [ ] Newsletter semanal — elegir día estratégico de envío
-- [ ] Enriquecer libros existentes con publisher/pages (correr enrich-books-metadata.ts cuando se resetee cuota Google Books)
+
+### Cron jobs (Claude /schedule)
+- [ ] **Enriquecer metadata libros** — correr enrich-books-metadata.ts + fix-covers.ts (una vez, mañana 10 abril)
+- [ ] **Auditoría portadas** — semanal, detectar y reparar portadas rotas
+- [ ] **Google Trends ranking** — ya existe cron diario 6am (trending_score)
+- [ ] **Newsletter automático** — envío semanal con novedades (pendiente definir día)
+- [ ] **Limpieza listings inactivos** — avisar vendedores con libros >90 días sin actividad
 
 ### Features futuros
 - [ ] Páginas newsletter: testimonios, historia García Márquez, voces reales
