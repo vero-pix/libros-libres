@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import HeroBar from "./HeroBar";
 import TiendaToggle from "./TiendaToggle";
 import CollectionBanners from "./CollectionBanners";
-import AdSlot from "@/components/ui/AdSlot";
 
 const ScanAnimation = dynamic(() => import("./ScanAnimation"));
 const PaymentAnimation = dynamic(() => import("./PaymentAnimation"));
@@ -81,13 +80,6 @@ export default function HomeShell({ totalListings, hasFilters, children }: Props
           {children}
         </TiendaToggle>
       </main>
-
-      {/* Ad between store and features */}
-      {!hasFilters && process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
-        <div className="max-w-5xl mx-auto px-6 py-4">
-          <AdSlot slot="between-sections" format="horizontal" />
-        </div>
-      )}
 
       {/* Feature sections — below the store */}
       {!hasFilters && (

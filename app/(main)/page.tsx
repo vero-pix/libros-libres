@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import CategoriesMobileDrawer from "@/components/ui/CategoriesMobileDrawer";
-import AdSlot from "@/components/ui/AdSlot";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
 import ListingCardList from "@/components/listings/ListingCardList";
@@ -234,9 +233,6 @@ export default async function HomePage({ searchParams }: Props) {
                       </div>
                       {secondHalf.length > 0 && (
                         <>
-                          {process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
-                            <AdSlot slot="in-feed" format="horizontal" className="my-6" />
-                          )}
                           <div className={gridClass}>
                             {secondHalf.map((listing) => (
                               <CardComponent key={listing.id} listing={listing} />
@@ -257,12 +253,6 @@ export default async function HomePage({ searchParams }: Props) {
             )}
           </div>
 
-          {/* Ad slot — sidebar right */}
-          <div className="hidden xl:block w-40 shrink-0">
-            <div className="sticky top-4">
-              <AdSlot slot="sidebar-right" format="vertical" />
-            </div>
-          </div>
         </div>
 
         <Recommendations />

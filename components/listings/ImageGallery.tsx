@@ -26,7 +26,7 @@ export default function ImageGallery({ mainImage, images, alt, author }: Props) 
     // Parse title and author from alt (format: "Title")
     const title = alt;
     return (
-      <div className="w-full aspect-[3/4] max-w-[280px] bg-gradient-to-br from-amber-50 via-cream to-brand-50 rounded-lg flex flex-col items-center justify-center p-6 border border-brand-100 relative overflow-hidden">
+      <div className="w-[280px] aspect-[3/4] bg-gradient-to-br from-amber-50 via-cream to-brand-50 rounded-lg flex flex-col items-center justify-center p-6 border border-brand-100 relative overflow-hidden">
         {/* Decorative top bar */}
         <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-brand-500 via-amber-500 to-brand-600" />
         {/* Decorative lines */}
@@ -57,7 +57,7 @@ export default function ImageGallery({ mainImage, images, alt, author }: Props) 
   return (
     <div className="flex flex-col items-center gap-3">
       {/* Main image */}
-      <div className="relative w-full max-w-[280px] aspect-[3/4]">
+      <div className="relative w-[280px] aspect-[3/4]">
         <Image
           key={current.id}
           src={current.image_url}

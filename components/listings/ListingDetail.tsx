@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import type { ListingWithBook } from "@/types";
 import { addRecentlyViewed } from "./RecentlyViewed";
 import AddToCartButton from "@/components/ui/AddToCartButton";
-import AdSlot from "@/components/ui/AdSlot";
 import ImageGallery from "./ImageGallery";
 import ShareButtons from "./ShareButtons";
 import ContactSellerButton from "@/components/messages/ContactSellerButton";
@@ -290,66 +289,21 @@ export default function ListingDetail({ listing, images = [] }: Props) {
         </p>
       </div>
 
-      {/* Ad — only render wrapper if AdSense is configured */}
-      {process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
-        <div className="border-t border-gray-100 px-6 py-4">
-          <AdSlot slot="listing-detail" format="horizontal" />
-        </div>
-      )}
     </div>
   );
 }
 
 function DetailTabs({ listing }: { listing: ListingWithBook }) {
-  const [activeTab, setActiveTab] = useState<"descripcion" | "ubicacion" | "vendedor">("descripcion");
   const { book } = listing;
-  const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
-
-  const tabs = [
-    { key: "descripcion" as const, label: "Descripción" },
-    { key: "vendedor" as const, label: "Vendedor" },
-  ];
 
   return (
     <div className="border-t border-gray-100">
-      <div className="flex border-b border-gray-100">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${
-              activeTab === tab.key
-                ? "text-brand-600 border-b-2 border-brand-500"
-                : "text-ink-muted hover:text-ink"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
       <div className="px-5 sm:px-6 py-4">
-        {activeTab === "descripcion" && (
-          book.description ? (
-            <p className="text-sm text-gray-600 leading-relaxed">{book.description}</p>
-          ) : (
-            <p className="text-sm text-gray-400 italic">Sin sinopsis disponible. Consulta al vendedor por más detalles.</p>
-          )
-        )}
-{activeTab === "vendedor" && (
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center font-bold flex-shrink-0">
-              {sellerName[0].toUpperCase()}
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-700">{sellerName}</p>
-              <Link
-                href={`/vendedor/${listing.seller_id}`}
-                className="text-xs text-brand-600 hover:text-brand-700 transition-colors"
-              >
-                Ver tienda del vendedor
-              </Link>
-            </div>
-          </div>
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">Descripción</h3>
+        {book.description ? (
+          <p className="text-sm text-gray-600 leading-relaxed">{book.description}</p>
+        ) : (
+          <p className="text-sm text-gray-400 italic">Sin sinopsis disponible. Consulta al vendedor por más detalles.</p>
         )}
       </div>
     </div>

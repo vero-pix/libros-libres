@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
-import AdSlot from "@/components/ui/AdSlot";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
@@ -158,12 +157,6 @@ export default async function SearchPage({ searchParams }: Props) {
             )}
           </div>
 
-          {/* Ad slot — sidebar right */}
-          <div className="hidden xl:block w-40 shrink-0">
-            <div className="sticky top-4">
-              <AdSlot slot="search-sidebar" format="vertical" />
-            </div>
-          </div>
         </div>
       </main>
     </div>
