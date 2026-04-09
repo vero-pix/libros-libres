@@ -53,6 +53,10 @@ export default function ListingCard({ listing }: Props) {
               placeholder="blur"
               blurDataURL={BLUR_PLACEHOLDER}
               onError={() => setImgError(true)}
+              onLoad={(e) => {
+                const img = e.currentTarget as HTMLImageElement;
+                if (img.naturalWidth < 10 || img.naturalHeight < 10) setImgError(true);
+              }}
             />
           ) : (
             placeholder
