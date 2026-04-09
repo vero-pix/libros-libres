@@ -179,15 +179,25 @@ export async function GET(request: NextRequest) {
 
   const cleanISBN = isbn.replace(/[-\s]/g, "");
 
+  // Only accept Spanish descriptions
+  const isSpanish = (d: string) => /\b(el|la|los|las|del|por|una|con|que|en|de|su|este|esta|como|para|más|entre|sobre|desde|hasta|pero|sino|también|tiene|puede|hace|sido|está|fue|ser|hay|sus|nos|muy)\b/i.test(d);
+  const isSpam = (d: string) => d.includes("13-digit number") || d.includes("ISBN Handbook");
+
   // Try Google Books first
   const googleResult = await searchGoogleBooks(cleanISBN);
   if (googleResult) {
+    if (googleResult.description && (!isSpanish(googleResult.description) || isSpam(googleResult.description))) {
+      googleResult.description = "";
+    }
     return NextResponse.json(googleResult);
   }
 
   // Fallback to Open Library
   const olResult = await searchOpenLibrary(cleanISBN);
   if (olResult) {
+    if (olResult.description && (!isSpanish(olResult.description) || isSpam(olResult.description))) {
+      olResult.description = "";
+    }
     return NextResponse.json(olResult);
   }
 

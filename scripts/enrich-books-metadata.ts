@@ -166,9 +166,10 @@ async function main() {
       if (!book.description && meta.description) {
         // Solo guardar sinopsis en español — descartar inglés y spam de ISBN Handbook
         const d = meta.description;
-        const isEnglish = /\b(the|you|this|have|will|that|from|your|with)\b/i.test(d) && !/\b(el|la|los|las|del|por|una|con|que)\b/i.test(d);
+        // Solo aceptar sinopsis en español
+        const hasSpanish = /\b(el|la|los|las|del|por|una|con|que|en|de|su|este|esta|como|para|más|entre|sobre|desde|hasta|pero|sino|también|tiene|puede|hace|sido|está|fue|ser|hay|sus|nos|muy)\b/i.test(d);
         const isSpam = d.includes("13-digit number") || d.includes("ISBN Handbook");
-        if (!isEnglish && !isSpam) updates.description = d;
+        if (hasSpanish && !isSpam) updates.description = d;
       }
 
       if (Object.keys(updates).length > 0) {
