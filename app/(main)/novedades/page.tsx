@@ -5,6 +5,27 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "9 abril 2026",
+    title: "Envíos a todo Chile con Shipit",
+    description:
+      "Ahora puedes recibir libros en tu casa. Al elegir envío courier en el checkout, cotizas en tiempo real entre Starken, Chilexpress, Blue Express, 99 Minutos y más. Eliges el que más te convenga y pagas todo junto.",
+    tag: "Nuevo",
+  },
+  {
+    date: "9 abril 2026",
+    title: "Recuperar contraseña",
+    description:
+      "¿Olvidaste tu contraseña? Ahora puedes recuperarla desde el login. Te llega un link al correo para crear una nueva.",
+    tag: "Nuevo",
+  },
+  {
+    date: "9 abril 2026",
+    title: "Categoría Esoterismo",
+    description:
+      "Tarot, astrología, masonería, ciencias ocultas, espiritismo, metafísica, ovnis y más. Pedido directo de nuestra comunidad.",
+    tag: "Nuevo",
+  },
+  {
+    date: "9 abril 2026",
     title: "URLs amigables con tienda por vendedor",
     description:
       "Cada libro ahora tiene su propia URL legible: tuslibros.cl/libro/vendedor/titulo-del-libro. Mejor para compartir, mejor para Google, y cada vendedor empieza a construir su identidad dentro de la plataforma.",
