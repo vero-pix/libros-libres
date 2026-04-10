@@ -97,26 +97,20 @@ export async function getShipitQuotes(
   }
 
   try {
-    const ref = `TL-${Date.now().toString(36).slice(-8)}`.slice(0, 15);
     const res = await fetch(`${BASE_URL}/rates`, {
       method: "POST",
       headers: HEADERS,
       body: JSON.stringify({
         parcel: {
-          kind: 0,
-          platform: 2,
-          reference: ref,
-          items: 1,
-          sizes: { width, height, length, weight },
-          destiny: {
-            commune_id: destId,
-            commune_name: destCommune.toUpperCase(),
-            street: dest?.street ?? "Por confirmar",
-            number: dest?.number ?? 0,
-            full_name: dest?.full_name ?? "Comprador",
-            email: dest?.email ?? "",
-            phone: dest?.phone ?? "",
-          },
+          length,
+          width,
+          height,
+          weight,
+          origin_id: originId,
+          destiny_id: destId,
+          type_of_destiny: "domicilio",
+          algorithm: "1",
+          algorithm_days: "2",
         },
       }),
     });
@@ -136,13 +130,15 @@ export async function getShipitQuotes(
     }
 
     return prices
-      .filter((p: any) => p.price > 0)
+      .filter((p: any) => p.price > 0 && p.available_to_shipping !== false)
       .map((p: any, i: number) => ({
-        service: p.name ?? p.courier ?? `Servicio ${i + 1}`,
-        serviceCode: p.id ?? i,
-        deliveryTime: p.days ? `${p.days} día${p.days > 1 ? "s" : ""} hábil${p.days > 1 ? "es" : ""}` : "3-5 días hábiles",
-        price: Math.round(p.price ?? p.total ?? 0),
-        courier: p.courier ?? p.name ?? "Courier",
+        service: p.courier?.display_name ?? p.courier?.name ?? `Servicio ${i + 1}`,
+        serviceCode: i,
+        deliveryTime: p.days
+          ? `${p.days} día${p.days > 1 ? "s" : ""} hábil${p.days > 1 ? "es" : ""}`
+          : p.name ?? "3-5 días hábiles",
+        price: Math.round(p.price),
+        courier: p.courier?.name ?? "courier",
       }))
       .sort((a: ShippingQuote, b: ShippingQuote) => a.price - b.price);
   } catch (err) {
@@ -150,3 +146,117 @@ export async function getShipitQuotes(
     return [];
   }
 }
+
+/* ── Crear envío en Shipit ── */
+
+const ORDERS_URL = "https://orders.shipit.cl/v";
+const ORDERS_HEADERS = {
+  "Content-Type": "application/json",
+  "Accept": "application/vnd.orders.v1",
+  "X-Shipit-Email": SHIPIT_EMAIL,
+  "X-Shipit-Access-Token": SHIPIT_TOKEN,
+};
+
+export interface ShipitOrderInput {
+  /** ID único de la orden en tuslibros.cl */
+  orderId: string;
+  /** Datos del destino */
+  destiny: {
+    street: string;
+    number: number;
+    complement?: string;
+    commune_id: number;
+    commune_name: string;
+    full_name: string;
+    email: string;
+    phone: string;
+  };
+  /** Dimensiones del paquete */
+  sizes?: { width: number; height: number; length: number; weight: number };
+  /** Courier seleccionado */
+  courier: { client: string; price: number };
+}
+
+export interface ShipitOrderResult {
+  id: number;
+  state: string;
+  tracking_code?: string;
+  error?: string;
+}
+
+/**
+ * Crea una orden/envío en Shipit.
+ * Docs: POST https://orders.shipit.cl/v/orders
+ */
+export async function createShipitOrder(input: ShipitOrderInput): Promise<ShipitOrderResult> {
+  const { orderId, destiny, sizes, courier } = input;
+
+  const destCommuneId = destiny.commune_id || (await findCommuneId(destiny.commune_name));
+  if (!destCommuneId) {
+    return { id: 0, state: "error", error: `Comuna destino no encontrada: ${destiny.commune_name}` };
+  }
+
+  const body = {
+    order: {
+      kind: 0,
+      platform: 2,
+      reference: `TL-${orderId.slice(0, 12)}`,
+      items: 1,
+      seller: {
+        status: "paid",
+        name: "tuslibros",
+        id: orderId,
+      },
+      sizes: sizes ?? { width: 15, height: 22, length: 5, weight: 0.5 },
+      courier: {
+        client: courier.client,
+        selected: true,
+        payable: false,
+      },
+      prices: {
+        total: courier.price,
+        price: courier.price,
+        tax: 0,
+        overcharge: 0,
+      },
+      destiny: {
+        street: destiny.street,
+        number: destiny.number,
+        complement: destiny.complement ?? "",
+        commune_id: destCommuneId,
+        commune_name: destiny.commune_name.toUpperCase(),
+        full_name: destiny.full_name,
+        email: destiny.email,
+        phone: destiny.phone,
+        kind: "home_delivery",
+      },
+    },
+  };
+
+  try {
+    const res = await fetch(`${ORDERS_URL}/orders`, {
+      method: "POST",
+      headers: ORDERS_HEADERS,
+      body: JSON.stringify(body),
+    });
+
+    const data = await res.json();
+
+    if (data.error || data.state === "error") {
+      console.error("[shipit] Create order error:", data.error);
+      return { id: 0, state: "error", error: data.error };
+    }
+
+    return {
+      id: data.id,
+      state: data.state ?? "draft",
+      tracking_code: data.tracking_number ?? data.tracking_code,
+    };
+  } catch (err) {
+    console.error("[shipit] Create order exception:", err);
+    return { id: 0, state: "error", error: String(err) };
+  }
+}
+
+/** Resuelve nombre de comuna a ID de Shipit (exportado para uso externo) */
+export { findCommuneId };

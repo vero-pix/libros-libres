@@ -3,6 +3,8 @@ import { createServerClient } from "@supabase/ssr";
 import { paymentClient } from "@/lib/mercadopago";
 import { notifySeller } from "@/lib/notifications";
 import { sendEmail } from "@/lib/email";
+import { createShipitOrder } from "@/lib/shipit";
+import { extractCommune } from "@/lib/chilexpress";
 import crypto from "crypto";
 
 /**
@@ -124,6 +126,63 @@ export async function POST(req: NextRequest) {
         notifySeller(order.id, supabase).catch((err) =>
           console.error("[webhook] notifySeller error:", err)
         );
+
+        // ── Create Shipit shipment if courier order ──
+        try {
+          const { data: shipitOrder } = await supabase
+            .from("orders")
+            .select("id, buyer_id, buyer_address, shipping_cost, courier")
+            .eq("id", order.id)
+            .single();
+
+          const isInPerson = shipitOrder?.courier === "Entrega en persona" || shipitOrder?.courier === "Punto de retiro";
+
+          if (shipitOrder?.buyer_address && !isInPerson) {
+            // Get buyer info separately to avoid array type issue
+            const { data: buyer } = await supabase
+              .from("users")
+              .select("full_name, email, phone")
+              .eq("id", shipitOrder.buyer_id)
+              .single();
+
+            const commune = extractCommune(shipitOrder.buyer_address);
+            const addressParts = shipitOrder.buyer_address.split(",")[0]?.trim() ?? "";
+            const streetMatch = addressParts.match(/^(.+?)\s+(\d+)/);
+
+            const shipitResult = await createShipitOrder({
+              orderId: order.id,
+              destiny: {
+                street: streetMatch?.[1] ?? addressParts,
+                number: parseInt(streetMatch?.[2] ?? "0", 10),
+                commune_id: 0,
+                commune_name: commune,
+                full_name: buyer?.full_name ?? "Comprador",
+                email: buyer?.email ?? "",
+                phone: buyer?.phone ?? "",
+              },
+              courier: {
+                client: shipitOrder.courier ?? "starken",
+                price: shipitOrder.shipping_cost ?? 0,
+              },
+            });
+
+            if (shipitResult.state !== "error") {
+              await supabase
+                .from("orders")
+                .update({
+                  tracking_code: shipitResult.tracking_code ?? null,
+                  shipping_status: shipitResult.state,
+                })
+                .eq("id", order.id);
+              console.log(`[webhook] Shipit order created: ${shipitResult.id} for order ${order.id}`);
+            } else {
+              console.error(`[webhook] Shipit order failed for ${order.id}:`, shipitResult.error);
+            }
+          }
+        } catch (shipitErr) {
+          console.error("[webhook] Shipit creation error:", shipitErr);
+          // Don't fail the webhook — payment is already confirmed
+        }
 
         // ── Transactional emails ──
         try {
