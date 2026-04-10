@@ -219,7 +219,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="Ej: San Pío X 2555, Providencia"
+              placeholder="Calle, número, comuna — ej: Av. Apoquindo 3000, Las Condes"
               required
               className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
             />
