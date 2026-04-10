@@ -3,13 +3,13 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import type { ListingWithBook } from "@/types";
-import { SERVICE_FEE } from "@/lib/mercadopago";
 
 interface ShippingQuote {
   service: string;
   serviceCode: number;
   deliveryTime: string;
   price: number;
+  courier?: string;
 }
 
 // Fallback cuando no hay API de courier o falla la cotización
@@ -34,7 +34,7 @@ const DELIVERY_OPTIONS = [
   { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis — coordina lugar y hora con el vendedor", icon: "🤝", enabled: true },
   // Punto de retiro: reactivar cuando haya convenios con lugares específicos
   // { value: "pickup_point" as const, label: "Punto de retiro", desc: "Retira en un punto convenido", icon: "📍", enabled: true },
-  { value: "courier" as const, label: "Envío courier", desc: "Próximamente", icon: "📦", enabled: false },
+  { value: "courier" as const, label: "Envío courier", desc: "Recibe en tu domicilio vía Shipit", icon: "📦", enabled: true },
 ];
 
 export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props) {
@@ -55,8 +55,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
   const isCourier = deliveryMethod === "courier";
   const selectedQuote = isCourier ? quotes.find((q) => q.serviceCode === selectedService) : null;
   const shippingCost = selectedQuote?.price ?? 0;
-  const serviceFee = isCourier ? SERVICE_FEE : 0;
-  const total = bookPrice + shippingCost + serviceFee;
+  const total = bookPrice + shippingCost;
 
   const fetchQuotes = useCallback(
     async (addr: string) => {
@@ -86,7 +85,6 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
 
         const q = data.quotes as ShippingQuote[];
         setQuotes(q);
-        // Seleccionar el más barato por defecto
         if (q.length > 0) {
           const cheapest = q.reduce((a, b) => (a.price < b.price ? a : b));
           setSelectedService(cheapest.serviceCode);
@@ -102,19 +100,12 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
     [listing.id]
   );
 
-  // Cotizar al cargar si ya tenemos dirección
+  // Cotizar al cargar si ya tenemos dirección guardada
   useEffect(() => {
-    if (buyerAddress) {
+    if (buyerAddress && buyerAddress.trim().length >= 10) {
       fetchQuotes(buyerAddress);
     }
   }, [buyerAddress, fetchQuotes]);
-
-  // Debounce: cotizar cuando el usuario deja de escribir
-  useEffect(() => {
-    if (!address || address === buyerAddress) return;
-    const timer = setTimeout(() => fetchQuotes(address), 800);
-    return () => clearTimeout(timer);
-  }, [address, buyerAddress, fetchQuotes]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -131,6 +122,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
           shipping_speed: "standard",
           shipping_cost_override: isCourier ? selectedQuote!.price : 0,
           shipping_service: isCourier ? selectedQuote!.service : deliveryMethod === "in_person" ? "Entrega en persona" : "Punto de retiro",
+          shipping_courier: isCourier ? selectedQuote!.courier : undefined,
           buyer_address: isCourier ? address : deliveryMethod,
         }),
       });
@@ -222,18 +214,28 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
       {isCourier && (
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <h2 className="font-semibold text-gray-900 mb-4">Dirección de envío</h2>
-          <input
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Dirección completa (calle, número, comuna, ciudad)"
-            required
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Ej: San Pío X 2555, Providencia"
+              required
+              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+            />
+            <button
+              type="button"
+              onClick={() => fetchQuotes(address)}
+              disabled={quoting || address.trim().length < 5}
+              className="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white text-sm font-medium rounded-md transition-colors whitespace-nowrap"
+            >
+              {quoting ? "Cotizando..." : "Cotizar"}
+            </button>
+          </div>
           {quoting && (
             <p className="text-xs text-gray-400 mt-2 flex items-center gap-1.5">
               <span className="w-3 h-3 border-2 border-gray-300 border-t-brand-500 rounded-full animate-spin" />
-              Cotizando opciones de envío...
+              Consultando couriers disponibles...
             </p>
           )}
         </div>
@@ -272,7 +274,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
                       {q.service}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {q.deliveryTime}{(q as any).courier ? ` — ${(q as any).courier}` : ""}
+                      {q.deliveryTime}{q.courier ? ` — ${q.courier}` : ""}
                     </p>
                   </div>
                 </div>
@@ -307,12 +309,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName }: Props
                 : "Gratis"}
             </span>
           </div>
-          {serviceFee > 0 && (
-            <div className="flex justify-between">
-              <span className="text-gray-600">Cargo por servicio</span>
-              <span className="text-gray-900">${serviceFee.toLocaleString("es-CL")}</span>
-            </div>
-          )}
+          {/* Comisión se maneja internamente en split payment, no se muestra al comprador */}
           <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between font-bold">
             <span className="text-gray-900">Total</span>
             <span className="text-gray-900">

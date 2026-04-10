@@ -87,6 +87,23 @@ const GENRE_MAP: Record<string, NormalizedGenre> = {
   "spirituality": { category: "no-ficcion", subcategory: "espiritualidad" },
   "religion": { category: "no-ficcion", subcategory: "espiritualidad" },
 
+  // Esoterismo
+  "esoterismo": { category: "no-ficcion", subcategory: "esoterismo" },
+  "ocultismo": { category: "no-ficcion", subcategory: "esoterismo" },
+  "occult": { category: "no-ficcion", subcategory: "esoterismo" },
+  "tarot": { category: "no-ficcion", subcategory: "esoterismo" },
+  "astrologia": { category: "no-ficcion", subcategory: "esoterismo" },
+  "astrology": { category: "no-ficcion", subcategory: "esoterismo" },
+  "masoneria": { category: "no-ficcion", subcategory: "esoterismo" },
+  "magia": { category: "no-ficcion", subcategory: "esoterismo" },
+  "magia negra": { category: "no-ficcion", subcategory: "esoterismo" },
+  "magia blanca": { category: "no-ficcion", subcategory: "esoterismo" },
+  "ciencias ocultas": { category: "no-ficcion", subcategory: "esoterismo" },
+  "espiritismo": { category: "no-ficcion", subcategory: "esoterismo" },
+  "metafisica": { category: "no-ficcion", subcategory: "esoterismo" },
+  "ovnis": { category: "no-ficcion", subcategory: "esoterismo" },
+  "ufologia": { category: "no-ficcion", subcategory: "esoterismo" },
+
   // Negocios
   "negocios": { category: "no-ficcion", subcategory: "negocios" },
   "business": { category: "no-ficcion", subcategory: "negocios" },
