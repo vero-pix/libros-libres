@@ -102,7 +102,7 @@ export default function DevolucionesPage() {
 
         <div className="text-center mt-10">
           <Link
-            href="/contacto"
+            href="/sobre-nosotros#contacto"
             className="inline-block bg-ink text-cream px-6 py-3 rounded-lg font-medium hover:bg-ink/90"
           >
             ¿Tienes una devolución? Escríbenos

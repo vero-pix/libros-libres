@@ -132,7 +132,7 @@ export default function SobreNosotrosPage() {
         </section>
 
         {/* Contact form */}
-        <section>
+        <section id="contacto" className="scroll-mt-24">
           <ContactForm />
         </section>
       </main>
