@@ -44,7 +44,7 @@ export default async function MisVentasPage() {
     .from("orders")
     .select(`
       id, book_price, shipping_cost, service_fee, total, status,
-      courier, tracking_code, created_at,
+      courier, tracking_code, shipping_label_url, shipping_status, buyer_address, created_at,
       listing:listings(id, book:books(title, author, cover_url)),
       buyer:users!orders_buyer_id_fkey(full_name, email)
     `)
@@ -172,13 +172,17 @@ export default async function MisVentasPage() {
                       <th className="px-4 py-3">Libro</th>
                       <th className="px-4 py-3">Comprador</th>
                       <th className="px-4 py-3">Precio</th>
+                      <th className="px-4 py-3">Envío</th>
                       <th className="px-4 py-3">Estado</th>
                       <th className="px-4 py-3">Fecha</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-cream-dark/10">
-                    {orders.map((order: any) => (
-                      <tr key={order.id} className="hover:bg-cream-warm/30">
+                    {orders.map((order: any) => {
+                      const isInPerson = order.courier === "Entrega en persona" || order.courier === "Punto de retiro" || !order.courier;
+                      const isPaid = order.status === "paid" || order.status === "shipped" || order.status === "delivered";
+                      return (
+                      <tr key={order.id} className="hover:bg-cream-warm/30 align-top">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             {order.listing?.book?.cover_url && (
@@ -199,10 +203,54 @@ export default async function MisVentasPage() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-ink-muted">
-                          {order.buyer?.full_name ?? "—"}
+                          <div className="min-w-0">
+                            <p className="truncate">{order.buyer?.full_name ?? "—"}</p>
+                            {!isInPerson && order.buyer_address && (
+                              <p className="text-xs text-ink-muted/70 truncate mt-0.5" title={order.buyer_address}>
+                                {order.buyer_address}
+                              </p>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3 font-medium">
                           ${Number(order.book_price).toLocaleString("es-CL")}
+                        </td>
+                        <td className="px-4 py-3">
+                          {isInPerson ? (
+                            <span className="text-xs text-ink-muted">🤝 En persona</span>
+                          ) : isPaid ? (
+                            <div className="space-y-1.5 min-w-[180px]">
+                              <div className="text-xs font-medium text-ink">
+                                📦 {order.courier ?? "Courier"}
+                              </div>
+                              {order.tracking_code && (
+                                <div className="text-[11px] font-mono text-ink-muted">
+                                  {order.tracking_code}
+                                </div>
+                              )}
+                              {order.shipping_label_url ? (
+                                <a
+                                  href={order.shipping_label_url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-block text-[11px] bg-ink text-cream px-2 py-1 rounded-md hover:bg-ink/90"
+                                >
+                                  📄 Descargar etiqueta
+                                </a>
+                              ) : (
+                                <span className="text-[11px] text-amber-700">Etiqueta en preparación…</span>
+                              )}
+                              <div className="pt-0.5">
+                                <a href="/como-despachar" className="text-[11px] text-brand-600 hover:underline">
+                                  ¿Cómo despacho?
+                                </a>
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-ink-muted">
+                              📦 {order.courier ?? "Courier"} — pendiente de pago
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3">
                           <span className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_LABELS[order.status as OrderStatus]?.class ?? ""}`}>
@@ -213,7 +261,8 @@ export default async function MisVentasPage() {
                           {new Date(order.created_at).toLocaleDateString("es-CL")}
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

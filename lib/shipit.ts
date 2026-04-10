@@ -181,7 +181,26 @@ export interface ShipitOrderResult {
   id: number;
   state: string;
   tracking_code?: string;
+  label_url?: string;
   error?: string;
+}
+
+/** Best-effort extraction of a printable label URL from a Shipit order response. */
+function extractLabelUrl(data: any): string | undefined {
+  if (!data) return undefined;
+  // Shipit returns different shapes depending on plan/endpoint.
+  const candidates = [
+    data.label_url,
+    data.labels_url,
+    data.url_label,
+    data.label,
+    typeof data.labels === "string" ? data.labels : undefined,
+    Array.isArray(data.labels) ? data.labels[0]?.url ?? data.labels[0] : undefined,
+    data.packing?.label_url,
+    data.packing?.url,
+  ];
+  const found = candidates.find((c) => typeof c === "string" && c.startsWith("http"));
+  return found;
 }
 
 /**
@@ -247,10 +266,14 @@ export async function createShipitOrder(input: ShipitOrderInput): Promise<Shipit
       return { id: 0, state: "error", error: data.error };
     }
 
+    // Log once so we can inspect the actual shape returned by Shipit.
+    console.log("[shipit] Create order raw response keys:", Object.keys(data ?? {}));
+
     return {
       id: data.id,
       state: data.state ?? "draft",
       tracking_code: data.tracking_number ?? data.tracking_code,
+      label_url: extractLabelUrl(data),
     };
   } catch (err) {
     console.error("[shipit] Create order exception:", err);
