@@ -104,7 +104,7 @@ export default function ComoDespacharPage() {
             Si algo no te cuadra o tienes una situación especial, escríbenos. Estamos construyendo esto
             juntos y nos importa que el proceso sea fácil para ti.
           </p>
-          <Link href="/contacto" className="text-sm text-blue-700 font-medium hover:underline">
+          <Link href="/sobre-nosotros#contacto" className="text-sm text-blue-700 font-medium hover:underline">
             Contáctanos →
           </Link>
         </section>
