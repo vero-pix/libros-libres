@@ -1,8 +1,8 @@
 /**
  * Compress and resize an image file before uploading.
+ * Outputs WebP for smaller file sizes and better quality.
  * Max dimensions: 1200x1600 (book cover proportions)
- * Quality: 0.8 (JPEG) — good balance between quality and size
- * Target: under 500KB
+ * Quality: 0.8 — good balance between quality and size
  */
 export async function compressImage(file: File, maxWidth = 1200, maxHeight = 1600, quality = 0.8): Promise<File> {
   return new Promise((resolve) => {
@@ -10,7 +10,6 @@ export async function compressImage(file: File, maxWidth = 1200, maxHeight = 160
     img.onload = () => {
       let { width, height } = img;
 
-      // Scale down if needed
       if (width > maxWidth || height > maxHeight) {
         const ratio = Math.min(maxWidth / width, maxHeight / height);
         width = Math.round(width * ratio);
@@ -26,16 +25,16 @@ export async function compressImage(file: File, maxWidth = 1200, maxHeight = 160
       canvas.toBlob(
         (blob) => {
           if (blob) {
-            const compressed = new File([blob], file.name.replace(/\.\w+$/, ".jpg"), {
-              type: "image/jpeg",
+            const compressed = new File([blob], file.name.replace(/\.\w+$/, ".webp"), {
+              type: "image/webp",
               lastModified: Date.now(),
             });
             resolve(compressed);
           } else {
-            resolve(file); // fallback to original
+            resolve(file);
           }
         },
-        "image/jpeg",
+        "image/webp",
         quality
       );
     };

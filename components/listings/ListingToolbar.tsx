@@ -82,6 +82,7 @@ export default function ListingToolbar() {
       </button>
 
       <select
+        aria-label="Ordenar publicaciones"
         onChange={handleChange("sort")}
         defaultValue={searchParams.get("sort") ?? ""}
         className={selectClass}
@@ -97,6 +98,7 @@ export default function ListingToolbar() {
           <span className="absolute left-2 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
           <input
             type="number"
+            aria-label="Precio mínimo"
             placeholder="Min"
             defaultValue={searchParams.get("price_min") ?? ""}
             onBlur={handlePriceBlur("price_min")}
@@ -109,6 +111,7 @@ export default function ListingToolbar() {
           <span className="absolute left-2 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
           <input
             type="number"
+            aria-label="Precio máximo"
             placeholder="Max"
             defaultValue={searchParams.get("price_max") ?? ""}
             onBlur={handlePriceBlur("price_max")}
@@ -121,6 +124,7 @@ export default function ListingToolbar() {
       {/* Author filter */}
       <input
         type="text"
+        aria-label="Filtrar por autor"
         placeholder="Filtrar por autor..."
         defaultValue={searchParams.get("author") ?? ""}
         onBlur={(e) => updateParam("author", e.target.value)}
@@ -130,6 +134,7 @@ export default function ListingToolbar() {
 
       {/* Condition */}
       <select
+        aria-label="Filtrar por condición"
         onChange={handleChange("condition")}
         defaultValue={searchParams.get("condition") ?? ""}
         className={selectClass}
@@ -143,6 +148,7 @@ export default function ListingToolbar() {
 
       {/* Modality */}
       <select
+        aria-label="Filtrar por modalidad"
         onChange={handleChange("modality")}
         defaultValue={searchParams.get("modality") ?? ""}
         className={selectClass}

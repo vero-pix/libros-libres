@@ -5,6 +5,34 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "9 abril 2026",
+    title: "URLs amigables con tienda por vendedor",
+    description:
+      "Cada libro ahora tiene su propia URL legible: tuslibros.cl/libro/vendedor/titulo-del-libro. Mejor para compartir, mejor para Google, y cada vendedor empieza a construir su identidad dentro de la plataforma.",
+    tag: "Mejora",
+  },
+  {
+    date: "9 abril 2026",
+    title: "Categorías y etiquetas",
+    description:
+      "Todo el catálogo ahora está organizado en 5 categorías principales, 32 subcategorías y etiquetas temáticas. Navega por Novela, Ensayo, No ficción, Infantil o Coleccionable desde el sidebar.",
+    tag: "Nueva herramienta",
+  },
+  {
+    date: "9 abril 2026",
+    title: "Buscador en Mis Libros",
+    description:
+      "Si tienes muchos libros publicados, ahora puedes buscar por título o autor directamente en tu panel de publicaciones.",
+    tag: "Mejora",
+  },
+  {
+    date: "9 abril 2026",
+    title: "Imágenes más rápidas",
+    description:
+      "Las portadas ahora se comprimen en formato WebP antes de subirse. Cargan más rápido y pesan menos, sin perder calidad visible.",
+    tag: "Mejora",
+  },
+  {
+    date: "9 abril 2026",
     title: "Ficha bibliográfica completa",
     description:
       "Ahora cada libro muestra editorial, cantidad de páginas, año de publicación y tipo de encuadernación (tapa dura o blanda). Los datos se auto-completan al buscar por ISBN.",

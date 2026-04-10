@@ -43,9 +43,15 @@ export default function MyListings({ listings: initial }: Props) {
   }, [searchParams]);
   const [loading, setLoading] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | ListingStatus>("all");
+  const [search, setSearch] = useState("");
   const supabase = createClient();
 
-  const filtered = filter === "all" ? listings : listings.filter((l) => l.status === filter);
+  const filtered = (filter === "all" ? listings : listings.filter((l) => l.status === filter))
+    .filter((l) => {
+      if (!search.trim()) return true;
+      const q = search.toLowerCase();
+      return l.book.title.toLowerCase().includes(q) || l.book.author.toLowerCase().includes(q);
+    });
 
   const counts = {
     all: listings.length,
@@ -112,6 +118,27 @@ export default function MyListings({ listings: initial }: Props) {
         ))}
       </div>
 
+      {/* Search */}
+      <div className="relative">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Buscar por título o autor…"
+          className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 pl-10 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition-all"
+        />
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        {search && (
+          <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
+
       {/* Listings */}
       {filtered.map((listing) => (
         <ListingRow
@@ -133,7 +160,7 @@ export default function MyListings({ listings: initial }: Props) {
 
       {filtered.length === 0 && (
         <p className="text-center text-gray-400 py-8">
-          No hay publicaciones con este filtro.
+          {search.trim() ? `Sin resultados para "${search}"` : "No hay publicaciones con este filtro."}
         </p>
       )}
     </div>
