@@ -26,6 +26,13 @@ export async function middleware(request: NextRequest) {
       url.pathname = `/libro/${(data.seller as any).username}/${data.slug}`;
       return NextResponse.redirect(url, 308);
     }
+
+    // Fallback: slug no resuelve a ningún listing → tratarlo como búsqueda
+    // Esto recupera tráfico SEO de URLs legacy (WordPress, Buscalibre, etc.)
+    const searchUrl = request.nextUrl.clone();
+    searchUrl.pathname = "/search";
+    searchUrl.searchParams.set("q", slug.replace(/-/g, " "));
+    return NextResponse.redirect(searchUrl, 302);
   }
 
   // Redirect legacy /listings/[uuid] → /libro/[username]/[slug]
