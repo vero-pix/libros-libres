@@ -14,7 +14,7 @@ export default function DevolucionesPage() {
             Devoluciones
           </h1>
           <p className="text-ink-muted">
-            Mi regla acá es simple: si algo salió mal, lo arreglamos. Que quien compra reciba lo que pidió, y que quien vende no pierda cuando actuó de buena fe. Si tienes dudas con un caso, escríbeme directo.
+            Recibir un libro en buen estado protege a quien compra y a quien vende por igual. Es una transacción recíproca, un acto de confianza. Mi rol acá es cuidar esa confianza: si algo salió mal, lo vemos juntos. Si tienes dudas con un caso, escríbeme directo.
           </p>
         </header>
 

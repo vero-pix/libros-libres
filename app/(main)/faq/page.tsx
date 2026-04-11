@@ -25,7 +25,7 @@ const faqSections = [
       },
       {
         q: "¿Puedo negociar el precio?",
-        a: "Sí, y me gusta que así sea. Armé Libros Libres para que la conversación entre quien vende y quien compra sea directa, sin que yo me meta en el medio. Conversen por WhatsApp, pónganse de acuerdo. Y si quieren pagar con MercadoPago, también pueden ajustar el precio entre ustedes para repartirse la comisión como les acomode. Mi regla es una sola: libertad. — Vero",
+        a: "Sí, y me gusta que así sea. Armé tuslibros.cl para que la conversación entre quien vende y quien compra sea directa, sin que yo me meta en el medio. Conversen por WhatsApp, pónganse de acuerdo. Y si quieren pagar con MercadoPago, también pueden ajustar el precio entre ustedes para repartirse la comisión como les acomode. Mi regla es una sola: libertad. — Vero",
       },
       {
         q: "¿Cómo sé si el libro está en buen estado?",
