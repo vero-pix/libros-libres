@@ -118,6 +118,19 @@
 - [x] AdSense eliminado (generaba errores 403/400 sin estar aprobado)
 - [x] Tab Ubicación eliminado (redundante con pin de comuna)
 
+### Sesión 11 abril (voz personal + gong + fixes)
+- [x] Voz personal en todo el sitio (sobre-nosotros, historia, faq, como-funciona, devoluciones, alianzas, novedades, publish, manifiesto home)
+- [x] Historia reescrita con narrativa real de Verónica (20 años, pausa, ventana, segunda oportunidad)
+- [x] Plan de lanzamiento multi-canal de la historia (newsletter + LinkedIn + WhatsApp)
+- [x] HTML de revisión editorial con todos los textos del sitio (`docs/REVISION-COPY-2026-04-11.html`)
+- [x] CategoryPicker con taxonomía real desde tabla `categories` — reemplaza legacy select de 36 géneros en publish y edit
+- [x] Footer: quita Contacto y Infantil, categorías actualizadas a slugs nuevos, reordenado (sobre → historia → cómo funciona → faq → alianzas)
+- [x] Alianzas marcada como "próximamente"
+- [x] Eliminada página `/planes` (contenido incorrecto, planes aún no definidos)
+- [x] Gong de Telegram al publicar: bot `@Tuslibros_cl_bot` notifica con libro, autor, vendedor, precio, comuna y link directo
+- [x] Fix autocomplete buscador: redirigía a `/libro/[slug]` (ruta inexistente), ahora usa `libroUrl()` helper con fallback a `/listings/[id]` para vendedores sin username
+- [x] Publicados primeros libros en cuenta admin: dos Max Frisch Seix Barral Biblioteca Breve 1983 con portadas cropeadas y precios con descuento visible
+
 ---
 
 ## En progreso
@@ -154,6 +167,15 @@
 - [x] Slug autogenerado al publicar (con dedup)
 - [x] Redirect permanente /listings/[uuid] → /libro/[slug]
 - [x] 13 componentes actualizados (cards, mapa, carrito, buscador, recomendaciones)
+
+### 📊 Observabilidad y alertas (pendiente — posterior a tracción inicial)
+
+- [ ] Activar Vercel Web Analytics (filtra bots, da visitas reales)
+- [ ] Activar Vercel Speed Insights (Core Web Vitals por usuario)
+- [ ] Conectar tabla `page_views` (ya existe migración del 7 abril) al tracking del cliente
+- [ ] Dashboard `/admin/stats` propio: visitas, top libros vistos, referrers (WhatsApp/Instagram/Google), errores de usuarios reales
+- [ ] Alertas automáticas ante errores 5xx en producción (Vercel → Slack/email)
+- [ ] Filtro en logs de errores 404/500 excluyendo bots (SemrushBot, AhrefsBot, etc.)
 
 ### 🔴 Distribución y redes sociales (PRIORIDAD)
 
@@ -206,6 +228,7 @@
 - [ ] Newsletter semanal — elegir día estratégico
 - [ ] Dominio personalizado Supabase
 - [ ] Fix INP issue (botón bloqueó UI 6.2s según Vercel Toolbar)
+- [ ] **Valuación libros antiguos (sáb/dom 12-13 abril)** — Vero fotografía su colección de libros viejos en distintos idiomas y Claude evalúa cuáles tienen valor de colección (primera edición, editorial histórica, autor buscado). Ejercicio de aprendizaje mutuo para agudizar ojo de joyas en el catálogo.
 
 ### Requiere acción de Verónica
 - [ ] Apple OAuth ($99/año) — decidir si vale la pena
