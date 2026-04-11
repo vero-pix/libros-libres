@@ -1,7 +1,7 @@
 /**
  * Genera la URL de un libro/listing.
- * Formato: /libro/[username]/[slug]
- * Fallback: /libro/[slug] si no hay username, /listings/[id] si no hay slug.
+ * Formato amigable: /libro/[username]/[slug] cuando el vendedor tiene username.
+ * Fallback: /listings/[id] cuando no hay username (no existe la ruta /libro/[slug] sola).
  */
 export function libroUrl(listing: {
   id: string;
@@ -10,9 +10,6 @@ export function libroUrl(listing: {
 }): string {
   if (listing.slug && listing.seller?.username) {
     return `/libro/${listing.seller.username}/${listing.slug}`;
-  }
-  if (listing.slug) {
-    return `/libro/${listing.slug}`;
   }
   return `/listings/${listing.id}`;
 }
