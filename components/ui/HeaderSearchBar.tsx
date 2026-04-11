@@ -2,10 +2,12 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
+import { libroUrl } from "@/lib/urls";
 
 interface Suggestion {
   id: string;
   slug: string | null;
+  username: string | null;
   title: string;
   author: string;
   cover_url: string | null;
@@ -81,7 +83,13 @@ export default function HeaderSearchBar() {
   function selectSuggestion(s: Suggestion) {
     setQuery(s.title);
     setOpen(false);
-    router.push(s.slug ? `/libro/${s.slug}` : `/listings/${s.id}`);
+    router.push(
+      libroUrl({
+        id: s.id,
+        slug: s.slug,
+        seller: { username: s.username },
+      })
+    );
   }
 
   return (
