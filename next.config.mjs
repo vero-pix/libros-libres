@@ -14,7 +14,7 @@ const nextConfig = {
   async redirects() {
     return [
       // WordPress legacy URLs → new routes
-      { source: '/libro/:slug', destination: '/search?q=:slug', permanent: true },
+      // NOTA: /libro/:slug ya NO se redirige acá — el middleware lo resuelve a /libro/[username]/[slug]
       { source: '/producto/:slug', destination: '/search?q=:slug', permanent: true },
       { source: '/product/:slug', destination: '/search?q=:slug', permanent: true },
       { source: '/categoria-producto/:slug', destination: '/?genre=:slug', permanent: true },
