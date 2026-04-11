@@ -37,9 +37,9 @@ export default function SobreNosotrosPage() {
         {/* Mission / intro */}
         <section className="mb-12">
           <div className="bg-cream-warm rounded-xl p-8 border border-cream-dark border-l-4 border-l-brand-600">
-            <h2 className="text-sm uppercase tracking-widest text-brand-600 font-semibold mb-3">Por qué existe esto</h2>
+            <h2 className="text-sm uppercase tracking-widest text-brand-600 font-semibold mb-3">Por qué existe tuslibros.cl</h2>
             <p className="text-ink text-lg leading-relaxed font-light">
-              No nació de una frustración. Nació de la ilusión. Del amor por los libros de papel, por su peso, por su olor, por subrayarlos. Esto es, casi, un gesto romántico.
+              Nació de la ilusión. Del amor por los libros de papel, por su peso, por su olor, por subrayarlos. Es, casi, un gesto romántico.
             </p>
           </div>
         </section>
@@ -51,7 +51,7 @@ export default function SobreNosotrosPage() {
           </h2>
           <div className="bg-white rounded-xl shadow-sm border border-cream-dark p-6 space-y-4 text-ink-muted leading-relaxed">
             <p>
-              Hace unos 20 años armé una primera versión de esto. Era la misma idea — conectar lectores directo, sin las comisiones y los líos de las plataformas que ya existían. La mantuve a pulso, con plata mía, durante años. Crecía, pero el costo también crecía, y en algún momento tuve que soltarla. Dolió.
+              Hace unos 20 años armé una primera versión de tuslibros.cl. Era la misma idea — conectar lectores directo, sin las comisiones y los líos de las plataformas que ya existían. La mantuve a pulso, con plata mía, durante años. Crecía, pero el costo también crecía, y en algún momento tuve que soltarla. Dolió.
             </p>
             <p>
               Pasaron quince meses. Un día estaba mirando la ciudad desde la ventana — toda esa extensión de edificios, departamentos, casas — y pensé: en cada una de esas ventanas hay una estantería. Y en cada estantería hay un libro que yo no sé que existe, que alguien ya leyó, que quizás me cambiaría algo si lo encontrara.
@@ -60,7 +60,7 @@ export default function SobreNosotrosPage() {
               Imaginé poder ver todo eso conectado. Descubrir un libro que está literalmente al lado mío, sin tener que entrar a una librería, sin algoritmo que me empuje otra cosa. Y poder preguntarle a la persona que lo tiene: &ldquo;¿está bueno?&rdquo;. Como cuando te recomienda un libro una amiga.
             </p>
             <p>
-              Eso es tuslibros.cl. Una segunda oportunidad para esa idea, ahora con mejores herramientas y con menos ego. Si estás leyendo esto, probablemente eres parte de lo que estoy intentando construir.
+              Así nació tuslibros.cl. Una segunda oportunidad para esa idea, ahora con mejores herramientas y con menos ego. Si llegaste hasta acá leyendo, probablemente eres parte de lo que estoy intentando construir.
             </p>
             <p className="text-right text-sm italic text-ink">— Vero</p>
           </div>
@@ -85,7 +85,7 @@ export default function SobreNosotrosPage() {
         {/* Who is it for */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-ink mb-4 border-b-2 border-brand-600 pb-2 inline-block">
-            ¿Para quién es esto?
+            ¿Para quién es tuslibros.cl?
           </h2>
           <div className="bg-white rounded-xl shadow-sm border border-cream-dark p-6">
             <p className="text-ink-muted leading-relaxed">
