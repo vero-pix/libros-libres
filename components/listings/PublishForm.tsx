@@ -266,6 +266,15 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
 
       if (listingErr) throw listingErr;
 
+      // Gong Telegram (fire-and-forget) — Vero recibe notificación cuando alguien publica
+      if (newListing?.id) {
+        fetch("/api/webhooks/listing-created", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ listingId: newListing.id }),
+        }).catch(() => {});
+      }
+
       // Guardar teléfono en el perfil del usuario si fue ingresado
       if (phone) {
         await supabase.from("users").update({ phone }).eq("id", userId);
