@@ -29,3 +29,6 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Working notes — nunca subir ideas, borradores ni material personal al repo
+/ideas/
