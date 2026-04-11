@@ -2,21 +2,14 @@ import Image from "next/image";
 import ContactForm from "@/components/ui/ContactForm";
 
 export const metadata = {
-  title: "Sobre Nosotros — Libros Libres",
+  title: "Sobre nosotros — tuslibros.cl",
 };
 
 const values = [
-  { icon: "🆓", title: "Gratuito", description: "Publicar siempre será gratis" },
-  { icon: "⚡", title: "Simple", description: "Escanea, publica, vende — en menos de un minuto" },
-  { icon: "📍", title: "Local", description: "Conectamos vecinos lectores en el mismo barrio" },
-  { icon: "🤝", title: "Directo", description: "Sin plataformas de pago intermedias" },
-];
-
-const steps = [
-  "Publica tu libro en segundos escaneando el código de barras",
-  "Aparece en el mapa para compradores cercanos",
-  "Se contactan por WhatsApp y coordinan directamente",
-  "Sin comisiones, sin intermediarios, sin complicaciones",
+  { icon: "📖", title: "Los libros son de papel", description: "Nos gusta el olor, el peso, las páginas dobladas. Lo físico importa." },
+  { icon: "🏠", title: "Cerca", description: "El libro que buscas probablemente está en la estantería de al lado." },
+  { icon: "🤝", title: "Sin mucho medio", description: "Hablan directo vendedor y comprador. Yo no me meto en el medio." },
+  { icon: "🆓", title: "Publicar es gratis", description: "Siempre. No hay versión premium escondida." },
 ];
 
 export default function SobreNosotrosPage() {
@@ -34,59 +27,49 @@ export default function SobreNosotrosPage() {
         />
         <div className="absolute inset-0 bg-cream/70" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-4xl font-bold text-ink mb-2">Sobre Libros Libres</h1>
-          <p className="text-ink-muted text-lg max-w-xl">La historia detrás de Libros Libres</p>
+          <h1 className="text-4xl font-bold text-ink mb-2">Hola, soy Vero</h1>
+          <p className="text-ink-muted text-lg max-w-xl">Y esta es la historia detrás de tuslibros.cl</p>
         </div>
       </div>
 
       {/* Content */}
       <main className="max-w-3xl mx-auto px-4 py-12">
-        {/* Mission Card */}
+        {/* Mission / intro */}
         <section className="mb-12">
-          <div className="bg-cream-warm rounded-xl p-8 text-center border border-cream-dark border-l-4 border-l-brand-600">
-            <h2 className="text-sm uppercase tracking-widest text-brand-600 font-semibold mb-3">Nuestra misión</h2>
-            <p className="text-ink text-xl leading-relaxed font-light">
-              Facilitar el acceso a libros usados conectando lectores cercanos de forma simple y directa, sin intermediarios.
+          <div className="bg-cream-warm rounded-xl p-8 border border-cream-dark border-l-4 border-l-brand-600">
+            <h2 className="text-sm uppercase tracking-widest text-brand-600 font-semibold mb-3">Por qué existe esto</h2>
+            <p className="text-ink text-lg leading-relaxed font-light">
+              No nació de una frustración. Nació de la ilusión. Del amor por los libros de papel, por su peso, por su olor, por subrayarlos. Esto es, casi, un gesto romántico.
             </p>
           </div>
         </section>
 
-        {/* Origin Story */}
+        {/* Origin Story — real */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-ink mb-4 border-b-2 border-brand-600 pb-2 inline-block">
-            Cómo empezó
+            Cómo empezó (la versión honesta)
           </h2>
-          <div className="bg-white rounded-xl shadow-sm border border-cream-dark p-6">
-            <p className="text-ink-muted leading-relaxed mb-4">
-              Libros Libres nació de una necesidad simple: encontrar libros usados cerca de casa sin pasar por plataformas complicadas, sin comisiones abusivas y sin esperar días de despacho.
+          <div className="bg-white rounded-xl shadow-sm border border-cream-dark p-6 space-y-4 text-ink-muted leading-relaxed">
+            <p>
+              Hace unos 20 años armé una primera versión de esto. Era la misma idea — conectar lectores directo, sin las comisiones y los líos de las plataformas que ya existían. La mantuve a pulso, con plata mía, durante años. Crecía, pero el costo también crecía, y en algún momento tuve que soltarla. Dolió.
             </p>
-            <p className="text-ink-muted leading-relaxed">
-              La idea es sencilla: si alguien en tu barrio tiene el libro que buscas, ¿por qué no conectarlos directamente?
+            <p>
+              Pasaron quince meses. Un día estaba mirando la ciudad desde la ventana — toda esa extensión de edificios, departamentos, casas — y pensé: en cada una de esas ventanas hay una estantería. Y en cada estantería hay un libro que yo no sé que existe, que alguien ya leyó, que quizás me cambiaría algo si lo encontrara.
             </p>
-          </div>
-        </section>
-
-        {/* How it works */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-ink mb-4 border-b-2 border-brand-600 pb-2 inline-block">
-            Cómo funciona
-          </h2>
-          <div className="space-y-3">
-            {steps.map((step, i) => (
-              <div key={i} className="flex items-start gap-4 bg-white rounded-xl shadow-sm border border-cream-dark p-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center text-sm font-bold">
-                  {i + 1}
-                </div>
-                <p className="text-ink-muted leading-relaxed pt-1">{step}</p>
-              </div>
-            ))}
+            <p>
+              Imaginé poder ver todo eso conectado. Descubrir un libro que está literalmente al lado mío, sin tener que entrar a una librería, sin algoritmo que me empuje otra cosa. Y poder preguntarle a la persona que lo tiene: &ldquo;¿está bueno?&rdquo;. Como cuando te recomienda un libro una amiga.
+            </p>
+            <p>
+              Eso es tuslibros.cl. Una segunda oportunidad para esa idea, ahora con mejores herramientas y con menos ego. Si estás leyendo esto, probablemente eres parte de lo que estoy intentando construir.
+            </p>
+            <p className="text-right text-sm italic text-ink">— Vero</p>
           </div>
         </section>
 
         {/* Values */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-ink mb-6 border-b-2 border-brand-600 pb-2 inline-block">
-            Nuestros valores
+            Lo que nos importa
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {values.map((v) => (
@@ -102,11 +85,11 @@ export default function SobreNosotrosPage() {
         {/* Who is it for */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-ink mb-4 border-b-2 border-brand-600 pb-2 inline-block">
-            ¿Para quién es?
+            ¿Para quién es esto?
           </h2>
           <div className="bg-white rounded-xl shadow-sm border border-cream-dark p-6">
             <p className="text-ink-muted leading-relaxed">
-              Para cualquier persona en Chile que quiera darle una segunda vida a sus libros o encontrar lecturas a buen precio cerca de su casa.
+              Para quien lee en papel y no le gusta tirar los libros a la basura cuando ya no los necesita. Para quien busca algo específico y prefiere encontrarlo a la vuelta de la esquina antes que pagar despacho. Para quien le gusta conversar sobre libros con desconocidos. Para ti, básicamente, si llegaste hasta acá leyendo.
             </p>
           </div>
         </section>
@@ -114,8 +97,8 @@ export default function SobreNosotrosPage() {
         {/* Contact */}
         <section>
           <div className="bg-brand-50 rounded-xl p-6 text-center border border-brand-200">
-            <h2 className="text-xl font-bold text-ink mb-2">Contacto</h2>
-            <p className="text-ink-muted mb-4">¿Tienes sugerencias, reportes de abuso o necesitas ayuda?</p>
+            <h2 className="text-xl font-bold text-ink mb-2">Escríbeme</h2>
+            <p className="text-ink-muted mb-4">Sugerencias, reclamos, dudas, ideas — me llegan todas y las leo yo.</p>
             <a
               href="https://wa.me/56994583067?text=Hola%2C%20tengo%20una%20consulta%20sobre%20tuslibros.cl"
               target="_blank"
@@ -127,7 +110,7 @@ export default function SobreNosotrosPage() {
               </svg>
               Escríbenos por WhatsApp
             </a>
-            <p className="text-xs text-ink-muted mt-3">Respondemos en menos de 24 horas</p>
+            <p className="text-xs text-ink-muted mt-3">Trato de responder dentro del día.</p>
           </div>
         </section>
 

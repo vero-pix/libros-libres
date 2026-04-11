@@ -51,7 +51,6 @@ export default function Footer() {
             <h4 className="font-display font-bold text-ink mb-4 text-sm">Accesos</h4>
             <ul className="space-y-2.5 text-ink-muted">
               <li><Link href="/publish" className="hover:text-brand-600 transition-colors">Vende tu libro</Link></li>
-              <li><Link href="/planes" className="hover:text-brand-600 transition-colors">Planes</Link></li>
               <li><Link href="/search" className="hover:text-brand-600 transition-colors">Buscar</Link></li>
             </ul>
           </div>
