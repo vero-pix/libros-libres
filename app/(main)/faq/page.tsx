@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 
 export const metadata = {
   title: "Preguntas Frecuentes — Libros Libres",
@@ -22,11 +21,11 @@ const faqSections = [
       },
       {
         q: "¿Cuánto cuesta comprar?",
-        a: "El precio que ves es el precio que pagas. En ventas directas por WhatsApp no hay ningún costo adicional. Si compras con MercadoPago, la comisión la asume el vendedor, no tú.",
+        a: "Pagas el precio publicado. Nada escondido, nada raro.",
       },
       {
         q: "¿Puedo negociar el precio?",
-        a: "Sí, el precio es negociable directamente con el vendedor a través de WhatsApp.",
+        a: "Sí, y me gusta que así sea. Armé Libros Libres para que la conversación entre quien vende y quien compra sea directa, sin que yo me meta en el medio. Conversen por WhatsApp, pónganse de acuerdo. Y si quieren pagar con MercadoPago, también pueden ajustar el precio entre ustedes para repartirse la comisión como les acomode. Mi regla es una sola: libertad. — Vero",
       },
       {
         q: "¿Cómo sé si el libro está en buen estado?",
@@ -44,6 +43,14 @@ const faqSections = [
       {
         q: "¿Cuánto cuesta publicar?",
         a: "Publicar es 100% gratis, siempre. Sin límite de publicaciones.",
+      },
+      {
+        q: "¿Cuándo se aplican comisiones?",
+        a: (
+          <span>
+            Las comisiones <strong>solo aplican</strong> cuando usas nuestras herramientas integradas: pago con <strong>MercadoPago</strong> (y otras pasarelas que sumemos) o <strong>despacho por courier</strong> (Shipit hoy, más integraciones en camino). Si coordinas todo por WhatsApp y entregas en persona, no pagas nada.
+          </span>
+        ),
       },
       {
         q: "¿Cómo publico un libro?",
@@ -69,31 +76,6 @@ const faqSections = [
       {
         q: "¿Cómo elimino una publicación?",
         a: "Puedes pausar o eliminar publicaciones desde tu perfil en la sección Mis Libros.",
-      },
-    ],
-  },
-  {
-    title: "Planes y comisiones",
-    questions: [
-      {
-        q: "¿Qué son los planes?",
-        a: "Los planes definen las herramientas que usas para vender. Con el plan Libre publicas gratis y coordinas todo por WhatsApp, sin comisiones ni costo mensual. Los planes Librero y Librería agregan pago seguro con MercadoPago, despacho con courier, y comisiones reducidas a cambio de una suscripción mensual.",
-      },
-      {
-        q: "¿Cuándo me conviene subir de plan?",
-        a: "Si vendes más de 5 libros al mes usando MercadoPago, el plan Librero ($9.990/mes) te ahorra dinero por la diferencia de comisiones (5% vs 8%). Si eres librería o vendes volumen alto, el plan Librería ($29.990/mes) reduce la comisión al 3% y agrega carga masiva por Excel.",
-      },
-      {
-        q: "¿Puedo vender sin pagar comisión?",
-        a: "Sí. Con el plan Libre puedes publicar y coordinar ventas directamente por WhatsApp sin ningún costo. La comisión solo aplica cuando usas nuestro sistema de pago integrado (MercadoPago).",
-      },
-      {
-        q: "¿Cómo se cobran las comisiones?",
-        a: "Se descuentan automáticamente del monto de cada venta antes de transferir a tu cuenta de MercadoPago. No hay cobros sorpresa ni costos ocultos.",
-      },
-      {
-        q: "¿Puedo cambiar de plan?",
-        a: "Sí, puedes subir o bajar de plan en cualquier momento desde tu perfil. El cambio aplica desde el siguiente período.",
       },
     ],
   },
@@ -190,13 +172,6 @@ export default function FAQPage() {
           </div>
         ))}
 
-        {/* CTA a planes */}
-        <div className="text-center mt-10">
-          <p className="text-ink-muted mb-2">¿Quieres vender más?</p>
-          <Link href="/planes" className="text-brand-600 font-semibold hover:underline text-lg">
-            Conoce nuestros planes para vendedores &rarr;
-          </Link>
-        </div>
       </main>
     </div>
   );
