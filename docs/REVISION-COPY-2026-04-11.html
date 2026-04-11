@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Revisión de copy — tuslibros.cl · 11 abril 2026</title>
+<style>
+  :root {
+    --cream: #faf6ef;
+    --cream-warm: #f4ecdc;
+    --cream-dark: #e5d9c0;
+    --ink: #2a2417;
+    --ink-muted: #6b6250;
+    --brand: #b8893f;
+    --brand-dark: #8d6628;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.7;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 60px 32px 120px;
+    font-size: 17px;
+  }
+  header.top {
+    text-align: center;
+    margin-bottom: 60px;
+    padding-bottom: 40px;
+    border-bottom: 2px solid var(--cream-dark);
+  }
+  header.top .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--brand);
+    font-family: -apple-system, 'Helvetica Neue', sans-serif;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  header.top h1 {
+    font-size: 36px;
+    margin: 0 0 12px;
+    color: var(--ink);
+  }
+  header.top p {
+    color: var(--ink-muted);
+    font-style: italic;
+    margin: 0;
+  }
+  nav.toc {
+    background: var(--cream-warm);
+    border: 1px solid var(--cream-dark);
+    border-radius: 12px;
+    padding: 24px 32px;
+    margin-bottom: 60px;
+    font-family: -apple-system, 'Helvetica Neue', sans-serif;
+    font-size: 14px;
+  }
+  nav.toc h3 {
+    margin: 0 0 12px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brand);
+    font-weight: 600;
+  }
+  nav.toc ol {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--ink-muted);
+  }
+  nav.toc li { margin-bottom: 4px; }
+  nav.toc a { color: var(--ink); text-decoration: none; }
+  nav.toc a:hover { color: var(--brand); }
+  section.page {
+    margin-bottom: 72px;
+    padding-top: 20px;
+  }
+  section.page h2 {
+    font-size: 28px;
+    color: var(--ink);
+    border-bottom: 3px solid var(--brand);
+    padding-bottom: 8px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  section.page > .route {
+    font-family: 'SF Mono', Menlo, monospace;
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-bottom: 24px;
+  }
+  h3 {
+    font-size: 20px;
+    color: var(--ink);
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+  h4 {
+    font-size: 15px;
+    color: var(--brand-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: -apple-system, 'Helvetica Neue', sans-serif;
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+  p { margin: 0 0 14px; }
+  blockquote {
+    border-left: 4px solid var(--brand);
+    background: white;
+    padding: 20px 24px;
+    margin: 20px 0;
+    font-style: italic;
+    color: var(--ink);
+    border-radius: 0 8px 8px 0;
+  }
+  ol, ul { margin: 0 0 14px; padding-left: 24px; }
+  ul li, ol li { margin-bottom: 6px; color: var(--ink-muted); }
+  em { color: var(--brand-dark); }
+  strong { color: var(--ink); }
+  .meta {
+    background: var(--cream-warm);
+    border: 1px solid var(--cream-dark);
+    border-left: 4px solid var(--brand);
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 20px;
+  }
+  .meta p:last-child { margin-bottom: 0; }
+  .signature {
+    text-align: right;
+    font-style: italic;
+    color: var(--ink);
+    margin-top: 12px;
+  }
+  .faq-item {
+    background: white;
+    border: 1px solid var(--cream-dark);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  .faq-item .q {
+    font-weight: 600;
+    color: var(--brand-dark);
+    margin-bottom: 6px;
+    font-family: -apple-system, 'Helvetica Neue', sans-serif;
+    font-size: 15px;
+  }
+  .faq-item .a {
+    color: var(--ink-muted);
+    font-size: 15px;
+  }
+  .values-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .value {
+    background: white;
+    border: 1px solid var(--cream-dark);
+    padding: 16px;
+    border-radius: 8px;
+  }
+  .value strong { display: block; margin-bottom: 4px; }
+  .value span { color: var(--ink-muted); font-size: 14px; }
+  .pending {
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 12px;
+    padding: 24px 32px;
+    margin-top: 60px;
+    font-family: -apple-system, 'Helvetica Neue', sans-serif;
+    font-size: 14px;
+  }
+  .pending h3 {
+    margin-top: 0;
+    color: #92400e;
+  }
+  .pending li { color: #78350f; }
+  footer.bottom {
+    text-align: center;
+    font-family: -apple-system, 'Helvetica Neue', sans-serif;
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--cream-dark);
+  }
+  @media print {
+    body { padding: 20px; max-width: none; }
+    section.page { page-break-inside: avoid; }
+    nav.toc { page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="eyebrow">Revisión editorial · tuslibros.cl</div>
+  <h1>Todo el copy del sitio, en un solo lugar</h1>
+  <p>Para que lo leas de corrido, marques lo que quieras cambiar, y me pases todo junto.<br>— 11 abril 2026</p>
+</header>
+
+<nav class="toc">
+  <h3>Páginas</h3>
+  <ol>
+    <li><a href="#home">Home — Manifiesto</a></li>
+    <li><a href="#sobre">Sobre nosotros</a></li>
+    <li><a href="#historia">Nuestra historia</a></li>
+    <li><a href="#como-funciona">Cómo funciona</a></li>
+    <li><a href="#faq">Preguntas frecuentes</a></li>
+    <li><a href="#alianzas">Alianzas</a></li>
+    <li><a href="#novedades">Novedades</a></li>
+    <li><a href="#devoluciones">Devoluciones</a></li>
+    <li><a href="#despachar">Cómo despachar</a></li>
+    <li><a href="#publish">Publicar un libro</a></li>
+    <li><a href="#footer">Footer</a></li>
+  </ol>
+</nav>
+
+<!-- ============ 1. HOME ============ -->
+<section class="page" id="home">
+  <h2>1. Home — Manifiesto</h2>
+  <div class="route">/</div>
+
+  <h4>Eyebrow</h4>
+  <p>Por qué existimos</p>
+
+  <h4>Título</h4>
+  <p>Tus libros merecen circular.<br><em>Yo los conecto contigo.</em></p>
+
+  <h4>Párrafo 1</h4>
+  <p>En Chile hay millones de libros durmiendo en estanterías. Cada casa es una librería que nadie puede ver. Acá las hacemos visibles — por ubicación, por cercanía, por el título que andas buscando y que probablemente está más cerca de lo que crees.</p>
+
+  <h4>Párrafo 2</h4>
+  <p>Tu estantería se transforma en una vitrina para lectores cerca de ti. Cada libro que publicas es un libro que encuentra un nuevo lector. Y yo no me meto en el medio.</p>
+</section>
+
+<!-- ============ 2. SOBRE NOSOTROS ============ -->
+<section class="page" id="sobre">
+  <h2>2. Sobre nosotros</h2>
+  <div class="route">/sobre-nosotros</div>
+
+  <h3>Hero</h3>
+  <p><strong>H1:</strong> Hola, soy Vero<br>
+  <strong>Subtítulo:</strong> Y esta es la historia detrás de tuslibros.cl</p>
+
+  <h3>Por qué existe tuslibros.cl</h3>
+  <div class="meta">
+    <p>Nació de la ilusión. Del amor por los libros de papel, por su peso, por su olor, por subrayarlos. Es, casi, un gesto romántico.</p>
+  </div>
+
+  <h3>Cómo empezó (la versión honesta)</h3>
+  <p>Hace unos 20 años armé una primera versión de tuslibros.cl. Era la misma idea — conectar lectores directo, sin las comisiones y los líos de las plataformas que ya existían. La mantuve a pulso, con plata mía, durante años. Crecía, pero el costo también crecía, y en algún momento tuve que soltarla. Dolió.</p>
+
+  <p>Pasaron quince meses. Un día estaba mirando la ciudad desde la ventana — toda esa extensión de edificios, departamentos, casas — y pensé: en cada una de esas ventanas hay una estantería. Y en cada estantería hay un libro que yo no sé que existe, que alguien ya leyó, que quizás me cambiaría algo si lo encontrara.</p>
+
+  <p>Imaginé poder ver todo eso conectado. Descubrir un libro que está literalmente al lado mío, sin tener que entrar a una librería, sin algoritmo que me empuje otra cosa. Y poder preguntarle a la persona que lo tiene: <em>&ldquo;¿está bueno?&rdquo;</em>. Como cuando te recomienda un libro una amiga.</p>
+
+  <p>Así nació tuslibros.cl. Una segunda oportunidad para esa idea, ahora con mejores herramientas y con menos ego. Si llegaste hasta acá leyendo, probablemente eres parte de lo que estoy intentando construir.</p>
+
+  <p class="signature">— Vero</p>
+
+  <h3>Lo que importa</h3>
+  <div class="values-grid">
+    <div class="value"><strong>📖 Los libros son de papel</strong><span>Nos gusta el olor, el peso, las páginas dobladas. Lo físico importa.</span></div>
+    <div class="value"><strong>🏠 Cerca</strong><span>El libro que buscas probablemente está en la estantería de al lado.</span></div>
+    <div class="value"><strong>🤝 Sin mucho medio</strong><span>Hablan directo vendedor y comprador. Yo no me meto en el medio.</span></div>
+    <div class="value"><strong>🆓 Publicar es gratis</strong><span>Siempre. No hay versión premium escondida.</span></div>
+  </div>
+
+  <h3>¿Para quién es tuslibros.cl?</h3>
+  <p>Para quien lee en papel y no le gusta tirar los libros a la basura cuando ya no los necesita. Para quien busca algo específico y prefiere encontrarlo a la vuelta de la esquina antes que pagar despacho. Para quien le gusta conversar sobre libros con desconocidos. Para ti, básicamente, si llegaste hasta acá leyendo.</p>
+
+  <h3>Escríbeme</h3>
+  <p><strong>Texto:</strong> Sugerencias, reclamos, dudas, ideas — me llegan todas y las leo yo.<br>
+  <strong>Botón:</strong> Escríbenos por WhatsApp<br>
+  <strong>Pie:</strong> Trato de responder dentro del día.</p>
+</section>
+
+<!-- ============ 3. HISTORIA ============ -->
+<section class="page" id="historia">
+  <h2>3. Nuestra historia</h2>
+  <div class="route">/historia</div>
+
+  <h3>Hero</h3>
+  <p><strong>Eyebrow:</strong> Nuestra historia<br>
+  <strong>H1:</strong> Veinte años, una pausa, <em>y una segunda oportunidad.</em><br>
+  <strong>Autor:</strong> Por Vero</p>
+
+  <h3>Cuerpo</h3>
+  <p>Esta idea no es nueva. La primera versión la armé hace como veinte años. Era más rudimentaria, claro — otra internet, otro país, otro yo. Pero la intuición era la misma: conectar a quienes tienen libros con quienes los buscan, sin que una plataforma grande se lleve la mitad en comisiones ni convierta a los lectores en usuarios.</p>
+
+  <p>Aguanté esa primera iteración a pulso. Con plata mía, con tiempo mío, varios años. Crecía lento pero crecía. El problema es que los costos también crecían, y yo no era una empresa — era una persona con una obsesión. En algún momento tuve que soltarla. Dolió más de lo que pensé que dolería.</p>
+
+  <p>Pasaron quince meses. Quince meses sin volver a mirar eso. Hacía otras cosas, trabajaba en otras cosas, me decía a mí misma que había sido una experiencia linda pero que ya estaba. Que había aprendido y que con eso bastaba.</p>
+
+  <blockquote>Un día estaba mirando la ciudad desde la ventana. Toda esa extensión de edificios, departamentos, casas. Y pensé: en cada una de esas ventanas hay una estantería. Y en cada estantería hay un libro que yo no sé que existe.</blockquote>
+
+  <p>Un libro que alguien ya leyó, que quizás le cambió algo, y que ahora está ahí, durmiendo. Y yo, sin saberlo, paso caminando por abajo todos los días.</p>
+
+  <p>Esa imagen no se me fue. Volví a pensar en la idea de hace veinte años, pero distinta. Ya no era solo &ldquo;que los lectores se conecten sin comisiones&rdquo;. Era algo más cercano, más físico, casi vecinal. Descubrir un libro que está literalmente al lado mío, sin algoritmo que me empuje otra cosa, sin tener que entrar a una librería. Y poder preguntarle a la persona que lo tiene: <em>&ldquo;¿está bueno?&rdquo;</em>. Como cuando te recomienda un libro una amiga.</p>
+
+  <p>Eso es tuslibros.cl. Una segunda oportunidad para esa idea, ahora con mejores herramientas, con menos ego, y con muchísima más claridad sobre lo que no quiero que sea.</p>
+
+  <h3>Lo que no quiero que sea</h3>
+  <p>No quiero que sea otro marketplace frío donde los libros son productos y los lectores son usuarios. No quiero cobrarles a los vendedores por publicar. No quiero meter algoritmos en medio de una conversación entre dos personas que quieren hablar sobre un libro. No quiero que esto se parezca a las plataformas que me hicieron soltar la primera versión.</p>
+
+  <p>Quiero que sea cercano. Que el libro que buscas probablemente esté en la estantería de al lado. Que puedas preguntarle a quien lo tiene cómo le pareció. Que si se venden cara a cara, yo no cobre nada. Que si usan las herramientas que armé para hacerlo más seguro — pago con MercadoPago, despacho por courier — entonces sí cobre algo, porque mantener eso cuesta. Pero siempre con la regla: la conversación es de ustedes, no mía.</p>
+
+  <h3>Por qué te estoy contando esto</h3>
+  <p>Porque si estás leyendo hasta acá, probablemente eres la clase de persona para la que estoy construyendo esto. Alguien que lee en papel, que guarda los libros, que los subraya, que no los tira cuando ya no los necesita. Alguien que entiende que un libro usado a veces vale más que uno nuevo, porque viene con las huellas de quien lo leyó antes.</p>
+
+  <p>Esta es la segunda oportunidad. No quiero volver a soltarla.</p>
+
+  <p class="signature">— Vero</p>
+</section>
+
+<!-- ============ 4. CÓMO FUNCIONA ============ -->
+<section class="page" id="como-funciona">
+  <h2>4. Cómo funciona</h2>
+  <div class="route">/como-funciona</div>
+
+  <h3>Hero</h3>
+  <p><strong>H1:</strong> Cómo funciona<br>
+  <strong>Subtítulo:</strong> Tres formas de comprar un libro, y una de publicar el tuyo</p>
+
+  <h3>Compra directa</h3>
+  <p>El modo más simple, y mi favorito. Tú y quien vende se hablan directo por WhatsApp, se ponen de acuerdo, y yo no me meto en el medio. No cobro nada.</p>
+
+  <h3>Compra con pago seguro</h3>
+  <p>Si prefieres no coordinar nada, pagas con MercadoPago desde la publicación y listo. Acá sí cobramos una comisión chica, porque la pasarela y el despacho cuestan. Si no quieres comisión, usa WhatsApp.</p>
+
+  <h3>Arriendo de libros</h3>
+  <p>Algunos libros los lees una vez y ya. Para esos, armamos el arriendo: pagas una fracción del precio más una garantía, lees tranquilo, y cuando devuelves el libro en buen estado recuperas la garantía completa.</p>
+
+  <h3>Las reglas de la casa</h3>
+  <ul>
+    <li>✅ Publicar siempre es gratis</li>
+    <li>✅ Cero comisión si coordinas por WhatsApp</li>
+    <li>✅ Pago seguro con MercadoPago (opcional)</li>
+    <li>✅ Despacho a todo Chile con Shipit</li>
+    <li>✅ Arriendo con garantía reembolsable</li>
+  </ul>
+</section>
+
+<!-- ============ 5. FAQ ============ -->
+<section class="page" id="faq">
+  <h2>5. Preguntas frecuentes</h2>
+  <div class="route">/faq</div>
+
+  <h3>Hero</h3>
+  <p><strong>H1:</strong> Preguntas frecuentes<br>
+  <strong>Subtítulo:</strong> Lo que me preguntan más seguido. Si te falta algo, escríbeme.</p>
+
+  <h3>Para compradores</h3>
+
+  <div class="faq-item">
+    <div class="q">¿Cómo compro un libro?</div>
+    <div class="a">
+      <ol>
+        <li>Busca el libro en el catálogo, mapa o barra de búsqueda</li>
+        <li>Haz clic en el libro que te interesa</li>
+        <li>Contacta al vendedor por WhatsApp o compra directamente con MercadoPago</li>
+        <li>Coordina la entrega en persona, retiro, o recibe por courier</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">¿Cuánto cuesta comprar?</div>
+    <div class="a">Pagas el precio publicado. Nada escondido, nada raro.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">¿Puedo negociar el precio?</div>
+    <div class="a">Sí, y me gusta que así sea. Armé tuslibros.cl para que la conversación entre quien vende y quien compra sea directa, sin que yo me meta en el medio. Conversen por WhatsApp, pónganse de acuerdo. Y si quieren pagar con MercadoPago, también pueden ajustar el precio entre ustedes para repartirse la comisión como les acomode. Mi regla es una sola: libertad. — Vero</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">¿Cómo sé si el libro está en buen estado?</div>
+    <div class="a">Cada publicación incluye el estado del libro: <strong>Como nuevo</strong>, <strong>Buen estado</strong>, <strong>Estado regular</strong> o <strong>Con detalles</strong>. También puedes preguntarle directamente al vendedor antes de acordar la compra.</div>
+  </div>
+
+  <h3>Para vendedores</h3>
+
+  <div class="faq-item">
+    <div class="q">¿Cuánto cuesta publicar?</div>
+    <div class="a">Cero. Siempre. Publica uno o mil, da igual — es gratis y va a seguir siendo gratis.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">¿Cuándo se aplican comisiones?</div>
+    <div class="a">Las comisiones <strong>solo aplican</strong> cuando usas nuestras herramientas integradas: pago con <strong>MercadoPago</strong> (y otras pasarelas que sumemos) o <strong>despacho por courier</strong> (Shipit hoy, más integraciones en camino). Si coordinas todo por WhatsApp y entregas en persona, no pagas nada.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">¿Cómo publico un libro?</div>
+    <div class="a">
+      <ol>
+        <li>Inicia sesión en tu cuenta</li>
+        <li>Haz clic en <strong>Publicar libro</strong></li>
+        <li>Escanea el código de barras o ingresa el ISBN</li>
+        <li>Completa precio y estado del libro</li>
+        <li>Marca la ubicación en el mapa</li>
+        <li>Tu libro aparece en el catálogo al instante</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">¿Cómo me contactan los compradores?</div>
+    <div class="a">Los compradores te escriben directamente por WhatsApp al número que registraste en tu perfil. También pueden comprarte directamente con MercadoPago sin necesidad de coordinarse contigo.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">¿Puedo publicar muchos libros?</div>
+    <div class="a">Sí, todos los que quieras. Si tienes una biblioteca grande, también tenemos un importador por CSV para subir todo de una sola vez.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">¿Cómo elimino una publicación?</div>
+    <div class="a">Desde tu perfil, en la sección Mis Libros, puedes pausar o eliminar cualquier publicación cuando quieras.</div>
+  </div>
+
+  <h3>Arriendos de libros</h3>
+
+  <div class="faq-item">
+    <div class="q">¿Cómo funciona el arriendo?</div>
+    <div class="a">Algunos libros los lees una vez y ya — para esos armamos esto. Quien publica activa la opción al listar. Quien arrienda paga el arriendo (por 7, 14 o 30 días) más una garantía. Devuelves el libro en buen estado y recuperas la garantía completa.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">¿Cuánto cuesta arrendar un libro?</div>
+    <div class="a">El precio lo pone cada vendedor. Normalmente es una fracción del precio de venta — un libro de $12.000 puede quedar en $3.000 de arriendo más garantía reembolsable. La garantía suele ser el precio del libro completo, para que nadie pierda si el libro no vuelve.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">¿Qué pasa si no devuelvo el libro a tiempo?</div>
+    <div class="a">Se retiene la garantía como compensación al vendedor. No es un castigo, es simplemente que el libro ya no vuelve y quien lo prestó no queda a cero.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">¿La garantía es reembolsable?</div>
+    <div class="a">Sí, completa. Si devuelves dentro del plazo y en buen estado, la garantía vuelve entera a tu cuenta de MercadoPago.</div>
+  </div>
+
+  <h3>Cuenta y perfil</h3>
+
+  <div class="faq-item">
+    <div class="q">¿Cómo creo una cuenta?</div>
+    <div class="a">Haz clic en <strong>Registrarse</strong> e ingresa tu nombre, correo y contraseña. No necesitas tarjeta de crédito.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">Olvidé mi contraseña, ¿qué hago?</div>
+    <div class="a">En la pantalla de inicio de sesión, haz clic en <strong>¿Olvidaste tu contraseña?</strong> para recibir un correo de recuperación.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="q">¿Puedo usar tuslibros.cl sin cuenta?</div>
+    <div class="a">Sí, para mirar. Puedes ver el catálogo, buscar, explorar el mapa, todo sin registrarte. Para publicar un libro o escribirle a alguien sí necesitas crear una cuenta — es un trámite de menos de un minuto.</div>
+  </div>
+</section>
+
+<!-- ============ 6. ALIANZAS ============ -->
+<section class="page" id="alianzas">
+  <h2>6. Alianzas</h2>
+  <div class="route">/alianzas · (próximamente)</div>
+
+  <div class="meta">
+    <p><strong>Próximamente.</strong> Estamos recién abriendo esta conversación. Si te interesa ser de los primeros, escríbeme.</p>
+  </div>
+
+  <h3>Hero</h3>
+  <p><strong>Eyebrow:</strong> Alianzas institucionales<br>
+  <strong>H1:</strong> Hagamos circular los libros <em>entre quienes los necesitan.</em><br>
+  <strong>Subtítulo:</strong> Si trabajas en una universidad, biblioteca, centro de alumnos o librería de segunda mano, probablemente estemos pensando en lo mismo: cómo hacer que los libros lleguen a más gente y cuesten menos.</p>
+
+  <h3>Lo que tengo en la cabeza</h3>
+  <p>Una de las razones por las que armé tuslibros.cl es porque los libros universitarios son carísimos, se compran una vez, se usan un semestre, y después quedan en el estante. Mientras tanto, el semestre siguiente otro estudiante paga precio nuevo por el mismo libro.</p>
+
+  <p>Eso no tiene por qué ser así. Si las instituciones que ya tienen la comunidad (universidades, centros de alumnos, bibliotecas) se suman, podemos armar algo que funcione mejor para todos: los estudiantes ahorran, los libros circulan, y quien los vende recupera algo.</p>
+
+  <p>No necesito que integren nada técnico. No cobro por ser parte. Si hay ventas que salen de tus canales, te paso una comisión por referido — porque si tú ayudas a que esto crezca, es justo que también recibas algo.</p>
+
+  <h3>Cómo podríamos colaborar</h3>
+  <div class="values-grid">
+    <div class="value"><strong>Bibliotecas universitarias</strong><span>Cuando un libro no está en la biblioteca o tiene lista de espera, el estudiante puede encontrarlo acá, usado, más barato, y probablemente a la vuelta del campus.</span></div>
+    <div class="value"><strong>Centros de alumnos</strong><span>Un canal directo para que los estudiantes intercambien la bibliografía del semestre entre ellos, sin intermediarios. Yo pongo la plataforma, ustedes ponen la comunidad.</span></div>
+    <div class="value"><strong>Coordinaciones de carrera</strong><span>Compártanme la bibliografía obligatoria del semestre y armamos una lista dirigida. Los estudiantes la encuentran fácil, los que tienen el libro pueden ofrecerlo.</span></div>
+    <div class="value"><strong>Librerías de segunda mano</strong><span>Una vitrina digital adicional, sin costo fijo, con carga masiva por CSV para que no tengan que subir libro por libro.</span></div>
+  </div>
+  <p><em>¿Tu caso es otro? Mejor, cuéntame y lo pensamos juntos.</em></p>
+
+  <h3>Conversemos 20 minutos</h3>
+  <p>Sin compromiso. Te muestro la plataforma, me cuentas cómo es tu institución, y vemos si tiene sentido armar algo juntos.</p>
+  <p class="signature">— Vero, fundadora de tuslibros.cl</p>
+</section>
+
+<!-- ============ 7. NOVEDADES ============ -->
+<section class="page" id="novedades">
+  <h2>7. Novedades</h2>
+  <div class="route">/novedades</div>
+
+  <h3>Hero</h3>
+  <p><strong>H1:</strong> Novedades<br>
+  <strong>Subtítulo:</strong> Lo que vamos arreglando, mejorando y construyendo acá adentro. Lo escribo yo, lo lees tú. — Vero</p>
+
+  <p><em>El changelog con fechas y descripciones de cada mejora se mantiene igual — avísame si quieres revisarlo también.</em></p>
+</section>
+
+<!-- ============ 8. DEVOLUCIONES ============ -->
+<section class="page" id="devoluciones">
+  <h2>8. Devoluciones</h2>
+  <div class="route">/devoluciones</div>
+
+  <h3>Hero</h3>
+  <p><strong>H1:</strong> Devoluciones<br>
+  <strong>Subtítulo:</strong> Recibir un libro en buen estado protege a quien compra y a quien vende por igual. Es una transacción recíproca, un acto de confianza. Mi rol acá es cuidar esa confianza: si algo salió mal, lo vemos juntos. Si tienes dudas con un caso, escríbeme directo.</p>
+
+  <h3>Si tú eres vendedor</h3>
+  <p>No te preocupes: antes de pedirte que aceptes cualquier devolución, valido yo que el reclamo sea legítimo. Tus ventas están protegidas contra devoluciones sin motivo. Si te llega un caso que no te cuadra, escríbeme antes de responder y lo vemos juntos.</p>
+</section>
+
+<!-- ============ 9. CÓMO DESPACHAR ============ -->
+<section class="page" id="despachar">
+  <h2>9. Cómo despachar</h2>
+  <div class="route">/como-despachar</div>
+
+  <h3>Hero</h3>
+  <p><strong>H1:</strong> Cómo despachar un libro<br>
+  <strong>Subtítulo:</strong> Vendiste un libro, felicitaciones. Acá te dejo los 5 pasos para que llegue bien a su nuevo lector. Son fáciles, te prometo.</p>
+
+  <h3>¿Tienes dudas?</h3>
+  <p>Si algo no te cuadra o tienes una situación especial, escríbeme. Estoy construyendo esto de a poco y me importa que el proceso sea simple para ti. — Vero</p>
+</section>
+
+<!-- ============ 10. PUBLISH ============ -->
+<section class="page" id="publish">
+  <h2>10. Publicar un libro</h2>
+  <div class="route">/publish</div>
+
+  <h3>Hero</h3>
+  <p><strong>Badge:</strong> Siempre gratis<br>
+  <strong>H1:</strong> Publica tu libro<br>
+  <strong>Subtítulo:</strong> Escanea el ISBN con tu celular o escribe los datos a mano. Nosotros completamos portada, sinopsis y categoría — tú solo ponle precio.</p>
+</section>
+
+<!-- ============ 11. FOOTER ============ -->
+<section class="page" id="footer">
+  <h2>11. Footer</h2>
+  <div class="route">Global — todas las páginas</div>
+
+  <h3>Newsletter</h3>
+  <p><strong>Título:</strong> Newsletter<br>
+  <strong>Texto:</strong> Recibe recomendaciones, novedades y libros destacados cada semana.</p>
+
+  <h3>Columnas</h3>
+  <ul>
+    <li><strong>Categorías:</strong> Ficción · No ficción · Académicos · Coleccionables</li>
+    <li><strong>Información:</strong> Sobre nosotros · Nuestra historia · Cómo funciona · FAQ · Alianzas (próximamente)</li>
+    <li><strong>Legal:</strong> Términos y condiciones · Privacidad · Devoluciones</li>
+    <li><strong>Accesos:</strong> Vende tu libro · Buscar</li>
+  </ul>
+
+  <h3>Bottom</h3>
+  <p>© 2026 Libros Libres — tuslibros.cl<br>
+  ¿Dudas? vero@economics.cl</p>
+</section>
+
+<!-- ============ PENDIENTES ============ -->
+<div class="pending">
+  <h3>Pendientes para decidir</h3>
+  <ul>
+    <li><strong>"Libros Libres" sigue apareciendo</strong> en metadata SEO, footer copyright, términos, privacidad, newsletter template y emails transaccionales. ¿Reemplazamos todo por tuslibros.cl o lo mantenemos como marca paraguas?</li>
+    <li><strong>Términos y Condiciones</strong> — no los he tocado en esta revisión (son legales). Si quieres darles la vuelta humana también, avísame.</li>
+    <li><strong>Política de Privacidad</strong> — igual que términos.</li>
+    <li><strong>Changelog completo de novedades</strong> — no está aquí, si lo quieres revisar entrada por entrada te lo paso aparte.</li>
+    <li><strong>Textos de emails transaccionales</strong> (bienvenida, confirmación de compra, etc.) — pendientes de otra tanda.</li>
+  </ul>
+</div>
+
+<footer class="bottom">
+  Revisión editorial · tuslibros.cl · 11 abril 2026<br>
+  Para imprimir: <kbd>Cmd/Ctrl + P</kbd>
+</footer>
+
+</body>
+</html>
