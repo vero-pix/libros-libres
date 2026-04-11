@@ -153,23 +153,35 @@ export async function POST(req: NextRequest) {
     const address = profile?.default_address || [profile?.comuna, profile?.region].filter(Boolean).join(", ") || "Chile";
     const coverUrl = buildCoverUrl(isbn);
 
-    const { error: listErr } = await supabase.from("listings").insert({
-      book_id: bookId,
-      seller_id: user.id,
-      price,
-      condition,
-      modality,
-      cover_image_url: coverUrl,
-      address,
-      latitude: profile?.default_latitude || null,
-      longitude: profile?.default_longitude || null,
-      status: "active",
-    });
+    const { data: inserted, error: listErr } = await supabase
+      .from("listings")
+      .insert({
+        book_id: bookId,
+        seller_id: user.id,
+        price,
+        condition,
+        modality,
+        cover_image_url: coverUrl,
+        address,
+        latitude: profile?.default_latitude || null,
+        longitude: profile?.default_longitude || null,
+        status: "active",
+      })
+      .select("id")
+      .single();
 
     if (listErr) {
       results.push({ title, status: "error", message: listErr.message });
     } else {
       results.push({ title, status: "ok" });
+      // Gong Telegram (fire-and-forget)
+      if (inserted?.id) {
+        fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://tuslibros.cl"}/api/webhooks/listing-created`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ listingId: inserted.id }),
+        }).catch(() => {});
+      }
     }
   }
 
