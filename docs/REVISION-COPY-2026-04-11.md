@@ -70,7 +70,7 @@ Para quien lee en papel y no le gusta tirar los libros a la basura cuando ya no 
 ### Hero
 - **Eyebrow:** Nuestra historia
 - **H1:** Veinte años, una pausa, *y una segunda oportunidad.*
-- **Autor:** Por Verónica Velásquez · Fundadora
+- **Autor:** Por Vero
 
 ### Cuerpo
 
