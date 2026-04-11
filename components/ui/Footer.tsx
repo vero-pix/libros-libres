@@ -23,10 +23,10 @@ export default function Footer() {
           <div>
             <h4 className="font-display font-bold text-ink mb-4 text-sm">Categorías</h4>
             <ul className="space-y-2.5 text-ink-muted">
-              <li><Link href="/?genre=Ficción" className="hover:text-brand-600 transition-colors">Ficción</Link></li>
-              <li><Link href="/?genre=Ciencia" className="hover:text-brand-600 transition-colors">Ciencia</Link></li>
-              <li><Link href="/?genre=Historia" className="hover:text-brand-600 transition-colors">Historia</Link></li>
-              <li><Link href="/?genre=Infantil" className="hover:text-brand-600 transition-colors">Infantil</Link></li>
+              <li><Link href="/?category=ficcion" className="hover:text-brand-600 transition-colors">Ficción</Link></li>
+              <li><Link href="/?category=no-ficcion" className="hover:text-brand-600 transition-colors">No ficción</Link></li>
+              <li><Link href="/?category=academicos" className="hover:text-brand-600 transition-colors">Académicos</Link></li>
+              <li><Link href="/?category=coleccionables" className="hover:text-brand-600 transition-colors">Coleccionables</Link></li>
             </ul>
           </div>
           <div>
@@ -37,7 +37,6 @@ export default function Footer() {
               <li><Link href="/como-funciona" className="hover:text-brand-600 transition-colors">Cómo funciona</Link></li>
               <li><Link href="/faq" className="hover:text-brand-600 transition-colors">FAQ</Link></li>
               <li><Link href="/alianzas" className="hover:text-brand-600 transition-colors">Alianzas <span className="text-[10px] text-ink-muted/70">(próximamente)</span></Link></li>
-              <li><Link href="/sobre-nosotros#contacto" className="hover:text-brand-600 transition-colors">Contacto</Link></li>
             </ul>
           </div>
           <div>

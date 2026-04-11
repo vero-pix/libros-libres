@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import type { ListingWithBook, ListingStatus } from "@/types";
-import { CATEGORY_OPTIONS } from "@/lib/genres";
+import CategoryPicker from "@/components/listings/CategoryPicker";
 import CoverUpload from "@/components/books/CoverUpload";
 import ImageUploadMultiple from "@/components/listings/ImageUploadMultiple";
 
@@ -235,11 +235,17 @@ function ListingRow({
             </span>
           </div>
 
-          {book.genre && (
-            <span className="inline-block text-[10px] bg-brand-50 text-brand-600 px-2 py-0.5 rounded-full mt-1.5">
-              {book.genre}
-            </span>
-          )}
+          {(() => {
+            const b = book as any;
+            const label = b.subcategory ?? b.category ?? b.genre;
+            if (!label) return null;
+            const display = String(label).replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
+            return (
+              <span className="inline-block text-[10px] bg-brand-50 text-brand-600 px-2 py-0.5 rounded-full mt-1.5">
+                {display}
+              </span>
+            );
+          })()}
 
           {/* Actions */}
           <div className="flex flex-wrap gap-2 mt-3">
@@ -330,7 +336,8 @@ function EditForm({
   // Book fields
   const [title, setTitle] = useState(book.title);
   const [author, setAuthor] = useState(book.author);
-  const [genre, setGenre] = useState(book.genre ?? "");
+  const [categorySlug, setCategorySlug] = useState<string | null>(((book as any).category as string | null) ?? null);
+  const [subcategorySlug, setSubcategorySlug] = useState<string | null>(((book as any).subcategory as string | null) ?? null);
   const [description, setDescription] = useState(book.description ?? "");
   const [publisher, setPublisher] = useState((book as any).publisher ?? "");
   const [pages, setPages] = useState(((book as any).pages ?? "").toString());
@@ -377,10 +384,7 @@ function EditForm({
         setDescription(data.description);
         filled++;
       }
-      if (data.genre && !genre) {
-        setGenre(data.genre);
-        filled++;
-      }
+      // Nota: no autocompletamos categoría desde API — la taxonomía interna la decide la vendedora.
       setFetchMsg(filled > 0 ? `${filled} campo${filled > 1 ? "s" : ""} completado${filled > 1 ? "s" : ""} desde ${data.source}` : "No se encontraron datos nuevos.");
     } catch {
       setFetchMsg("Error al buscar datos.");
@@ -397,7 +401,8 @@ function EditForm({
     const bookUpdates: Record<string, unknown> = {
       title: title.trim(),
       author: author.trim(),
-      genre: genre || null,
+      category: categorySlug,
+      subcategory: subcategorySlug,
       description: description.trim() || null,
       publisher: publisher.trim() || null,
       pages: pages ? parseInt(pages) : null,
@@ -495,14 +500,14 @@ function EditForm({
             <label className="block text-xs font-medium text-gray-500 mb-1">Autor</label>
             <input value={author} onChange={(e) => setAuthor(e.target.value)} className={inputClass} />
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
-            <select value={genre} onChange={(e) => setGenre(e.target.value)} className={inputClass}>
-              <option value="">Sin categoría</option>
-              {CATEGORY_OPTIONS.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+          <div className="col-span-2">
+            <CategoryPicker
+              value={{ category: categorySlug, subcategory: subcategorySlug }}
+              onChange={(v) => {
+                setCategorySlug(v.category);
+                setSubcategorySlug(v.subcategory);
+              }}
+            />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">Editorial</label>

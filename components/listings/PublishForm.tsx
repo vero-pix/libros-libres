@@ -15,7 +15,7 @@ const DraggableLocationPicker = dynamic(
 );
 import type { BookData } from "@/types";
 import Image from "next/image";
-import { CATEGORY_OPTIONS } from "@/lib/genres";
+import CategoryPicker from "@/components/listings/CategoryPicker";
 import CoverUpload from "@/components/books/CoverUpload";
 import ImageUploadMultiple from "@/components/listings/ImageUploadMultiple";
 import { compressImage } from "@/lib/image-compress";
@@ -54,7 +54,8 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
   const supabase = createClient();
 
   const [book, setBook] = useState<BookData | null>(null);
-  const [genre, setGenre] = useState("");
+  const [categorySlug, setCategorySlug] = useState<string | null>(null);
+  const [subcategorySlug, setSubcategorySlug] = useState<string | null>(null);
   const [binding, setBinding] = useState<string>("");
   const [customCoverUrl, setCustomCoverUrl] = useState<string | null>(null);
   const [modality, setModality] = useState<Modality>("sale");
@@ -183,13 +184,20 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
     try {
       // Si el libro tiene ISBN, hacer upsert para evitar duplicados.
       // Si no tiene ISBN (ingreso manual), hacer insert directo.
-      const rawGenre = genre || book.genre || "";
-      const normalized = normalizeGenre(rawGenre, book.title, book.description);
+      // Si el usuario eligió explícitamente: usar esa selección.
+      // Si no, intentar inferir desde genre del libro (legacy path).
+      let finalCategory: string | null = categorySlug;
+      let finalSubcategory: string | null = subcategorySlug;
+      if (!finalCategory && book.genre) {
+        const normalized = normalizeGenre(book.genre, book.title, book.description);
+        finalCategory = normalized.category ?? null;
+        finalSubcategory = normalized.subcategory ?? null;
+      }
       const tags = suggestTags({
         title: book.title,
         author: book.author,
-        category: normalized.category,
-        subcategory: normalized.subcategory,
+        category: finalCategory ?? undefined,
+        subcategory: finalSubcategory ?? undefined,
         description: book.description,
       });
 
@@ -199,9 +207,9 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
         author: book.author,
         description: book.description ?? null,
         cover_url: customCoverUrl ?? book.cover_url ?? null,
-        genre: genre || book.genre || null,
-        category: normalized.category,
-        subcategory: normalized.subcategory,
+        genre: book.genre || null,
+        category: finalCategory,
+        subcategory: finalSubcategory,
         tags,
         published_year: book.published_year ?? null,
         publisher: book.publisher ?? null,
@@ -343,11 +351,11 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
                 onUploaded={setCustomCoverUrl}
               />
               <div className="flex-1 min-w-0">
-                <BookCard book={book} onClear={() => { setBook(null); setGenre(""); setCustomCoverUrl(null); }} />
+                <BookCard book={book} onClear={() => { setBook(null); setCategorySlug(null); setSubcategorySlug(null); setCustomCoverUrl(null); }} />
               </div>
             </div>
           ) : (
-            <ISBNSearch onBookFound={(b) => { setBook(b); setGenre(b.genre ?? ""); }} />
+            <ISBNSearch onBookFound={(b) => { setBook(b); }} />
           )}
         </div>
       </section>
@@ -362,19 +370,16 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
             </h2>
           </div>
           <div className="px-6 py-5">
-            <select
-              value={genre}
-              onChange={(e) => setGenre(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
-            >
-              <option value="">Sin categoría</option>
-              {CATEGORY_OPTIONS.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-            {book.genre && genre !== book.genre && (
+            <CategoryPicker
+              value={{ category: categorySlug, subcategory: subcategorySlug }}
+              onChange={(v) => {
+                setCategorySlug(v.category);
+                setSubcategorySlug(v.subcategory);
+              }}
+            />
+            {book.genre && !categorySlug && (
               <p className="text-xs text-gray-400 mt-1.5">
-                Categoría original: {book.genre}
+                Sugerencia según datos del libro: {book.genre}
               </p>
             )}
           </div>
