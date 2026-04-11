@@ -27,7 +27,7 @@ export default function HistoriaPage() {
             <span className="italic text-brand-600">y una segunda oportunidad.</span>
           </h1>
           <p className="text-ink-muted">
-            Por Verónica Velásquez · Fundadora
+            Por Vero
           </p>
         </header>
 
