@@ -43,7 +43,7 @@ export default async function PublishPage() {
             Publica tu libro
           </h1>
           <p className="text-ink-muted mt-3 max-w-md mx-auto leading-relaxed">
-            Escanea el ISBN o ingresa los datos manualmente. Autocompletamos portada, sinopsis y categoría.
+            Escanea el ISBN con tu celular o escribe los datos a mano. Nosotros completamos portada, sinopsis y categoría — tú solo ponle precio.
           </p>
 
           {/* Mini steps */}

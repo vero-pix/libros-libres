@@ -46,18 +46,19 @@ export default function HomeShell({ totalListings, hasFilters, children }: Props
                 <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-ink leading-tight mb-4">
                   Tus libros merecen circular.
                   <br />
-                  <span className="italic text-brand-600">Nosotros los conectamos.</span>
+                  <span className="italic text-brand-600">Yo los conecto contigo.</span>
                 </h2>
                 <p className="text-ink-muted leading-relaxed max-w-lg mx-auto lg:mx-0">
-                  Hay millones de libros acumulando polvo en casas de Chile.
-                  Cada estantería es una librería que nadie puede ver.
-                  Nosotros la hacemos visible: geolocalización en tiempo real,
-                  pago seguro, despacho a tu puerta.
+                  En Chile hay millones de libros durmiendo en estanterías.
+                  Cada casa es una librería que nadie puede ver. Acá las
+                  hacemos visibles — por ubicación, por cercanía, por el
+                  título que andas buscando y que probablemente está más
+                  cerca de lo que crees.
                 </p>
                 <p className="text-ink-muted leading-relaxed mt-4 max-w-lg mx-auto lg:mx-0">
-                  Tu experiencia es personal. Tu estantería se transforma
-                  en una vitrina para lectores cerca de ti. Cada libro que
-                  publicas es un libro que encuentra un nuevo lector.
+                  Tu estantería se transforma en una vitrina para lectores
+                  cerca de ti. Cada libro que publicas es un libro que
+                  encuentra un nuevo lector. Y yo no me meto en el medio.
                 </p>
               </div>
 

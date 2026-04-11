@@ -33,10 +33,11 @@ export default function Footer() {
             <h4 className="font-display font-bold text-ink mb-4 text-sm">Información</h4>
             <ul className="space-y-2.5 text-ink-muted">
               <li><Link href="/sobre-nosotros" className="hover:text-brand-600 transition-colors">Sobre nosotros</Link></li>
+              <li><Link href="/historia" className="hover:text-brand-600 transition-colors">Nuestra historia</Link></li>
               <li><Link href="/como-funciona" className="hover:text-brand-600 transition-colors">Cómo funciona</Link></li>
               <li><Link href="/faq" className="hover:text-brand-600 transition-colors">FAQ</Link></li>
-              <li><Link href="/historia" className="hover:text-brand-600 transition-colors">Nuestra historia</Link></li>
-              <li><a href="mailto:vero@economics.cl" className="hover:text-brand-600 transition-colors">Contacto</a></li>
+              <li><Link href="/alianzas" className="hover:text-brand-600 transition-colors">Alianzas <span className="text-[10px] text-ink-muted/70">(próximamente)</span></Link></li>
+              <li><Link href="/sobre-nosotros#contacto" className="hover:text-brand-600 transition-colors">Contacto</Link></li>
             </ul>
           </div>
           <div>

@@ -145,7 +145,7 @@ export default function NovedadesPage() {
       <main className="max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Novedades</h1>
         <p className="text-ink-muted mb-8">
-          Todo lo nuevo en Libros Libres. Herramientas, mejoras y lanzamientos.
+          Lo que vamos arreglando, mejorando y construyendo acá adentro. Lo escribo yo, lo lees tú. — Vero
         </p>
 
         <div className="space-y-6">
