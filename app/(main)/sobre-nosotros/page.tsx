@@ -69,7 +69,7 @@ export default function SobreNosotrosPage() {
         {/* Values */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-ink mb-6 border-b-2 border-brand-600 pb-2 inline-block">
-            Lo que nos importa
+            Lo que importa
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {values.map((v) => (
