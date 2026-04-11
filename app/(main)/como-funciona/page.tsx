@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Cómo Funciona — Libros Libres",
+  title: "Cómo funciona — tuslibros.cl",
 };
 
 const directSteps = [
@@ -33,10 +33,10 @@ const sellerSteps = [
 
 const benefits = [
   { icon: "✅", text: "Publicar siempre es gratis" },
-  { icon: "✅", text: "Sin comisiones en ventas por WhatsApp" },
-  { icon: "✅", text: "Pago seguro con MercadoPago" },
-  { icon: "✅", text: "Despacho a domicilio (próximamente)" },
-  { icon: "✅", text: "Arriendo de libros con garantía reembolsable" },
+  { icon: "✅", text: "Cero comisión si coordinas por WhatsApp" },
+  { icon: "✅", text: "Pago seguro con MercadoPago (opcional)" },
+  { icon: "✅", text: "Despacho a todo Chile con Shipit" },
+  { icon: "✅", text: "Arriendo con garantía reembolsable" },
 ];
 
 function StepCard({ step }: { step: { number: number; icon: string; title: string; description: string } }) {
@@ -70,8 +70,8 @@ export default function ComoFuncionaPage() {
         />
         <div className="absolute inset-0 bg-cream/70" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-4xl font-bold text-ink mb-2">Cómo Funciona</h1>
-          <p className="text-ink-muted text-lg max-w-xl">Tres formas de comprar libros, una de publicar</p>
+          <h1 className="text-4xl font-bold text-ink mb-2">Cómo funciona</h1>
+          <p className="text-ink-muted text-lg max-w-xl">Tres formas de comprar un libro, y una de publicar el tuyo</p>
         </div>
       </div>
 
@@ -82,7 +82,7 @@ export default function ComoFuncionaPage() {
           <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
             Compra directa
           </h2>
-          <p className="text-ink-muted mb-6">El modo más simple. Tú y el vendedor coordinan todo por WhatsApp, sin costo.</p>
+          <p className="text-ink-muted mb-6">El modo más simple, y mi favorito. Tú y quien vende se hablan directo por WhatsApp, se ponen de acuerdo, y yo no me meto en el medio. No cobro nada.</p>
           <div className="space-y-5">
             {directSteps.map((step) => <StepCard key={step.number} step={step} />)}
           </div>
@@ -93,7 +93,7 @@ export default function ComoFuncionaPage() {
           <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
             Compra con pago seguro
           </h2>
-          <p className="text-ink-muted mb-6">Paga con MercadoPago directo desde la publicación. Tu dinero queda protegido.</p>
+          <p className="text-ink-muted mb-6">Si prefieres no coordinar nada, pagas con MercadoPago desde la publicación y listo. Acá sí cobramos una comisión chica, porque la pasarela y el despacho cuestan. Si no quieres comisión, usa WhatsApp.</p>
           <div className="space-y-5">
             {mpSteps.map((step) => <StepCard key={step.number} step={step} />)}
           </div>
@@ -104,7 +104,7 @@ export default function ComoFuncionaPage() {
           <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
             Arriendo de libros
           </h2>
-          <p className="text-ink-muted mb-6">Lee lo que quieras sin comprarlo. Devuelve y recupera tu garantía.</p>
+          <p className="text-ink-muted mb-6">Algunos libros los lees una vez y ya. Para esos, armamos el arriendo: pagas una fracción del precio más una garantía, lees tranquilo, y cuando devuelves el libro en buen estado recuperas la garantía completa.</p>
           <div className="space-y-5">
             {rentalSteps.map((step) => <StepCard key={step.number} step={step} />)}
           </div>
@@ -123,7 +123,7 @@ export default function ComoFuncionaPage() {
         {/* Benefits */}
         <section className="mb-14">
           <div className="bg-cream-warm rounded-xl p-8 text-center border border-cream-dark">
-            <h2 className="text-2xl font-bold text-ink mb-6">Beneficios</h2>
+            <h2 className="text-2xl font-bold text-ink mb-6">Las reglas de la casa</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {benefits.map((b) => (
                 <div key={b.text} className="bg-brand-50 rounded-lg px-5 py-4 border border-brand-200">

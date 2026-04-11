@@ -56,7 +56,7 @@ export default function ComoDespacharPage() {
             Cómo despachar un libro
           </h1>
           <p className="text-ink-muted text-lg">
-            Guía rápida para vendedores. Sigue estos 5 pasos y tu libro llegará bien a su nuevo lector.
+            Vendiste un libro, felicitaciones. Acá te dejo los 5 pasos para que llegue bien a su nuevo lector. Son fáciles, te prometo.
           </p>
         </header>
 
@@ -101,8 +101,8 @@ export default function ComoDespacharPage() {
         <section className="bg-blue-50 border border-blue-200 rounded-xl p-6">
           <h2 className="font-semibold text-blue-900 mb-2">¿Tienes dudas?</h2>
           <p className="text-sm text-blue-800 leading-relaxed mb-3">
-            Si algo no te cuadra o tienes una situación especial, escríbenos. Estamos construyendo esto
-            juntos y nos importa que el proceso sea fácil para ti.
+            Si algo no te cuadra o tienes una situación especial, escríbeme. Estoy construyendo esto
+            de a poco y me importa que el proceso sea simple para ti. — Vero
           </p>
           <Link href="/sobre-nosotros#contacto" className="text-sm text-blue-700 font-medium hover:underline">
             Contáctanos →

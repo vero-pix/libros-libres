@@ -11,11 +11,10 @@ export default function DevolucionesPage() {
       <main className="max-w-3xl mx-auto px-4 py-10 sm:py-14">
         <header className="mb-10">
           <h1 className="font-display text-3xl sm:text-4xl font-bold text-ink mb-3">
-            Política de devoluciones
+            Devoluciones
           </h1>
           <p className="text-ink-muted">
-            Queremos que tanto compradores como vendedores tengan una experiencia justa y
-            transparente.
+            Mi regla acá es simple: si algo salió mal, lo arreglamos. Que quien compra reciba lo que pidió, y que quien vende no pierda cuando actuó de buena fe. Si tienes dudas con un caso, escríbeme directo.
           </p>
         </header>
 
@@ -92,11 +91,11 @@ export default function DevolucionesPage() {
         </section>
 
         <section className="bg-white border border-cream-dark/40 rounded-xl p-6 mb-6">
-          <h2 className="font-semibold text-ink text-lg mb-3">Para vendedores</h2>
+          <h2 className="font-semibold text-ink text-lg mb-3">Si tú eres vendedor</h2>
           <p className="text-sm text-ink-muted leading-relaxed">
-            Si recibes una solicitud de devolución, nosotros validamos primero que sea legítima.
-            Tus ventas están protegidas contra devoluciones injustificadas. Si tienes dudas sobre
-            un caso específico, escríbenos antes de aceptar o rechazar.
+            No te preocupes: antes de pedirte que aceptes cualquier devolución, valido yo que el
+            reclamo sea legítimo. Tus ventas están protegidas contra devoluciones sin motivo. Si te
+            llega un caso que no te cuadra, escríbeme antes de responder y lo vemos juntos.
           </p>
         </section>
 

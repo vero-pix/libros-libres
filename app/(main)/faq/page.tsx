@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 export const metadata = {
-  title: "Preguntas Frecuentes — Libros Libres",
+  title: "Preguntas frecuentes — tuslibros.cl",
 };
 
 const faqSections = [
@@ -42,7 +42,7 @@ const faqSections = [
     questions: [
       {
         q: "¿Cuánto cuesta publicar?",
-        a: "Publicar es 100% gratis, siempre. Sin límite de publicaciones.",
+        a: "Cero. Siempre. Publica uno o mil, da igual — es gratis y va a seguir siendo gratis.",
       },
       {
         q: "¿Cuándo se aplican comisiones?",
@@ -71,11 +71,11 @@ const faqSections = [
       },
       {
         q: "¿Puedo publicar muchos libros?",
-        a: "Sí, sin límite. Puedes publicar toda tu biblioteca.",
+        a: "Sí, todos los que quieras. Si tienes una biblioteca grande, también tenemos un importador por CSV para subir todo de una sola vez.",
       },
       {
         q: "¿Cómo elimino una publicación?",
-        a: "Puedes pausar o eliminar publicaciones desde tu perfil en la sección Mis Libros.",
+        a: "Desde tu perfil, en la sección Mis Libros, puedes pausar o eliminar cualquier publicación cuando quieras.",
       },
     ],
   },
@@ -84,19 +84,19 @@ const faqSections = [
     questions: [
       {
         q: "¿Cómo funciona el arriendo?",
-        a: "El vendedor activa la opción de arriendo al publicar. El comprador paga el arriendo (por 7, 14 o 30 días) más una garantía reembolsable. Al devolver el libro en buen estado, recupera la garantía.",
+        a: "Algunos libros los lees una vez y ya — para esos armamos esto. Quien publica activa la opción al listar. Quien arrienda paga el arriendo (por 7, 14 o 30 días) más una garantía. Devuelves el libro en buen estado y recuperas la garantía completa.",
       },
       {
         q: "¿Cuánto cuesta arrendar un libro?",
-        a: "El precio lo fija el vendedor. Típicamente es una fracción del precio de venta. Ejemplo: un libro de $12.000 puede arrendarse por $3.000 + garantía reembolsable.",
+        a: "El precio lo pone cada vendedor. Normalmente es una fracción del precio de venta — un libro de $12.000 puede quedar en $3.000 de arriendo más garantía reembolsable. La garantía suele ser el precio del libro completo, para que nadie pierda si el libro no vuelve.",
       },
       {
         q: "¿Qué pasa si no devuelvo el libro a tiempo?",
-        a: "Si no devuelves dentro del plazo, se retiene la garantía como compensación al vendedor.",
+        a: "Se retiene la garantía como compensación al vendedor. No es un castigo, es simplemente que el libro ya no vuelve y quien lo prestó no queda a cero.",
       },
       {
         q: "¿La garantía es reembolsable?",
-        a: "Sí. Si devuelves el libro dentro del plazo y en buen estado, tu garantía se devuelve completa a tu cuenta de MercadoPago.",
+        a: "Sí, completa. Si devuelves dentro del plazo y en buen estado, la garantía vuelve entera a tu cuenta de MercadoPago.",
       },
     ],
   },
@@ -120,8 +120,8 @@ const faqSections = [
         ),
       },
       {
-        q: "¿Puedo usar Libros Libres sin cuenta?",
-        a: "Puedes ver el catálogo y buscar libros sin cuenta. Para publicar o contactar vendedores necesitas registrarte.",
+        q: "¿Puedo usar tuslibros.cl sin cuenta?",
+        a: "Sí, para mirar. Puedes ver el catálogo, buscar, explorar el mapa, todo sin registrarte. Para publicar un libro o escribirle a alguien sí necesitas crear una cuenta — es un trámite de menos de un minuto.",
       },
     ],
   },
@@ -142,8 +142,8 @@ export default function FAQPage() {
         />
         <div className="absolute inset-0 bg-cream/70" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-4xl font-bold text-ink mb-2">Preguntas Frecuentes</h1>
-          <p className="text-ink-muted text-lg max-w-xl">Resolvemos tus dudas sobre Libros Libres</p>
+          <h1 className="text-4xl font-bold text-ink mb-2">Preguntas frecuentes</h1>
+          <p className="text-ink-muted text-lg max-w-xl">Lo que me preguntan más seguido. Si te falta algo, escríbeme.</p>
         </div>
       </div>
 
