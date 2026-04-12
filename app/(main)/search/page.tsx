@@ -71,7 +71,7 @@ export default async function SearchPage({ searchParams }: Props) {
       seller:users(id, full_name, avatar_url, phone, username, mercadopago_user_id)
     `
     )
-    .eq("status", "active");
+    .in("status", ["active", "completed"]);
 
   // Filtrar por book IDs encontrados en la búsqueda de texto
   if (matchingBookIds !== null) {
