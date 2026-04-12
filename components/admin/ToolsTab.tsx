@@ -33,8 +33,50 @@ export default function ToolsTab({ users }: { users: AdminUser[] }) {
     .filter((u) => u.full_name)
     .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? ""));
 
+  const LINKS: { label: string; href: string; desc: string; external?: boolean }[] = [
+    { label: "Publicar libro", href: "/publish", desc: "Crear una nueva publicación" },
+    { label: "Buscar libros", href: "/search", desc: "Buscador público con filtros" },
+    { label: "Mis ventas", href: "/mis-ventas", desc: "Ventas, carritos de compradores" },
+    { label: "Mis pedidos", href: "/mis-pedidos", desc: "Pedidos como comprador" },
+    { label: "Mis libros", href: "/mis-libros", desc: "Gestionar publicaciones propias" },
+    { label: "Mensajes", href: "/mensajes", desc: "Bandeja de mensajería interna" },
+    { label: "Perfil", href: "/perfil", desc: "Editar perfil, teléfono, dirección" },
+    { label: "Novedades", href: "/novedades", desc: "Changelog público del sitio" },
+    { label: "Referidos", href: "/referidos", desc: "Programa de referidos y código personal" },
+    { label: "Alianzas", href: "/alianzas", desc: "Landing para instituciones" },
+    { label: "Sobre nosotros", href: "/sobre-nosotros", desc: "Página institucional" },
+    { label: "Importar CSV", href: "/mis-libros/importar", desc: "Carga masiva por archivo" },
+    { label: "Supabase", href: "https://supabase.com/dashboard", desc: "Base de datos y storage", external: true },
+    { label: "Vercel", href: "https://vercel.com/dashboard", desc: "Deploys y logs", external: true },
+    { label: "MercadoPago", href: "https://www.mercadopago.cl/developers/panel", desc: "Panel de pagos", external: true },
+  ];
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Quick links */}
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">Accesos rápidos</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {LINKS.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target={link.external ? "_blank" : undefined}
+              rel={link.external ? "noopener noreferrer" : undefined}
+              className="group bg-white border border-gray-200 rounded-xl p-3 hover:border-gray-400 hover:shadow-sm transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-900 group-hover:text-ink">{link.label}</span>
+                {link.external && <span className="text-[10px] text-gray-400">↗</span>}
+              </div>
+              <p className="text-[11px] text-gray-400 mt-0.5">{link.desc}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <hr className="border-gray-200" />
+
       <p className="text-sm text-gray-500">Herramientas de mantenimiento de la tienda. Cada acción consulta APIs externas y puede tardar unos minutos.</p>
 
       <div className="bg-white rounded-xl border border-gray-200 p-4">
