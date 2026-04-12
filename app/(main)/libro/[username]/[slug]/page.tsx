@@ -129,6 +129,42 @@ export default async function LibroPage({ params }: Props) {
       availability: listing.status === "active" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
       seller: { "@type": "Person", name: listing.seller?.full_name },
       url: canonicalUrl,
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: "3500",
+          currency: "CLP",
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "CL",
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: {
+            "@type": "QuantitativeValue",
+            minValue: 1,
+            maxValue: 2,
+            unitCode: "DAY",
+          },
+          transitTime: {
+            "@type": "QuantitativeValue",
+            minValue: 1,
+            maxValue: 5,
+            unitCode: "DAY",
+          },
+        },
+      },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "CL",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 7,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn",
+        returnPolicySeasonalOverride: undefined,
+      },
     },
   };
 
