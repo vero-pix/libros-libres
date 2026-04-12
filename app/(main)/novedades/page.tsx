@@ -4,6 +4,29 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 
 const novedades = [
   {
+    date: "12 abril 2026",
+    title: "Libros vendidos se quedan en el catálogo",
+    description:
+      "Cuando un libro se vende, ahora aparece marcado como \"Vendido\" en vez de desaparecer. Así puedes ver qué se ha vendido, buscar similares o contactar al vendedor por si tiene más.",
+    tag: "Nuevo",
+  },
+  {
+    date: "12 abril 2026",
+    title: "Mantenedor de categorías",
+    description:
+      "Las categorías del sitio ahora se pueden agregar, editar y reordenar desde el panel de administración. Ya no hace falta tocar código para crear una categoría nueva.",
+    tag: "Mejora",
+  },
+  {
+    date: "12 abril 2026",
+    title: "Maigret sube de precio",
+    description:
+      "La colección Maigret de Luis de Caralt ahora está a $7.990. Investigamos el mercado y estas ediciones vintage valen más de lo que les habíamos puesto. Si tienes alguno, cuídalo.",
+    link: "/search?q=maigret",
+    linkText: "Ver la colección",
+    tag: "Mejora",
+  },
+  {
     date: "11 abril 2026",
     title: "Compra múltiple en un solo pago",
     description:
@@ -14,7 +37,7 @@ const novedades = [
     date: "11 abril 2026",
     title: "33 novelas de Maigret",
     description:
-      "Toda la colección Luis de Caralt de Georges Simenon, el comisario más famoso de la novela policial francesa. 33 títulos a $5.000 cada uno.",
+      "Toda la colección Luis de Caralt de Georges Simenon, el comisario más famoso de la novela policial francesa. 33 títulos de colección.",
     link: "/search?q=maigret",
     linkText: "Ver la colección",
     tag: "Lanzamiento",
