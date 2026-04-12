@@ -81,6 +81,7 @@ export default function CartView({
     });
     setItems((prev) => prev.filter((i) => i.listing_id !== listingId));
     setRemoving(null);
+    window.dispatchEvent(new CustomEvent("cart-updated"));
   }
 
   async function handleClearCart() {
@@ -97,6 +98,7 @@ export default function CartView({
     );
     setItems([]);
     setClearing(false);
+    window.dispatchEvent(new CustomEvent("cart-updated"));
   }
 
   if (items.length === 0) {

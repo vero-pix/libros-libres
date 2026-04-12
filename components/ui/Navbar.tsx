@@ -13,6 +13,7 @@ export default async function Navbar() {
   } = await supabase.auth.getUser();
 
   let displayName: string | null = null;
+  let cartCount = 0;
   if (user) {
     const { data: profile } = await supabase
       .from("users")
@@ -24,6 +25,12 @@ export default async function Navbar() {
       profile?.full_name ??
       (user.user_metadata?.full_name as string | undefined) ??
       null;
+
+    const { count } = await supabase
+      .from("cart_items")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+    cartCount = count ?? 0;
   }
 
   return (
@@ -47,7 +54,7 @@ export default async function Navbar() {
           </div>
 
           <div className="ml-auto">
-            <NavbarClient user={user} displayName={displayName} />
+            <NavbarClient user={user} displayName={displayName} initialCartCount={cartCount} />
           </div>
         </div>
       </div>
