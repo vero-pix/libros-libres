@@ -26,7 +26,36 @@ const BLUR_PLACEHOLDER = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWln
 export default function ListingCard({ listing }: Props) {
   const [showQuickView, setShowQuickView] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [cartState, setCartState] = useState<"idle" | "loading" | "added">("idle");
   const { book } = listing;
+
+  async function handleAddToCart(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (cartState !== "idle") return;
+    setCartState("loading");
+    try {
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: listing.id }),
+      });
+      if (res.ok) {
+        setCartState("added");
+        window.dispatchEvent(new CustomEvent("cart-updated"));
+        setTimeout(() => setCartState("idle"), 1800);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        if (data.error?.includes("No autenticado")) {
+          window.location.href = `/login?next=/`;
+          return;
+        }
+        setCartState("idle");
+      }
+    } catch {
+      setCartState("idle");
+    }
+  }
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
 
@@ -97,15 +126,27 @@ export default function ListingCard({ listing }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </button>
-        <Link
-          href={`/checkout/${listing.id}`}
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-brand-500 shadow-md text-white hover:bg-brand-600"
-          title="Comprar"
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          disabled={cartState === "loading"}
+          className={`w-8 h-8 flex items-center justify-center rounded-full shadow-md text-white transition-colors ${
+            cartState === "added"
+              ? "bg-green-500"
+              : "bg-brand-500 hover:bg-brand-600"
+          } disabled:opacity-70`}
+          title={cartState === "added" ? "Agregado al carrito" : "Agregar al carrito"}
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-          </svg>
-        </Link>
+          {cartState === "added" ? (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+            </svg>
+          )}
+        </button>
       </div>
 
       <div className="p-4">
