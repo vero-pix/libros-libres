@@ -6,6 +6,22 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "12 abril 2026",
+    title: "Página para vendedores",
+    description:
+      "Nueva landing en tuslibros.cl/vender que explica en 30 segundos cómo publicar un libro. Tres pasos, cero complicaciones. Si conoces a alguien con libros juntando polvo, mándale el link.",
+    link: "/vender",
+    linkText: "Ver la página",
+    tag: "Nuevo",
+  },
+  {
+    date: "12 abril 2026",
+    title: "Banners promocionales en el sitio",
+    description:
+      "Ahora cuando buscas libros o revisas novedades, ves un banner que te invita a vender los tuyos. Porque todo comprador es un vendedor que todavía no se anima.",
+    tag: "Mejora",
+  },
+  {
+    date: "12 abril 2026",
     title: "Libros vendidos se quedan en el catálogo",
     description:
       "Cuando un libro se vende, ahora aparece marcado como \"Vendido\" en vez de desaparecer. Así puedes ver qué se ha vendido, buscar similares o contactar al vendedor por si tiene más.",
