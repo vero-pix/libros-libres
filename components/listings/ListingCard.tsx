@@ -91,13 +91,18 @@ export default function ListingCard({ listing }: Props) {
           ) : (
             placeholder
           )}
-          <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
-            {isNew(listing.created_at) && (
+          {listing.status === "completed" && (
+            <div className="absolute inset-0 bg-black/40 z-[1] flex items-center justify-center">
+              <span className="text-white font-bold text-sm uppercase tracking-wider bg-red-600 px-4 py-1.5 rounded-full shadow-lg">Vendido</span>
+            </div>
+          )}
+          <div className="absolute top-3 right-3 flex flex-col gap-1 items-end z-[2]">
+            {isNew(listing.created_at) && listing.status !== "completed" && (
               <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm bg-brand-500 text-white">
                 Nuevo
               </span>
             )}
-            {hasDiscount(listing) && (
+            {hasDiscount(listing) && listing.status !== "completed" && (
               <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm bg-red-500 text-white">
                 Oferta
               </span>
@@ -115,7 +120,7 @@ export default function ListingCard({ listing }: Props) {
       </Link>
 
       {/* Hover actions */}
-      <div className="absolute bottom-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200">
+      <div className={`absolute bottom-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 ${listing.status === "completed" ? "hidden" : ""}`}>
         <button
           onClick={() => setShowQuickView(true)}
           className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md text-ink-muted hover:text-brand-600"

@@ -89,10 +89,17 @@ export default function ListingDetail({ listing, images = [] }: Props) {
     });
   }, [listing.id, book.title, coverUrl, listing.price, book.genre, book.author]);
 
+  const isSold = listing.status === "completed";
+
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden relative">
+      {isSold && (
+        <div className="absolute top-4 right-4 z-10 bg-red-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg uppercase tracking-wider">
+          Vendido
+        </div>
+      )}
       {/* Cover + Info — mobile: imagen arriba centrada, desktop: lado a lado */}
-      <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 p-5 sm:p-8">
+      <div className={`flex flex-col sm:flex-row gap-6 sm:gap-8 p-5 sm:p-8 ${isSold ? "opacity-75" : ""}`}>
         {/* Cover / Gallery */}
         <div className="flex-shrink-0 flex justify-center sm:justify-start">
           <ImageGallery
@@ -260,16 +267,25 @@ export default function ListingDetail({ listing, images = [] }: Props) {
       {/* Buy CTA */}
       {listing.price != null && listing.modality !== "loan" && (
         <div className="border-t border-gray-100 px-6 py-4 bg-gray-50 space-y-3">
-          <Link
-            href={`/checkout/${listing.id}`}
-            className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold py-4 rounded-xl transition-all text-lg shadow-md hover:shadow-lg"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-            </svg>
-            Comprar — ${listing.price.toLocaleString("es-CL")}
-          </Link>
-          <AddToCartButton listingId={listing.id} />
+          {isSold ? (
+            <div className="text-center py-4">
+              <p className="text-lg font-bold text-red-600">Este libro ya fue vendido</p>
+              <p className="text-sm text-gray-500 mt-1">Pero puedes buscar otros similares o contactar al vendedor por si tiene más.</p>
+            </div>
+          ) : (
+            <>
+              <Link
+                href={`/checkout/${listing.id}`}
+                className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold py-4 rounded-xl transition-all text-lg shadow-md hover:shadow-lg"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                </svg>
+                Comprar — ${listing.price.toLocaleString("es-CL")}
+              </Link>
+              <AddToCartButton listingId={listing.id} />
+            </>
+          )}
         </div>
       )}
 
