@@ -44,8 +44,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const title = `${listing.book.title} — ${listing.book.author} | tuslibros.cl`;
-  const description = listing.book.description
-    ? listing.book.description.slice(0, 160)
+  const rawDesc = listing.book.description;
+  const description = rawDesc
+    ? rawDesc.length <= 160
+      ? rawDesc
+      : rawDesc.slice(0, rawDesc.lastIndexOf(" ", 157)) + "..."
     : `${listing.modality === "loan" ? "Arrienda" : "Compra"} "${listing.book.title}" de ${listing.book.author} en tuslibros.cl. ${listing.price ? `$${listing.price.toLocaleString("es-CL")} CLP.` : ""} Publicado por ${listing.seller?.full_name || "un vendedor"}.`;
   const image = listing.book.cover_url || "/og-image.png";
   const url = `https://tuslibros.cl/libro/${params.username}/${params.slug}`;
