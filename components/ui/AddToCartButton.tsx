@@ -19,6 +19,7 @@ export default function AddToCartButton({ listingId }: Props) {
       });
       if (res.ok) {
         setStatus("added");
+        window.dispatchEvent(new CustomEvent("cart-updated"));
         setTimeout(() => setStatus("idle"), 2000);
       } else {
         const data = await res.json();
