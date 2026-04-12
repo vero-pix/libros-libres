@@ -151,6 +151,54 @@
 
 ## Pendiente
 
+### 🟡 Funcionalidad post-primera-venta (abril 2026)
+
+**Mantenedor de categorías sugeridas por vendedores**
+- [ ] Tabla `category_suggestions` (vendedor, nombre propuesto, padre sugerido, descripción, status)
+- [ ] Botón "¿No encuentras tu categoría? Sugiérela" en el publish form → modal
+- [ ] Notificación email/Telegram a admin cuando llega sugerencia
+- [ ] Vista `/admin/sugerencias` para revisar, editar slug y aprobar (inserta en `categories` + agrega variantes al genreNormalizer)
+- [ ] Feedback al vendedor cuando se aprueba/rechaza su sugerencia
+- [ ] Origen: 11 abril 2026, vendedor sugirió "Ficción / Mitología" por WhatsApp (agregada manualmente)
+
+**Vista de vendedor: carritos con mis libros**
+- [ ] Página `/mis-ventas/carritos` lista compradores que tienen libros míos en carrito y no han pagado
+- [ ] Permite ver cuántos libros, total potencial, tiempo en carrito
+- [ ] Botón "Contactar" que abre mensaje interno / WhatsApp
+- [ ] Objetivo: rescatar ventas como la de Fabian (11 abril), que se cerró por WhatsApp manual
+- [ ] **Privacidad:** mostrar solo el carrito filtrado (items del vendedor), no el resto del carrito del comprador
+
+**Agente QA con Playwright**
+- [ ] Setup Playwright contra preview y producción
+- [ ] Flujos dorados automatizados: registro, búsqueda, agregar al carrito, bundle checkout, pago sandbox, mensajería, publicar libro
+- [ ] Subagente `ux-tester` custom que corre flujos bajo demanda con screenshots
+- [ ] Integración: correr después de cada push grande antes de promover a producción
+
+**Kit Metralleta — reescribir con tono confesional**
+- [ ] Revisar los mensajes de la primera iteración GTM (banners, stories, DMs)
+- [ ] Reescribirlos con el tono confesional del video marketing (10 abril)
+- [ ] Reemplazar frases genéricas tipo "conecta con personas reales" por contenido con carne humana
+- [ ] Ver memoria `feedback_copy_humanity.md` para el criterio
+
+### ✅ Bundle checkout (COMPLETADO 11 abril)
+- [x] Migración `bundle_id` en orders + índice
+- [x] `/api/orders` acepta `listing_ids[]` — N orders, una preferencia MP
+- [x] Página `/checkout/bundle?listings=...` con resumen multi-libro
+- [x] CartView agrupado por vendedor con botón "Comprar N libros"
+- [x] Webhook detecta bundles, un solo email/Shipit/tracking propagado
+- [x] `/orders/[id]` y `/mis-pedidos` agrupan visualmente por bundle_id
+
+### ✅ Badge del carrito en header (COMPLETADO 11 abril)
+- [x] Server component Navbar fetchea cart_count
+- [x] NavbarClient muestra badge rojo con número
+- [x] Evento `cart-updated` reactivo desde AddToCartButton y CartView
+- [x] Fix botón del card: ya no redirige a checkout, agrega al carrito de verdad
+
+### ✅ Categoría Mitología (COMPLETADO 11 abril)
+- [x] Insertada en tabla `categories` bajo Ficción
+- [x] Variantes en genreNormalizer (mitología, mythology, mitos, leyendas, folklore)
+- [x] Origen: sugerencia de vendedor por WhatsApp
+
 ### ✅ Reorganización de categorías (COMPLETADO 9 abril)
 - [x] Tabla categories con árbol: 5 raíces, 32 subcategorías
 - [x] Taxonomía: Ficción, No ficción, Infantil/juvenil, Académicos, Coleccionables
