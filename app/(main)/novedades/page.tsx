@@ -4,6 +4,73 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 
 const novedades = [
   {
+    date: "11 abril 2026",
+    title: "Compra múltiple en un solo pago",
+    description:
+      "Si tienes varios libros del mismo vendedor en el carrito, ahora los pagas todos juntos con un solo checkout. Un pago, un envío, un tracking. Así debió ser siempre.",
+    tag: "Nuevo",
+  },
+  {
+    date: "11 abril 2026",
+    title: "33 novelas de Maigret",
+    description:
+      "Toda la colección Luis de Caralt de Georges Simenon, el comisario más famoso de la novela policial francesa. 33 títulos a $5.000 cada uno.",
+    link: "/search?q=maigret",
+    linkText: "Ver la colección",
+    tag: "Lanzamiento",
+  },
+  {
+    date: "11 abril 2026",
+    title: "Badge del carrito en vivo",
+    description:
+      "El ícono del carrito ahora muestra cuántos libros tienes. Se actualiza al instante cuando agregas o quitas algo, sin recargar la página.",
+    tag: "Mejora",
+  },
+  {
+    date: "11 abril 2026",
+    title: "Vendedores ven tus carritos",
+    description:
+      "Si un vendedor ve que tienes sus libros en el carrito hace días, te puede escribir para ofrecerte un trato. Rescate de ventas en tiempo real.",
+    tag: "Nueva herramienta",
+  },
+  {
+    date: "11 abril 2026",
+    title: "Perfil progresivo",
+    description:
+      "Ya no te pedimos todo al registrarte. Teléfono y dirección se piden justo cuando los necesitas: al publicar o al comprar. 20 segundos y sigues.",
+    tag: "Mejora",
+  },
+  {
+    date: "11 abril 2026",
+    title: "Categoría Mitología",
+    description:
+      "Mitología griega, nórdica, romana, celta, leyendas y folklore. Sugerida por un vendedor de la comunidad.",
+    tag: "Nuevo",
+  },
+  {
+    date: "10 abril 2026",
+    title: "Flujo de despacho para vendedores",
+    description:
+      "Si vendes un libro por courier, ahora recibes un email con la etiqueta de envío lista para imprimir, el tracking y 5 pasos claros para despachar. Todo automático.",
+    tag: "Nuevo",
+  },
+  {
+    date: "10 abril 2026",
+    title: "Cómo despachar y devoluciones",
+    description:
+      "Dos páginas nuevas: una guía paso a paso para vendedores que despachan por primera vez, y una política clara de devoluciones vía Chilexpress.",
+    link: "/como-despachar",
+    linkText: "Ver guía de despacho",
+    tag: "Nueva herramienta",
+  },
+  {
+    date: "10 abril 2026",
+    title: "Correo @tuslibros.cl funcionando",
+    description:
+      "Ahora puedes escribirnos a cualquier dirección @tuslibros.cl y nos llega. Correo de dominio propio para contacto y soporte.",
+    tag: "Mejora",
+  },
+  {
     date: "9 abril 2026",
     title: "Envíos a todo Chile con Shipit",
     description:
