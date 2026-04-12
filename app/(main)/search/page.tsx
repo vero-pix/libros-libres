@@ -5,6 +5,7 @@ import { buildCategoryTree } from "@/lib/categoryTree";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
+import PromoBanner from "@/components/ui/PromoBanner";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 
@@ -129,6 +130,10 @@ export default async function SearchPage({ searchParams }: Props) {
             Resultados para &ldquo;{q}&rdquo;
           </h1>
         )}
+
+        <div className="mb-6">
+          <PromoBanner variant="publish" />
+        </div>
 
         <div className="flex gap-8">
           <CategoriesSidebar categoryTree={categoryTree} />
