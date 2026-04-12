@@ -46,6 +46,21 @@ const GENRE_MAP: Record<string, NormalizedGenre> = {
   "cuentos": { category: "ficcion", subcategory: "cuentos" },
   "short stories": { category: "ficcion", subcategory: "cuentos" },
 
+  // Mitología
+  "mitologia": { category: "ficcion", subcategory: "mitologia" },
+  "mitología": { category: "ficcion", subcategory: "mitologia" },
+  "mythology": { category: "ficcion", subcategory: "mitologia" },
+  "myths": { category: "ficcion", subcategory: "mitologia" },
+  "mito": { category: "ficcion", subcategory: "mitologia" },
+  "mitos": { category: "ficcion", subcategory: "mitologia" },
+  "mitologia griega": { category: "ficcion", subcategory: "mitologia" },
+  "mitologia nordica": { category: "ficcion", subcategory: "mitologia" },
+  "mitologia romana": { category: "ficcion", subcategory: "mitologia" },
+  "mitologia celta": { category: "ficcion", subcategory: "mitologia" },
+  "leyendas": { category: "ficcion", subcategory: "mitologia" },
+  "legends": { category: "ficcion", subcategory: "mitologia" },
+  "folklore": { category: "ficcion", subcategory: "mitologia" },
+
   // No ficción
   "no ficción": { category: "no-ficcion", subcategory: "ensayo" },
   "no ficcion": { category: "no-ficcion", subcategory: "ensayo" },
