@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { OrderWithDetails } from "@/types";
 
@@ -20,55 +20,122 @@ const STATUS_COLORS: Record<string, string> = {
   cancelled: "bg-red-100 text-red-800",
 };
 
-function OrderCard({ order }: { order: OrderWithDetails }) {
-  const book = order.listing?.book;
-  const date = new Date(order.created_at).toLocaleDateString("es-CL", {
+interface OrderGroup {
+  key: string;
+  bundleId: string | null;
+  orders: OrderWithDetails[];
+  total: number;
+  firstOrder: OrderWithDetails;
+}
+
+function groupByBundle(orders: OrderWithDetails[]): OrderGroup[] {
+  const byBundle = new Map<string, OrderWithDetails[]>();
+  const singles: OrderWithDetails[] = [];
+  for (const o of orders) {
+    const bid = (o as any).bundle_id as string | null;
+    if (bid) {
+      if (!byBundle.has(bid)) byBundle.set(bid, []);
+      byBundle.get(bid)!.push(o);
+    } else {
+      singles.push(o);
+    }
+  }
+  const groups: OrderGroup[] = [];
+  byBundle.forEach((ordersInBundle, bid) => {
+    const sorted = ordersInBundle.slice().sort((a, b) =>
+      a.created_at.localeCompare(b.created_at)
+    );
+    groups.push({
+      key: bid,
+      bundleId: bid,
+      orders: sorted,
+      total: sorted.reduce((sum, o) => sum + Number(o.total ?? 0), 0),
+      firstOrder: sorted[0],
+    });
+  });
+  for (const o of singles) {
+    groups.push({
+      key: o.id,
+      bundleId: null,
+      orders: [o],
+      total: Number(o.total ?? 0),
+      firstOrder: o,
+    });
+  }
+  // Ordenar por fecha de la primera order, descendente
+  groups.sort((a, b) =>
+    b.firstOrder.created_at.localeCompare(a.firstOrder.created_at)
+  );
+  return groups;
+}
+
+function BundleCard({ group }: { group: OrderGroup }) {
+  const firstBook = group.orders[0].listing?.book;
+  const date = new Date(group.firstOrder.created_at).toLocaleDateString("es-CL", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
+  const status = group.firstOrder.status;
+  const count = group.orders.length;
+  const otherBooks = group.orders.slice(1);
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 flex gap-4 bg-white">
-      {book?.cover_url && (
-        <img
-          src={book.cover_url}
-          alt={book.title}
-          className="w-16 h-20 object-cover rounded shrink-0"
-        />
-      )}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-navy truncate">
-            {book?.title ?? "Libro"}
-          </h3>
-          <span
-            className={`text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${STATUS_COLORS[order.status]}`}
-          >
-            {STATUS_LABELS[order.status]}
-          </span>
-        </div>
-        <p className="text-sm text-gray-500">{book?.author}</p>
-        <p className="text-sm font-semibold text-brand-500 mt-1">
-          ${order.total.toLocaleString("es-CL")}
-        </p>
-        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-          <span>{date}</span>
-          {order.courier && <span>Courier: {order.courier}</span>}
-          {order.tracking_code && (
-            <span>Tracking: {order.tracking_code}</span>
-          )}
-        </div>
-        {["paid", "shipped", "delivered"].includes(order.status) && (
-          <Link
-            href={`/listings/${order.listing_id}#reviews`}
-            className="mt-2 inline-block text-xs font-semibold text-brand-500 hover:text-brand-600 transition-colors"
-          >
-            Dejar valoración
-          </Link>
+    <Link
+      href={`/orders/${group.firstOrder.id}`}
+      className="block border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow"
+    >
+      <div className="flex gap-4">
+        {firstBook?.cover_url && (
+          <img
+            src={firstBook.cover_url}
+            alt={firstBook.title}
+            className="w-16 h-20 object-cover rounded shrink-0"
+          />
         )}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-semibold text-navy truncate">
+              {count === 1
+                ? firstBook?.title ?? "Libro"
+                : `${firstBook?.title ?? "Libro"} y ${count - 1} más`}
+            </h3>
+            <span
+              className={`text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${STATUS_COLORS[status]}`}
+            >
+              {STATUS_LABELS[status]}
+            </span>
+          </div>
+          {count === 1 ? (
+            <p className="text-sm text-gray-500">{firstBook?.author}</p>
+          ) : (
+            <p className="text-xs text-gray-500 truncate">
+              {otherBooks
+                .map((o) => o.listing?.book?.title ?? "")
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          )}
+          <p className="text-sm font-semibold text-brand-500 mt-1">
+            ${group.total.toLocaleString("es-CL")}
+            {count > 1 && (
+              <span className="text-xs text-ink-muted font-normal ml-1">
+                · {count} libros
+              </span>
+            )}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+            <span>{date}</span>
+            {group.firstOrder.courier && (
+              <span>Courier: {group.firstOrder.courier}</span>
+            )}
+            {group.firstOrder.tracking_code && (
+              <span>Tracking: {group.firstOrder.tracking_code}</span>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -89,12 +156,15 @@ export default function OrderTabs({
 }) {
   const [tab, setTab] = useState<"purchases" | "sales">("purchases");
 
+  const purchaseGroups = useMemo(() => groupByBundle(purchases), [purchases]);
+  const saleGroups = useMemo(() => groupByBundle(sales), [sales]);
+
   const tabs = [
-    { key: "purchases" as const, label: "Mis Compras", count: purchases.length },
-    { key: "sales" as const, label: "Mis Ventas", count: sales.length },
+    { key: "purchases" as const, label: "Mis Compras", count: purchaseGroups.length },
+    { key: "sales" as const, label: "Mis Ventas", count: saleGroups.length },
   ];
 
-  const orders = tab === "purchases" ? purchases : sales;
+  const groups = tab === "purchases" ? purchaseGroups : saleGroups;
 
   return (
     <div>
@@ -115,16 +185,14 @@ export default function OrderTabs({
       </div>
 
       <div className="space-y-3">
-        {orders.length === 0 ? (
+        {groups.length === 0 ? (
           <EmptyState
             message={
-              tab === "purchases"
-                ? "Aun no tienes compras"
-                : "Aun no tienes ventas"
+              tab === "purchases" ? "Aun no tienes compras" : "Aun no tienes ventas"
             }
           />
         ) : (
-          orders.map((order) => <OrderCard key={order.id} order={order} />)
+          groups.map((g) => <BundleCard key={g.key} group={g} />)
         )}
       </div>
     </div>

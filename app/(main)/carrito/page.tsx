@@ -18,7 +18,7 @@ export default async function CarritoPage() {
       id, listing_id, added_at,
       listing:listings(id, slug, price, status, cover_image_url,
         book:books(title, author, cover_url),
-        seller:users(id, full_name, username)
+        seller:users(id, full_name, username, mercadopago_user_id, phone)
       )
     `)
     .eq("user_id", user.id)
