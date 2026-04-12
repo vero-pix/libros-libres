@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import type { Order, OrderStatus } from "@/types";
+import BuyerCartsSection from "@/components/sales/BuyerCartsSection";
 
 export const metadata = {
   title: "Mis Ventas — tuslibros.cl",
@@ -76,6 +77,109 @@ export default async function MisVentasPage() {
 
   const commissions = rawCommissions ?? [];
 
+  // Carritos de compradores con libros míos (listings activos del vendedor
+  // actual que están en el cart_items de otros usuarios)
+  const { data: mySellerListings } = await supabase
+    .from("listings")
+    .select("id")
+    .eq("seller_id", user.id)
+    .eq("status", "active");
+
+  const myListingIds = (mySellerListings ?? []).map((l) => l.id);
+
+  let buyerCarts: Array<{
+    buyerId: string;
+    buyerName: string;
+    buyerEmail: string | null;
+    buyerPhone: string | null;
+    items: Array<{
+      listing_id: string;
+      title: string;
+      author: string;
+      price: number;
+      cover_url: string | null;
+      added_at: string;
+    }>;
+    total: number;
+    firstAddedAt: string;
+    daysInCart: number;
+  }> = [];
+
+  if (myListingIds.length > 0) {
+    const { data: cartRows } = await supabase
+      .from("cart_items")
+      .select(
+        `
+        user_id, listing_id, added_at,
+        listing:listings(id, price,
+          book:books(title, author, cover_url)),
+        buyer:users(id, full_name, email, phone)
+      `
+      )
+      .in("listing_id", myListingIds)
+      .neq("user_id", user.id)
+      .order("added_at", { ascending: true });
+
+    const byBuyer = new Map<
+      string,
+      {
+        buyerId: string;
+        buyerName: string;
+        buyerEmail: string | null;
+        buyerPhone: string | null;
+        items: Array<{
+          listing_id: string;
+          title: string;
+          author: string;
+          price: number;
+          cover_url: string | null;
+          added_at: string;
+        }>;
+        total: number;
+        firstAddedAt: string;
+      }
+    >();
+
+    for (const row of cartRows ?? []) {
+      const buyer = (row as any).buyer;
+      const listing = (row as any).listing;
+      if (!buyer || !listing) continue;
+      if (!byBuyer.has(buyer.id)) {
+        byBuyer.set(buyer.id, {
+          buyerId: buyer.id,
+          buyerName: buyer.full_name ?? "Comprador",
+          buyerEmail: buyer.email ?? null,
+          buyerPhone: buyer.phone ?? null,
+          items: [],
+          total: 0,
+          firstAddedAt: row.added_at,
+        });
+      }
+      const entry = byBuyer.get(buyer.id)!;
+      entry.items.push({
+        listing_id: listing.id,
+        title: listing.book?.title ?? "Libro",
+        author: listing.book?.author ?? "",
+        price: Number(listing.price ?? 0),
+        cover_url: listing.book?.cover_url ?? null,
+        added_at: row.added_at,
+      });
+      entry.total += Number(listing.price ?? 0);
+      if (row.added_at < entry.firstAddedAt) entry.firstAddedAt = row.added_at;
+    }
+
+    buyerCarts = Array.from(byBuyer.values()).map((c) => ({
+      ...c,
+      daysInCart: Math.floor(
+        (Date.now() - new Date(c.firstAddedAt).getTime()) /
+          (1000 * 60 * 60 * 24)
+      ),
+    }));
+
+    // Ordenar: los más antiguos primero (más urgentes)
+    buyerCarts.sort((a, b) => b.daysInCart - a.daysInCart);
+  }
+
   // Stats
   const paidOrders = orders.filter((o: any) => o.status !== "pending" && o.status !== "cancelled");
   const totalVentas = paidOrders.reduce((sum: number, o: any) => sum + Number(o.book_price), 0);
@@ -117,6 +221,8 @@ export default async function MisVentasPage() {
             para recibir pagos directos con split payment.
           </div>
         )}
+
+        <BuyerCartsSection carts={buyerCarts} />
 
         {/* Stats cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
