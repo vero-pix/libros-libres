@@ -174,6 +174,15 @@
 - [ ] Subagente `ux-tester` custom que corre flujos bajo demanda con screenshots
 - [ ] Integración: correr después de cada push grande antes de promover a producción
 
+**Reseñas: separar libro vs vendedor**
+- [ ] Problema actual: las reseñas viven pegadas al `listing`, pero cuando se vende el listing desaparece → reseña queda huérfana y no sirve a futuros compradores
+- [ ] Migración: tabla `reviews` con `target_type: 'book' | 'seller'` + FK a `books.id` o `users.id`
+- [ ] Mover widget actual de reseñas desde ficha del listing a ficha del libro (nivel `books`)
+- [ ] Nuevo widget "Reputación del vendedor" en `/vendedor/[id]`
+- [ ] Post-compra: modal al marcar entrega que invita a dejar 2 reseñas (libro + vendedor)
+- [ ] Origen: observación de Vero el 11 abril — "¿para qué comentarios si solo pueden comentar una vez vendidos, es decir cuando ya no existan?"
+- [ ] Prioridad: antes de tener volumen real de ventas
+
 **Kit Metralleta — reescribir con tono confesional**
 - [ ] Revisar los mensajes de la primera iteración GTM (banners, stories, DMs)
 - [ ] Reescribirlos con el tono confesional del video marketing (10 abril)
