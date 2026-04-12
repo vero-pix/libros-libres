@@ -296,10 +296,6 @@ export default function ShelfTransformation() {
               </circle>
             ))}
 
-            {/* Counter */}
-            <text x="240" y="228" textAnchor="middle" className="text-[9px] font-sans font-medium" fill="#b8860b">
-              9 libros conectando lectores en Santiago
-            </text>
           </svg>
         </div>
       </div>
