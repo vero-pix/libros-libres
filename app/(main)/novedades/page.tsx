@@ -1,4 +1,5 @@
 import Link from "next/link";
+import PromoBanner from "@/components/ui/PromoBanner";
 
 export const metadata = { title: "Novedades — tuslibros.cl" };
 
@@ -237,6 +238,10 @@ export default function NovedadesPage() {
         <p className="text-ink-muted mb-8">
           Lo que vamos arreglando, mejorando y construyendo acá adentro. Lo escribo yo, lo lees tú. — Vero
         </p>
+
+        <div className="mb-8">
+          <PromoBanner variant="circulate" />
+        </div>
 
         <div className="space-y-6">
           {novedades.map((item, i) => (
