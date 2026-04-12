@@ -103,6 +103,7 @@ export interface Order {
   tracking_code: string | null;
   mercadopago_preference_id: string | null;
   mercadopago_payment_id: string | null;
+  bundle_id: string | null;
   buyer_address: string | null;
   buyer_latitude: number | null;
   buyer_longitude: number | null;

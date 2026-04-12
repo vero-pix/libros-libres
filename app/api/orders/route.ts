@@ -9,7 +9,15 @@ import {
 } from "@/lib/mercadopago";
 import { calculateCommission } from "@/lib/commissions";
 import { refreshSellerToken } from "@/lib/mercadopago-oauth";
+import crypto from "crypto";
 
+/**
+ * POST /api/orders
+ * Body (bundle):    { listing_ids: string[], shipping_speed, ... }
+ * Body (singular):  { listing_id: string, shipping_speed, ... } — compat
+ *
+ * Crea N orders con un bundle_id compartido y una sola preferencia MP.
+ */
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
 
@@ -21,52 +29,82 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
+  const rawListingIds: string[] = Array.isArray(body.listing_ids)
+    ? body.listing_ids
+    : body.listing_id
+      ? [body.listing_id]
+      : [];
+
   const {
-    listing_id,
     shipping_speed,
     shipping_cost_override,
     shipping_service,
+    shipping_courier,
     buyer_address,
   } = body as {
-    listing_id: string;
     shipping_speed: "standard" | "express";
     shipping_cost_override?: number;
     shipping_service?: string;
+    shipping_courier?: string;
     buyer_address?: string;
   };
 
-  if (!listing_id || !shipping_speed) {
+  if (rawListingIds.length === 0 || !shipping_speed) {
     return NextResponse.json(
       { error: "Faltan campos requeridos" },
       { status: 400 }
     );
   }
 
-  // Fetch listing with book and seller (incluyendo datos MP para split)
-  const { data: listing, error: listingError } = await supabase
+  // Deduplicar
+  const listingIds = Array.from(new Set(rawListingIds));
+
+  // Fetch todos los listings del bundle
+  const { data: listings, error: listingsError } = await supabase
     .from("listings")
     .select(
       `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_access_token, mercadopago_user_id, plan)`
     )
-    .eq("id", listing_id)
-    .eq("status", "active")
-    .single();
+    .in("id", listingIds)
+    .eq("status", "active");
 
-  if (listingError || !listing) {
+  if (listingsError || !listings || listings.length === 0) {
     return NextResponse.json(
-      { error: "Publicación no encontrada o no disponible" },
+      { error: "Publicaciones no encontradas o no disponibles" },
       { status: 404 }
     );
   }
 
-  if (listing.seller_id === user.id) {
+  if (listings.length !== listingIds.length) {
     return NextResponse.json(
-      { error: "No puedes comprar tu propio libro" },
+      {
+        error:
+          "Uno o más libros ya no están disponibles. Vuelve al carrito y verifica.",
+      },
+      { status: 409 }
+    );
+  }
+
+  // Validar: todos del mismo vendedor
+  const sellerIds = new Set(listings.map((l: any) => l.seller_id));
+  if (sellerIds.size > 1) {
+    return NextResponse.json(
+      { error: "El bundle debe ser de un solo vendedor" },
       { status: 400 }
     );
   }
 
-  const seller = listing.seller as {
+  const sellerId = listings[0].seller_id;
+
+  // Validar: no puede comprar sus propios libros
+  if (sellerId === user.id) {
+    return NextResponse.json(
+      { error: "No puedes comprar tus propios libros" },
+      { status: 400 }
+    );
+  }
+
+  const seller = listings[0].seller as {
     id: string;
     full_name: string;
     email: string;
@@ -76,70 +114,94 @@ export async function POST(req: NextRequest) {
     plan: "free" | "librero" | "libreria";
   };
 
-  const bookPrice = listing.price ?? 0;
-  // Usar precio real del courier si viene, sino fallback fijo
-  const shippingCost = shipping_cost_override ?? SHIPPING_COSTS[shipping_speed] ?? SHIPPING_COSTS.standard;
-  const courier = shipping_service ?? COURIER_BY_SPEED[shipping_speed] ?? "Envío estándar";
+  // Cálculos
+  const totalBookPrice = listings.reduce(
+    (sum: number, l: any) => sum + (l.price ?? 0),
+    0
+  );
+  const shippingCost =
+    shipping_cost_override ??
+    SHIPPING_COSTS[shipping_speed] ??
+    SHIPPING_COSTS.standard;
+  const courier =
+    shipping_service ?? COURIER_BY_SPEED[shipping_speed] ?? "Envío estándar";
 
-  // Calcular comisión según plan del vendedor
   const useSplit = !!seller.mercadopago_access_token;
-  const isInPerson = shipping_service === "Entrega en persona" || shipping_service === "Punto de retiro";
+  const isInPerson =
+    shipping_service === "Entrega en persona" ||
+    shipping_service === "Punto de retiro";
+
   const { rate: commissionRate, commission } = useSplit
-    ? calculateCommission(bookPrice, seller.plan ?? "free", "sale")
+    ? calculateCommission(totalBookPrice, seller.plan ?? "free", "sale")
     : { rate: 0, commission: 0 };
 
-  // In-person/pickup: no service fee. Courier: split → commission, no split → fixed fee
   const serviceFee = isInPerson ? 0 : useSplit ? commission : SERVICE_FEE;
-  const total = bookPrice + shippingCost + serviceFee;
+  const bundleGrandTotal = totalBookPrice + shippingCost + serviceFee;
 
-  // Create order in Supabase
-  const { data: order, error: orderError } = await supabase
-    .from("orders")
-    .insert({
-      listing_id,
+  // Generar bundle_id (siempre, también para single-item)
+  const bundleId = crypto.randomUUID();
+
+  // Crear N orders, shipping/fee solo en la primera (prorrateo "cabeza del bundle")
+  const orderRows = listings.map((l: any, idx: number) => {
+    const isFirst = idx === 0;
+    const itemShipping = isFirst ? shippingCost : 0;
+    const itemFee = isFirst ? serviceFee : 0;
+    const itemTotal = (l.price ?? 0) + itemShipping + itemFee;
+    return {
+      listing_id: l.id,
       buyer_id: user.id,
-      seller_id: listing.seller_id,
-      book_price: bookPrice,
-      shipping_cost: shippingCost,
-      service_fee: serviceFee,
-      total,
+      seller_id: sellerId,
+      book_price: l.price ?? 0,
+      shipping_cost: itemShipping,
+      service_fee: itemFee,
+      total: itemTotal,
       status: "pending",
       shipping_speed,
       courier,
       buyer_address: buyer_address ?? null,
-    })
-    .select()
-    .single();
+      bundle_id: bundleId,
+    };
+  });
 
-  if (orderError || !order) {
+  const { data: createdOrders, error: orderError } = await supabase
+    .from("orders")
+    .insert(orderRows)
+    .select("id, listing_id");
+
+  if (orderError || !createdOrders || createdOrders.length === 0) {
     return NextResponse.json(
-      { error: "Error al crear la orden: " + (orderError?.message ?? "unknown") },
+      {
+        error:
+          "Error al crear las órdenes: " + (orderError?.message ?? "unknown"),
+      },
       { status: 500 }
     );
   }
 
-  // Create MercadoPago preference
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const book = listing.book as { title: string; author: string };
+  const firstOrderId = createdOrders[0].id;
+
+  // Preferencia MP
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   try {
     const items = [
-      {
-        id: listing_id,
-        title: `${book.title} — ${book.author}`,
+      ...listings.map((l: any) => ({
+        id: l.id,
+        title: `${l.book.title} — ${l.book.author}`,
         quantity: 1,
-        unit_price: Math.round(bookPrice),
+        unit_price: Math.round(l.price ?? 0),
         currency_id: "CLP",
-      },
+      })),
       {
-        id: `shipping-${order.id}`,
+        id: `shipping-${bundleId}`,
         title: `Envío ${shipping_speed === "express" ? "rápido" : "estándar"} (${courier})`,
         quantity: 1,
         unit_price: Math.round(shippingCost),
         currency_id: "CLP",
       },
       {
-        id: `fee-${order.id}`,
+        id: `fee-${bundleId}`,
         title: "Cargo por servicio tuslibros.cl",
         quantity: 1,
         unit_price: Math.round(serviceFee),
@@ -148,20 +210,23 @@ export async function POST(req: NextRequest) {
     ];
 
     const backUrls = {
-      success: `${siteUrl}/orders/${order.id}?status=success`,
-      failure: `${siteUrl}/orders/${order.id}?status=failure`,
-      pending: `${siteUrl}/orders/${order.id}?status=pending`,
+      success: `${siteUrl}/orders/${firstOrderId}?status=success`,
+      failure: `${siteUrl}/orders/${firstOrderId}?status=failure`,
+      pending: `${siteUrl}/orders/${firstOrderId}?status=pending`,
     };
 
     let preference;
 
     if (useSplit) {
-      // ── SPLIT PAYMENT ──
       const collectorId = process.env.MERCADOPAGO_COLLECTOR_ID;
       if (!collectorId) {
-        await supabase.from("orders").delete().eq("id", order.id);
-        return NextResponse.json({ error: "Configuración de marketplace incompleta" }, { status: 500 });
+        await supabase.from("orders").delete().eq("bundle_id", bundleId);
+        return NextResponse.json(
+          { error: "Configuración de marketplace incompleta" },
+          { status: 500 }
+        );
       }
+
       let sellerToken = seller.mercadopago_access_token!;
       const splitBody = {
         items,
@@ -169,11 +234,10 @@ export async function POST(req: NextRequest) {
         marketplace: collectorId,
         back_urls: backUrls,
         auto_return: "approved" as const,
-        external_reference: order.id,
+        external_reference: bundleId,
         notification_url: `${siteUrl}/api/webhooks/mercadopago`,
       };
 
-      // Get refresh token upfront
       const { data: sellerTokenData } = await supabase
         .from("users")
         .select("mercadopago_refresh_token")
@@ -188,56 +252,63 @@ export async function POST(req: NextRequest) {
         if (!refreshToken) throw splitErr;
         const freshToken = await refreshSellerToken(seller.id, refreshToken);
         if (!freshToken) throw splitErr;
-
         sellerToken = freshToken;
         const sellerPref = sellerPreferenceClient(sellerToken);
         preference = await sellerPref.create({ body: splitBody });
       }
     } else {
-      // ── SIN SPLIT (vendedor sin MP conectado) ──
-      // Todo llega a tuslibros, se transfiere manualmente después.
       preference = await preferenceClient.create({
         body: {
           items,
           back_urls: backUrls,
           auto_return: "approved",
-          external_reference: order.id,
+          external_reference: bundleId,
           notification_url: `${siteUrl}/api/webhooks/mercadopago`,
         },
       });
     }
 
-    // Update order with preference ID
+    // Guardar preference_id en todas las orders del bundle
     await supabase
       .from("orders")
       .update({ mercadopago_preference_id: preference.id })
-      .eq("id", order.id);
+      .eq("bundle_id", bundleId);
 
-    // Registrar comisión si es split
+    // Una comisión por bundle
     if (useSplit) {
       await supabase.from("commissions").insert({
-        order_id: order.id,
-        seller_id: listing.seller_id,
+        order_id: firstOrderId,
+        seller_id: sellerId,
         transaction_type: "sale",
-        gross_amount: bookPrice,
+        gross_amount: totalBookPrice,
         commission_rate: commissionRate,
         commission_amount: commission,
         seller_plan: seller.plan ?? "free",
       });
     }
 
+    // Limpiar carrito: quitar los listings recién comprados
+    await supabase
+      .from("cart_items")
+      .delete()
+      .eq("user_id", user.id)
+      .in("listing_id", listingIds);
+
     return NextResponse.json({
-      order_id: order.id,
+      bundle_id: bundleId,
+      order_ids: createdOrders.map((o: any) => o.id),
+      order_id: firstOrderId, // compat single-item
       init_point: preference.init_point,
+      total: bundleGrandTotal,
     });
   } catch (err: unknown) {
-    // Clean up the order if MP fails
-    await supabase.from("orders").delete().eq("id", order.id);
-    let message = "Error de MercadoPago";
-    if (err instanceof Error) {
-      message = err.message;
-    }
-    console.error("MercadoPago error:", JSON.stringify(err, null, 2));
+    // Rollback: borrar orders del bundle si MP falla
+    await supabase.from("orders").delete().eq("bundle_id", bundleId);
+    const message = err instanceof Error ? err.message : "Error de MercadoPago";
+    console.error(
+      "MercadoPago error:",
+      JSON.stringify(err, Object.getOwnPropertyNames(err))
+    );
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

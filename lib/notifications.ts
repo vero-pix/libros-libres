@@ -9,11 +9,12 @@ export interface SellerNotification {
   bookAuthor: string;
   total: number;
   whatsappUrl: string | null;
+  bundleSize?: number;
 }
 
 /**
- * Fetch order details and build a seller notification payload.
- * Currently logs to console; ready for email/SMS integration later.
+ * Notifica al vendedor sobre una venta. Si la order pertenece a un bundle,
+ * agrega contexto del bundle al mensaje.
  */
 export async function notifySeller(
   orderId: string,
@@ -23,7 +24,7 @@ export async function notifySeller(
     .from("orders")
     .select(
       `
-      id, total, status,
+      id, total, status, bundle_id,
       listing:listings(id, price, book:books(title, author)),
       seller:users!orders_seller_id_fkey(full_name, email, phone),
       buyer:users!orders_buyer_id_fkey(full_name, email)
@@ -53,13 +54,37 @@ export async function notifySeller(
   };
 
   const book = listing.book;
+  const bundleId = (order as any).bundle_id as string | null;
 
-  // Build WhatsApp deep-link if seller has a phone number
+  // Si es bundle, agrupar toda la info
+  let bundleSize = 1;
+  let bundleTotal = Number(order.total);
+  let titleSummary = book.title;
+
+  if (bundleId) {
+    const { data: bundleOrders } = await supabase
+      .from("orders")
+      .select("id, total, listing:listings(book:books(title))")
+      .eq("bundle_id", bundleId);
+    if (bundleOrders && bundleOrders.length > 0) {
+      bundleSize = bundleOrders.length;
+      bundleTotal = bundleOrders.reduce(
+        (sum: number, o: any) => sum + Number(o.total ?? 0),
+        0
+      );
+      if (bundleSize > 1) {
+        titleSummary = `${book.title} y ${bundleSize - 1} más`;
+      }
+    }
+  }
+
   let whatsappUrl: string | null = null;
   if (seller.phone) {
     const cleanPhone = seller.phone.replace(/\D/g, "");
     const message = encodeURIComponent(
-      `Hola ${seller.full_name}! Tu libro "${book.title}" fue comprado por ${buyer.full_name} en Libros Libres. Total: $${order.total}. Prepara el envio!`
+      bundleSize > 1
+        ? `Hola ${seller.full_name}! ${buyer.full_name} compró ${bundleSize} libros tuyos en Libros Libres. Total: $${bundleTotal.toLocaleString("es-CL")}. Revisa Mis Ventas para coordinar el envío!`
+        : `Hola ${seller.full_name}! Tu libro "${book.title}" fue comprado por ${buyer.full_name} en Libros Libres. Total: $${Number(order.total).toLocaleString("es-CL")}. Prepara el envio!`
     );
     whatsappUrl = `https://wa.me/${cleanPhone}?text=${message}`;
   }
@@ -69,20 +94,19 @@ export async function notifySeller(
     sellerName: seller.full_name,
     sellerPhone: seller.phone,
     buyerName: buyer.full_name,
-    bookTitle: book.title,
+    bookTitle: titleSummary,
     bookAuthor: book.author,
-    total: order.total,
+    total: bundleTotal,
     whatsappUrl,
+    bundleSize,
   };
 
-  // TODO: Integrate email service (Resend, SendGrid, etc.)
-  // TODO: Send push notification via web push or mobile
   console.log("[notifySeller] Venta confirmada:", {
     order: orderId,
     seller: seller.full_name,
     buyer: buyer.full_name,
-    book: `${book.title} — ${book.author}`,
-    total: order.total,
+    books: bundleSize > 1 ? `${bundleSize} libros` : `${book.title} — ${book.author}`,
+    total: bundleTotal,
     whatsappUrl,
   });
 
