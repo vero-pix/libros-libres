@@ -266,17 +266,29 @@ export default function NovedadesPage() {
               className="bg-white rounded-xl border border-cream-dark/30 p-6"
             >
               <div className="flex items-center gap-3 mb-2">
-                <span
-                  className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
-                    item.tag === "Nueva herramienta"
+                {(() => {
+                  // Parse "12 abril 2026" format
+                  const meses: Record<string, number> = { enero: 0, febrero: 1, marzo: 2, abril: 3, mayo: 4, junio: 5, julio: 6, agosto: 7, septiembre: 8, octubre: 9, noviembre: 10, diciembre: 11 };
+                  const parts = item.date.split(" ");
+                  const d = new Date(Number(parts[2]), meses[parts[1]] ?? 0, Number(parts[0]));
+                  const diffDays = Math.floor((Date.now() - d.getTime()) / 86400000);
+                  const isRecent = diffDays <= 3;
+
+                  const tagLabel = isRecent ? "Nuevo" : item.tag;
+                  const tagClass = isRecent
+                    ? "bg-green-50 text-green-700"
+                    : item.tag === "Nueva herramienta"
                       ? "bg-brand-50 text-brand-600"
                       : item.tag === "Lanzamiento"
                         ? "bg-green-50 text-green-700"
-                        : "bg-yellow-50 text-yellow-700"
-                  }`}
-                >
-                  {item.tag}
-                </span>
+                        : "bg-yellow-50 text-yellow-700";
+
+                  return (
+                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${tagClass}`}>
+                      {tagLabel}
+                    </span>
+                  );
+                })()}
                 <span className="text-xs text-ink-muted">{item.date}</span>
               </div>
               <h2 className="text-lg font-semibold text-ink mb-1">
