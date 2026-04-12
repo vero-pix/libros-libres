@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { AdminOrder, AdminListing, AdminUser, ContactMessage, Subscriber } from "@/components/admin/types";
+import type { AdminCategory } from "@/components/admin/CategoriesTab";
 import { Stat, EmptyState } from "@/components/admin/SharedUI";
 import OrdersTab from "@/components/admin/OrdersTab";
 import ListingsTab from "@/components/admin/ListingsTab";
@@ -9,6 +10,7 @@ import UsersTab from "@/components/admin/UsersTab";
 import ToolsTab from "@/components/admin/ToolsTab";
 import NewsletterSender from "@/components/admin/NewsletterSender";
 import AnalyticsTab from "@/components/admin/AnalyticsTab";
+import CategoriesTab from "@/components/admin/CategoriesTab";
 
 interface Props {
   orders: AdminOrder[];
@@ -16,17 +18,19 @@ interface Props {
   users: AdminUser[];
   messages?: ContactMessage[];
   subscribers?: Subscriber[];
+  categories?: AdminCategory[];
 }
 
-type Tab = "orders" | "listings" | "users" | "messages" | "subscribers" | "analytics" | "tools";
+type Tab = "orders" | "listings" | "users" | "messages" | "subscribers" | "categories" | "analytics" | "tools";
 
-export default function AdminDashboard({ orders: initOrders, listings: initListings, users: initUsers, messages = [], subscribers = [] }: Props) {
+export default function AdminDashboard({ orders: initOrders, listings: initListings, users: initUsers, messages = [], subscribers = [], categories: initCategories = [] }: Props) {
   const [tab, setTab] = useState<Tab>("orders");
   const [orders, setOrders] = useState(initOrders);
   const [listings, setListings] = useState(initListings);
   const [users, setUsers] = useState(initUsers);
   const [msgs] = useState(messages);
   const [subs] = useState(subscribers);
+  const [cats, setCats] = useState(initCategories);
 
   const unreadMessages = msgs.filter((m) => !m.read).length;
   const totalRevenue = orders
@@ -39,6 +43,7 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
     { key: "users", label: "Usuarios", count: users.length },
     { key: "messages", label: "Mensajes", count: msgs.length },
     { key: "subscribers", label: "Newsletter", count: subs.length },
+    { key: "categories", label: "Categorías", count: cats.length },
     { key: "analytics", label: "Analytics", count: 0 },
     { key: "tools", label: "Herramientas", count: 0 },
   ];
@@ -129,6 +134,9 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
 
           {subs.length > 0 && <NewsletterSender subscriberCount={subs.length} />}
         </div>
+      )}
+      {tab === "categories" && (
+        <CategoriesTab categories={cats} onUpdate={setCats} />
       )}
       {tab === "analytics" && (
         <AnalyticsTab />
