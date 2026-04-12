@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import PublishForm from "@/components/listings/PublishForm";
 
 export default async function PublishPage() {
@@ -26,6 +27,69 @@ export default async function PublishPage() {
           address: (profile.default_address as string | null) ?? "",
         }
       : null;
+
+  // Campos mínimos para publicar: teléfono + dirección (lat/lng)
+  const missingPhone = !profile?.phone;
+  const missingAddress = !defaultLocation;
+  const profileIncomplete = missingPhone || missingAddress;
+
+  if (profileIncomplete) {
+    return (
+      <div className="min-h-screen bg-cream">
+        <main className="max-w-xl mx-auto px-4 py-16">
+          <div className="bg-white rounded-xl border border-amber-300 p-8 text-center">
+            <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full mb-4">
+              <span className="text-xs font-semibold text-amber-700">
+                Un paso más antes de publicar
+              </span>
+            </div>
+            <h1 className="font-display text-2xl font-bold text-ink mb-3">
+              Completa tu perfil
+            </h1>
+            <p className="text-ink-muted text-sm mb-6 leading-relaxed">
+              Para que tu libro pueda ser comprado con entrega en persona o por
+              courier, necesitamos estos datos tuyos:
+            </p>
+            <ul className="text-left inline-block space-y-2 mb-6">
+              <li
+                className={`flex items-center gap-2 text-sm ${missingPhone ? "text-amber-800" : "text-green-700"}`}
+              >
+                <span className="w-5 h-5 rounded-full flex items-center justify-center bg-current/10">
+                  {missingPhone ? "!" : "✓"}
+                </span>
+                <span>
+                  <strong>Teléfono</strong>{" "}
+                  <span className="text-ink-muted">— para coordinar con compradores por WhatsApp</span>
+                </span>
+              </li>
+              <li
+                className={`flex items-center gap-2 text-sm ${missingAddress ? "text-amber-800" : "text-green-700"}`}
+              >
+                <span className="w-5 h-5 rounded-full flex items-center justify-center bg-current/10">
+                  {missingAddress ? "!" : "✓"}
+                </span>
+                <span>
+                  <strong>Dirección / ubicación</strong>{" "}
+                  <span className="text-ink-muted">— para calcular cercanía y cotizar envíos</span>
+                </span>
+              </li>
+            </ul>
+            <div>
+              <Link
+                href="/perfil?next=/publish"
+                className="inline-block bg-brand-500 hover:bg-brand-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+              >
+                Completar mi perfil
+              </Link>
+            </div>
+            <p className="text-xs text-ink-muted mt-4">
+              Te tomas 30 segundos y vuelves acá a publicar.
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-cream">

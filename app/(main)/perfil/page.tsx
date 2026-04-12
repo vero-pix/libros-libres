@@ -19,6 +19,10 @@ export default async function PerfilPage() {
     .eq("id", user.id)
     .single();
 
+  const missingPhone = !profile?.phone;
+  const missingAddress = profile?.default_latitude == null || profile?.default_longitude == null;
+  const incomplete = missingPhone || missingAddress;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-lg mx-auto px-4 py-8">
@@ -28,6 +32,21 @@ export default async function PerfilPage() {
             Actualiza tus datos de contacto y ubicación.
           </p>
         </div>
+        {incomplete && (
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm">
+            <p className="font-semibold text-amber-900 mb-1">
+              Completa tu perfil para publicar y comprar
+            </p>
+            <ul className="text-amber-800 space-y-0.5 mt-2">
+              {missingPhone && (
+                <li>• <strong>Teléfono</strong> — necesario para coordinar con vendedores y compradores</li>
+              )}
+              {missingAddress && (
+                <li>• <strong>Dirección / ubicación</strong> — para cercanía y cotización de envíos</li>
+              )}
+            </ul>
+          </div>
+        )}
         <ProfileForm
           userId={user.id}
           initialFullName={profile?.full_name ?? ""}
