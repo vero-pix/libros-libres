@@ -183,6 +183,13 @@
 - [ ] Origen: observación de Vero el 11 abril — "¿para qué comentarios si solo pueden comentar una vez vendidos, es decir cuando ya no existan?"
 - [ ] Prioridad: antes de tener volumen real de ventas
 
+**Optimización polling `/api/messages/unread`**
+- [ ] Hoy se llama cada 30s desde el badge de mensajes — genera carga constante sobre Supabase
+- [ ] Opción A: reducir frecuencia (cada 2-3 min en vez de 30s) — simple, inmediato
+- [ ] Opción B: reemplazar por Supabase Realtime subscription sobre tabla `messages` filtrado por recipient_id — suscripción activa, 0 polling, push real
+- [ ] Origen: observación 11 abril mirando logs de Vercel
+- [ ] Prioridad: baja ahora, media cuando haya 50+ usuarios activos
+
 **Kit Metralleta — reescribir con tono confesional**
 - [ ] Revisar los mensajes de la primera iteración GTM (banners, stories, DMs)
 - [ ] Reescribirlos con el tono confesional del video marketing (10 abril)
