@@ -16,7 +16,7 @@ const steps = [
     n: 2,
     icon: "🖨️",
     title: "Imprime la etiqueta",
-    body: "Desde Mis Ventas, busca la orden y haz click en “Descargar etiqueta”. Imprímela en hoja tamaño carta. Si no tienes impresora en casa, la mayoría de sucursales del courier la pueden imprimir mostrando el PDF desde el celular.",
+    body: 'Desde Mis Ventas, busca la orden y haz click en \u201cDescargar etiqueta\u201d. Imprímela en hoja tamaño carta. Si no tienes impresora en casa, la mayoría de sucursales del courier la pueden imprimir mostrando el PDF desde el celular.',
   },
   {
     n: 3,
@@ -60,6 +60,12 @@ export default function ComoDespacharPage() {
           </p>
         </header>
 
+        <div className="mb-4">
+          <Link href="/mis-ventas" className="text-brand-600 font-semibold hover:underline text-sm">
+            Ir a Mis Ventas para ver tus órdenes →
+          </Link>
+        </div>
+
         <div className="space-y-5 mb-12">
           {steps.map((step) => (
             <div
@@ -96,6 +102,13 @@ export default function ComoDespacharPage() {
             <li>• No uses cajas mucho más grandes que el libro (se golpea adentro)</li>
             <li>• Si el libro es antiguo o delicado, menciónalo en las notas al comprador</li>
           </ul>
+          <p className="text-sm text-ink-muted mt-4">
+            ¿El comprador reportó un problema?{" "}
+            <Link href="/devoluciones" className="text-brand-600 font-semibold hover:underline">
+              Lee la política de devoluciones
+            </Link>
+            .
+          </p>
         </section>
 
         <section className="bg-blue-50 border border-blue-200 rounded-xl p-6">
