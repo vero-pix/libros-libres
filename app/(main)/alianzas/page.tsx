@@ -23,7 +23,7 @@ const IDEAS = [
   },
   {
     name: "Librerías de segunda mano",
-    what: "Una vitrina digital adicional, sin costo fijo, con carga masiva por CSV para que no tengan que subir libro por libro.",
+    what: "Una vitrina digital adicional, sin costo fijo, con carga masiva por CSV para que no tengan que subir libro por libro. Publicar es gratis.",
   },
 ];
 
@@ -88,7 +88,11 @@ export default function AlianzasPage() {
         <section className="bg-brand-50 border border-brand-200 rounded-xl p-8 text-center">
           <h2 className="font-display text-xl font-bold text-ink mb-2">Conversemos 20 minutos</h2>
           <p className="text-sm text-ink-muted mb-6 max-w-md mx-auto">
-            Sin compromiso. Te muestro la plataforma, me cuentas cómo es tu institución, y vemos si tiene sentido armar algo juntos.
+            Sin compromiso. Te muestro{" "}
+            <Link href="/search" className="text-brand-600 font-semibold hover:underline">
+              la plataforma
+            </Link>
+            , me cuentas cómo es tu institución, y vemos si tiene sentido armar algo juntos.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a

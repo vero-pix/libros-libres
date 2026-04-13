@@ -7,8 +7,7 @@ interface FeaturedSeller {
   id: string;
   full_name: string;
   avatar_url: string | null;
-  comuna?: string | null;
-  region?: string | null;
+  city?: string | null;
   bio?: string | null;
   _listing_count?: number;
 }
@@ -112,9 +111,9 @@ export default function FeaturedRow({ featuredListings, featuredSellers }: Props
                   <p className="font-semibold text-ink group-hover:text-brand-600 transition-colors truncate">
                     {seller.full_name}
                   </p>
-                  {(seller.comuna || seller.region) && (
+                  {seller.city && (
                     <p className="text-xs text-ink-muted truncate">
-                      {[seller.comuna, seller.region].filter(Boolean).join(", ")}
+                      {seller.city}
                     </p>
                   )}
                   <div className="flex items-center gap-2 mt-1">

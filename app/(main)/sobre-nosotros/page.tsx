@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import ContactForm from "@/components/ui/ContactForm";
 
 export const metadata = {
@@ -91,6 +92,14 @@ export default function SobreNosotrosPage() {
             <p className="text-ink-muted leading-relaxed">
               Para quien lee en papel y no le gusta tirar los libros a la basura cuando ya no los necesita. Para quien busca algo específico y prefiere encontrarlo a la vuelta de la esquina antes que pagar despacho. Para quien le gusta conversar sobre libros con desconocidos. Para ti, básicamente, si llegaste hasta acá leyendo.
             </p>
+            <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center">
+              <Link href="/search" className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm">
+                Buscar libros
+              </Link>
+              <Link href="/publish" className="inline-block border-2 border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm">
+                Publicar el mío
+              </Link>
+            </div>
           </div>
         </section>
 

@@ -1,8 +1,11 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export const metadata = {
   title: "Preguntas frecuentes — tuslibros.cl",
 };
+
+const linkClass = "text-brand-600 font-semibold hover:underline";
 
 const faqSections = [
   {
@@ -12,9 +15,23 @@ const faqSections = [
         q: "¿Cómo compro un libro?",
         a: (
           <ol className="list-decimal list-inside space-y-1 text-ink-muted">
-            <li>Busca el libro en el catálogo, mapa o barra de búsqueda</li>
+            <li>
+              Busca el libro en el{" "}
+              <Link href="/search" className={linkClass}>catálogo</Link>,{" "}
+              <Link href="/mapa" className={linkClass}>mapa</Link> o barra de búsqueda
+            </li>
             <li>Haz clic en el libro que te interesa</li>
-            <li>Contacta al vendedor por WhatsApp o compra directamente con MercadoPago</li>
+            <li>
+              Contacta al vendedor por WhatsApp o compra directamente con{" "}
+              <a
+                href="https://www.mercadopago.cl"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkClass}
+              >
+                MercadoPago
+              </a>
+            </li>
             <li>Coordina la entrega en persona, retiro, o recibe por courier</li>
           </ol>
         ),
@@ -25,7 +42,20 @@ const faqSections = [
       },
       {
         q: "¿Puedo negociar el precio?",
-        a: "Sí, y me gusta que así sea. Armé tuslibros.cl para que la conversación entre quien vende y quien compra sea directa, sin que yo me meta en el medio. Conversen por WhatsApp, pónganse de acuerdo. Y si quieren pagar con MercadoPago, también pueden ajustar el precio entre ustedes para repartirse la comisión como les acomode. Mi regla es una sola: libertad. — Vero",
+        a: (
+          <span>
+            Sí, y me gusta que así sea. Armé tuslibros.cl para que la conversación entre quien vende y quien compra sea directa, sin que yo me meta en el medio. Conversen por WhatsApp, pónganse de acuerdo. Y si quieren pagar con{" "}
+            <a
+              href="https://www.mercadopago.cl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+            >
+              MercadoPago
+            </a>
+            , también pueden ajustar el precio entre ustedes para repartirse la comisión como les acomode. Mi regla es una sola: libertad. — Vero
+          </span>
+        ),
       },
       {
         q: "¿Cómo sé si el libro está en buen estado?",
@@ -48,7 +78,20 @@ const faqSections = [
         q: "¿Cuándo se aplican comisiones?",
         a: (
           <span>
-            Las comisiones <strong>solo aplican</strong> cuando usas nuestras herramientas integradas: pago con <strong>MercadoPago</strong> (y otras pasarelas que sumemos) o <strong>despacho por courier</strong> (Shipit hoy, más integraciones en camino). Si coordinas todo por WhatsApp y entregas en persona, no pagas nada.
+            Las comisiones <strong>solo aplican</strong> cuando usas nuestras herramientas integradas: pago con{" "}
+            <a
+              href="https://www.mercadopago.cl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+            >
+              MercadoPago
+            </a>{" "}
+            (y otras pasarelas que sumemos) o{" "}
+            <strong>
+              <Link href="/como-despachar" className={linkClass}>despacho por courier</Link>
+            </strong>{" "}
+            (Shipit hoy, más integraciones en camino). Si coordinas todo por WhatsApp y entregas en persona, no pagas nada.
           </span>
         ),
       },
@@ -57,25 +100,64 @@ const faqSections = [
         a: (
           <ol className="list-decimal list-inside space-y-1 text-ink-muted">
             <li>Inicia sesión en tu cuenta</li>
-            <li>Haz clic en <strong>Publicar libro</strong></li>
-            <li>Escanea el código de barras o ingresa el ISBN</li>
+            <li>
+              Haz clic en{" "}
+              <Link href="/publish" className={linkClass}>
+                <strong>Publicar libro</strong>
+              </Link>
+            </li>
+            <li>
+              Escanea el{" "}
+              <Link href="/publish" className={linkClass}>código de barras o ingresa el ISBN</Link>
+            </li>
             <li>Completa precio y estado del libro</li>
-            <li>Marca la ubicación en el mapa</li>
-            <li>Tu libro aparece en el catálogo al instante</li>
+            <li>
+              Marca la ubicación en el{" "}
+              <Link href="/mapa" className={linkClass}>mapa</Link>
+            </li>
+            <li>
+              Tu libro aparece en el{" "}
+              <Link href="/search" className={linkClass}>catálogo</Link> al instante
+            </li>
           </ol>
         ),
       },
       {
         q: "¿Cómo me contactan los compradores?",
-        a: "Los compradores te escriben directamente por WhatsApp al número que registraste en tu perfil. También pueden comprarte directamente con MercadoPago sin necesidad de coordinarse contigo.",
+        a: (
+          <span>
+            Los compradores te escriben directamente por WhatsApp al número que registraste en tu{" "}
+            <Link href="/perfil" className={linkClass}>perfil</Link>. También pueden comprarte directamente con{" "}
+            <a
+              href="https://www.mercadopago.cl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+            >
+              MercadoPago
+            </a>{" "}
+            sin necesidad de coordinarse contigo.
+          </span>
+        ),
       },
       {
         q: "¿Puedo publicar muchos libros?",
-        a: "Sí, todos los que quieras. Si tienes una biblioteca grande, también tenemos un importador por CSV para subir todo de una sola vez.",
+        a: (
+          <span>
+            Sí, todos los que quieras. Si tienes una biblioteca grande, también tenemos un{" "}
+            <Link href="/mis-libros/importar" className={linkClass}>importador por CSV</Link> para subir todo de una sola vez.
+          </span>
+        ),
       },
       {
         q: "¿Cómo elimino una publicación?",
-        a: "Desde tu perfil, en la sección Mis Libros, puedes pausar o eliminar cualquier publicación cuando quieras.",
+        a: (
+          <span>
+            Desde tu{" "}
+            <Link href="/perfil" className={linkClass}>perfil</Link>, en la sección{" "}
+            <Link href="/mis-libros" className={linkClass}>Mis Libros</Link>, puedes pausar o eliminar cualquier publicación cuando quieras.
+          </span>
+        ),
       },
     ],
   },
@@ -84,7 +166,12 @@ const faqSections = [
     questions: [
       {
         q: "¿Cómo funciona el arriendo?",
-        a: "Algunos libros los lees una vez y ya — para esos armamos esto. Quien publica activa la opción al listar. Quien arrienda paga el arriendo (por 7, 14 o 30 días) más una garantía. Devuelves el libro en buen estado y recuperas la garantía completa.",
+        a: (
+          <span>
+            Algunos libros los lees una vez y ya — para esos armamos esto. Quien publica activa la opción al listar. Quien arrienda paga el arriendo (por 7, 14 o 30 días) más una{" "}
+            <Link href="/devoluciones" className={linkClass}>garantía</Link>. Devuelves el libro en buen estado y recuperas la garantía completa.
+          </span>
+        ),
       },
       {
         q: "¿Cuánto cuesta arrendar un libro?",
@@ -96,7 +183,21 @@ const faqSections = [
       },
       {
         q: "¿La garantía es reembolsable?",
-        a: "Sí, completa. Si devuelves dentro del plazo y en buen estado, la garantía vuelve entera a tu cuenta de MercadoPago.",
+        a: (
+          <span>
+            Sí, completa. Si devuelves dentro del plazo y en buen estado, la{" "}
+            <Link href="/devoluciones" className={linkClass}>garantía</Link> vuelve entera a tu cuenta de{" "}
+            <a
+              href="https://www.mercadopago.cl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+            >
+              MercadoPago
+            </a>
+            .
+          </span>
+        ),
       },
     ],
   },
@@ -107,7 +208,11 @@ const faqSections = [
         q: "¿Cómo creo una cuenta?",
         a: (
           <span>
-            Haz clic en <strong>Registrarse</strong> e ingresa tu nombre, correo y contraseña. No necesitas tarjeta de crédito.
+            Haz clic en{" "}
+            <Link href="/register" className={linkClass}>
+              <strong>Registrarse</strong>
+            </Link>{" "}
+            e ingresa tu nombre, correo y contraseña. No necesitas tarjeta de crédito.
           </span>
         ),
       },
@@ -115,13 +220,25 @@ const faqSections = [
         q: "Olvidé mi contraseña, ¿qué hago?",
         a: (
           <span>
-            En la pantalla de inicio de sesión, haz clic en <strong>¿Olvidaste tu contraseña?</strong> para recibir un correo de recuperación.
+            En la pantalla de inicio de sesión, haz clic en{" "}
+            <Link href="/reset-password" className={linkClass}>
+              <strong>¿Olvidaste tu contraseña?</strong>
+            </Link>{" "}
+            para recibir un correo de recuperación.
           </span>
         ),
       },
       {
         q: "¿Puedo usar tuslibros.cl sin cuenta?",
-        a: "Sí, para mirar. Puedes ver el catálogo, buscar, explorar el mapa, todo sin registrarte. Para publicar un libro o escribirle a alguien sí necesitas crear una cuenta — es un trámite de menos de un minuto.",
+        a: (
+          <span>
+            Sí, para mirar. Puedes ver el{" "}
+            <Link href="/search" className={linkClass}>catálogo</Link>, buscar, explorar el{" "}
+            <Link href="/mapa" className={linkClass}>mapa</Link>, todo sin registrarte. Para{" "}
+            <Link href="/publish" className={linkClass}>publicar un libro</Link> o escribirle a alguien sí necesitas{" "}
+            <Link href="/register" className={linkClass}>crear una cuenta</Link> — es un trámite de menos de un minuto.
+          </span>
+        ),
       },
     ],
   },
@@ -171,6 +288,26 @@ export default function FAQPage() {
             </div>
           </div>
         ))}
+
+        {/* CTA */}
+        <div className="mt-12 bg-white rounded-2xl border border-cream-dark shadow-sm px-6 py-8 text-center">
+          <p className="text-xl font-bold text-ink mb-2">¿No encontraste lo que buscabas?</p>
+          <p className="text-ink-muted mb-5">Escríbeme directo — respondo rápido.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/contacto"
+              className="inline-block bg-brand-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-brand-700 transition-colors"
+            >
+              Ir a Contacto
+            </Link>
+            <a
+              href="mailto:hola@tuslibros.cl"
+              className="inline-block border border-brand-600 text-brand-600 font-semibold px-6 py-3 rounded-xl hover:bg-brand-50 transition-colors"
+            >
+              hola@tuslibros.cl
+            </a>
+          </div>
+        </div>
 
       </main>
     </div>

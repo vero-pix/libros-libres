@@ -93,7 +93,7 @@ export default function ComoFuncionaPage() {
           <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
             Compra con pago seguro
           </h2>
-          <p className="text-ink-muted mb-6">Si prefieres no coordinar nada, pagas con MercadoPago desde la publicación y listo. Acá sí cobramos una comisión chica, porque la pasarela y el despacho cuestan. Si no quieres comisión, usa WhatsApp.</p>
+          <p className="text-ink-muted mb-6">Si prefieres no coordinar nada, pagas con <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a> desde la publicación y listo. Acá sí cobramos una comisión chica, porque la pasarela y el despacho cuestan. Si no quieres comisión, usa WhatsApp.</p>
           <div className="space-y-5">
             {mpSteps.map((step) => <StepCard key={step.number} step={step} />)}
           </div>
@@ -137,8 +137,16 @@ export default function ComoFuncionaPage() {
         </section>
 
         {/* CTA */}
-        <div className="text-center">
-          <p className="text-ink-muted mb-2">¿Tienes dudas?</p>
+        <div className="text-center space-y-4">
+          <div>
+            <Link href="/search" className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors mr-3">
+              Explorar el catálogo
+            </Link>
+            <Link href="/publish" className="inline-block border-2 border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white font-semibold px-6 py-3 rounded-xl transition-colors">
+              Publicar un libro
+            </Link>
+          </div>
+          <p className="text-ink-muted">¿Tienes dudas?</p>
           <Link href="/faq" className="text-brand-600 font-semibold hover:underline text-lg">
             Visita nuestras Preguntas Frecuentes &rarr;
           </Link>

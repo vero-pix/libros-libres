@@ -67,7 +67,8 @@ export default function DevolucionesPage() {
             </li>
             <li>
               Una vez que el vendedor recibe el libro, se procesa el reembolso del monto del libro a
-              tu cuenta de MercadoPago.
+              tu cuenta de{" "}
+              <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a>.
             </li>
           </ol>
         </section>

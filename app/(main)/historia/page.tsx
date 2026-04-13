@@ -107,7 +107,7 @@ export default function HistoriaPage() {
             esté en la estantería de al lado. Que puedas preguntarle a quien
             lo tiene cómo le pareció. Que si se venden cara a cara, yo no
             cobre nada. Que si usan las herramientas que armé para hacerlo
-            más seguro — pago con MercadoPago, despacho por courier —
+            más seguro — pago con <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a>, despacho por courier —
             entonces sí cobre algo, porque mantener eso cuesta. Pero siempre
             con la regla: la conversación es de ustedes, no mía.
           </p>
@@ -151,7 +151,12 @@ export default function HistoriaPage() {
               Publicar un libro
             </Link>
           </div>
-          <p className="text-xs text-ink-muted mt-6">
+          <p className="text-xs text-ink-muted mt-4">
+            <Link href="/como-funciona" className="text-brand-600 font-semibold hover:underline">
+              ¿Cómo funciona exactamente?
+            </Link>
+          </p>
+          <p className="text-xs text-ink-muted mt-3">
             ¿Quieres escribirme?{" "}
             <Link href="/sobre-nosotros#contacto" className="text-brand-600 hover:underline">
               Estoy acá

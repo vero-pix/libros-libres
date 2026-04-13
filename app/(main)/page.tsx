@@ -77,7 +77,7 @@ export default async function HomePage({ searchParams }: Props) {
       .limit(10),
     supabase
       .from("users")
-      .select("id, full_name, avatar_url, comuna, region, bio")
+      .select("id, full_name, avatar_url, city, bio")
       .eq("featured", true)
       .limit(10),
   ]);
