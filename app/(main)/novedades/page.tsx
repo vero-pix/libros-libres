@@ -5,6 +5,34 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 
 const novedades = [
   {
+    date: "13 abril 2026",
+    title: "Vendedores destacados",
+    description:
+      "Ahora los mejores vendedores aparecen destacados en la portada con su nombre, ciudad y cantidad de libros. Si vendes seguido y cuidas tus publicaciones, podrías ser el próximo.",
+    tag: "Nuevo",
+  },
+  {
+    date: "13 abril 2026",
+    title: "WhatsApp directo",
+    description:
+      "¿Tienes una duda? Ahora puedes escribirnos por WhatsApp desde el menú de navegación. Responde Vero, no un bot.",
+    tag: "Nuevo",
+  },
+  {
+    date: "13 abril 2026",
+    title: "Más filtros de búsqueda",
+    description:
+      "Ahora puedes filtrar por encuadernación (tapa dura o blanda), editorial y rango de páginas. Para los que saben exactamente lo que buscan.",
+    tag: "Mejora",
+  },
+  {
+    date: "13 abril 2026",
+    title: "Buscador en tienda del vendedor",
+    description:
+      "Si un vendedor tiene muchos libros, ahora puedes buscar dentro de su tienda por título o autor. Sin scroll infinito.",
+    tag: "Mejora",
+  },
+  {
     date: "12 abril 2026",
     title: "Página para vendedores",
     description:
