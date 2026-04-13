@@ -66,6 +66,13 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Libros Libres" />
+        {/* Google Analytics GA4 */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-N243GH70EQ" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-N243GH70EQ');`,
+          }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `if("serviceWorker" in navigator){setTimeout(()=>{navigator.serviceWorker.register("/sw.js")},3000)}`,
