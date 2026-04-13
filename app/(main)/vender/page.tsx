@@ -72,14 +72,16 @@ export default function VenderPage() {
   return (
     <div className="min-h-screen bg-cream">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-navy to-navy-light text-white">
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.03) 35px, rgba(255,255,255,.03) 70px)",
-          }} />
-        </div>
+      <section className="relative overflow-hidden text-white">
+        {/* Background image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/images/hero-libros.jpg')" }}
+        />
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-navy/75" />
 
-        <div className="relative max-w-4xl mx-auto px-4 py-16 sm:py-24 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 py-20 sm:py-28 text-center">
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight animate-fade-in-up">
             Publica tu libro<br />
             <span className="text-brand-400">en 10 segundos</span>
