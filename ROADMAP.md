@@ -150,10 +150,13 @@
 ### Distribución — canales activos
 - [x] Google Merchant Center + Business Profile
 - [x] WhatsApp Status (video v5)
-- [ ] LinkedIn — post listo para martes 14 abril 8:30 AM
-- [ ] Reddit r/chile — texto listo
+- [x] LinkedIn — post confesional publicado 13 abril
+- [x] Reddit r/chile — publicado 13 abril
+- [x] WhatsApp Status — imagen Skich publicada 13 abril
+- [x] Cylex — registrado 13 abril
+- [ ] Páginas Amarillas
+- [ ] GuíaLocal
 - [ ] Goodreads grupos Chile
-- [ ] Directorios (Cylex, Páginas Amarillas)
 - [ ] Email a centros de alumnos (Kit Metralleta)
 - [ ] Email a coordinadores de carrera (mensaje #6 del kit)
 
