@@ -77,7 +77,7 @@ export default async function HomePage({ searchParams }: Props) {
       .limit(10),
     supabase
       .from("users")
-      .select("id, full_name, avatar_url")
+      .select("id, full_name, avatar_url, comuna, region, bio")
       .eq("featured", true)
       .limit(10),
   ]);
@@ -125,14 +125,12 @@ export default async function HomePage({ searchParams }: Props) {
     };
   });
 
-  // Featured listings first (paid plans), then by trending score
+  // Featured listings first (paid plans), then preserve selected sort
   listings.sort((a, b) => {
     if (a._featured && !b._featured) return -1;
     if (!a._featured && b._featured) return 1;
-    // Within same tier, rank by trending_score descending
-    const aScore = (a as any).trending_score ?? 0;
-    const bScore = (b as any).trending_score ?? 0;
-    return bScore - aScore;
+    // Within same tier, preserve the sort from the query (created_at, price, etc.)
+    return 0;
   });
 
   // Filter by new taxonomy
