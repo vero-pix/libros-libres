@@ -121,14 +121,11 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
               </svg>
             </span>
           )}
-        </div>
-      </Link>
-
-      {/* Hover actions */}
-      <div className={`absolute bottom-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 ${listing.status === "completed" ? "hidden" : ""}`}>
+          {/* Action buttons inside image area */}
+          <div className={`absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 z-[3] ${listing.status === "completed" ? "hidden" : ""}`}>
         <button
-          onClick={() => startTransition(() => setShowQuickView(true))}
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md text-ink-muted hover:text-brand-600"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); startTransition(() => setShowQuickView(true)); }}
+          className="w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-lg text-ink-muted hover:text-brand-600 transition-colors"
           title="Vista rápida"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -138,9 +135,9 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
         </button>
         <button
           type="button"
-          onClick={handleAddToCart}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(e); }}
           disabled={cartState === "loading"}
-          className={`w-8 h-8 flex items-center justify-center rounded-full shadow-md text-white transition-colors ${
+          className={`w-9 h-9 flex items-center justify-center rounded-full shadow-lg text-white transition-colors ${
             cartState === "added"
               ? "bg-green-500"
               : "bg-brand-500 hover:bg-brand-600"
@@ -157,7 +154,9 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
             </svg>
           )}
         </button>
-      </div>
+          </div>
+        </div>
+      </Link>
 
       <div className="p-4">
         <Link href={libroUrl(listing)}>

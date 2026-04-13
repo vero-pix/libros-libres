@@ -29,11 +29,8 @@ export async function buildCategoryTree(
 
   return (dbCategories ?? [])
     .filter((c) => !c.parent_slug)
-    .map((root) => ({
-      slug: root.slug,
-      name: root.name,
-      count: catCount.get(root.slug) ?? 0,
-      children: (dbCategories ?? [])
+    .map((root) => {
+      const children = (dbCategories ?? [])
         .filter((c) => c.parent_slug === root.slug)
         .map((sub) => ({
           slug: sub.slug,
@@ -41,6 +38,12 @@ export async function buildCategoryTree(
           count: subCount.get(sub.slug) ?? 0,
           children: [],
         }))
-        .sort((a, b) => b.count - a.count),
-    }));
+        .sort((a, b) => b.count - a.count);
+
+      // El conteo del padre incluye todos los libros de esa categoría,
+      // incluso los que no tienen subcategoría asignada
+      const count = catCount.get(root.slug) ?? 0;
+
+      return { slug: root.slug, name: root.name, count, children };
+    });
 }
