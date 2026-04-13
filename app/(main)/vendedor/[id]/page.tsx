@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
+import SellerListingsGrid from "@/components/listings/SellerListingsGrid";
 import Avatar from "@/components/ui/Avatar";
 import type { ListingWithBook } from "@/types";
 
@@ -256,11 +257,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
                 ))}
               </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
-              {listings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} />
-              ))}
-            </div>
+            <SellerListingsGrid listings={listings} />
           </>
         ) : (
           <div className="text-center py-16 text-gray-400">

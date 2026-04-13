@@ -2,10 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { memo, useState, useCallback, useTransition } from "react";
+import dynamic from "next/dynamic";
 import type { ListingWithBook } from "@/types";
 import { libroUrl } from "@/lib/urls";
-import QuickViewModal from "./QuickViewModal";
+
+const QuickViewModal = dynamic(() => import("./QuickViewModal"), {
+  ssr: false,
+});
 
 function isNew(createdAt: string) {
   const diff = Date.now() - new Date(createdAt).getTime();
@@ -23,13 +27,14 @@ interface Props {
 
 const BLUR_PLACEHOLDER = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI2NyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjVmMGU4Ii8+PC9zdmc+";
 
-export default function ListingCard({ listing }: Props) {
+const ListingCard = memo(function ListingCard({ listing }: Props) {
   const [showQuickView, setShowQuickView] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [cartState, setCartState] = useState<"idle" | "loading" | "added">("idle");
+  const [, startTransition] = useTransition();
   const { book } = listing;
 
-  async function handleAddToCart(e: React.MouseEvent) {
+  const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (cartState !== "idle") return;
@@ -55,7 +60,7 @@ export default function ListingCard({ listing }: Props) {
     } catch {
       setCartState("idle");
     }
-  }
+  }, [cartState, listing.id]);
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
 
@@ -122,7 +127,7 @@ export default function ListingCard({ listing }: Props) {
       {/* Hover actions */}
       <div className={`absolute bottom-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 ${listing.status === "completed" ? "hidden" : ""}`}>
         <button
-          onClick={() => setShowQuickView(true)}
+          onClick={() => startTransition(() => setShowQuickView(true))}
           className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md text-ink-muted hover:text-brand-600"
           title="Vista rápida"
         >
@@ -213,4 +218,6 @@ export default function ListingCard({ listing }: Props) {
     )}
     </>
   );
-}
+});
+
+export default ListingCard;

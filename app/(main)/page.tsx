@@ -46,6 +46,10 @@ interface Props {
     condition?: string;
     modality?: string;
     author?: string;
+    binding?: string;
+    publisher?: string;
+    pages_min?: string;
+    pages_max?: string;
     page?: string;
     view?: string;
     lat?: string;
@@ -55,13 +59,13 @@ interface Props {
 
 export default async function HomePage({ searchParams }: Props) {
   const supabase = await createClient();
-  const { genre, category, subcategory, tag, sort, price_min, price_max, condition, modality, author, page, view, lat, lng } = searchParams;
+  const { genre, category, subcategory, tag, sort, price_min, price_max, condition, modality, author, binding, publisher, pages_min, pages_max, page, view, lat, lng } = searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10) || 1);
   const viewMode = view === "list" ? "list" : "grid";
   const userLat = lat ? parseFloat(lat) : null;
   const userLng = lng ? parseFloat(lng) : null;
 
-  const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author);
+  const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max);
 
   // Featured queries in parallel with main query
   const [featuredListingsRes, featuredSellersRes] = await Promise.all([
@@ -154,6 +158,27 @@ export default async function HomePage({ searchParams }: Props) {
   if (author) {
     listings = listings.filter(
       (l) => l.book.author?.toLowerCase().includes(author.toLowerCase())
+    );
+  }
+
+  if (binding) {
+    listings = listings.filter(
+      (l) => l.book.binding?.toLowerCase() === binding.toLowerCase()
+    );
+  }
+  if (publisher) {
+    listings = listings.filter(
+      (l) => l.book.publisher?.toLowerCase().includes(publisher.toLowerCase())
+    );
+  }
+  if (pages_min) {
+    listings = listings.filter(
+      (l) => l.book.pages != null && l.book.pages >= Number(pages_min)
+    );
+  }
+  if (pages_max) {
+    listings = listings.filter(
+      (l) => l.book.pages != null && l.book.pages <= Number(pages_max)
     );
   }
 

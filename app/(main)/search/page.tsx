@@ -18,6 +18,10 @@ interface Props {
     price_max?: string;
     condition?: string;
     modality?: string;
+    binding?: string;
+    publisher?: string;
+    pages_min?: string;
+    pages_max?: string;
   };
 }
 
@@ -48,7 +52,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function SearchPage({ searchParams }: Props) {
   const supabase = await createClient();
-  const { q, genre, sort, price_min, price_max, condition, modality } = searchParams;
+  const { q, genre, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max } = searchParams;
 
   // Si hay búsqueda de texto, primero encontrar los book IDs que coincidan
   let matchingBookIds: string[] | null = null;
@@ -110,6 +114,27 @@ export default async function SearchPage({ searchParams }: Props) {
   if (genre) {
     listings = listings.filter(
       (l) => l.book.genre?.toLowerCase() === genre.toLowerCase()
+    );
+  }
+
+  if (binding) {
+    listings = listings.filter(
+      (l) => l.book.binding?.toLowerCase() === binding.toLowerCase()
+    );
+  }
+  if (publisher) {
+    listings = listings.filter(
+      (l) => l.book.publisher?.toLowerCase().includes(publisher.toLowerCase())
+    );
+  }
+  if (pages_min) {
+    listings = listings.filter(
+      (l) => l.book.pages != null && l.book.pages >= Number(pages_min)
+    );
+  }
+  if (pages_max) {
+    listings = listings.filter(
+      (l) => l.book.pages != null && l.book.pages <= Number(pages_max)
     );
   }
 

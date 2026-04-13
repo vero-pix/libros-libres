@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { libroUrl } from "@/lib/urls";
 
 interface Suggestion {
@@ -16,6 +16,7 @@ interface Suggestion {
 export default function HeaderSearchBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [, startTransition] = useTransition();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
@@ -60,7 +61,9 @@ export default function HeaderSearchBar() {
     e.preventDefault();
     if (query.trim()) {
       setOpen(false);
-      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+      startTransition(() => {
+        router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+      });
     }
   }
 
@@ -83,13 +86,13 @@ export default function HeaderSearchBar() {
   function selectSuggestion(s: Suggestion) {
     setQuery(s.title);
     setOpen(false);
-    router.push(
+    startTransition(() => router.push(
       libroUrl({
         id: s.id,
         slug: s.slug,
         seller: { username: s.username },
       })
-    );
+    ));
   }
 
   return (

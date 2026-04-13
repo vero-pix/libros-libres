@@ -2,10 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { memo, useState, useTransition } from "react";
+import dynamic from "next/dynamic";
 import type { ListingWithBook } from "@/types";
 import { libroUrl } from "@/lib/urls";
-import QuickViewModal from "./QuickViewModal";
+
+const QuickViewModal = dynamic(() => import("./QuickViewModal"), {
+  ssr: false,
+});
 
 const CONDITION_LABELS: Record<string, string> = {
   new: "Como nuevo",
@@ -18,8 +22,9 @@ interface Props {
   listing: ListingWithBook;
 }
 
-export default function ListingCardList({ listing }: Props) {
+const ListingCardList = memo(function ListingCardList({ listing }: Props) {
   const [showQuickView, setShowQuickView] = useState(false);
+  const [, startTransition] = useTransition();
   const { book } = listing;
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
@@ -90,7 +95,7 @@ export default function ListingCardList({ listing }: Props) {
 
           {/* Quick view button */}
           <button
-            onClick={() => setShowQuickView(true)}
+            onClick={() => startTransition(() => setShowQuickView(true))}
             className="hidden sm:flex items-center justify-center w-9 h-9 rounded-full border border-cream-dark text-ink-muted hover:text-brand-600 hover:border-brand-500 transition-colors flex-shrink-0"
             title="Vista rápida"
           >
@@ -107,4 +112,6 @@ export default function ListingCardList({ listing }: Props) {
       )}
     </>
   );
-}
+});
+
+export default ListingCardList;
