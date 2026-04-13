@@ -1,23 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ListingToolbar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [locating, setLocating] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const isNearMe = !!searchParams.get("lat");
 
-  function updateParam(key: string, value: string) {
+  const updateParam = useCallback((key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value) {
       params.set(key, value);
     } else {
       params.delete(key);
     }
-    router.push(`?${params.toString()}`);
-  }
+    startTransition(() => {
+      router.push(`?${params.toString()}`);
+    });
+  }, [searchParams, router]);
 
   function handleNearMe() {
     if (isNearMe) {
@@ -26,7 +29,9 @@ export default function ListingToolbar() {
       params.delete("lat");
       params.delete("lng");
       params.delete("sort");
-      router.push(`?${params.toString()}`);
+      startTransition(() => {
+        router.push(`?${params.toString()}`);
+      });
       return;
     }
     setLocating(true);
@@ -36,7 +41,9 @@ export default function ListingToolbar() {
         params.set("lat", pos.coords.latitude.toFixed(6));
         params.set("lng", pos.coords.longitude.toFixed(6));
         params.set("sort", "distance");
-        router.push(`?${params.toString()}`);
+        startTransition(() => {
+          router.push(`?${params.toString()}`);
+        });
         setLocating(false);
       },
       () => {
@@ -157,6 +164,52 @@ export default function ListingToolbar() {
         <option value="sale">Venta</option>
         <option value="loan">Arriendo</option>
       </select>
+
+      {/* Binding */}
+      <select
+        aria-label="Filtrar por encuadernación"
+        onChange={handleChange("binding")}
+        defaultValue={searchParams.get("binding") ?? ""}
+        className={selectClass}
+      >
+        <option value="">Encuadernación: Todos</option>
+        <option value="Tapa dura">Tapa dura</option>
+        <option value="Tapa blanda">Tapa blanda</option>
+      </select>
+
+      {/* Publisher */}
+      <input
+        type="text"
+        aria-label="Filtrar por editorial"
+        placeholder="Editorial..."
+        defaultValue={searchParams.get("publisher") ?? ""}
+        onBlur={(e) => updateParam("publisher", e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+        className="text-sm border border-gray-200 rounded-md px-3 py-2 w-40 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-400"
+      />
+
+      {/* Pages range */}
+      <div className="flex items-center gap-1">
+        <input
+          type="number"
+          aria-label="Páginas mínimas"
+          placeholder="Pág. min"
+          defaultValue={searchParams.get("pages_min") ?? ""}
+          onBlur={handlePriceBlur("pages_min")}
+          onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+          className="text-sm border border-gray-200 rounded-md py-2 px-2 w-24 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-400"
+        />
+        <span className="text-gray-400 text-sm">–</span>
+        <input
+          type="number"
+          aria-label="Páginas máximas"
+          placeholder="Pág. max"
+          defaultValue={searchParams.get("pages_max") ?? ""}
+          onBlur={handlePriceBlur("pages_max")}
+          onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+          className="text-sm border border-gray-200 rounded-md py-2 px-2 w-24 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-400"
+        />
+      </div>
     </div>
   );
 }

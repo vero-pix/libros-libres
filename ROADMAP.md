@@ -1,6 +1,6 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 9 abril 2026, 13:00
+Última actualización: 12 abril 2026
 
 ---
 
@@ -21,6 +21,10 @@
 - [x] Env vars producción actualizadas
 - [x] RESEND_API_KEY configurada en Vercel ✅
 - [x] Primera venta real completada (6 abril 2026) — split payment funciona ✅
+- [x] Correo @tuslibros.cl (ImprovMX catch-all)
+- [x] Google Merchant Center operativo (18 clicks últimos 28 días)
+- [x] Google Business Profile (4.3 estrellas, 4 opiniones)
+- [x] Stitch MCP configurado para diseño visual con IA
 
 ### UI/UX — Estilo Martfury
 - [x] Paleta cream unificada todas las páginas
@@ -55,7 +59,7 @@
 - [x] Dashboard ventas + carrito persistente
 - [x] Galería imágenes (publicación + post + edición)
 - [x] Reviews/valoraciones + estrellas en cards
-- [x] Marcar como vendido
+- [x] Marcar como vendido + badge "Vendido" visible en catálogo
 - [x] Libros destacados por plan (badge "Destacado", prioridad en grilla)
 - [x] Filtro "Cerca de mí" (geolocalización navegador + haversine)
 - [x] Sistema de recomendaciones (por género/autor, con cache)
@@ -66,13 +70,17 @@
 - [x] Fotos adicionales al editar libro (ImageUploadMultiple en EditForm)
 - [x] Primera foto extra se asigna como portada si no hay cover
 - [x] CoverUpload mobile: galería + cámara (sin capture forzado) + eliminar portada
+- [x] Bundle checkout — compra múltiple en un solo pago por vendedor
+- [x] Badge del carrito reactivo en header
+- [x] Vista vendedor: carritos con mis libros (rescate de ventas)
+- [x] Perfil progresivo — datos justos cuando se necesitan
 
 ### Página vendedor
 - [x] Perfil: avatar, nombre, ciudad, bio, miembro desde, stats
 - [x] Canales contacto: WhatsApp, Instagram, Email
 - [x] Sorting: Recientes, Precio ↑↓, Título, Autor
 
-### SEO & Performance (auditoría 7 abril — 16/16 items)
+### SEO & Performance
 - [x] Metadata dinámica en listing detail + search + vendedor
 - [x] JSON-LD schemas (Product, BreadcrumbList, Organization)
 - [x] Lazy load mapbox en formularios de publicación
@@ -80,6 +88,9 @@
 - [x] h1 en home, ISR en listing detail, Suspense skeletons
 - [x] Vercel Analytics + placeholder blur + cache API recommendations
 - [x] Scanner ISBN: timeout 3s Google Books → fallback rápido Open Library
+- [x] Meta descriptions truncan en palabra completa (no cortan a la mitad)
+- [x] Libros vendidos siguen indexados con schema SoldOut
+- [x] Structured data shipping + return policy (Google Search Console)
 
 ### Emails (10+ transaccionales)
 - [x] Confirmación registro
@@ -95,216 +106,145 @@
 - [x] Panel con stats, delete individual/masivo, filtros por status
 - [x] Tab Newsletter con preview y botón enviar
 - [x] Tab Analytics: visitas/día, navegadores, OS, dispositivos, páginas top
-- [x] Tab Herramientas: botones para portadas, auditoría, sinopsis, metadata
+- [x] Tab Herramientas: botones para portadas, auditoría, sinopsis, metadata + accesos rápidos a todas las funcionalidades
+- [x] Tab Categorías: mantenedor CRUD con árbol visual, agregar/editar/reordenar/eliminar
 - [x] API /api/admin/enrich-metadata (ejecuta enriquecimiento desde panel)
 - [x] PageTracker invisible (registra cada visita en Supabase)
 - [x] Selector de vendedor en herramientas (filtrar operaciones por vendedor)
 - [x] Toggle featured (estrella) por publicación
 - [x] Escudo dorado solo en libros destacados (no en todos con MP)
 
-### Datos y calidad (sesión 9 abril)
-- [x] 116+ libros publicados activos
-- [x] 92 libros enriquecidos con metadata (editorial, páginas, sinopsis) via Google Books + Open Library
-- [x] 47 portadas arregladas con script fix-covers + 8 de Open Library + 4 recortadas de fotos reales
+### Datos y calidad
+- [x] 500+ libros publicados (incluyendo 33 Maigret colección Luis de Caralt)
+- [x] 92 libros enriquecidos con metadata via Google Books + Open Library
+- [x] Portadas validadas con auditoría automática + fallback UI
 - [x] 13 sinopsis spam/inglés eliminadas + filtro: solo acepta sinopsis en español
-- [x] 13 editoriales falsas ("ISBN Handbook") eliminadas
-- [x] Google Books API key inválida → script funciona sin key
 - [x] Validación título/autor obligatorios al publicar
 - [x] Detección imágenes placeholder en cards (onLoad size check)
-- [x] Búsqueda: strip paréntesis para evitar romper PostgREST or()
-- [x] Buscador: sugerencias navegan directo al libro (no re-buscan por título)
-- [x] Checkout: botón MercadoPago solo si vendedor tiene MP conectado
-- [x] CONTEXT.md reescrito como referencia técnica completa
-- [x] AdSense eliminado (generaba errores 403/400 sin estar aprobado)
-- [x] Tab Ubicación eliminado (redundante con pin de comuna)
+- [x] Categorización automática al publicar (genreNormalizer + tagSuggester)
+- [x] 5 categorías principales, 32+ subcategorías, tags controlados
 
-### Sesión 11 abril (voz personal + gong + fixes)
-- [x] Voz personal en todo el sitio (sobre-nosotros, historia, faq, como-funciona, devoluciones, alianzas, novedades, publish, manifiesto home)
-- [x] Historia reescrita con narrativa real de Verónica (20 años, pausa, ventana, segunda oportunidad)
-- [x] Plan de lanzamiento multi-canal de la historia (newsletter + LinkedIn + WhatsApp)
-- [x] HTML de revisión editorial con todos los textos del sitio (`docs/REVISION-COPY-2026-04-11.html`)
-- [x] CategoryPicker con taxonomía real desde tabla `categories` — reemplaza legacy select de 36 géneros en publish y edit
-- [x] Footer: quita Contacto y Infantil, categorías actualizadas a slugs nuevos, reordenado (sobre → historia → cómo funciona → faq → alianzas)
-- [x] Alianzas marcada como "próximamente"
-- [x] Eliminada página `/planes` (contenido incorrecto, planes aún no definidos)
-- [x] Gong de Telegram al publicar: bot `@Tuslibros_cl_bot` notifica con libro, autor, vendedor, precio, comuna y link directo
-- [x] Fix autocomplete buscador: redirigía a `/libro/[slug]` (ruta inexistente), ahora usa `libroUrl()` helper con fallback a `/listings/[id]` para vendedores sin username
-- [x] Publicados primeros libros en cuenta admin: dos Max Frisch Seix Barral Biblioteca Breve 1983 con portadas cropeadas y precios con descuento visible
+### Contenido y marketing
+- [x] Voz personal en todo el sitio (confesional, 1ª persona, español chileno)
+- [x] Video marketing v5 (56s, narrado por Vero, guion validado)
+- [x] Kit Metralleta v2 confesional (6 mensajes listos) — `docs/kit_metralleta_confesional.html`
+- [x] Newsletter 14 abril listo — `docs/newsletter_14abril2026.html`
+- [x] Textos para directorios/Reddit/LinkedIn — `docs/listados_directorios.html`
+- [x] Landing /vender (conversión vendedores)
+- [x] Banners promocionales en /search y /novedades (PromoBanner component)
+- [x] Badge 'Nuevo' dinámico en novedades (3 días)
+- [x] Landing alianzas institucionales
+- [x] Sistema de referidos con código personal
+- [x] Página novedades (changelog público)
+- [x] Gong Telegram al publicar libro
 
 ---
 
 ## En progreso
 
 ### Shipit courier
-- [x] Webhook endpoint preparado (/api/webhooks/shipit)
-- [x] Formato API corregido según docs oficiales (kind, platform, sizes, destiny)
-- [x] Respuesta enviada a Camila (Shipit) con detalle de integración
-- [ ] Esperando confirmación de Camila sobre couriers activos y tarifas
-- [ ] Tarifas no configuradas — Shipit debe activar couriers en la cuenta
+- [x] Integración completa funcionando en producción
+- [x] Cotización en tiempo real, etiquetas, tracking
+- [ ] Esperando confirmación de Camila sobre couriers activos y tarifas finales
 
-### Revisión catálogo (a cargo de Verónica)
-- [ ] Revisar portadas que no corresponden a la edición real
-- [ ] Subir fotos faltantes manualmente (7 libros sin portada)
-- [ ] Corregir sinopsis incorrectas restantes
+### Distribución — canales activos
+- [x] Google Merchant Center + Business Profile
+- [x] WhatsApp Status (video v5)
+- [ ] LinkedIn — post listo para martes 14 abril 8:30 AM
+- [ ] Reddit r/chile — texto listo
+- [ ] Goodreads grupos Chile
+- [ ] Directorios (Cylex, Páginas Amarillas)
+- [ ] Email a centros de alumnos (Kit Metralleta)
+- [ ] Email a coordinadores de carrera (mensaje #6 del kit)
 
 ---
 
 ## Pendiente
 
-### 🟡 Funcionalidad post-primera-venta (abril 2026)
+### 🟡 Prioridad alta (abril 2026)
 
-**Mantenedor de categorías sugeridas por vendedores**
-- [ ] Tabla `category_suggestions` (vendedor, nombre propuesto, padre sugerido, descripción, status)
-- [ ] Botón "¿No encuentras tu categoría? Sugiérela" en el publish form → modal
-- [ ] Notificación email/Telegram a admin cuando llega sugerencia
-- [ ] Vista `/admin/sugerencias` para revisar, editar slug y aprobar (inserta en `categories` + agrega variantes al genreNormalizer)
-- [ ] Feedback al vendedor cuando se aprueba/rechaza su sugerencia
-- [ ] Origen: 11 abril 2026, vendedor sugirió "Ficción / Mitología" por WhatsApp (agregada manualmente)
+**Contenido editorial / Blog (SEO long-tail)**
+- [ ] Base técnica SEO está sólida — la debilidad es falta de contenido para long-tail
+- [ ] Blog con tono confesional: "Por qué tu Neruda del 2008 vale más de lo que crees"
+- [ ] Prioridad baja por ahora — foco en circulación universitaria primero
 
-**Vista de vendedor: carritos con mis libros**
-- [ ] Página `/mis-ventas/carritos` lista compradores que tienen libros míos en carrito y no han pagado
-- [ ] Permite ver cuántos libros, total potencial, tiempo en carrito
-- [ ] Botón "Contactar" que abre mensaje interno / WhatsApp
-- [ ] Objetivo: rescatar ventas como la de Fabian (11 abril), que se cerró por WhatsApp manual
-- [ ] **Privacidad:** mostrar solo el carrito filtrado (items del vendedor), no el resto del carrito del comprador
+**Google Search Console**
+- [x] Setup y monitoreo — 10 páginas indexadas, structured data shipping/returns agregado
 
 **Agente QA con Playwright**
 - [ ] Setup Playwright contra preview y producción
 - [ ] Flujos dorados automatizados: registro, búsqueda, agregar al carrito, bundle checkout, pago sandbox, mensajería, publicar libro
 - [ ] Subagente `ux-tester` custom que corre flujos bajo demanda con screenshots
-- [ ] Integración: correr después de cada push grande antes de promover a producción
+
+### 🟠 Prioridad media
+
+**Mantenedor de categorías sugeridas por vendedores**
+- [x] CRUD de categorías en admin (completado 12 abril)
+- [ ] Tabla `category_suggestions` (vendedor → admin)
+- [ ] Botón "¿No encuentras tu categoría? Sugiérela" en publish form
+- [ ] Notificación email/Telegram a admin cuando llega sugerencia
 
 **Reseñas: separar libro vs vendedor**
-- [ ] Problema actual: las reseñas viven pegadas al `listing`, pero cuando se vende el listing desaparece → reseña queda huérfana y no sirve a futuros compradores
-- [ ] Migración: tabla `reviews` con `target_type: 'book' | 'seller'` + FK a `books.id` o `users.id`
-- [ ] Mover widget actual de reseñas desde ficha del listing a ficha del libro (nivel `books`)
-- [ ] Nuevo widget "Reputación del vendedor" en `/vendedor/[id]`
-- [ ] Post-compra: modal al marcar entrega que invita a dejar 2 reseñas (libro + vendedor)
-- [ ] Origen: observación de Vero el 11 abril — "¿para qué comentarios si solo pueden comentar una vez vendidos, es decir cuando ya no existan?"
-- [ ] Prioridad: antes de tener volumen real de ventas
+- [ ] Problema: reseñas pegadas al listing, cuando se vende queda huérfana
+- [ ] Migración: tabla `reviews` con `target_type: 'book' | 'seller'`
+- [ ] Widget "Reputación del vendedor" en `/vendedor/[id]`
 
 **Optimización polling `/api/messages/unread`**
-- [ ] Hoy se llama cada 30s desde el badge de mensajes — genera carga constante sobre Supabase
-- [ ] Opción A: reducir frecuencia (cada 2-3 min en vez de 30s) — simple, inmediato
-- [ ] Opción B: reemplazar por Supabase Realtime subscription sobre tabla `messages` filtrado por recipient_id — suscripción activa, 0 polling, push real
-- [ ] Origen: observación 11 abril mirando logs de Vercel
-- [ ] Prioridad: baja ahora, media cuando haya 50+ usuarios activos
+- [ ] Hoy cada 30s — reducir a 2-3 min o migrar a Supabase Realtime
+- [ ] Prioridad sube cuando haya 50+ usuarios activos
 
-**Kit Metralleta — reescribir con tono confesional**
-- [ ] Revisar los mensajes de la primera iteración GTM (banners, stories, DMs)
-- [ ] Reescribirlos con el tono confesional del video marketing (10 abril)
-- [ ] Reemplazar frases genéricas tipo "conecta con personas reales" por contenido con carne humana
-- [ ] Ver memoria `feedback_copy_humanity.md` para el criterio
+**Manejo de stock**
+- [ ] Cantidad disponible por listing (hoy es 1 o nada)
+- [ ] Descontar automáticamente al vender
+- [ ] Prioridad: cuando haya vendedores con múltiples copias
 
-### ✅ Bundle checkout (COMPLETADO 11 abril)
-- [x] Migración `bundle_id` en orders + índice
-- [x] `/api/orders` acepta `listing_ids[]` — N orders, una preferencia MP
-- [x] Página `/checkout/bundle?listings=...` con resumen multi-libro
-- [x] CartView agrupado por vendedor con botón "Comprar N libros"
-- [x] Webhook detecta bundles, un solo email/Shipit/tracking propagado
-- [x] `/orders/[id]` y `/mis-pedidos` agrupan visualmente por bundle_id
+### 🔵 Futuro
 
-### ✅ Badge del carrito en header (COMPLETADO 11 abril)
-- [x] Server component Navbar fetchea cart_count
-- [x] NavbarClient muestra badge rojo con número
-- [x] Evento `cart-updated` reactivo desde AddToCartButton y CartView
-- [x] Fix botón del card: ya no redirige a checkout, agrega al carrito de verdad
+**Expansión Brasil** (evaluado 12 abril)
+- [ ] Gap real: no existe P2P de libros entre personas (Estante Virtual es solo librerías)
+- [ ] Mercado universitario fragmentado en WhatsApp/Facebook
+- [ ] Modelo de cercanía tendría sentido en São Paulo
+- [ ] Decisión: esperar 12-18 meses, validar Chile primero
+- [ ] Hijo de Vero en Brasil puede hacer validación informal en su universidad
 
-### ✅ Categoría Mitología (COMPLETADO 11 abril)
-- [x] Insertada en tabla `categories` bajo Ficción
-- [x] Variantes en genreNormalizer (mitología, mythology, mitos, leyendas, folklore)
-- [x] Origen: sugerencia de vendedor por WhatsApp
+**Diseño visual con Stitch (Google)**
+- [x] MCP configurado y conectado a Claude Code
+- [x] Banners promocionales
+- [ ] Landing pages por segmento
+- [ ] Contenido visual para redes
 
-### ✅ Reorganización de categorías (COMPLETADO 9 abril)
-- [x] Tabla categories con árbol: 5 raíces, 32 subcategorías
-- [x] Taxonomía: Ficción, No ficción, Infantil/juvenil, Académicos, Coleccionables
-- [x] 160 libros migrados automáticamente con genreNormalizer
-- [x] Tags controlados (Clásico, Borges, BibliotecaDeBabel, Coleccionable, etc.)
-- [x] Sidebar reescrito: categorías desplegables + tags destacados clickeables
-- [x] Categorización automática al publicar (genreNormalizer + tagSuggester)
-- [x] API /api/books con filtros por category, subcategory, tag, precio
-- [x] Tags como chips clickeables en ficha del libro
-
-### ✅ URLs amigables (COMPLETADO 9 abril)
-- [x] Ruta /libro/[slug] con metadata, JSON-LD, breadcrumbs
-- [x] 111 slugs generados desde títulos
-- [x] Slug autogenerado al publicar (con dedup)
-- [x] Redirect permanente /listings/[uuid] → /libro/[slug]
-- [x] 13 componentes actualizados (cards, mapa, carrito, buscador, recomendaciones)
-
-### 📊 Observabilidad y alertas (pendiente — posterior a tracción inicial)
-
-- [ ] Activar Vercel Web Analytics (filtra bots, da visitas reales)
-- [ ] Activar Vercel Speed Insights (Core Web Vitals por usuario)
-- [ ] Conectar tabla `page_views` (ya existe migración del 7 abril) al tracking del cliente
-- [ ] Dashboard `/admin/stats` propio: visitas, top libros vistos, referrers (WhatsApp/Instagram/Google), errores de usuarios reales
-- [ ] Alertas automáticas ante errores 5xx en producción (Vercel → Slack/email)
-- [ ] Filtro en logs de errores 404/500 excluyendo bots (SemrushBot, AhrefsBot, etc.)
-
-### 🔴 Distribución y redes sociales (PRIORIDAD)
-
-**Fase 1 — Presencia (semana 9-13 abril)**
-- [ ] Crear cuenta Instagram @tuslibros.cl
-- [ ] Publicar 3 stories con banners Canva
-- [ ] Publicar post feed Instagram: carrusel "Qué es tuslibros.cl"
-- [ ] Publicar post LinkedIn: lanzamiento tuslibros.cl
-- [ ] Enviar newsletter de lanzamiento a suscriptores
-
-**Fase 2 — Tracción (semana 14-20 abril)**
-- [ ] Publicar 2-3 posts/semana en Instagram
-- [ ] Ejecutar kit metralleta en canales universitarios
-- [ ] Compartir en grupos Facebook de lectura/libros Chile
-- [ ] Contactar 20 vendedores históricos con mensaje personalizado
-
-**Fase 3 — Escala (semana 21+ abril)**
-- [ ] Evaluar herramienta automatización (Buffer/Later)
-- [ ] Contenido recurrente: "Libro de la semana", "Colección destacada"
-- [ ] Recontactar resto de 150+ vendedores históricos
-
-### Panel analytics vendedores
+**Panel analytics vendedores**
 - [ ] Dashboard por vendedor: visitas, mensajes, ventas, libros publicados
 - [ ] Primeros 50 vendedores: panel gratis de por vida
-- [ ] Después: feature de plan Librero/Librería
 
-### Cron jobs
-- [ ] Google Trends ranking (trending_score)
-- [ ] Newsletter automático semanal
-- [ ] Limpieza listings inactivos >90 días
+**Comparador de precios**
+- [ ] Scraping automático Buscalibre/MercadoLibre
+- [ ] Búsqueda internacional: joyas que valen más fuera de Chile
+- [x] Comparador manual HTML existente
 
-### Comparador de precios (inteligencia competitiva)
-- [ ] Scraping automático Buscalibre/MercadoLibre (requiere Puppeteer o Browserless)
-- [ ] Búsqueda internacional: detectar joyas que fuera de Chile valen mucho más (AbeBooks, Amazon, IberLibro)
-- [ ] Dashboard: "tus libros más baratos que la competencia" como argumento de venta
-- [x] Comparador manual: HTML con links directos a BL/ML para 109 libros (docs/comparador_precios.html)
-
-### Mis Libros (gestión vendedor)
-- [ ] Buscador/filtro en /mis-libros para encontrar publicaciones propias rápido
-- [ ] Sorting en /mis-libros (precio, título, fecha)
-
-### Features futuros
-- [x] Mensajería interna entre compradores y vendedores
-- [ ] Filtros por encuadernación, editorial, páginas en la tienda
-- [ ] Buscador en página del vendedor (/vendedor/[id])
-- [x] Foto-a-catálogo completo: IA identifica libros de foto grupal → publicación masiva
-- [ ] Tracking envíos (cuando Shipit active)
+**Otros features**
+- [ ] Filtros por encuadernación, editorial, páginas
+- [ ] Buscador en página del vendedor
+- [ ] Tracking envíos visual
 - [ ] OAuth Facebook/Instagram
-- [ ] Compartir en Instagram Stories al publicar
-- [ ] Newsletter semanal — elegir día estratégico
-- [ ] Dominio personalizado Supabase
-- [ ] Fix INP issue (botón bloqueó UI 6.2s según Vercel Toolbar)
-- [ ] **Valuación libros antiguos (sáb/dom 12-13 abril)** — Vero fotografía su colección de libros viejos en distintos idiomas y Claude evalúa cuáles tienen valor de colección (primera edición, editorial histórica, autor buscado). Ejercicio de aprendizaje mutuo para agudizar ojo de joyas en el catálogo.
+- [ ] Newsletter semanal automático
+- [ ] Fix INP issue (6.2s según Vercel Toolbar)
 
 ### Requiere acción de Verónica
 - [ ] Apple OAuth ($99/año) — decidir si vale la pena
 - [ ] Recontactar 150+ vendedores históricos
 - [ ] WhatsApp Business para tuslibros.cl
+- [ ] Configurar verificación 2 pasos Google Cloud (deadline 16 abril)
+- [ ] Publicar en Reddit, LinkedIn, Goodreads (textos listos)
 
 ### Descartados
-- ~~Checkout múltiple carrito~~ — split payment MP no soporta múltiples vendedores
+- ~~Checkout múltiple carrito~~ — split payment MP no soporta múltiples vendedores → resuelto con bundle checkout por vendedor
 - ~~Infinite scroll~~ — paginación numérica es mejor para SEO
 - ~~Suscripciones mensuales~~ — foco en comisiones por venta
 - ~~Fee fijo~~ — nunca habrá fee fijo
 - ~~AdSense~~ — eliminado, generaba errores sin aprobación
+- ~~Expansión Brasil inmediata~~ — Chile primero, Brasil en 12-18 meses
+- ~~Upgrade Next.js 16 / Tailwind 4~~ — no ahora, sin beneficio inmediato vs riesgo
 
 ---
 
@@ -314,25 +254,25 @@
 
 ---
 
-## Datos actuales (9 abril 2026)
-- 116+ libros publicados activos
-- 160 libros con taxonomía (category/subcategory/tags)
-- 111 URLs amigables (/libro/slug)
-- 92 libros enriquecidos con metadata
-- 5 categorías principales, 32 subcategorías
-- 5+ usuarios registrados
-- 3 suscriptores newsletter
-- 1 venta real completada con split payment
+## Datos actuales (12 abril 2026)
+- 500+ libros publicados
+- 33 Maigret colección Luis de Caralt a $7.990
+- 5 categorías principales, 32+ subcategorías (admin CRUD)
+- 9+ usuarios registrados
+- 4+ suscriptores newsletter
+- 1+ ventas reales con split payment
 - 10+ emails transaccionales funcionando
-- PWA instalable + service worker offline
-- Analytics propias con tracking de visitas
-- Stack: Next.js 14, Supabase, MercadoPago, Mapbox, Resend, Vercel Analytics
+- Google Merchant Center activo (18 clicks/28 días)
+- Google Business Profile (4.3★, 4 opiniones)
+- Stack: Next.js 14, Supabase, MercadoPago, Shipit, Mapbox, Resend, Vercel
 
 ---
 
 ## Documentos de referencia
 - `MODELO-NEGOCIO.md` — flujos de pago, planes, comisiones, ciclo arriendo
-- `CONTEXT.md` — contexto técnico del proyecto
+- `CLAUDE.md` — convenciones del proyecto para Claude Code
+- `docs/kit_metralleta_confesional.html` — mensajes listos tono confesional (v2)
+- `docs/newsletter_14abril2026.html` — newsletter lunes 14
+- `docs/listados_directorios.html` — textos para Google, Reddit, LinkedIn, directorios
+- `docs/tuslibros_gtm.html` — Go-to-market strategy
 - `docs/INSTRUCCIONES_CARGA_MASIVA.md` — formato CSV para vendedores
-- `docs/tuslibros_gtm.html` — Go-to-market strategy completa
-- `docs/tuslibros_kit_metralleta.html` — Kit táctico de mensajes listos
