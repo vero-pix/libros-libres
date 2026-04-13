@@ -2,6 +2,17 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServerClient } from "@supabase/ssr";
 
+const SPANISH_WORDS = /\b(el|la|los|las|del|por|una|con|que|en|de|su|este|esta|como|para|más|entre|sobre|desde|hasta|pero|sino|también|tiene|puede|hace|sido|está|fue|ser|hay|sus|nos|muy|cuando|donde|quien|cuyo|cuya|mientras|aunque|porque|si|ya|lo|le|les|se|al|era|han|son|una|uno|autor|libro|obra|vida|mundo|historia|tiempo|años)\b/gi;
+const ENGLISH_WORDS = /\b(the|and|this|with|that|from|have|been|their|which|about|into|through|when|where|author|novel|story|world|life|his|her|its|they|them|will|would|could|should|shall|may|might|must|does|did|had|has|was|were|are|him|she|who|what|how|our|your|we|he|it)\b/gi;
+
+function isSpanishDescription(text: string): boolean {
+  const isSpam = text.includes("13-digit number") || text.includes("ISBN Handbook");
+  if (isSpam) return false;
+  const esMatches = (text.match(SPANISH_WORDS) ?? []).length;
+  const enMatches = (text.match(ENGLISH_WORDS) ?? []).length;
+  return esMatches >= 3 && esMatches > enMatches;
+}
+
 interface Meta {
   publisher: string | null;
   pages: number | null;
@@ -103,11 +114,8 @@ export async function POST(req: Request) {
     const updates: Record<string, unknown> = {};
     if (!book.publisher && meta.publisher) updates.publisher = meta.publisher;
     if (!book.pages && meta.pages) updates.pages = meta.pages;
-    if (!book.description && meta.description) {
-      const d = meta.description;
-      const hasSpanish = /\b(el|la|los|las|del|por|una|con|que|en|de|su|este|esta|como|para|más|entre|sobre|desde|hasta|pero|sino|también|tiene|puede|hace|sido|está|fue|ser|hay|sus|nos|muy)\b/i.test(d);
-      const isSpam = d.includes("13-digit number") || d.includes("ISBN Handbook");
-      if (hasSpanish && !isSpam) updates.description = d;
+    if (!book.description && meta.description && isSpanishDescription(meta.description)) {
+      updates.description = meta.description;
     }
 
     if (Object.keys(updates).length > 0) {

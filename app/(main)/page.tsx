@@ -99,7 +99,7 @@ export default async function HomePage({ searchParams }: Props) {
   let query = supabase
     .from("listings")
     .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`)
-    .eq("status", "active");
+    .in("status", ["active", "completed"]);
 
   if (condition) query = query.eq("condition", condition);
   if (modality) query = query.in("modality", modality === "both" ? ["both"] : [modality, "both"]);

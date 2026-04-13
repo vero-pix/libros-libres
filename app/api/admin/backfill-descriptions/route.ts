@@ -3,6 +3,17 @@ import { createClient } from "@/lib/supabase/server";
 import { createServerClient } from "@supabase/ssr";
 import { translateGenre } from "@/lib/genres";
 
+const SPANISH_WORDS = /\b(el|la|los|las|del|por|una|con|que|en|de|su|este|esta|como|para|más|entre|sobre|desde|hasta|pero|sino|también|tiene|puede|hace|sido|está|fue|ser|hay|sus|nos|muy|cuando|donde|quien|cuyo|cuya|mientras|aunque|porque|si|ya|lo|le|les|se|al|era|han|son|una|uno|autor|libro|obra|vida|mundo|historia|tiempo|años)\b/gi;
+const ENGLISH_WORDS = /\b(the|and|this|with|that|from|have|been|their|which|about|into|through|when|where|author|novel|story|world|life|his|her|its|they|them|will|would|could|should|shall|may|might|must|does|did|had|has|was|were|are|him|she|who|what|how|our|your|we|he|it)\b/gi;
+
+function isSpanishDescription(text: string): boolean {
+  const isSpam = text.includes("13-digit number") || text.includes("ISBN Handbook");
+  if (isSpam) return false;
+  const esMatches = (text.match(SPANISH_WORDS) ?? []).length;
+  const enMatches = (text.match(ENGLISH_WORDS) ?? []).length;
+  return esMatches >= 3 && esMatches > enMatches;
+}
+
 /**
  * POST /api/admin/backfill-descriptions
  * Busca sinopsis en español para libros que no tienen descripción.
@@ -111,10 +122,13 @@ export async function POST(req: NextRequest) {
       } catch {}
     }
 
-    if (description) {
+    if (description && isSpanishDescription(description)) {
       await adminDb.from("books").update({ description }).eq("id", book.id);
       updated++;
       results.push({ title: book.title, status: "ok" });
+    } else if (description) {
+      failed++;
+      results.push({ title: book.title, status: "descripción en inglés, omitida" });
     } else {
       failed++;
       results.push({ title: book.title, status: "no encontrada" });
