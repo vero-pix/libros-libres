@@ -193,12 +193,13 @@
 - [ ] Widget "Reputación del vendedor" en `/vendedor/[id]`
 
 **Botón Mensaje en página del vendedor**
-- [ ] Agregar botón "Mensaje" junto a WhatsApp/Email en /vendedor/[id]
-- [ ] Abre conversación en mensajería interna con el vendedor
+- [x] Botón "Mensaje" junto a WhatsApp/Email en /vendedor/[id]
+- [x] Abre conversación en mensajería interna con el vendedor
+- [x] ?to=userId crea conversación automáticamente si no existe
 
 **Contactar comprador desde pedidos**
-- [ ] Botón "Escribir al comprador" en Mis Ventas cuando hay pedido pendiente
-- [ ] Inicia conversación en mensajería interna vinculada al pedido
+- [x] Botón "Escribir al comprador" en Mis Ventas
+- [x] Link directo a mensajería interna vinculada al comprador
 
 **Optimización polling `/api/messages/unread`**
 - [ ] Hoy cada 30s — reducir a 2-3 min o migrar a Supabase Realtime
@@ -229,8 +230,9 @@
 - [ ] Primeros 50 vendedores: panel gratis de por vida
 
 **Comparador de precios**
-- [ ] Scraping automático Buscalibre/MercadoLibre
-- [ ] Búsqueda internacional: joyas que valen más fuera de Chile
+- [x] Comparador integrado en ficha del libro (Buscalibre, MercadoLibre, IberLibro)
+- [x] Solo visible para el vendedor del libro
+- [ ] Scraping automático con precios reales (futuro)
 - [x] Comparador manual HTML existente
 
 **Otros features**
@@ -265,13 +267,15 @@
 
 ---
 
-## Datos actuales (12 abril 2026)
-- 500+ libros publicados
+## Datos actuales (13 abril 2026)
+- 183 libros publicados (172 activos, 7 vendidos, 4 pausados)
 - 33 Maigret colección Luis de Caralt a $7.990
 - 5 categorías principales, 32+ subcategorías (admin CRUD)
-- 9+ usuarios registrados
+- 11 usuarios registrados
 - 4+ suscriptores newsletter
-- 1+ ventas reales con split payment
+- 2 ventas reales con split payment
+- Google Analytics GA4 integrado
+- Distribución activa: LinkedIn, Reddit, WhatsApp, Cylex
 - 10+ emails transaccionales funcionando
 - Google Merchant Center activo (18 clicks/28 días)
 - Google Business Profile (4.3★, 4 opiniones)
