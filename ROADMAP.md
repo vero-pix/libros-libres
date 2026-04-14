@@ -192,6 +192,14 @@
 - [ ] Migración: tabla `reviews` con `target_type: 'book' | 'seller'`
 - [ ] Widget "Reputación del vendedor" en `/vendedor/[id]`
 
+**Botón Mensaje en página del vendedor**
+- [ ] Agregar botón "Mensaje" junto a WhatsApp/Email en /vendedor/[id]
+- [ ] Abre conversación en mensajería interna con el vendedor
+
+**Contactar comprador desde pedidos**
+- [ ] Botón "Escribir al comprador" en Mis Ventas cuando hay pedido pendiente
+- [ ] Inicia conversación en mensajería interna vinculada al pedido
+
 **Optimización polling `/api/messages/unread`**
 - [ ] Hoy cada 30s — reducir a 2-3 min o migrar a Supabase Realtime
 - [ ] Prioridad sube cuando haya 50+ usuarios activos

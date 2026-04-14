@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import SellerListingsGrid from "@/components/listings/SellerListingsGrid";
@@ -182,8 +183,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
         )}
 
         {/* Contact channels */}
-        {(seller.phone || (seller as any).public_email || (seller as any).instagram) && (
-          <div className="mb-8 flex flex-wrap gap-3">
+        <div className="mb-8 flex flex-wrap gap-3">
             {seller.phone && (() => {
               const cleanPhone = seller.phone.replace(/\D/g, "");
               return (
@@ -225,8 +225,16 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
                 Email
               </a>
             )}
+            <Link
+              href={`/mensajes?to=${seller.id}`}
+              className="inline-flex items-center gap-2 px-4 py-2.5 border-2 border-brand-400 text-brand-600 hover:bg-brand-50 font-semibold rounded-xl transition-colors text-sm"
+            >
+              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-none stroke-current" xmlns="http://www.w3.org/2000/svg" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+              </svg>
+              Mensaje
+            </Link>
           </div>
-        )}
 
         {/* Listings grid */}
         {listings.length > 0 ? (
