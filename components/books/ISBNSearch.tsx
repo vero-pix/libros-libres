@@ -13,6 +13,9 @@ interface Props {
 interface ManualForm {
   title: string;
   author: string;
+  description: string;
+  publisher: string;
+  pages: string;
 }
 
 export default function ISBNSearch({ onBookFound }: Props) {
@@ -20,7 +23,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showManual, setShowManual] = useState(false);
-  const [manual, setManual] = useState<ManualForm>({ title: "", author: "" });
+  const [manual, setManual] = useState<ManualForm>({ title: "", author: "", description: "", publisher: "", pages: "" });
   const [showScanner, setShowScanner] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -57,7 +60,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
       if (!data.title?.trim()) {
         setError("Encontramos el ISBN pero sin título. Completa los datos manualmente.");
         setShowManual(true);
-        setManual({ title: data.title || "", author: data.author || "" });
+        setManual({ title: data.title || "", author: data.author || "", description: "", publisher: "", pages: "" });
         return;
       }
 
@@ -108,12 +111,15 @@ export default function ISBNSearch({ onBookFound }: Props) {
     onBookFound({
       title: manual.title.trim(),
       author: manual.author.trim(),
+      description: manual.description.trim() || undefined,
+      publisher: manual.publisher.trim() || null,
+      pages: manual.pages ? Number(manual.pages) : null,
       isbn: isbn.replace(/[-\s]/g, "") || undefined,
     });
     setShowManual(false);
     setError(null);
     setIsbn("");
-    setManual({ title: "", author: "" });
+    setManual({ title: "", author: "", description: "", publisher: "", pages: "" });
   }
 
   return (
@@ -225,6 +231,38 @@ export default function ISBNSearch({ onBookFound }: Props) {
               placeholder="Ej: Patrick Rothfuss"
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
             />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Sinopsis <span className="text-gray-400 font-normal">(opcional)</span></label>
+            <textarea
+              value={manual.description}
+              onChange={(e) => setManual((m) => ({ ...m, description: e.target.value }))}
+              rows={3}
+              placeholder="De qué trata el libro..."
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Editorial <span className="text-gray-400 font-normal">(opcional)</span></label>
+              <input
+                type="text"
+                value={manual.publisher}
+                onChange={(e) => setManual((m) => ({ ...m, publisher: e.target.value }))}
+                placeholder="Ej: Planeta"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Páginas <span className="text-gray-400 font-normal">(opcional)</span></label>
+              <input
+                type="number"
+                value={manual.pages}
+                onChange={(e) => setManual((m) => ({ ...m, pages: e.target.value }))}
+                placeholder="Ej: 320"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+              />
+            </div>
           </div>
           <div className="flex gap-2">
             <button

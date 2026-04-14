@@ -485,7 +485,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
                     onChange={(e) => setOriginalPrice(e.target.value)}
                     placeholder="Ej: 15000"
                     min="0"
-                    step="100"
+                    step="1"
                     className="w-full pl-7 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                   />
                 </div>
@@ -509,7 +509,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="0"
                     min="0"
-                    step="100"
+                    step="1"
                     className="w-full pl-7 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                   />
                 </div>
@@ -533,7 +533,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
                     onChange={(e) => setRentalPrice(e.target.value)}
                     placeholder="3000"
                     min="0"
-                    step="100"
+                    step="1"
                     className="w-full pl-7 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                   />
                 </div>
