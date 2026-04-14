@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import type { Order, OrderStatus } from "@/types";
 import BuyerCartsSection from "@/components/sales/BuyerCartsSection";
 
@@ -44,7 +45,7 @@ export default async function MisVentasPage() {
   const { data: rawOrders } = await supabase
     .from("orders")
     .select(`
-      id, book_price, shipping_cost, service_fee, total, status,
+      id, buyer_id, book_price, shipping_cost, service_fee, total, status,
       courier, tracking_code, shipping_label_url, shipping_status, buyer_address, created_at,
       listing:listings(id, book:books(title, author, cover_url)),
       buyer:users!orders_buyer_id_fkey(full_name, email)
@@ -316,6 +317,15 @@ export default async function MisVentasPage() {
                                 {order.buyer_address}
                               </p>
                             )}
+                            <Link
+                              href={`/mensajes?to=${order.buyer_id}`}
+                              className="inline-flex items-center gap-1 mt-1 text-[11px] text-brand-600 hover:underline font-medium"
+                            >
+                              <svg viewBox="0 0 24 24" className="w-3 h-3 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                              </svg>
+                              Escribir
+                            </Link>
                           </div>
                         </td>
                         <td className="px-4 py-3 font-medium">
