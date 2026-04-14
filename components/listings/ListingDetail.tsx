@@ -10,6 +10,7 @@ import AddToCartButton from "@/components/ui/AddToCartButton";
 import ImageGallery from "./ImageGallery";
 import ShareButtons from "./ShareButtons";
 import ContactSellerButton from "@/components/messages/ContactSellerButton";
+import PriceCompare from "@/components/listings/PriceCompare";
 
 function WhatsAppButton({ phone, title }: { phone: string | null; title: string }) {
   if (!phone) {
@@ -224,6 +225,15 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               <p className="text-xs font-semibold text-gray-500 mb-1">Notas del vendedor</p>
               <p className="text-sm text-gray-600">{listing.notes}</p>
             </div>
+          )}
+
+          {isOwner && (
+            <PriceCompare
+              title={book.title}
+              author={book.author}
+              isbn={book.isbn}
+              currentPrice={listing.price}
+            />
           )}
 
           {listing.address && (
