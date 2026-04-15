@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { notFound } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 import ListingDetail from "@/components/listings/ListingDetail";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -79,8 +79,10 @@ export default async function LibroPage({ params }: Props) {
   const supabase = await createClient();
   const listing = await getListing(params.username, params.slug);
 
+  // Ver comentario en listings/[id]: listings eliminados → home con 308
+  // en vez de 404 seco. Mejor UX y mejor señal a Google.
   if (!listing) {
-    notFound();
+    permanentRedirect("/");
   }
 
   const { data: images } = await supabase
