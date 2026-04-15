@@ -60,7 +60,13 @@ export default function ISBNSearch({ onBookFound }: Props) {
       if (!data.title?.trim()) {
         setError("Encontramos el ISBN pero sin título. Completa los datos manualmente.");
         setShowManual(true);
-        setManual({ title: data.title || "", author: data.author || "", description: "", publisher: "", pages: "" });
+        // Mergear: sólo rellenar campos que estén vacíos en el form manual
+        // para no borrar datos que el usuario ya haya escrito a mano.
+        setManual((m) => ({
+          ...m,
+          title: m.title || data.title || "",
+          author: m.author || data.author || "",
+        }));
         return;
       }
 
@@ -170,7 +176,9 @@ export default function ISBNSearch({ onBookFound }: Props) {
             onChange={(e) => {
               setIsbn(formatISBN(e.target.value));
               setError(null);
-              setShowManual(false);
+              // No cerrar el formulario manual por cambiar el ISBN: si el
+              // usuario ya empezó a llenar datos a mano (p.ej. libro antiguo
+              // sin ISBN claro), perder ese progreso es lo que reportó Felipe.
             }}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder="978-956-000-0000"
