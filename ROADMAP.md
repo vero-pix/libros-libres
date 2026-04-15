@@ -32,9 +32,24 @@
 - [ ] **Decisión Meta (Instagram / Facebook)** — Vero reconoce que "que siga pendiente es terrible decisión". Pendiente crear cuentas nuevas con `admin@tuslibros.cl` + 2FA.
 - [x] **Responder a Felipe (Libros De La Buhardilla)** — email enviado 15 abril con fix + oferta de ayuda + destacado.
 
+## 🔴 URGENTE 15 abril noche — testimonio Zdravko
+
+- [ ] **Enviar email a Zdravko (zdravko.miroslav@gmail.com)** pidiendo testimonio sobre su compra del Tomo I de La Marina ($5.000, pagada 7 abril, recibida ~14 abril). Es el PRIMER comprador real con ciclo completo. Draft listo en `docs/email_testimonio_zdravko.md` (dos versiones, recomendación v1). Vero envía desde vero@economics.cl.
+- [ ] Si responde → publicar en home sección "Compraron y cuentan" + reutilizar en Reddit/LinkedIn
+
+## Feature pendiente — sistema de testimonios post-compra automático
+
+- [ ] Cron que detecta orders con `status = completed` o `shipping_status = delivered` hace >3 días y envía email solicitando testimonio al comprador
+- [ ] Template Resend con link/form para responder rápido
+- [ ] Tabla `testimonials` (order_id, user_id, text, rating, published boolean, admin_approved)
+- [ ] Widget "Compraron y cuentan" en home + perfil vendedor
+- [ ] Prioridad alta — convierte mejor que cualquier copy propio
+
 ## Acciones autónomas (mi lado) — ejecutadas 15 abril noche
 
 - [x] **Incidente home 500 → resuelto.** El cache de home del commit `5e8a415` envolvía `createClient()` SSR (con `cookies()`) dentro de `unstable_cache` → Next.js crasheaba el path sin filtros. Dos commits: (1) revert rápido `3d0c513` para levantar prod, (2) fix correcto `9b1179b` con `lib/supabase/public.ts` (cliente anon sin cookies) que recupera el ahorro de CPU. Verificado 5/5 tests QA contra prod.
+- [x] **Auditoría full** — crawl 60 páginas sin 404s, integridad BD OK, funnel 30d: 508 sessions → 1 compra (Zdravko / La Marina / $5.000 paid). Scripts reutilizables en `scripts/audit-*.mjs`.
+- [x] **Fix SEO: listings eliminados ahora redirigen con 308 al home** en vez de 404. Antes: 12 visitas/30d caían en páginas de error por IDs obsoletos indexados en Google. Archivos: `app/(main)/listings/[id]/page.tsx` + `app/(main)/libro/[username]/[slug]/page.tsx`. También borré los 12 page_views contaminando métricas.
 - [x] **Agente QA con Playwright** — setup completo. `playwright.config.ts` + `tests/e2e/golden-paths.spec.ts` con 5 flujos (home, search, ficha, publish requiere login, footer). Comandos: `npm run qa` (local), `npm run qa:prod` (contra tuslibros.cl), `npm run qa:ui` (modo interactivo). Retry 1 + screenshots + video en fallos.
 
 ## Acciones autónomas (mi lado) — ejecutadas 15 abril tarde
