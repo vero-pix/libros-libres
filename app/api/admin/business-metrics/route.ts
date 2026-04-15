@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+// Cache in-memory del resultado. El tab Negocio es admin, baja frecuencia,
+// no necesita datos al segundo. Evita quemar CPU con 5 queries pesadas.
+let cachedResponse: { payload: unknown; expiresAt: number } | null = null;
+const CACHE_TTL_MS = 10 * 60 * 1000;
+
 export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -8,6 +13,10 @@ export async function GET() {
 
   const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
   if (profile?.role !== "admin") return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+
+  if (cachedResponse && cachedResponse.expiresAt > Date.now()) {
+    return NextResponse.json(cachedResponse.payload);
+  }
 
   const since30 = new Date(Date.now() - 30 * 864e5).toISOString();
 
@@ -78,7 +87,7 @@ export async function GET() {
   }
   const topSellers = Object.values(sellerMap).sort((a, b) => (b.listings + b.sold * 3) - (a.listings + a.sold * 3)).slice(0, 8);
 
-  return NextResponse.json({
+  const payload = {
     funnel,
     revenue: {
       totalPaid,
@@ -90,5 +99,7 @@ export async function GET() {
     abandonedCarts: { total: cartItems.length, uniqueBuyers, totalValue, items: cartItems },
     pendingOrders: pendingList,
     topSellers,
-  });
+  };
+  cachedResponse = { payload, expiresAt: Date.now() + CACHE_TTL_MS };
+  return NextResponse.json(payload);
 }
