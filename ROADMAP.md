@@ -1,6 +1,24 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 12 abril 2026
+Última actualización: 15 abril 2026
+
+---
+
+## Sesión 15 abril 2026
+
+- [x] Sort de home por idioma: featured pagos → con portada → en español → resto. Libros alemanes al final.
+- [x] Columna `books.language` (default `es`) + migración `20260415_add_book_language.sql` aplicada.
+- [x] Backfill language: 26 libros alemanes detectados via Open Library + heurística, aplicados. 6 adicionales marcados manual.
+- [x] Badge visible de idioma en `ListingCard` cuando `language !== 'es'`.
+- [x] Fix bug publish form: al tocar campo ISBN después de abrir modo manual, se borraba el formulario — afectaba libros antiguos sin ISBN. Corregido en `components/books/ISBNSearch.tsx`.
+- [x] Merge vs overwrite en ISBNSearch cuando la API devuelve libro sin título.
+- [x] Badge "Pago seguro MercadoPago" en perfil vendedor (`/vendedor/[id]`) y ficha del libro (`ListingDetail`) cuando el vendedor tiene MP conectado.
+- [x] Libros De La Buhardilla marcado como vendedor destacado (featured=true).
+- [x] Memoria consolidada de 40 archivos → 3 (`MEMORY.md`, `user_veronica.md`, `context.md`).
+
+## Pendientes de esta línea de trabajo
+
+- [ ] Detector preciso de francés e inglés (franc-min u otra lib). La heurística actual tiene muchos falsos positivos con títulos en español que comparten palabras (la, le, de, of, in). Esto NO se hizo hoy porque requiere instalar una dependencia nueva (`franc-min`) y evaluarla contra el catálogo — lo dejo solo en caso de que molesten los 7 libros que quedaron marcados como `fr` erróneamente; si no se notan, no vale el tiempo.
 
 ---
 
