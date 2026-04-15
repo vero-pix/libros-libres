@@ -5,6 +5,13 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 
 const novedades = [
   {
+    date: "15 abril 2026",
+    title: "La portada ya no empieza en alemán",
+    description:
+      "Reordené la home: los libros en español y con portada aparecen primero; los que están en otros idiomas quedan al final y llevan una etiqueta visible (DE, EN, FR) para que sepas antes de hacer clic. La primera impresión importa.",
+    tag: "Mejora",
+  },
+  {
     date: "13 abril 2026",
     title: "Vendedores destacados",
     description:
