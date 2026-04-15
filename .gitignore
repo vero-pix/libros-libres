@@ -32,3 +32,16 @@ Thumbs.db
 
 # Working notes — nunca subir ideas, borradores ni material personal al repo
 /ideas/
+
+# Imágenes pesadas en working dirs (no versionar)
+*.HEIC
+*.heic
+docs/IMG_*
+docs/crops/
+docs/maigrets/
+docs/*.jpeg
+docs/*.jpg
+docs/*.pdf
+docs/maigret.jpg
+linda.*
+public/hero-libros-old.jpg
