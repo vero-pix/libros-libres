@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { notFound, redirect } from "next/navigation";
+import { redirect, permanentRedirect } from "next/navigation";
 import ListingDetail from "@/components/listings/ListingDetail";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -50,7 +50,10 @@ export default async function ListingByIdPage({ params }: Props) {
   const supabase = await createClient();
   const listing = await getListing(params.id);
 
-  if (!listing) notFound();
+  // Si el listing fue eliminado (borradores viejos, limpieza de BD, IDs
+  // que quedaron indexados en Google), redirigir al home con 308 para que
+  // Google actualice y el usuario aterrice en algo útil en vez de un 404.
+  if (!listing) permanentRedirect("/");
 
   // Si tiene URL amigable, redirigir
   if (listing.slug && listing.seller?.username) {
