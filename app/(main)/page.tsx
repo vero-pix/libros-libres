@@ -129,10 +129,13 @@ export default async function HomePage({ searchParams }: Props) {
   // no-latinos evidentes). Los mandamos al final para que la home no muestre
   // títulos ilegibles como primera impresión.
   const looksNonSpanish = (l: ListingWithBook) => {
+    // Prefiere la columna language si está presente (backfill via Open Library)
+    const lang = (l.book as any).language as string | null | undefined;
+    if (lang) return lang !== "es";
+    // Fallback heurístico para libros sin language seteada
     const text = `${l.book.title ?? ""} ${l.book.author ?? ""}`.toLowerCase();
     if (/[äöüß]/.test(text)) return true;
     if (/\b(der|die|das|und|ein|eine|für|nicht|mit|ist|sich|auf|dem|den|wenn|wir|ich)\b/.test(text)) return true;
-    // Autores conocidos en alemán que ya están cargados en catálogo
     if (/\bfrisch\b|\bkafka\b|\bhesse\b|\bgrass\b|\bmann\b/.test(text)) return true;
     return false;
   };
