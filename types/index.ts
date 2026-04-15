@@ -30,6 +30,7 @@ export interface Book {
   publisher: string | null;
   pages: number | null;
   binding: string | null;
+  language: string | null;
   created_by: string | null;
   created_at: string;
 }

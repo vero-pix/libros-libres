@@ -112,6 +112,14 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
                 Oferta
               </span>
             )}
+            {(book as any).language && (book as any).language !== "es" && (
+              <span
+                className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm bg-ink/80 text-white"
+                title={`Libro en ${ {en:"inglés",de:"alemán",fr:"francés",it:"italiano",pt:"portugués"}[(book as any).language as string] ?? (book as any).language }`}
+              >
+                {(book as any).language}
+              </span>
+            )}
           </div>
           {listing._featured && (
             <span className="absolute bottom-3 left-3 w-5 h-5" title="Libro destacado">
