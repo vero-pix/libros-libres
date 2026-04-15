@@ -46,7 +46,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
   // Seller profile
   const { data: seller } = await supabase
     .from("users")
-    .select("id, full_name, avatar_url, city, bio, created_at, phone, public_email, instagram")
+    .select("id, full_name, avatar_url, city, bio, created_at, phone, public_email, instagram, mercadopago_user_id")
     .eq("id", params.id)
     .single();
 
@@ -126,6 +126,17 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
                 </span>
               )}
               <span>Miembro desde {memberSince}</span>
+              {seller.mercadopago_user_id && (
+                <span
+                  className="inline-flex items-center gap-1.5 bg-[#009EE3]/10 text-[#009EE3] px-2.5 py-0.5 rounded-full border border-[#009EE3]/25 font-medium"
+                  title="Este vendedor acepta pagos seguros a través de MercadoPago. Tu compra queda protegida."
+                >
+                  <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="currentColor" aria-hidden="true">
+                    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 14.414L6.586 12 8 10.586l3 3 5-5L17.414 10l-6.414 6.414z" />
+                  </svg>
+                  Pago seguro MercadoPago
+                </span>
+              )}
             </div>
 
             {/* Stats */}
