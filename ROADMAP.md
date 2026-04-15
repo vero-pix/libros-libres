@@ -15,6 +15,14 @@
 - [x] Badge "Pago seguro MercadoPago" en perfil vendedor (`/vendedor/[id]`) y ficha del libro (`ListingDetail`) cuando el vendedor tiene MP conectado.
 - [x] Libros De La Buhardilla marcado como vendedor destacado (featured=true).
 - [x] Memoria consolidada de 40 archivos → 3 (`MEMORY.md`, `user_veronica.md`, `context.md`).
+- [x] Limpieza BD: borradas 4 orders de prueba + 3 carritos de prueba + 39 page_views de cuenta Alicuota + el usuario completo. Métricas ahora reflejan tráfico real.
+
+## Infraestructura de medición (ya operativa — confirmado 15 abril)
+
+- [x] Google Analytics GA4 activo (ID `G-N243GH70EQ`)
+- [x] Google Search Console verificado (archivo `public/google265a60d87748f586.html`)
+- [x] Vercel Analytics activo
+- [x] PageTracker propio en `page_views` (tabla Supabase) — listings vistos, fuente de tráfico, usuario
 
 ## Pendientes de esta línea de trabajo
 
