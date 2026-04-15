@@ -26,15 +26,14 @@ Hola Zdravko,
 
 Soy Vero de tuslibros.cl. Vi que te llegó bien el Tomo I de La Marina
 en la historia de Chile — gracias por confiar en un sitio nuevo que
-prácticamente empieza a caminar.
+recién parte.
 
-Estoy recolectando testimonios para mostrar en la página. No necesito
-un texto elaborado: dos líneas contándome cómo fue la experiencia
-(si llegó rápido, si el libro estaba como esperabas, si volverías a
-comprar) me sirven un montón.
+Estoy juntando testimonios para la página. No necesito nada elaborado:
+dos líneas contándome cómo te fue (si llegó rápido, si el libro estaba
+como esperabas, si volverías a comprar) me sirven caleta.
 
-¿Te animas? Con responder este mismo correo ya está. Lo publicaría con
-tu nombre y ciudad (si prefieres solo con inicial, dime no más).
+¿Te tinca? Con que respondas este mismo correo me basta. Lo publicaría
+con tu nombre y ciudad (si prefieres solo con inicial, me avisas no más).
 
 Un abrazo y gracias,
 Vero
@@ -47,17 +46,17 @@ Asunto: Dos líneas sobre tu compra
 
 Hola Zdravko,
 
-Gracias por comprar el Tomo I de La Marina en tuslibros.cl — fuiste de
-los primeros en usar el checkout completo desde que abrimos.
+Gracias por comprar el Tomo I de La Marina en tuslibros.cl — fuiste
+de los primeros en pasar por el checkout completo desde que abrimos.
 
 Te escribo para pedirte un favor chico: ¿me cuentas en dos líneas cómo
-fue la experiencia? (envío, estado del libro, lo que quieras).
+te fue? (envío, estado del libro, lo que quieras).
 
 Lo publicaría en la home como testimonio — con tu nombre y ciudad, a
-menos que prefieras inicial. Tu feedback convence a otros compradores
-mucho más que lo que yo pueda escribir.
+menos que prefieras solo con inicial. Tu experiencia convence caleta
+más que cualquier cosa que yo pueda escribir.
 
-Cualquiera de las dos opciones me sirve, gracias de antemano.
+Cualquiera de las dos sirve, gracias de antemano.
 
 Vero
 tuslibros.cl
