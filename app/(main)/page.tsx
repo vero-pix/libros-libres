@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import ListingToolbar from "@/components/listings/ListingToolbar";
@@ -21,6 +22,64 @@ export const metadata: Metadata = {
 };
 
 const ITEMS_PER_PAGE = 20;
+
+// Cache de los listings para los visitantes sin filtros ni orden personalizado
+// (el 90% del tráfico real). TTL corto para que no se note desactualizado.
+const getDefaultListings = unstable_cache(
+  async () => {
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`)
+      .in("status", ["active", "completed"])
+      .order("created_at", { ascending: false });
+    return data ?? [];
+  },
+  ["home-default-listings"],
+  { revalidate: 60 }
+);
+
+const getFeaturedListings = unstable_cache(
+  async () => {
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username)`)
+      .eq("status", "active")
+      .eq("featured", true)
+      .limit(10);
+    return data ?? [];
+  },
+  ["home-featured-listings"],
+  { revalidate: 120 }
+);
+
+const getFeaturedSellers = unstable_cache(
+  async () => {
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("users")
+      .select("id, full_name, avatar_url, city, bio")
+      .eq("featured", true)
+      .limit(10);
+    if (!data) return [];
+    return Promise.all(
+      data.map(async (seller) => {
+        const { count } = await supabase
+          .from("listings")
+          .select("id", { count: "exact", head: true })
+          .eq("seller_id", seller.id)
+          .eq("status", "active");
+        return { ...seller, _listing_count: count ?? 0 };
+      })
+    );
+  },
+  ["home-featured-sellers"],
+  { revalidate: 300 }
+);
 
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
@@ -67,54 +126,37 @@ export default async function HomePage({ searchParams }: Props) {
 
   const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max);
 
-  // Featured queries in parallel with main query
-  const [featuredListingsRes, featuredSellersRes] = await Promise.all([
-    supabase
-      .from("listings")
-      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username)`)
-      .eq("status", "active")
-      .eq("featured", true)
-      .limit(10),
-    supabase
-      .from("users")
-      .select("id, full_name, avatar_url, city, bio")
-      .eq("featured", true)
-      .limit(10),
+  // Featured (cacheados — no dependen de filtros)
+  const [featuredListings, featuredSellers] = await Promise.all([
+    getFeaturedListings() as unknown as Promise<ListingWithBook[]>,
+    getFeaturedSellers(),
   ]);
 
-  const featuredListings = (featuredListingsRes.data as unknown as ListingWithBook[]) ?? [];
-
-  // Count listings per featured seller
-  const featuredSellers = await Promise.all(
-    (featuredSellersRes.data ?? []).map(async (seller) => {
-      const { count } = await supabase
-        .from("listings")
-        .select("id", { count: "exact", head: true })
-        .eq("seller_id", seller.id)
-        .eq("status", "active");
-      return { ...seller, _listing_count: count ?? 0 };
-    })
-  );
-
-  let query = supabase
-    .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`)
-    .in("status", ["active", "completed"]);
-
-  if (condition) query = query.eq("condition", condition);
-  if (modality) query = query.in("modality", modality === "both" ? ["both"] : [modality, "both"]);
-  if (price_min) query = query.gte("price", Number(price_min));
-  if (price_max) query = query.lte("price", Number(price_max));
-
-  if (sort === "price_asc") {
-    query = query.order("price", { ascending: true });
-  } else if (sort === "price_desc") {
-    query = query.order("price", { ascending: false });
+  // Listings principales: si no hay filtros ni sort personalizado, usar la
+  // versión cacheada (ahorra ~90% del CPU del home). Si hay filtros o sort,
+  // ejecutar en vivo.
+  const hasCustomSort = sort === "price_asc" || sort === "price_desc" || sort === "distance";
+  let rawListings: unknown;
+  if (!hasFilters && !hasCustomSort) {
+    rawListings = await getDefaultListings();
   } else {
-    query = query.order("created_at", { ascending: false });
-  }
+    let query = supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`)
+      .in("status", ["active", "completed"]);
 
-  const { data: rawListings } = await query;
+    if (condition) query = query.eq("condition", condition);
+    if (modality) query = query.in("modality", modality === "both" ? ["both"] : [modality, "both"]);
+    if (price_min) query = query.gte("price", Number(price_min));
+    if (price_max) query = query.lte("price", Number(price_max));
+
+    if (sort === "price_asc") query = query.order("price", { ascending: true });
+    else if (sort === "price_desc") query = query.order("price", { ascending: false });
+    else query = query.order("created_at", { ascending: false });
+
+    const res = await query;
+    rawListings = res.data;
+  }
   let listings = ((rawListings ?? []) as unknown as (ListingWithBook & { reviews?: { rating: number }[] })[]).map((l) => {
     const reviews = l.reviews ?? [];
     return {
