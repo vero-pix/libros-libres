@@ -6,6 +6,13 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "15 abril 2026",
+    title: "Fix: publicar libros antiguos sin ISBN",
+    description:
+      "Algunos vendedores reportaron que al publicar libros antiguos que no tienen ISBN, el formulario manual parecía borrarse al tocar el campo de ISBN. Arreglado: ahora los datos que escribes a mano se conservan aunque cambies de un modo a otro.",
+    tag: "Fix",
+  },
+  {
+    date: "15 abril 2026",
     title: "La portada ya no empieza en alemán",
     description:
       "Reordené la home: los libros en español y con portada aparecen primero; los que están en otros idiomas quedan al final y llevan una etiqueta visible (DE, EN, FR) para que sepas antes de hacer clic. La primera impresión importa.",
