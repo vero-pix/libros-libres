@@ -32,6 +32,11 @@
 - [ ] **Decisión Meta (Instagram / Facebook)** — Vero reconoce que "que siga pendiente es terrible decisión". Pendiente crear cuentas nuevas con `admin@tuslibros.cl` + 2FA.
 - [x] **Responder a Felipe (Libros De La Buhardilla)** — email enviado 15 abril con fix + oferta de ayuda + destacado.
 
+## Acciones autónomas (mi lado) — ejecutadas 15 abril noche
+
+- [x] **Incidente home 500 → resuelto.** El cache de home del commit `5e8a415` envolvía `createClient()` SSR (con `cookies()`) dentro de `unstable_cache` → Next.js crasheaba el path sin filtros. Dos commits: (1) revert rápido `3d0c513` para levantar prod, (2) fix correcto `9b1179b` con `lib/supabase/public.ts` (cliente anon sin cookies) que recupera el ahorro de CPU. Verificado 5/5 tests QA contra prod.
+- [x] **Agente QA con Playwright** — setup completo. `playwright.config.ts` + `tests/e2e/golden-paths.spec.ts` con 5 flujos (home, search, ficha, publish requiere login, footer). Comandos: `npm run qa` (local), `npm run qa:prod` (contra tuslibros.cl), `npm run qa:ui` (modo interactivo). Retry 1 + screenshots + video en fallos.
+
 ## Acciones autónomas (mi lado) — ejecutadas 15 abril tarde
 
 - [x] **Tab "Negocio" en `/admin`** — embudo de conversión (visitas → registro → orden → pago), revenue confirmado, carritos abandonados con tiempo, órdenes pendientes de pago, top vendedores. Endpoint nuevo: `/api/admin/business-metrics`. Te permite ver todo esto sin pedirme queries.
@@ -218,8 +223,9 @@
 - [x] Setup y monitoreo — 10 páginas indexadas, structured data shipping/returns agregado
 
 **Agente QA con Playwright**
-- [ ] Setup Playwright contra preview y producción
-- [ ] Flujos dorados automatizados: registro, búsqueda, agregar al carrito, bundle checkout, pago sandbox, mensajería, publicar libro
+- [x] Setup Playwright contra local y producción (15 abril)
+- [x] 5 flujos dorados iniciales: home, search, ficha libro, publish requiere login, footer
+- [ ] Ampliar a: registro real, agregar al carrito, bundle checkout, pago sandbox MP, mensajería, publicar libro con login
 - [ ] Subagente `ux-tester` custom que corre flujos bajo demanda con screenshots
 
 ### 🟠 Prioridad media
