@@ -257,6 +257,17 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               </p>
               <p className="text-[10px] text-gray-400">Ver todos sus libros</p>
             </div>
+            {listing.seller?.mercadopago_user_id && (
+              <span
+                className="ml-auto inline-flex items-center gap-1 bg-[#009EE3]/10 text-[#009EE3] px-2 py-0.5 rounded-full border border-[#009EE3]/25 text-[10px] font-semibold"
+                title="Pago seguro con MercadoPago — tu compra queda protegida"
+              >
+                <svg viewBox="0 0 24 24" className="w-3 h-3" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 14.414L6.586 12 8 10.586l3 3 5-5L17.414 10l-6.414 6.414z" />
+                </svg>
+                Pago seguro
+              </span>
+            )}
           </Link>
 
           {/* Share */}
