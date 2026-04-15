@@ -125,11 +125,29 @@ export default async function HomePage({ searchParams }: Props) {
     };
   });
 
-  // Featured listings first (paid plans), then preserve selected sort
+  // Heurística: detectar libros que NO están en español (alemán u otros idiomas
+  // no-latinos evidentes). Los mandamos al final para que la home no muestre
+  // títulos ilegibles como primera impresión.
+  const looksNonSpanish = (l: ListingWithBook) => {
+    const text = `${l.book.title ?? ""} ${l.book.author ?? ""}`.toLowerCase();
+    if (/[äöüß]/.test(text)) return true;
+    if (/\b(der|die|das|und|ein|eine|für|nicht|mit|ist|sich|auf|dem|den|wenn|wir|ich)\b/.test(text)) return true;
+    // Autores conocidos en alemán que ya están cargados en catálogo
+    if (/\bfrisch\b|\bkafka\b|\bhesse\b|\bgrass\b|\bmann\b/.test(text)) return true;
+    return false;
+  };
+  const hasCover = (l: ListingWithBook) =>
+    !!(l.cover_image_url || l.book?.cover_url);
+
+  // Orden final: (1) featured pagos, (2) con portada, (3) en español,
+  // manteniendo el orden seleccionado del query dentro de cada tier.
   listings.sort((a, b) => {
     if (a._featured && !b._featured) return -1;
     if (!a._featured && b._featured) return 1;
-    // Within same tier, preserve the sort from the query (created_at, price, etc.)
+    const coverA = hasCover(a), coverB = hasCover(b);
+    if (coverA !== coverB) return coverA ? -1 : 1;
+    const nonEsA = looksNonSpanish(a), nonEsB = looksNonSpanish(b);
+    if (nonEsA !== nonEsB) return nonEsA ? 1 : -1;
     return 0;
   });
 
