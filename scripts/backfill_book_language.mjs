@@ -66,7 +66,11 @@ for (const b of books) {
   let detected = await fromOpenLibrary(b.isbn);
   if (!detected) detected = heuristic(b.title, b.author);
   counts[detected] = (counts[detected] ?? 0) + 1;
-  if (detected !== current) {
+  // Conservador: solo aplica cambios a 'de' (heurística muy confiable con ä/ö/ü/ß).
+  // Francés e inglés tienen demasiados falsos positivos con libros en español.
+  const onlyGerman = process.argv.includes("--only-german");
+  const shouldApply = onlyGerman ? detected === "de" : true;
+  if (detected !== current && shouldApply) {
     changed++;
     console.log(`${b.title?.slice(0, 50)} [${b.author?.slice(0, 25)}] → ${detected}`);
     if (fix) {
