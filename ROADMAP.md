@@ -24,7 +24,24 @@
 - [x] Vercel Analytics activo
 - [x] PageTracker propio en `page_views` (tabla Supabase) — listings vistos, fuente de tráfico, usuario
 
-## Pendientes de esta línea de trabajo
+## Acciones de Vero — estado 15 abril tarde
+
+- [ ] **Post LinkedIn** — movido al **próximo martes 21 abril**. Tracción previa bajísima, decisión de Vero de posponer una semana con mejor preparación (anécdotas de visitas a librerías).
+- [ ] **🔴 PENDIENTE URGENTE — Visitas a librerías físicas de Santiago**. Pospuesto desde el 11 abril, sigue sin ejecutar. Alta prioridad declarada por Vero el 15 abril.
+- [ ] **Post narrativo en r/chile** — Vero pidió ayuda **esta noche (15 abril)**. Necesita draft con tono confesional + call honesta de feedback, sin disfraz de marketing.
+- [ ] **Decisión Meta (Instagram / Facebook)** — Vero reconoce que "que siga pendiente es terrible decisión". Pendiente crear cuentas nuevas con `admin@tuslibros.cl` + 2FA.
+- [x] **Responder a Felipe (Libros De La Buhardilla)** — email enviado 15 abril con fix + oferta de ayuda + destacado.
+
+## Acciones autónomas (mi lado) — ejecutadas 15 abril tarde
+
+- [x] **Tab "Negocio" en `/admin`** — embudo de conversión (visitas → registro → orden → pago), revenue confirmado, carritos abandonados con tiempo, órdenes pendientes de pago, top vendedores. Endpoint nuevo: `/api/admin/business-metrics`. Te permite ver todo esto sin pedirme queries.
+- [x] **Fix OG images**: el share en WhatsApp/redes ahora usa la foto del vendedor (`cover_image_url`) primero, después Open Library. Aplicado en `/libro/[username]/[slug]` y `/listings/[id]`. Los 2 PATHS estaban con el mismo gap.
+- [x] **Borrador post Reddit r/chile** en `docs/reddit_r_chile_post.md` — dos opciones de tono (confesional corta + pregunta directa), notas tácticas, métricas a monitorear antes/después.
+
+## Acciones autónomas pendientes (no bloqueantes, las hago cuando vuelvas)
+
+- [ ] Email de carrito abandonado automático (cron + Resend + template). NO se construyó hoy porque post-limpieza solo queda el carrito de Fabian ya vendido por WhatsApp — la automatización no tendría efecto inmediato. Volver cuando haya carritos nuevos que justifiquen la infra.
+- [ ] Páginas SEO de colecciones (`/coleccion/maigret`, `/coleccion/biblioteca-de-babel`). NO se construyó hoy porque requiere contenido editorial que merece decisión tuya de tono.
 
 - [ ] Detector preciso de francés e inglés (franc-min u otra lib). La heurística actual tiene muchos falsos positivos con títulos en español que comparten palabras (la, le, de, of, in). Esto NO se hizo hoy porque requiere instalar una dependencia nueva (`franc-min`) y evaluarla contra el catálogo — lo dejo solo en caso de que molesten los 7 libros que quedaron marcados como `fr` erróneamente; si no se notan, no vale el tiempo.
 

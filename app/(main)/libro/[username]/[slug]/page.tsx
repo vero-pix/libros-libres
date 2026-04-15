@@ -50,7 +50,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ? rawDesc
       : rawDesc.slice(0, rawDesc.lastIndexOf(" ", 157)) + "..."
     : `${listing.modality === "loan" ? "Arrienda" : "Compra"} "${listing.book.title}" de ${listing.book.author} en tuslibros.cl. ${listing.price ? `$${listing.price.toLocaleString("es-CL")} CLP.` : ""} Publicado por ${listing.seller?.full_name || "un vendedor"}.`;
-  const image = listing.book.cover_url || "/og-image.png";
+  const image = listing.cover_image_url || listing.book.cover_url || "/og-image.png";
   const url = `https://tuslibros.cl/libro/${params.username}/${params.slug}`;
 
   return {

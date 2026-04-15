@@ -29,8 +29,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${listing.book.title} — ${listing.book.author} | tuslibros.cl`;
   const description = listing.book.description
     || `${listing.book.title} de ${listing.book.author} en tuslibros.cl.`;
+  const image = listing.cover_image_url || listing.book.cover_url || "/og-image.png";
 
-  return { title, description };
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      siteName: "tuslibros.cl",
+      type: "article",
+      locale: "es_CL",
+      images: [{ url: image, width: 600, height: 900, alt: listing.book.title }],
+    },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
+  };
 }
 
 export default async function ListingByIdPage({ params }: Props) {

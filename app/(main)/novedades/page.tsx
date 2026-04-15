@@ -6,6 +6,13 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "15 abril 2026",
+    title: "Portada correcta al compartir en WhatsApp",
+    description:
+      "Cuando compartías un link de tuslibros.cl por WhatsApp u otras redes, salía la portada genérica de Open Library en vez de la foto real del libro que subió el vendedor. Ya no. Ahora aparece primero la foto del vendedor, y solo si no tiene se usa la portada por defecto.",
+    tag: "Fix",
+  },
+  {
+    date: "15 abril 2026",
     title: "Fix: publicar libros antiguos sin ISBN",
     description:
       "Algunos vendedores reportaron que al publicar libros antiguos que no tienen ISBN, el formulario manual parecía borrarse al tocar el campo de ISBN. Arreglado: ahora los datos que escribes a mano se conservan aunque cambies de un modo a otro.",

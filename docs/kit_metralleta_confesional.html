@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tuslibros.cl — Kit Metralleta (versión confesional)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #f5f0e8; color: #1a1a2e; font-size: 14px; line-height: 1.6; padding: 40px 20px 80px; }
+  .page { max-width: 720px; margin: 0 auto; }
+
+  h1 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  h1 span { color: #d4a017; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 40px; border-bottom: 2px solid #1a1a2e; padding-bottom: 20px; }
+
+  .nota { background: #fdf5e0; border-left: 3px solid #d4a017; padding: 16px 20px; margin-bottom: 40px; font-size: 13px; color: #555; line-height: 1.7; }
+  .nota strong { color: #1a1a2e; }
+
+  .msg-section { margin-bottom: 48px; }
+  .msg-header { margin-bottom: 16px; }
+  .msg-header h2 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
+  .msg-header .canal { font-size: 11px; color: #888; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+  .msg-context { font-size: 13px; color: #888; font-style: italic; margin-bottom: 12px; line-height: 1.6; }
+
+  .msg-box { background: white; border: 1px solid #e0dbd2; border-radius: 12px; padding: 24px; position: relative; white-space: pre-wrap; font-size: 13px; line-height: 1.8; color: #333; }
+  .msg-box .subject { font-weight: 700; color: #1a1a2e; margin-bottom: 12px; font-size: 12px; letter-spacing: 0.5px; }
+
+  .copy-btn { position: absolute; top: 12px; right: 12px; background: #1a1a2e; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: inherit; }
+  .copy-btn:hover { background: #333; }
+
+  .divider { border: none; border-top: 1px solid #e0dbd2; margin: 48px 0; }
+
+  .footer { text-align: center; font-size: 12px; color: #aaa; margin-top: 60px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Kit <span>Metralleta</span></h1>
+  <div class="subtitle">Mensajes listos para copiar y mandar. Versión confesional — abril 2026.</div>
+
+  <div class="nota">
+    <strong>Tono:</strong> Estos mensajes están escritos como habla Vero, no como habla una marca.
+    Parten de algo real — un problema, una anécdota, una pregunta incómoda.
+    Si suena como algo que podrías decir en una conversación de pasillo, está bien.
+    Si suena como un folleto, hay que reescribirlo.
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- 1. VENDEDORES — LinkedIn / Email / WhatsApp -->
+  <!-- ═══════════════════════════════════════ -->
+
+  <div class="msg-section">
+    <div class="msg-header">
+      <h2>1. Para vendedores (personas con libros en la casa)</h2>
+      <div class="canal">LinkedIn · Email · WhatsApp · Reenvío</div>
+    </div>
+    <div class="msg-context">
+      Este es el mensaje más importante. Lo puedes publicar en LinkedIn, mandarlo por WhatsApp,
+      o reenviarlo a alguien que sabes que tiene repisas llenas. Funciona como post o como mensaje directo.
+    </div>
+    <div class="msg-box" id="msg-vendedores">
+      <button class="copy-btn" onclick="copyMsg('msg-vendedores')">Copiar</button>
+Pregunta honesta: ¿cuántos libros tienes que ya leíste y no vas a volver a leer?
+
+Yo tenía más de 200. Los contaba con culpa, como si acumularlos fuera quererlos.
+
+Pero un libro que nadie lee no es un tesoro — es polvo con buena portada.
+
+Así que hice tuslibros.cl. Publicas en 30 segundos, le ponemos precio, y si alguien lo quiere, coordinamos el envío y te llega la plata directo. Sin intermediarios, sin comisiones raras.
+
+No es una startup, no es una app con inversionistas. Soy yo, Verónica, una economista que tiene más libros que ropa y decidió resolver el problema en vez de seguir quejándose.
+
+Si tienes libros parados: tuslibros.cl
+Si conoces a alguien que los tiene: reenvía esto.
+
+Los libros circulando son más útiles que los libros acumulando polvo.</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- 2. CENTROS DE ALUMNOS -->
+  <!-- ═══════════════════════════════════════ -->
+
+  <div class="msg-section">
+    <div class="msg-header">
+      <h2>2. Para centros de alumnos</h2>
+      <div class="canal">Email institucional</div>
+    </div>
+    <div class="msg-context">
+      El objetivo es que te den 20 minutos. No cerrar nada por email.
+      Adjuntar la propuesta de alianza de una página.
+    </div>
+    <div class="msg-box" id="msg-centros">
+      <button class="copy-btn" onclick="copyMsg('msg-centros')">Copiar</button>
+      <div class="subject">ASUNTO: Una idea para los libros que tus estudiantes ya no usan</div>
+Hola [nombre],
+
+Soy Verónica Velásquez. Hice tuslibros.cl porque me parecía absurdo que hubiera miles de libros universitarios acumulando polvo en departamentos de Santiago mientras otros estudiantes los andan buscando.
+
+La plataforma ya funciona: publicar es gratis, el pago va directo al vendedor, y coordinamos el envío. Solo cobramos cuando se vende.
+
+Lo que quiero proponerles es simple: que el Centro de Alumnos de [Universidad] ayude a difundir la plataforma entre sus estudiantes. A cambio, ofrecemos visibilidad para las actividades del Centro en el sitio y una comisión por cada venta que venga de sus canales.
+
+No es un proyecto gigante ni una integración técnica — es básicamente un link y un par de mensajes en sus canales.
+
+¿Tienes 20 minutos esta semana para que te lo cuente? Adjunto una página con el detalle.
+
+Verónica Velásquez
+tuslibros.cl · vero@tuslibros.cl</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- 3. BIBLIOTECAS -->
+  <!-- ═══════════════════════════════════════ -->
+
+  <div class="msg-section">
+    <div class="msg-header">
+      <h2>3. Para bibliotecas universitarias</h2>
+      <div class="canal">Email institucional</div>
+    </div>
+    <div class="msg-context">
+      Este es el gancho más fuerte: cuando tu catálogo no tiene el libro, nosotros probablemente sí.
+      No es competencia, es complemento.
+    </div>
+    <div class="msg-box" id="msg-biblioteca">
+      <button class="copy-btn" onclick="copyMsg('msg-biblioteca')">Copiar</button>
+      <div class="subject">ASUNTO: Cuando un libro no está en el catálogo — una propuesta</div>
+Estimado/a [nombre]:
+
+Mi nombre es Verónica Velásquez. Dirijo tuslibros.cl, una plataforma de libros usados entre personas, con búsqueda por ISBN y envío a domicilio.
+
+Le escribo por algo concreto: cada semestre hay estudiantes que buscan un título en la biblioteca, no está disponible, y quedan sin opciones. Ese libro probablemente existe — en la repisa de alguien que lo leyó el semestre pasado.
+
+La propuesta es que cuando un título de su catálogo no esté disponible, la ficha pueda incluir un enlace a tuslibros.cl donde ese mismo libro puede estar en versión usada. El estudiante no queda sin solución, y la biblioteca ofrece un recurso adicional sin costo.
+
+No requiere integración técnica — basta con un link en la sección de recursos alternativos.
+
+¿Le interesa conversar 20 minutos? Puedo ir a la biblioteca o hacemos una videollamada corta.
+
+Verónica Velásquez
+tuslibros.cl · vero@tuslibros.cl</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- 4. LIBRERÍAS DE BARRIO -->
+  <!-- ═══════════════════════════════════════ -->
+
+  <div class="msg-section">
+    <div class="msg-header">
+      <h2>4. Para librerías de segunda mano</h2>
+      <div class="canal">Visita presencial</div>
+    </div>
+    <div class="msg-context">
+      Este funciona mejor cara a cara. Llegas, te presentas, dejas la hoja impresa.
+      El pitch es: vitrina digital sin tener que construirla.
+    </div>
+    <div class="msg-box" id="msg-libreria">
+      <button class="copy-btn" onclick="copyMsg('msg-libreria')">Copiar</button>
+Hola, buenos días.
+
+Soy Verónica, de tuslibros.cl — una plataforma de libros usados que estamos lanzando acá en Chile.
+
+Le voy a ser directa: usted tiene libros que la gente de otros barrios no sabe que existen. Y yo tengo una plataforma donde esos libros aparecen en un mapa, con precio, fotos y envío coordinado.
+
+La idea es simple: usted publica su inventario en tuslibros.cl, nosotros coordinamos el despacho cuando alguien compra, y la plata le llega directo. Sin costo fijo — solo una comisión cuando se vende.
+
+Es como tener una segunda vitrina, pero en todo Santiago.
+
+Le dejo esta hoja con el detalle. Si le interesa, me llama o me escribe y partimos esta misma semana.
+
+[entregar propuesta de una página]</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- 5. COLEGIOS IB / BILINGÜES -->
+  <!-- ═══════════════════════════════════════ -->
+
+  <div class="msg-section">
+    <div class="msg-header">
+      <h2>5. Para apoderados de colegios IB / bilingües</h2>
+      <div class="canal">WhatsApp grupo apoderados</div>
+    </div>
+    <div class="msg-context">
+      Un solo post. El objetivo es que un apoderado lo comparta a otros grupos.
+      Los libros IB cuestan $40.000-80.000 nuevos — el gancho económico es fuerte.
+    </div>
+    <div class="msg-box" id="msg-ib">
+      <button class="copy-btn" onclick="copyMsg('msg-ib')">Copiar</button>
+Hola a todos, perdón por el mensaje largo pero creo que vale la pena.
+
+¿Se acuerdan de lo que gastaron en libros del IB el año pasado? ¿Y dónde están esos libros ahora?
+
+Probablemente en un estante. Los míos también estaban así.
+
+Hice tuslibros.cl para resolver exactamente eso: los estudiantes publican los libros que ya usaron y otros los compran a una fracción del precio. Con envío a domicilio y pago seguro.
+
+Publicar es gratis. Solo se cobra comisión cuando el libro se vende.
+
+Si sus hijos tienen textos del año pasado (IB, Cambridge, AP, lo que sea), pueden subirlos en 30 segundos: tuslibros.cl
+
+Y si alguien está buscando textos para este semestre, probablemente ya están ahí.
+
+Ojalá les sirva. Si alguien tiene preguntas, me escriben directo: vero@tuslibros.cl</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- 6. COORDINADORES DE CARRERA -->
+  <!-- ═══════════════════════════════════════ -->
+
+  <div class="msg-section">
+    <div class="msg-header">
+      <h2>6. Para coordinadores de carrera / profesores</h2>
+      <div class="canal">Email directo</div>
+    </div>
+    <div class="msg-context">
+      Nuevo canal. Los coordinadores de carrera tienen el email de todos los alumnos
+      y pueden reenviar una recomendación con un click. El gancho: los textos obligatorios son caros.
+    </div>
+    <div class="msg-box" id="msg-coordinador">
+      <button class="copy-btn" onclick="copyMsg('msg-coordinador')">Copiar</button>
+      <div class="subject">ASUNTO: Recurso para tus estudiantes — libros de la carrera a menor precio</div>
+Hola [nombre],
+
+Soy Verónica Velásquez, de tuslibros.cl.
+
+Te escribo porque sé que cada semestre tus estudiantes gastan fortunas en textos que otros estudiantes de la misma carrera ya tienen guardados en la casa.
+
+tuslibros.cl es una plataforma donde pueden vender y comprar esos libros entre ellos — con envío coordinado y pago seguro. Publicar es gratis.
+
+No te pido nada complicado: si te parece útil, basta con reenviar este mensaje a tus alumnos o mencionarlo en algún canal de la carrera. Eso ya ayuda mucho.
+
+Si quieres ver qué libros de [carrera] ya están disponibles: tuslibros.cl/search?q=[carrera]
+
+Cualquier duda, me escribes.
+
+Verónica Velásquez
+tuslibros.cl · vero@tuslibros.cl</div>
+  </div>
+
+</div>
+
+<div class="footer">
+  tuslibros.cl — Kit Metralleta v2 (confesional) · Abril 2026
+</div>
+
+<script>
+function copyMsg(id) {
+  const el = document.getElementById(id);
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text.trim()).then(() => {
+    const btn = el.querySelector('.copy-btn') || el.parentElement.querySelector('.copy-btn');
+    if (btn) { btn.textContent = '¡Copiado!'; setTimeout(() => btn.textContent = 'Copiar', 2000); }
+  });
+}
+</script>
+</body>
+</html>
