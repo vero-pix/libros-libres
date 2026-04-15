@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "bulk-upload": "npx tsx scripts/bulk-upload.ts"
+    "bulk-upload": "npx tsx scripts/bulk-upload.ts",
+    "qa": "playwright test",
+    "qa:prod": "QA_BASE_URL=https://tuslibros.cl playwright test",
+    "qa:ui": "playwright test --ui"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
@@ -27,6 +30,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/typography": "^0.5.19",
     "@types/mapbox-gl": "^3.4.1",
     "@types/node": "^20.17.30",

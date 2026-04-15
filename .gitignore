@@ -45,3 +45,8 @@ docs/*.pdf
 docs/maigret.jpg
 linda*
 public/hero-libros-old.jpg
+
+# Playwright
+/test-results/
+/tests/playwright-report/
+/playwright/.cache/

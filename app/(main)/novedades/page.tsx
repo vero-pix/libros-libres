@@ -6,6 +6,13 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "15 abril 2026",
+    title: "Home más rápida (y estable)",
+    description:
+      "Ajusté el cache del home para que responda al instante y sin quemar CPU. Si pillaste un error pasajero en la tarde, ya quedó resuelto. Ahora la portada carga fluida aunque tengamos más tráfico.",
+    tag: "Mejora",
+  },
+  {
+    date: "15 abril 2026",
     title: "Portada correcta al compartir en WhatsApp",
     description:
       "Cuando compartías un link de tuslibros.cl por WhatsApp u otras redes, salía la portada genérica de Open Library en vez de la foto real del libro que subió el vendedor. Ya no. Ahora aparece primero la foto del vendedor, y solo si no tiene se usa la portada por defecto.",
