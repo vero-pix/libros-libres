@@ -26,9 +26,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const listing = await getListing(params.id);
   if (!listing) return { title: "Libro no encontrado — tuslibros.cl" };
 
-  const title = `${listing.book.title} — ${listing.book.author} | tuslibros.cl`;
+  const priceStr = listing.price ? `$${listing.price.toLocaleString("es-CL")}` : "";
+  const title = priceStr
+    ? `${listing.book.title} — ${listing.book.author} (${priceStr}, usado)`
+    : `${listing.book.title} — ${listing.book.author}`;
   const description = listing.book.description
-    || `${listing.book.title} de ${listing.book.author} en tuslibros.cl.`;
+    ? (listing.book.description.length <= 160 ? listing.book.description : listing.book.description.slice(0, 157) + "…")
+    : `${listing.book.title} de ${listing.book.author} — libro usado${priceStr ? ` desde ${priceStr}` : ""}. Envío por courier o retiro en Chile. tuslibros.cl`;
   const image = listing.cover_image_url || listing.book.cover_url || "/og-image.png";
 
   return {

@@ -31,17 +31,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const { data: listings } = await supabase
       .from("listings")
-      .select("id, updated_at")
+      .select("id, slug, updated_at, seller:users(username)")
       .eq("status", "active")
       .order("updated_at", { ascending: false })
-      .limit(500);
+      .limit(1000);
 
-    listingPages = (listings ?? []).map((l) => ({
-      url: `${baseUrl}/listings/${l.id}`,
-      lastModified: new Date(l.updated_at),
-      changeFrequency: "weekly" as const,
-      priority: 0.9,
-    }));
+    listingPages = (listings ?? []).map((l: any) => {
+      const username = l.seller?.username;
+      const url =
+        username && l.slug
+          ? `${baseUrl}/libro/${username}/${l.slug}`
+          : `${baseUrl}/listings/${l.id}`;
+      return {
+        url,
+        lastModified: new Date(l.updated_at),
+        changeFrequency: "weekly" as const,
+        priority: 0.9,
+      };
+    });
   } catch {
     // Sitemap still works without dynamic pages
   }

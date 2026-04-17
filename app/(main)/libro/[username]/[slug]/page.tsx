@@ -43,13 +43,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Libro no encontrado — tuslibros.cl" };
   }
 
-  const title = `${listing.book.title} — ${listing.book.author} | tuslibros.cl`;
+  const priceStr = listing.price ? `$${listing.price.toLocaleString("es-CL")}` : "";
+  const title = priceStr
+    ? `${listing.book.title} — ${listing.book.author} (${priceStr}, usado)`
+    : `${listing.book.title} — ${listing.book.author}`;
   const rawDesc = listing.book.description;
+  const sellerName = listing.seller?.full_name || "un vendedor de tuslibros.cl";
   const description = rawDesc
-    ? rawDesc.length <= 160
-      ? rawDesc
-      : rawDesc.slice(0, rawDesc.lastIndexOf(" ", 157)) + "..."
-    : `${listing.modality === "loan" ? "Arrienda" : "Compra"} "${listing.book.title}" de ${listing.book.author} en tuslibros.cl. ${listing.price ? `$${listing.price.toLocaleString("es-CL")} CLP.` : ""} Publicado por ${listing.seller?.full_name || "un vendedor"}.`;
+    ? (rawDesc.length <= 160 ? rawDesc : rawDesc.slice(0, rawDesc.lastIndexOf(" ", 157)) + "…")
+    : `${listing.book.title} de ${listing.book.author} — libro usado${priceStr ? ` desde ${priceStr}` : ""}. Publicado por ${sellerName} en tuslibros.cl. Envío por courier o retiro en mano en Chile.`;
   const image = listing.cover_image_url || listing.book.cover_url || "/og-image.png";
   const url = `https://tuslibros.cl/libro/${params.username}/${params.slug}`;
 
@@ -119,9 +121,11 @@ export default async function LibroPage({ params }: Props) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: listing.book.title,
-    description: listing.book.description || `${listing.book.title} de ${listing.book.author}`,
-    image: listing.book.cover_url || undefined,
+    name: `${listing.book.title} — ${listing.book.author}`,
+    description: listing.book.description || `${listing.book.title} de ${listing.book.author}. Libro usado publicado en tuslibros.cl.`,
+    image: listing.cover_image_url || listing.book.cover_url || undefined,
+    brand: { "@type": "Brand", name: "tuslibros.cl" },
+    itemCondition: "https://schema.org/UsedCondition",
     author: { "@type": "Person", name: listing.book.author },
     isbn: listing.book.isbn || undefined,
     offers: {

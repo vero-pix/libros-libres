@@ -24,16 +24,29 @@ export const viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tuslibros.cl"),
-  title: "Libros Libres — Donde los libros encuentran nuevos lectores",
+  title: {
+    default: "tuslibros.cl — Libros usados en Chile con envío o retiro",
+    template: "%s | tuslibros.cl",
+  },
   description:
-    "Compra, vende y presta libros cerca de ti. Publica gratis, paga seguro con MercadoPago, recibe en tu casa.",
-  keywords: ["libros", "segunda mano", "marketplace", "préstamo", "Chile"],
+    "Compra y vende libros usados en Santiago y todo Chile. Desde $3.000, pago seguro con MercadoPago, despacho por courier o retiro en mano. Publica gratis tu biblioteca.",
+  keywords: [
+    "libros usados",
+    "libros usados Chile",
+    "libros usados Santiago",
+    "comprar libros usados",
+    "vender libros usados",
+    "libros segunda mano",
+    "marketplace libros",
+    "arriendo libros",
+    "librería online Chile",
+  ],
   openGraph: {
-    title: "Libros Libres — Donde los libros encuentran nuevos lectores",
+    title: "tuslibros.cl — Libros usados en Chile con envío o retiro",
     description:
-      "Compra, vende y presta libros cerca de ti. Publica gratis, paga seguro con MercadoPago, recibe en tu casa.",
+      "Compra y vende libros usados en Chile. Desde $3.000, pago seguro con MercadoPago, despacho o retiro.",
     url: "https://tuslibros.cl",
-    siteName: "Libros Libres",
+    siteName: "tuslibros.cl",
     type: "website",
     locale: "es_CL",
     images: [
@@ -41,15 +54,15 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Libros Libres — Donde los libros encuentran nuevos lectores",
+        alt: "tuslibros.cl — Libros usados en Chile",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Libros Libres — Donde los libros encuentran nuevos lectores",
+    title: "tuslibros.cl — Libros usados en Chile",
     description:
-      "Compra, vende y presta libros cerca de ti. Publica gratis, paga seguro con MercadoPago, recibe en tu casa.",
+      "Libros usados en Chile desde $3.000. Pago seguro, despacho o retiro en mano.",
     images: ["/og-image.png"],
   },
 };
