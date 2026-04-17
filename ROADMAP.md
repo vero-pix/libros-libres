@@ -1,6 +1,72 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 15 abril 2026
+Última actualización: 16 abril 2026 (noche)
+
+---
+
+## Sesión 16 abril 2026 — tarde/noche
+
+**Hitos grandes del día:**
+- [x] **Zdravko respondió al testimonio** — autorizado para publicar como "Z." Cita completa en `memory/project_primer_comprador.md`. Ya vive en el home como `TestimonialBanner`.
+- [x] **Primer nuevo vendedor tras el lanzamiento beta: Nicolás Eltit** (`nicoeltit@gmail.com`, Las Condes) — registro OK, MP conectado. Único listing: Mein Kampf a $35.000. Marcado como `deprioritized` por tono.
+- [x] **Catálogo curado**: top 10 destacados con orden controlado (`featured_rank`) + fila nueva de coleccionables + 4 libros marcados como colección (Parra Nascimento 1972 + Emar "Un Año" + Emar "Ayer" + De Rokha Habana 1991).
+
+**Cambios de código y BD:**
+- [x] Columna `listings.deprioritized` (boolean) — baja en el orden sin esconder. Aplicada al sort de home, mapa, API `/api/listings`, y búsqueda.
+- [x] Columna `listings.featured_rank` (int) — orden controlado manualmente para los destacados. `getFeaturedListings` ahora ordena por rank.
+- [x] Columna `listings.is_collectible` (boolean) — para objetos de colección (propiedad del ejemplar, no del libro en abstracto). Nuevo componente `CollectibleRow` en home + badge "Colección" en `ListingCard`.
+- [x] **Top 10 destacados con orden fijo**: 1. Parra (Nascimento 1972, colección) 2. Donoso 3. Borges (El Aleph) 4. García Márquez (General en su laberinto) 5. Vargas Llosa (Conversación I) 6. Fuentes (La Región Más Transparente) 7. Wilde (Canterville) 8. Kundera 9. Monterroso (La Letra E) 10. Franzen (Libertad).
+- [x] **Mapa "con más alma"**: markers diferenciados por tier (coleccionable ink+borde dorado, featured ámbar, regular dorado), thumbnails de portada en sidebar, copy cálido "Libros a la vuelta de la esquina", leyenda visual.
+- [x] **3 coleccionables publicados bajo seller vero**: Juan Emar "Un Año" ($12k, slug `un-ano`), Emar "Ayer" ($14k, slug `ayer`), Pablo de Rokha "Lo humano en la poesía" ($14k, slug `lo-humano-en-la-poesia`, edición cubana 1991 con 4 fotos). Script reutilizable: `scripts/publish_collectibles.mjs`.
+- [x] **Email testimonio Zdravko enviado** via Resend (ID `b1bf8684-cb8f-4a8c-8c6d-fab435dcbb51`, desde `noreply@tuslibros.cl` reply-to `vero@economics.cl`) y **respondido** esa misma madrugada.
+- [x] **SEO overhaul** (post auditoría):
+  - Hero del home reescrito: titular claro "Libros usados en Chile, con envío o retiro en mano" + precio desde + dos CTA (Explorar / Publicar). Reemplaza el hero poético.
+  - Metadata global con keywords de intención ("libros usados santiago/chile").
+  - Fichas de libro: title con precio `(Título — Autor — $PRECIO, usado)` para mejor CTR en SERPs.
+  - Schema.org Product con `itemCondition: UsedCondition` y `brand`.
+  - **Sitemap crítico**: ahora usa `/libro/username/slug` en vez de `/listings/UUID`. Antes Google indexaba URLs feas.
+- [x] Novedades actualizada con todas las entradas del día.
+
+**Scripts nuevos (reutilizables):**
+- `scripts/check_nicolas.mjs` — diagnóstico vendedor
+- `scripts/rank_featured_candidates.mjs` — ranquea catálogo por heurística autor/portada/precio/idioma/MP
+- `scripts/build_featured_sql.mjs` — genera SQL para top 10
+- `scripts/verify_featured.mjs` — verifica featured y coleccionables aplicados
+- `scripts/publish_collectibles.mjs` — publica libros con múltiples fotos + is_collectible
+- `scripts/audit_entry_exit.mjs` — entry/exit pages, bounce, referrers, catálogo invisible, embudo
+
+**Auditoría 30d al cierre del día:**
+- 339 sessions / 1000 pageviews / 2.95 views/sesión
+- **Bounce rate 72.6%** — 246 sessions de 1 sola página
+- 97% entra por `/` home (329/339)
+- 72.9% del catálogo invisible — 137 de 188 listings sin una sola visita en 30d
+- Embudo compra: 0 carritos, 0 checkouts, 2 logins, 0 registros, 0 órdenes
+- Google trajo solo 46 visitas en 30d. IG+FB+LinkedIn: 4 visitas combinadas.
+- **Top visitados son paradójicos**: Kokoschka (24), Máximas y Aforismos (7), Lecciones Ciencias Ocultas (6) — NO los autores comerciales → quien llega son buscadores de rarezas, no lectores generales.
+
+**Acciones autónomas ejecutadas (deploy en prod):**
+- Commits: `2d6807e` (deprioritized), `5bf0687` (top10 + coleccionables + mapa), `b38c126` (3 coleccionables nuevos), `18341da` (testimonio), `09a7d33` (SEO + hero).
+- Dos SQL pegados por Vero en Supabase Editor: (1) `deprioritized` column + marcar Nicolás, (2) `featured_rank` + `is_collectible` + top 10 + marcar Parra coleccionable.
+
+**Fixes finales (internos, no van a /novedades):**
+- [x] Portadas de los Emar habían quedado acostadas por EXIF Orientation=6 ignorado al cortar con magick. Fix: `-auto-orient -strip` antes del crop, luego rotar 90° CCW porque los libros estaban apilados arriba-abajo en la foto horizontal original. Script `scripts/_fix_emar_covers.mjs` regenera y re-sube las dos portadas actualizando `cover_image_url`. Patrón reutilizable para futuras fotos de iPhone.
+
+**Pendientes post-sesión:**
+- [ ] **Hobsbawm "Un tiempo de rupturas"** quedó con `featured=true` sin `featured_rank` (huérfano). No aparece en el top 10 por el `limit(10)` pero técnicamente está marcado. Limpiar: `update listings set featured=false where featured_rank is null and featured=true;`
+- [ ] **Google Search Console**: re-submit del sitemap cambiado (URLs `/libro/…` nuevas). Vero debe hacerlo desde su GSC.
+- [ ] **PostHog + Sentry** — instrumentación de eventos (clicks, scroll, abandono, errores). Requiere cuentas de Vero para DSN/project key.
+- [ ] **Componente testimonios escalable** — hoy TestimonialBanner está hardcodeado. Cuando haya ≥3, migrar a tabla `testimonials` + widget.
+- [ ] **Campañas con deep link** a libros específicos (no al home) en IG/WhatsApp — las redes traen casi cero tráfico hoy.
+- [ ] **Post LinkedIn para `/vender`** — Vero quiere distribuir la landing de captación. Draft listo, tono confesional, CTA a https://tuslibros.cl/vender. Texto consensuado en la sesión (ver chat). Acompañar con 3 imágenes 1080×1080 (mismo estilo que `whatsapp_universitarios_*.png`, pasos "Escanea / Precio / Listo") — no se renderizaron en esta sesión, reusar Playwright + HTML como en `scripts/render_whatsapp_images.mjs`. Horario óptimo: martes–jueves 9–11 AM.
+- [ ] **Distribución multi-canal de `/vender`**: WhatsApp Status + cadenas, IG feed + Stories, Reddit r/chile (draft en `docs/reddit_r_chile_post.md`), email a los 150+ vendedores históricos, grupos FB "Libros Chile", Goodreads.
+- [ ] **SEO de `/vender`** — hoy title/description existen pero podrían apuntar más a la intención de búsqueda ("vender libros usados Chile", "cómo vender mis libros online"). Rápido.
+
+---
+
+## Sesión 16 abril 2026 — mañana
+
+- [x] **Auditoría tracción** — 3 días secos de registros (último: Zdravko + Belen el 13 abril). 20 libros publicados en 3 días pero concentrados en @fabian. Tráfico cayendo: 178 → 141 → 75 → 50. Script reutilizable: `scripts/check_recent_activity.mjs`.
+- [x] **Imágenes WhatsApp universitarios** (1080×1080) — dos ángulos: A arriendo (cream), B venta + arriendo (navy). Para que cliente con hija en U forwardee. Archivos: `docs/whatsapp_universitarios_{a,b}.png`. HTML fuente: `docs/whatsapp_universitarios.html`. Render via Playwright: `scripts/render_whatsapp_images.mjs`.
 
 ---
 
@@ -32,10 +98,11 @@
 - [ ] **Decisión Meta (Instagram / Facebook)** — Vero reconoce que "que siga pendiente es terrible decisión". Pendiente crear cuentas nuevas con `admin@tuslibros.cl` + 2FA.
 - [x] **Responder a Felipe (Libros De La Buhardilla)** — email enviado 15 abril con fix + oferta de ayuda + destacado.
 
-## 🔴 URGENTE 15 abril noche — testimonio Zdravko
+## Testimonio Zdravko
 
-- [ ] **Enviar email a Zdravko (zdravko.miroslav@gmail.com)** pidiendo testimonio sobre su compra del Tomo I de La Marina ($5.000, pagada 7 abril, recibida ~14 abril). Es el PRIMER comprador real con ciclo completo. Draft listo en `docs/email_testimonio_zdravko.md` (dos versiones, recomendación v1). Vero envía desde vero@economics.cl.
-- [ ] Si responde → publicar en home sección "Compraron y cuentan" + reutilizar en Reddit/LinkedIn
+- [x] **Email enviado 16 abril** via Resend a `zdravko.miroslav@gmail.com` (ID `83c40ecf-3734-45a9-a84a-2effe6c0fc7b`). From `noreply@tuslibros.cl`, reply-to `vero@economics.cl`. HTML con botón CTA "Escribir mi testimonio" (mailto pre-llenado). Script reutilizable: `scripts/send_zdravko_email.mjs`.
+- [ ] **Si responde** → publicar en home sección "Compraron y cuentan" + reutilizar en Reddit/LinkedIn.
+- [ ] **Si no responde al 21 abril** (5 días) → seguimiento corto de 2 líneas o dejarlo ir.
 
 ## Feature pendiente — sistema de testimonios post-compra automático
 
