@@ -160,6 +160,8 @@ const ORDERS_HEADERS = {
 export interface ShipitOrderInput {
   /** ID único de la orden en tuslibros.cl */
   orderId: string;
+  /** Cantidad de productos en el paquete (bundle). Default 1. */
+  itemCount?: number;
   /** Datos del destino */
   destiny: {
     street: string;
@@ -171,10 +173,31 @@ export interface ShipitOrderInput {
     email: string;
     phone: string;
   };
-  /** Dimensiones del paquete */
+  /** Dimensiones del paquete. Si no vienen se estiman a partir de itemCount. */
   sizes?: { width: number; height: number; length: number; weight: number };
   /** Courier seleccionado */
   courier: { client: string; price: number };
+}
+
+/**
+ * Estima dimensiones/peso razonables para un paquete de N libros apilados.
+ * Pensado para que Shipit no rechace la emisión por declarar "1 libro" cuando
+ * en realidad van más — problema observado en el bundle de Camilo (17 abril 2026).
+ */
+export function estimateBookPackageSize(itemCount: number): {
+  width: number;
+  height: number;
+  length: number;
+  weight: number;
+} {
+  const n = Math.max(1, Math.min(itemCount, 20));
+  // Libros promedio: 400 g, 20×15 cm, grosor ~3 cm
+  return {
+    width: 20,
+    height: 22,
+    length: Math.min(30, 4 + 3 * n),
+    weight: Math.max(0.5, Math.min(10, 0.1 + 0.4 * n)),
+  };
 }
 
 export interface ShipitOrderResult {
@@ -208,25 +231,28 @@ function extractLabelUrl(data: any): string | undefined {
  * Docs: POST https://orders.shipit.cl/v/orders
  */
 export async function createShipitOrder(input: ShipitOrderInput): Promise<ShipitOrderResult> {
-  const { orderId, destiny, sizes, courier } = input;
+  const { orderId, itemCount, destiny, sizes, courier } = input;
 
   const destCommuneId = destiny.commune_id || (await findCommuneId(destiny.commune_name));
   if (!destCommuneId) {
     return { id: 0, state: "error", error: `Comuna destino no encontrada: ${destiny.commune_name}` };
   }
 
+  const items = Math.max(1, itemCount ?? 1);
+  const resolvedSizes = sizes ?? estimateBookPackageSize(items);
+
   const body = {
     order: {
       kind: 0,
       platform: 2,
       reference: `TL-${orderId.slice(0, 12)}`,
-      items: 1,
+      items,
       seller: {
         status: "paid",
         name: "tuslibros",
         id: orderId,
       },
-      sizes: sizes ?? { width: 15, height: 22, length: 5, weight: 0.5 },
+      sizes: resolvedSizes,
       courier: {
         client: courier.client,
         selected: true,
