@@ -6,6 +6,13 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "16 abril 2026",
+    title: "Tres nuevas piezas de colección en el catálogo",
+    description:
+      "Sumé tres joyas a la sección de coleccionables: 'Un Año' y 'Ayer' de Juan Emar (vanguardia chilena del 35, edición Biblioteca Claves de Chile + LOM), y una antología de Pablo de Rokha editada en La Habana en 1991 durante el Período Especial, papel rústico y todo. Si te gusta la literatura chilena de los márgenes, míralas.",
+    tag: "Nuevo",
+  },
+  {
+    date: "16 abril 2026",
     title: "Nueva fila: Ediciones especiales y coleccionables",
     description:
       "Hay libros que no son 'libros usados' — son objetos con historia: primeras ediciones, tirajes viejos de Nascimento, títulos agotados. Ahora tienen su propia sección en la home y un sello distintivo. El primer destacado: una edición Nascimento 1972 de Poemas y Antipoemas de Nicanor Parra.",
