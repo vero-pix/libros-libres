@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <title>Cards tuslibros.cl — imprimir A4</title>
+  <style>
+    @page { size: A4; margin: 1cm; }
+    body {
+      margin: 0;
+      padding: 1cm;
+      font-family: Georgia, 'Playfair Display', serif;
+      background: #f5f0e8;
+    }
+    .sheet {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 0.5cm;
+      width: 100%;
+      height: calc(100vh - 2cm);
+    }
+    .card {
+      background: #fff;
+      border: 1px dashed #c9b99c;
+      padding: 1.2cm 1cm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      break-inside: avoid;
+      aspect-ratio: 1 / 1;
+    }
+    .card .tag {
+      font-size: 9pt;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #b8860b;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+    }
+    .card h1 {
+      font-size: 22pt;
+      margin: 0.2cm 0 0.1cm;
+      line-height: 1.05;
+      color: #1a1a2e;
+      font-weight: 700;
+    }
+    .card h1 em {
+      color: #d4a017;
+      font-style: italic;
+    }
+    .card p {
+      font-size: 10pt;
+      color: #555;
+      line-height: 1.4;
+      margin: 0.2cm 0;
+    }
+    .card .url {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11pt;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+    .card .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .card .footer .left {
+      flex: 1;
+    }
+    .card .qr {
+      width: 2.8cm;
+      height: 2.8cm;
+      flex-shrink: 0;
+    }
+    .card .sign {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9pt;
+      color: #888;
+      margin-top: 0.3cm;
+    }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .sheet { height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <!-- 6 cards idénticas, 2×3 en A4 -->
+    <!-- Cada card ≈ 9×9 cm recortable -->
+    <!-- Repetimos 6 veces -->
+
+    <!-- CARD TEMPLATE (repetido 6 veces) -->
+    <div class="card">
+      <div>
+        <div class="tag">tuslibros.cl</div>
+        <h1>Tus libros<br><em>merecen circular.</em></h1>
+        <p>Publica tu biblioteca gratis. Pago seguro con MercadoPago, envío o retiro en mano.</p>
+      </div>
+      <div class="footer">
+        <div class="left">
+          <div class="url">tuslibros.cl/vender</div>
+          <div class="sign">— Vero</div>
+        </div>
+        <img class="qr"
+             src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://tuslibros.cl/vender&margin=2"
+             alt="QR tuslibros.cl/vender">
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="tag">tuslibros.cl</div>
+        <h1>Tus libros<br><em>merecen circular.</em></h1>
+        <p>Publica tu biblioteca gratis. Pago seguro con MercadoPago, envío o retiro en mano.</p>
+      </div>
+      <div class="footer">
+        <div class="left">
+          <div class="url">tuslibros.cl/vender</div>
+          <div class="sign">— Vero</div>
+        </div>
+        <img class="qr"
+             src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://tuslibros.cl/vender&margin=2"
+             alt="QR tuslibros.cl/vender">
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="tag">tuslibros.cl</div>
+        <h1>Tus libros<br><em>merecen circular.</em></h1>
+        <p>Publica tu biblioteca gratis. Pago seguro con MercadoPago, envío o retiro en mano.</p>
+      </div>
+      <div class="footer">
+        <div class="left">
+          <div class="url">tuslibros.cl/vender</div>
+          <div class="sign">— Vero</div>
+        </div>
+        <img class="qr"
+             src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://tuslibros.cl/vender&margin=2"
+             alt="QR tuslibros.cl/vender">
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="tag">tuslibros.cl</div>
+        <h1>Tus libros<br><em>merecen circular.</em></h1>
+        <p>Publica tu biblioteca gratis. Pago seguro con MercadoPago, envío o retiro en mano.</p>
+      </div>
+      <div class="footer">
+        <div class="left">
+          <div class="url">tuslibros.cl/vender</div>
+          <div class="sign">— Vero</div>
+        </div>
+        <img class="qr"
+             src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://tuslibros.cl/vender&margin=2"
+             alt="QR tuslibros.cl/vender">
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="tag">tuslibros.cl</div>
+        <h1>Tus libros<br><em>merecen circular.</em></h1>
+        <p>Publica tu biblioteca gratis. Pago seguro con MercadoPago, envío o retiro en mano.</p>
+      </div>
+      <div class="footer">
+        <div class="left">
+          <div class="url">tuslibros.cl/vender</div>
+          <div class="sign">— Vero</div>
+        </div>
+        <img class="qr"
+             src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://tuslibros.cl/vender&margin=2"
+             alt="QR tuslibros.cl/vender">
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="tag">tuslibros.cl</div>
+        <h1>Tus libros<br><em>merecen circular.</em></h1>
+        <p>Publica tu biblioteca gratis. Pago seguro con MercadoPago, envío o retiro en mano.</p>
+      </div>
+      <div class="footer">
+        <div class="left">
+          <div class="url">tuslibros.cl/vender</div>
+          <div class="sign">— Vero</div>
+        </div>
+        <img class="qr"
+             src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://tuslibros.cl/vender&margin=2"
+             alt="QR tuslibros.cl/vender">
+      </div>
+    </div>
+  </div>
+</body>
+</html>
