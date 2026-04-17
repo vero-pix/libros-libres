@@ -100,6 +100,7 @@ export default async function SearchPage({ searchParams }: Props) {
     query = query.lte("price", Number(price_max));
   }
 
+  query = query.order("deprioritized", { ascending: true });
   if (sort === "price_asc") {
     query = query.order("price", { ascending: true });
   } else if (sort === "price_desc") {

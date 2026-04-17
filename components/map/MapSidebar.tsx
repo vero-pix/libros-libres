@@ -48,6 +48,8 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
     }
 
     return [...filtered].sort((a, b) => {
+      const depA = !!(a as any).deprioritized, depB = !!(b as any).deprioritized;
+      if (depA !== depB) return depA ? 1 : -1;
       if (sortMode === "distance" && userLocation) {
         const distA = haversineKm(userLocation.lat, userLocation.lng, a.latitude ?? 0, a.longitude ?? 0);
         const distB = haversineKm(userLocation.lat, userLocation.lng, b.latitude ?? 0, b.longitude ?? 0);

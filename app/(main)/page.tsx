@@ -181,9 +181,12 @@ export default async function HomePage({ searchParams }: Props) {
   const hasCover = (l: ListingWithBook) =>
     !!(l.cover_image_url || l.book?.cover_url);
 
-  // Orden final: (1) featured pagos, (2) con portada, (3) en español,
-  // manteniendo el orden seleccionado del query dentro de cada tier.
+  // Orden final: depriorizados SIEMPRE al final; dentro del tier no-depriorizado:
+  // (1) featured pagos, (2) con portada, (3) en español. Manteniendo el orden
+  // seleccionado del query dentro de cada tier.
   listings.sort((a, b) => {
+    const depA = !!(a as any).deprioritized, depB = !!(b as any).deprioritized;
+    if (depA !== depB) return depA ? 1 : -1;
     if (a._featured && !b._featured) return -1;
     if (!a._featured && b._featured) return 1;
     const coverA = hasCover(a), coverB = hasCover(b);
