@@ -23,7 +23,12 @@ function buildGeoJSON(listings: ListingWithBook[]): GeoJSON.FeatureCollection {
           type: "Point",
           coordinates: [l.longitude!, l.latitude!],
         },
-        properties: { id: l.id },
+        properties: {
+          id: l.id,
+          featured: !!(l as any).featured,
+          collectible: !!(l as any).is_collectible,
+          tier: (l as any).is_collectible ? 2 : (l as any).featured ? 1 : 0,
+        },
       })),
   };
 }
@@ -111,17 +116,39 @@ export default function BookMap({ onListingsLoaded, onUserLocation, flyToListing
         paint: { "text-color": "#fff" },
       });
 
-      // Pin individual (sin cluster)
+      // Pin individual (sin cluster) — color según tier:
+      //   0 = regular (dorado estándar)
+      //   1 = featured (ámbar vibrante, más grande)
+      //   2 = coleccionable (ink con borde dorado, más grande aún)
       map.addLayer({
         id: "unclustered",
         type: "circle",
         source: SOURCE_ID,
         filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-color": "#d4a017",
-          "circle-radius": 9,
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#fff",
+          "circle-color": [
+            "match", ["get", "tier"],
+            2, "#1a1a1a",   // coleccionable → ink
+            1, "#f5b841",   // featured → ámbar vibrante
+            "#d4a017",      // regular → dorado
+          ],
+          "circle-radius": [
+            "match", ["get", "tier"],
+            2, 12,
+            1, 11,
+            9,
+          ],
+          "circle-stroke-width": [
+            "match", ["get", "tier"],
+            2, 3,
+            1, 2.5,
+            2,
+          ],
+          "circle-stroke-color": [
+            "match", ["get", "tier"],
+            2, "#d4a017",   // coleccionable → borde dorado
+            "#fff",
+          ],
         },
       });
 

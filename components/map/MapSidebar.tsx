@@ -61,6 +61,11 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
       if (sortMode === "genre") {
         return (a.book.genre ?? "").localeCompare(b.book.genre ?? "");
       }
+      // Sin ubicación: coleccionables primero, luego featured, luego resto
+      const colA = !!(a as any).is_collectible, colB = !!(b as any).is_collectible;
+      if (colA !== colB) return colA ? -1 : 1;
+      const featA = !!(a as any).featured, featB = !!(b as any).featured;
+      if (featA !== featB) return featA ? -1 : 1;
       return 0;
     });
   }, [listings, sortMode, filterGenre, userLocation]);
@@ -126,36 +131,58 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
                     )
                   : null;
 
+              const coverUrl = (listing as any).cover_image_url || listing.book.cover_url;
+              const isCollectible = !!(listing as any).is_collectible;
+              const isFeatured = !!(listing as any).featured;
               return (
                 <li key={listing.id}>
                   <button
                     onClick={() => onListingClick(listing)}
-                    className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors"
+                    className="w-full text-left px-4 py-3 hover:bg-cream-warm transition-colors flex gap-3 items-start"
                   >
-                    <p className="text-sm font-medium text-gray-900 leading-tight line-clamp-1">
-                      {listing.book.title}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {listing.book.author}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      {listing.price != null && (
-                        <span className="text-xs font-semibold text-gray-900">
-                          ${listing.price.toLocaleString("es-CL")}
-                        </span>
+                    <div className={`relative flex-shrink-0 w-12 h-16 rounded overflow-hidden bg-cream-warm ${isCollectible ? "ring-2 ring-ink" : isFeatured ? "ring-2 ring-amber-400" : "ring-1 ring-gray-200"}`}>
+                      {coverUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={coverUrl} alt={listing.book.title} className="w-full h-full object-cover" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-[8px] text-gray-400 p-1 text-center leading-tight">
+                          {listing.book.title}
+                        </div>
                       )}
-                      {listing.book.genre && (
-                        <span className="text-xs text-gray-400">
-                          {translateGenre(listing.book.genre)}
-                        </span>
-                      )}
-                      {dist != null && (
-                        <span className="text-xs text-brand-600 ml-auto">
-                          {dist < 1
-                            ? `${Math.round(dist * 1000)}m`
-                            : `${dist.toFixed(1)}km`}
-                        </span>
-                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        {isCollectible && (
+                          <span className="text-[8px] font-bold uppercase tracking-widest bg-ink text-cream px-1 py-0.5 rounded">
+                            Colección
+                          </span>
+                        )}
+                        <p className="text-sm font-medium text-gray-900 leading-tight line-clamp-1">
+                          {listing.book.title}
+                        </p>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
+                        {listing.book.author}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        {listing.price != null && (
+                          <span className="text-xs font-semibold text-gray-900">
+                            ${listing.price.toLocaleString("es-CL")}
+                          </span>
+                        )}
+                        {listing.book.genre && (
+                          <span className="text-xs text-gray-400">
+                            {translateGenre(listing.book.genre)}
+                          </span>
+                        )}
+                        {dist != null && (
+                          <span className="text-xs text-brand-600 ml-auto">
+                            {dist < 1
+                              ? `${Math.round(dist * 1000)}m`
+                              : `${dist.toFixed(1)}km`}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </button>
                 </li>

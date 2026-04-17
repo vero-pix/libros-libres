@@ -102,6 +102,11 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
             </div>
           )}
           <div className="absolute top-3 right-3 flex flex-col gap-1 items-end z-[2]">
+            {(listing as any).is_collectible && listing.status !== "completed" && (
+              <span className="text-[10px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full shadow-sm bg-ink text-cream">
+                Colección
+              </span>
+            )}
             {isNew(listing.created_at) && listing.status !== "completed" && (
               <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm bg-brand-500 text-white">
                 Nuevo
