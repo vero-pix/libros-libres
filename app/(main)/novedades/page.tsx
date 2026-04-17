@@ -6,6 +6,13 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "16 abril 2026",
+    title: "Home más directa + más visibilidad en Google",
+    description:
+      "Rehice el titular de la portada para que se entienda en 2 segundos qué es tuslibros.cl: 'Libros usados en Chile, con envío o retiro en mano'. Sumé dos botones grandes (Explorar / Publicar). Y corregí algo importante del SEO: hasta ayer, Google indexaba las fichas con URLs feas tipo /listings/UUID; ahora indexa las URLs bonitas /libro/vendedor/slug, con título, precio y 'usado' en el resultado de búsqueda. Cada libro pasa a ser una puerta de entrada nueva.",
+    tag: "Mejora",
+  },
+  {
+    date: "16 abril 2026",
     title: "El primer testimonio en la home",
     description:
       "Un comprador real que ya recibió su libro accedió a que publicara su experiencia. Ahora aparece en la portada, debajo de los destacados. No es copy mío: son sus palabras. Ojalá el primero de muchos.",

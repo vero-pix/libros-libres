@@ -10,15 +10,47 @@ interface Props {
 export default function HeroBar({ totalListings, onToggleMap }: Props) {
   return (
     <section className="bg-cream-warm border-b border-cream-dark overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
-        {/* Tagline — links to manifesto */}
-        <a href="#manifiesto" className="flex-shrink-0 group">
-          <h1 className="font-display text-xl sm:text-2xl font-bold text-ink leading-tight group-hover:text-brand-600 transition-colors">
+      {/* Gran titular — claro en 2 segundos */}
+      <div className="max-w-7xl mx-auto px-6 pt-10 pb-6 text-center sm:text-left">
+        <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-ink leading-[1.1] tracking-tight">
+          Libros usados en Chile,{" "}
+          <span className="italic text-brand-600">con envío o retiro en mano.</span>
+        </h1>
+        <p className="text-ink-muted mt-3 text-base sm:text-lg max-w-2xl">
+          {totalListings > 0 ? (
+            <>
+              {totalListings} libros publicados hoy, desde <strong className="text-ink">$3.000</strong>.
+              Pago seguro con MercadoPago, despacho por courier o retiro en Santiago.
+            </>
+          ) : (
+            <>Cargando el catálogo…</>
+          )}
+        </p>
+        <div className="mt-5 flex flex-wrap gap-3 justify-center sm:justify-start">
+          <button
+            onClick={() => document.getElementById("tienda")?.scrollIntoView({ behavior: "smooth" })}
+            className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-md hover:bg-brand-600 transition-colors shadow"
+          >
+            Explorar {totalListings > 0 ? `${totalListings} libros` : "catálogo"}
+          </button>
+          <Link
+            href="/publish"
+            className="inline-flex items-center px-6 py-3 bg-white border border-ink/20 text-ink text-sm font-semibold rounded-md hover:border-brand-500 hover:text-brand-600 transition-colors"
+          >
+            Publicar el mío (gratis)
+          </Link>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 pb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
+        {/* Tagline poético — enlace al manifiesto */}
+        <a href="#manifiesto" className="flex-shrink-0 group hidden sm:block">
+          <p className="font-display text-base font-bold text-ink leading-tight group-hover:text-brand-600 transition-colors">
             Cada estantería es una{" "}
             <span className="italic text-brand-600">librería.</span>
-          </h1>
-          <p className="text-ink-muted text-xs mt-1 group-hover:text-ink transition-colors">
-            {totalListings} libros en la red &middot; Descubre por qué
+          </p>
+          <p className="text-ink-muted text-xs mt-0.5 group-hover:text-ink transition-colors">
+            Descubre por qué →
           </p>
         </a>
 
