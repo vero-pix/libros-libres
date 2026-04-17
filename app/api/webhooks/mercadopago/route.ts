@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { paymentClient } from "@/lib/mercadopago";
 import { notifySeller } from "@/lib/notifications";
 import { sendEmail } from "@/lib/email";
-import { createShipitOrder } from "@/lib/shipit";
+import { createShipitOrder, estimateBookPackageSize } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
 import crypto from "crypto";
 
@@ -134,6 +134,8 @@ export async function POST(req: NextRequest) {
 
             const shipitResult = await createShipitOrder({
               orderId: headOrder.id,
+              itemCount: bundleOrders.length,
+              sizes: estimateBookPackageSize(bundleOrders.length),
               destiny: {
                 street: streetMatch?.[1] ?? addressParts,
                 number: parseInt(streetMatch?.[2] ?? "0", 10),

@@ -288,6 +288,15 @@ export default async function MisVentasPage() {
                     {orders.map((order: any) => {
                       const isInPerson = order.courier === "Entrega en persona" || order.courier === "Punto de retiro" || !order.courier;
                       const isPaid = order.status === "paid" || order.status === "shipped" || order.status === "delivered";
+                      const ageHours = (Date.now() - new Date(order.created_at).getTime()) / 36e5;
+                      const labelStuck = isPaid && !isInPerson && !order.shipping_label_url && ageHours > 1;
+                      const supportMailto = labelStuck
+                        ? `mailto:soporte@shipit.cl?subject=${encodeURIComponent(
+                            `Ayuda con envío — orden ${order.id.slice(0, 8)}`
+                          )}&body=${encodeURIComponent(
+                            `Hola equipo de Shipit,\n\nMi envío no logra emitir la etiqueta. Necesito que me ayuden a regenerarla.\n\nDetalles:\n- Referencia: TL-${order.id.slice(0, 12)}\n- Courier: ${order.courier ?? "Starken"}\n- Comprador: ${order.buyer?.full_name ?? ""}\n- Dirección: ${order.buyer_address ?? ""}\n- Fecha pedido: ${new Date(order.created_at).toLocaleString("es-CL")}\n\nGracias.`
+                          )}`
+                        : null;
                       return (
                       <tr key={order.id} className="hover:bg-cream-warm/30 align-top">
                         <td className="px-4 py-3">
@@ -353,6 +362,16 @@ export default async function MisVentasPage() {
                                 >
                                   📄 Descargar etiqueta
                                 </a>
+                              ) : labelStuck ? (
+                                <div className="space-y-1">
+                                  <span className="text-[11px] text-red-700 block">Etiqueta demorada · pide ayuda</span>
+                                  <a
+                                    href={supportMailto!}
+                                    className="inline-block text-[11px] bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
+                                  >
+                                    ✉️ Escribir a Shipit
+                                  </a>
+                                </div>
                               ) : (
                                 <span className="text-[11px] text-amber-700">Etiqueta en preparación…</span>
                               )}
