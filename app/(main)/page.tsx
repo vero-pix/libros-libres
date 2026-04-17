@@ -13,6 +13,7 @@ import HomeShell from "@/components/home/HomeShell";
 import { buildCategoryTree } from "@/lib/categoryTree";
 import FeaturedRow from "@/components/home/FeaturedRow";
 import CollectibleRow from "@/components/home/CollectibleRow";
+import TestimonialBanner from "@/components/home/TestimonialBanner";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
@@ -299,6 +300,7 @@ export default async function HomePage({ searchParams }: Props) {
             {!hasFilters && collectibleListings.length > 0 && (
               <CollectibleRow listings={collectibleListings} />
             )}
+            {!hasFilters && <TestimonialBanner />}
 
             <Suspense fallback={<div className="h-10 bg-gray-100 rounded-lg animate-pulse mb-4" />}>
               <ListingToolbar />

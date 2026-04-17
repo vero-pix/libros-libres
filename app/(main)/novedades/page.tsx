@@ -6,6 +6,13 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "16 abril 2026",
+    title: "El primer testimonio en la home",
+    description:
+      "Un comprador real que ya recibió su libro accedió a que publicara su experiencia. Ahora aparece en la portada, debajo de los destacados. No es copy mío: son sus palabras. Ojalá el primero de muchos.",
+    tag: "Nuevo",
+  },
+  {
+    date: "16 abril 2026",
     title: "Tres nuevas piezas de colección en el catálogo",
     description:
       "Sumé tres joyas a la sección de coleccionables: 'Un Año' y 'Ayer' de Juan Emar (vanguardia chilena del 35, edición Biblioteca Claves de Chile + LOM), y una antología de Pablo de Rokha editada en La Habana en 1991 durante el Período Especial, papel rústico y todo. Si te gusta la literatura chilena de los márgenes, míralas.",
