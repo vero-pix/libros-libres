@@ -17,6 +17,7 @@ export async function GET() {
       longitude,
       address,
       status,
+      deprioritized,
       created_at,
       book:books (
         id,
@@ -36,6 +37,7 @@ export async function GET() {
     .eq("status", "active")
     .not("latitude", "is", null)
     .not("longitude", "is", null)
+    .order("deprioritized", { ascending: true })
     .order("created_at", { ascending: false });
 
   if (error) {

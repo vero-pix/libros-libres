@@ -5,6 +5,13 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 
 const novedades = [
   {
+    date: "16 abril 2026",
+    title: "Catálogo más curado en la home y el mapa",
+    description:
+      "Ahora tengo una forma simple de bajar en el orden libros que no calzan con el tono del catálogo, sin esconderlos: siguen encontrándose al buscarlos por nombre o en el perfil del vendedor, pero no aparecen arriba en la home ni en el listado del mapa. La primera impresión la cuido yo.",
+    tag: "Mejora",
+  },
+  {
     date: "15 abril 2026",
     title: "Home más rápida (y estable)",
     description:
