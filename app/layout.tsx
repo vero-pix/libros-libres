@@ -103,7 +103,7 @@ export default function RootLayout({
               alternateName: "tuslibros.cl",
               url: "https://tuslibros.cl",
               logo: "https://tuslibros.cl/og-image.png",
-              description: "Compra, vende y presta libros cerca de ti. El Uber de los libros.",
+              description: "Marketplace chileno de libros usados. Compra, vende y arrienda libros cerca de ti, con mapa, despacho por courier o retiro en mano.",
               sameAs: ["https://www.linkedin.com/in/economista-veronica-velasquez/"],
             }),
           }}
