@@ -3,7 +3,30 @@ import { updateSession } from "@/lib/supabase/middleware";
 import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  // 410 Gone para URLs legacy de Woocommerce (WordPress era).
+  // Google las quita del índice más rápido que con 404.
+  const wooParams = ["add-to-cart", "add-to-wishlist", "add_to_compare"];
+  if (wooParams.some((p) => searchParams.has(p))) {
+    return new NextResponse(null, { status: 410 });
+  }
+
+  // /tienda/* (tiendas Woocommerce) → redirect al home
+  if (pathname.startsWith("/tienda/")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    url.search = "";
+    return NextResponse.redirect(url, 308);
+  }
+
+  // Paginación legacy WP /page/N → redirect al home
+  if (/^\/page\/\d+\/?$/.test(pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    url.search = "";
+    return NextResponse.redirect(url, 308);
+  }
 
   // Redirect legacy /libro/[slug] (without username) → /libro/[username]/[slug]
   const libroMatch = pathname.match(/^\/libro\/([^/]+)$/);
