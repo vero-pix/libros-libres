@@ -6,6 +6,27 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "16 abril 2026",
+    title: "Nueva fila: Ediciones especiales y coleccionables",
+    description:
+      "Hay libros que no son 'libros usados' — son objetos con historia: primeras ediciones, tirajes viejos de Nascimento, títulos agotados. Ahora tienen su propia sección en la home y un sello distintivo. El primer destacado: una edición Nascimento 1972 de Poemas y Antipoemas de Nicanor Parra.",
+    tag: "Nuevo",
+  },
+  {
+    date: "16 abril 2026",
+    title: "Top 10 de libros destacados, ordenado a mano",
+    description:
+      "Renové los 10 libros destacados de la portada. Antes salían títulos muy de nicho; ahora verás primero los nombres que vale la pena mostrar: Parra, Donoso, Borges, García Márquez, Vargas Llosa, Fuentes, Wilde, Kundera, Monterroso, Franzen.",
+    tag: "Mejora",
+  },
+  {
+    date: "16 abril 2026",
+    title: "Mapa con más alma",
+    description:
+      "El mapa ahora muestra miniaturas de las portadas en el listado lateral, diferencia los libros de colección (círculo oscuro con borde dorado) y los destacados (ámbar vibrante), y cambié el copy: 'Libros a la vuelta de la esquina'. La idea: que aunque tengamos pocos puntos hoy, se vea vivo y con intención.",
+    tag: "Mejora",
+  },
+  {
+    date: "16 abril 2026",
     title: "Catálogo más curado en la home y el mapa",
     description:
       "Ahora tengo una forma simple de bajar en el orden libros que no calzan con el tono del catálogo, sin esconderlos: siguen encontrándose al buscarlos por nombre o en el perfil del vendedor, pero no aparecen arriba en la home ni en el listado del mapa. La primera impresión la cuido yo.",

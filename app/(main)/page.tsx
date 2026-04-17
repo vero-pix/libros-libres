@@ -12,6 +12,7 @@ import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
 import { buildCategoryTree } from "@/lib/categoryTree";
 import FeaturedRow from "@/components/home/FeaturedRow";
+import CollectibleRow from "@/components/home/CollectibleRow";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
@@ -48,10 +49,26 @@ const getFeaturedListings = unstable_cache(
       .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username)`)
       .eq("status", "active")
       .eq("featured", true)
+      .order("featured_rank", { ascending: true, nullsFirst: false })
       .limit(10);
     return data ?? [];
   },
-  ["home-featured-listings"],
+  ["home-featured-listings-v2"],
+  { revalidate: 120 }
+);
+
+const getCollectibleListings = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data } = await supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username)`)
+      .eq("status", "active")
+      .eq("is_collectible", true)
+      .limit(12);
+    return data ?? [];
+  },
+  ["home-collectible-listings"],
   { revalidate: 120 }
 );
 
@@ -125,9 +142,10 @@ export default async function HomePage({ searchParams }: Props) {
   const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
-  const [featuredListings, featuredSellers] = await Promise.all([
+  const [featuredListings, featuredSellers, collectibleListings] = await Promise.all([
     getFeaturedListings() as unknown as Promise<ListingWithBook[]>,
     getFeaturedSellers(),
+    getCollectibleListings() as unknown as Promise<ListingWithBook[]>,
   ]);
 
   // Listings principales: sin filtros ni sort custom → versión cacheada
@@ -277,6 +295,9 @@ export default async function HomePage({ searchParams }: Props) {
           <div className="flex-1 min-w-0">
             {!hasFilters && (featuredListings.length > 0 || featuredSellers.length > 0) && (
               <FeaturedRow featuredListings={featuredListings} featuredSellers={featuredSellers} />
+            )}
+            {!hasFilters && collectibleListings.length > 0 && (
+              <CollectibleRow listings={collectibleListings} />
             )}
 
             <Suspense fallback={<div className="h-10 bg-gray-100 rounded-lg animate-pulse mb-4" />}>

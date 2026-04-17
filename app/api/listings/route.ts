@@ -18,6 +18,9 @@ export async function GET() {
       address,
       status,
       deprioritized,
+      featured,
+      is_collectible,
+      cover_image_url,
       created_at,
       book:books (
         id,
