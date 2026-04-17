@@ -29,6 +29,14 @@ const STATUS_CONFIG: Record<
   },
 };
 
+const STATUS_ALIAS: Record<string, string> = {
+  paid: "success",
+  approved: "success",
+  completed: "success",
+  rejected: "failure",
+  cancelled: "failure",
+};
+
 export default async function OrderPage({ params, searchParams }: Props) {
   const supabase = await createClient();
 
@@ -67,7 +75,8 @@ export default async function OrderPage({ params, searchParams }: Props) {
     }
   }
 
-  const paymentStatus = searchParams.status ?? order.status;
+  const rawStatus = searchParams.status ?? order.status;
+  const paymentStatus = STATUS_ALIAS[rawStatus] ?? rawStatus;
   const config = STATUS_CONFIG[paymentStatus] ?? STATUS_CONFIG.pending;
   const isBundle = bundleOrders.length > 1;
 
