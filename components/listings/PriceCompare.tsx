@@ -5,9 +5,10 @@ interface Props {
   author?: string | null;
   isbn?: string | null;
   currentPrice?: number | null;
+  variant?: "seller" | "buyer";
 }
 
-export default function PriceCompare({ title, author, isbn, currentPrice }: Props) {
+export default function PriceCompare({ title, author, isbn, currentPrice, variant = "seller" }: Props) {
   const searchTerm = isbn || `${title} ${author || ""}`.trim();
   const encodedTitle = encodeURIComponent(searchTerm);
   const mlSearch = encodeURIComponent(`${title} ${author || ""}`.trim());
@@ -40,8 +41,12 @@ export default function PriceCompare({ title, author, isbn, currentPrice }: Prop
       </div>
       {currentPrice && (
         <p className="text-xs text-ink-muted mb-3">
-          Tu precio: <span className="font-bold text-ink">${currentPrice.toLocaleString("es-CL")}</span>
-          {" · "}Revisa cuánto cobran en otros sitios antes de vender
+          {variant === "buyer" ? "Precio acá: " : "Tu precio: "}
+          <span className="font-bold text-ink">${currentPrice.toLocaleString("es-CL")}</span>
+          {" · "}
+          {variant === "buyer"
+            ? "revisa cuánto cobran en otros sitios"
+            : "Revisa cuánto cobran en otros sitios antes de vender"}
         </p>
       )}
       <div className="flex flex-wrap gap-2">
