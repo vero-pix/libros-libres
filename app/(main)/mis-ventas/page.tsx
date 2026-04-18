@@ -364,12 +364,14 @@ export default async function MisVentasPage() {
                                 </a>
                               ) : labelStuck ? (
                                 <div className="space-y-1">
-                                  <span className="text-[11px] text-red-700 block">Etiqueta demorada · pide ayuda</span>
+                                  <span className="text-[11px] text-ink-muted block">
+                                    Sin etiqueta para imprimir — el courier Shipit trae el manifiesto al retiro.
+                                  </span>
                                   <a
                                     href={supportMailto!}
-                                    className="inline-block text-[11px] bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
+                                    className="inline-block text-[11px] bg-cream-warm text-ink px-2 py-1 rounded-md border border-cream-dark/40 hover:bg-cream-dark/20"
                                   >
-                                    ✉️ Escribir a Shipit
+                                    ¿Algo raro? Escribir a Shipit
                                   </a>
                                 </div>
                               ) : (
