@@ -15,26 +15,20 @@ const steps = [
   {
     n: 2,
     icon: "🖨️",
-    title: "Imprime la etiqueta",
-    body: 'Desde Mis Ventas, busca la orden y haz click en \u201cDescargar etiqueta\u201d. Imprímela en hoja tamaño carta. Si no tienes impresora en casa, la mayoría de sucursales del courier la pueden imprimir mostrando el PDF desde el celular.',
+    title: "Imprime la etiqueta (si está disponible)",
+    body: 'Entra a Mis Ventas y busca tu orden. Si ves el botón "Descargar etiqueta", imprímela en hoja tamaño carta y pégala en la parte más plana del paquete con cinta transparente. ¿Sin impresora? En cualquier librería o cyber te la imprimen desde el celular. Si NO ves el botón, no te preocupes: significa que el courier Shipit trae el manifiesto impreso al momento del retiro — tú solo anotas el código de tracking y el nombre del destinatario en el paquete para identificarlo.',
   },
   {
     n: 3,
-    icon: "🏷️",
-    title: "Pega la etiqueta",
-    body: "Pega la etiqueta en la parte más plana del paquete, bien firme, con cinta transparente. Asegúrate de que el código de barras quede visible y sin dobleces.",
+    icon: "🏠",
+    title: "Deja el paquete listo para el retiro",
+    body: 'Shipit coordina un retiro a domicilio en la dirección que registraste. La fecha y ventana horaria de retiro aparece en el detalle de la orden (por ejemplo: "20 abril, 11:00–17:00"). Necesitas que alguien esté en casa durante esa ventana para entregar el paquete. Si la venta se paga antes de las 11 AM, el retiro suele quedar para ese mismo día; si es después, queda agendado para el siguiente día hábil.',
   },
   {
     n: 4,
-    icon: "🚚",
-    title: "Llévala a la sucursal del courier",
-    body: "Lleva el paquete a una sucursal del courier indicado en la orden (Chilexpress, Starken, Blue Express, 99 Minutos, Recíbelo o Spread). No es necesario pagar nada — el envío ya está cobrado al comprador. Solo muestra la etiqueta en el mesón.",
-  },
-  {
-    n: 5,
     icon: "✅",
-    title: "Guarda el comprobante",
-    body: "La sucursal te va a entregar un comprobante de admisión. Guárdalo hasta que el comprador confirme que recibió el libro. Es tu respaldo si algo no llega.",
+    title: "Firma el manifiesto y guárdalo",
+    body: "Cuando llegue el courier, te entrega un manifiesto o comprobante de retiro para firmar (una copia queda contigo). Guárdalo hasta que el comprador confirme que recibió el libro — es tu respaldo si algo se pierde en el camino. No pagas nada al courier: el envío se factura directamente a la cuenta de tuslibros.cl a fin de mes.",
   },
 ];
 
@@ -51,14 +45,28 @@ export default function ComoDespacharPage() {
           </Link>
         </div>
 
-        <header className="mb-12">
+        <header className="mb-10">
           <h1 className="font-display text-3xl sm:text-4xl font-bold text-ink mb-3">
             Cómo despachar un libro
           </h1>
           <p className="text-ink-muted text-lg">
-            Vendiste un libro, felicitaciones. Acá te dejo los 5 pasos para que llegue bien a su nuevo lector. Son fáciles, te prometo.
+            Vendiste un libro, felicitaciones. Acá te dejo los 4 pasos para que llegue bien a su nuevo lector. Son fáciles, te prometo.
           </p>
         </header>
+
+        <section className="mb-12 bg-gradient-to-br from-brand-50 to-cream-warm border border-brand-200 rounded-2xl p-6 sm:p-7">
+          <div className="flex items-start gap-3 mb-2">
+            <span className="text-2xl">🏠</span>
+            <h2 className="font-display text-xl sm:text-2xl font-bold text-ink">
+              El courier pasa a buscar a tu casa
+            </h2>
+          </div>
+          <p className="text-sm sm:text-base text-ink-muted leading-relaxed">
+            No tienes que ir a ninguna sucursal ni hacer fila. Cuando se confirma una venta, Shipit coordina
+            un retiro a domicilio y un courier pasa por el paquete a la dirección que tienes registrada.
+            Tú solo lo dejas listo y esperas en casa en la ventana que te indica la orden.
+          </p>
+        </section>
 
         <div className="mb-4">
           <Link href="/mis-ventas" className="text-brand-600 font-semibold hover:underline text-sm">
@@ -89,8 +97,10 @@ export default function ComoDespacharPage() {
         <section className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-8">
           <h2 className="font-semibold text-amber-900 mb-2">⏱️ Plazo de despacho</h2>
           <p className="text-sm text-amber-800 leading-relaxed">
-            Despacha el libro dentro de los <strong>2 días hábiles</strong> siguientes a la venta. Esto
-            mantiene a los compradores contentos y asegura que tu tienda mantenga una buena reputación.
+            Ten el paquete listo dentro de los <strong>2 días hábiles</strong> siguientes a la venta.
+            Shipit agenda el retiro con corte diario a las <strong>11:00 AM</strong>: si la venta se paga
+            después de esa hora, el retiro queda para el día hábil siguiente. Despachar a tiempo mantiene
+            a los compradores contentos y asegura la buena reputación de tu tienda.
           </p>
         </section>
 
