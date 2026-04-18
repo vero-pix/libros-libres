@@ -12,6 +12,36 @@ export async function middleware(request: NextRequest) {
     return new NextResponse(null, { status: 410 });
   }
 
+  // 410 Gone para prefijos legacy WP/WC típicos que hoy devuelven 404.
+  // 410 señala "se fue para siempre" y Google las remueve del índice más rápido.
+  const legacyPrefixes = [
+    "/tag/",
+    "/category/",
+    "/author/",
+    "/producto-categoria/",
+    "/comments/",
+    "/wp-json/",
+  ];
+  if (
+    legacyPrefixes.some((p) => pathname.startsWith(p)) ||
+    pathname === "/feed" ||
+    pathname.startsWith("/feed/") ||
+    pathname === "/rss" ||
+    pathname.startsWith("/rss/")
+  ) {
+    return new NextResponse(null, { status: 410 });
+  }
+
+  // Permalinks legacy de WordPress (/?p=123, /?page_id=45) — hoy devuelven 200 con
+  // el home y generan duplicados en el índice. Con path exactamente "/" y param
+  // numérico, les damos 410.
+  if (pathname === "/") {
+    const wpPermalink = ["p", "page_id", "cat", "tag_id", "attachment_id"];
+    if (wpPermalink.some((k) => /^\d+$/.test(searchParams.get(k) ?? ""))) {
+      return new NextResponse(null, { status: 410 });
+    }
+  }
+
   // /tienda/* (tiendas Woocommerce) → redirect al home
   if (pathname.startsWith("/tienda/")) {
     const url = request.nextUrl.clone();
