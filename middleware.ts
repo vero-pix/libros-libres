@@ -18,7 +18,15 @@ export async function middleware(request: NextRequest) {
     "/tag/",
     "/category/",
     "/author/",
+    "/autor/",
     "/producto-categoria/",
+    "/product-category/",
+    "/product/",
+    "/tienda-de-libros/",
+    "/shop-carousel/",
+    "/vendedores-destatacados/",
+    "/condicion/",
+    "/estado/",
     "/comments/",
     "/wp-json/",
   ];
@@ -58,8 +66,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
-  // Redirect legacy /libro/[slug] (without username) → /libro/[username]/[slug]
-  const libroMatch = pathname.match(/^\/libro\/([^/]+)$/);
+  // Redirect legacy /libro/[slug] (without username, con o sin trailing slash) → /libro/[username]/[slug]
+  const libroMatch = pathname.match(/^\/libro\/([^/]+)\/?$/);
   if (libroMatch) {
     const slug = libroMatch[1];
     // Create a lightweight Supabase client for the lookup
