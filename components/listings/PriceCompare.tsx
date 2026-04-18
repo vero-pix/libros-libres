@@ -29,6 +29,11 @@ export default function PriceCompare({ title, author, isbn, currentPrice, varian
       url: `https://www.iberlibro.com/servlet/SearchResults?kn=${encodedTitle}&sortby=17`,
       color: "text-red-600 border-red-300 hover:bg-red-50",
     },
+    {
+      name: "Facebook",
+      url: `https://www.facebook.com/marketplace/search/?query=${mlSearch}`,
+      color: "text-blue-600 border-blue-300 hover:bg-blue-50",
+    },
   ];
 
   return (
