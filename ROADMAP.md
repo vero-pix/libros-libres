@@ -1,6 +1,25 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 16 abril 2026 (noche)
+Última actualización: 18 abril 2026
+
+---
+
+## Sesión 18 abril 2026 — Expo libros usados
+
+**Contexto del día:** Vero va a la Expo libros usados (sábado 18 abril) — primer intento real de onboardear libreros físicos y captar tráfico presencial al sitio.
+
+**Cambios visibles para usuarios:**
+- [x] **Footer con redes sociales** — íconos LinkedIn + X en el bottom del footer. LinkedIn apunta a `linkedin.com/company/tuslibros`, X a `x.com/tuslibroscl`. SVGs inline sin dependencias nuevas. Commit `ea86484`.
+- [x] **Reddit descartado del footer** — tracción real en `u/verokaplus/r/RepublicaCadeChile` (51 arrivotos, respuestas orgánicas) pero es cuenta personal con posts no relacionados (#ProntuarioPiñera, r/chile). Reddit queda como **canal de growth orgánico**, no de presencia de marca en el footer.
+
+**Material para el evento:**
+- [x] **QR para expo** en `docs/qr_expo_18abril.png` (1200×1200, corrección de errores alta). Apunta a `https://tuslibros.cl/?utm_source=expo-libros&utm_medium=qr&utm_campaign=18abril` — trackeable en GA4 por `utm_campaign=18abril`.
+- [x] **Plan de uso del QR sin imprimir**: abrir desde celular con zoom máximo + brillo 100% + auto-bloqueo desactivado + modo claro. Alternativa verbal: "busca tuslibros.cl en Google".
+
+**Pendientes post-evento:**
+- [ ] **Medir tracción del QR** en GA4 (filtro `utm_campaign = 18abril`) — cuántos escaneos reales, cuántos convirtieron a registro/publicación.
+- [ ] **Preguntar cómo estuvo la expo** — primer intento real de onboardear libreros. Guardar en memoria los resultados (cuántos libreros conocidos, cuántos interesados, feedback sobre modelo).
+- [ ] **LinkedIn empresa tiene 15 seguidores** — estrategia de crecimiento pendiente (¿publicar desde la página con regularidad? ¿pedir follows a red personal?).
 
 ---
 
