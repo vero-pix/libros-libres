@@ -227,14 +227,14 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             </div>
           )}
 
-          {isOwner && (
-            <PriceCompare
-              title={book.title}
-              author={book.author}
-              isbn={book.isbn}
-              currentPrice={listing.price}
-            />
-          )}
+          <PriceCompare
+            title={book.title}
+            author={book.author}
+            isbn={book.isbn}
+            currentPrice={listing.price}
+            variant={isOwner ? "seller" : "buyer"}
+          />
+
 
           {listing.address && (
             <p className="text-sm text-gray-500 mt-3 flex items-start gap-1">
