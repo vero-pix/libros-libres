@@ -6,6 +6,13 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "18 abril 2026",
+    title: "El courier pasa a buscar los libros a tu casa (sí, a TU casa)",
+    description:
+      "Siempre fue así, pero la guía de despacho decía al revés (\"lleva el paquete a la sucursal del courier\") y era un error viejo que no había actualizado. Lo arreglé hoy: ahora /como-despachar explica bien que Shipit coordina un retiro a domicilio y un courier pasa por el paquete a la dirección que tienes registrada, sin que tengas que moverte de la casa. El corte diario es a las 11 AM (si la venta se paga antes, el retiro suele ser ese mismo día; si es después, al día hábil siguiente). También arreglé un mensaje feo en Mis Ventas que decía \"etiqueta demorada · pide ayuda\" en rojo, cuando en realidad para la mayoría de los envíos el courier trae el manifiesto impreso al retiro y tú no necesitas imprimir nada.",
+    tag: "Fix",
+  },
+  {
+    date: "18 abril 2026",
     title: "El comparador de precios ahora también es para quien compra (y suma Facebook Marketplace)",
     description:
       "Hasta hoy, los botones para comparar con Buscalibre, MercadoLibre e IberLibro los veía solo el vendedor al publicar, para calibrar su precio. Me lo pidió un usuario por WhatsApp: que los compradores también pudieran ver esos accesos directos en la ficha del libro, y de paso que sumáramos Facebook Marketplace. Dicho y hecho. Ahora en cada libro aparece el precio de tuslibros.cl y al lado cuatro links (Buscalibre, MercadoLibre, IberLibro, Facebook) para chequear el mismo título en otros sitios. Nada que ocultar.",
