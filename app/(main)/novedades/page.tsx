@@ -6,6 +6,13 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "18 abril 2026",
+    title: "Limpieza grande de SEO: Google va a volver a mirar el sitio con cariño",
+    description:
+      "Trabajé toda la tarde el SEO. Resumen: 10,9 mil URLs rastreadas por Google estaban sin indexar — la mayoría basura legacy de la versión Woocommerce vieja del sitio. Ahora el sitio responde con 410 (se fue para siempre) a las URLs tipo /tag, /category, /author, /tienda-de-libros, /product-category, /product, /condicion, /estado, /feed, /rss, /?p=N, /?page_id=N. También extendí la regla de /libro para tolerar el slash final. Agregué schema.org WebSite con SearchAction (para que eventualmente salga una cajita de búsqueda directa en los resultados de Google) y extendí el Organization con areaServed=Chile. Verifiqué la propiedad de dominio en Search Console para tener la data completa. Y enriquecí 78 fichas de libros con sinopsis, editorial y páginas que les faltaban. En 2-4 semanas, cuando Google vuelva a crawlear todo, esperamos que las páginas indexadas salten de 19 a varios cientos.",
+    tag: "Mejora",
+  },
+  {
+    date: "18 abril 2026",
     title: "El courier pasa a buscar los libros a tu casa (sí, a TU casa)",
     description:
       "Siempre fue así, pero la guía de despacho decía al revés (\"lleva el paquete a la sucursal del courier\") y era un error viejo que no había actualizado. Lo arreglé hoy: ahora /como-despachar explica bien que Shipit coordina un retiro a domicilio y un courier pasa por el paquete a la dirección que tienes registrada, sin que tengas que moverte de la casa. El corte diario es a las 11 AM (si la venta se paga antes, el retiro suele ser ese mismo día; si es después, al día hábil siguiente). También arreglé un mensaje feo en Mis Ventas que decía \"etiqueta demorada · pide ayuda\" en rojo, cuando en realidad para la mayoría de los envíos el courier trae el manifiesto impreso al retiro y tú no necesitas imprimir nada.",
