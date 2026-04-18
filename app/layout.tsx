@@ -104,7 +104,30 @@ export default function RootLayout({
               url: "https://tuslibros.cl",
               logo: "https://tuslibros.cl/og-image.png",
               description: "Marketplace chileno de libros usados. Compra, vende y arrienda libros cerca de ti, con mapa, despacho por courier o retiro en mano.",
+              areaServed: { "@type": "Country", name: "Chile" },
               sameAs: ["https://www.linkedin.com/in/economista-veronica-velasquez/"],
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "tuslibros.cl",
+              alternateName: "Libros Libres",
+              url: "https://tuslibros.cl",
+              inLanguage: "es-CL",
+              description: "Libros usados en Chile con envío o retiro. Pago seguro con MercadoPago.",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate: "https://tuslibros.cl/search?q={search_term_string}",
+                },
+                "query-input": "required name=search_term_string",
+              },
             }),
           }}
         />
