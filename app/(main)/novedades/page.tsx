@@ -6,9 +6,9 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 const novedades = [
   {
     date: "18 abril 2026",
-    title: "El comparador de precios ahora también es para quien compra",
+    title: "El comparador de precios ahora también es para quien compra (y suma Facebook Marketplace)",
     description:
-      "Hasta hoy, los botones para comparar con Buscalibre, MercadoLibre e IberLibro los veía solo el vendedor al publicar, para calibrar su precio. Me lo pidió un usuario por WhatsApp: que los compradores también pudieran ver esos accesos directos en la ficha del libro. Dicho y hecho. Ahora en cada libro aparece el precio de tuslibros.cl y al lado los links para chequear el mismo título en otros sitios. Nada que ocultar.",
+      "Hasta hoy, los botones para comparar con Buscalibre, MercadoLibre e IberLibro los veía solo el vendedor al publicar, para calibrar su precio. Me lo pidió un usuario por WhatsApp: que los compradores también pudieran ver esos accesos directos en la ficha del libro, y de paso que sumáramos Facebook Marketplace. Dicho y hecho. Ahora en cada libro aparece el precio de tuslibros.cl y al lado cuatro links (Buscalibre, MercadoLibre, IberLibro, Facebook) para chequear el mismo título en otros sitios. Nada que ocultar.",
     tag: "Nuevo",
   },
   {
