@@ -5,6 +5,13 @@ export const metadata = { title: "Novedades — tuslibros.cl" };
 
 const novedades = [
   {
+    date: "18 abril 2026",
+    title: "El comparador de precios ahora también es para quien compra",
+    description:
+      "Hasta hoy, los botones para comparar con Buscalibre, MercadoLibre e IberLibro los veía solo el vendedor al publicar, para calibrar su precio. Me lo pidió un usuario por WhatsApp: que los compradores también pudieran ver esos accesos directos en la ficha del libro. Dicho y hecho. Ahora en cada libro aparece el precio de tuslibros.cl y al lado los links para chequear el mismo título en otros sitios. Nada que ocultar.",
+    tag: "Nuevo",
+  },
+  {
     date: "16 abril 2026",
     title: "Home más directa + más visibilidad en Google",
     description:
