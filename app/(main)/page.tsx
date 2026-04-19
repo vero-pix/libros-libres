@@ -282,7 +282,16 @@ export default async function HomePage({ searchParams }: Props) {
   return (
     <div className="min-h-screen bg-cream">
 
-      <HomeShell totalListings={totalListings} hasFilters={hasFilters}>
+      <HomeShell
+        totalListings={totalListings}
+        hasFilters={hasFilters}
+        featuredRow={
+          !hasFilters && (featuredListings.length > 0 || featuredSellers.length > 0) ? (
+            <FeaturedRow featuredListings={featuredListings} featuredSellers={featuredSellers} />
+          ) : null
+        }
+        testimonialBanner={!hasFilters ? <TestimonialBanner /> : null}
+      >
         <Breadcrumbs items={[
           { label: "Inicio", href: "/" },
           { label: "Tienda", href: (category || subcategory || tag) ? "/" : undefined },
@@ -294,13 +303,9 @@ export default async function HomePage({ searchParams }: Props) {
           <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalListings} />
 
           <div className="flex-1 min-w-0">
-            {!hasFilters && (featuredListings.length > 0 || featuredSellers.length > 0) && (
-              <FeaturedRow featuredListings={featuredListings} featuredSellers={featuredSellers} />
-            )}
             {!hasFilters && collectibleListings.length > 0 && (
               <CollectibleRow listings={collectibleListings} />
             )}
-            {!hasFilters && <TestimonialBanner />}
 
             <Suspense fallback={<div className="h-10 bg-gray-100 rounded-lg animate-pulse mb-4" />}>
               <ListingToolbar />
