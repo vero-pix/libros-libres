@@ -6,18 +6,14 @@ import HeroBar from "./HeroBar";
 import TiendaToggle from "./TiendaToggle";
 import CollectionBanners from "./CollectionBanners";
 
-const ScanAnimation = dynamic(() => import("./ScanAnimation"));
-const PaymentAnimation = dynamic(() => import("./PaymentAnimation"));
-const ShippingAnimation = dynamic(() => import("./ShippingAnimation"));
-const RentalSection = dynamic(() => import("./RentalSection"));
 const ShelfTransformation = dynamic(() => import("./ShelfTransformation"));
 
 interface Props {
   totalListings: number;
   hasFilters: boolean;
-  featuredRow?: ReactNode; // libros destacados (above-the-fold)
-  testimonialBanner?: ReactNode; // quote de comprador real (above-the-fold)
-  children: ReactNode; // the grid content
+  featuredRow?: ReactNode;
+  testimonialBanner?: ReactNode;
+  children: ReactNode;
 }
 
 export default function HomeShell({ totalListings, hasFilters, featuredRow, testimonialBanner, children }: Props) {
@@ -35,48 +31,12 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
         <h1 className="sr-only">Libros usados cerca de ti — tuslibros.cl</h1>
       )}
 
-      {/* Above-the-fold: libros destacados + testimonio (antes del manifiesto) */}
+      {/* Above-the-fold: libros destacados + testimonio */}
       {!hasFilters && (featuredRow || testimonialBanner) && (
         <section className="bg-white border-b border-cream-dark">
           <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
             {featuredRow}
             {testimonialBanner}
-          </div>
-        </section>
-      )}
-
-      {/* Manifiesto — el "por qué" */}
-      {!hasFilters && (
-        <section id="manifiesto" className="bg-cream-warm border-b border-cream-dark scroll-mt-20">
-          <div className="max-w-6xl mx-auto px-6 py-16">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              {/* Left — message */}
-              <div className="text-center lg:text-left">
-                <p className="text-xs font-medium tracking-[0.3em] uppercase text-brand-600 mb-4">
-                  Por qué existimos
-                </p>
-                <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-ink leading-tight mb-4">
-                  Tus libros merecen circular.
-                  <br />
-                  <span className="italic text-brand-600">Yo los conecto contigo.</span>
-                </h2>
-                <p className="text-ink-muted leading-relaxed max-w-lg mx-auto lg:mx-0">
-                  En Chile hay millones de libros durmiendo en estanterías.
-                  Cada casa es una librería que nadie puede ver. Acá las
-                  hacemos visibles — por ubicación, por cercanía, por el
-                  título que andas buscando y que probablemente está más
-                  cerca de lo que crees.
-                </p>
-                <p className="text-ink-muted leading-relaxed mt-4 max-w-lg mx-auto lg:mx-0">
-                  Tu estantería se transforma en una vitrina para lectores
-                  cerca de ti. Cada libro que publicas es un libro que
-                  encuentra un nuevo lector. Y yo no me meto en el medio.
-                </p>
-              </div>
-
-              {/* Right — animated illustration */}
-              <ShelfTransformation />
-            </div>
           </div>
         </section>
       )}
@@ -94,14 +54,31 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
         </TiendaToggle>
       </main>
 
-      {/* Feature sections — below the store */}
+      {/* Manifiesto compacto al final — antes del footer */}
       {!hasFilters && (
-        <>
-          <ScanAnimation />
-          <PaymentAnimation />
-          <ShippingAnimation />
-          <RentalSection />
-        </>
+        <section id="manifiesto" className="bg-cream-warm border-t border-cream-dark">
+          <div className="max-w-6xl mx-auto px-6 py-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <div className="text-center lg:text-left">
+                <p className="text-xs font-medium tracking-[0.3em] uppercase text-brand-600 mb-3">
+                  Por qué existimos
+                </p>
+                <h2 className="font-display text-xl sm:text-2xl font-bold text-ink leading-tight mb-3">
+                  Tus libros merecen circular.{" "}
+                  <span className="italic text-brand-600">Yo los conecto contigo.</span>
+                </h2>
+                <p className="text-sm text-ink-muted leading-relaxed max-w-lg mx-auto lg:mx-0">
+                  En Chile hay millones de libros durmiendo en estanterías. Cada
+                  casa es una librería que nadie puede ver. Acá las hacemos
+                  visibles — por ubicación, por cercanía, por el título que
+                  andas buscando y que probablemente está más cerca de lo que
+                  crees.
+                </p>
+              </div>
+              <ShelfTransformation />
+            </div>
+          </div>
+        </section>
       )}
     </>
   );
