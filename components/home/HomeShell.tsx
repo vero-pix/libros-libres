@@ -15,10 +15,12 @@ const ShelfTransformation = dynamic(() => import("./ShelfTransformation"));
 interface Props {
   totalListings: number;
   hasFilters: boolean;
+  featuredRow?: ReactNode; // libros destacados (above-the-fold)
+  testimonialBanner?: ReactNode; // quote de comprador real (above-the-fold)
   children: ReactNode; // the grid content
 }
 
-export default function HomeShell({ totalListings, hasFilters, children }: Props) {
+export default function HomeShell({ totalListings, hasFilters, featuredRow, testimonialBanner, children }: Props) {
   const [forceMap, setForceMap] = useState(false);
 
   const handleToggleMap = useCallback(() => {
@@ -31,6 +33,16 @@ export default function HomeShell({ totalListings, hasFilters, children }: Props
         <HeroBar totalListings={totalListings} onToggleMap={handleToggleMap} />
       ) : (
         <h1 className="sr-only">Libros usados cerca de ti — tuslibros.cl</h1>
+      )}
+
+      {/* Above-the-fold: libros destacados + testimonio (antes del manifiesto) */}
+      {!hasFilters && (featuredRow || testimonialBanner) && (
+        <section className="bg-white border-b border-cream-dark">
+          <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+            {featuredRow}
+            {testimonialBanner}
+          </div>
+        </section>
       )}
 
       {/* Manifiesto — el "por qué" */}
