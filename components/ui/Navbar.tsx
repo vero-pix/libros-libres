@@ -36,8 +36,8 @@ export default async function Navbar() {
   return (
     <header className="shrink-0 bg-ink flex flex-col sticky top-0 z-50">
       {/* Row 1: Logo + Search + Auth */}
-      <div className="bg-cream px-4 py-4">
-        <div className="max-w-7xl mx-auto flex items-center gap-6">
+      <div className="bg-cream px-4 py-3 sm:py-4">
+        <div className="max-w-7xl mx-auto flex items-center gap-4 sm:gap-6">
           <Link href="/" className="group whitespace-nowrap">
             <span className="font-display text-2xl font-bold text-ink tracking-tight">
               Libros{" "}
@@ -61,17 +61,17 @@ export default async function Navbar() {
 
       {/* Row 2: Navigation */}
       <nav className="text-cream-warm">
-        <div className="max-w-7xl mx-auto px-4 flex items-center gap-0 flex-wrap">
-          <NavLink href="/">Inicio</NavLink>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 flex items-center gap-0 flex-nowrap overflow-x-auto scrollbar-hide">
+          <NavLink href="/" className="hidden sm:inline-flex">Inicio</NavLink>
           <NavLink href="/#tienda">Explorar</NavLink>
           <NavLink href="/publish">Vender</NavLink>
-          <NavLink href="/novedades">Novedades</NavLink>
+          <NavLink href="/novedades" className="hidden sm:inline-flex">Novedades</NavLink>
 
           {user && (
             <>
             <Link
               href="/mensajes"
-              className="text-xs font-medium uppercase tracking-[0.15em] px-4 py-3.5 hover:bg-white/10 transition-colors whitespace-nowrap flex items-center"
+              className="text-[11px] sm:text-xs font-medium uppercase tracking-[0.1em] sm:tracking-[0.15em] px-2.5 sm:px-4 py-3 sm:py-3.5 hover:bg-white/10 transition-colors whitespace-nowrap flex items-center"
             >
               Mensajes
               <UnreadBadge />
@@ -94,6 +94,7 @@ export default async function Navbar() {
             label="Ayuda"
             items={[
               { href: "/como-funciona", label: "Cómo funciona" },
+              { href: "/novedades", label: "Novedades" },
               { href: "/faq", label: "FAQ" },
               { href: "/sobre-nosotros", label: "Sobre nosotros" },
               { href: "/alianzas", label: "Alianzas institucionales" },
@@ -105,7 +106,7 @@ export default async function Navbar() {
             href="https://wa.me/56994583067?text=Hola%2C%20tengo%20una%20consulta%20sobre%20tuslibros.cl"
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-auto text-xs font-medium uppercase tracking-[0.15em] px-3 py-3.5 hover:bg-white/10 transition-colors whitespace-nowrap flex items-center gap-1.5 text-green-400 hover:text-green-300"
+            className="ml-auto text-[11px] sm:text-xs font-medium uppercase tracking-[0.1em] sm:tracking-[0.15em] px-2.5 sm:px-3 py-3 sm:py-3.5 hover:bg-white/10 transition-colors whitespace-nowrap flex items-center gap-1.5 text-green-400 hover:text-green-300"
             title="Escríbenos por WhatsApp"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -117,7 +118,7 @@ export default async function Navbar() {
       </nav>
 
       {/* Mobile search */}
-      <div className="md:hidden bg-cream border-b border-cream-dark px-4 py-2">
+      <div className="md:hidden bg-cream border-b border-cream-dark px-3 py-1.5">
         <Suspense>
           <HeaderSearchBar />
         </Suspense>
@@ -126,11 +127,11 @@ export default async function Navbar() {
   );
 }
 
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLink({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) {
   return (
     <Link
       href={href}
-      className="text-xs font-medium uppercase tracking-[0.15em] px-4 py-3.5 hover:bg-white/10 transition-colors whitespace-nowrap"
+      className={`text-[11px] sm:text-xs font-medium uppercase tracking-[0.1em] sm:tracking-[0.15em] px-2.5 sm:px-4 py-3 sm:py-3.5 hover:bg-white/10 transition-colors whitespace-nowrap inline-flex items-center ${className}`}
     >
       {children}
     </Link>
