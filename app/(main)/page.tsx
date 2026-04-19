@@ -290,7 +290,13 @@ export default async function HomePage({ searchParams }: Props) {
             <FeaturedRow featuredListings={featuredListings} featuredSellers={featuredSellers} />
           ) : null
         }
-        testimonialBanner={!hasFilters ? <TestimonialBanner /> : null}
+        testimonialBanner={
+          !hasFilters ? (
+            <div className="lg:hidden">
+              <TestimonialBanner />
+            </div>
+          ) : null
+        }
       >
         <Breadcrumbs items={[
           { label: "Inicio", href: "/" },
