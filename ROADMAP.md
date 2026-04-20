@@ -1,6 +1,6 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 19 abril 2026
+Última actualización: 19 abril 2026 — noche
 
 ---
 
@@ -59,6 +59,49 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 ---
 
 ## Archivo histórico
+
+---
+
+## Sesión 19 abril 2026 — Replanteo home + Economía inversa
+
+**Contexto del día:** Post LinkedIn + GA4 mostró 72% bounce en home y 0 visitas a `/register` (el script estaba roto). Diagnóstico del embudo encontró las fricciones reales; sesión dedicada a arreglar la home y lanzar una iniciativa nueva.
+
+**Cambios visibles en producción:**
+- [x] **Fix #1 — FeaturedRow above the fold** (commit `91bfb62`). Desktop: 7 portadas + mini-testimonio de Zdravko arriba, antes del manifiesto.
+- [x] **Fix #2-6 — Replanteo completo de home** (commit `911bfad`). Home pasa de ~6000px a ~3800px:
+  - Eliminadas 4 feature sections (Scan/Payment/Shipping/Rental) del HomeShell
+  - HeroBar simplificado sin las 5 cards horizontales + mini-testimonio inline
+  - Manifiesto "Tus libros merecen circular" movido al final, compacto
+  - "Explorar N libros" ahora es Link a `/search` (no scroll-anchor)
+  - Testimonial banner grande solo en mobile (evita duplicar con el mini-quote inline del hero desktop)
+- [x] **Navbar mobile compacto** (commit `22832fa`). Se ocultan Inicio y Novedades (Novedades va al dropdown Ayuda), padding reducido.
+- [x] **Hotfix navbar dropdowns** (commit `6367ab9`). El `overflow-x-auto` recortaba los dropdowns absolute (Mi cuenta + Ayuda). Revertido a flex-wrap. Incidente documentado en `memory/feedback_smoke_test_antes_de_merge.md`.
+- [x] **Sinopsis de Camino al Futuro traducida al inglés→español** (script `_update_camino_synopsis.mjs`).
+- [x] **Smoke tests E2E ampliados** (commit `6f9f0ab`) — cubren dropdowns navbar, CTA del hero, comparador en ficha, fold above. Scripts `npm run smoke` y `npm run predeploy`.
+- [x] **Iniciativa "Economía inversa" / "Se busca · La comunidad pide"** (commit `369aff8`) — tabla `book_requests`, API `/api/requests`, página `/solicitudes`, sección home con ejemplo real (Fukuyama). Ver `memory/project_economia_inversa.md`.
+- [x] **MercadoPago de Margarita (mamá de Vero) conectada** al vendedor TusLibros — MP id `3346177708`, RUT 4962439-5. Las ventas de TusLibros se depositan a la cuenta de ella.
+
+**Diagnósticos del día (memoria):**
+- `project_home_fold_diagnosis_19abril.md` — por qué 72% bounce (no se veía ni un libro above the fold).
+- `project_home_replanteo_19abril.md` — estructura global rota, redundancia hero↔feature sections, 10+ secciones.
+- `project_economia_inversa.md` — la nueva iniciativa completa.
+
+**Reglas nuevas en memoria:**
+- `feedback_smoke_test_antes_de_merge.md` — cambios a componentes críticos requieren probar interacciones, no solo screenshot.
+- `feedback_no_trafico_fake_analytics.md` — screenshots/videos siempre contra localhost, nunca producción.
+- `feedback_no_intervenir_ventas_terceros.md` — si el carrito abandonado es de otro seller, dejarlo.
+- `feedback_no_copy_manufacturado.md` — cuando Vero pide "su voz", usar SUS palabras reales, no inventar.
+
+**Datos reales del embudo 30d (para comparar después):**
+- 368 sessions, 72.3% bounce en home
+- 15 users totales, 8 externos, 2 compradores reales (Zdravko, Camilo)
+- 141/191 listings sin una sola visita → catálogo invisible antes del fix
+- 4 órdenes pagadas totales = $53.647 ($5k Zdravko + $48.647 Camilo bundle)
+
+**Pendientes post-sesión:**
+- [ ] **Medir impacto del replanteo home** en GA4 en 48h. Meta: bounce < 55%.
+- [ ] **Aplicar smoke tests como hábito antes de cada push** (nunca más un incidente tipo navbar dropdowns rotos).
+- [ ] **Retomar "fix mobile navbar a 1 línea SIN romper dropdowns"** — opción: `position: fixed` en NavDropdown con portal, o refactor a hamburger.
 
 ---
 
