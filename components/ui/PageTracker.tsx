@@ -13,11 +13,23 @@ function getSessionId(): string {
   return sid;
 }
 
-/**
- * Lightweight page tracker.
- * Only tracks listing views (for "libros más vistos" and seller analytics).
- * General traffic (pageviews, browsers, OS) is handled by Vercel Analytics.
- */
+// Rutas que NO queremos trackear (paneles privados, auth, checkout con datos
+// sensibles, rutas técnicas). Todo lo demás va al analytics.
+const EXCLUDE_PATTERNS = [
+  /^\/api\//,
+  /^\/admin/,
+  /^\/mis-/,
+  /^\/perfil/,
+  /^\/mensajes/,
+  /^\/carrito/,
+  /^\/checkout/,
+  /^\/login/,
+  /^\/register/,
+  /^\/forgot-password/,
+  /^\/reset-password/,
+  /^\/orders\//,
+];
+
 export default function PageTracker() {
   const pathname = usePathname();
   const lastPath = useRef("");
@@ -26,17 +38,18 @@ export default function PageTracker() {
     if (pathname === lastPath.current) return;
     lastPath.current = pathname;
 
-    // Only track listing detail pages and home
-    const listingMatch = pathname.match(/^\/listings\/([a-f0-9-]+)$/);
-    const isHome = pathname === "/";
-    const isSearch = pathname === "/search";
+    if (EXCLUDE_PATTERNS.some((re) => re.test(pathname))) return;
 
-    if (!listingMatch && !isHome && !isSearch) return;
+    // Si entra a una ficha /listings/UUID, guardamos listing_id.
+    // Para /libro/:username/:slug no tenemos UUID acá — el ID se resolverá
+    // server-side si hace falta (o con join listings_slug → id más adelante).
+    const listingMatch = pathname.match(/^\/listings\/([a-f0-9-]+)$/);
+    const listing_id = listingMatch?.[1] ?? null;
 
     const data = JSON.stringify({
       path: pathname,
       referrer: document.referrer || null,
-      listing_id: listingMatch?.[1] || null,
+      listing_id,
       session_id: getSessionId(),
     });
 
