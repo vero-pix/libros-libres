@@ -37,9 +37,12 @@ interface BookMapProps {
   onListingsLoaded?: (listings: ListingWithBook[]) => void;
   onUserLocation?: (loc: { lat: number; lng: number }) => void;
   flyToListing?: ListingWithBook | null;
+  /** Si se provee, usamos estos listings en vez de hacer fetch a /api/listings.
+   *  Útil para vistas filtradas (ej. /search) que ya resolvieron los listings server-side. */
+  listings?: ListingWithBook[];
 }
 
-export default function BookMap({ onListingsLoaded, onUserLocation, flyToListing }: BookMapProps = {}) {
+export default function BookMap({ onListingsLoaded, onUserLocation, flyToListing, listings: externalListings }: BookMapProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const listingsRef = useRef<ListingWithBook[]>([]);
@@ -191,8 +194,15 @@ export default function BookMap({ onListingsLoaded, onUserLocation, flyToListing
     };
   }, []);
 
-  // 2. Fetch listings
+  // 2. Resolver listings: si vienen como prop, usarlos directo (ej. /search);
+  //    si no, fetch del API (comportamiento legacy para home y /mapa).
   useEffect(() => {
+    if (externalListings) {
+      setListings(externalListings);
+      listingsRef.current = externalListings;
+      onListingsLoaded?.(externalListings);
+      return;
+    }
     async function fetchListings() {
       const res = await fetch("/api/listings");
       if (!res.ok) return;
@@ -202,7 +212,7 @@ export default function BookMap({ onListingsLoaded, onUserLocation, flyToListing
       onListingsLoaded?.(data);
     }
     fetchListings();
-  }, []);
+  }, [externalListings]);
 
   // 3. Fly to listing when sidebar item is clicked
   useEffect(() => {
