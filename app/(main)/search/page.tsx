@@ -5,6 +5,7 @@ import { buildCategoryTree } from "@/lib/categoryTree";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
+import SearchResultsToggle from "@/components/listings/SearchResultsToggle";
 import PromoBanner from "@/components/ui/PromoBanner";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { Metadata } from "next";
@@ -177,11 +178,13 @@ export default async function SearchPage({ searchParams }: Props) {
             </Suspense>
 
             {listings.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
-                {listings.map((listing) => (
-                  <ListingCard key={listing.id} listing={listing} />
-                ))}
-              </div>
+              <SearchResultsToggle listings={listings} resultsCount={listings.length}>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {listings.map((listing) => (
+                    <ListingCard key={listing.id} listing={listing} />
+                  ))}
+                </div>
+              </SearchResultsToggle>
             ) : (
               <div className="text-center py-16 text-gray-500">
                 <p className="text-lg">No se encontraron resultados.</p>
