@@ -61,7 +61,7 @@ export default async function Navbar() {
 
       {/* Row 2: Navigation */}
       <nav className="text-cream-warm">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 flex items-center gap-0 flex-nowrap overflow-x-auto scrollbar-hide">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 flex items-center gap-0 flex-wrap">
           <NavLink href="/" className="hidden sm:inline-flex">Inicio</NavLink>
           <NavLink href="/#tienda">Explorar</NavLink>
           <NavLink href="/publish">Vender</NavLink>
