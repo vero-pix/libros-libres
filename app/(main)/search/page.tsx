@@ -6,6 +6,7 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
 import PromoBanner from "@/components/ui/PromoBanner";
+import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 
@@ -137,6 +138,12 @@ export default async function SearchPage({ searchParams }: Props) {
     listings = listings.filter(
       (l) => l.book.pages != null && l.book.pages <= Number(pages_max)
     );
+  }
+
+  // Si no hay sort custom por precio, aplicar el orden de presentación
+  // (español arriba, con portada arriba, deprioritized al final).
+  if (sort !== "price_asc" && sort !== "price_desc") {
+    listings = sortListingsForDisplay(listings);
   }
 
   const allListings = (rawListings as unknown as ListingWithBook[]) ?? [];

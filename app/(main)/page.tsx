@@ -15,6 +15,7 @@ import FeaturedRow from "@/components/home/FeaturedRow";
 import CollectibleRow from "@/components/home/CollectibleRow";
 import TestimonialBanner from "@/components/home/TestimonialBanner";
 import RequestsRow from "@/components/home/RequestsRow";
+import { sortListingsForDisplay } from "@/lib/sortListings";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
@@ -184,37 +185,9 @@ export default async function HomePage({ searchParams }: Props) {
     };
   });
 
-  // Heurística: detectar libros que NO están en español (alemán u otros idiomas
-  // no-latinos evidentes). Los mandamos al final para que la home no muestre
-  // títulos ilegibles como primera impresión.
-  const looksNonSpanish = (l: ListingWithBook) => {
-    // Prefiere la columna language si está presente (backfill via Open Library)
-    const lang = (l.book as any).language as string | null | undefined;
-    if (lang) return lang !== "es";
-    // Fallback heurístico para libros sin language seteada
-    const text = `${l.book.title ?? ""} ${l.book.author ?? ""}`.toLowerCase();
-    if (/[äöüß]/.test(text)) return true;
-    if (/\b(der|die|das|und|ein|eine|für|nicht|mit|ist|sich|auf|dem|den|wenn|wir|ich)\b/.test(text)) return true;
-    if (/\bfrisch\b|\bkafka\b|\bhesse\b|\bgrass\b|\bmann\b/.test(text)) return true;
-    return false;
-  };
-  const hasCover = (l: ListingWithBook) =>
-    !!(l.cover_image_url || l.book?.cover_url);
-
-  // Orden final: depriorizados SIEMPRE al final; dentro del tier no-depriorizado:
-  // (1) featured pagos, (2) con portada, (3) en español. Manteniendo el orden
-  // seleccionado del query dentro de cada tier.
-  listings.sort((a, b) => {
-    const depA = !!(a as any).deprioritized, depB = !!(b as any).deprioritized;
-    if (depA !== depB) return depA ? 1 : -1;
-    if (a._featured && !b._featured) return -1;
-    if (!a._featured && b._featured) return 1;
-    const coverA = hasCover(a), coverB = hasCover(b);
-    if (coverA !== coverB) return coverA ? -1 : 1;
-    const nonEsA = looksNonSpanish(a), nonEsB = looksNonSpanish(b);
-    if (nonEsA !== nonEsB) return nonEsA ? 1 : -1;
-    return 0;
-  });
+  // Orden de presentación: deprioritized al final, featured arriba, con
+  // portada arriba, español arriba. Helper compartido con /search y /vendedor.
+  listings = sortListingsForDisplay(listings);
 
   // Filter by new taxonomy
   if (subcategory) {
