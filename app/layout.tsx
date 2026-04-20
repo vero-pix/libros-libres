@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next";
 import Footer from "@/components/ui/Footer";
 import BackToTop from "@/components/ui/BackToTop";
 import PageTracker from "@/components/ui/PageTracker";
