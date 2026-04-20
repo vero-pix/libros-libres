@@ -8,7 +8,9 @@ interface Props {
 }
 
 export default function CollectibleRow({ listings }: Props) {
-  if (listings.length === 0) return null;
+  // Si hay menos de 4, la sección queda visualmente vacía y entorpece.
+  // Mejor ocultarla hasta que tenga masa crítica.
+  if (listings.length < 4) return null;
 
   return (
     <section className="mb-8">
