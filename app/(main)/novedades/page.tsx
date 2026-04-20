@@ -38,6 +38,36 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "19 abril 2026",
+    title: "Economía inversa: ahora los compradores piden y los vendedores escuchan",
+    description:
+      "Un usuario me escribió por WhatsApp buscando \"El fin de la historia y el último hombre\" de Fukuyama — no lo teníamos. Le dije que buenísima idea: en vez de que solo los vendedores publiquen y los compradores busquen, que también funcione al revés. Los compradores dejan una solicitud y los vendedores que tienen el libro lo publican. Ya vive en la home como \"Se busca · La comunidad pide\" y tiene su propia página en /solicitudes. La primera solicitud es justo la de Fukuyama — si alguien la tiene, que la publique.",
+    tag: "Lanzamiento",
+    link: "/solicitudes",
+    linkText: "Ver solicitudes abiertas",
+    visual: {
+      kind: "milestone",
+      icon: "🔁",
+      metric: "Demanda → Oferta",
+      detail: "la comunidad pide, los vendedores responden",
+    },
+  },
+  {
+    date: "19 abril 2026",
+    title: "La home ahora muestra libros arriba en 1 segundo",
+    description:
+      "Revisé Analytics: 72% de la gente entraba a la home y se iba sin clickear nada. Motivo: no se veía ni un libro arriba, había que pasar el manifiesto entero antes de ver catálogo. Lo reordené. Ahora el hero ocupa menos espacio, tiene un mini-testimonio de Z. al lado, y los libros destacados aparecen al segundo. También saqué 4 secciones largas de marketing (scan, pago, envío, arriendo) que duplicaban lo de arriba — viven en sus landings (/vender, /como-funciona, /como-despachar). Y en mobile compacté el navbar.",
+    tag: "Mejora",
+    visual: {
+      kind: "stat",
+      stats: [
+        { big: "~6000 → 3800 px", small: "altura total de la home" },
+        { big: "10 → 6", small: "secciones de scroll" },
+        { big: "72% → ?", small: "bounce rate (a medir en 48h)" },
+      ],
+    },
+  },
+  {
     date: "18 abril 2026",
     title: "Limpieza grande de SEO: Google va a volver a mirar el sitio con cariño",
     description:
