@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import SellerListingsGrid from "@/components/listings/SellerListingsGrid";
 import Avatar from "@/components/ui/Avatar";
+import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
 
 interface Props {
@@ -67,6 +68,12 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
   else if (sort === "price_desc") listings = [...listings].sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
   else if (sort === "title") listings = [...listings].sort((a, b) => a.book.title.localeCompare(b.book.title));
   else if (sort === "author") listings = [...listings].sort((a, b) => (a.book.author ?? "").localeCompare(b.book.author ?? ""));
+  else {
+    // "Recientes" (default): aplicar el orden de presentación de tuslibros
+    // (español arriba, con portada arriba, deprioritized al final).
+    // Mantiene el orden de created_at dentro de cada tier.
+    listings = sortListingsForDisplay(listings);
+  }
 
   // Seller reviews: reviews for all listings owned by this seller
   const listingIds = listings.map((l) => l.id);
