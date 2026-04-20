@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createPublicClient } from "@/lib/supabase/public";
+import { createClient } from "@/lib/supabase/server";
 import RequestForm from "./RequestForm";
 import type { Metadata } from "next";
 
@@ -27,8 +28,38 @@ export default async function SolicitudesPage() {
     .order("created_at", { ascending: false })
     .limit(100);
 
-  const open = ((requests ?? []) as BookRequest[]).filter((r) => !r.fulfilled);
-  const fulfilled = ((requests ?? []) as BookRequest[]).filter((r) => r.fulfilled);
+  // Si hay usuario logueado con ciudad, ordenar primero las solicitudes
+  // cuyo requester_location matchee (proximidad = venta probable).
+  const sessionClient = await createClient();
+  const {
+    data: { user },
+  } = await sessionClient.auth.getUser();
+  let viewerCity: string | null = null;
+  if (user) {
+    const { data: profile } = await sessionClient
+      .from("users")
+      .select("city")
+      .eq("id", user.id)
+      .maybeSingle();
+    viewerCity = (profile?.city ?? "").trim().toLowerCase() || null;
+  }
+
+  const all = (requests ?? []) as BookRequest[];
+  const rankByProximity = (list: BookRequest[]) => {
+    if (!viewerCity) return list;
+    const tokens = viewerCity.split(/[\s,]+/).filter((t) => t.length >= 3);
+    const score = (r: BookRequest) => {
+      const loc = (r.requester_location ?? "").toLowerCase();
+      if (!loc) return 0;
+      if (loc.includes(viewerCity)) return 2;
+      if (tokens.some((t) => loc.includes(t))) return 1;
+      return 0;
+    };
+    return [...list].sort((a, b) => score(b) - score(a));
+  };
+
+  const open = rankByProximity(all.filter((r) => !r.fulfilled));
+  const fulfilled = all.filter((r) => r.fulfilled);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-cream-warm to-cream">

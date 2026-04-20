@@ -71,5 +71,17 @@ export async function POST(req: NextRequest) {
     session_id: session_id || null,
   });
 
+  // Si el usuario está logueado, backfillar las pageviews previas de esta
+  // session que aún no tienen user_id (entradas anónimas antes del login).
+  // Esto es lo que nos permite ver "este usuario vino de LinkedIn → navegó
+  // X libros → se registró" en lugar de tener dos trayectos desconectados.
+  if (user?.id && session_id) {
+    await supabase
+      .from("page_views")
+      .update({ user_id: user.id })
+      .eq("session_id", session_id)
+      .is("user_id", null);
+  }
+
   return NextResponse.json({ ok: true });
 }
