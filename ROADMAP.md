@@ -1,6 +1,62 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 18 abril 2026
+Última actualización: 19 abril 2026
+
+---
+
+## Checklist pre-deploy (obligatorio)
+
+Antes de mergear a `main` cualquier cambio a **componentes críticos** (Navbar, HomeShell, HeroBar, ListingDetail, checkout, publish, auth):
+
+```bash
+# 1. Build pasa
+npm run build
+
+# 2. Smoke tests pasan (levantar dev server antes en :3000 o :3001 con QA_BASE_URL)
+PORT=3001 npm run dev &  # en otra terminal
+QA_BASE_URL=http://localhost:3001 npm run smoke
+```
+
+Los smoke tests viven en `tests/e2e/golden-paths.spec.ts` y validan:
+- Home carga con listings visibles above the fold
+- **Dropdown "Ayuda" abre al hover y al click** ← incidente 19 abril
+- **Dropdown "Mi cuenta" accesible** (si logueado)
+- CTA "Ver N libros" del hero → navega a `/search`
+- Ficha de libro abre sin 404
+- **Comparador de precios visible en ficha** con links a Buscalibre/MercadoLibre
+- `/publish` redirige a login si no autenticado
+- Footer con links críticos (Términos, etc.)
+
+Si alguno falla, **no mergear**. Investigar root cause primero.
+
+**Incidente que originó esta regla:** 19 abril 2026, agregué `overflow-x-auto` al navbar para compactar mobile. El build pasó, el screenshot se veía bien, deployé. Los dropdowns absolute quedaron recortados por el overflow → nadie podía entrar a Mi cuenta / Ayuda / publicar. Hotfix inmediato.
+
+---
+
+## Roadmap vivo (19 abril 2026)
+
+### Urgente (romper = detener flujo de usuarios)
+- [ ] **Fix mobile navbar sin romper dropdowns**: retomar el objetivo de compactar a 1 línea en mobile, pero con `position: fixed` o portal en NavDropdown en vez de depender de `overflow` del padre.
+- [ ] **Tracking session → user_id**: cuando alguien se registra, vincular el session_id previo al user.id para saber el canal (LinkedIn, Reddit, orgánico). Hoy estamos ciegos.
+- [ ] **Shipit roto para sellers no-admin**: draft queda sin emitirse, vendedor sin panel → ver `memory/project_shipit_flow_broken_for_sellers.md`.
+
+### Importante (UX que mueve conversión)
+- [ ] **Monitorear bounce rate post-replanteo home** en GA4 durante 48h. Base previa: 72% bounce en /. Meta: <55%.
+- [ ] **Sinopsis masiva en español**: correr `scripts/audit_english_descriptions.sql` para listar libros con descripción en inglés, traducir por tanda.
+- [ ] **Activación post-registro**: de 8 externos registrados en 30d, 5 no hicieron nada. Diseñar mail de onboarding + CTA claro al loguearse.
+
+### Infra / housekeeping
+- [ ] **Migrar imágenes a R2** — hoy Next Image desactivado, Supabase Storage caro.
+- [ ] **RLS fix en `contact_messages`** — queries fallan para usuarios no-admin.
+- [ ] **Reactivar Next Image** post R2.
+
+### Nice-to-have
+- [ ] **Navbar Inicio/Novedades en dropdown mobile**: hamburger que libera la nav row.
+- [ ] **Retomar el 'Explorar N libros' como scroll-anchor si la home queda bien corta** — hoy es link a `/search` (commit 911bfad).
+
+---
+
+## Archivo histórico
 
 ---
 

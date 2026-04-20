@@ -10,7 +10,9 @@
     "bulk-upload": "npx tsx scripts/bulk-upload.ts",
     "qa": "playwright test",
     "qa:prod": "QA_BASE_URL=https://tuslibros.cl playwright test",
-    "qa:ui": "playwright test --ui"
+    "qa:ui": "playwright test --ui",
+    "smoke": "playwright test golden-paths",
+    "predeploy": "npm run build && npm run smoke"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
