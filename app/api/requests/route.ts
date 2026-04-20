@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@/lib/supabase/server";
+import { notifyRequestSellers } from "@/lib/notifyRequestSellers";
 
 /**
  * GET /api/requests
@@ -87,6 +88,16 @@ export async function POST(req: NextRequest) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // Notificar a sellers activos por email (side effect, sin bloquear la
+  // respuesta al usuario que pide el libro). Si algo falla, se logea.
+  notifyRequestSellers({
+    id: data.id,
+    title: data.title,
+    author: data.author ?? null,
+    notes: notes?.trim() || null,
+    requester_location: requester_location?.trim() || null,
+  }).catch((e) => console.error("[notifyRequestSellers] error:", e));
 
   return NextResponse.json({ request: data }, { status: 201 });
 }
