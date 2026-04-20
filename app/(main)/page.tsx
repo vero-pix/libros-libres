@@ -14,6 +14,7 @@ import { buildCategoryTree } from "@/lib/categoryTree";
 import FeaturedRow from "@/components/home/FeaturedRow";
 import CollectibleRow from "@/components/home/CollectibleRow";
 import TestimonialBanner from "@/components/home/TestimonialBanner";
+import RequestsRow from "@/components/home/RequestsRow";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
@@ -297,6 +298,7 @@ export default async function HomePage({ searchParams }: Props) {
             </div>
           ) : null
         }
+        requestsRow={!hasFilters ? <RequestsRow /> : null}
       >
         <Breadcrumbs items={[
           { label: "Inicio", href: "/" },

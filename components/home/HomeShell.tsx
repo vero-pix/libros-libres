@@ -13,10 +13,11 @@ interface Props {
   hasFilters: boolean;
   featuredRow?: ReactNode;
   testimonialBanner?: ReactNode;
+  requestsRow?: ReactNode;
   children: ReactNode;
 }
 
-export default function HomeShell({ totalListings, hasFilters, featuredRow, testimonialBanner, children }: Props) {
+export default function HomeShell({ totalListings, hasFilters, featuredRow, testimonialBanner, requestsRow, children }: Props) {
   const [forceMap, setForceMap] = useState(false);
 
   const handleToggleMap = useCallback(() => {
@@ -40,6 +41,9 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
           </div>
         </section>
       )}
+
+      {/* Economía inversa: se busca */}
+      {!hasFilters && requestsRow}
 
       {/* Collection banners */}
       {!hasFilters && (

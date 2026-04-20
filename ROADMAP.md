@@ -41,6 +41,8 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 - [ ] **Shipit roto para sellers no-admin**: draft queda sin emitirse, vendedor sin panel → ver `memory/project_shipit_flow_broken_for_sellers.md`.
 
 ### Importante (UX que mueve conversión)
+- [ ] **Notificar solicitudes a vendedores**: cuando alguien pide un libro en /solicitudes, mandar email a los sellers activos + suscriptores del newsletter. "Alguien está buscando este libro — si lo tienes, publícalo y vendes hoy." Crítico para activar la "economía inversa" — sin notificación, los vendedores no van a entrar a revisar la lista.
+- [ ] **Ranking por cercanía en /solicitudes**: cuando un vendedor logueado entre a ver las solicitudes, ordenarlas primero por ciudad/región coincidente con la suya. "Vendedor en Osorno ve primero las solicitudes de Osorno, Valdivia, Puerto Varas." Aumenta drásticamente la probabilidad de que una solicitud se cumpla (retiro en mano o envío corto = más barato y rápido).
 - [ ] **Monitorear bounce rate post-replanteo home** en GA4 durante 48h. Base previa: 72% bounce en /. Meta: <55%.
 - [ ] **Sinopsis masiva en español**: correr `scripts/audit_english_descriptions.sql` para listar libros con descripción en inglés, traducir por tanda.
 - [ ] **Activación post-registro**: de 8 externos registrados en 30d, 5 no hicieron nada. Diseñar mail de onboarding + CTA claro al loguearse.
