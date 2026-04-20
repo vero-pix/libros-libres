@@ -4,13 +4,18 @@ import { createServerClient } from "@supabase/ssr";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://tuslibros.cl";
 
-  // Static pages
+  // Static pages (solo rutas PÚBLICAS — las que requieren login redirigen a
+  // /login y Google las marca como "Página con redirección", bajando el SEO).
   const staticPages = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "daily" as const, priority: 1 },
     { url: `${baseUrl}/search`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.8 },
     { url: `${baseUrl}/mapa`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.8 },
-    { url: `${baseUrl}/publish`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
+    // /publish requiere login — usar /vender (landing pública) en su lugar
+    { url: `${baseUrl}/vender`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${baseUrl}/solicitudes`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.7 },
     { url: `${baseUrl}/como-funciona`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.6 },
+    { url: `${baseUrl}/como-despachar`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.5 },
+    { url: `${baseUrl}/devoluciones`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.4 },
     { url: `${baseUrl}/faq`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.5 },
     { url: `${baseUrl}/sobre-nosotros`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.5 },
     { url: `${baseUrl}/historia`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.4 },
