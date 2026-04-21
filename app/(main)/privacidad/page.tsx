@@ -5,7 +5,11 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import Image from "next/image";
 
 export const metadata = {
-  title: "Política de Privacidad — Libros Libres",
+  title: "Política de Privacidad — tuslibros.cl",
+  description:
+    "Cómo tuslibros.cl protege tus datos personales: información que recolectamos, cómo la usamos, integración con MercadoPago y Shipit, y tus derechos como usuario en Chile.",
+  alternates: { canonical: "https://tuslibros.cl/privacidad" },
+  robots: { index: true, follow: false },
 };
 
 export default async function PrivacidadPage() {

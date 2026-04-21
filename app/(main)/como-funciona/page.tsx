@@ -2,7 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Cómo funciona — tuslibros.cl",
+  title: "Cómo funciona — comprar, vender y arrendar libros usados | tuslibros.cl",
+  description:
+    "Guía paso a paso para usar tuslibros.cl: cómo comprar con MercadoPago, cómo publicar tus libros gratis, cómo funciona el arriendo con garantía, y cómo coordinamos el despacho por courier o retiro en mano.",
+  alternates: { canonical: "https://tuslibros.cl/como-funciona" },
 };
 
 const directSteps = [

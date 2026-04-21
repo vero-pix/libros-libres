@@ -3,6 +3,9 @@ import Link from "next/link";
 
 export const metadata = {
   title: "Preguntas frecuentes — tuslibros.cl",
+  description:
+    "Resuelve tus dudas sobre comprar, vender y arrendar libros usados en tuslibros.cl. Cómo funciona el pago con MercadoPago, despachos a Chile, arriendos con garantía y más.",
+  alternates: { canonical: "https://tuslibros.cl/faq" },
 };
 
 const linkClass = "text-brand-600 font-semibold hover:underline";
