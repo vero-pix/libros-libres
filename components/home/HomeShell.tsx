@@ -14,10 +14,11 @@ interface Props {
   featuredRow?: ReactNode;
   testimonialBanner?: ReactNode;
   requestsRow?: ReactNode;
+  heroRequestStrip?: ReactNode;
   children: ReactNode;
 }
 
-export default function HomeShell({ totalListings, hasFilters, featuredRow, testimonialBanner, requestsRow, children }: Props) {
+export default function HomeShell({ totalListings, hasFilters, featuredRow, testimonialBanner, requestsRow, heroRequestStrip, children }: Props) {
   const [forceMap, setForceMap] = useState(false);
 
   const handleToggleMap = useCallback(() => {
@@ -26,6 +27,8 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
 
   return (
     <>
+      {!hasFilters && heroRequestStrip}
+
       {!hasFilters ? (
         <HeroBar totalListings={totalListings} onToggleMap={handleToggleMap} />
       ) : (

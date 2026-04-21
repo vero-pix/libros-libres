@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import MapSidebar from "@/components/map/MapSidebar";
+import MapErrorBoundary from "@/components/map/MapErrorBoundary";
 import type { ListingWithBook } from "@/types";
 
 const BookMap = dynamic(() => import("@/components/map/BookMap"), {
@@ -37,11 +38,13 @@ export default function MapaClient() {
         />
       </div>
       <main className="flex-1 relative">
-        <BookMap
-          onListingsLoaded={handleListingsLoaded}
-          onUserLocation={handleUserLocation}
-          flyToListing={flyTo}
-        />
+        <MapErrorBoundary>
+          <BookMap
+            onListingsLoaded={handleListingsLoaded}
+            onUserLocation={handleUserLocation}
+            flyToListing={flyTo}
+          />
+        </MapErrorBoundary>
       </main>
     </div>
   );

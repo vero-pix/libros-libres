@@ -56,6 +56,9 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 - [ ] **Navbar Inicio/Novedades en dropdown mobile**: hamburger que libera la nav row.
 - [ ] **Retomar el 'Explorar N libros' como scroll-anchor si la home queda bien corta** — hoy es link a `/search` (commit 911bfad).
 
+### Investigar — alianzas de logística
+- [ ] **Uber Despachos Chile** — UX de tracking espectacular (mapa en vivo + ETA + animación del pedido en preparación). Investigar cómo contactarlos para evaluar integración como alternativa a Shipit para envíos locales (Santiago). Posible vía: Uber Direct API (B2B), o contacto comercial Chile. Referencia visual: `docs/uber_despachos_tracking.png` (pendiente guardar). Caso de uso: retiros urbanos mismo día entre comprador y vendedor en RM.
+
 ---
 
 ## Archivo histórico
