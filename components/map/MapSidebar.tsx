@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import type { ListingWithBook } from "@/types";
 import { translateGenre } from "@/lib/genres";
+import { libroUrl } from "@/lib/urls";
 
 type SortMode = "distance" | "author" | "genre";
 
@@ -135,10 +137,10 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
               const isCollectible = !!(listing as any).is_collectible;
               const isFeatured = !!(listing as any).featured;
               return (
-                <li key={listing.id}>
-                  <button
-                    onClick={() => onListingClick(listing)}
-                    className="w-full text-left px-4 py-3 hover:bg-cream-warm transition-colors flex gap-3 items-start"
+                <li key={listing.id} className="group relative">
+                  <Link
+                    href={libroUrl(listing)}
+                    className="block px-4 py-3 pr-10 hover:bg-cream-warm transition-colors flex gap-3 items-start"
                   >
                     <div className={`relative flex-shrink-0 w-12 h-16 rounded overflow-hidden bg-cream-warm ${isCollectible ? "ring-2 ring-ink" : isFeatured ? "ring-2 ring-amber-400" : "ring-1 ring-gray-200"}`}>
                       {coverUrl ? (
@@ -157,7 +159,7 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
                             Colección
                           </span>
                         )}
-                        <p className="text-sm font-medium text-gray-900 leading-tight line-clamp-1">
+                        <p className="text-sm font-medium text-gray-900 leading-tight line-clamp-1 group-hover:text-brand-600">
                           {listing.book.title}
                         </p>
                       </div>
@@ -184,7 +186,22 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
                         )}
                       </div>
                     </div>
-                  </button>
+                  </Link>
+                  {listing.latitude != null && listing.longitude != null && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onListingClick(listing);
+                      }}
+                      title="Ver en el mapa"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-gray-400 hover:text-brand-600 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                      </svg>
+                    </button>
+                  )}
                 </li>
               );
             })}
