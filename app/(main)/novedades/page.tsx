@@ -39,6 +39,47 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 const novedades: Entry[] = [
   {
     date: "21 abril 2026",
+    title: "Nueva página dedicada a libros usados en Chile",
+    description:
+      "Publiqué una landing específica en /libros-usados-chile con foco en quién llega desde Google buscando la frase exacta. Tiene el hero de la casa, los tres diferenciadores (mapa, curación, pago seguro), el testimonio de Z., una grilla con los libros destacados del día y una sección de preguntas frecuentes que suelo responder por WhatsApp. Esta página trabaja a la par del home: el home es para quien ya conoce tuslibros.cl; esta es para quien recién lo está encontrando.",
+    tag: "Lanzamiento",
+    link: "/libros-usados-chile",
+    linkText: "Ver la página nueva",
+    visual: {
+      kind: "milestone",
+      icon: "🌱",
+      metric: "Página SEO",
+      detail: "para quien llega desde Google",
+    },
+  },
+  {
+    date: "21 abril 2026",
+    title: "40 libros ahora tienen ficha enriquecida",
+    description:
+      "Pasé 40 libros del catálogo por Google Books y Open Library para completarles sinopsis, editorial y número de páginas. Son libros que habían quedado con ficha pelada — solo título y autor. Ahora tienen contexto real para el comprador que llega desde una búsqueda. Quedaron 69 libros sin datos públicos disponibles (ediciones demasiado antiguas o locales); a esos los enriqueceremos a mano cuando pueda.",
+    tag: "Mejora",
+    visual: {
+      kind: "milestone",
+      icon: "📚",
+      metric: "40 fichas",
+      detail: "con sinopsis, editorial y páginas",
+    },
+  },
+  {
+    date: "21 abril 2026",
+    title: "Los títulos en Google ya no se cortan a la mitad",
+    description:
+      "Google recorta títulos de más de 60 caracteres en los resultados de búsqueda. Muchas fichas de libros quedaban cortadas feo — aparecían como \"Historia de la filosofía occidental desde Grec...\" sin autor ni precio. Ajusté el generador de títulos para que priorice el título del libro, el autor y el precio de forma inteligente, truncando con puntos suspensivos sólo cuando hace falta.",
+    tag: "Fix",
+    visual: {
+      kind: "milestone",
+      icon: "🔍",
+      metric: "94 fichas",
+      detail: "con títulos optimizados para Google",
+    },
+  },
+  {
+    date: "21 abril 2026",
     title: "Adiós al banner de \"Versión beta\"",
     description:
       "Llevo 3 semanas con el sitio abierto al público, con ventas reales, split payment funcionando, 207 libros publicados y 17 usuarios registrados. Ya no es beta. Saqué el banner amarillo que estaba arriba del navbar — de ahora en adelante tuslibros.cl es un producto en marcha, no un experimento.",

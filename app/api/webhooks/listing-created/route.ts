@@ -84,7 +84,45 @@ export async function POST(req: Request) {
     if (!tgRes.ok) {
       const err = await tgRes.text();
       console.error("Telegram send failed:", err);
-      return NextResponse.json({ error: "telegram failed", detail: err }, { status: 500 });
+      // No retornamos error — seguimos con el email aunque Telegram falle
+    }
+
+    // Email a admin vía Resend (complementa al Telegram)
+    const resendKey = process.env.RESEND_API_KEY;
+    const adminEmail = process.env.ADMIN_EMAIL || "vero@economics.cl";
+    if (resendKey) {
+      try {
+        const emailHtml = `
+<div style="font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#faf7f1;color:#151522">
+  <div style="border-left:3px solid #d4a017;padding-left:16px;margin-bottom:20px">
+    <p style="color:#8b8b9c;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 4px 0">Nueva publicación en tuslibros.cl</p>
+    <h2 style="font-family:Georgia,serif;font-size:22px;margin:0;color:#1a1a2e">${escape(title)}</h2>
+    <p style="color:#5a6b7d;margin:4px 0 0 0;font-style:italic">${escape(author)}</p>
+  </div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+    <tr><td style="padding:6px 0;color:#8b8b9c;font-size:13px;width:100px">Vendedor</td><td style="padding:6px 0;font-size:14px">${escape(sellerName)}</td></tr>
+    <tr><td style="padding:6px 0;color:#8b8b9c;font-size:13px">Precio</td><td style="padding:6px 0;font-size:14px;font-weight:600">${priceDisplay}</td></tr>
+    ${commune ? `<tr><td style="padding:6px 0;color:#8b8b9c;font-size:13px">Ciudad</td><td style="padding:6px 0;font-size:14px">${escape(commune)}</td></tr>` : ""}
+  </table>
+  <a href="${url}" style="display:inline-block;padding:10px 20px;background:#1a1a2e;color:#faf7f1;text-decoration:none;border-radius:6px;font-size:14px;font-weight:600">Ver publicación →</a>
+</div>`;
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${resendKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "tuslibros.cl <noreply@tuslibros.cl>",
+            to: [adminEmail],
+            reply_to: adminEmail,
+            subject: `📖 Nueva publicación: ${title}`,
+            html: emailHtml,
+          }),
+        });
+      } catch (emailErr) {
+        console.error("Resend email failed:", emailErr);
+      }
     }
 
     return NextResponse.json({ ok: true });
