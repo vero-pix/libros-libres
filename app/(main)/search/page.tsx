@@ -114,6 +114,19 @@ export default async function SearchPage({ searchParams }: Props) {
   const { data: rawListings } = await query;
   let listings = (rawListings as unknown as ListingWithBook[]) ?? [];
 
+  // Trackear la búsqueda (fire-and-forget, no bloquea render)
+  if (q) {
+    const normalized = q.toLowerCase().trim();
+    supabase
+      .from("search_queries")
+      .insert({
+        query: q,
+        normalized_query: normalized,
+        results_count: listings.length,
+      })
+      .then(() => {});
+  }
+
   if (genre) {
     listings = listings.filter(
       (l) => l.book.genre?.toLowerCase() === genre.toLowerCase()
