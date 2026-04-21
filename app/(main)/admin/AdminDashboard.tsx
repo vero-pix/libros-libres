@@ -12,6 +12,7 @@ import NewsletterSender from "@/components/admin/NewsletterSender";
 import AnalyticsTab from "@/components/admin/AnalyticsTab";
 import BusinessTab from "@/components/admin/BusinessTab";
 import CategoriesTab from "@/components/admin/CategoriesTab";
+import SearchesTab from "@/components/admin/SearchesTab";
 
 interface Props {
   orders: AdminOrder[];
@@ -22,7 +23,7 @@ interface Props {
   categories?: AdminCategory[];
 }
 
-type Tab = "orders" | "listings" | "users" | "messages" | "subscribers" | "categories" | "analytics" | "business" | "tools";
+type Tab = "orders" | "listings" | "users" | "messages" | "subscribers" | "categories" | "analytics" | "business" | "searches" | "tools";
 
 export default function AdminDashboard({ orders: initOrders, listings: initListings, users: initUsers, messages = [], subscribers = [], categories: initCategories = [] }: Props) {
   const [tab, setTab] = useState<Tab>("orders");
@@ -47,6 +48,7 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
     { key: "categories", label: "Categorías", count: cats.length },
     { key: "analytics", label: "Analytics", count: 0 },
     { key: "business", label: "Negocio", count: 0 },
+    { key: "searches", label: "Búsquedas", count: 0 },
     { key: "tools", label: "Herramientas", count: 0 },
   ];
 
@@ -145,6 +147,9 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
       )}
       {tab === "business" && (
         <BusinessTab />
+      )}
+      {tab === "searches" && (
+        <SearchesTab />
       )}
       {tab === "tools" && (
         <ToolsTab users={users} />
