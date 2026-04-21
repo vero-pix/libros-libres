@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 export default function MapaPage() {
   return (
     <div className="flex flex-col h-screen">
+      <h1 className="sr-only">Mapa de libros usados en Chile — tuslibros.cl</h1>
       <MapaClient />
     </div>
   );

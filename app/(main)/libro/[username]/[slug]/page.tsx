@@ -44,9 +44,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const priceStr = listing.price ? `$${listing.price.toLocaleString("es-CL")}` : "";
-  const title = priceStr
-    ? `${listing.book.title} — ${listing.book.author} (${priceStr}, usado)`
-    : `${listing.book.title} — ${listing.book.author}`;
+  const bookTitle = listing.book.title || "";
+  const author = listing.book.author || "";
+  // Truncamiento inteligente para mantener title ≤60 chars (recomendación Google).
+  // Prioridad: título > autor > precio. Si el título es muy largo, se trunca con … y se mantiene el autor.
+  const buildTitle = () => {
+    const full = priceStr
+      ? `${bookTitle} — ${author} (${priceStr}, usado)`
+      : `${bookTitle} — ${author}`;
+    if (full.length <= 60) return full;
+    // Sin precio
+    const noPrice = `${bookTitle} — ${author}`;
+    if (noPrice.length <= 60) return noPrice;
+    // Trunca el título pero preserva el autor
+    const maxBookLen = 60 - author.length - 3 - 1; // " — " + "…"
+    if (maxBookLen >= 15) {
+      return `${bookTitle.slice(0, maxBookLen).trimEnd()}… — ${author}`;
+    }
+    // Autor y título largos: corte duro
+    return full.slice(0, 59).trimEnd() + "…";
+  };
+  const title = buildTitle();
   const rawDesc = listing.book.description;
   const sellerName = listing.seller?.full_name || "un vendedor de tuslibros.cl";
   const description = rawDesc
