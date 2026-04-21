@@ -38,6 +38,19 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "20 abril 2026",
+    title: "Nuevo titular en la home: tuslibros, los que ya leíste y los que te faltan",
+    description:
+      "El H1 de la home decía \"Libros usados en Chile, con envío o retiro en mano\" — funcional pero genérico, podía ser cualquier marketplace. Lo cambié a \"tuslibros, los que ya leíste y los que te faltan\". Más corto, más emocional, y pone el nombre arriba (que es lo que Google también va a indexar). El subtítulo ahora dice \"X ejemplares disponibles hoy\" en vez de \"libros publicados\", para dejar claro que son stock real.",
+    tag: "Mejora",
+    visual: {
+      kind: "milestone",
+      icon: "📖",
+      metric: "tuslibros",
+      detail: "los que ya leíste y los que te faltan",
+    },
+  },
+  {
     date: "19 abril 2026",
     title: "Economía inversa: ahora los compradores piden y los vendedores escuchan",
     description:

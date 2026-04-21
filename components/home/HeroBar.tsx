@@ -14,14 +14,14 @@ export default function HeroBar({ totalListings, onToggleMap }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 lg:gap-10 items-end">
           <div className="text-center lg:text-left">
             <h1 className="font-display text-2xl sm:text-3xl lg:text-5xl font-bold text-ink leading-[1.1] tracking-tight">
-              Libros usados en Chile,{" "}
-              <span className="italic text-brand-600">con envío o retiro en mano.</span>
+              tuslibros,{" "}
+              <span className="italic text-brand-600">los que ya leíste y los que te faltan.</span>
             </h1>
             <p className="text-ink-muted mt-2 sm:mt-3 text-sm sm:text-base max-w-2xl mx-auto lg:mx-0">
               {totalListings > 0 ? (
                 <>
-                  {totalListings} libros publicados hoy, desde <strong className="text-ink">$3.000</strong>.
-                  Pago seguro con MercadoPago, despacho por courier o retiro en Santiago.
+                  {totalListings} ejemplares disponibles hoy, desde <strong className="text-ink">$3.000</strong>.
+                  Pago con MercadoPago, envío por courier a todo Chile o retiro en Santiago.
                 </>
               ) : (
                 <>Cargando el catálogo…</>
