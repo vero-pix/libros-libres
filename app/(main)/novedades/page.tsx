@@ -39,6 +39,62 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 const novedades: Entry[] = [
   {
     date: "21 abril 2026",
+    title: "Adiós al banner de \"Versión beta\"",
+    description:
+      "Llevo 3 semanas con el sitio abierto al público, con ventas reales, split payment funcionando, 207 libros publicados y 17 usuarios registrados. Ya no es beta. Saqué el banner amarillo que estaba arriba del navbar — de ahora en adelante tuslibros.cl es un producto en marcha, no un experimento.",
+    tag: "Mejora",
+    visual: {
+      kind: "milestone",
+      icon: "🚀",
+      metric: "De beta a producto",
+      detail: "3 semanas, 207 libros, ventas reales",
+    },
+  },
+  {
+    date: "21 abril 2026",
+    title: "El mapa ahora abre por default en desktop",
+    description:
+      "Antes había que scrollear hasta \"Tienda\" y hacer click en \"Mapa\" para verlo. Ahora en computador la tienda parte directo con el mapa abierto — 144 libros en Providencia, 32 en Ñuñoa, 2 en Las Condes, todos visibles al entrar. En celular se queda en grilla (ahí el scroll manda). También subí la sección completa arriba de las colecciones, para que el toggle esté más cerca del hero, y cambié el estilo del mapa a uno con más detalle (nombres de calles, relieves suaves).",
+    tag: "Mejora",
+    link: "/mapa",
+    linkText: "Ver el mapa completo",
+    visual: {
+      kind: "milestone",
+      icon: "🗺️",
+      metric: "Mapa arriba",
+      detail: "los libros por ubicación como primera impresión",
+    },
+  },
+  {
+    date: "21 abril 2026",
+    title: "Click en un libro del mapa ahora te lleva a su ficha",
+    description:
+      "Esto era un detalle que me molestaba: si estabas en el mapa y clickeabas un libro de la lista lateral, te centraba el mapa en ese punto — lo cual era útil, pero no era lo que uno espera. Ahora el click te lleva directo a la ficha del libro (ver descripción, fotos, comprar). El \"centrar en el mapa\" queda como un botón chico de pin que aparece al hacer hover.",
+    tag: "Fix",
+    visual: {
+      kind: "milestone",
+      icon: "🎯",
+      metric: "Click = ficha",
+      detail: "comportamiento esperado, sin clicks perdidos",
+    },
+  },
+  {
+    date: "21 abril 2026",
+    title: "\"Se busca\" ahora también aparece arriba del hero",
+    description:
+      "Las solicitudes que hace la comunidad (el /solicitudes) estaban solo en la mitad del home. Agregué una franja ámbar arriba de todo, pegada al navbar, que muestra la solicitud más reciente: \"Alguien en X busca tal libro — ¿lo tienes? Publícalo →\". Click lleva directo a publicar ese libro con el título ya autocompletado. Es un gancho de demanda — los vendedores ven una oportunidad concreta al entrar.",
+    tag: "Lanzamiento",
+    link: "/solicitudes",
+    linkText: "Ver todas las solicitudes",
+    visual: {
+      kind: "milestone",
+      icon: "🔔",
+      metric: "Demanda visible",
+      detail: "solicitud activa en el primer vistazo",
+    },
+  },
+  {
+    date: "21 abril 2026",
     title: "Gente de confianza: una página propia para los amigos de la casa",
     description:
       "Abrí una página nueva, /gente-de-confianza, con profesores y servicios de gente cercana que recomiendo personalmente. No es publicidad fría — son contactos que uso y que funcionan. Parte con Jose María (Excel, Power BI, VBA, Portugués, +10 años dando clases). Si a alguien le hace sentido aparecer ahí, que me escriba: yo elijo uno por uno. Además cambié el hero: el botón \"Publicar el mío (gratis)\" quedó como \"Ofrecer mi libro\", y sumé un tercero \"¿No está? Búscalo acá\" que te lleva a solicitudes.",
