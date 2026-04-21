@@ -3,7 +3,10 @@ import Link from "next/link";
 import ContactForm from "@/components/ui/ContactForm";
 
 export const metadata = {
-  title: "Sobre nosotros — tuslibros.cl",
+  title: "Sobre tuslibros.cl — marketplace chileno de libros usados",
+  description:
+    "La historia detrás de tuslibros.cl: un marketplace chileno de libros usados construido en Providencia. Por qué los libros físicos, por qué el mapa, y por qué creemos que el libro que buscas está en la estantería de al lado.",
+  alternates: { canonical: "https://tuslibros.cl/sobre-nosotros" },
 };
 
 const values = [
