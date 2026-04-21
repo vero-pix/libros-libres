@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>tuslibros.cl — One Pager · Abril 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a1a2e;
+    --gold: #d4a017;
+    --cream: #faf7f1;
+    --ink: #151522;
+    --muted: #8b8b9c;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  html, body { background: var(--cream); font-family: 'Inter', sans-serif; color: var(--ink); }
+  .page {
+    width: 297mm;
+    min-height: 210mm;
+    padding: 12mm 14mm;
+    margin: 0 auto;
+    background: var(--cream);
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 6mm;
+  }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--navy); padding-bottom: 5mm; }
+  .brand { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 500; color: var(--navy); letter-spacing: -0.02em; }
+  .brand span { color: var(--gold); }
+  .tag { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-top: 3mm; }
+  .headline-block { padding: 4mm 0; }
+  .headline { font-family: 'Cormorant Garamond', serif; font-size: 28px; line-height: 1.15; color: var(--ink); font-weight: 500; max-width: 90%; }
+  .subhead { font-size: 13px; color: var(--muted); margin-top: 3mm; max-width: 85%; }
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6mm; padding: 5mm 0; border-top: 1px solid rgba(139,139,156,0.3); border-bottom: 1px solid rgba(139,139,156,0.3); }
+  .metric .num { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--gold); line-height: 1; }
+  .metric .lbl { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); margin-top: 2mm; font-weight: 600; }
+  .metric .sub { font-size: 10px; color: var(--muted); margin-top: 1mm; font-style: italic; }
+  .grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 6mm; padding: 2mm 0; }
+  .col h3 { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 3mm; }
+  .col p, .col li { font-size: 11px; line-height: 1.5; margin-bottom: 2mm; }
+  .col ul { list-style: none; }
+  .col ul li { padding-left: 4mm; position: relative; }
+  .col ul li::before { content: "→"; position: absolute; left: 0; color: var(--gold); font-weight: 700; }
+  .ask {
+    background: var(--navy); color: var(--cream); padding: 5mm 7mm;
+    display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 5mm;
+    align-items: center; margin-top: 3mm;
+  }
+  .ask h4 { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 2mm; }
+  .ask .big { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--cream); line-height: 1.1; }
+  .ask p { font-size: 10.5px; line-height: 1.5; color: rgba(250,247,241,0.85); }
+  .footer { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; padding-top: 3mm; border-top: 1px solid rgba(139,139,156,0.3); }
+  .accent { color: var(--gold); }
+  strong { font-weight: 600; }
+  @page { size: A4 landscape; margin: 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div>
+      <div class="brand">tuslibros<span>.cl</span></div>
+      <div class="tag">Los libros de tu ciudad · Marketplace Chile</div>
+    </div>
+    <div style="text-align: right;">
+      <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-weight: 600;">Ronda Pre-seed · Abril 2026</div>
+      <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--navy); margin-top: 2mm;">USD 80-120k · pre-money USD 1.2M</div>
+      <div style="font-size: 10px; color: var(--muted); margin-top: 1mm;">$76 – $114 millones CLP · runway 12 meses</div>
+    </div>
+  </div>
+
+  <div class="headline-block">
+    <div class="headline">Marketplace de libros usados con mapa, curación y split payment. 18 días en producción, 3 compradores reales con 11 libros vendidos, 3 librerías activadas orgánicamente.</div>
+    <div class="subhead">En Chile se transan $8-12 mil millones CLP/año de libros usados (~USD 8-12M). No existe una plataforma digital dedicada. Nosotros la estamos construyendo.</div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric">
+      <div class="num">438</div>
+      <div class="lbl">Usuarios activos</div>
+      <div class="sub">GA4 · 10 días reales</div>
+    </div>
+    <div class="metric">
+      <div class="num">20%</div>
+      <div class="lbl">Conv. registro→compra</div>
+      <div class="sub">Benchmark seed: 5-15%</div>
+    </div>
+    <div class="metric">
+      <div class="num">$90k</div>
+      <div class="lbl">GMV acumulado CLP</div>
+      <div class="sub">3 ventas / 11 libros</div>
+    </div>
+    <div class="metric">
+      <div class="num">$45</div>
+      <div class="lbl">Burn mensual USD</div>
+      <div class="sub">Infra total / disciplina</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+      <h3>Qué resuelve</h3>
+      <p>El libro usado que quieres existe, pero encontrarlo hoy toma tres búsquedas, cero garantía y una conversación de WhatsApp con un desconocido. Buscalibre domina nuevo. MercadoLibre es commodity sin curación. Las librerías de viejo siguen offline.</p>
+      <p><strong>tuslibros.cl tiene tres diferenciadores que nadie tiene junto:</strong> mapa geolocalizado tipo Uber, curación de rarezas (featured/coleccionables), split payment OAuth con MercadoPago. Además, <strong>foto-a-catálogo</strong>: subes la portada, un LLM identifica el libro y enriquece metadata desde Google Books + Open Library. Único en Chile.</p>
+    </div>
+
+    <div class="col">
+      <h3>Tracción · 18 días</h3>
+      <ul>
+        <li><strong>3 compradores reales · 11 libros · $90k CLP GMV</strong> (Zdravko, set Maigret, bundle Camilo)</li>
+        <li><strong>3 librerías profesionales</strong> activadas orgánicamente (Huertas, Buhardilla, CIMLibros) sin marketing</li>
+        <li><strong>207 listings</strong> curados, valor catálogo $2.4M CLP</li>
+        <li><strong>Primer testimonio autorizado</strong> publicado en home</li>
+        <li><strong>Bundle multi-libro</strong>: $48k, 3 libros a Concepción, Starken, entregado exitosamente</li>
+      </ul>
+    </div>
+
+    <div class="col">
+      <h3>Equipo & stack</h3>
+      <p><strong>Verónica Velásquez</strong> — economista, founder de economics.cl. Founder única con AI-augmented dev.</p>
+      <p><strong>Stack</strong>: Next.js 14 · Supabase · MercadoPago split · Shipit · Mapbox · Vercel. Producción real en 7 días, iterado 18.</p>
+      <p><em>Costo de reproducir esto con agencia: USD 150-250k. Costo real: 7 días-persona.</em></p>
+    </div>
+  </div>
+
+  <div class="ask">
+    <div>
+      <h4>La propuesta</h4>
+      <div class="big">USD 80-120k · 6-9% · SAFE o nota convertible</div>
+      <p style="margin-top: 2mm;">Pre-money USD 1.2M defendible por Berkus + Scorecard + replacement cost. Rango negociable USD 1.0M-1.4M. Cubre salario founder full-time + marketing + activación.</p>
+    </div>
+    <div>
+      <h4>Uso de fondos · 12 meses (USD 100k)</h4>
+      <ul style="list-style: none; font-size: 10.5px; color: rgba(250,247,241,0.9);">
+        <li>60% · Salario founder ($5M CLP/mes)</li>
+        <li>20% · Marketing + GTM</li>
+        <li>12% · Activación librerías + features</li>
+        <li>8% · Infra + reserva</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Hito 12 meses</h4>
+      <ul style="list-style: none; font-size: 10.5px; color: rgba(250,247,241,0.9);">
+        <li>20 vendedores activos</li>
+        <li>$5 millones CLP MRR</li>
+        <li>500+ tx/mes</li>
+        <li>2 alianzas universitarias</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Verónica Velásquez — vero@economics.cl — Santiago, Chile</span>
+    <span>tuslibros.cl · abril 2026</span>
+  </div>
+
+</div>
+</body>
+</html>
