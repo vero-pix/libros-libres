@@ -49,16 +49,31 @@ export default function BookMap({ onListingsLoaded, onUserLocation, flyToListing
   const [mapLoaded, setMapLoaded] = useState(false);
   const [listings, setListings] = useState<ListingWithBook[]>([]);
   const [selectedListing, setSelectedListing] = useState<ListingWithBook | null>(null);
+  const [initError, setInitError] = useState<Error | null>(null);
+
+  if (initError) {
+    throw initError;
+  }
 
   // 1. Initialize map once
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    const map = new mapboxgl.Map({
-      container: containerRef.current,
-      style: "mapbox://styles/mapbox/light-v11",
-      center: DEFAULT_CENTER,
-      zoom: DEFAULT_ZOOM,
+    let map: mapboxgl.Map;
+    try {
+      map = new mapboxgl.Map({
+        container: containerRef.current,
+        style: "mapbox://styles/mapbox/light-v11",
+        center: DEFAULT_CENTER,
+        zoom: DEFAULT_ZOOM,
+      });
+    } catch (err) {
+      setInitError(err as Error);
+      return;
+    }
+    map.on("error", (e) => {
+      const msg = (e.error?.message || "").toLowerCase();
+      if (msg.includes("webgl")) setInitError(e.error as Error);
     });
 
     map.addControl(new mapboxgl.NavigationControl(), "top-right");

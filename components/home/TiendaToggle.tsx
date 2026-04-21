@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import MapSidebar from "@/components/map/MapSidebar";
+import MapErrorBoundary from "@/components/map/MapErrorBoundary";
 import type { ListingWithBook } from "@/types";
 
 const BookMap = dynamic(() => import("@/components/map/BookMap"), {
@@ -93,11 +94,13 @@ export default function TiendaToggle({ children, forceMap, onForceMapConsumed }:
             />
           </div>
           <div className="flex-1 relative">
-            <BookMap
-              onListingsLoaded={handleListingsLoaded}
-              onUserLocation={handleUserLocation}
-              flyToListing={flyTo}
-            />
+            <MapErrorBoundary>
+              <BookMap
+                onListingsLoaded={handleListingsLoaded}
+                onUserLocation={handleUserLocation}
+                flyToListing={flyTo}
+              />
+            </MapErrorBoundary>
           </div>
         </div>
       )}

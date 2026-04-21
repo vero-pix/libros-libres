@@ -15,6 +15,7 @@ import FeaturedRow from "@/components/home/FeaturedRow";
 import CollectibleRow from "@/components/home/CollectibleRow";
 import TestimonialBanner from "@/components/home/TestimonialBanner";
 import RequestsRow from "@/components/home/RequestsRow";
+import HeroRequestStrip from "@/components/home/HeroRequestStrip";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
@@ -272,6 +273,7 @@ export default async function HomePage({ searchParams }: Props) {
           ) : null
         }
         requestsRow={!hasFilters ? <RequestsRow /> : null}
+        heroRequestStrip={!hasFilters ? <HeroRequestStrip /> : null}
       >
         <Breadcrumbs items={[
           { label: "Inicio", href: "/" },

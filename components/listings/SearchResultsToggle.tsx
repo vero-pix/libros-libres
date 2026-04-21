@@ -3,6 +3,7 @@
 import { useState, useCallback, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import MapSidebar from "@/components/map/MapSidebar";
+import MapErrorBoundary from "@/components/map/MapErrorBoundary";
 import type { ListingWithBook } from "@/types";
 
 const BookMap = dynamic(() => import("@/components/map/BookMap"), {
@@ -91,11 +92,13 @@ export default function SearchResultsToggle({ listings, resultsCount, children }
             />
           </div>
           <div className="flex-1 relative">
-            <BookMap
-              listings={listingsWithCoords}
-              onUserLocation={handleUserLocation}
-              flyToListing={flyTo}
-            />
+            <MapErrorBoundary>
+              <BookMap
+                listings={listingsWithCoords}
+                onUserLocation={handleUserLocation}
+                flyToListing={flyTo}
+              />
+            </MapErrorBoundary>
           </div>
         </div>
       ) : (

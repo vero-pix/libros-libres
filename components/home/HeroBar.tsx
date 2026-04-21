@@ -39,7 +39,13 @@ export default function HeroBar({ totalListings, onToggleMap }: Props) {
                 href="/publish"
                 className="inline-flex items-center px-6 py-3 bg-white border border-ink/20 text-ink text-sm font-semibold rounded-md hover:border-brand-500 hover:text-brand-600 transition-colors"
               >
-                Publicar el mío (gratis)
+                Ofrecer mi libro
+              </Link>
+              <Link
+                href="/solicitudes"
+                className="inline-flex items-center px-6 py-3 bg-transparent border border-amber-600/60 text-amber-800 text-sm font-semibold rounded-md hover:bg-amber-50 hover:border-amber-700 transition-colors"
+              >
+                ¿No está? Búscalo acá →
               </Link>
             </div>
           </div>
