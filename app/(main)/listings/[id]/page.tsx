@@ -27,9 +27,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!listing) return { title: "Libro no encontrado — tuslibros.cl" };
 
   const priceStr = listing.price ? `$${listing.price.toLocaleString("es-CL")}` : "";
-  const title = priceStr
-    ? `${listing.book.title} — ${listing.book.author} (${priceStr}, usado)`
-    : `${listing.book.title} — ${listing.book.author}`;
+  const bookTitle = listing.book.title || "";
+  const author = listing.book.author || "";
+  const buildTitle = () => {
+    const full = priceStr
+      ? `${bookTitle} — ${author} (${priceStr}, usado)`
+      : `${bookTitle} — ${author}`;
+    if (full.length <= 60) return full;
+    const noPrice = `${bookTitle} — ${author}`;
+    if (noPrice.length <= 60) return noPrice;
+    const maxBookLen = 60 - author.length - 3 - 1;
+    if (maxBookLen >= 15) return `${bookTitle.slice(0, maxBookLen).trimEnd()}… — ${author}`;
+    return full.slice(0, 59).trimEnd() + "…";
+  };
+  const title = buildTitle();
   const description = listing.book.description
     ? (listing.book.description.length <= 160 ? listing.book.description : listing.book.description.slice(0, 157) + "…")
     : `${listing.book.title} de ${listing.book.author} — libro usado${priceStr ? ` desde ${priceStr}` : ""}. Envío por courier o retiro en Chile. tuslibros.cl`;

@@ -30,9 +30,19 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
       {!hasFilters && heroRequestStrip}
 
       {!hasFilters ? (
-        <HeroBar totalListings={totalListings} onToggleMap={handleToggleMap} />
+        <>
+          <HeroBar totalListings={totalListings} onToggleMap={handleToggleMap} />
+          {/* SEO: keywords naturales del mercado, invisibles al usuario */}
+          <p className="sr-only">
+            tuslibros.cl es el marketplace chileno de libros usados.
+            Compra y vende libros usados en Chile con mapa geolocalizado,
+            pago seguro por MercadoPago y despacho por courier o retiro en
+            mano. Encuentra libros usados en Santiago, Valparaíso, Concepción
+            y todas las regiones de Chile desde $3.000.
+          </p>
+        </>
       ) : (
-        <h1 className="sr-only">Libros usados cerca de ti — tuslibros.cl</h1>
+        <h1 className="sr-only">Libros usados en Chile — tuslibros.cl</h1>
       )}
 
       {/* Above-the-fold: libros destacados + testimonio */}
