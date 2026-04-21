@@ -44,8 +44,9 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 - [x] ~~Notificar solicitudes a vendedores~~ — ✅ commit `badfe98` del 20 abril. Email automático a sellers activos al crear solicitud, con CTA a /publish pre-rellenado.
 - [x] ~~Ranking por cercanía en /solicitudes~~ — ✅ commit `2201b48` del 20 abril. Sellers logueados ven primero solicitudes de su ciudad (score: exacto 2, por token 1, sin match 0).
 - [x] ~~Activación post-registro~~ — ✅ webhook `/api/webhooks/new-user` envía welcome email con 3 CTAs (publicar, explorar, comprar). Se puede mejorar con re-engage a 3 días si no publican.
-- [ ] **Monitorear bounce rate post-replanteo home** en GA4 durante 48h. Base previa: 72% bounce en /. Meta: <55%. → Pendiente: acción manual de Vero en GA4.
-- [ ] **Sinopsis masiva en español** → `scripts/audit_english_descriptions.sql` existe pero no se ha corrido. Correr para listar libros con descripción en inglés y traducir por tanda.
+- [x] ~~Sinopsis masiva en español~~ — ✅ 208 de 209 libros en español. Último traducido 21 abril (Calculus de Binmore).
+
+> **Nota**: "Monitorear bounce rate en GA4" dejó de ser un TODO — es ritual de observación que Vero hace cuando mira GA4, no una tarea con deliverable.
 
 ### Nuevo — agregado 21 abril 2026
 - [ ] **Medir impacto de la landing `/libros-usados-chile`** — monitorear en GSC cuántas impressions/clicks trae la keyword objetivo a partir de 3-4 semanas.
@@ -53,7 +54,7 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 - [ ] **Re-engage email a 3 días post-registro** — si user no publicó ni compró en 3 días, email recordatorio con link directo al ISBN scanner o a un libro destacado relevante.
 
 ### Infra / housekeeping
-- [ ] **Migrar imágenes a R2** — Supabase Storage caro. Pendiente.
+- [ ] **Migrar imágenes a Cloudflare R2** — único pendiente real de infra. Supabase Storage cuesta más que R2 a volumen. Sesión dedicada (~2h con testing).
 - [x] ~~RLS fix en `contact_messages`~~ — ✅ aplicado 21 abril desde Supabase Security Advisor.
 - [x] ~~Reactivar Next Image~~ — ✅ commit `e5a3b81`. Vercel Pro cubre transformaciones.
 
