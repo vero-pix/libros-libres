@@ -63,10 +63,18 @@ export default function SearchResultsToggle({ listings, resultsCount, children }
           </button>
           <button
             onClick={() => setView("map")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
-              view === "map" ? "bg-ink text-cream" : "text-ink-muted hover:text-ink"
+            className={`relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded transition-all ${
+              view === "map"
+                ? "bg-ink text-cream"
+                : "bg-red-600 text-white shadow-sm hover:bg-red-700"
             }`}
           >
+            {view !== "map" && (
+              <span className="pointer-events-none absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+              </span>
+            )}
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
               <path
@@ -75,7 +83,7 @@ export default function SearchResultsToggle({ listings, resultsCount, children }
                 d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
               />
             </svg>
-            Mapa
+            Ver en mapa
           </button>
         </div>
       </div>

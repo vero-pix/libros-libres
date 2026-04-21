@@ -48,18 +48,18 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
       {/* Economía inversa: se busca */}
       {!hasFilters && requestsRow}
 
-      {/* Collection banners */}
-      {!hasFilters && (
-        <div className="max-w-7xl mx-auto px-6 pt-6">
-          <CollectionBanners />
-        </div>
-      )}
-
       <main id="tienda" className="max-w-7xl mx-auto px-6 py-10 scroll-mt-32">
         <TiendaToggle forceMap={forceMap} onForceMapConsumed={() => setForceMap(false)}>
           {children}
         </TiendaToggle>
       </main>
+
+      {/* Collection banners */}
+      {!hasFilters && (
+        <div className="max-w-7xl mx-auto px-6 pb-10">
+          <CollectionBanners />
+        </div>
+      )}
 
       {/* Manifiesto compacto al final — antes del footer */}
       {!hasFilters && (
