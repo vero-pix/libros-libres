@@ -1,6 +1,6 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 19 abril 2026 — noche
+Última actualización: 21 abril 2026 — noche
 
 ---
 
@@ -33,24 +33,29 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 
 ---
 
-## Roadmap vivo (19 abril 2026)
+## Roadmap vivo (21 abril 2026)
 
 ### Urgente (romper = detener flujo de usuarios)
-- [ ] **Fix mobile navbar sin romper dropdowns**: retomar el objetivo de compactar a 1 línea en mobile, pero con `position: fixed` o portal en NavDropdown en vez de depender de `overflow` del padre.
-- [ ] **Tracking session → user_id**: cuando alguien se registra, vincular el session_id previo al user.id para saber el canal (LinkedIn, Reddit, orgánico). Hoy estamos ciegos.
-- [ ] **Shipit roto para sellers no-admin**: draft queda sin emitirse, vendedor sin panel → ver `memory/project_shipit_flow_broken_for_sellers.md`.
+- [x] ~~Fix mobile navbar sin romper dropdowns~~ — ✅ confirmado 21 abril por Vero, funciona bien
+- [x] ~~Tracking session → user_id~~ — ✅ commit `2201b48` del 20 abril. Endpoint `/api/analytics` backfillea pageviews anónimas de la sesión con user_id al loguearse.
+- [x] ~~Shipit roto para sellers no-admin~~ — ✅ corregido 21 abril. Vero confirmó que funciona en todas sus ventas; memoria anterior era sobre-generalización de un edge case de dimensionamiento en bundles.
 
 ### Importante (UX que mueve conversión)
-- [ ] **Notificar solicitudes a vendedores**: cuando alguien pide un libro en /solicitudes, mandar email a los sellers activos + suscriptores del newsletter. "Alguien está buscando este libro — si lo tienes, publícalo y vendes hoy." Crítico para activar la "economía inversa" — sin notificación, los vendedores no van a entrar a revisar la lista.
-- [ ] **Ranking por cercanía en /solicitudes**: cuando un vendedor logueado entre a ver las solicitudes, ordenarlas primero por ciudad/región coincidente con la suya. "Vendedor en Osorno ve primero las solicitudes de Osorno, Valdivia, Puerto Varas." Aumenta drásticamente la probabilidad de que una solicitud se cumpla (retiro en mano o envío corto = más barato y rápido).
-- [ ] **Monitorear bounce rate post-replanteo home** en GA4 durante 48h. Base previa: 72% bounce en /. Meta: <55%.
-- [ ] **Sinopsis masiva en español**: correr `scripts/audit_english_descriptions.sql` para listar libros con descripción en inglés, traducir por tanda.
-- [ ] **Activación post-registro**: de 8 externos registrados en 30d, 5 no hicieron nada. Diseñar mail de onboarding + CTA claro al loguearse.
+- [x] ~~Notificar solicitudes a vendedores~~ — ✅ commit `badfe98` del 20 abril. Email automático a sellers activos al crear solicitud, con CTA a /publish pre-rellenado.
+- [x] ~~Ranking por cercanía en /solicitudes~~ — ✅ commit `2201b48` del 20 abril. Sellers logueados ven primero solicitudes de su ciudad (score: exacto 2, por token 1, sin match 0).
+- [x] ~~Activación post-registro~~ — ✅ webhook `/api/webhooks/new-user` envía welcome email con 3 CTAs (publicar, explorar, comprar). Se puede mejorar con re-engage a 3 días si no publican.
+- [ ] **Monitorear bounce rate post-replanteo home** en GA4 durante 48h. Base previa: 72% bounce en /. Meta: <55%. → Pendiente: acción manual de Vero en GA4.
+- [ ] **Sinopsis masiva en español** → `scripts/audit_english_descriptions.sql` existe pero no se ha corrido. Correr para listar libros con descripción en inglés y traducir por tanda.
+
+### Nuevo — agregado 21 abril 2026
+- [ ] **Medir impacto de la landing `/libros-usados-chile`** — monitorear en GSC cuántas impressions/clicks trae la keyword objetivo a partir de 3-4 semanas.
+- [ ] **Revisar tabla `search_queries` semanalmente** — identificar gaps del catálogo (queries con 0 resultados) y publicar los libros más buscados que faltan. Disponible en `/admin` → tab Búsquedas.
+- [ ] **Re-engage email a 3 días post-registro** — si user no publicó ni compró en 3 días, email recordatorio con link directo al ISBN scanner o a un libro destacado relevante.
 
 ### Infra / housekeeping
-- [ ] **Migrar imágenes a R2** — hoy Next Image desactivado, Supabase Storage caro.
-- [ ] **RLS fix en `contact_messages`** — queries fallan para usuarios no-admin.
-- [ ] **Reactivar Next Image** post R2.
+- [ ] **Migrar imágenes a R2** — Supabase Storage caro. Pendiente.
+- [x] ~~RLS fix en `contact_messages`~~ — ✅ aplicado 21 abril desde Supabase Security Advisor.
+- [x] ~~Reactivar Next Image~~ — ✅ commit `e5a3b81`. Vercel Pro cubre transformaciones.
 
 ### Nice-to-have
 - [ ] **Navbar Inicio/Novedades en dropdown mobile**: hamburger que libera la nav row.
