@@ -34,22 +34,35 @@ export default function UsersTab({ users, onUpdate }: { users: AdminUser[]; onUp
 
   async function deleteUser(id: string) {
     if (!window.confirm("¿Eliminar este usuario?")) return;
-    const { error } = await supabase.from("users").delete().eq("id", id);
-    if (!error) {
-      onUpdate(users.filter((u) => u.id !== id));
-      setSelected((prev) => { const n = new Set(prev); n.delete(id); return n; });
+    const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      if (body.blockers) {
+        alert(`No se puede eliminar: tiene ${body.blockers.listings} listings, ${body.blockers.ordersAsBuyer} órdenes como comprador, ${body.blockers.ordersAsSeller} como vendedor. Elimina esos primero.`);
+      } else {
+        alert(`Error: ${body.error || res.statusText}`);
+      }
+      return;
     }
+    onUpdate(users.filter((u) => u.id !== id));
+    setSelected((prev) => { const n = new Set(prev); n.delete(id); return n; });
   }
 
   async function deleteSelected() {
     const ids = Array.from(selected);
     if (ids.length === 0) return;
     if (!window.confirm(`¿Eliminar ${ids.length} usuario(s)?`)) return;
-    const { error } = await supabase.from("users").delete().in("id", ids);
-    if (!error) {
-      onUpdate(users.filter((u) => !ids.includes(u.id)));
-      setSelected(new Set());
-    }
+    const results = await Promise.all(
+      ids.map(async (id) => {
+        const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
+        return { id, ok: res.ok };
+      })
+    );
+    const successIds = results.filter((r) => r.ok).map((r) => r.id);
+    const failures = results.length - successIds.length;
+    if (failures > 0) alert(`${failures} usuario(s) no se pudieron eliminar (tienen data asociada).`);
+    onUpdate(users.filter((u) => !successIds.includes(u.id)));
+    setSelected(new Set());
   }
 
   return (

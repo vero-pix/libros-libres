@@ -59,8 +59,10 @@ export default async function SearchPage({ searchParams }: Props) {
   // Si hay búsqueda de texto, primero encontrar los book IDs que coincidan
   let matchingBookIds: string[] | null = null;
   if (q) {
-    // Strip parentheses and special chars that break PostgREST or() syntax
-    const clean = q.replace(/[()]/g, "").trim();
+    // Normalizar guiones a espacios (usuarios copian URLs de Buscalibre tipo
+    // "las-ventajas-de-ser-invisible" — que sin esto no matchearía nada).
+    // También strip paréntesis y espacios múltiples.
+    const clean = q.replace(/[-_]+/g, " ").replace(/[()]/g, "").replace(/\s+/g, " ").trim();
     const term = `%${clean}%`;
     const { data: matchedBooks } = await supabase
       .from("books")
