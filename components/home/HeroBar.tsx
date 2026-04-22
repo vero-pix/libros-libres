@@ -56,11 +56,10 @@ export default function HeroBar({ totalListings, onToggleMap }: Props) {
               Compraron y cuentan
             </p>
             <p className="font-serif italic text-sm text-ink leading-snug">
-              “Fácil y sin complicaciones. Muy buena disposición por parte del vendedor,
-              volvería a comprar sin ningún problema.”
+              “Encantado con mi primera compra. Los libros llegaron rápido y en buen estado hasta la puerta de mi casa, además con una sorpresa buenísima. Una experiencia recomendada 👌🏻”
             </p>
             <p className="text-xs text-ink-muted mt-2">
-              — <span className="font-semibold text-ink">Z.</span> · compró <em>La Marina en la historia de Chile · Tomo I</em>
+              — <span className="font-semibold text-ink">Camilo</span> · bundle de 3 libros a Concepción
             </p>
           </aside>
         </div>
