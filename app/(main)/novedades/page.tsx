@@ -732,8 +732,60 @@ function daysAgo(date: string): number {
   return Math.floor((Date.now() - d.getTime()) / 86400000);
 }
 
+async function fetchFulfilledRequests(): Promise<Entry[]> {
+  const supabase = createPublicClient();
+  const { data } = await supabase
+    .from("book_requests")
+    .select(`
+      id, title, author, requester_location, fulfilled_at,
+      fulfilled_listing:listings!fulfilled_listing_id(id, slug, cover_image_url, seller:users(username))
+    `)
+    .eq("fulfilled", true)
+    .not("fulfilled_at", "is", null)
+    .order("fulfilled_at", { ascending: false })
+    .limit(10);
+  if (!data) return [];
+  const mesesES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  return data.map((r: any) => {
+    const d = new Date(r.fulfilled_at);
+    const dateStr = `${d.getDate()} ${mesesES[d.getMonth()]} ${d.getFullYear()}`;
+    const seller = r.fulfilled_listing?.seller?.username;
+    const slug = r.fulfilled_listing?.slug;
+    const link = seller && slug ? `/libro/${seller}/${slug}` : null;
+    const locationText = r.requester_location ? ` en ${r.requester_location}` : "";
+    return {
+      date: dateStr,
+      title: `¡Cumplida! Alguien pedía "${r.title}" y apareció`,
+      description: `Alguien${locationText} buscaba este libro en la sección "Se busca". Esta semana apareció: un vendedor lo publicó y ahora está disponible para comprar. La economía inversa funcionando — los compradores piden, los vendedores aparecen.`,
+      tag: "Cumplida",
+      link: link ?? undefined,
+      linkText: link ? "Ver el libro" : undefined,
+      visual: {
+        kind: "milestone",
+        icon: "🎯",
+        metric: "Pedido → publicado",
+        detail: `${r.title} de ${r.author}`,
+      },
+    } as Entry;
+  });
+}
+
+function parseSpanishDate(s: string): number {
+  // "21 abril 2026" → timestamp
+  const meses: Record<string, number> = { enero:0, febrero:1, marzo:2, abril:3, mayo:4, junio:5, julio:6, agosto:7, septiembre:8, octubre:9, noviembre:10, diciembre:11 };
+  const m = s.match(/^(\d+)\s+(\w+)\s+(\d+)$/);
+  if (!m) return 0;
+  return new Date(Number(m[3]), meses[m[2].toLowerCase()] ?? 0, Number(m[1])).getTime();
+}
+
 export default async function NovedadesPage() {
   const pool = await fetchListingPool();
+  const fulfilled = await fetchFulfilledRequests();
+
+  // Mezclar novedades hardcoded + cumplimientos dinámicos, ordenar desc por fecha
+  const allEntries = [...fulfilled, ...novedades].sort(
+    (a, b) => parseSpanishDate(b.date) - parseSpanishDate(a.date)
+  );
 
   const pick = (match: (l: PoolListing) => boolean, limit = 6) =>
     pool.filter(match).slice(0, limit);
@@ -815,7 +867,7 @@ export default async function NovedadesPage() {
 
         {/* TIMELINE de entradas */}
         <div className="space-y-6">
-          {novedades.map((item, i) => {
+          {allEntries.map((item, i) => {
             const isRecent = daysAgo(item.date) <= 3;
             const v = item.visual;
 
