@@ -12,6 +12,13 @@ interface Banner {
 
 const BANNERS: Banner[] = [
   {
+    title: "Día del Libro · 23 abril",
+    subtitle: "Joyas seleccionadas para celebrar",
+    href: "/?collectible=1",
+    gradient: "from-rose-700 via-amber-600 to-amber-400",
+    icon: "🎉",
+  },
+  {
     title: "Novela Negra",
     subtitle: "Montalbán, Ellroy, Black",
     href: "/?genre=Novela+Negra",
