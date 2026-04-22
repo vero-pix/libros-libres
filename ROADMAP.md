@@ -1,6 +1,6 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 21 abril 2026 — noche
+Última actualización: 22 abril 2026 — noche
 
 ---
 
@@ -50,8 +50,20 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 
 ### Nuevo — agregado 21 abril 2026
 - [ ] **Medir impacto de la landing `/libros-usados-chile`** — monitorear en GSC cuántas impressions/clicks trae la keyword objetivo a partir de 3-4 semanas.
-- [ ] **Revisar tabla `search_queries` semanalmente** — identificar gaps del catálogo (queries con 0 resultados) y publicar los libros más buscados que faltan. Disponible en `/admin` → tab Búsquedas.
+- [x] ~~Revisar tabla `search_queries` semanalmente~~ — ✅ primera revisión 22 abril. 17 de 19 búsquedas frecuentes sin match en catálogo; publicado en /novedades como llamado a vendedores.
 - [ ] **Re-engage email a 3 días post-registro** — si user no publicó ni compró en 3 días, email recordatorio con link directo al ISBN scanner o a un libro destacado relevante.
+
+### Nuevo — agregado 22 abril 2026
+- [ ] **Recuperar Instagram @tuslibros.cl** — en proceso. Probado reset por email (admin@tuslibros.cl) sin éxito. Próximo paso: formulario /hacked/ + video selfie + prueba ownership (registro NIC Chile, GSC verification, sitio en producción).
+- [ ] **Constituir SpA + postular Startup Chile SUP** — acordado para miércoles 23 abril (Día del Libro, aprovechar visibilidad).
+- [ ] **3 DMs warm a ángeles** — pendiente desde 21 abril. Deck USD 80-120k listo en `docs/deck_valorizacion.pptx`.
+- [ ] **Ping a Alfredo Enrione** — mentor warm potencial. Ofrecer café/Zoom 30min framing "primer pilot run y lectura del modelo".
+- [ ] **Escribir a 3 librerías activadas** — acordado martes 22 abril, verificar si se hizo.
+- [ ] **Decisión AdSense** — Google aprobó el sitio pero DECIDIDO no activar ahora (revenue simbólico, mostraría competidores, daña Core Web Vitals). Revisitar cuando sesiones ≥10k/mes y bounce <50%. Pub ID guardado: `ca-pub-7953415124311211`.
+- [ ] **Fix #3 HeroBar simplificado** — sacar las 5 cards horizontales (redundan con feature sections ya movidas). Alto impacto, bajo esfuerzo.
+- [ ] **Rotación automática FeaturedRow** — 191 de 240 listings sin una sola visita en 30d. Exponer los enterrados con pool rotativo.
+- [ ] **Search empty state review** — 80% bounce en /search. Auditar qué ve alguien cuando busca algo que no existe.
+- [ ] **PostHog session replay** — para entender POR QUÉ rebotan (hoy solo sabemos CUÁNTO). Activar cuando tenga presupuesto.
 
 ### Infra / housekeeping
 - [ ] **Migrar imágenes a Cloudflare R2** — único pendiente real de infra. Supabase Storage cuesta más que R2 a volumen. Sesión dedicada (~2h con testing).
@@ -68,6 +80,46 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 ---
 
 ## Archivo histórico
+
+---
+
+## Sesión 22 abril 2026 — SEMrush, testimonio Camilo, Día del Libro
+
+### Métricas del día
+- **345 pageviews / 50 sesiones** — uno de los días más altos del mes.
+- **Bounce 26.2%** (vs 72.6% promedio 30d) — **3x mejor que el mes**. Un día no hace tendencia, pero señal fuerte.
+- **Views/session 7.14** (vs 2.95 promedio mes).
+- Pico 70 views a las 19 UTC — probablemente WhatsApp de Joy empezando a circular.
+
+### Logros no ejecutivos
+- **SEMrush Position Tracking 15-22 abril**: tuslibros.cl es **el único dominio del sector que sube** (+2.19%). Buscalibre, Literata, Green Libros, Libros del Ayer, El Cid, Casa del Libro y Yapo están todos en rojo (-0.13% a -2.68%). Pasé de posición 9 a posición 5.
+- **Google aprobó AdSense** — decisión consciente NO activar todavía (ver roadmap).
+- **GSC ↔ GA4 vinculado** — usando propiedad de dominio `tuslibros.cl`.
+- **Camilo recibió su bundle en Concepción** (primer envío a regiones) y dio testimonio: *"Encantado con mi primera compra. Los libros llegaron rápido y en buen estado hasta la puerta de mi casa, además con una sorpresa buenísima."*
+- **Lanzamiento comunicación Día del Libro** — Joy (tía de Vero) empezó a difundir por WhatsApp. Texto pulido para reenviar a grupos: foco en personas-con-biblioteca-armada + colegios (planes lectores).
+
+### Deploy del día (3 commits)
+1. `18fde3e` — Banner "Día del Libro · 23 abril" al inicio de CollectionBanners + entradas /novedades: SEMrush +2.19% y 17 buscados sin match.
+2. `2946532` — Testimonio de Camilo agregado junto al de Zdravko en TestimonialBanner (grid 2 cols responsive).
+3. `9c94afe` — Mini-testimonio del hero actualizado de Z. a Camilo (narrativa más fuerte, primer envío a regiones).
+
+### Usernames asignados (9)
+`nicoeltit` (único con impacto real: 1 listing activo pasa de URL UUID a `/libro/nicoeltit/mein-kampf`), + `viviana`, `alejandra`, `belen`, `zdravko`, `camilo`, `mikael`, `jorgeveliz`, `felix` (preventivos para cuando publiquen).
+
+### Aprendizajes guardados en memoria
+- **Bulk upload con fotos manuales no funciona** — libros con ISBN + scanner sí, libros antiguos sin ISBN mejor publicar a mano desde admin. Intento con 11 libros antiguos (Puig, Heiremans, Graham, Portichuelo, Pascal, Maurois, Teitelboim) ejecutado y después eliminado por Vero.
+- **Silencio estratégico es golden** — Vero decidió NO publicar en LinkedIn/Reddit con el reporte SEMrush. Dejar que Día del Libro + Reddit hablen solos.
+
+### Datos útiles descubiertos hoy
+- **17 títulos buscados sin match** en el catálogo (Aun tenemos patria, El túnel Sábato, Hollywood Bukowski, Farreras Rozman, Seda Baricco, Giancoli, Magnus Chase, etc.). Demanda identificada — ya publicada en /novedades como llamado a vendedores.
+- **16 usuarios registrados totales**, 12/16 tenían UUIDs feos antes de hoy (ahora 3, y son cuentas extra de Vero que se mantuvieron sin username a propósito).
+- **4 orders totales all-time** (funnel 30d dice 0 porque el script cuenta compradores únicos post-filtro).
+
+### Pendientes críticos al cierre
+- Recuperar Instagram @tuslibros.cl (en proceso, camino /hacked/ + video selfie).
+- 3 DMs warm a ángeles (pendiente desde 21 abril).
+- SpA + Startup Chile SUP (acordado para mañana 23 abril).
+- Testimonio de Camilo con estrellas en ficha — opcional, manual si Vero lo decide.
 
 ---
 
