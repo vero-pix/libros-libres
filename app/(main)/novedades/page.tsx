@@ -38,6 +38,34 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "22 abril 2026",
+    title: "Primera semana en el radar SEO de Chile — somos el único dominio del sector que sube",
+    description:
+      "SEMrush me mandó el reporte de Position Tracking del sector librerías online en Chile (período 15-22 abril). Buscalibre, Librería Literata, Green Libros, Libros del Ayer, Libros El Cid, Casa del Libro: los siete competidores que me rodean están en rojo esta semana (entre -0.13% y -2.68%). tuslibros.cl es el único dominio que sube — +2.19% en visibilidad orgánica. Pasé de posición 9 a posición 5. Es una semana, no una tendencia — pero es la señal más clara que he tenido de que los fixes de SEO de los últimos 15 días están siendo leídos por Google. La siguiente métrica a cruzar es cuánto de esto se traduce en clicks reales.",
+    tag: "Señal",
+    visual: {
+      kind: "milestone",
+      icon: "📈",
+      metric: "+2.19%",
+      detail: "visibilidad SEO — único del sector subiendo",
+    },
+  },
+  {
+    date: "22 abril 2026",
+    title: "17 títulos que alguien está buscando y no encuentra — si los tienes en casa, súbelos",
+    description:
+      "Revisé las búsquedas que hacen los usuarios en el buscador interno del sitio. De las 19 búsquedas más repetidas, 17 no tienen match en el catálogo hoy. Son títulos concretos que alguien vino a buscar y se fue sin encontrar: Aun tenemos patria, El túnel (Sábato), Administración una perspectiva global (Koontz), MBA personal, El archivo de Sherlock Holmes, Hollywood (Bukowski), Percy Jackson El ladrón del rayo, Medicina interna Farreras Rozman, Historia de Chile 4, Seda (Baricco), Traficantes y lavadores (Salazar), Física Giancoli, Bajo la misma estrella, Gran libro del Kamasutra, Microeconomía, Magnus Chase y los dioses de Asgard. Si tienes alguno durmiendo en una estantería, súbelo — hay demanda real, específica, esperando.",
+    tag: "Demanda",
+    link: "/publish",
+    linkText: "Publicar un libro",
+    visual: {
+      kind: "milestone",
+      icon: "🔍",
+      metric: "17 títulos",
+      detail: "buscados sin resultado esta semana",
+    },
+  },
+  {
     date: "21 abril 2026",
     title: "Nueva página dedicada a libros usados en Chile",
     description:
