@@ -31,13 +31,43 @@ export async function POST(req: Request) {
     const { data: listing } = await supabase
       .from("listings")
       .select(
-        "id, slug, price, modality, address, book:books(title, author), seller:users(full_name, username)"
+        "id, slug, price, modality, address, deprioritized, book:books(title, author), seller:users(full_name, username)"
       )
       .eq("id", listingId)
       .single();
 
     if (!listing) {
       return NextResponse.json({ error: "listing not found" }, { status: 404 });
+    }
+
+    // Auto-deprioritización por contenido político/controversial.
+    // Se matchea con word-boundary en título y autor. Si ya está deprioritized
+    // (por ej. flag manual), no lo volvemos a actualizar.
+    const POLITICAL_KEYWORDS = [
+      "allende", "pinochet", "unidad popular", "dictadura",
+      "fidel castro", "stalin", "hitler", "mein kampf",
+      "golpe de estado", "11 de septiembre", "jaime guzmán",
+      "frei montalva", "patricio aylwin", "bachelet",
+      "piñera", "lagos", "evo morales", "lula", "maduro",
+      "comunismo", "socialismo", "marxismo", "capital marx",
+      "fascismo", "nazi", "militar chile", "corbalán",
+      "mitos de la democracia", "memoria histórica",
+    ];
+    const matchesPolitical = (text: string) => {
+      const t = (text || "").toLowerCase();
+      return POLITICAL_KEYWORDS.some((k) => {
+        const re = new RegExp(`\\b${k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+        return re.test(t);
+      });
+    };
+    try {
+      const bookForCheck = (listing as any).book ?? {};
+      if (!(listing as any).deprioritized && (matchesPolitical(bookForCheck.title || "") || matchesPolitical(bookForCheck.author || ""))) {
+        await supabase.from("listings").update({ deprioritized: true }).eq("id", listingId);
+        console.log(`[listing-created] Auto-deprioritized político: ${bookForCheck.title}`);
+      }
+    } catch (depErr) {
+      console.error("Auto-deprioritization failed:", depErr);
     }
 
     const book = (listing as any).book ?? {};
