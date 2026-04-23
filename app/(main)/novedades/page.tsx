@@ -1145,7 +1145,7 @@ export default async function NovedadesPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <a
-              href="https://wa.me/?text=Vero%20est%C3%A1%20construyendo%20tuslibros.cl%20—%20marketplace%20de%20libros%20usados%20en%20Chile.%20Este%20es%20el%20diario%20de%20lo%20que%20pas%C3%B3%20estas%20dos%20semanas%3A%20https%3A%2F%2Ftuslibros.cl%2Fnovedades"
+              href="https://wa.me/?text=Vero%20est%C3%A1%20construyendo%20tuslibros.cl%20%E2%80%94%20marketplace%20chileno%20de%20libros%20usados%20entre%20personas.%20Con%20pago%20seguro%20y%20env%C3%ADo%20puerta%20a%20puerta.%20Este%20es%20el%20diario%3A%20https%3A%2F%2Ftuslibros.cl%2Fnovedades"
               target="_blank"
               rel="noopener"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors"
@@ -1153,7 +1153,7 @@ export default async function NovedadesPage() {
               WhatsApp
             </a>
             <a
-              href="https://twitter.com/intent/tweet?text=Dos%20semanas%20en%20tuslibros.cl%3A%20primer%20testimonio%2C%20primer%20env%C3%ADo%20a%20regi%C3%B3n%2C%2078%20fichas%20enriquecidas%20y%20ediciones%20de%20colecci%C3%B3n.&url=https%3A%2F%2Ftuslibros.cl%2Fnovedades"
+              href="https://x.com/intent/post?text=tuslibros.cl%20%E2%80%94%20marketplace%20chileno%20de%20libros%20usados%20entre%20personas.%20Pago%20seguro%20y%20env%C3%ADo%20puerta%20a%20puerta.&url=https%3A%2F%2Ftuslibros.cl%2Fnovedades&via=tuslibroscl"
               target="_blank"
               rel="noopener"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ink text-cream text-sm font-semibold hover:bg-ink/85 transition-colors"
