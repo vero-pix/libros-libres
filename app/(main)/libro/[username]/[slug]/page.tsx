@@ -82,7 +82,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url,
       siteName: "tuslibros.cl",
-      type: "article",
+      type: "book",
       locale: "es_CL",
       images: [{ url: image, width: 600, height: 900, alt: listing.book.title }],
     },
