@@ -132,18 +132,20 @@ interface Props {
     view?: string;
     lat?: string;
     lng?: string;
+    collectible?: string;
   };
 }
 
 export default async function HomePage({ searchParams }: Props) {
   const supabase = await createClient();
-  const { genre, category, subcategory, tag, sort, price_min, price_max, condition, modality, author, binding, publisher, pages_min, pages_max, page, view, lat, lng } = searchParams;
+  const { genre, category, subcategory, tag, sort, price_min, price_max, condition, modality, author, binding, publisher, pages_min, pages_max, page, view, lat, lng, collectible } = searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10) || 1);
   const viewMode = view === "list" ? "list" : "grid";
   const userLat = lat ? parseFloat(lat) : null;
   const userLng = lng ? parseFloat(lng) : null;
+  const collectibleOnly = collectible === "1";
 
-  const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max);
+  const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || collectibleOnly);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
   const [featuredListings, featuredSellers, collectibleListings] = await Promise.all([
@@ -168,6 +170,7 @@ export default async function HomePage({ searchParams }: Props) {
     if (modality) query = query.in("modality", modality === "both" ? ["both"] : [modality, "both"]);
     if (price_min) query = query.gte("price", Number(price_min));
     if (price_max) query = query.lte("price", Number(price_max));
+    if (collectibleOnly) query = query.eq("is_collectible", true);
 
     if (sort === "price_asc") query = query.order("price", { ascending: true });
     else if (sort === "price_desc") query = query.order("price", { ascending: false });
