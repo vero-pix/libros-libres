@@ -78,7 +78,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Libros Libres" />
+        <meta name="apple-mobile-web-app-title" content="tuslibros.cl" />
         {/* Google Analytics GA4 */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-N243GH70EQ" />
         <script
@@ -99,8 +99,8 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: "Libros Libres",
-              alternateName: "tuslibros.cl",
+              name: "tuslibros.cl",
+              alternateName: "tuslibros",
               url: "https://tuslibros.cl",
               logo: "https://tuslibros.cl/og-image.png",
               description: "Marketplace chileno de libros usados. Compra, vende y arrienda libros cerca de ti, con mapa, despacho por courier o retiro en mano.",
@@ -116,7 +116,7 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               name: "tuslibros.cl",
-              alternateName: "Libros Libres",
+              alternateName: "tuslibros",
               url: "https://tuslibros.cl",
               inLanguage: "es-CL",
               description: "Libros usados en Chile con envío o retiro. Pago seguro con MercadoPago.",

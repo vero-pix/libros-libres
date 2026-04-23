@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props) {
       title,
       description,
       url: `https://tuslibros.cl/vendedor/${params.id}`,
-      siteName: "Libros Libres",
+      siteName: "tuslibros.cl",
       type: "profile",
       locale: "es_CL",
     },

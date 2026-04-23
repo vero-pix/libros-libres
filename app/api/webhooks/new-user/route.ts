@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
         subject: "Bienvenido a tuslibros.cl — Tu estantería te espera",
         html: `
           <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
-            <h1 style="color:#1a1a1a;font-size:24px;margin-bottom:4px">Libros Libres</h1>
+            <h1 style="color:#1a1a1a;font-size:24px;margin-bottom:4px">tuslibros.cl</h1>
             <p style="color:#888;font-size:14px;margin-top:0">Cada estantería es una librería</p>
 
             <h2 style="color:#1a1a1a;font-size:18px;margin-top:24px">Hola ${name.split(" ")[0]}, bienvenido/a</h2>

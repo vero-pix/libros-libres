@@ -1,6 +1,6 @@
 {
-  "name": "Libros Libres — tuslibros.cl",
-  "short_name": "Libros Libres",
+  "name": "tuslibros.cl — tus libros, los que ya leíste",
+  "short_name": "tuslibros.cl",
   "description": "Compra, vende y arrienda libros cerca de ti",
   "start_url": "/",
   "display": "standalone",

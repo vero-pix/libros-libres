@@ -24,8 +24,8 @@ export default function LoginPage() {
               <span className="italic text-brand-600">nuevos lectores.</span>
             </h2>
             <p className="text-ink-muted mt-4 leading-relaxed">
-              Compra, vende y arrienda libros cerca de ti.
-              Más de 500 libros disponibles en todo Chile.
+              Compra, vende y arrienda los libros que tienes cerca.
+              Desde $3.000, con pago seguro y despacho puerta a puerta.
             </p>
           </div>
 
