@@ -136,16 +136,28 @@ export default async function LibroPage({ params }: Props) {
 
   const canonicalUrl = `https://tuslibros.cl/libro/${params.username}/${params.slug}`;
 
+  const bookCondition = listing.condition === "new"
+    ? "https://schema.org/NewCondition"
+    : "https://schema.org/UsedCondition";
+  const bookFormat = (listing.book as any).binding === "hardcover"
+    ? "https://schema.org/Hardcover"
+    : "https://schema.org/Paperback";
+  const bookLanguage = (listing.book as any).language || "es";
+  const bookImage = listing.cover_image_url || listing.book.cover_url || undefined;
+  const bookDescription = listing.book.description || `${listing.book.title} de ${listing.book.author}. Libro usado publicado en tuslibros.cl.`;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: `${listing.book.title} — ${listing.book.author}`,
-    description: listing.book.description || `${listing.book.title} de ${listing.book.author}. Libro usado publicado en tuslibros.cl.`,
-    image: listing.cover_image_url || listing.book.cover_url || undefined,
+    description: bookDescription,
+    image: bookImage,
     brand: { "@type": "Brand", name: "tuslibros.cl" },
-    itemCondition: "https://schema.org/UsedCondition",
+    itemCondition: bookCondition,
     author: { "@type": "Person", name: listing.book.author },
     isbn: listing.book.isbn || undefined,
+    inLanguage: bookLanguage,
+    bookFormat,
     offers: {
       "@type": "Offer",
       price: listing.price,
@@ -192,6 +204,30 @@ export default async function LibroPage({ params }: Props) {
     },
   };
 
+  const bookJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Book",
+    name: listing.book.title,
+    author: { "@type": "Person", name: listing.book.author },
+    isbn: listing.book.isbn || undefined,
+    bookFormat,
+    inLanguage: bookLanguage,
+    image: bookImage,
+    description: bookDescription,
+    publisher: (listing.book as any).publisher || undefined,
+    datePublished: listing.book.published_year ? String(listing.book.published_year) : undefined,
+    numberOfPages: (listing.book as any).pages || undefined,
+    offers: {
+      "@type": "Offer",
+      price: listing.price,
+      priceCurrency: "CLP",
+      availability: listing.status === "active" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+      itemCondition: bookCondition,
+      seller: { "@type": "Person", name: listing.seller?.full_name },
+      url: canonicalUrl,
+    },
+  };
+
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -205,6 +241,7 @@ export default async function LibroPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-cream">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(bookJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <main className="max-w-7xl mx-auto px-6 py-10">
         <Breadcrumbs
