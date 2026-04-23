@@ -43,16 +43,26 @@ export async function middleware(request: NextRequest) {
     "/producto-categoria/",
     "/product-category/",
     "/product/",
-    "/tienda-de-libros/",
+    "/producto/",
+    "/shop/",
     "/shop-carousel/",
+    "/tienda-de-libros/",
+    "/tienda/",
     "/vendedores-destatacados/",
     "/condicion/",
     "/estado/",
     "/comments/",
+    "/cart/",
+    "/my-account/",
+    "/checkout/old/",
     "/wp-json/",
+    "/wp-content/",
+    "/wp-admin/",
+    "/wp-includes/",
   ];
   if (
     legacyPrefixes.some((p) => pathname.startsWith(p)) ||
+    pathname.endsWith(".php") ||
     pathname === "/feed" ||
     pathname.startsWith("/feed/") ||
     pathname === "/rss" ||
@@ -71,13 +81,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // /tienda/* (tiendas Woocommerce) → redirect al home
-  if (pathname.startsWith("/tienda/")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    url.search = "";
-    return NextResponse.redirect(url, 308);
-  }
+  // (antes hacíamos redirect 308 de /tienda/ al home; hoy va en el 410 Gone
+  // de legacyPrefixes para que Google las desindexe más rápido)
 
   // Paginación legacy WP /page/N → redirect al home
   if (/^\/page\/\d+\/?$/.test(pathname)) {
