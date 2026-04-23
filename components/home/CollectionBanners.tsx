@@ -19,6 +19,13 @@ const BANNERS: Banner[] = [
     icon: "🎉",
   },
   {
+    title: "Filosofía",
+    subtitle: "Jaeger, Séneca, Plutarco, Urban",
+    href: "/?genre=Filosof%C3%ADa",
+    gradient: "from-slate-800 to-slate-600",
+    icon: "🏛️",
+  },
+  {
     title: "Novela Negra",
     subtitle: "Montalbán, Ellroy, Black",
     href: "/?genre=Novela+Negra",
