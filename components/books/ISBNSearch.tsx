@@ -138,23 +138,36 @@ export default function ISBNSearch({ onBookFound }: Props) {
         />
       )}
 
-      {/* Scan button */}
-      <button
-        type="button"
-        onClick={() => setShowScanner(true)}
-        className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-brand-300 hover:border-brand-500 hover:bg-brand-50 text-brand-600 hover:text-brand-700 font-medium rounded-xl text-sm transition-all"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-          <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
-          <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
-          <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
-          <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
-          <line x1="7" y1="12" x2="7" y2="12.01"/>
-          <line x1="12" y1="7" x2="12" y2="17"/>
-          <line x1="17" y1="12" x2="17" y2="12.01"/>
-        </svg>
-        Escanear código de barras
-      </button>
+      {/* Scan + Manual buttons — same visual level */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => setShowScanner(true)}
+          className="flex items-center justify-center gap-2 py-3 border-2 border-dashed border-brand-300 hover:border-brand-500 hover:bg-brand-50 text-brand-600 hover:text-brand-700 font-medium rounded-xl text-sm transition-all"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+            <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+            <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+            <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+            <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+            <line x1="7" y1="12" x2="7" y2="12.01"/>
+            <line x1="12" y1="7" x2="12" y2="17"/>
+            <line x1="17" y1="12" x2="17" y2="12.01"/>
+          </svg>
+          Escanear código de barras
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowManual(true)}
+          className="flex items-center justify-center gap-2 py-3 border-2 border-dashed border-brand-300 hover:border-brand-500 hover:bg-brand-50 text-brand-600 hover:text-brand-700 font-medium rounded-xl text-sm transition-all"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          Sin ISBN · ingreso manual
+        </button>
+      </div>
 
       <div className="flex items-center gap-2 text-xs text-gray-300">
         <span className="flex-1 border-t border-gray-200" />
@@ -292,16 +305,6 @@ export default function ISBNSearch({ onBookFound }: Props) {
         </div>
       )}
 
-      {/* Link para saltar directo al manual sin ISBN */}
-      {!showManual && (
-        <button
-          type="button"
-          onClick={() => setShowManual(true)}
-          className="text-xs text-gray-400 hover:text-brand-500 transition-colors"
-        >
-          ¿No tienes el ISBN? Ingresar título y autor manualmente →
-        </button>
-      )}
     </div>
   );
 }

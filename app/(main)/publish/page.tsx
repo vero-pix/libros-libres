@@ -107,13 +107,13 @@ export default async function PublishPage() {
             Publica tu libro
           </h1>
           <p className="text-ink-muted mt-3 max-w-md mx-auto leading-relaxed">
-            Escanea el ISBN con tu celular o escribe los datos a mano. Nosotros completamos portada, sinopsis y categoría — tú solo ponle precio.
+            Escanea el ISBN, búscalo con el número, o ingrésalo a mano si no lo tienes. Nosotros completamos portada, sinopsis y categoría — tú solo ponle precio.
           </p>
 
           {/* Mini steps */}
           <div className="flex items-center justify-center gap-6 mt-8">
             {[
-              { num: "1", text: "Busca por ISBN" },
+              { num: "1", text: "Busca el libro (o ingreso manual)" },
               { num: "2", text: "Ponle precio" },
               { num: "3", text: "Marca ubicación" },
             ].map((step, i) => (
@@ -130,6 +130,52 @@ export default async function PublishPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Explicación del despacho puerta a puerta */}
+      <section className="bg-white border-b border-cream-dark">
+        <div className="max-w-2xl mx-auto px-4 py-6">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-brand-600 font-semibold mb-3 text-center">
+            Y cuando alguien lo compre…
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="bg-cream-warm border border-cream-dark/40 rounded-xl p-4">
+              <p className="text-xl mb-1">🚪</p>
+              <p className="font-semibold text-ink text-sm mb-1">Retiro en mano</p>
+              <p className="text-xs text-ink-muted leading-relaxed">
+                El comprador pasa a buscar tu libro. Coordinan por WhatsApp.
+              </p>
+            </div>
+            <div className="bg-cream-warm border border-cream-dark/40 rounded-xl p-4">
+              <p className="text-xl mb-1">📦</p>
+              <p className="font-semibold text-ink text-sm mb-1">Despacho con Shipit</p>
+              <p className="text-xs text-ink-muted leading-relaxed">
+                Imprimes la etiqueta que te genera el sistema y el courier de Shipit pasa a buscar el libro a tu casa. No tienes que ir a ninguna oficina.
+              </p>
+            </div>
+          </div>
+
+          {/* ¿Tienes muchos libros? Te ayudo yo. */}
+          <a
+            href="https://wa.me/56994583067?text=Hola%20Vero%2C%20tengo%20varios%20libros%20para%20publicar%20en%20tuslibros.cl"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 flex items-start gap-3 bg-gradient-to-br from-brand-50 to-amber-50 border border-brand-200 rounded-xl p-4 hover:shadow-md transition-shadow group"
+          >
+            <span className="text-2xl flex-shrink-0">📚</span>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-ink text-sm mb-1">
+                ¿Tienes muchos libros? Te ayudo yo.
+              </p>
+              <p className="text-xs text-ink-muted leading-relaxed">
+                Si tienes una ruma entera, no pierdas la tarde subiéndolos de a uno. Mándame un Excel con los títulos, o una foto de la pila apilada por WhatsApp y yo los cargo por ti. — Vero
+              </p>
+              <p className="text-xs text-brand-700 font-medium mt-2 group-hover:underline">
+                Escribirme por WhatsApp →
+              </p>
+            </div>
+          </a>
         </div>
       </section>
 

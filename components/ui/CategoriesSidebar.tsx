@@ -75,7 +75,9 @@ export default function CategoriesSidebar({
         </li>
       </ul>
 
-      {categoryTree.map((group, idx) => {
+      {categoryTree
+        .filter((group) => group.count >= 5 || group.slug === activeCategory)
+        .map((group, idx) => {
         const isOpen = openGroups.has(idx);
         return (
           <div key={group.slug} className="mt-3">
