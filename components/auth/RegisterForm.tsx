@@ -106,14 +106,6 @@ export default function RegisterForm() {
 
   return (
     <div className="space-y-4">
-      <SocialLoginButtons />
-
-      <div className="relative flex items-center gap-3 my-5">
-        <div className="flex-1 border-t border-cream-dark/40" />
-        <span className="text-xs text-ink-muted">o con tu correo</span>
-        <div className="flex-1 border-t border-cream-dark/40" />
-      </div>
-
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">

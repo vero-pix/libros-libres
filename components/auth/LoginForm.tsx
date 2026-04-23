@@ -89,8 +89,6 @@ export default function LoginForm() {
           Regístrate gratis
         </Link>
       </p>
-
-      <SocialLoginButtons />
     </form>
   );
 }
