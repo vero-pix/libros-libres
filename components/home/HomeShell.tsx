@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import HeroBar from "./HeroBar";
 import TiendaToggle from "./TiendaToggle";
 import CollectionBanners from "./CollectionBanners";
+import LeadCaptureBar from "@/components/ui/LeadCaptureBar";
 
 const ShelfTransformation = dynamic(() => import("./ShelfTransformation"));
 
@@ -97,6 +98,8 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
           </div>
         </section>
       )}
+
+      {!hasFilters && <LeadCaptureBar />}
     </>
   );
 }
