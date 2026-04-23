@@ -35,42 +35,46 @@ export async function middleware(request: NextRequest) {
 
   // 410 Gone para prefijos legacy WP/WC típicos que hoy devuelven 404.
   // 410 señala "se fue para siempre" y Google las remueve del índice más rápido.
+  // Prefijos legacy sin trailing slash. Matchea tanto /wp-admin, /wp-admin/ como
+  // /wp-admin/anything — así una request con o sin slash final cae en 410.
+  // OJO: /product y /producto NO están acá porque next.config.mjs los redirige
+  // a /search?q=:slug (recuperación de tráfico con intent).
   const legacyPrefixes = [
-    "/tag/",
-    "/category/",
-    "/author/",
-    "/autor/",
-    "/producto-categoria/",
-    "/product-category/",
-    "/product/",
-    "/producto/",
-    "/shop/",
-    "/shop-carousel/",
-    "/tienda-de-libros/",
-    "/tienda/",
-    "/vendedores-destatacados/",
-    "/condicion/",
-    "/estado/",
-    "/comments/",
-    "/cart/",
-    "/my-account/",
-    "/mi-cuenta/",
-    "/checkout/old/",
-    "/wp-json/",
-    "/wp-content/",
-    "/wp-admin/",
-    "/wp-includes/",
+    "/tag",
+    "/category",
+    "/author",
+    "/autor",
+    "/producto-categoria",
+    "/product-category",
+    "/shop",
+    "/shop-carousel",
+    "/tienda",
+    "/tienda-de-libros",
+    "/vendedores-destatacados",
+    "/condicion",
+    "/estado",
+    "/comments",
+    "/cart",
+    "/my-account",
+    "/mi-cuenta",
+    "/checkout/old",
+    "/finalizar-compra",
+    "/wp-json",
+    "/wp-content",
+    "/wp-admin",
+    "/wp-includes",
+    "/wp-login",
+    "/xmlrpc",
+    "/feed",
+    "/rss",
   ];
-  const legacyExact = ["/wp-login", "/wp-login.php"];
   const legacyExtensions = [".php", ".asp", ".aspx"];
+  const matchesLegacyPrefix = legacyPrefixes.some(
+    (p) => pathname === p || pathname.startsWith(p + "/"),
+  );
   if (
-    legacyPrefixes.some((p) => pathname.startsWith(p)) ||
-    legacyExact.includes(pathname) ||
-    legacyExtensions.some((ext) => pathname.endsWith(ext)) ||
-    pathname === "/feed" ||
-    pathname.startsWith("/feed/") ||
-    pathname === "/rss" ||
-    pathname.startsWith("/rss/")
+    matchesLegacyPrefix ||
+    legacyExtensions.some((ext) => pathname.endsWith(ext))
   ) {
     return new NextResponse(null, { status: 410 });
   }
