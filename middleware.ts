@@ -2,8 +2,29 @@ import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 import { createServerClient } from "@supabase/ssr";
 
+// Herramientas de automatización / browser impersonation detectadas en el tráfico.
+// Respetamos Googlebot, Bingbot, ChatGPT-User, PerplexityBot y SEO tools (SEMrush, Ahrefs).
+const BLOCKED_UA = [
+  /LikeWise/i,
+  /HeadlessChrome/i,
+  /Puppeteer/i,
+  /Playwright/i,
+  /Selenium/i,
+  /PhantomJS/i,
+  /scrapy/i,
+  /python-requests/i,
+  /node-fetch/i,
+  /Go-http-client/i,
+];
+
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
+
+  // Bloqueo UA de scrapers conocidos. Responde 403 sin servir contenido.
+  const ua = request.headers.get("user-agent") ?? "";
+  if (BLOCKED_UA.some((p) => p.test(ua))) {
+    return new NextResponse("Forbidden", { status: 403 });
+  }
 
   // 410 Gone para URLs legacy de Woocommerce (WordPress era).
   // Google las quita del índice más rápido que con 404.
