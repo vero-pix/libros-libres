@@ -60,7 +60,7 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
       {!hasFilters && requestsRow}
 
       <main id="tienda" className="max-w-7xl mx-auto px-6 py-10 scroll-mt-32">
-        <TiendaToggle forceMap={forceMap} onForceMapConsumed={() => setForceMap(false)}>
+        <TiendaToggle forceMap={forceMap} onForceMapConsumed={() => setForceMap(false)} hasFilters={hasFilters}>
           {children}
         </TiendaToggle>
       </main>

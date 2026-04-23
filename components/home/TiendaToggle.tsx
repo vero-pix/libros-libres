@@ -15,18 +15,21 @@ interface Props {
   children: ReactNode;
   forceMap?: boolean;
   onForceMapConsumed?: () => void;
+  hasFilters?: boolean;
 }
 
-export default function TiendaToggle({ children, forceMap, onForceMapConsumed }: Props) {
+export default function TiendaToggle({ children, forceMap, onForceMapConsumed, hasFilters }: Props) {
   const [view, setView] = useState<"grid" | "map">("grid");
 
-  // Desktop default = mapa (gancho visual). Mobile se queda en grilla (scroll crítico + SEO).
-  // Se ejecuta solo una vez en el mount del cliente.
+  // Desktop default = mapa (gancho visual) SOLO si no hay filtros activos.
+  // Con filtros (banner clickeado, categoría, etc.) se respeta la grilla para
+  // que el usuario vea los libros que pidió. Mobile se queda en grilla siempre.
   useEffect(() => {
+    if (hasFilters) return;
     if (typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches) {
       setView("map");
     }
-  }, []);
+  }, [hasFilters]);
 
   useEffect(() => {
     if (forceMap) {
