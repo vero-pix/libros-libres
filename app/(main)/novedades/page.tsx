@@ -39,6 +39,90 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 const novedades: Entry[] = [
   {
     date: "22 abril 2026",
+    title: "Día del Libro: 13 libros con hasta 50% de descuento",
+    description:
+      "Para el 23 de abril armé ofertas reales en 13 libros del catálogo. No son números inflados para simular descuentos: son libros que tenía a precio de librería tradicional y que bajé agresivamente para que sirvan como regalo o antojo de fin de mes. Carpe Diem de $29.900 → $14.900. Elogio de la sombra y Opus nigrum, ambos de Yourcenar, de $32.990 → $16.490. Ojo del Espíritu (Ken Wilber) de $28.000 → $13.990. La montaña mágica de Mann de $18.000 → $8.990. Tres ediciones de Biblioteca de Babel (Borges dirigió esa colección) con 40% off: Bartleby el escribiente, La puerta en el muro, El cardenal Napellus. El precio anterior queda tachado en la ficha para que la oferta sea transparente.",
+    tag: "Oferta",
+    link: "/",
+    linkText: "Ver el home con ofertas",
+    visual: {
+      kind: "milestone",
+      icon: "🎉",
+      metric: "Hasta 50% off",
+      detail: "13 libros con precio tachado real",
+    },
+  },
+  {
+    date: "22 abril 2026",
+    title: "Registro simplificado: 3 campos y listo",
+    description:
+      "El formulario de registro pedía nombre, correo, contraseña, país, región y comuna. Era demasiado para alguien que solo quiere mirar. Lo dejé en tres campos: nombre, correo, contraseña. País y región se deducen después cuando vas a comprar o publicar (ahí sí hace sentido pedirlos). También moví el botón de Google arriba del formulario para que el registro con un clic sea la primera opción visible. Y si te registras con correo, automáticamente te suscribo al newsletter — así los avisos de libros nuevos te llegan sin que tengas que hacer un paso extra.",
+    tag: "Mejora",
+    link: "/register",
+    linkText: "Probar el registro",
+    visual: {
+      kind: "milestone",
+      icon: "✍️",
+      metric: "3 campos",
+      detail: "antes pedía 6, ahora solo lo esencial",
+    },
+  },
+  {
+    date: "22 abril 2026",
+    title: "Segundo testimonio en la home: Camilo de Concepción",
+    description:
+      "Camilo fue el comprador del primer envío a región — un bundle de 3 libros a Concepción por Starken. Esta semana me escribió contando que llegaron rápido, en buen estado y con una sorpresa: puse una postal a mano dentro del paquete. Me dio permiso para publicar sus palabras y ahora la home muestra dos testimonios reales: el de Z. (retiro en Providencia) y el de Camilo (envío a región). Dos tipos de compra, dos lugares, dos voces. La prueba social deja de ser un caso aislado.",
+    tag: "Hito",
+    visual: {
+      kind: "quote",
+      text: "Encantado con mi primera compra. Los libros llegaron rápido y en buen estado hasta la puerta de mi casa, además con una sorpresa buenísima. Una experiencia recomendada 👌🏻",
+      who: "Camilo · Concepción",
+      book: "Bundle de 3 libros por Starken",
+    },
+  },
+  {
+    date: "22 abril 2026",
+    title: "Si te vas sin comprar, déjame tu correo y te aviso cuando llegue algo",
+    description:
+      "Agregué una tarjeta discreta que aparece después de 25 segundos navegando el home: pide un correo a cambio de avisos cuando entren libros que puedan gustarte. No es un pop-up agresivo, no tapa la pantalla, se cierra con una X. Si ya me dejaste tu correo no la volvemos a mostrar. Es una red para capturar interés temprano — la gente que entra, mira y se va sin registrarse es la que más se pierde, y ahora al menos queda un hilo.",
+    tag: "Lanzamiento",
+    visual: {
+      kind: "milestone",
+      icon: "📬",
+      metric: "Lead capture",
+      detail: "correo antes de que se vayan",
+    },
+  },
+  {
+    date: "22 abril 2026",
+    title: "Publicar es más fácil: sin ISBN también puedes, y Vero te ayuda si tienes muchos",
+    description:
+      "Arreglé el formulario de publicar para que no asuma que todos tienen el ISBN a la mano. Ahora hay dos botones grandes, al mismo nivel: \"Escanear código de barras\" y \"Sin ISBN · ingreso manual\". Además agregué una explicación clara del despacho puerta a puerta con Shipit (tú imprimes la etiqueta, el courier pasa a buscar el libro a tu casa, no tienes que ir a ninguna oficina). Y una invitación: si tienes varios libros, no pierdas la tarde subiéndolos de a uno — me mandas un Excel o una foto de la ruma por WhatsApp y te los cargo yo. Quitar fricción en el onboarding del vendedor es lo único que permite escalar el catálogo sin pedirle esfuerzo al usuario.",
+    tag: "Mejora",
+    link: "/publish",
+    linkText: "Ir a publicar",
+    visual: {
+      kind: "milestone",
+      icon: "📦",
+      metric: "Puerta a puerta",
+      detail: "Shipit pasa por tu casa · sin oficinas",
+    },
+  },
+  {
+    date: "22 abril 2026",
+    title: "Protección contra bots y scrapers de LLM",
+    description:
+      "Vercel me alertó de un ataque automatizado desde proxies residenciales chilenos — alguien con un script de scraping golpeando el sitio en paralelo. Agregué bloqueos en el middleware contra los user-agents típicos de bots (Puppeteer, Playwright, Selenium, PhantomJS, scripts en Python, Go y Node que no se identifican). Además actualicé el robots.txt para bloquear por completo los crawlers que entrenan LLMs sin devolver tráfico — GPTBot, ClaudeBot, CCBot, Bytespider, Amazonbot, Google-Extended, entre otros. Google y Bing de búsqueda siguen pasando normal, y ChatGPT-User y PerplexityBot también (esos sí citan con clicks reales al sitio). Es higiene de infraestructura pero ahorra compute y protege a los vendedores que publican fotos y descripciones de su catálogo.",
+    tag: "Fix",
+    visual: {
+      kind: "milestone",
+      icon: "🛡️",
+      metric: "13 crawlers",
+      detail: "bloqueados del scraping LLM",
+    },
+  },
+  {
+    date: "22 abril 2026",
     title: "Primera semana en el radar SEO de Chile — somos el único dominio del sector que sube",
     description:
       "SEMrush me mandó el reporte de Position Tracking del sector librerías online en Chile (período 15-22 abril). Buscalibre, Librería Literata, Green Libros, Libros del Ayer, Libros El Cid, Casa del Libro: los siete competidores que me rodean están en rojo esta semana (entre -0.13% y -2.68%). tuslibros.cl es el único dominio que sube — +2.19% en visibilidad orgánica. Pasé de posición 9 a posición 5. Es una semana, no una tendencia — pero es la señal más clara que he tenido de que los fixes de SEO de los últimos 15 días están siendo leídos por Google. La siguiente métrica a cruzar es cuánto de esto se traduce en clicks reales.",
@@ -846,19 +930,20 @@ export default async function NovedadesPage() {
             </p>
           </div>
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[1.05] text-cream mb-6 animate-fade-in-up" style={{ animationDelay: "60ms" }}>
-            Dos semanas en las que <em className="text-amber-300 not-italic font-normal italic">pasaron cosas</em>.
+            Día 25 — ya <em className="text-amber-300 not-italic font-normal italic">pasaron cosas</em>.
           </h1>
           <p className="text-base md:text-lg text-cream/80 max-w-2xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "120ms" }}>
-            Primer testimonio de un comprador real. Primer envío a región (Concepción, tres libros, Starken).
-            Limpieza grande del SEO. Nuevas piezas de colección. Esto es lo que fue pasando, contado por orden
-            de importancia y no solo cronológico. Lo escribo yo. — Vero
+            Tres compradores reales, once libros vendidos, primer envío a región, el único dominio del
+            sector subiendo en SEO, ofertas reales para el Día del Libro, registro en 3 campos y un
+            formulario de publicar más humano. Esto es lo que fue pasando, contado por orden de
+            importancia y no solo cronológico. Lo escribo yo. — Vero
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 animate-fade-in-up" style={{ animationDelay: "180ms" }}>
             {[
-              { big: "2", small: "compradores reales" },
-              { big: "1", small: "testimonio publicado" },
-              { big: "78", small: "fichas enriquecidas" },
-              { big: "10,9K", small: "URLs legacy limpiadas" },
+              { big: "3", small: "compradores reales" },
+              { big: "11", small: "libros vendidos" },
+              { big: "+2.19%", small: "SEO — único del sector subiendo" },
+              { big: "13", small: "libros con hasta 50% off" },
             ].map((s) => (
               <div key={s.small} className="border-l-2 border-amber-300/40 pl-4">
                 <p className="font-display text-3xl md:text-4xl text-cream leading-none">{s.big}</p>
@@ -873,19 +958,19 @@ export default async function NovedadesPage() {
         {/* SPOTLIGHT — tres momentos grandes */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 animate-fade-in-up" style={{ animationDelay: "240ms" }}>
           <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Hito · 16 abr</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">Primer testimonio en la home</p>
-            <p className="text-xs text-ink-muted">Un comprador real aceptó que publicara sus palabras.</p>
+            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Oferta · 22 abr</p>
+            <p className="font-display text-lg text-ink leading-snug mb-2">Día del Libro con 50% off</p>
+            <p className="text-xs text-ink-muted">13 libros con ofertas reales — Yourcenar, Borges, Mann, Wilber.</p>
           </div>
           <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Hito · 17 abr</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">Primer envío a región</p>
-            <p className="text-xs text-ink-muted">Bundle de 3 libros a Concepción por Starken. $48.647 pagados.</p>
+            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Hito · 22 abr</p>
+            <p className="font-display text-lg text-ink leading-snug mb-2">Segundo testimonio en la home</p>
+            <p className="text-xs text-ink-muted">Camilo, el comprador del envío a Concepción, cuenta que llegaron rápido y con sorpresa.</p>
           </div>
           <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Catálogo · 16 abr</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">Emar y de Rokha entran</p>
-            <p className="text-xs text-ink-muted">Vanguardia chilena del 35 y una antología editada en La Habana, 1991.</p>
+            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Señal · 22 abr</p>
+            <p className="font-display text-lg text-ink leading-snug mb-2">Único dominio del sector subiendo</p>
+            <p className="text-xs text-ink-muted">+2.19% en SEMrush mientras los 7 competidores bajan. De posición 9 a 5.</p>
           </div>
         </section>
 

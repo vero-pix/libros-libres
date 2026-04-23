@@ -83,6 +83,7 @@ const getFeaturedSellers = unstable_cache(
       .from("users")
       .select("id, full_name, avatar_url, city, bio")
       .eq("featured", true)
+      .not("avatar_url", "is", null)
       .limit(10);
     if (!data) return [];
     return Promise.all(

@@ -109,7 +109,7 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
             )}
             {isNew(listing.created_at) && listing.status !== "completed" && (
               <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm bg-brand-500 text-white">
-                Nuevo
+                Recién publicado
               </span>
             )}
             {hasDiscount(listing) && listing.status !== "completed" && (

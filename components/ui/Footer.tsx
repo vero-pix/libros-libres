@@ -36,7 +36,7 @@ export default function Footer() {
               <li><Link href="/historia" className="hover:text-brand-600 transition-colors">Nuestra historia</Link></li>
               <li><Link href="/como-funciona" className="hover:text-brand-600 transition-colors">Cómo funciona</Link></li>
               <li><Link href="/faq" className="hover:text-brand-600 transition-colors">FAQ</Link></li>
-              <li><Link href="/alianzas" className="hover:text-brand-600 transition-colors">Alianzas <span className="text-[10px] text-ink-muted/70">(próximamente)</span></Link></li>
+              <li><Link href="/alianzas" className="hover:text-brand-600 transition-colors">Alianzas</Link></li>
             </ul>
           </div>
           <div>
@@ -60,7 +60,7 @@ export default function Footer() {
       {/* Bottom */}
       <div className="border-t border-cream-dark bg-cream-warm">
         <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-muted">
-          <span>© {new Date().getFullYear()} Libros Libres — tuslibros.cl</span>
+          <span>© {new Date().getFullYear()} tuslibros.cl</span>
           <div className="flex items-center gap-4">
             <a
               href="https://www.linkedin.com/company/tuslibros/"
