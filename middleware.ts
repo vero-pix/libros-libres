@@ -54,15 +54,19 @@ export async function middleware(request: NextRequest) {
     "/comments/",
     "/cart/",
     "/my-account/",
+    "/mi-cuenta/",
     "/checkout/old/",
     "/wp-json/",
     "/wp-content/",
     "/wp-admin/",
     "/wp-includes/",
   ];
+  const legacyExact = ["/wp-login", "/wp-login.php"];
+  const legacyExtensions = [".php", ".asp", ".aspx"];
   if (
     legacyPrefixes.some((p) => pathname.startsWith(p)) ||
-    pathname.endsWith(".php") ||
+    legacyExact.includes(pathname) ||
+    legacyExtensions.some((ext) => pathname.endsWith(ext)) ||
     pathname === "/feed" ||
     pathname.startsWith("/feed/") ||
     pathname === "/rss" ||
@@ -156,6 +160,6 @@ export const config = {
      * - favicon.ico
      * - public folder files
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
