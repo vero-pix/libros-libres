@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<title>tuslibros.cl — Para la tía · Abril 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf7f1;
+    --cream-warm: #ede0c1;
+    --cream-alt: #f3ead5;
+    --gold: #a77a0e;
+    --gold-soft: #d4a017;
+    --ink: #2d2e3d;
+    --navy-soft: #3d4670;
+    --muted: #8b8b9c;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  html, body {
+    background: var(--cream);
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--ink);
+    scroll-snap-type: y mandatory;
+    overflow-x: hidden;
+  }
+  .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+  .deck { display: flex; flex-direction: column; }
+
+  .slide {
+    width: 100vw;
+    min-height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5vh 7vw;
+    position: relative;
+    page-break-after: always;
+  }
+  @media (min-height: 720px) {
+    .slide { height: 100vh; }
+  }
+  .slide.cream { background: var(--cream); }
+  .slide.warm { background: var(--cream-warm); }
+  .slide.alt { background: var(--cream-alt); }
+
+  .slide-number {
+    position: absolute;
+    bottom: 3vh;
+    right: 4vw;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .slide-tag {
+    position: absolute;
+    top: 4vh;
+    left: 4vw;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  h1.hero {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(56px, 9vw, 140px);
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--navy-soft);
+  }
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 5.5vw, 80px);
+    font-weight: 500;
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: 0.5em;
+  }
+  h1 em { color: var(--gold); font-style: italic; }
+  h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 3.2vw, 44px); font-weight: 500; }
+  h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(12px, 1vw, 14px);
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1em;
+  }
+  p, li {
+    font-size: clamp(16px, 1.35vw, 22px);
+    line-height: 1.55;
+    max-width: 70ch;
+  }
+  p + p { margin-top: 1em; }
+  ul.bullets { list-style: none; padding: 0; }
+  ul.bullets li {
+    padding: 0.5em 0 0.5em 1.8em;
+    position: relative;
+    border-bottom: 1px solid rgba(139, 139, 156, 0.25);
+  }
+  ul.bullets li:before {
+    content: "→";
+    color: var(--gold);
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+
+  .hero-sub {
+    font-size: clamp(20px, 1.8vw, 28px);
+    color: var(--ink);
+    opacity: 0.85;
+    margin-top: 1.5em;
+    max-width: 55ch;
+    line-height: 1.5;
+  }
+
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3vw; align-items: start; margin-top: 2em; }
+  .metric .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 5.5vw, 90px);
+    font-weight: 500;
+    line-height: 1;
+    color: var(--gold);
+    letter-spacing: -0.02em;
+  }
+  .metric .lbl {
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-top: 0.5em;
+    font-weight: 600;
+  }
+  .metric .sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 0.4em;
+    font-style: italic;
+  }
+
+  .divider {
+    width: 60px;
+    height: 3px;
+    background: var(--gold);
+    margin: 1.2em 0;
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--cream);
+  }
+
+  .ask-box {
+    background: var(--cream-warm);
+    border-left: 4px solid var(--gold);
+    padding: 2em 2.5em;
+    margin-top: 1.5em;
+  }
+  .ask-box .big {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(42px, 5vw, 72px);
+    line-height: 1.1;
+    color: var(--navy-soft);
+    font-weight: 500;
+  }
+  .ask-box .big .accent { color: var(--gold); }
+  .ask-box .sub {
+    font-size: 16px;
+    color: var(--ink);
+    margin-top: 0.8em;
+    opacity: 0.85;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
+  th, td { text-align: left; padding: 0.7em 0.4em; border-bottom: 1px solid rgba(139,139,156,0.3); font-size: clamp(13px, 1.1vw, 17px); }
+  th { color: var(--gold); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  .quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(26px, 2.8vw, 42px);
+    font-style: italic;
+    line-height: 1.3;
+    color: var(--navy-soft);
+    border-left: 3px solid var(--gold);
+    padding-left: 1em;
+    margin: 1em 0;
+  }
+  .quote-author {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-style: normal;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 1em;
+    display: block;
+    font-weight: 600;
+  }
+
+  .nav-hint {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    background: rgba(0,0,0,0.1);
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    opacity: 0.6;
+    z-index: 100;
+  }
+
+  @page { size: 1600px 900px; margin: 0; }
+  @media print {
+    html, body { background: var(--cream); scroll-snap-type: none; }
+    .slide { page-break-after: always; break-inside: avoid; width: 1600px; height: 900px; padding: 80px 120px; overflow: hidden; }
+    .nav-hint { display: none; }
+  }
+
+  @media (max-width: 768px) {
+    .grid-3 { grid-template-columns: 1fr; gap: 1.5em; }
+    .slide { padding: 6vh 6vw; height: auto; min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-hint">↓ desplaza · P imprime a PDF</div>
+
+<div class="deck">
+
+  <!-- ═══════════════ 1 — Portada ═══════════════ -->
+  <section class="slide alt">
+    <div class="slide-tag">Abril 2026</div>
+    <h1 class="hero serif">tuslibros<span style="color: var(--gold);">.cl</span></h1>
+    <p class="hero-sub">Los libros de tu ciudad.<br>Un marketplace para libros usados con mapa, cercanía y pago seguro — construido en Chile, desde Providencia.</p>
+    <div style="margin-top: 3em; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted);">
+      Verónica Velásquez · Founder
+    </div>
+    <div class="slide-number">1 / 5</div>
+  </section>
+
+  <!-- ═══════════════ 2 — Qué hice ═══════════════ -->
+  <section class="slide cream">
+    <div class="slide-tag">Qué hice estos 18 días</div>
+    <h1 class="serif">Un producto real, con ventas reales, <em>ya funcionando</em>.</h1>
+    <div class="divider"></div>
+
+    <p style="margin-top: 1em; max-width: 65ch;">
+      Armé tuslibros.cl en 7 días con tecnología moderna (la misma que usan Uber o Airbnb) e integré pagos con MercadoPago y despachos con Shipit. El 3 de abril salió a producción. Hoy, 18 días después, ya hay compradores reales con sus libros en la puerta.
+    </p>
+
+    <ul class="bullets" style="margin-top: 2em; max-width: 60ch;">
+      <li><strong>Publicar es gratis</strong>, como hoy se hace en MercadoLibre</li>
+      <li><strong>El mapa</strong> te muestra los libros cerca de ti, como Uber</li>
+      <li><strong>MercadoPago</strong> divide el pago entre el vendedor y la plataforma</li>
+      <li><strong>Shipit</strong> genera la etiqueta y retira en la casa del vendedor</li>
+    </ul>
+
+    <div class="slide-number">2 / 5</div>
+  </section>
+
+  <!-- ═══════════════ 3 — Tracción + testimonio ═══════════════ -->
+  <section class="slide warm">
+    <div class="slide-tag">Los números reales, sin maquillar</div>
+    <h1 class="serif">3 compradores · 11 libros · <span style="color: var(--gold);">$90.000 CLP</span> en 18 días.</h1>
+
+    <div class="grid-3" style="margin-top: 2.5em;">
+      <div class="metric">
+        <div class="num">3</div>
+        <div class="lbl">Compradores reales</div>
+        <div class="sub">Zdravko · Set Maigret · Camilo</div>
+      </div>
+      <div class="metric">
+        <div class="num">11</div>
+        <div class="lbl">Libros vendidos</div>
+        <div class="sub">1 + 7 + 3</div>
+      </div>
+      <div class="metric">
+        <div class="num">3</div>
+        <div class="lbl">Librerías activadas</div>
+        <div class="sub">Orgánicamente, sin marketing</div>
+      </div>
+    </div>
+
+    <div class="quote" style="margin-top: 2.5em; max-width: 70ch;">
+      "Fácil y sin complicaciones. Muy buena disposición por parte del vendedor, volvería a comprar sin ningún problema."
+      <span class="quote-author">— Z., primer comprador, 7 abril 2026</span>
+    </div>
+
+    <div class="slide-number">3 / 5</div>
+  </section>
+
+  <!-- ═══════════════ 4 — Lo que pido ═══════════════ -->
+  <section class="slide cream">
+    <div class="slide-tag">Propuesta</div>
+    <h1 class="serif">Necesito <em>USD 25.000</em> para los próximos 3 meses.</h1>
+    <p style="color: var(--muted); margin-top: 0.3em;">~$24 millones de pesos · inversión a cambio de una participación pequeña (~2%)</p>
+
+    <div class="ask-box">
+      <div class="big">USD 25.000 <span style="font-size: 0.55em; color: var(--muted);">= $24 millones CLP</span></div>
+      <div class="sub">A pre-money USD 1.200.000 (valorización respaldada por 3 métodos profesionales — comparables con startups similares de la región).</div>
+    </div>
+
+    <div style="margin-top: 2.5em;">
+      <h3>En qué se gastan</h3>
+      <table>
+        <tbody>
+          <tr>
+            <td>Operación 3 meses (dedicación completa de la founder)</td>
+            <td class="num">60% · $14M CLP</td>
+          </tr>
+          <tr>
+            <td>Marketing digital + activación de librerías</td>
+            <td class="num">30% · $7M CLP</td>
+          </tr>
+          <tr>
+            <td>Reserva operativa + infraestructura</td>
+            <td class="num">10% · $2.5M CLP</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin-top: 2em; font-size: 14px; color: var(--muted); font-style: italic; max-width: 70ch;">
+      Con estos 3 meses demuestro el modelo con más tracción. Al final del trimestre, levanto una ronda más grande con inversionistas institucionales, y el valor de tu participación sube significativamente.
+    </p>
+
+    <div class="slide-number">4 / 5</div>
+  </section>
+
+  <!-- ═══════════════ 5 — Cierre ═══════════════ -->
+  <section class="slide alt">
+    <div class="slide-tag">Hablemos</div>
+    <h1 class="serif">Gracias por escuchar.<br><em>Si tienes preguntas, acá estoy.</em></h1>
+
+    <div style="margin-top: 3em; max-width: 60ch;">
+      <p>El proyecto ya está funcionando, ya tiene compradores reales y ya tiene librerías interesadas. Lo que estoy buscando es acompañamiento — alguien que confíe en el modelo durante estos primeros 3 meses mientras lo hago crecer.</p>
+    </div>
+
+    <div class="ask-box" style="margin-top: 2.5em;">
+      <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--navy-soft);">
+        <strong>Verónica Velásquez</strong><br>
+        <span style="font-size: 16px; font-family: 'Inter', sans-serif; color: var(--ink); opacity: 0.8;">Founder · tuslibros.cl · economics.cl</span>
+      </div>
+      <div class="sub" style="margin-top: 1em;">
+        vero@economics.cl · Santiago · Providencia
+      </div>
+    </div>
+
+    <div class="slide-number">5 / 5</div>
+  </section>
+
+</div>
+
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+      current = Math.min(current + 1, slides.length - 1);
+      slides[current].scrollIntoView({ behavior: 'smooth' });
+      e.preventDefault();
+    } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+      current = Math.max(current - 1, 0);
+      slides[current].scrollIntoView({ behavior: 'smooth' });
+      e.preventDefault();
+    } else if (e.key === 'p' || e.key === 'P') {
+      window.print();
+    }
+  });
+</script>
+
+</body>
+</html>

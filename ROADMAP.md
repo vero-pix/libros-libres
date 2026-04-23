@@ -1,6 +1,6 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 22 abril 2026 — noche (extensión post-22:30)
+Última actualización: 23 abril 2026 — tarde (SEO y Growth)
 
 ---
 
@@ -60,6 +60,10 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 - [ ] **Ping a Alfredo Enrione** — mentor warm potencial. Ofrecer café/Zoom 30min framing "primer pilot run y lectura del modelo".
 - [ ] **Escribir a 3 librerías activadas** — acordado martes 22 abril, verificar si se hizo.
 
+### Nuevo — agregado 23 abril 2026 (SEO y Growth)
+- [ ] **Backlinks (Linkbuilding)** — enviar correos en frío (plantillas de ecología/universidades) a 5 blogs para apalancar la autoridad de dominio.
+- [ ] **Monitorear posiciones en GSC** — revisar en 2 semanas si el cambio de Titles hizo que "libros usados" suba al Top 5.
+
 ### Nuevo — agregado 22 abril 2026 (extensión nocturna)
 - [ ] **Validar ciclo Shipit end-to-end para vendedores NO-admin** — CRÍTICO. Memoria marca que está roto; cim y Antonio podrían vender y fallar el draft. Crear cuenta test, simular venta, verificar etiqueta + courier. ANTES de promover "puerta a puerta" más fuerte.
 - [ ] **WhatsApp a Antonio Lacámara** (+56 9 6502 0050). Conectó MP solo pero abandonó /publish tras 75s. Dirección Providencia Pedro Lautaro Ferrer 2945. Mensaje: "¿te trabaste en algo? te ayudo a subir el primero en 2min".
@@ -89,6 +93,22 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 ---
 
 ## Archivo histórico
+
+---
+
+## Sesión 23 abril 2026 — Auditoría SEO, Diario Financiero y Reddit IT
+
+### Auditoría y SEO Técnico
+- **Auditoría perfecta**: `robots.ts` (bloqueo de bots IA y paths parametrizados), `sitemap.ts` dinámico y Schemas JSON-LD (`Product`, `Book`, `BreadcrumbList`) evaluados con nota 10/10.
+- **Data GSC**: tuslibros.cl ya rankea en primera/segunda página (pos media 9.8) para *palabras clave core* ("libros usados", "venta de libros usados chile") con CTR altísimo (5.9%).
+- **Ejecución SEO On-Page** (implementado hoy):
+  - `app/layout.tsx`: Título global cambiado de "Libros libres..." a `"Libros Usados en Chile | Compra y Venta — tuslibros.cl"` para capturar volumen exacto.
+  - `app/(main)/vender/page.tsx`: Título H1 cambiado de "Publica tu libro" a `"Vende tus libros usados"` y metadata optimizada.
+
+### Growth y Distribución
+- **Apagado PMax**: Se detuvo campaña de Google Ads Performance Max accidental. Foco 100% orgánico (GA4 mostró 19 sesiones de Bing y 27 de Reddit orgánicas).
+- **Pitch a Prensa**: Email enviado a Diario Financiero (`buzondf@df.cl`) pitcheando el modelo de negocio digital de nicho y economía circular (desde `vero@economics.cl`).
+- **Reddit r/chileIT**: Publicación exitosa de estilo "humilde/indie" (Showoff de Side-project) en la comunidad de devs, pidiendo feedback y bugs (luego de baneo automático en r/chile).
 
 ---
 

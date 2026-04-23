@@ -1,0 +1,7 @@
+# Lista de conocidos para enviar newsletter Día del Libro
+# Un email por línea. Líneas que empiezan con # se ignoran.
+# Vero pega aquí los emails y el asistente corre:
+#   node --env-file=.env.local --env-file=.env.local.newsletter scripts/send_newsletter_conocidos.mjs
+
+# ej: maria@gmail.com
+# ej: juan@gmail.com

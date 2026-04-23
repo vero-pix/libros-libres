@@ -2,9 +2,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Vende tus libros — tuslibros.cl",
+  title: "Vender Libros Usados en Chile | tuslibros.cl",
   description:
-    "Publica tus libros usados en 10 segundos. Escanea el código de barras, ponle precio y listo. Pago seguro con MercadoPago, envío a todo Chile.",
+    "¿Quieres vender libros usados en Chile? Publica en 10 segundos. Escanea el código de barras, ponle precio y listo. Pago seguro con MercadoPago y envío a todo el país.",
   alternates: { canonical: "https://tuslibros.cl/vender" },
 };
 
@@ -83,7 +83,7 @@ export default function VenderPage() {
 
         <div className="relative max-w-4xl mx-auto px-4 py-20 sm:py-28 text-center">
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight animate-fade-in-up">
-            Publica tu libro<br />
+            Vende tus libros usados<br />
             <span className="text-brand-400">en 10 segundos</span>
           </h1>
           <p className="mt-6 text-lg sm:text-xl text-white/80 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
