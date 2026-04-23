@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Libros Libres — Donde los libros encuentran nuevos lectores";
+export const alt = "tuslibros.cl — los libros que ya leíste y los que te faltan";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -16,7 +16,7 @@ export default function OGImage() {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          background: "linear-gradient(135deg, #faf8f4 0%, #f5f0e8 100%)",
+          background: "linear-gradient(135deg, #faf7f2 0%, #f5e5c0 100%)",
           fontFamily: "Georgia, serif",
         }}
       >
@@ -25,52 +25,46 @@ export default function OGImage() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "16px",
+            gap: "18px",
           }}
         >
-          <div style={{ fontSize: 72, display: "flex" }}>
-            <span style={{ fontWeight: 700, color: "#1a1a2e" }}>Libros </span>
-            <span style={{ fontWeight: 700, color: "#d4a017" }}>Libres</span>
+          <div style={{ fontSize: 84, display: "flex", fontWeight: 700 }}>
+            <span style={{ color: "#2a1f14" }}>tuslibros</span>
+            <span style={{ color: "#a8581e" }}>.cl</span>
           </div>
           <div
             style={{
-              fontSize: 28,
-              color: "#6b6b7b",
-              maxWidth: 600,
+              fontSize: 32,
+              color: "#3a2f24",
+              maxWidth: 820,
               textAlign: "center",
-              lineHeight: 1.4,
-            }}
-          >
-            Compra, vende y arrienda libros cerca de ti. Pago seguro con MercadoPago.
-          </div>
-          <div
-            style={{
-              display: "flex",
-              gap: "40px",
-              marginTop: "24px",
-              fontSize: 20,
-              color: "#6b6b7b",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <span style={{ fontSize: 36, fontWeight: 700, color: "#d4a017" }}>500+</span>
-              <span>libros</span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <span style={{ fontSize: 36, fontWeight: 700, color: "#d4a017" }}>150+</span>
-              <span>vendedores</span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <span style={{ fontSize: 36, fontWeight: 700, color: "#d4a017" }}>100%</span>
-              <span>seguro</span>
-            </div>
-          </div>
-          <div
-            style={{
-              marginTop: "20px",
-              fontSize: 18,
-              color: "#d4a017",
+              lineHeight: 1.35,
               fontStyle: "italic",
+            }}
+          >
+            Los libros que ya leíste y los que te faltan.
+          </div>
+          <div
+            style={{
+              fontSize: 22,
+              color: "#7a6649",
+              maxWidth: 760,
+              textAlign: "center",
+              lineHeight: 1.45,
+              marginTop: "6px",
+            }}
+          >
+            Compra, vende y arrienda libros en Chile. Pago seguro con MercadoPago.
+            Despacho puerta a puerta con Shipit o retiro en mano.
+          </div>
+          <div
+            style={{
+              marginTop: "34px",
+              fontSize: 18,
+              color: "#a8581e",
+              letterSpacing: "4px",
+              textTransform: "uppercase",
+              fontWeight: 600,
             }}
           >
             tuslibros.cl

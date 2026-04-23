@@ -31,10 +31,10 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const q = searchParams.q;
   const genre = searchParams.genre;
   const title = q
-    ? `Resultados para "${q}" — Libros Libres`
+    ? `Resultados para "${q}" — tuslibros.cl`
     : genre
-      ? `${genre} — Libros Libres`
-      : "Buscar libros — Libros Libres";
+      ? `${genre} — tuslibros.cl`
+      : "Buscar libros — tuslibros.cl";
   const description = q
     ? `Encuentra "${q}" en tuslibros.cl. Libros usados cerca de ti, pago seguro con MercadoPago.`
     : "Busca libros usados cerca de ti en tuslibros.cl. Compra, vende y presta libros de forma segura.";

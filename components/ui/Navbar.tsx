@@ -40,10 +40,10 @@ export default async function Navbar() {
         <div className="max-w-7xl mx-auto flex items-center gap-4 sm:gap-6">
           <Link href="/" className="group whitespace-nowrap">
             <span className="font-display text-2xl font-bold text-ink tracking-tight">
-              Libros{" "}
+              tuslibros
             </span>
             <span className="font-display text-2xl font-bold text-brand-600 tracking-tight group-hover:text-brand-500 transition-colors">
-              Libres
+              .cl
             </span>
           </Link>
 

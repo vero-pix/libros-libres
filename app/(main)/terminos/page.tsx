@@ -5,7 +5,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import Image from "next/image";
 
 export const metadata = {
-  title: "Términos y Condiciones — Libros Libres",
+  title: "Términos y Condiciones — tuslibros.cl",
 };
 
 export default async function TerminosPage() {
@@ -28,7 +28,7 @@ export default async function TerminosPage() {
         <div className="absolute inset-0 bg-cream/70" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
           <h1 className="text-4xl font-bold text-ink mb-2">Términos y Condiciones</h1>
-          <p className="text-ink-muted text-lg max-w-xl">Condiciones de uso de la plataforma Libros Libres</p>
+          <p className="text-ink-muted text-lg max-w-xl">Condiciones de uso de la plataforma tuslibros.cl</p>
         </div>
       </div>
 

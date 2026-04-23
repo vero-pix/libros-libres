@@ -1,6 +1,6 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 22 abril 2026 — noche
+Última actualización: 22 abril 2026 — noche (extensión post-22:30)
 
 ---
 
@@ -59,6 +59,15 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 - [ ] **3 DMs warm a ángeles** — pendiente desde 21 abril. Deck USD 80-120k listo en `docs/deck_valorizacion.pptx`.
 - [ ] **Ping a Alfredo Enrione** — mentor warm potencial. Ofrecer café/Zoom 30min framing "primer pilot run y lectura del modelo".
 - [ ] **Escribir a 3 librerías activadas** — acordado martes 22 abril, verificar si se hizo.
+
+### Nuevo — agregado 22 abril 2026 (extensión nocturna)
+- [ ] **Validar ciclo Shipit end-to-end para vendedores NO-admin** — CRÍTICO. Memoria marca que está roto; cim y Antonio podrían vender y fallar el draft. Crear cuenta test, simular venta, verificar etiqueta + courier. ANTES de promover "puerta a puerta" más fuerte.
+- [ ] **WhatsApp a Antonio Lacámara** (+56 9 6502 0050). Conectó MP solo pero abandonó /publish tras 75s. Dirección Providencia Pedro Lautaro Ferrer 2945. Mensaje: "¿te trabaste en algo? te ayudo a subir el primero en 2min".
+- [ ] **Publicar LinkedIn SEMrush** — archivo `docs/linkedin_semrush_23abril.md` con 3 versiones A/B/C. Horario 8:00–9:30 am mañana 23 abr. Adjuntar screenshot del reporte SEMrush.
+- [ ] **Pasar prompt carrusel a ChatGPT** (opcional) — `docs/prompt_ia_linkedin_carrusel.md` genera 5 slides 1080×1080. Subir a LinkedIn como documento = carrusel. +30% impresiones vs post plano.
+- [ ] **Reddit r/chile post SEMrush** — NO publicar fría. Tono orgánico, sin pitch. Pendiente decidir si la semana próxima.
+- [ ] **Escribir a cimlibros** — primer vendedor externo onboardeado solo (33 listings activos, ritmo de 6 libros en 48h). Feedback real de UX + agradecimiento.
+- [ ] **Fix Libros Huertas avatar** — removido temporalmente del carrusel de vendedores destacados (filtro `.not("avatar_url", "is", null)`). Pedirle foto por WhatsApp para reactivar.
 - [ ] **Decisión AdSense** — Google aprobó el sitio pero DECIDIDO no activar ahora (revenue simbólico, mostraría competidores, daña Core Web Vitals). Revisitar cuando sesiones ≥10k/mes y bounce <50%. Pub ID guardado: `ca-pub-7953415124311211`.
 - [ ] **Fix #3 HeroBar simplificado** — sacar las 5 cards horizontales (redundan con feature sections ya movidas). Alto impacto, bajo esfuerzo.
 - [ ] **Rotación automática FeaturedRow** — 191 de 240 listings sin una sola visita en 30d. Exponer los enterrados con pool rotativo.
@@ -98,17 +107,25 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 - **Camilo recibió su bundle en Concepción** (primer envío a regiones) y dio testimonio: *"Encantado con mi primera compra. Los libros llegaron rápido y en buen estado hasta la puerta de mi casa, además con una sorpresa buenísima."*
 - **Lanzamiento comunicación Día del Libro** — Joy (tía de Vero) empezó a difundir por WhatsApp. Texto pulido para reenviar a grupos: foco en personas-con-biblioteca-armada + colegios (planes lectores).
 
-### Deploy del día (3 commits)
+### Deploy del día (4 commits)
 1. `18fde3e` — Banner "Día del Libro · 23 abril" al inicio de CollectionBanners + entradas /novedades: SEMrush +2.19% y 17 buscados sin match.
 2. `2946532` — Testimonio de Camilo agregado junto al de Zdravko en TestimonialBanner (grid 2 cols responsive).
 3. `9c94afe` — Mini-testimonio del hero actualizado de Z. a Camilo (narrativa más fuerte, primer envío a regiones).
+4. `2bf456b` — **Mega-commit extensión nocturna**: 13 ofertas 50% off con `original_price` tachado, top 10 reorganizado (vero + cimlibros intercalados), registro simplificado a 3 campos + auto-newsletter con nombre, welcome email personalizado 1ª persona, LeadCaptureBar (pop-up 25s), /publish con botón "Sin ISBN" prominente + explicación Shipit puerta a puerta + CTA WhatsApp para ruma, badge "Nuevo"→"Recién publicado", categorías <5 ocultas, footer sin "(próximamente)" ni "Libros Libres", vendedores destacados filtrados por avatar, bot protection (UA blocking + robots.txt anti-LLM), /novedades con 6 entradas nuevas + hero actualizado (3 compradores, 11 vendidos, +2.19% SEO).
+
+### Envíos automáticos de la noche
+- **Newsletter a 19 destinatarios únicos** (users + newsletter_subscribers sin duplicados) enviado via Resend con subject "Hoy es el Día del Libro — ¿me ayudas a moverlo?". HTML en `docs/newsletter_22abril.html`. Script reutilizable en `scripts/send_newsletter_23abril.mjs`.
+
+### Primer vendedor externo onboardeado solo
+- **Antonio Lacámara** (`a.lacamara@gmail.com`, +56 9 6502 0050, Providencia Pedro Lautaro Ferrer 2945) registró con email+password, confirmó en 31s, conectó MercadoPago solo en 5 min, fue a `/publish` 2 veces pero abandonó tras 75s sin crear listing. Diagnóstico: fricción de preparación, no bug. No tenía libro/ISBN a mano. Fix aplicado en commit `2bf456b` (botón Sin ISBN prominente + CTA WhatsApp "mándame la ruma").
+- **cimlibros** sigue publicando solo: 33 listings activos, 6 libros publicados en 48h (Ricky B., Historia del Libro en Chile, Armada, Pintura Social, Introducción a la Medicina Experimental, Crónicas de Guerra). Nicho claro: historia de Chile, ciencia antigua, biografías.
 
 ### Usernames asignados (9)
 `nicoeltit` (único con impacto real: 1 listing activo pasa de URL UUID a `/libro/nicoeltit/mein-kampf`), + `viviana`, `alejandra`, `belen`, `zdravko`, `camilo`, `mikael`, `jorgeveliz`, `felix` (preventivos para cuando publiquen).
 
 ### Aprendizajes guardados en memoria
 - **Bulk upload con fotos manuales no funciona** — libros con ISBN + scanner sí, libros antiguos sin ISBN mejor publicar a mano desde admin. Intento con 11 libros antiguos (Puig, Heiremans, Graham, Portichuelo, Pascal, Maurois, Teitelboim) ejecutado y después eliminado por Vero.
-- **Silencio estratégico es golden** — Vero decidió NO publicar en LinkedIn/Reddit con el reporte SEMrush. Dejar que Día del Libro + Reddit hablen solos.
+- **Post-extensión nocturna: Vero SÍ decidió publicar LinkedIn** — mañana 23 abr entre 8:00–9:30am con reporte SEMrush. Rompió el "silencio estratégico" inicial porque las señales del día (Antonio, cim, newsletter a 19, ofertas) le devolvieron energía.
 
 ### Datos útiles descubiertos hoy
 - **17 títulos buscados sin match** en el catálogo (Aun tenemos patria, El túnel Sábato, Hollywood Bukowski, Farreras Rozman, Seda Baricco, Giancoli, Magnus Chase, etc.). Demanda identificada — ya publicada en /novedades como llamado a vendedores.
@@ -116,6 +133,9 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 - **4 orders totales all-time** (funnel 30d dice 0 porque el script cuenta compradores únicos post-filtro).
 
 ### Pendientes críticos al cierre
+- **Validar Shipit end-to-end para vendedores no-admin** (crítico antes de prometer puerta a puerta más fuerte — cim y Antonio podrían disparar el bug).
+- **WhatsApp a Antonio Lacámara** mañana en la mañana — preguntarle por qué abandonó /publish, ofrecer ayuda.
+- **Publicar LinkedIn con SEMrush** mañana 8:00–9:30 am (archivo `docs/linkedin_semrush_23abril.md`).
 - Recuperar Instagram @tuslibros.cl (en proceso, camino /hacked/ + video selfie).
 - 3 DMs warm a ángeles (pendiente desde 21 abril).
 - SpA + Startup Chile SUP (acordado para mañana 23 abril).

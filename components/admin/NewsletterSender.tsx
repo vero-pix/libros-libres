@@ -5,10 +5,10 @@ import { useState } from "react";
 const NEWSLETTER_TEMPLATES = [
   {
     name: "Lanzamiento — El Uber de los libros",
-    subject: "Libros Libres ya está en vivo — el Uber de los libros",
+    subject: "tuslibros.cl ya está en vivo — el Uber de los libros",
     html: `
 <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background: #faf8f4;">
-  <h1 style="font-size: 28px; color: #1a1a2e; margin-bottom: 4px;">Libros Libres</h1>
+  <h1 style="font-size: 28px; color: #1a1a2e; margin-bottom: 4px;">tuslibros.cl</h1>
   <p style="font-size: 13px; color: #d4a017; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px;">El Uber de los libros</p>
 
   <p style="font-size: 16px; color: #333; line-height: 1.7;">
@@ -57,7 +57,7 @@ const NEWSLETTER_TEMPLATES = [
   </div>
 
   <p style="font-size: 13px; color: #999; text-align: center; margin-top: 32px; border-top: 1px solid #ede7db; padding-top: 16px;">
-    Recibiste este email porque te suscribiste al newsletter de Libros Libres.<br>
+    Recibiste este email porque te suscribiste al newsletter de tuslibros.cl.<br>
     <a href="https://tuslibros.cl" style="color: #d4a017;">tuslibros.cl</a> — Donde los libros encuentran nuevos lectores
   </p>
 </div>`,
