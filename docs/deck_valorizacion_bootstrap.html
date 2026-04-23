@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<title>tuslibros.cl — Inversión Bootstrap · Abril 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a1a2e;
+    --navy-light: #2a2a44;
+    --gold: #d4a017;
+    --gold-soft: #e8c257;
+    --cream: #faf7f1;
+    --ink: #151522;
+    --muted: #8b8b9c;
+    --accent-red: #c14040;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: #0a0a14;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--ink);
+    scroll-snap-type: y mandatory;
+    overflow-x: hidden;
+  }
+  .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+  .deck {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .slide {
+    width: 100vw;
+    min-height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5vh 7vw;
+    position: relative;
+    overflow: visible;
+    page-break-after: always;
+  }
+  @media (min-height: 720px) {
+    .slide { height: 100vh; }
+  }
+  .slide.cream { background: var(--cream); color: var(--ink); }
+  .slide.navy { background: var(--navy); color: var(--cream); }
+  .slide.navy h1, .slide.navy h2, .slide.navy h3 { color: var(--gold-soft); }
+  .slide-number {
+    position: absolute;
+    bottom: 3vh;
+    right: 4vw;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .slide-tag {
+    position: absolute;
+    top: 4vh;
+    left: 4vw;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+  }
+  h1.hero {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(56px, 9vw, 140px);
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.6em;
+  }
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 3.2vw, 44px);
+    font-weight: 500;
+    line-height: 1.15;
+    margin-bottom: 0.5em;
+  }
+  h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(14px, 1.1vw, 16px);
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.2em;
+  }
+  p, li {
+    font-size: clamp(15px, 1.25vw, 19px);
+    line-height: 1.55;
+    max-width: 70ch;
+  }
+  p + p { margin-top: 1em; }
+  ul { list-style: none; padding: 0; }
+  ul.bullets li {
+    padding: 0.4em 0 0.4em 1.5em;
+    position: relative;
+    border-bottom: 1px solid rgba(139, 139, 156, 0.15);
+  }
+  ul.bullets li:before {
+    content: "→";
+    color: var(--gold);
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4vw; align-items: start; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2.5vw; align-items: start; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.8vw; align-items: start; }
+  .metric { padding: 1em 0; }
+  .metric-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(44px, 5.5vw, 84px);
+    font-weight: 500;
+    line-height: 1;
+    color: var(--gold);
+    letter-spacing: -0.02em;
+  }
+  .metric-label {
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.4em;
+    font-weight: 500;
+  }
+  .metric-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 0.6em;
+    font-style: italic;
+  }
+  .navy .metric-label { color: rgba(250, 247, 241, 0.55); }
+  .navy .metric-sub { color: rgba(250, 247, 241, 0.7); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: clamp(13px, 1vw, 16px);
+  }
+  th, td {
+    text-align: left;
+    padding: 0.8em 0.6em;
+    border-bottom: 1px solid rgba(139, 139, 156, 0.25);
+  }
+  th {
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 11px;
+    color: var(--gold);
+  }
+  .navy th { color: var(--gold-soft); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--navy);
+  }
+  .quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 3.5vw, 48px);
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.25;
+    color: var(--gold-soft);
+    border-left: 3px solid var(--gold);
+    padding-left: 1em;
+    margin: 1.5em 0;
+  }
+  .quote-author {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 1em;
+    display: block;
+  }
+  .divider {
+    width: 60px;
+    height: 3px;
+    background: var(--gold);
+    margin: 1.5em 0;
+  }
+  .hero-sub {
+    font-size: clamp(18px, 1.6vw, 24px);
+    color: rgba(250, 247, 241, 0.75);
+    margin-top: 2em;
+    max-width: 50ch;
+    line-height: 1.5;
+  }
+  .cta-box {
+    border: 2px solid var(--gold);
+    padding: 2em;
+    background: rgba(212, 160, 23, 0.08);
+    margin-top: 2em;
+  }
+  .footnote {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2em;
+    line-height: 1.5;
+    font-style: italic;
+  }
+  .nav-hint {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    background: rgba(0,0,0,0.7);
+    color: var(--cream);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    opacity: 0.6;
+    z-index: 100;
+  }
+  .nav-hint:hover { opacity: 1; }
+  .small { font-size: 13px; color: var(--muted); }
+  .navy .small { color: rgba(250, 247, 241, 0.6); }
+  .accent { color: var(--gold); }
+  strong { font-weight: 600; }
+
+  /* Slide 1 specific */
+  .cover {
+    background: var(--navy);
+    color: var(--cream);
+    justify-content: space-between;
+  }
+  .cover-header { margin-top: 2vh; }
+  .cover-main { align-self: flex-start; max-width: 85%; }
+  .cover-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 13px;
+    color: rgba(250, 247, 241, 0.6);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .cover-mark {
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--gold);
+    margin-bottom: 2em;
+  }
+
+  /* Print — fuerza colores a que se rendericen en PDF */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  @page {
+    size: 1600px 900px;
+    margin: 0;
+  }
+  @media print {
+    html, body {
+      scroll-snap-type: none;
+      background: var(--navy);
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .deck { display: block; }
+    .slide {
+      page-break-after: always;
+      page-break-inside: avoid;
+      break-after: page;
+      break-inside: avoid;
+      width: 1600px;
+      height: 900px;
+      min-height: 900px;
+      padding: 60px 100px;
+      overflow: hidden;
+    }
+    .slide.cream { background: var(--cream) !important; color: var(--ink) !important; }
+    .slide.navy { background: var(--navy) !important; color: var(--cream) !important; }
+    .slide.cover { background: var(--navy) !important; color: var(--cream) !important; }
+    .pill { background: var(--gold) !important; color: var(--navy) !important; }
+    .metric-number { color: var(--gold) !important; }
+    .accent { color: var(--gold) !important; }
+    h3 { color: var(--gold) !important; }
+    .nav-hint { display: none !important; }
+    .slide-number { color: var(--muted) !important; }
+    /* Escalar textos para que no queden gigantes en la página print */
+    h1.hero { font-size: 96px !important; }
+    h1 { font-size: 56px !important; }
+    h2 { font-size: 36px !important; }
+    p, li { font-size: 16px !important; }
+    .metric-number { font-size: 64px !important; }
+    .hero-sub { font-size: 20px !important; }
+    .quote { font-size: 32px !important; }
+  }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; gap: 1.5em; }
+    .slide { padding: 6vh 6vw; height: auto; min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-hint">↓ desplaza · p imprime a PDF</div>
+
+<div class="deck">
+
+  <!-- ═══════════════ SLIDE 1 — Portada ═══════════════ -->
+  <section class="slide cover">
+    <div class="cover-header">
+      <div class="cover-mark">tl</div>
+      <div class="pill">PROPUESTA DE INVERSIÓN · ABRIL 2026</div>
+    </div>
+
+    <div class="cover-main">
+      <h1 class="hero serif">tuslibros<span class="accent">.cl</span></h1>
+      <p class="hero-sub">
+        Los libros de tu ciudad.<br>
+        Marketplace de libros usados con mapa, curación y split payment.
+      </p>
+    </div>
+
+    <div class="cover-footer">
+      <span>Verónica Velásquez · Founder</span>
+      <span>Santiago, Chile · Abril 2026</span>
+    </div>
+    <div class="slide-number">01 / 11</div>
+  </section>
+
+  <!-- ═══════════════ SLIDE 2 — Problema ═══════════════ -->
+  <section class="slide cream">
+    <div class="slide-tag">El problema</div>
+    <h1 class="serif">El mercado de libros usados en Chile es grande, pero está <em>invisible</em>.</h1>
+    <div class="divider"></div>
+
+    <div class="grid-3" style="margin-top: 2em;">
+      <div>
+        <div class="metric-number">$8-12</div>
+        <div class="metric-label">mil millones CLP / año</div>
+        <p class="small" style="margin-top: 1em;">Mercado estimado de libros usados en Chile, repartido entre MercadoLibre, Facebook Marketplace, librerías de viejo e intercambios informales. Equivalente a USD 8-12 millones.</p>
+      </div>
+      <div>
+        <div class="metric-number">0</div>
+        <div class="metric-label">Plataforma digital dedicada</div>
+        <p class="small" style="margin-top: 1em;">Buscalibre domina libro nuevo. MercadoLibre es commodity sin curación. Facebook no tiene pago integrado ni confianza. Las librerías de viejo siguen offline.</p>
+      </div>
+      <div>
+        <div class="metric-number">72%</div>
+        <div class="metric-label">Catálogo invisible</div>
+        <p class="small" style="margin-top: 1em;">Antes de tuslibros: el libro usado que quieres existe, pero encontrarlo toma tres búsquedas, cero garantía y una conversación de WhatsApp con un desconocido.</p>
+      </div>
+    </div>
+
+    <p style="margin-top: 3em; max-width: 60ch; font-style: italic; color: var(--muted);">
+      En Chile compramos ~45 millones de libros al año. El mercado de segunda vida existe, pero no tiene infraestructura digital. Nadie lo está resolviendo.
+    </p>
+
+    <div class="slide-number">02 / 11</div>
+  </section>
+
+  <!-- ═══════════════ SLIDE 3 — Solución ═══════════════ -->
+  <section class="slide navy">
+    <div class="slide-tag">La solución</div>
+    <h1 class="serif">Un marketplace con <em>tres</em> diferenciadores que nadie tiene junto.</h1>
+
+    <div class="grid-3" style="margin-top: 3em;">
+      <div>
+        <h3>Mapa geolocalizado</h3>
+        <p>Ves los libros como puntos en el mapa de tu ciudad. El libro más cercano es el mejor resultado. Experiencia tipo Uber, no catálogo plano.</p>
+      </div>
+      <div>
+        <h3>Curación de rarezas</h3>
+        <p>Featured, coleccionables y top 10 priorizan primeras ediciones, títulos agotados, editoriales históricas. No competimos en commodity — competimos en lo que nadie tiene.</p>
+      </div>
+      <div>
+        <h3>Split payment integrado</h3>
+        <p>OAuth con MercadoPago: el pago se divide automáticamente entre vendedor y plataforma. Courier Shipit genera etiqueta al confirmar el pago. Un solo flujo, cero fricción operativa.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 3.5em; padding: 1.5em 2em; background: rgba(212, 160, 23, 0.12); border-left: 3px solid var(--gold);">
+      <h3 style="margin-bottom: 0.5em;">Feature único en Chile: <span style="color: var(--cream);">foto-a-catálogo</span></h3>
+      <p style="color: rgba(250, 247, 241, 0.85);">
+        Subes la foto de la portada. Identificación vía LLM + enriquecimiento automático con Google Books y Open Library. Ningún competidor en Chile tiene esto. Elimina el 90% del trabajo de publicar.
+      </p>
+    </div>
+
+    <div class="slide-number">03 / 11</div>
+  </section>
+
+  <!-- ═══════════════ SLIDE 4 — Producto ═══════════════ -->
+  <section class="slide cream">
+    <div class="slide-tag">Producto</div>
+    <h1 class="serif">En producción real desde el Viernes Santo.<br><span style="color: var(--muted);">Construido en 7 días. Iterado 18.</span></h1>
+    <div class="divider"></div>
+
+    <div class="grid-2" style="margin-top: 2em;">
+      <div>
+        <h3>Stack moderno</h3>
+        <ul class="bullets">
+          <li>Next.js 14 App Router + React 18 + TypeScript</li>
+          <li>Supabase (Postgres + Storage + Auth)</li>
+          <li>MercadoPago OAuth con split payment</li>
+          <li>Shipit (Starken, Chilexpress, Blue Express, 99 Minutos)</li>
+          <li>Mapbox GL + geolocalización precisa</li>
+          <li>Vercel + CI/CD automático en producción</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Funcionalidad operativa</h3>
+        <ul class="bullets">
+          <li>Bundle checkout multi-libro con preferencia MP única</li>
+          <li>URLs amigables <code>/libro/[vendedor]/[slug]</code></li>
+          <li>Mensajería interna con RLS</li>
+          <li>Sistema de categorías con árbol (5 raíces · 32 subcategorías)</li>
+          <li>Novedades, destacados, coleccionables, tiers</li>
+          <li>Admin panel con CRUD completo</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="footnote">
+      Costo de reproducir esto con una agencia de desarrollo: USD 150k-250k. Costo real construido con AI-augmented development: el equivalente a 7 días-persona.
+    </p>
+
+    <div class="slide-number">04 / 11</div>
+  </section>
+
+  <!-- ═══════════════ SLIDE 5 — Tracción ═══════════════ -->
+  <section class="slide navy">
+    <div class="slide-tag">Tracción · 18 días</div>
+    <h1 class="serif">Sin distribución activa ni gasto en marketing.</h1>
+
+    <div class="grid-4" style="margin-top: 3em;">
+      <div class="metric">
+        <div class="metric-number">438</div>
+        <div class="metric-label">Usuarios activos</div>
+        <div class="metric-sub">GA4, primeros 10 días reales</div>
+      </div>
+      <div class="metric">
+        <div class="metric-number">3</div>
+        <div class="metric-label">Compradores reales</div>
+        <div class="metric-sub">11 libros vendidos</div>
+      </div>
+      <div class="metric">
+        <div class="metric-number">3</div>
+        <div class="metric-label">Librerías activadas</div>
+        <div class="metric-sub">Orgánicamente, sin outreach</div>
+      </div>
+      <div class="metric">
+        <div class="metric-number">207</div>
+        <div class="metric-label">Listings curados</div>
+        <div class="metric-sub">Valor catálogo $2.4M CLP</div>
+      </div>
+    </div>
+
+    <div class="grid-4" style="margin-top: 3em;">
+      <div class="metric">
+        <div class="metric-number">20%</div>
+        <div class="metric-label">Conversión registro → compra</div>
+        <div class="metric-sub">Benchmark seed marketplace: 5-15%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-number">4.6</div>
+        <div class="metric-label">Vistas / usuario</div>
+        <div class="metric-sub">Engagement sano, no bouncing</div>
+      </div>
+      <div class="metric">
+        <div class="metric-number">$90k</div>
+        <div class="metric-label">GMV acumulado CLP</div>
+        <div class="metric-sub">3 ventas en 18 días</div>
+      </div>
+      <div class="metric">
+        <div class="metric-number">$45</div>
+        <div class="metric-label">Burn mensual USD</div>
+        <div class="metric-sub">Vercel Pro + Supabase Pro</div>
+      </div>
+    </div>
+
+    <p class="footnote" style="color: rgba(250, 247, 241, 0.55); margin-top: 3em;">
+      Operación iniciada 3 abril 2026. Tres ventas reales en 18 días: Zdravko (7 abril, La Marina en la Historia de Chile, $5.000), set de 7 Maigret a tercer comprador ($40.000), y bundle multi-libro de 3 títulos a Camilo (17 abril, Concepción, $45.000).
+    </p>
+
+    <div class="slide-number">05 / 11</div>
+  </section>
+
+  <!-- ═══════════════ SLIDE 6 — Testimonio / por qué funciona ═══════════════ -->
+  <section class="slide cream">
+    <div class="slide-tag">Evidencia</div>
+    <h1 class="serif">El patrón ya está validado.</h1>
+
+    <div class="quote">
+      "Fácil y sin complicaciones. Muy buena disposición por parte del vendedor, volvería a comprar sin ningún problema."
+      <span class="quote-author">— Z., primer comprador, La Marina en la Historia de Chile · Tomo I · 7 abril 2026</span>
+    </div>
+
+    <div class="grid-2" style="margin-top: 2.5em;">
+      <div>
+        <h3>Qué vendemos</h3>
+        <p><strong>Libros raros a precio 40-60% bajo IberLibro/Buscalibre.</strong> El bundle de Camilo incluyó Parra ($23.992, IberLibro €30-50) y De Rokha edición cubana 1991 agotada ($14.000). Son joyas, no commodity.</p>
+      </div>
+      <div>
+        <h3>Por qué no moriremos en commodity</h3>
+        <p>Quien llega a tuslibros ya filtró Buscalibre y MercadoLibre. Busca lo que esos no tienen. Competir en best-seller moderno es suicidio. <strong>La ventaja defendible es la curación.</strong></p>
+      </div>
+    </div>
+
+    <p class="footnote">
+      Publicados 3 libros el 16 abril a las 21h. Vendidos en bundle 14 horas después, 17 abril 15h. Tiempo entre publicación y venta en caso de libro raro + precio competitivo: menos de un día.
+    </p>
+
+    <div class="slide-number">06 / 11</div>
+  </section>
+
+  <!-- ═══════════════ SLIDE 7 — Mercado ═══════════════ -->
+  <section class="slide navy">
+    <div class="slide-tag">Mercado</div>
+    <h1 class="serif">TAM, SAM, SOM — conservador.</h1>
+
+    <div style="margin-top: 2em; padding: 1em 1.5em; background: rgba(212, 160, 23, 0.1); border-left: 2px solid var(--gold);">
+      <p style="font-size: 13px; color: rgba(250, 247, 241, 0.85); line-height: 1.6;">
+        <strong style="color: var(--gold);">TAM</strong> (Total Addressable Market): techo teórico del mercado si todos compraran.  &nbsp;·&nbsp;
+        <strong style="color: var(--gold);">SAM</strong> (Serviceable Addressable): porción a la que el producto realmente puede llegar.  &nbsp;·&nbsp;
+        <strong style="color: var(--gold);">SOM</strong> (Serviceable Obtainable): lo que es realista capturar en 3 años.
+      </p>
+    </div>
+
+    <div class="grid-3" style="margin-top: 2em;">
+      <div>
+        <div class="metric-number">$10 mil millones</div>
+        <div class="metric-label">CLP / año · TAM Chile</div>
+        <p style="margin-top: 1em; color: rgba(250, 247, 241, 0.8);">Total de libros usados transados en Chile al año entre todos los canales (online, offline, informal). ~USD 10.5 millones.</p>
+      </div>
+      <div>
+        <div class="metric-number">$3-4 mil millones</div>
+        <div class="metric-label">CLP / año · SAM urbano</div>
+        <p style="margin-top: 1em; color: rgba(250, 247, 241, 0.8);">Santiago, Valparaíso, Concepción. Donde la densidad permite el modelo de mapa y courier same-day. ~USD 3.2-4.2 millones.</p>
+      </div>
+      <div>
+        <div class="metric-number">$300-400 millones</div>
+        <div class="metric-label">CLP / año · SOM año 3</div>
+        <p style="margin-top: 1em; color: rgba(250, 247, 241, 0.8);">Con 10% de penetración digital del mercado urbano, GMV objetivo año 3. ~USD 315-420k.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 3em;">
+      <h3>Crecimiento estructural</h3>
+      <ul class="bullets" style="max-width: 80ch;">
+        <li>Mercado del libro físico en Chile crece 8-12% anual post-pandemia (Cámara Chilena del Libro)</li>
+        <li>Economía circular + sustentabilidad empuja usado vs. nuevo</li>
+        <li>Generación universitaria busca libros de cátedra usados (nicho de alta recurrencia)</li>
+        <li>Coleccionismo en alza: bibliófilos chilenos pagan CLP 50-300k por primera edición nacional</li>
+      </ul>
+    </div>
+
+    <div class="slide-number">07 / 11</div>
+  </section>
+
+  <!-- ═══════════════ SLIDE 8 — Competencia ═══════════════ -->
+  <section class="slide cream">
+    <div class="slide-tag">Competencia</div>
+    <h1 class="serif">No competimos contra ellos — resolvemos lo que <em>ninguno</em> resuelve.</h1>
+
+    <table style="margin-top: 2.5em;">
+      <thead>
+        <tr>
+          <th>Jugador</th>
+          <th>Libro nuevo</th>
+          <th>Libro usado</th>
+          <th>Curación</th>
+          <th>Mapa / cercanía</th>
+          <th>Split payment</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Buscalibre</strong></td>
+          <td>✓</td>
+          <td>—</td>
+          <td>Editorial</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>MercadoLibre</strong></td>
+          <td>✓</td>
+          <td>✓ commodity</td>
+          <td>—</td>
+          <td>—</td>
+          <td>Parcial</td>
+        </tr>
+        <tr>
+          <td><strong>Facebook Marketplace</strong></td>
+          <td>—</td>
+          <td>✓ informal</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>Librerías de viejo</strong></td>
+          <td>—</td>
+          <td>✓ offline</td>
+          <td>Curador</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr style="background: rgba(212, 160, 23, 0.12);">
+          <td><strong>tuslibros.cl</strong></td>
+          <td>—</td>
+          <td><strong>✓ curado</strong></td>
+          <td><strong>✓ featured + coleccionable</strong></td>
+          <td><strong>✓</strong></td>
+          <td><strong>✓ OAuth MP</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top: 2em; font-style: italic; color: var(--muted);">
+      La posición competitiva no es "otro Buscalibre" ni "otro MercadoLibre". Es la librería de viejo de Santiago, pero online, con mapa, con pago integrado y con foto-a-catálogo.
+    </p>
+
+    <div class="slide-number">08 / 11</div>
+  </section>
+
+  <!-- ═══════════════ SLIDE 9 — Equipo ═══════════════ -->
+  <section class="slide navy">
+    <div class="slide-tag">Equipo</div>
+    <h1 class="serif">Founder única, velocity probada.</h1>
+
+    <div class="grid-2" style="margin-top: 3em;">
+      <div>
+        <h3>Verónica Velásquez — Founder</h3>
+        <p>Background en economía y consultoría. Founder de <em>economics.cl</em>. Decisión deliberada de operar sin cofundador técnico.</p>
+        <p style="margin-top: 1em;">No es limitación: es el modelo. Dev asistido por Claude Code me permite iterar producción en horas lo que una startup tradicional iteraría en semanas.</p>
+      </div>
+      <div>
+        <h3>Evidencia de ejecución</h3>
+        <ul class="bullets">
+          <li><strong>7 días</strong> desde 0 hasta producción con MP + Shipit</li>
+          <li><strong>18 días</strong> de iteración continua: 207 listings curados, 3 librerías onboardeadas, 3 compradores · 11 libros vendidos</li>
+          <li><strong>Deploy diario</strong> a producción sin regresiones críticas</li>
+          <li><strong>Burn $45/mes</strong>: disciplina de capital desde día uno</li>
+          <li><strong>Founder cerca del customer</strong>: respondí yo el primer email de Zdravko, yo mandé el testimonio a revisión, yo entregué el primer bundle a Camilo</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="footnote" style="color: rgba(250, 247, 241, 0.6); margin-top: 3em;">
+      El argumento tradicional contra un founder único es ejecución. La evidencia de los últimos 18 días responde eso antes de la pregunta.
+    </p>
+
+    <div class="slide-number">09 / 11</div>
+  </section>
+
+  <!-- ═══════════════ SLIDE 10 — Valorización y Uso de Fondos (BOOTSTRAP) ═══════════════ -->
+  <section class="slide cream">
+    <div class="slide-tag">Propuesta · Bootstrap</div>
+    <h1 class="serif">USD 40-60k · 3-5% · pre-money USD 1.2M.</h1>
+    <p style="color: var(--muted); font-size: 16px; margin-top: 0.3em;">$38 – $57 millones CLP · ronda ángel · SAFE o nota convertible · 12 meses de opex puro</p>
+    <div class="divider"></div>
+
+    <div class="grid-2" style="margin-top: 1.2em;">
+      <div>
+        <h3>Valorización triangulada</h3>
+        <table style="margin-top: 0.5em;">
+          <tbody>
+            <tr>
+              <td>Berkus Method</td>
+              <td class="num"><strong>USD 1.6M</strong></td>
+            </tr>
+            <tr>
+              <td>Scorecard vs. comparables LatAm</td>
+              <td class="num"><strong>USD 1.42M</strong></td>
+            </tr>
+            <tr>
+              <td>Replacement cost (piso)</td>
+              <td class="num"><strong>USD 200k</strong></td>
+            </tr>
+            <tr>
+              <td>Comparables Chile seed marketplace</td>
+              <td class="num"><strong>USD 1.2-1.4M</strong></td>
+            </tr>
+            <tr style="background: rgba(212, 160, 23, 0.12);">
+              <td><strong>Pre-money objetivo</strong></td>
+              <td class="num"><strong>USD 1.2M</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top: 0.8em; padding: 0.7em 1em; background: rgba(21, 21, 34, 0.05); border-left: 2px solid var(--gold); font-size: 11px; line-height: 1.55;">
+          <strong style="color: var(--gold);">Métodos, en breve:</strong><br>
+          <strong>Berkus</strong> — asigna hasta USD 500k a cada uno de 5 componentes (idea, producto, equipo, alianzas, ventas).<br>
+          <strong>Scorecard</strong> — compara contra comparables seed LatAm, ajusta por fuerzas relativas.<br>
+          <strong>Replacement cost</strong> — cuánto costaría reconstruir lo construido. Piso.
+        </div>
+      </div>
+      <div>
+        <h3>Uso de fondos · 12 meses (USD 50k base)</h3>
+        <table style="margin-top: 0.5em;">
+          <tbody>
+            <tr>
+              <td>Marketing digital + GTM (Kit Metralleta)</td>
+              <td class="num"><strong>45%</strong></td>
+            </tr>
+            <tr>
+              <td>Activación librerías + dev apoyo</td>
+              <td class="num">30%</td>
+            </tr>
+            <tr>
+              <td>Features clave (mobile, reseñas)</td>
+              <td class="num">15%</td>
+            </tr>
+            <tr>
+              <td>Infra + reserva operativa</td>
+              <td class="num">10%</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="small" style="margin-top: 0.6em; font-style: italic;">Founder subsidia su propio tiempo con ahorros. Sin salario en este ask — 100% del capital va a ejecución de mercado. Break-even operacional estimado mes 14 (escenario bull).</p>
+
+        <h3 style="margin-top: 1em;">Hito a 12 meses</h3>
+        <ul class="bullets">
+          <li>20 vendedores activos · 2 alianzas universitarias</li>
+          <li>$5 millones CLP MRR · 500+ transacciones/mes</li>
+          <li>Listo para ronda seed USD 500k-1M (donde sí se incluye salario founder)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="slide-number">10 / 11</div>
+  </section>
+
+  <!-- ═══════════════ SLIDE 11 — Cierre ═══════════════ -->
+  <section class="slide navy">
+    <div class="slide-tag">Hablemos</div>
+    <h1 class="hero serif" style="font-size: clamp(56px, 8vw, 120px); margin-top: 1em;">
+      El mejor momento para<br>entrar es <em style="color: var(--gold);">ahora</em>.
+    </h1>
+
+    <div style="margin-top: 3em; max-width: 70ch;">
+      <p style="font-size: clamp(18px, 1.5vw, 22px); line-height: 1.6; color: rgba(250, 247, 241, 0.85);">
+        En 18 días el producto está en producción, hay compradores reales con ciclo cerrado, 3 librerías profesionales llegaron solas y el primer testimonio autorizado está publicado. El capital que busco es para <strong style="color: var(--gold-soft);">activar lo que ya está tocando la puerta</strong> — no para construir algo desde cero.
+      </p>
+    </div>
+
+    <div class="cta-box" style="margin-top: 3em;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2em;">
+        <div>
+          <h3>Verónica Velásquez</h3>
+          <p style="color: var(--cream);">Founder · tuslibros.cl</p>
+          <p style="margin-top: 0.8em; color: rgba(250, 247, 241, 0.8);">
+            <a href="mailto:vero@economics.cl" style="color: var(--gold-soft);">vero@economics.cl</a><br>
+            Santiago · Providencia
+          </p>
+        </div>
+        <div>
+          <h3>Próximos pasos</h3>
+          <ul class="bullets" style="color: rgba(250, 247, 241, 0.85);">
+            <li>Deep dive de tracción (GA4 + Supabase)</li>
+            <li>Revisión de proyección 36 meses</li>
+            <li>Term sheet en 1-2 semanas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-number">11 / 11</div>
+  </section>
+
+</div>
+
+<script>
+  // Navegación con flechas
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+      current = Math.min(current + 1, slides.length - 1);
+      slides[current].scrollIntoView({ behavior: 'smooth' });
+      e.preventDefault();
+    } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+      current = Math.max(current - 1, 0);
+      slides[current].scrollIntoView({ behavior: 'smooth' });
+      e.preventDefault();
+    } else if (e.key === 'p' || e.key === 'P') {
+      window.print();
+    }
+  });
+</script>
+
+</body>
+</html>

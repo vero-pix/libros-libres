@@ -1,6 +1,6 @@
 # tuslibros.cl — Contexto técnico del proyecto
 
-Última actualización: 9 abril 2026
+Última actualización: 23 abril 2026
 
 ## Producto
 
@@ -167,12 +167,12 @@ Marketplace de libros usados en Chile. Compra, venta y arriendo entre personas, 
 
 ---
 
-## Datos actuales (9 abril 2026)
+## Datos actuales (23 abril 2026)
 
-- 116+ libros publicados activos
-- 92 libros enriquecidos con metadata (editorial, páginas, sinopsis)
-- 5+ usuarios registrados
-- 3 suscriptores newsletter
-- 1 venta real completada con split payment (6 abril 2026)
-- 30 categorías actuales (pendiente reorganización/taxonomía)
-- 111 slugs generados para URLs amigables
+- 183+ libros publicados activos (incluye colecciones)
+- Tráfico SEO comprobado en GSC para "libros usados" y "venta de libros usados"
+- Adquisición orgánica activa vía Google, Bing y Reddit
+- 16+ usuarios registrados
+- Ventas reales completadas y envíos por courier (Shipit) activos
+- Distribución y PR activo: Diario Financiero (Pitch), Reddit (r/chileIT, r/chile)
+- SEO Técnico On-Page: 10/10 (Sitemaps dinámicos, Schemas JSON-LD x3, Titles enfocados en conversión)

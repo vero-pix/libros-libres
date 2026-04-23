@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<title>Mis libros huérfanos — tuslibros.cl</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #faf7f1; color: #2d2e3d; padding: 40px 24px; }
+  .container { max-width: 980px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 500; color: #1a1a2e; margin-bottom: 8px; }
+  .subtitle { color: #8b8b9c; font-size: 15px; margin-bottom: 32px; }
+  .controls { background: white; padding: 20px; border-radius: 12px; margin-bottom: 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .controls button { padding: 8px 16px; border-radius: 8px; border: 1px solid #1a1a2e; background: white; cursor: pointer; font-size: 13px; font-weight: 600; }
+  .controls button.primary { background: #1a1a2e; color: white; }
+  .controls .summary { margin-left: auto; font-size: 13px; color: #8b8b9c; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat { background: white; padding: 16px; border-radius: 12px; }
+  .stat .num { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: #d4a017; line-height: 1; }
+  .stat .lbl { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #8b8b9c; margin-top: 4px; font-weight: 600; }
+  table { width: 100%; background: white; border-radius: 12px; overflow: hidden; border-collapse: collapse; }
+  th, td { padding: 12px 14px; text-align: left; font-size: 13px; border-bottom: 1px solid #f0ecdf; }
+  th { background: #f3ead5; color: #1a1a2e; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; position: sticky; top: 0; }
+  tr.rescue { background: #fef6e3; }
+  tr.trash { opacity: 0.4; text-decoration: line-through; }
+  .check-col { width: 50px; text-align: center; }
+  .date-col { width: 100px; color: #8b8b9c; font-size: 11px; }
+  .isbn-col { width: 120px; color: #8b8b9c; font-size: 12px; font-family: ui-monospace, monospace; }
+  .action-col { width: 180px; }
+  .action-btn { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; border: none; cursor: pointer; margin-right: 4px; }
+  .action-btn.rescue { background: #d4a017; color: white; }
+  .action-btn.trash { background: #c14040; color: white; }
+  .action-btn.skip { background: #e0e0e8; color: #2d2e3d; }
+  .note { background: #fef6e3; border-left: 3px solid #d4a017; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; line-height: 1.6; }
+  details { margin-top: 24px; background: white; padding: 16px 20px; border-radius: 12px; }
+  summary { font-weight: 600; cursor: pointer; }
+  .export-area { background: white; padding: 16px; border-radius: 8px; margin-top: 16px; font-family: monospace; font-size: 12px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Tus libros huérfanos</h1>
+  <p class="subtitle">Books que escaneaste o iniciaste publicar pero nunca convertiste en listing activo. Decide cuál rescatar y cuál tirar.</p>
+
+  <div class="note">
+    <strong>Cómo usar esta lista:</strong> para cada libro, click en <em>Rescatar</em> (quedará en amarillo, yo te lo publico después) o <em>Tirar</em> (queda tachado, lo borramos). Cuando termines, el bloque al final te da el CSV de IDs para pasarme. No se guarda nada todavía — esto es tu hoja de trabajo.
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="num">49</div><div class="lbl">Total huérfanos tuyos</div></div>
+    <div class="stat"><div class="num" id="count-rescue">0</div><div class="lbl">Para rescatar</div></div>
+    <div class="stat"><div class="num" id="count-trash">0</div><div class="lbl">Para tirar</div></div>
+  </div>
+
+  <div class="controls">
+    <button onclick="markAll('rescue')">Rescatar todos</button>
+    <button onclick="markAll('trash')">Tirar todos</button>
+    <button onclick="markAll('skip')">Limpiar selección</button>
+    <button class="primary" onclick="exportLists()">Exportar listas</button>
+    <div class="summary" id="summary">0 rescatar · 0 tirar · 49 sin decidir</div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="check-col">#</th>
+        <th>Título</th>
+        <th>Autor</th>
+        <th class="isbn-col">ISBN</th>
+        <th class="date-col">Creado</th>
+        <th class="action-col">Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr id="row-6333d7f2-d08b-4835-9f88-c177f8e28c6f" data-id="6333d7f2-d08b-4835-9f88-c177f8e28c6f">
+        <td class="check-col">1</td>
+        <td>Uniones<br><small style="color:#8b8b9c">Editorial Seix Barral</small></td>
+        <td>Robert Musil</td>
+        <td class="isbn-col">9788432231285</td>
+        <td class="date-col">2026-04-08</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('6333d7f2-d08b-4835-9f88-c177f8e28c6f', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('6333d7f2-d08b-4835-9f88-c177f8e28c6f', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('6333d7f2-d08b-4835-9f88-c177f8e28c6f', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-7213fc6a-84cd-4fab-8c02-29e8dde7a57d" data-id="7213fc6a-84cd-4fab-8c02-29e8dde7a57d">
+        <td class="check-col">2</td>
+        <td>Los Idus de Marzo<br><small style="color:#8b8b9c">Emece Editores</small></td>
+        <td>Thornton Wilder</td>
+        <td class="isbn-col">9789500423977</td>
+        <td class="date-col">2026-04-08</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('7213fc6a-84cd-4fab-8c02-29e8dde7a57d', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('7213fc6a-84cd-4fab-8c02-29e8dde7a57d', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('7213fc6a-84cd-4fab-8c02-29e8dde7a57d', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-359279a4-327e-4a4b-8434-7bcaeb676b0d" data-id="359279a4-327e-4a4b-8434-7bcaeb676b0d">
+        <td class="check-col">3</td>
+        <td>El sastre de Panama<br><small style="color:#8b8b9c">DEBOLS!LLO</small></td>
+        <td>John le Carre</td>
+        <td class="isbn-col">9789500417655</td>
+        <td class="date-col">2026-04-08</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('359279a4-327e-4a4b-8434-7bcaeb676b0d', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('359279a4-327e-4a4b-8434-7bcaeb676b0d', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('359279a4-327e-4a4b-8434-7bcaeb676b0d', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-f353683a-3e0b-48b0-8939-9671bc70cc12" data-id="f353683a-3e0b-48b0-8939-9671bc70cc12">
+        <td class="check-col">4</td>
+        <td>La verdad esta en otra parte</td>
+        <td>E.A. Dal Maschio</td>
+        <td class="isbn-col">9788447130566</td>
+        <td class="date-col">2026-04-08</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('f353683a-3e0b-48b0-8939-9671bc70cc12', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('f353683a-3e0b-48b0-8939-9671bc70cc12', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('f353683a-3e0b-48b0-8939-9671bc70cc12', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-467af8f3-6179-47fe-aff8-5bfa39421953" data-id="467af8f3-6179-47fe-aff8-5bfa39421953">
+        <td class="check-col">5</td>
+        <td>Los Idus de Marzo<br><small style="color:#8b8b9c">DEBOLSILLO</small></td>
+        <td>Valerio Massimo Manfredi</td>
+        <td class="isbn-col">9788499086651</td>
+        <td class="date-col">2026-04-08</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('467af8f3-6179-47fe-aff8-5bfa39421953', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('467af8f3-6179-47fe-aff8-5bfa39421953', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('467af8f3-6179-47fe-aff8-5bfa39421953', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-32762702-c1b9-486f-90ef-7a3cb0c4489d" data-id="32762702-c1b9-486f-90ef-7a3cb0c4489d">
+        <td class="check-col">6</td>
+        <td>A Noite da Espera<br><small style="color:#8b8b9c">COMPANHIA DAS LETRAS</small></td>
+        <td>Milton Hatoum</td>
+        <td class="isbn-col">9789896657529</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('32762702-c1b9-486f-90ef-7a3cb0c4489d', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('32762702-c1b9-486f-90ef-7a3cb0c4489d', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('32762702-c1b9-486f-90ef-7a3cb0c4489d', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-dadcffd5-3f0c-4ce5-bc8c-ff30d3087fe0" data-id="dadcffd5-3f0c-4ce5-bc8c-ff30d3087fe0">
+        <td class="check-col">7</td>
+        <td>Yo visité Ganímedes<br><small style="color:#8b8b9c">Solar</small></td>
+        <td>Yosip Ibrahim</td>
+        <td class="isbn-col">9789589196328</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('dadcffd5-3f0c-4ce5-bc8c-ff30d3087fe0', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('dadcffd5-3f0c-4ce5-bc8c-ff30d3087fe0', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('dadcffd5-3f0c-4ce5-bc8c-ff30d3087fe0', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-28f35fee-a5ec-4dc0-9446-b85fe519045d" data-id="28f35fee-a5ec-4dc0-9446-b85fe519045d">
+        <td class="check-col">8</td>
+        <td>Excesos<br><small style="color:#8b8b9c">Azhar ul Haque Sario</small></td>
+        <td>Mauricio Wacquez</td>
+        <td class="isbn-col">—</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('28f35fee-a5ec-4dc0-9446-b85fe519045d', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('28f35fee-a5ec-4dc0-9446-b85fe519045d', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('28f35fee-a5ec-4dc0-9446-b85fe519045d', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-95dbb92e-e07c-414f-bf16-8082f997fc42" data-id="95dbb92e-e07c-414f-bf16-8082f997fc42">
+        <td class="check-col">9</td>
+        <td>Luna de locos<br><small style="color:#8b8b9c">Plural editores</small></td>
+        <td>Manfredo Kempff</td>
+        <td class="isbn-col">9789990563627</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('95dbb92e-e07c-414f-bf16-8082f997fc42', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('95dbb92e-e07c-414f-bf16-8082f997fc42', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('95dbb92e-e07c-414f-bf16-8082f997fc42', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-69d295f7-9106-46ff-86d9-9f03d4285f8c" data-id="69d295f7-9106-46ff-86d9-9f03d4285f8c">
+        <td class="check-col">10</td>
+        <td>(sin título)</td>
+        <td></td>
+        <td class="isbn-col">0708817360231</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('69d295f7-9106-46ff-86d9-9f03d4285f8c', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('69d295f7-9106-46ff-86d9-9f03d4285f8c', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('69d295f7-9106-46ff-86d9-9f03d4285f8c', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-84c1d61b-f802-4816-97b1-a17da6b190ec" data-id="84c1d61b-f802-4816-97b1-a17da6b190ec">
+        <td class="check-col">11</td>
+        <td>El Guardián Entre El Centeno<br><small style="color:#8b8b9c">Alianza Editorial</small></td>
+        <td>J.D. Salinger</td>
+        <td class="isbn-col">9788420674209</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('84c1d61b-f802-4816-97b1-a17da6b190ec', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('84c1d61b-f802-4816-97b1-a17da6b190ec', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('84c1d61b-f802-4816-97b1-a17da6b190ec', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-9e8afe06-a9c5-4979-98ea-d2b5a705eb09" data-id="9e8afe06-a9c5-4979-98ea-d2b5a705eb09">
+        <td class="check-col">12</td>
+        <td>El Jardín De Las Dudas<br><small style="color:#8b8b9c">Planeta · 1993</small></td>
+        <td>Fernando Savater</td>
+        <td class="isbn-col">9789507424199</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('9e8afe06-a9c5-4979-98ea-d2b5a705eb09', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('9e8afe06-a9c5-4979-98ea-d2b5a705eb09', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('9e8afe06-a9c5-4979-98ea-d2b5a705eb09', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-5e471110-5858-4db9-a903-b131ac5a8162" data-id="5e471110-5858-4db9-a903-b131ac5a8162">
+        <td class="check-col">13</td>
+        <td>Cuentos, Fábulas Y Lo Demás Es Silencio<br><small style="color:#8b8b9c">Alfaguara Infantil</small></td>
+        <td>Augusto Monterroso</td>
+        <td class="isbn-col">9789681907570</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('5e471110-5858-4db9-a903-b131ac5a8162', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('5e471110-5858-4db9-a903-b131ac5a8162', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('5e471110-5858-4db9-a903-b131ac5a8162', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-41f5afba-d9df-4c64-95ad-afb51a1f70b7" data-id="41f5afba-d9df-4c64-95ad-afb51a1f70b7">
+        <td class="check-col">14</td>
+        <td>Oscuro Como La Tumba En La Que Yace Mi Amigo<br><small style="color:#8b8b9c">Tusquets Editor · 2002</small></td>
+        <td>Malcolm Lowry</td>
+        <td class="isbn-col">9788483108154</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('41f5afba-d9df-4c64-95ad-afb51a1f70b7', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('41f5afba-d9df-4c64-95ad-afb51a1f70b7', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('41f5afba-d9df-4c64-95ad-afb51a1f70b7', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-3845bafb-64ae-4e7b-b7dc-589bd75def77" data-id="3845bafb-64ae-4e7b-b7dc-589bd75def77">
+        <td class="check-col">15</td>
+        <td>Obra Breve<br><small style="color:#8b8b9c">Celestial Arts · 1995</small></td>
+        <td>Arturo Pérez-Reverte</td>
+        <td class="isbn-col">9788420481791</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('3845bafb-64ae-4e7b-b7dc-589bd75def77', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('3845bafb-64ae-4e7b-b7dc-589bd75def77', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('3845bafb-64ae-4e7b-b7dc-589bd75def77', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-a5ef34d8-c9d3-4b40-8584-dd491c4042fc" data-id="a5ef34d8-c9d3-4b40-8584-dd491c4042fc">
+        <td class="check-col">16</td>
+        <td>HHhH<br><small style="color:#8b8b9c">Random House · 2009</small></td>
+        <td>Laurent Binet</td>
+        <td class="isbn-col">9781448155149</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('a5ef34d8-c9d3-4b40-8584-dd491c4042fc', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('a5ef34d8-c9d3-4b40-8584-dd491c4042fc', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('a5ef34d8-c9d3-4b40-8584-dd491c4042fc', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-683272ba-17a8-4c66-a71a-e0a8e3f6ce23" data-id="683272ba-17a8-4c66-a71a-e0a8e3f6ce23">
+        <td class="check-col">17</td>
+        <td>El Cementerio De Praga</td>
+        <td>Umberto Eco</td>
+        <td class="isbn-col">9788426418975</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('683272ba-17a8-4c66-a71a-e0a8e3f6ce23', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('683272ba-17a8-4c66-a71a-e0a8e3f6ce23', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('683272ba-17a8-4c66-a71a-e0a8e3f6ce23', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-845e7711-5bde-4eaf-902b-7a3e4e3e19ca" data-id="845e7711-5bde-4eaf-902b-7a3e4e3e19ca">
+        <td class="check-col">18</td>
+        <td>Los Pájaros De Bangkok<br><small style="color:#8b8b9c">RBA · 1983</small></td>
+        <td>Manuel Vázquez Montalbán</td>
+        <td class="isbn-col">9788432022166</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('845e7711-5bde-4eaf-902b-7a3e4e3e19ca', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('845e7711-5bde-4eaf-902b-7a3e4e3e19ca', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('845e7711-5bde-4eaf-902b-7a3e4e3e19ca', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-e474bf5b-6e54-4d41-8835-e41f48df0e90" data-id="e474bf5b-6e54-4d41-8835-e41f48df0e90">
+        <td class="check-col">19</td>
+        <td>Vidas Para Leerlas<br><small style="color:#8b8b9c">Santillana · 1998</small></td>
+        <td>Guillermo Cabrera Infante</td>
+        <td class="isbn-col">9788420483696</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('e474bf5b-6e54-4d41-8835-e41f48df0e90', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('e474bf5b-6e54-4d41-8835-e41f48df0e90', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('e474bf5b-6e54-4d41-8835-e41f48df0e90', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-9e9b52ca-e789-4271-b57a-83dbf1bfe503" data-id="9e9b52ca-e789-4271-b57a-83dbf1bfe503">
+        <td class="check-col">20</td>
+        <td>El Vuelo De La Reina<br><small style="color:#8b8b9c">Santillana USA Publishing Company · 2002</small></td>
+        <td>Tomás Eloy Martínez</td>
+        <td class="isbn-col">9788466310642</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('9e9b52ca-e789-4271-b57a-83dbf1bfe503', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('9e9b52ca-e789-4271-b57a-83dbf1bfe503', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('9e9b52ca-e789-4271-b57a-83dbf1bfe503', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-889a6620-c488-44c3-bcc6-acc2106f09cd" data-id="889a6620-c488-44c3-bcc6-acc2106f09cd">
+        <td class="check-col">21</td>
+        <td>Las Sombras Del Mundo<br><small style="color:#8b8b9c">Alianza · 1995</small></td>
+        <td>Juan Perucho</td>
+        <td class="isbn-col">9788420646695</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('889a6620-c488-44c3-bcc6-acc2106f09cd', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('889a6620-c488-44c3-bcc6-acc2106f09cd', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('889a6620-c488-44c3-bcc6-acc2106f09cd', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-cb024fad-f256-4767-b9de-08589aa36c3a" data-id="cb024fad-f256-4767-b9de-08589aa36c3a">
+        <td class="check-col">22</td>
+        <td>Camel Club<br><small style="color:#8b8b9c">EDB FICCION · 2005</small></td>
+        <td>David Baldacci</td>
+        <td class="isbn-col">9788466626774</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('cb024fad-f256-4767-b9de-08589aa36c3a', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('cb024fad-f256-4767-b9de-08589aa36c3a', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('cb024fad-f256-4767-b9de-08589aa36c3a', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-63bdecf2-0a3b-41a5-8387-84dd01da0ba3" data-id="63bdecf2-0a3b-41a5-8387-84dd01da0ba3">
+        <td class="check-col">23</td>
+        <td>Calculus: Concepts And Methods<br><small style="color:#8b8b9c">Cambridge University Press</small></td>
+        <td>Ken Binmore</td>
+        <td class="isbn-col">9780521775410</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('63bdecf2-0a3b-41a5-8387-84dd01da0ba3', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('63bdecf2-0a3b-41a5-8387-84dd01da0ba3', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('63bdecf2-0a3b-41a5-8387-84dd01da0ba3', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-22dc3918-3fce-40e7-95aa-db504ebbb262" data-id="22dc3918-3fce-40e7-95aa-db504ebbb262">
+        <td class="check-col">24</td>
+        <td>Viajes Con Puff<br><small style="color:#8b8b9c">B (Ediciones B) · 2014</small></td>
+        <td>Richard Bach</td>
+        <td class="isbn-col">9788466654395</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('22dc3918-3fce-40e7-95aa-db504ebbb262', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('22dc3918-3fce-40e7-95aa-db504ebbb262', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('22dc3918-3fce-40e7-95aa-db504ebbb262', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-2d15fc2a-e2b4-4902-8c25-cbc97b37fd1d" data-id="2d15fc2a-e2b4-4902-8c25-cbc97b37fd1d">
+        <td class="check-col">25</td>
+        <td>Venganza<br><small style="color:#8b8b9c">Debolsillo · 2016</small></td>
+        <td>Benjamin Black</td>
+        <td class="isbn-col">9788466331777</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('2d15fc2a-e2b4-4902-8c25-cbc97b37fd1d', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('2d15fc2a-e2b4-4902-8c25-cbc97b37fd1d', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('2d15fc2a-e2b4-4902-8c25-cbc97b37fd1d', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-eeb6430d-84a5-4208-807b-67dc792df700" data-id="eeb6430d-84a5-4208-807b-67dc792df700">
+        <td class="check-col">26</td>
+        <td>Los Románticos<br><small style="color:#8b8b9c">Random House · 2000</small></td>
+        <td>Pankaj Mishra</td>
+        <td class="isbn-col">9781529151879</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('eeb6430d-84a5-4208-807b-67dc792df700', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('eeb6430d-84a5-4208-807b-67dc792df700', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('eeb6430d-84a5-4208-807b-67dc792df700', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-123a74bc-c368-4be6-a99f-4c61a7d739c8" data-id="123a74bc-c368-4be6-a99f-4c61a7d739c8">
+        <td class="check-col">27</td>
+        <td>El Lémur</td>
+        <td>Benjamin Black</td>
+        <td class="isbn-col">9788466326001</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('123a74bc-c368-4be6-a99f-4c61a7d739c8', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('123a74bc-c368-4be6-a99f-4c61a7d739c8', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('123a74bc-c368-4be6-a99f-4c61a7d739c8', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-61db4fb7-a132-46ad-b003-ef16fc1ba3a4" data-id="61db4fb7-a132-46ad-b003-ef16fc1ba3a4">
+        <td class="check-col">28</td>
+        <td>Órdenes Sagradas<br><small style="color:#8b8b9c">Debolsillo · 2016</small></td>
+        <td>Benjamin Black</td>
+        <td class="isbn-col">9788466329316</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('61db4fb7-a132-46ad-b003-ef16fc1ba3a4', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('61db4fb7-a132-46ad-b003-ef16fc1ba3a4', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('61db4fb7-a132-46ad-b003-ef16fc1ba3a4', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-a9641eed-885e-4b55-b1f6-07d9504c65dc" data-id="a9641eed-885e-4b55-b1f6-07d9504c65dc">
+        <td class="check-col">29</td>
+        <td>El Tiempo Entre Costuras<br><small style="color:#8b8b9c">Simon and Schuster · 2009</small></td>
+        <td>María Dueñas</td>
+        <td class="isbn-col">9788467239928</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('a9641eed-885e-4b55-b1f6-07d9504c65dc', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('a9641eed-885e-4b55-b1f6-07d9504c65dc', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('a9641eed-885e-4b55-b1f6-07d9504c65dc', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-f231c17b-cddd-46e9-a87a-0467ee0ec05f" data-id="f231c17b-cddd-46e9-a87a-0467ee0ec05f">
+        <td class="check-col">30</td>
+        <td>Las Mil Y Una Noches<br><small style="color:#8b8b9c">Ediciones LF · 1997</small></td>
+        <td>Anónimo</td>
+        <td class="isbn-col">9789508100696</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('f231c17b-cddd-46e9-a87a-0467ee0ec05f', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('f231c17b-cddd-46e9-a87a-0467ee0ec05f', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('f231c17b-cddd-46e9-a87a-0467ee0ec05f', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-026bbd38-2fe6-4edb-90e5-9e414dd1c63a" data-id="026bbd38-2fe6-4edb-90e5-9e414dd1c63a">
+        <td class="check-col">31</td>
+        <td>El Caballero De La Armadura Oxidada<br><small style="color:#8b8b9c">Ediciones Obelisco · 1997</small></td>
+        <td>Robert Fisher</td>
+        <td class="isbn-col">9789508200051</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('026bbd38-2fe6-4edb-90e5-9e414dd1c63a', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('026bbd38-2fe6-4edb-90e5-9e414dd1c63a', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('026bbd38-2fe6-4edb-90e5-9e414dd1c63a', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-d67fbff5-868f-4f26-8c81-d35d4645f1b7" data-id="d67fbff5-868f-4f26-8c81-d35d4645f1b7">
+        <td class="check-col">32</td>
+        <td>En Busca De April<br><small style="color:#8b8b9c">ALFAGUARA</small></td>
+        <td>Benjamin Black</td>
+        <td class="isbn-col">9788466334594</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('d67fbff5-868f-4f26-8c81-d35d4645f1b7', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('d67fbff5-868f-4f26-8c81-d35d4645f1b7', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('d67fbff5-868f-4f26-8c81-d35d4645f1b7', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-76b19e28-dc89-493d-9ce0-0867bb6bec97" data-id="76b19e28-dc89-493d-9ce0-0867bb6bec97">
+        <td class="check-col">33</td>
+        <td>Cruz Del Sur<br><small style="color:#8b8b9c">Ediciones B, S.A. (La trama) · 2000</small></td>
+        <td>Patricia Cornwell</td>
+        <td class="isbn-col">9788440697271</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('76b19e28-dc89-493d-9ce0-0867bb6bec97', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('76b19e28-dc89-493d-9ce0-0867bb6bec97', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('76b19e28-dc89-493d-9ce0-0867bb6bec97', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-b2bb6295-81b5-43c2-9b7c-0d6e9f3e8b44" data-id="b2bb6295-81b5-43c2-9b7c-0d6e9f3e8b44">
+        <td class="check-col">34</td>
+        <td>Muerte En Verano<br><small style="color:#8b8b9c">Debolsillo · 2016</small></td>
+        <td>Benjamin Black</td>
+        <td class="isbn-col">9788466331814</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('b2bb6295-81b5-43c2-9b7c-0d6e9f3e8b44', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('b2bb6295-81b5-43c2-9b7c-0d6e9f3e8b44', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('b2bb6295-81b5-43c2-9b7c-0d6e9f3e8b44', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-44b6d7fc-440b-424b-9097-fda306f5607b" data-id="44b6d7fc-440b-424b-9097-fda306f5607b">
+        <td class="check-col">35</td>
+        <td>El Otro Nombre De Laura<br><small style="color:#8b8b9c">Debolsillo · 2016</small></td>
+        <td>Benjamin Black</td>
+        <td class="isbn-col">9788466331807</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('44b6d7fc-440b-424b-9097-fda306f5607b', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('44b6d7fc-440b-424b-9097-fda306f5607b', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('44b6d7fc-440b-424b-9097-fda306f5607b', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-f946b915-b7d9-4419-a667-3ea51eec42fe" data-id="f946b915-b7d9-4419-a667-3ea51eec42fe">
+        <td class="check-col">36</td>
+        <td>Escenas En El Castillo<br><small style="color:#8b8b9c">El cuenco de plata</small></td>
+        <td>Paul Gadenne</td>
+        <td class="isbn-col">9782868691118</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('f946b915-b7d9-4419-a667-3ea51eec42fe', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('f946b915-b7d9-4419-a667-3ea51eec42fe', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('f946b915-b7d9-4419-a667-3ea51eec42fe', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-ea1f90dc-6385-468e-9015-e890169cdd64" data-id="ea1f90dc-6385-468e-9015-e890169cdd64">
+        <td class="check-col">37</td>
+        <td>La Casa Rusia<br><small style="color:#8b8b9c">DEBOLS!LLO · 2013</small></td>
+        <td>John le Carré</td>
+        <td class="isbn-col">9789875808812</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('ea1f90dc-6385-468e-9015-e890169cdd64', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('ea1f90dc-6385-468e-9015-e890169cdd64', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('ea1f90dc-6385-468e-9015-e890169cdd64', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-a0f3b802-8994-421d-8252-34772475a9ba" data-id="a0f3b802-8994-421d-8252-34772475a9ba">
+        <td class="check-col">38</td>
+        <td>Antigua Luz<br><small style="color:#8b8b9c">Alfaguara · 2012</small></td>
+        <td>John Banville</td>
+        <td class="isbn-col">9786071121202</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('a0f3b802-8994-421d-8252-34772475a9ba', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('a0f3b802-8994-421d-8252-34772475a9ba', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('a0f3b802-8994-421d-8252-34772475a9ba', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-978e94a9-401b-4927-826b-78bba45f7063" data-id="978e94a9-401b-4927-826b-78bba45f7063">
+        <td class="check-col">39</td>
+        <td>Rapsodia Gourmet<br><small style="color:#8b8b9c">Seix Barral · 2011</small></td>
+        <td>Muriel Barbery</td>
+        <td class="isbn-col">9788432228636</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('978e94a9-401b-4927-826b-78bba45f7063', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('978e94a9-401b-4927-826b-78bba45f7063', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('978e94a9-401b-4927-826b-78bba45f7063', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-7018c95e-fae4-43e3-b3e7-4717256b0347" data-id="7018c95e-fae4-43e3-b3e7-4717256b0347">
+        <td class="check-col">40</td>
+        <td>El Secreto De Christine<br><small style="color:#8b8b9c">Punto de Lectura · 2008</small></td>
+        <td>Benjamin Black</td>
+        <td class="isbn-col">9788466321365</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('7018c95e-fae4-43e3-b3e7-4717256b0347', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('7018c95e-fae4-43e3-b3e7-4717256b0347', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('7018c95e-fae4-43e3-b3e7-4717256b0347', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-0b17d6e0-52e6-4cc2-ba68-ad77da8f9efb" data-id="0b17d6e0-52e6-4cc2-ba68-ad77da8f9efb">
+        <td class="check-col">41</td>
+        <td>El Enigma Sagrado<br><small style="color:#8b8b9c">Booket · 2004</small></td>
+        <td>Michael Baigent</td>
+        <td class="isbn-col">9789508700889</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('0b17d6e0-52e6-4cc2-ba68-ad77da8f9efb', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('0b17d6e0-52e6-4cc2-ba68-ad77da8f9efb', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('0b17d6e0-52e6-4cc2-ba68-ad77da8f9efb', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-99a00318-b923-4167-9e4f-6eea2ebe5689" data-id="99a00318-b923-4167-9e4f-6eea2ebe5689">
+        <td class="check-col">42</td>
+        <td>Cuentos Reciclados<br><small style="color:#8b8b9c">Editorial Anagrama · 1997</small></td>
+        <td>Álvaro Pombo</td>
+        <td class="isbn-col">9788433910622</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('99a00318-b923-4167-9e4f-6eea2ebe5689', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('99a00318-b923-4167-9e4f-6eea2ebe5689', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('99a00318-b923-4167-9e4f-6eea2ebe5689', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-30cf73df-ce74-4093-8d54-ebd5f667a5b4" data-id="30cf73df-ce74-4093-8d54-ebd5f667a5b4">
+        <td class="check-col">43</td>
+        <td>Diana, O La Cazadora Solitaria<br><small style="color:#8b8b9c">Aguilar, Altea, Taurus, Alfaguara, S.A. de C.V. (Mexico) · 1994</small></td>
+        <td>Carlos Fuentes</td>
+        <td class="isbn-col">9789681902162</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('30cf73df-ce74-4093-8d54-ebd5f667a5b4', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('30cf73df-ce74-4093-8d54-ebd5f667a5b4', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('30cf73df-ce74-4093-8d54-ebd5f667a5b4', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-ff11bd4f-036c-47ca-a9dd-84550c48fc0a" data-id="ff11bd4f-036c-47ca-a9dd-84550c48fc0a">
+        <td class="check-col">44</td>
+        <td>El Urogallo<br><small style="color:#8b8b9c">Alfaguara · 2006</small></td>
+        <td>Michel Tournier</td>
+        <td class="isbn-col">9789870401544</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('ff11bd4f-036c-47ca-a9dd-84550c48fc0a', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('ff11bd4f-036c-47ca-a9dd-84550c48fc0a', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('ff11bd4f-036c-47ca-a9dd-84550c48fc0a', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-46765a53-06ae-4825-8b0d-36ba075af418" data-id="46765a53-06ae-4825-8b0d-36ba075af418">
+        <td class="check-col">45</td>
+        <td>El Arado De Oro<br><small style="color:#8b8b9c">Tusquets Editor</small></td>
+        <td>James Buchan</td>
+        <td class="isbn-col">9780140258271</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('46765a53-06ae-4825-8b0d-36ba075af418', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('46765a53-06ae-4825-8b0d-36ba075af418', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('46765a53-06ae-4825-8b0d-36ba075af418', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-557d89a3-24b9-4916-b4e6-2aa99257956a" data-id="557d89a3-24b9-4916-b4e6-2aa99257956a">
+        <td class="check-col">46</td>
+        <td>Libertad</td>
+        <td>Jonathan Franzen</td>
+        <td class="isbn-col">9788498383973</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('557d89a3-24b9-4916-b4e6-2aa99257956a', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('557d89a3-24b9-4916-b4e6-2aa99257956a', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('557d89a3-24b9-4916-b4e6-2aa99257956a', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-b0312085-c391-422b-85a5-2f3824dd7dba" data-id="b0312085-c391-422b-85a5-2f3824dd7dba">
+        <td class="check-col">47</td>
+        <td>Ripley Bogle<br><small style="color:#8b8b9c">Pan · 1989</small></td>
+        <td>Robert Wilson McLiam</td>
+        <td class="isbn-col">9780330313841</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('b0312085-c391-422b-85a5-2f3824dd7dba', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('b0312085-c391-422b-85a5-2f3824dd7dba', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('b0312085-c391-422b-85a5-2f3824dd7dba', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-ed1c6a5e-3778-470c-8a03-b7b8943d8dda" data-id="ed1c6a5e-3778-470c-8a03-b7b8943d8dda">
+        <td class="check-col">48</td>
+        <td>La Hermana<br><small style="color:#8b8b9c">Publicaciones y Ediciones Salamandra, S.A. · 2007</small></td>
+        <td>Sándor Márai</td>
+        <td class="isbn-col">9788498380897</td>
+        <td class="date-col">2026-04-07</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('ed1c6a5e-3778-470c-8a03-b7b8943d8dda', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('ed1c6a5e-3778-470c-8a03-b7b8943d8dda', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('ed1c6a5e-3778-470c-8a03-b7b8943d8dda', 'skip')">—</button>
+        </td>
+      </tr>
+      <tr id="row-ccc23185-63e9-408c-a642-8e64ed7add4a" data-id="ccc23185-63e9-408c-a642-8e64ed7add4a">
+        <td class="check-col">49</td>
+        <td>sopa de letras<br><small style="color:#8b8b9c">Azhar ul Haque Sario</small></td>
+        <td>anonimo</td>
+        <td class="isbn-col">—</td>
+        <td class="date-col">2026-04-06</td>
+        <td class="action-col">
+          <button class="action-btn rescue" onclick="mark('ccc23185-63e9-408c-a642-8e64ed7add4a', 'rescue')">Rescatar</button>
+          <button class="action-btn trash" onclick="mark('ccc23185-63e9-408c-a642-8e64ed7add4a', 'trash')">Tirar</button>
+          <button class="action-btn skip" onclick="mark('ccc23185-63e9-408c-a642-8e64ed7add4a', 'skip')">—</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details>
+    <summary>Lista exportada (después de marcar)</summary>
+    <div class="export-area" id="export">Marca los libros y presiona "Exportar listas" para generar el CSV aquí.</div>
+  </details>
+</div>
+
+<script>
+const state = {};
+function mark(id, action) {
+  state[id] = action;
+  const row = document.getElementById('row-' + id);
+  row.classList.remove('rescue', 'trash');
+  if (action === 'rescue') row.classList.add('rescue');
+  else if (action === 'trash') row.classList.add('trash');
+  updateSummary();
+}
+function markAll(action) {
+  document.querySelectorAll('tbody tr').forEach(tr => mark(tr.dataset.id, action));
+}
+function updateSummary() {
+  let r = 0, t = 0;
+  Object.values(state).forEach(v => { if (v === 'rescue') r++; else if (v === 'trash') t++; });
+  const s = 49 - r - t;
+  document.getElementById('summary').textContent = r + ' rescatar · ' + t + ' tirar · ' + s + ' sin decidir';
+  document.getElementById('count-rescue').textContent = r;
+  document.getElementById('count-trash').textContent = t;
+}
+function exportLists() {
+  const rescue = [], trash = [];
+  document.querySelectorAll('tbody tr').forEach(tr => {
+    const id = tr.dataset.id;
+    const title = tr.cells[1].innerText.split('\n')[0];
+    if (state[id] === 'rescue') rescue.push({ id, title });
+    else if (state[id] === 'trash') trash.push({ id, title });
+  });
+  const out = [
+    '═══ RESCATAR (' + rescue.length + ') ═══',
+    rescue.map(b => b.id + ' · ' + b.title).join('\n') || '(ninguno)',
+    '',
+    '═══ TIRAR (' + trash.length + ') ═══',
+    trash.map(b => b.id + ' · ' + b.title).join('\n') || '(ninguno)',
+  ].join('\n');
+  document.getElementById('export').textContent = out;
+}
+</script>
+</body>
+</html>

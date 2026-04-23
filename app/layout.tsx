@@ -25,7 +25,7 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://tuslibros.cl"),
   title: {
-    default: "Libros libres, puerta a puerta — tuslibros.cl",
+    default: "Libros Usados en Chile | Compra y Venta — tuslibros.cl",
     template: "%s | tuslibros.cl",
   },
   description:
