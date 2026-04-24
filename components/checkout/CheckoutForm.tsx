@@ -405,13 +405,4 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
       </aside>
     </div>
   );
-
-      {/* No payment method available */}
-      {!(listing.seller as any)?.mercadopago_user_id && !listing.seller?.phone && (
-        <p className="text-sm text-gray-500 text-center bg-gray-50 rounded-lg p-4">
-          Este vendedor aún no tiene métodos de pago configurados. Puedes contactarlo a través de las preguntas en la ficha del libro.
-        </p>
-      )}
-    </form>
-  );
 }
