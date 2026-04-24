@@ -1,4 +1,5 @@
 import Link from "next/link";
+import RequestsRow from "@/components/home/RequestsRow";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -107,7 +108,7 @@ export default function VenderPage() {
       </section>
 
       {/* Steps */}
-      <section className="max-w-4xl mx-auto px-4 py-16">
+      <section className="max-w-4xl mx-auto px-4 py-16 pb-0">
         <h2 className="font-display text-2xl sm:text-3xl font-bold text-ink text-center mb-12">
           Tres pasos. Cero complicaciones.
         </h2>
@@ -130,6 +131,10 @@ export default function VenderPage() {
           ))}
         </div>
       </section>
+
+      <div className="mt-16">
+        <RequestsRow />
+      </div>
 
       {/* Benefits grid */}
       <section className="bg-cream-warm border-y border-cream-dark/30">

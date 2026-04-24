@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import MyListings from "./MyListings";
+import WantedBounty from "@/components/listings/WantedBounty";
 import type { ListingWithBook } from "@/types";
 
 export const metadata = { title: "Mis Libros — tuslibros.cl" };
@@ -66,6 +67,9 @@ export default async function MisLibrosPage() {
             </span>
           </div>
         </div>
+
+        <WantedBounty />
+
         <MyListings listings={listings} />
       </main>
     </div>

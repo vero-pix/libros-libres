@@ -68,3 +68,14 @@ export interface Subscriber {
   email: string;
   subscribed_at: string;
 }
+
+export interface BookRequest {
+  id: string;
+  title: string;
+  author: string | null;
+  requester_email: string | null;
+  requester_whatsapp: string | null;
+  requester_location: string | null;
+  fulfilled: boolean;
+  created_at: string;
+}
