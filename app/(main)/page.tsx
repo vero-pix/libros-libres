@@ -50,7 +50,7 @@ const getFeaturedListings = unstable_cache(
     const supabase = createPublicClient();
     const { data } = await supabase
       .from("listings")
-      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username)`)
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
       .eq("status", "active")
       .eq("featured", true)
       .order("featured_rank", { ascending: true, nullsFirst: false })
@@ -66,7 +66,7 @@ const getCollectibleListings = unstable_cache(
     const supabase = createPublicClient();
     const { data } = await supabase
       .from("listings")
-      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username)`)
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
       .eq("status", "active")
       .eq("is_collectible", true)
       .limit(12);
