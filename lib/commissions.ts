@@ -2,9 +2,9 @@ type SellerPlan = "free" | "librero" | "libreria";
 type TransactionType = "sale" | "rental";
 
 const RATES: Record<SellerPlan, Record<TransactionType, number>> = {
-  free:     { sale: 0.08, rental: 0.10 },
-  librero:  { sale: 0.05, rental: 0.07 },
-  libreria: { sale: 0.03, rental: 0.05 },
+  free:     { sale: 0.0, rental: 0.0 },
+  librero:  { sale: 0.0, rental: 0.0 },
+  libreria: { sale: 0.0, rental: 0.0 },
 };
 
 export function getCommissionRate(plan: SellerPlan, type: TransactionType): number {

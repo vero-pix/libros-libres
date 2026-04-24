@@ -11,6 +11,7 @@ import ImageGallery from "./ImageGallery";
 import ShareButtons from "./ShareButtons";
 import ContactSellerButton from "@/components/messages/ContactSellerButton";
 import PriceCompare from "@/components/listings/PriceCompare";
+import SellerOtherListings from "./SellerOtherListings";
 
 function WhatsAppButton({ phone, title }: { phone: string | null; title: string }) {
   if (!phone) {
@@ -364,6 +365,9 @@ export default function ListingDetail({ listing, images = [] }: Props) {
         </p>
       </div>
 
+      <div className="px-6 sm:px-8">
+        <SellerOtherListings sellerId={listing.seller_id} currentListingId={listing.id} />
+      </div>
     </div>
   );
 }
