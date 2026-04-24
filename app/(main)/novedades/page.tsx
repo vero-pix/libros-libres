@@ -247,21 +247,6 @@ const novedades: Entry[] = [
     },
   },
   {
-    date: "21 abril 2026",
-    title: "Gente de confianza: una página propia para los amigos de la casa",
-    description:
-      "Abrí una página nueva, /gente-de-confianza, con profesores y servicios de gente cercana que recomiendo personalmente. No es publicidad fría — son contactos que uso y que funcionan. Parte con Jose María (Excel, Power BI, VBA, Portugués, +10 años dando clases). Si a alguien le hace sentido aparecer ahí, que me escriba: yo elijo uno por uno. Además cambié el hero: el botón \"Publicar el mío (gratis)\" quedó como \"Ofrecer mi libro\", y sumé un tercero \"¿No está? Búscalo acá\" que te lleva a solicitudes.",
-    tag: "Lanzamiento",
-    link: "/gente-de-confianza",
-    linkText: "Conocer a los amigos de la casa",
-    visual: {
-      kind: "milestone",
-      icon: "🤝",
-      metric: "Gente de confianza",
-      detail: "contactos que uso y que recomiendo yo",
-    },
-  },
-  {
     date: "20 abril 2026",
     title: "Nuevo titular en la home: tuslibros, los que ya leíste y los que te faltan",
     description:
