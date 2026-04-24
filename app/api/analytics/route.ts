@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { sendGong, escapeHtml } from "@/lib/notifications";
 
 function parseUserAgent(ua: string): { browser: string; os: string; device: string } {
   let browser = "Otro";
@@ -81,6 +82,18 @@ export async function POST(req: NextRequest) {
       .update({ user_id: user.id })
       .eq("session_id", session_id)
       .is("user_id", null);
+  }
+
+  // GONG: Notificar si alguien buscó y no encontró nada
+  if (path === "/search" && body.results_count === 0 && body.query) {
+    const q = body.query.trim();
+    if (q.length > 2) {
+      sendGong(
+        `🔍 <b>Búsqueda sin éxito</b>\n\n` +
+        `Alguien buscó: "<b>${escapeHtml(q)}</b>" y no encontró resultados.\n\n` +
+        `<a href="https://tuslibros.cl/admin/search-queries">Ver analíticas →</a>`
+      ).catch(() => {});
+    }
   }
 
   return NextResponse.json({ ok: true });
