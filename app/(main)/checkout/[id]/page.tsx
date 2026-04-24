@@ -29,16 +29,18 @@ export default async function CheckoutPage({ params }: Props) {
 
   const typedListing = listing as unknown as ListingWithBook;
 
-  if (typedListing.seller_id === user.id) {
+  if (user && typedListing.seller_id === user.id) {
     redirect(`/listings/${params.id}`);
   }
 
   // Get buyer profile for default address
-  const { data: buyerProfile } = await supabase
-    .from("users")
-    .select("full_name, default_address, phone")
-    .eq("id", user.id)
-    .single();
+  const { data: buyerProfile } = user 
+    ? await supabase
+        .from("users")
+        .select("full_name, default_address, phone")
+        .eq("id", user.id)
+        .single()
+    : { data: null };
 
   // Render checkout directly, handling missing info inside CheckoutForm
   return (
