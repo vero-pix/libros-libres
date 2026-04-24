@@ -155,6 +155,75 @@ export async function POST(req: Request) {
       }
     }
 
+    // Match with book requests (Wishlist fulfillment)
+    try {
+      const { data: requests } = await supabase
+        .from("book_requests")
+        .select("*")
+        .eq("fulfilled", false);
+
+      if (requests && requests.length > 0) {
+        for (const req of requests) {
+          const reqTitle = (req.title || "").toLowerCase().trim();
+          const pubTitle = (title || "").toLowerCase().trim();
+          
+          // Match simple: si el título pedido está contenido en el publicado o viceversa
+          const titleMatch = pubTitle.includes(reqTitle) || reqTitle.includes(pubTitle);
+          
+          if (titleMatch && reqTitle.length > 3) {
+            console.log(`[listing-created] 🎯 Match found for request ${req.id}: ${title}`);
+            
+            // 1. Avisar a Vero (Admin) por Telegram
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                chat_id: chatId,
+                text: `🎯 <b>¡MATCH DE DESEO!</b>\n\nAlguien publicó un libro que estaba en la lista de espera:\n\n📖 <b>${escape(title)}</b>\n✍️ ${escape(author)}\n👤 Pedido por: ${escape(req.requester_email || req.requester_whatsapp || "Anónimo")}\n\n<a href="${url}">Ver publicación y avisar →</a>`,
+                parse_mode: "HTML",
+              }),
+            }).catch(() => {});
+
+            // 2. Avisar al comprador por Email (si dejó uno)
+            if (req.requester_email && resendKey) {
+              const customerEmailHtml = `
+<div style="font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#ffffff;color:#151522;border:1px solid #e5e7eb;border-radius:16px">
+  <p style="color:#d4a017;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:0 0 8px 0">¡Buenas noticias!</p>
+  <h2 style="font-family:Georgia,serif;font-size:24px;margin:0 0 16px 0;color:#1a1a2e">Encontramos el libro que buscabas</h2>
+  <p style="font-size:16px;line-height:1.6;color:#4b5563;margin-bottom:24px">
+    Alguien acaba de publicar <strong>${escape(title)}</strong> en tuslibros.cl. Como nos pediste que te avisáramos, aquí tienes el link directo para que no se te escape:
+  </p>
+  <div style="background:#f9fafb;padding:20px;border-radius:12px;margin-bottom:24px;border:1px solid #f3f4f6">
+    <p style="margin:0;font-weight:700;color:#111827">${escape(title)}</p>
+    <p style="margin:4px 0 0 0;font-size:14px;color:#6b7280">${escape(author)}</p>
+  </div>
+  <a href="${url}" style="display:inline-block;padding:14px 28px;background:#1a1a2e;color:#ffffff;text-decoration:none;border-radius:8px;font-size:16px;font-weight:600">Ver y comprar libro →</a>
+  <p style="margin-top:24px;font-size:13px;color:#9ca3af">
+    Si ya no buscas este libro, puedes ignorar este correo. ¡Feliz lectura!
+  </p>
+</div>`;
+
+              await fetch("https://api.resend.com/emails", {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${resendKey}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  from: "tuslibros.cl <noreply@tuslibros.cl>",
+                  to: [req.requester_email],
+                  subject: `📖 ¡Lo encontramos! ${title} ya está disponible`,
+                  html: customerEmailHtml,
+                }),
+              }).catch((e) => console.error("Error sending match email:", e));
+            }
+          }
+        }
+      }
+    } catch (matchErr) {
+      console.error("Match with requests failed:", matchErr);
+    }
+
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     console.error("listing-created webhook error:", e);
