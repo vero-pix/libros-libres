@@ -25,11 +25,6 @@ export default function PriceCompare({ title, author, isbn, currentPrice, varian
       color: "text-yellow-700 border-yellow-300 hover:bg-yellow-50",
     },
     {
-      name: "IberLibro",
-      url: `https://www.iberlibro.com/servlet/SearchResults?kn=${encodedTitle}&sortby=17`,
-      color: "text-red-600 border-red-300 hover:bg-red-50",
-    },
-    {
       name: "Facebook",
       url: `https://www.facebook.com/marketplace/search/?query=${mlSearch}`,
       color: "text-blue-600 border-blue-300 hover:bg-blue-50",
@@ -42,18 +37,19 @@ export default function PriceCompare({ title, author, isbn, currentPrice, varian
         <svg className="w-4 h-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
         </svg>
-        <span className="text-xs font-semibold text-ink uppercase tracking-wider">Comparar precios</span>
+        <span className="text-xs font-semibold text-ink uppercase tracking-wider">Verificación de Valor</span>
       </div>
-      {currentPrice && (
-        <p className="text-xs text-ink-muted mb-3">
-          {variant === "buyer" ? "Precio acá: " : "Tu precio: "}
-          <span className="font-bold text-ink">${currentPrice.toLocaleString("es-CL")}</span>
-          {" · "}
-          {variant === "buyer"
-            ? "revisa cuánto cobran en otros sitios"
-            : "Revisa cuánto cobran en otros sitios antes de vender"}
+      
+      {variant === "buyer" ? (
+        <p className="text-[11px] text-ink-muted mb-3 leading-relaxed">
+          <span className="font-bold text-ink">Compra protegida:</span> En Libros-Libres tu dinero está seguro. Si encuentras el libro más barato en otro sitio, recuerda que acá tienes garantía de devolución si el estado no es el prometido.
+        </p>
+      ) : (
+        <p className="text-[11px] text-ink-muted mb-3 leading-relaxed">
+          <span className="font-bold text-ink">Sugerencia:</span> Revisa los precios de la competencia para asegurar que tu libro se venda rápido.
         </p>
       )}
+
       <div className="flex flex-wrap gap-2">
         {links.map((link) => (
           <a
@@ -61,7 +57,7 @@ export default function PriceCompare({ title, author, isbn, currentPrice, varian
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border rounded-lg transition-colors ${link.color}`}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border rounded-lg transition-colors ${link.color}`}
           >
             {link.name}
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
