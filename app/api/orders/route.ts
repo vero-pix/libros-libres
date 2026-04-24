@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import {
   preferenceClient,
   sellerPreferenceClient,
@@ -23,13 +24,60 @@ export async function POST(req: NextRequest) {
   const supabase = await createClient();
 
   const {
-    data: { user },
+    data: { user: authUser },
   } = await supabase.auth.getUser();
+
+  const body = await req.json();
+  const { guest_info } = body;
+
+  let user = authUser;
+
+  // GUEST CHECKOUT LOGIC
+  if (!user && guest_info) {
+    const adminSupabase = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } }
+    );
+
+    // 1. Check if user already exists in public.users by email
+    const { data: existingUser } = await adminSupabase
+      .from("users")
+      .select("id")
+      .eq("email", guest_info.email.toLowerCase().trim())
+      .single();
+
+    if (existingUser) {
+      user = { id: existingUser.id, email: guest_info.email } as any;
+    } else {
+      // 2. Create a new user in auth (shadow account)
+      const { data: newAuthUser, error: createError } = await adminSupabase.auth.admin.createUser({
+        email: guest_info.email.toLowerCase().trim(),
+        password: crypto.randomBytes(12).toString("hex"),
+        email_confirm: true,
+        user_metadata: { full_name: guest_info.name }
+      });
+
+      if (createError) {
+        return NextResponse.json({ error: "Error al crear cuenta de invitado: " + createError.message }, { status: 500 });
+      }
+
+      // 3. Create record in public.users
+      await adminSupabase.from("users").insert({
+        id: newAuthUser.user.id,
+        email: guest_info.email.toLowerCase().trim(),
+        full_name: guest_info.name,
+        phone: guest_info.phone,
+        city: body.buyer_address?.split(",").slice(-1)[0]?.trim() || null
+      });
+
+      user = newAuthUser.user as any;
+    }
+  }
+
   if (!user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
-
-  const body = await req.json();
   const rawListingIds: string[] = Array.isArray(body.listing_ids)
     ? body.listing_ids
     : body.listing_id

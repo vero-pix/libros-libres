@@ -42,8 +42,12 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("in_person");
   const [address, setAddress] = useState(buyerAddress);
   const [phone, setPhone] = useState(buyerPhone);
+  const [guestName, setGuestName] = useState(buyerName);
+  const [guestEmail, setGuestEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const isGuest = !buyerName;
 
   // Shipping quotes
   const [quotes, setQuotes] = useState<ShippingQuote[]>([]);
@@ -136,6 +140,11 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
           shipping_service: isCourier ? selectedQuote!.service : deliveryMethod === "in_person" ? "Entrega en persona" : "Punto de retiro",
           shipping_courier: isCourier ? selectedQuote!.courier : undefined,
           buyer_address: isCourier ? address : deliveryMethod,
+          guest_info: isGuest ? {
+            name: guestName,
+            email: guestEmail,
+            phone: phone
+          } : undefined
         }),
       });
 
@@ -164,17 +173,45 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
           <div className="px-6 py-4 border-b border-cream-dark bg-cream-warm">
             <h2 className="text-sm font-bold text-ink uppercase tracking-wider">Tus datos de contacto</h2>
           </div>
-          <div className="px-6 py-5">
-            <label className="block text-xs font-bold text-ink-muted uppercase tracking-wider mb-2">Teléfono WhatsApp</label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+56912345678"
-              required
-              className="w-full px-4 py-2.5 border border-cream-dark rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 bg-cream/30"
-            />
-            <p className="text-[10px] text-ink-muted mt-2 italic">Usado solo para coordinar la entrega de tu libro.</p>
+          <div className="px-6 py-5 space-y-4">
+            {isGuest && (
+              <>
+                <div>
+                  <label className="block text-xs font-bold text-ink-muted uppercase tracking-wider mb-2">Tu nombre completo</label>
+                  <input
+                    type="text"
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    placeholder="Ej: María García"
+                    required
+                    className="w-full px-4 py-2.5 border border-cream-dark rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 bg-cream/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-ink-muted uppercase tracking-wider mb-2">Correo electrónico</label>
+                  <input
+                    type="email"
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                    placeholder="tu@correo.com"
+                    required
+                    className="w-full px-4 py-2.5 border border-cream-dark rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 bg-cream/30"
+                  />
+                </div>
+              </>
+            )}
+            <div>
+              <label className="block text-xs font-bold text-ink-muted uppercase tracking-wider mb-2">Teléfono WhatsApp</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+56912345678"
+                required
+                className="w-full px-4 py-2.5 border border-cream-dark rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 bg-cream/30"
+              />
+            </div>
+            <p className="text-[10px] text-ink-muted mt-1 italic">Usado solo para coordinar la entrega de tu libro.</p>
           </div>
         </div>
 

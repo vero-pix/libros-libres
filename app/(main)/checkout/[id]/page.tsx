@@ -14,10 +14,6 @@ export default async function CheckoutPage({ params }: Props) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect(`/login?next=/checkout/${params.id}`);
-  }
-
   const { data: listing } = await supabase
     .from("listings")
     .select(
