@@ -85,20 +85,17 @@ export default function RegisterForm() {
 
   if (success) {
     return (
-      <div className="text-center space-y-4 py-4">
-        <div className="text-5xl">📬</div>
-        <h2 className="text-lg font-semibold text-gray-900">¡Revisa tu correo!</h2>
-        <p className="text-sm text-gray-500 leading-relaxed">
-          Te enviamos un link de confirmación a{" "}
-          <strong className="text-gray-800">{email}</strong>.
-          <br />
-          Haz clic para activar tu cuenta.
+      <div className="text-center space-y-4 py-8">
+        <div className="text-5xl">✨</div>
+        <h2 className="text-2xl font-display font-bold text-ink">¡Bienvenido a la comunidad!</h2>
+        <p className="text-sm text-ink-muted leading-relaxed max-w-xs mx-auto">
+          Tu cuenta ha sido creada exitosamente. Ya puedes empezar a comprar, vender o prestar libros.
         </p>
         <Link
           href="/login"
-          className="inline-block mt-2 text-sm text-brand-600 hover:underline font-medium"
+          className="inline-block w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-colors shadow-sm"
         >
-          Ir a iniciar sesión
+          Iniciar sesión ahora
         </Link>
       </div>
     );

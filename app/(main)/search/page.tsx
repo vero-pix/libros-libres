@@ -7,6 +7,7 @@ import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
 import SearchResultsToggle from "@/components/listings/SearchResultsToggle";
 import PromoBanner from "@/components/ui/PromoBanner";
+import BookRequestForm from "@/components/listings/BookRequestForm";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
@@ -59,16 +60,29 @@ export default async function SearchPage({ searchParams }: Props) {
   // Si hay búsqueda de texto, primero encontrar los book IDs que coincidan
   let matchingBookIds: string[] | null = null;
   if (q) {
-    // Normalizar guiones a espacios (usuarios copian URLs de Buscalibre tipo
-    // "las-ventajas-de-ser-invisible" — que sin esto no matchearía nada).
-    // También strip paréntesis y espacios múltiples.
+    // Normalizar guiones a espacios
     const clean = q.replace(/[-_]+/g, " ").replace(/[()]/g, "").replace(/\s+/g, " ").trim();
-    const term = `%${clean}%`;
-    const { data: matchedBooks } = await supabase
-      .from("books")
-      .select("id")
-      .or(`title.ilike.${term},author.ilike.${term},isbn.ilike.${term}`);
-    matchingBookIds = matchedBooks?.map((b) => b.id) ?? [];
+    const words = clean.split(" ").filter(w => w.length > 1);
+    
+    let bookQuery = supabase.from("books").select("id");
+    
+    if (words.length > 0) {
+      // Búsqueda por palabras: el título/autor debe contener TODAS las palabras (más preciso)
+      // o al menos matchear el string completo si es corto.
+      const filter = words.map(w => `title.ilike.%${w}%,author.ilike.%${w}%`).join(",");
+      const { data: matchedBooks } = await supabase
+        .from("books")
+        .select("id")
+        .or(filter);
+      matchingBookIds = matchedBooks?.map((b) => b.id) ?? [];
+    } else {
+      const term = `%${clean}%`;
+      const { data: matchedBooks } = await supabase
+        .from("books")
+        .select("id")
+        .or(`title.ilike.${term},author.ilike.${term},isbn.ilike.${term}`);
+      matchingBookIds = matchedBooks?.map((b) => b.id) ?? [];
+    }
   }
 
   let query = supabase
@@ -201,9 +215,17 @@ export default async function SearchPage({ searchParams }: Props) {
                 </div>
               </SearchResultsToggle>
             ) : (
-              <div className="text-center py-16 text-gray-500">
-                <p className="text-lg">No se encontraron resultados.</p>
-                <p className="text-sm mt-1">Prueba con otra búsqueda o explora el mapa.</p>
+              <div className="py-8">
+                <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mb-8">
+                  <p className="text-xl font-display font-bold text-ink">No encontramos este libro aún</p>
+                  <p className="text-gray-500 mt-2 max-w-md mx-auto">
+                    Nuestro catálogo crece día a día. ¿Quieres que te avisemos cuando alguien lo publique?
+                  </p>
+                </div>
+                
+                <div className="max-w-xl mx-auto">
+                  <BookRequestForm initialTitle={q} />
+                </div>
               </div>
             )}
           </div>
