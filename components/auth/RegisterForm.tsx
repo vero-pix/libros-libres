@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import SocialLoginButtons from "./SocialLoginButtons";
 
 export default function RegisterForm() {
   const supabase = createClient();
@@ -196,6 +197,7 @@ export default function RegisterForm() {
             Inicia sesión
           </Link>
         </p>
+        <SocialLoginButtons />
       </form>
     </div>
   );
