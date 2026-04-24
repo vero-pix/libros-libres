@@ -46,6 +46,9 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
         <h1 className="sr-only">Libros usados en Chile — tuslibros.cl</h1>
       )}
 
+      {/* Economía inversa: se busca (Prioridad Alta para activar el sitio) */}
+      {!hasFilters && requestsRow}
+
       {/* Above-the-fold: libros destacados + testimonio */}
       {!hasFilters && (featuredRow || testimonialBanner) && (
         <section className="bg-white border-b border-cream-dark">
@@ -55,9 +58,6 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
           </div>
         </section>
       )}
-
-      {/* Economía inversa: se busca */}
-      {!hasFilters && requestsRow}
 
       <main id="tienda" className="max-w-7xl mx-auto px-6 py-10 scroll-mt-32">
         <TiendaToggle forceMap={forceMap} onForceMapConsumed={() => setForceMap(false)} hasFilters={hasFilters}>

@@ -16,9 +16,30 @@ export default async function RequestsRow() {
     .select("id, title, author, requester_location, created_at")
     .eq("fulfilled", false)
     .order("created_at", { ascending: false })
-    .limit(8);
+    .limit(4);
 
-  if (!requests || requests.length === 0) return null;
+  const { data: recentSearches } = await supabase
+    .from("search_queries")
+    .select("query, created_at")
+    .eq("results_count", 0)
+    .gt("created_at", new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString())
+    .order("created_at", { ascending: false })
+    .limit(4);
+
+  const hasContent = (requests && requests.length > 0) || (recentSearches && recentSearches.length > 0);
+  if (!hasContent) return null;
+
+  // Mix both types of demand
+  const demandItems = [
+    ...(requests || []).map(r => ({ ...r, type: 'request' as const })),
+    ...(recentSearches || []).map(s => ({ 
+      id: `s-${s.query}`, 
+      title: s.query, 
+      author: null, 
+      requester_location: "Alguien hoy", 
+      type: 'search' as const 
+    }))
+  ].slice(0, 8);
 
   return (
     <section className="bg-gradient-to-br from-amber-50 via-cream-warm to-amber-100/60 border-y border-amber-200/60">
@@ -58,15 +79,17 @@ export default async function RequestsRow() {
 
           {/* Right — list */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {(requests as BookRequest[]).map((r) => (
+            {demandItems.map((r) => (
               <Link
                 key={r.id}
                 href={`/publish?title=${encodeURIComponent(r.title)}${r.author ? `&author=${encodeURIComponent(r.author)}` : ""}`}
                 className="group bg-white/90 backdrop-blur rounded-xl border border-amber-200 hover:border-amber-500 hover:shadow-md p-4 transition-all"
               >
                 <div className="flex items-start gap-3">
-                  <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full whitespace-nowrap mt-0.5">
-                    Se busca
+                  <span className={`text-[10px] uppercase tracking-[0.2em] font-bold px-2 py-0.5 rounded-full whitespace-nowrap mt-0.5 ${
+                    r.type === 'request' ? 'text-amber-700 bg-amber-100' : 'text-orange-700 bg-orange-100'
+                  }`}>
+                    {r.type === 'request' ? 'Se busca' : 'Demanda hoy'}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="font-display font-bold text-sm text-ink leading-snug line-clamp-2 group-hover:text-amber-800 transition-colors">
