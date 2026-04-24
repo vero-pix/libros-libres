@@ -90,15 +90,6 @@ export default async function Navbar() {
             /></>
           )}
 
-          <Link
-            href="/gente-de-confianza"
-            className="text-[11px] sm:text-xs font-medium uppercase tracking-[0.1em] sm:tracking-[0.15em] px-2.5 sm:px-4 py-3 sm:py-3.5 hover:bg-white/10 transition-colors whitespace-nowrap inline-flex items-center gap-1.5"
-          >
-            Gente de confianza
-            <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-amber-400 text-ink px-1.5 py-0.5 rounded-sm">
-              new
-            </span>
-          </Link>
 
           <NavDropdown
             label="Ayuda"
