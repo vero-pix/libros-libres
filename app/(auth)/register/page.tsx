@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import RegisterForm from "@/components/auth/RegisterForm";
+import AuthWantedList from "@/components/auth/AuthWantedList";
 
 export default function RegisterPage() {
   return (
@@ -27,6 +28,7 @@ export default function RegisterPage() {
               Crea tu cuenta en menos de un minuto. Sin comisiones ocultas,
               sin cargos mensuales. Tú decides cuánto cobrar.
             </p>
+            <AuthWantedList />
           </div>
 
           <div className="flex gap-8 text-ink-muted text-sm">
