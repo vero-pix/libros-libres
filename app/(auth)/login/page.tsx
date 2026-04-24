@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import LoginForm from "@/components/auth/LoginForm";
+import AuthWantedList from "@/components/auth/AuthWantedList";
 
 export default function LoginPage() {
   return (
@@ -27,6 +28,7 @@ export default function LoginPage() {
               Compra, vende y arrienda los libros que tienes cerca.
               Desde $3.000, con pago seguro y despacho puerta a puerta.
             </p>
+            <AuthWantedList />
           </div>
 
           <div className="flex gap-8 text-ink-muted text-sm">
