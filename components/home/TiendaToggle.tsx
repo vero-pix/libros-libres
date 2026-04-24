@@ -25,7 +25,10 @@ export default function TiendaToggle({ children, forceMap, onForceMapConsumed, h
   // Con filtros (banner clickeado, categoría, etc.) se respeta la grilla para
   // que el usuario vea los libros que pidió. Mobile se queda en grilla siempre.
   useEffect(() => {
-    if (hasFilters) return;
+    if (hasFilters) {
+      setView("grid");
+      return;
+    }
     if (typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches) {
       setView("map");
     }
