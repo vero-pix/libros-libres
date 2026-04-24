@@ -16,7 +16,7 @@ async function getListing(id: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram, username)`)
+    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram, username, mercadopago_user_id)`)
     .eq("id", id)
     .single();
   return data;
