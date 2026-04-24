@@ -9,6 +9,7 @@ import {
 } from "@/lib/mercadopago";
 import { calculateCommission } from "@/lib/commissions";
 import { refreshSellerToken } from "@/lib/mercadopago-oauth";
+import { sendGong, escapeHtml } from "@/lib/notifications";
 import crypto from "crypto";
 
 /**
@@ -293,6 +294,15 @@ export async function POST(req: NextRequest) {
       .delete()
       .eq("user_id", user.id)
       .in("listing_id", listingIds);
+
+    // GONG: Notificar intento de compra
+    sendGong(
+      `🛍️ <b>Nuevo intento de compra</b>\n\n` +
+      `Items: ${listings.length}\n` +
+      `Total: <b>$${bundleGrandTotal.toLocaleString("es-CL")}</b>\n` +
+      `Vendedor: ${escapeHtml(seller.full_name)}\n` +
+      `Comprador: ${escapeHtml(user.user_metadata?.full_name || user.email || "Alguien")}`
+    ).catch(() => {});
 
     return NextResponse.json({
       bundle_id: bundleId,

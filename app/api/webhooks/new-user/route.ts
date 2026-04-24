@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
+import { sendGong, escapeHtml } from "@/lib/notifications";
 
 const ADMIN_EMAIL = "vero@economics.cl";
 const WEBHOOK_SECRET = process.env.SUPABASE_WEBHOOK_SECRET;
@@ -53,6 +54,14 @@ export async function POST(req: NextRequest) {
         </div>
       `,
     });
+
+    // GONG: Telegram a Vero
+    await sendGong(
+      `👤 <b>Nuevo registro</b>\n\n` +
+      `Nombre: <b>${escapeHtml(name)}</b>\n` +
+      `Ciudad: ${escapeHtml(city)}\n` +
+      `Email: ${escapeHtml(email)}`
+    ).catch(() => {});
 
     // Welcome email to user
     if (email && email !== "Sin email") {
