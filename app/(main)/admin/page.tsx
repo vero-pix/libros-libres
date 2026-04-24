@@ -22,7 +22,7 @@ export default async function AdminPage() {
   if (profile?.role !== "admin") redirect("/");
 
   // Load all data for admin
-  const [ordersRes, listingsRes, usersRes, messagesRes, subscribersRes, categoriesRes] = await Promise.all([
+  const [ordersRes, listingsRes, usersRes, messagesRes, subscribersRes, categoriesRes, requestsRes] = await Promise.all([
     supabase
       .from("orders")
       .select(`
@@ -53,6 +53,10 @@ export default async function AdminPage() {
       .from("categories")
       .select("slug, name, parent_slug, sort_order")
       .order("sort_order", { ascending: true }),
+    supabase
+      .from("book_requests")
+      .select("*")
+      .order("created_at", { ascending: false }),
   ]);
 
   return (
@@ -66,6 +70,7 @@ export default async function AdminPage() {
           messages={messagesRes.data ?? []}
           subscribers={subscribersRes.data ?? []}
           categories={categoriesRes.data ?? []}
+          bookRequests={requestsRes.data ?? []}
         />
       </main>
     </div>

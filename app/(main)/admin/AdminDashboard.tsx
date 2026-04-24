@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { AdminOrder, AdminListing, AdminUser, ContactMessage, Subscriber } from "@/components/admin/types";
+import type { AdminOrder, AdminListing, AdminUser, ContactMessage, Subscriber, BookRequest } from "@/components/admin/types";
 import type { AdminCategory } from "@/components/admin/CategoriesTab";
 import { Stat, EmptyState } from "@/components/admin/SharedUI";
 import OrdersTab from "@/components/admin/OrdersTab";
@@ -21,11 +21,12 @@ interface Props {
   messages?: ContactMessage[];
   subscribers?: Subscriber[];
   categories?: AdminCategory[];
+  bookRequests?: BookRequest[];
 }
 
-type Tab = "orders" | "listings" | "users" | "messages" | "subscribers" | "categories" | "analytics" | "business" | "searches" | "tools";
+type Tab = "orders" | "listings" | "users" | "messages" | "subscribers" | "categories" | "requests" | "analytics" | "business" | "searches" | "tools";
 
-export default function AdminDashboard({ orders: initOrders, listings: initListings, users: initUsers, messages = [], subscribers = [], categories: initCategories = [] }: Props) {
+export default function AdminDashboard({ orders: initOrders, listings: initListings, users: initUsers, messages = [], subscribers = [], categories: initCategories = [], bookRequests: initRequests = [] }: Props) {
   const [tab, setTab] = useState<Tab>("orders");
   const [orders, setOrders] = useState(initOrders);
   const [listings, setListings] = useState(initListings);
@@ -33,6 +34,7 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
   const [msgs] = useState(messages);
   const [subs] = useState(subscribers);
   const [cats, setCats] = useState(initCategories);
+  const [requests, setRequests] = useState(initRequests);
 
   const unreadMessages = msgs.filter((m) => !m.read).length;
   const totalRevenue = orders
@@ -46,6 +48,7 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
     { key: "messages", label: "Mensajes", count: msgs.length },
     { key: "subscribers", label: "Newsletter", count: subs.length },
     { key: "categories", label: "Categorías", count: cats.length },
+    { key: "requests", label: "Pedidos", count: requests.filter(r => !r.fulfilled).length },
     { key: "analytics", label: "Analytics", count: 0 },
     { key: "business", label: "Negocio", count: 0 },
     { key: "searches", label: "Búsquedas", count: 0 },
@@ -61,6 +64,7 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
         <Stat label="Usuarios registrados" value={users.length} />
         <Stat label="Mensajes sin leer" value={unreadMessages} />
         <Stat label="Suscriptores newsletter" value={subs.length} />
+        <Stat label="Pedidos pendientes" value={requests.filter(r => !r.fulfilled).length} />
       </div>
 
       {/* Tabs */}
@@ -141,6 +145,54 @@ export default function AdminDashboard({ orders: initOrders, listings: initListi
       )}
       {tab === "categories" && (
         <CategoriesTab categories={cats} onUpdate={setCats} />
+      )}
+      {tab === "requests" && (
+        <div className="space-y-4">
+          {requests.length === 0 ? (
+            <EmptyState text="Sin pedidos de libros" />
+          ) : (
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <table className="w-full text-sm text-left">
+                <thead>
+                  <tr className="border-b border-gray-100 text-xs text-gray-500 uppercase">
+                    <th className="px-4 py-3">Libro / Autor</th>
+                    <th className="px-4 py-3">Contacto</th>
+                    <th className="px-4 py-3">Ubicación</th>
+                    <th className="px-4 py-3">Estado</th>
+                    <th className="px-4 py-3">Fecha</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {requests.map((r) => (
+                    <tr key={r.id} className={r.fulfilled ? "opacity-50" : ""}>
+                      <td className="px-4 py-3">
+                        <p className="font-bold text-gray-900">{r.title}</p>
+                        <p className="text-xs text-gray-500 italic">{r.author || "—"}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-xs">{r.requester_email || "—"}</p>
+                        <p className="text-xs text-brand-600 font-medium">{r.requester_whatsapp || ""}</p>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-500">
+                        {r.requester_location || "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                          r.fulfilled ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+                        }`}>
+                          {r.fulfilled ? "Completado" : "Pendiente"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-[10px] text-gray-400">
+                        {new Date(r.created_at).toLocaleDateString("es-CL")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       )}
       {tab === "analytics" && (
         <AnalyticsTab />
