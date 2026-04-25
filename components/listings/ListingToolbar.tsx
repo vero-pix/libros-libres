@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useCallback } from "react";
+import { useState, useEffect, useTransition, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ListingToolbar() {
@@ -8,7 +8,16 @@ export default function ListingToolbar() {
   const searchParams = useSearchParams();
   const [locating, setLocating] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [cities, setCities] = useState<Array<{ id: string; name: string; region: string }>>([]);
   const isNearMe = !!searchParams.get("lat");
+
+  // Fetch cities
+  useEffect(() => {
+    fetch("/api/cities")
+      .then((r) => r.json())
+      .then(setCities)
+      .catch(() => setCities([]));
+  }, []);
 
   const updateParam = useCallback((key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -138,6 +147,21 @@ export default function ListingToolbar() {
         onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
         className="text-sm border border-gray-200 rounded-md px-3 py-2 w-40 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-400"
       />
+
+      {/* City */}
+      <select
+        aria-label="Filtrar por ciudad"
+        onChange={handleChange("city_id")}
+        defaultValue={searchParams.get("city_id") ?? ""}
+        className={selectClass}
+      >
+        <option value="">Ciudad: Todos</option>
+        {cities.map((city) => (
+          <option key={city.id} value={city.id}>
+            {city.name}
+          </option>
+        ))}
+      </select>
 
       {/* Condition */}
       <select

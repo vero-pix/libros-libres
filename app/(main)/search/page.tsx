@@ -25,6 +25,7 @@ interface Props {
     publisher?: string;
     pages_min?: string;
     pages_max?: string;
+    city_id?: string;
   };
 }
 
@@ -55,7 +56,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function SearchPage({ searchParams }: Props) {
   const supabase = await createClient();
-  const { q, genre, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max } = searchParams;
+  const { q, genre, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max, city_id } = searchParams;
 
   // Si hay búsqueda de texto, primero encontrar los book IDs que coincidan
   let matchingBookIds: string[] | null = null;
@@ -110,6 +111,9 @@ export default async function SearchPage({ searchParams }: Props) {
   }
   if (modality) {
     query = query.eq("modality", modality);
+  }
+  if (city_id) {
+    query = query.eq("city_id", city_id);
   }
   if (price_min) {
     query = query.gte("price", Number(price_min));
