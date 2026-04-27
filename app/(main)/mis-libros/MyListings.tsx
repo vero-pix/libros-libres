@@ -55,6 +55,7 @@ export default function MyListings({ listings: initial }: Props) {
   const [loading, setLoading] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | ListingStatus>("all");
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"recent" | "views_desc" | "views_asc">("recent");
   const supabase = createClient();
 
   const filtered = (filter === "all" ? listings : listings.filter((l) => l.status === filter))
@@ -62,6 +63,16 @@ export default function MyListings({ listings: initial }: Props) {
       if (!search.trim()) return true;
       const q = search.toLowerCase();
       return l.book.title.toLowerCase().includes(q) || l.book.author.toLowerCase().includes(q);
+    })
+    .sort((a, b) => {
+      if (sortBy === "views_desc") {
+        return (viewMap[b.id] ?? 0) - (viewMap[a.id] ?? 0);
+      } else if (sortBy === "views_asc") {
+        return (viewMap[a.id] ?? 0) - (viewMap[b.id] ?? 0);
+      } else {
+        // recent (default)
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
     });
 
   const counts = {
@@ -148,6 +159,20 @@ export default function MyListings({ listings: initial }: Props) {
             </svg>
           </button>
         )}
+      </div>
+
+      {/* Sort dropdown */}
+      <div className="flex gap-2 items-center">
+        <label className="text-xs font-medium text-gray-600">Ordenar por:</label>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as any)}
+          className="bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500"
+        >
+          <option value="recent">Más recientes</option>
+          <option value="views_desc">Más visitas</option>
+          <option value="views_asc">Menos visitas</option>
+        </select>
       </div>
 
       {/* Listings */}
