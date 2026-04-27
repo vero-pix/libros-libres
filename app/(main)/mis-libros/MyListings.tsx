@@ -37,6 +37,17 @@ export default function MyListings({ listings: initial }: Props) {
   const searchParams = useSearchParams();
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  // Map of listingId -> total page views for this seller's listings.
+  const [viewMap, setViewMap] = useState<Record<string, number>>({});
+
+  // Fetch view counts once on mount from the seller-scoped API.
+  useEffect(() => {
+    fetch("/api/seller/listing-views")
+      .then((r) => r.json())
+      .then((d) => { if (d.views) setViewMap(d.views); })
+      .catch(() => {}); // Silently fail — views are informational only.
+  }, []);
+
   useEffect(() => {
     const editParam = searchParams.get("edit");
     if (editParam) setEditingId(editParam);
@@ -144,6 +155,7 @@ export default function MyListings({ listings: initial }: Props) {
         <ListingRow
           key={listing.id}
           listing={listing}
+          viewCount={viewMap[listing.id] ?? 0}
           isEditing={editingId === listing.id}
           isLoading={loading === listing.id}
           onToggleEdit={() => setEditingId(editingId === listing.id ? null : listing.id)}
@@ -171,6 +183,8 @@ export default function MyListings({ listings: initial }: Props) {
 
 interface RowProps {
   listing: ListingWithBook;
+  /** Total cumulative page views recorded for this listing. */
+  viewCount: number;
   isEditing: boolean;
   isLoading: boolean;
   onToggleEdit: () => void;
@@ -181,6 +195,7 @@ interface RowProps {
 
 function ListingRow({
   listing,
+  viewCount,
   isEditing,
   isLoading,
   onToggleEdit,
@@ -232,6 +247,14 @@ function ListingRow({
             )}
             <span className="text-xs text-gray-400">
               {CONDITION_LABELS[listing.condition]} · {MODALITY_LABELS[listing.modality]}
+            </span>
+            {/* View counter — shows total cumulative page views for this listing */}
+            <span className="inline-flex items-center gap-1 text-xs text-gray-400 ml-auto">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              {viewCount === 0 ? "Sin visitas aún" : `${viewCount} ${viewCount === 1 ? "visita" : "visitas"}`}
             </span>
           </div>
 
