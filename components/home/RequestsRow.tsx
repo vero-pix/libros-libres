@@ -11,6 +11,8 @@ interface BookRequest {
 
 export default async function RequestsRow() {
   const supabase = createPublicClient();
+
+  // Fetch unfulfilled book requests — direct demand from buyers.
   const { data: requests } = await supabase
     .from("book_requests")
     .select("id, title, author, requester_location, created_at")
@@ -18,27 +20,61 @@ export default async function RequestsRow() {
     .order("created_at", { ascending: false })
     .limit(4);
 
-  const { data: recentSearches } = await supabase
+  // Fetch raw search queries from the last 7 days (with OR without results).
+  // A wider window + all results makes this section resilient — it won't
+  // vanish just because no one searched with 0 results in the last 48h.
+  const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: rawSearches } = await supabase
     .from("search_queries")
-    .select("query, created_at")
-    .eq("results_count", 0)
-    .gt("created_at", new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString())
+    .select("query, results_count, created_at")
+    .gt("created_at", since7d)
     .order("created_at", { ascending: false })
-    .limit(4);
+    .limit(200); // Fetch more so we can rank after deduplication.
 
-  const hasContent = (requests && requests.length > 0) || (recentSearches && recentSearches.length > 0);
+  // Deduplicate searches by normalized query and rank by frequency.
+  // Prefer queries with 0 results (true gap in catalog) but show all if needed.
+  const queryCounts = new Map<string, { original: string; count: number; hasGap: boolean }>();
+  for (const s of rawSearches ?? []) {
+    const key = s.query.trim().toLowerCase();
+    if (!key || key.length < 3) continue; // Skip noise (very short queries).
+    const existing = queryCounts.get(key);
+    if (existing) {
+      existing.count += 1;
+      if (s.results_count === 0) existing.hasGap = true;
+    } else {
+      queryCounts.set(key, {
+        original: s.query.trim(),
+        count: 1,
+        hasGap: s.results_count === 0,
+      });
+    }
+  }
+
+  // Sort: catalog gaps first, then by frequency descending.
+  const topSearches = Array.from(queryCounts.values())
+    .sort((a, b) => {
+      if (a.hasGap !== b.hasGap) return a.hasGap ? -1 : 1;
+      return b.count - a.count;
+    })
+    .slice(0, 4);
+
+  const hasContent =
+    (requests && requests.length > 0) || topSearches.length > 0;
+
+  // Nothing to show at all — hide section completely.
   if (!hasContent) return null;
 
-  // Mix both types of demand
+  // Build unified demand items merging book_requests + top search queries.
   const demandItems = [
-    ...(requests || []).map(r => ({ ...r, type: 'request' as const })),
-    ...(recentSearches || []).map(s => ({ 
-      id: `s-${s.query}`, 
-      title: s.query, 
-      author: null, 
-      requester_location: "Alguien hoy", 
-      type: 'search' as const 
-    }))
+    ...(requests ?? []).map((r) => ({ ...r, type: "request" as const })),
+    ...topSearches.map((s) => ({
+      id: `s-${s.original}`,
+      title: s.original,
+      author: null as string | null,
+      // Show search frequency as social proof for sellers.
+      requester_location: s.count > 1 ? `${s.count} búsquedas esta semana` : "Alguien esta semana",
+      type: "search" as const,
+    })),
   ].slice(0, 8);
 
   return (
