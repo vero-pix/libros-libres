@@ -57,6 +57,14 @@ export default function PriceCompare({ title, author, isbn, currentPrice, varian
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => {
+              // Track the click silently without blocking navigation
+              fetch("/api/analytics/external-click", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ store: link.name, bookTitle: title, url: link.url }),
+              }).catch(() => {});
+            }}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border rounded-lg transition-colors ${link.color}`}
           >
             {link.name}

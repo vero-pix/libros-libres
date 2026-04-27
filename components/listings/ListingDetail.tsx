@@ -94,7 +94,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
   const isSold = listing.status === "completed";
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden relative">
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden relative pb-24 sm:pb-0">
       {isSold && (
         <div className="absolute top-4 right-4 z-10 bg-red-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg uppercase tracking-wider">
           Vendido
@@ -379,9 +379,34 @@ export default function ListingDetail({ listing, images = [] }: Props) {
         </p>
       </div>
 
-      <div className="px-6 sm:px-8">
+      <div className="px-6 sm:px-8 pb-4">
         <SellerOtherListings sellerId={listing.seller_id} currentListingId={listing.id} />
       </div>
+
+      {/* Mobile Sticky Buy Bar */}
+      {listing.price != null && listing.modality !== "loan" && !isSold && (
+        <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-[0_-8px_16px_rgba(0,0,0,0.05)] z-50 flex items-center justify-between gap-4 animate-in slide-in-from-bottom-full duration-300">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Precio</span>
+            <span className="text-xl font-black text-gray-900 leading-none">${listing.price.toLocaleString("es-CL")}</span>
+          </div>
+          <div className="flex-1">
+            {listing.seller?.mercadopago_user_id ? (
+              <Link
+                href={`/checkout/${listing.id}`}
+                className="flex items-center justify-center w-full bg-brand-600 active:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-base"
+              >
+                Comprar ahora
+              </Link>
+            ) : (
+              <WhatsAppButton
+                phone={listing.seller?.phone ?? null}
+                title={book.title}
+              />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
