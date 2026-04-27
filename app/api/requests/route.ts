@@ -99,5 +99,17 @@ export async function POST(req: NextRequest) {
     requester_location: requester_location?.trim() || null,
   }).catch((e) => console.error("[notifyRequestSellers] error:", e));
 
+  // GONG: Avisar por Telegram
+  import("@/lib/notifications").then(({ sendGong, escapeHtml }) => {
+    sendGong(
+      `📢 <b>¡Nueva Solicitud de Libro!</b>\n\n` +
+      `Alguien está buscando: <b>${escapeHtml(data.title)}</b>\n\n` +
+      (requester_email ? `Email: ${escapeHtml(requester_email)}\n` : "") +
+      (requester_whatsapp ? `WA: ${escapeHtml(requester_whatsapp)}\n` : "") +
+      (notes ? `Notas: <i>${escapeHtml(notes)}</i>\n` : "") +
+      `\n<a href="https://tuslibros.cl/admin/requests">Ver solicitudes →</a>`
+    ).catch(() => {});
+  });
+
   return NextResponse.json({ request: data }, { status: 201 });
 }

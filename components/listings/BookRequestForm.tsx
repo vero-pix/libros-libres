@@ -29,14 +29,21 @@ export default function BookRequestForm({ initialTitle = "" }: BookRequestFormPr
     const supabase = createClient();
 
     try {
-      const { error } = await supabase.from("book_requests").insert({
-        title,
-        requester_email: email,
-        requester_whatsapp: whatsapp,
-        notes,
+      const res = await fetch("/api/requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          requester_email: email,
+          requester_whatsapp: whatsapp,
+          notes,
+        }),
       });
 
-      if (error) throw error;
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Error al guardar el pedido");
+      }
 
       setIsDone(true);
     } catch (err: any) {
