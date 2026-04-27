@@ -33,7 +33,12 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 
 ---
 
-## Roadmap vivo (21 abril 2026)
+## Roadmap vivo (Actualizado 27 Abril 2026)
+
+### Optimizaciones de Funnel (27 Abril 2026)
+- [x] ~~Sticky Buy Bar (Mobile)~~ — ✅ implementado en `ListingDetail.tsx` para mejorar la conversión en vistas de celular.
+- [x] ~~Tracking Clicks Competencia~~ — ✅ implementado endpoint `/api/analytics/external-click` que avisa por Telegram si un usuario clica Buscalibre/MercadoLibre.
+- [x] ~~Gong Telegram Demanda Insatisfecha~~ — ✅ `BookRequestForm` ahora pega a `/api/requests` gatillando un Telegram instantáneo al admin para recuperar venta.
 
 ### Urgente (romper = detener flujo de usuarios)
 - [x] ~~Fix mobile navbar sin romper dropdowns~~ — ✅ confirmado 21 abril por Vero, funciona bien
