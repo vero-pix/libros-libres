@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 /**
  * GET /api/seller/listing-views
  *
  * Returns the total view count per listing for the authenticated seller.
  * Only returns data for listings that belong to the logged-in user.
- * Uses the service role key internally to read page_views (admin table),
+ * Uses the service role key to read page_views (no RLS restrictions),
  * but scopes the result to the seller's own listing IDs for privacy.
  */
 export async function GET() {
@@ -21,7 +22,7 @@ export async function GET() {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  // Fetch the seller's listing IDs.
+  // Fetch the seller's listing IDs using their own auth context.
   const { data: listings, error: listingError } = await supabase
     .from("listings")
     .select("id")
@@ -37,8 +38,9 @@ export async function GET() {
     return NextResponse.json({ views: {} });
   }
 
-  // Query page_views for those listing IDs — no date limit so it's cumulative.
-  const { data: views, error: viewError } = await supabase
+  // Use service role client to query page_views (bypasses RLS).
+  const serviceClient = createServiceRoleClient();
+  const { data: views, error: viewError } = await serviceClient
     .from("page_views")
     .select("listing_id")
     .in("listing_id", listingIds);
