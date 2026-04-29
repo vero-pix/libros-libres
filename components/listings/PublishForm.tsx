@@ -190,8 +190,10 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
       let finalSubcategory: string | null = subcategorySlug;
       if (!finalCategory && book.genre) {
         const normalized = normalizeGenre(book.genre, book.title, book.description);
-        finalCategory = normalized.category ?? null;
-        finalSubcategory = normalized.subcategory ?? null;
+        if (normalized) {
+          finalCategory = normalized.category;
+          finalSubcategory = normalized.subcategory;
+        }
       }
       const tags = suggestTags({
         title: book.title,

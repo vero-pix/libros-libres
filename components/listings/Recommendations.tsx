@@ -23,6 +23,7 @@ interface RecommendedListing {
   seller: {
     id: string;
     full_name: string | null;
+    username?: string | null;
     mercadopago_user_id?: string | null;
   } | null;
 }

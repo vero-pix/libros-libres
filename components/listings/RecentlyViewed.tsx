@@ -88,8 +88,9 @@ export default function RecentlyViewed() {
                 ${item.price.toLocaleString("es-CL")}
               </p>
             )}
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
