@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import SocialLoginButtons from "./SocialLoginButtons";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -15,35 +14,13 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaRef = useRef<HCaptcha>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    // Ejecutar captcha invisible y esperar token
-    let token = captchaToken;
-    if (!token) {
-      try {
-        const result = await captchaRef.current?.execute({ async: true });
-        token = result?.response ?? null;
-      } catch {
-        setError("Error de verificación de seguridad. Intenta de nuevo.");
-        setLoading(false);
-        return;
-      }
-    }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-      options: { captchaToken: token ?? undefined },
-    });
-
-    captchaRef.current?.resetCaptcha();
-    setCaptchaToken(null);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       setError("Correo o contraseña incorrectos. Verifica tus datos.");
@@ -91,14 +68,6 @@ export default function LoginForm() {
           ¿Olvidaste tu contraseña?
         </Link>
       </div>
-
-      <HCaptcha
-        ref={captchaRef}
-        sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-        size="invisible"
-        onVerify={(token) => setCaptchaToken(token)}
-        onExpire={() => setCaptchaToken(null)}
-      />
 
       {error && (
         <p className="text-sm text-red-600 bg-red-50 border border-red-100 px-3 py-2 rounded-xl">
