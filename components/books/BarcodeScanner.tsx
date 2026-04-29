@@ -53,23 +53,29 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
         Html5QrcodeSupportedFormats.EAN_13,
         Html5QrcodeSupportedFormats.EAN_8,
         Html5QrcodeSupportedFormats.CODE_128,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,
       ],
       verbose: false,
     });
     scannerRef.current = scanner;
 
-    // Use a more generous scan area (square-ish but not full height)
+    // Use a more generous scan area (horizontal rectangle)
     const screenW = window.innerWidth;
-    const boxW = Math.min(screenW - 60, 320);
-    const boxH = Math.round(boxW * 0.65); // More height for easier focus/alignment
+    const boxW = Math.min(screenW - 40, 400);
+    const boxH = 150; // Thin but wide for barcodes
 
     scanner
       .start(
         { facingMode: "environment" },
         {
-          fps: 15, // Safer for most devices
+          fps: 20, 
           qrbox: { width: boxW, height: boxH },
-          disableFlip: true,
+          aspectRatio: 1.777778,
+          disableFlip: false,
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true
+          }
         },
         (decodedText) => {
           if (detectedRef.current) return;
@@ -144,7 +150,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
 
       {/* Video Container */}
       <div className="flex-1 relative overflow-hidden bg-zinc-900" ref={containerRef}>
-        <div id="barcode-reader" className="absolute inset-0 w-full h-full [&>video]:!object-cover [&>video]:!w-full [&>video]:!h-full" />
+        <div id="barcode-reader" className="absolute inset-0 w-full h-full [&>video]:!object-contain [&>video]:!w-full [&>video]:!h-full" />
 
         {/* Detection Flash Overlay */}
         {isFlashing && (
@@ -172,8 +178,8 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
           <div 
             className="relative transition-all duration-500" 
             style={{ 
-              width: Math.min(window?.innerWidth - 60 || 280, 320), 
-              height: Math.round(Math.min(window?.innerWidth - 60 || 280, 320) * 0.65) 
+              width: Math.min(window?.innerWidth - 40 || 280, 400), 
+              height: 150 
             }}
           >
             {/* Línea de escaneo animada */}

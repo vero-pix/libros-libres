@@ -132,27 +132,61 @@ export default function CategoriesSidebar({
         );
       })}
 
-      {/* Tags destacados */}
-      <div className="mt-6 pt-4 border-t border-cream-dark/20">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-muted/60 px-3 mb-2">
-          Tags destacados
+      {/* Filtros de Precio */}
+      <div className="mt-8 pt-4 border-t border-cream-dark/20">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-ink-muted/80 px-3 mb-3">
+          Rango de Precio
         </p>
-        <div className="flex flex-wrap gap-1.5 px-3">
-          {FEATURED_TAGS.map((t) => (
+        <div className="space-y-1.5 px-1">
+          {[
+            { label: "Menos de $10.000", min: 0, max: 10000 },
+            { label: "$10.000 - $25.000", min: 10000, max: 25000 },
+            { label: "Más de $25.000", min: 25000, max: 1000000 },
+          ].map((range) => (
             <Link
-              key={t.tag}
-              href={`/?tag=${t.tag}`}
-              className={`text-[11px] px-2.5 py-1 rounded-full transition-colors ${
-                activeTag === t.tag
-                  ? "bg-brand-500 text-white"
-                  : "bg-cream-warm text-ink-muted hover:bg-brand-50 hover:text-brand-600"
-              }`}
+              key={range.label}
+              href={`/?price_min=${range.min}&price_max=${range.max}`}
+              className="block text-sm py-1.5 px-3 rounded-lg text-ink-muted hover:bg-cream-warm hover:text-ink transition-colors"
             >
-              #{t.label}
+              {range.label}
             </Link>
           ))}
         </div>
       </div>
+
+      {/* Filtro de Estado */}
+      <div className="mt-8 pt-4 border-t border-cream-dark/20">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-ink-muted/80 px-3 mb-3">
+          Estado del libro
+        </p>
+        <div className="space-y-1 px-1">
+          {[
+            { value: "new", label: "Como nuevo" },
+            { value: "good", label: "Buen estado" },
+            { value: "fair", label: "Estado regular" },
+          ].map((cond) => (
+            <Link
+              key={cond.value}
+              href={`/?condition=${cond.value}`}
+              className="block text-sm py-1.5 px-3 rounded-lg text-ink-muted hover:bg-cream-warm hover:text-ink transition-colors"
+            >
+              {cond.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Limpiar Filtros */}
+      {(activeCategory || activeTag) && (
+        <div className="mt-8 px-3">
+          <Link
+            href="/"
+            className="block text-center py-2 border border-cream-dark/40 text-ink-muted text-xs font-semibold rounded-xl hover:bg-white hover:text-brand-600 transition-colors"
+          >
+            Limpiar todos los filtros
+          </Link>
+        </div>
+      )}
     </aside>
   );
 }

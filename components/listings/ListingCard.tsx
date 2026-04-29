@@ -124,6 +124,14 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
               >
                 {(book as any).language}
               </span>
+            {listing.condition && listing.status !== "completed" && (
+              <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm border ${
+                listing.condition === "new" ? "bg-green-50 text-green-700 border-green-200" :
+                listing.condition === "good" ? "bg-blue-50 text-blue-700 border-blue-200" :
+                "bg-amber-50 text-amber-700 border-amber-200"
+              }`}>
+                {listing.condition === "new" ? "Nuevo" : listing.condition === "good" ? "Buen estado" : "Usado"}
+              </span>
             )}
           </div>
           {listing._featured && (
@@ -212,19 +220,29 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
               </p>
             </div>
           )}
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-cream-dark/20">
           <Link
             href={`/vendedor/${listing.seller_id}`}
-            className="text-[11px] text-ink-muted hover:text-brand-600 transition-colors flex items-center gap-1"
+            className="text-[11px] text-ink-muted hover:text-brand-600 transition-colors flex items-center gap-1.5"
           >
             {listing.seller?.avatar_url ? (
-              <Image src={listing.seller.avatar_url} alt="" width={16} height={16} className="rounded-full object-cover flex-shrink-0" />
+              <Image src={listing.seller.avatar_url} alt="" width={18} height={18} className="rounded-full object-cover flex-shrink-0" />
             ) : (
-              <span className="w-4 h-4 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-[8px] font-bold flex-shrink-0">
+              <span className="w-4.5 h-4.5 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-[9px] font-bold flex-shrink-0">
                 {sellerName[0].toUpperCase()}
               </span>
             )}
-            {sellerName}
+            <span className="font-medium">{sellerName}</span>
           </Link>
+          {listing.address && (
+            <span className="text-[10px] text-ink-muted flex items-center gap-1">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              {listing.address.split(",").slice(-2, -1)[0]?.trim() || listing.address.split(",")[0]}
+            </span>
+          )}
         </div>
       </div>
     </div>
