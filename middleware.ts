@@ -2,6 +2,18 @@ import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 import { createServerClient } from "@supabase/ssr";
 
+// Países bloqueados — fuente principal de bots y spam registrado en la plataforma.
+// Basado en ISO 3166-1 alpha-2. Vercel inyecta x-vercel-ip-country en cada request.
+const BLOCKED_COUNTRIES = new Set([
+  "RU", // Rusia
+  "VN", // Vietnam
+  "CN", // China
+  "KP", // Corea del Norte
+  "IR", // Irán
+  "BY", // Bielorrusia
+  "UA", // Ucrania (bots, no bloquear si hay usuarios reales — revisar en 30 días)
+]);
+
 // Herramientas de automatización / browser impersonation detectadas en el tráfico.
 // Respetamos Googlebot, Bingbot, ChatGPT-User, PerplexityBot y SEO tools (SEMrush, Ahrefs).
 const BLOCKED_UA = [
@@ -19,6 +31,13 @@ const BLOCKED_UA = [
 
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
+
+  // Bloqueo por país. Solo aplica a rutas de auth para no afectar SEO/bots legítimos.
+  const country = request.headers.get("x-vercel-ip-country") ?? "";
+  const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/api/auth") || pathname.startsWith("/api/orders") || pathname.startsWith("/api/newsletter");
+  if (isAuthRoute && BLOCKED_COUNTRIES.has(country)) {
+    return new NextResponse("Acceso no disponible en tu región.", { status: 403 });
+  }
 
   // Bloqueo UA de scrapers conocidos. Responde 403 sin servir contenido.
   const ua = request.headers.get("user-agent") ?? "";
