@@ -8,7 +8,7 @@ import type { ListingWithBook } from "@/types";
 export const metadata = {
   title: "Diario de tuslibros.cl — Abril 2026",
   description:
-    "Lo que pasó estas dos semanas en tuslibros.cl: primer testimonio, primer envío a Concepción, 78 fichas enriquecidas, limpieza de SEO y ediciones de colección en el catálogo.",
+    "Lo que pasó estas dos semanas en tuslibros.cl: nuevo lector con flash, primer testimonio, primer envío a Concepción, limpieza de SEO y más.",
 };
 
 export const revalidate = 300;
@@ -37,6 +37,21 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 };
 
 const novedades: Entry[] = [
+  {
+    date: "29 abril 2026",
+    title: "Nuevo lector con linterna (flash) y escaneo más sensible",
+    description:
+      "Vero me reportó que el lector de libros andaba 'pésimo' con algunos títulos nuevos. Lo rehice completo. Ahora el escáner tiene un botón de linterna ⚡️ para esos libros en estantes oscuros, un área de captura más grande y mejor sensibilidad (20 FPS). Además, si escaneas un libro que no está en las bases de datos internacionales, te permite seguir con el ingreso manual sin perder el ISBN que ya detectó. Y para que no hayan puntos ciegos, ahora me avisa por Telegram cada vez que alguien escanea algo que no encontramos, así podemos ver qué falta y agregarlo.",
+    tag: "Mejora",
+    link: "/publish",
+    linkText: "Probar el nuevo lector",
+    visual: {
+      kind: "milestone",
+      icon: "⚡️",
+      metric: "Flash activo",
+      detail: "escaneo en la oscuridad +20 FPS",
+    },
+  },
   {
     date: "22 abril 2026",
     title: "Día del Libro: 13 libros con hasta 50% de descuento",

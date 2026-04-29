@@ -28,11 +28,12 @@ export default function ISBNSearch({ onBookFound }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   function formatISBN(raw: string) {
-    return raw.replace(/[^\d-]/g, "").slice(0, 17);
+    // Allow digits, hyphens and 'X' (for ISBN-10)
+    return raw.replace(/[^\dX-]/gi, "").toUpperCase().slice(0, 17);
   }
 
   async function handleSearch() {
-    const clean = isbn.replace(/[-\s]/g, "");
+    const clean = isbn.replace(/[-\s]/g, "").toUpperCase();
     if (clean.length < 10) {
       setError("El ISBN debe tener 10 o 13 dígitos.");
       inputRef.current?.focus();
@@ -48,8 +49,9 @@ export default function ISBNSearch({ onBookFound }: Props) {
 
       if (!res.ok) {
         if (res.status === 404) {
-          setError("No encontramos ese ISBN. Puedes ingresar los datos manualmente.");
+          setError("No encontramos ese ISBN en las bases de datos internacionales.");
           setShowManual(true);
+          setManual(m => ({ ...m, title: m.title || "", author: m.author || "" }));
         } else {
           setError(data.error ?? "Error al consultar el servicio.");
         }
@@ -58,10 +60,8 @@ export default function ISBNSearch({ onBookFound }: Props) {
 
       // Si la API encontró el ISBN pero sin título, pedir datos manuales
       if (!data.title?.trim()) {
-        setError("Encontramos el ISBN pero sin título. Completa los datos manualmente.");
+        setError("Encontramos el código pero faltan datos. Complétalos a mano.");
         setShowManual(true);
-        // Mergear: sólo rellenar campos que estén vacíos en el form manual
-        // para no borrar datos que el usuario ya haya escrito a mano.
         setManual((m) => ({
           ...m,
           title: m.title || data.title || "",
@@ -75,28 +75,29 @@ export default function ISBNSearch({ onBookFound }: Props) {
       setError(null);
       setShowManual(false);
     } catch {
-      setError("Sin conexión. Verifica tu internet e intenta de nuevo.");
+      setError("Error de conexión. Prueba ingresando los datos manualmente.");
     } finally {
       setLoading(false);
     }
   }
 
   async function handleScanned(scannedIsbn: string) {
+    const clean = scannedIsbn.replace(/[-\s]/g, "").toUpperCase();
     setShowScanner(false);
-    setIsbn(scannedIsbn);
+    setIsbn(clean);
     setLoading(true);
     setError(null);
 
     try {
-      const res = await fetch(`/api/books/isbn?isbn=${scannedIsbn}`);
+      const res = await fetch(`/api/books/isbn?isbn=${clean}`);
       const data = await res.json();
 
       if (!res.ok) {
         if (res.status === 404) {
-          setError("No encontramos ese ISBN. Puedes ingresar los datos manualmente.");
+          setError("Código detectado pero no está en nuestra base de datos.");
           setShowManual(true);
         } else {
-          setError(data.error ?? "Error al consultar el servicio.");
+          setError(data.error ?? "Error al buscar los datos del libro.");
         }
         return;
       }
@@ -106,7 +107,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
       setError(null);
       setShowManual(false);
     } catch {
-      setError("Sin conexión. Verifica tu internet e intenta de nuevo.");
+      setError("Sin conexión. Puedes ingresar los datos manualmente.");
     } finally {
       setLoading(false);
     }

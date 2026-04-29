@@ -17,7 +17,7 @@ async function searchGoogleBooks(isbn: string) {
 
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3000);
+      const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout is safer
       const res = await fetch(url, { next: { revalidate: 86400 }, signal: controller.signal });
       clearTimeout(timeout);
       if (!res.ok) continue;
@@ -177,7 +177,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "ISBN requerido" }, { status: 400 });
   }
 
-  const cleanISBN = isbn.replace(/[-\s]/g, "");
+  const cleanISBN = isbn.replace(/[-\s]/g, "").toUpperCase();
 
   // Only accept Spanish descriptions
   const isSpanish = (d: string) => /\b(el|la|los|las|del|por|una|con|que|en|de|su|este|esta|como|para|más|entre|sobre|desde|hasta|pero|sino|también|tiene|puede|hace|sido|está|fue|ser|hay|sus|nos|muy)\b/i.test(d);
@@ -199,6 +199,22 @@ export async function GET(request: NextRequest) {
       olResult.description = "";
     }
     return NextResponse.json(olResult);
+  }
+
+  // Notificar a Vero por Telegram si un libro no se encontró
+  // Esto ayuda a diagnosticar por qué el lector "anda pésimo"
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
+  if (token && chatId) {
+    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: `🔍 <b>ISBN no encontrado</b>\n\nAlguien intentó buscar o escanear:\n<code>${cleanISBN}</code>\n\nNo estaba en Google ni OpenLibrary.`,
+        parse_mode: "HTML",
+      }),
+    }).catch(() => {});
   }
 
   return NextResponse.json({ error: "Libro no encontrado" }, { status: 404 });
