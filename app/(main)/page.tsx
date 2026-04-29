@@ -45,17 +45,20 @@ const getTotalActiveCount = unstable_cache(
 );
 
 const getDefaultListings = unstable_cache(
-  async () => {
+  async (page: number) => {
     const supabase = createPublicClient();
+    const start = (page - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE - 1;
+    
     const { data } = await supabase
       .from("listings")
       .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`)
       .in("status", ["active", "completed"])
       .order("created_at", { ascending: false })
-      .limit(60);
+      .range(start, end);
     return data ?? [];
   },
-  ["home-default-listings"],
+  ["home-default-listings-paged"],
   { revalidate: 60 }
 );
 
@@ -170,15 +173,16 @@ export default async function HomePage({ searchParams }: Props) {
   ]);
 
   // Listings principales: sin filtros ni sort custom → versión cacheada
-  // (ahorra ~90% del CPU del home). Con filtros/sort → query en vivo.
   const hasCustomSort = sort === "price_asc" || sort === "price_desc" || sort === "distance";
-  let rawListings: unknown;
+  let rawListings: any[] = [];
+  let totalCount = totalActiveCount;
+
   if (!hasFilters && !hasCustomSort) {
-    rawListings = await getDefaultListings();
+    rawListings = await getDefaultListings(currentPage);
   } else {
     let query = supabase
       .from("listings")
-      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`)
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`, { count: "exact" })
       .in("status", ["active", "completed"]);
 
     if (condition) query = query.eq("condition", condition);
@@ -191,10 +195,16 @@ export default async function HomePage({ searchParams }: Props) {
     else if (sort === "price_desc") query = query.order("price", { ascending: false });
     else query = query.order("created_at", { ascending: false });
 
-    const res = await query;
-    rawListings = res.data;
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE - 1;
+    
+    const { data, count } = await query.range(start, end);
+    rawListings = data ?? [];
+    totalCount = count ?? 0;
   }
-  let listings = ((rawListings ?? []) as unknown as (ListingWithBook & { reviews?: { rating: number }[] })[]).map((l) => {
+
+  // Map and sort for display
+  let listings = (rawListings as (ListingWithBook & { reviews?: { rating: number }[] })[]).map((l) => {
     const reviews = l.reviews ?? [];
     return {
       ...l,
@@ -203,74 +213,12 @@ export default async function HomePage({ searchParams }: Props) {
       _featured: l.seller?.plan === "librero" || l.seller?.plan === "libreria",
     };
   });
-
-  // Orden de presentación: deprioritized al final, featured arriba, con
-  // portada arriba, español arriba. Helper compartido con /search y /vendedor.
   listings = sortListingsForDisplay(listings);
 
-  // Filter by new taxonomy
-  if (subcategory) {
-    listings = listings.filter((l) => (l.book as any).subcategory === subcategory);
-  } else if (category) {
-    listings = listings.filter((l) => (l.book as any).category === category);
-  }
-  if (tag) {
-    listings = listings.filter((l) => ((l.book as any).tags ?? []).includes(tag));
-  }
-  // Legacy genre filter (backwards compat)
-  if (genre && !category && !subcategory) {
-    if (genre === "sin-categoria") {
-      listings = listings.filter((l) => !l.book.genre);
-    } else {
-      listings = listings.filter(
-        (l) => l.book.genre?.toLowerCase() === genre.toLowerCase()
-      );
-    }
-  }
-
-  if (author) {
-    listings = listings.filter(
-      (l) => l.book.author?.toLowerCase().includes(author.toLowerCase())
-    );
-  }
-
-  if (binding) {
-    listings = listings.filter(
-      (l) => l.book.binding?.toLowerCase() === binding.toLowerCase()
-    );
-  }
-  if (publisher) {
-    listings = listings.filter(
-      (l) => l.book.publisher?.toLowerCase().includes(publisher.toLowerCase())
-    );
-  }
-  if (pages_min) {
-    listings = listings.filter(
-      (l) => l.book.pages != null && l.book.pages >= Number(pages_min)
-    );
-  }
-  if (pages_max) {
-    listings = listings.filter(
-      (l) => l.book.pages != null && l.book.pages <= Number(pages_max)
-    );
-  }
-
-  // Sort by distance when user shares location
-  if (sort === "distance" && userLat != null && userLng != null) {
-    listings = listings
-      .map((l) => {
-        const dist = l.latitude != null && l.longitude != null
-          ? haversineKm(userLat, userLng, l.latitude, l.longitude)
-          : Infinity;
-        return { ...l, _distance: dist };
-      })
-      .sort((a, b) => (a as any)._distance - (b as any)._distance);
-  }
-
-  const allListings = (rawListings as unknown as ListingWithBook[]) ?? [];
-  const totalListings = allListings.length;
-
-  const categoryTree = await buildCategoryTree(supabase, allListings as any);
+  // For the sidebar category tree, we use the current page's listings as a sample 
+  // or we could fetch a slightly larger set if needed, but let's keep it lean.
+  const categoryTree = await buildCategoryTree(supabase, rawListings as any);
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   return (
     <div className="min-h-screen bg-cream">
@@ -301,7 +249,7 @@ export default async function HomePage({ searchParams }: Props) {
           ...(tag ? [{ label: `#${tag}` }] : []),
         ]} />
         <div className="flex gap-10">
-          <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalListings} />
+          <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalCount} />
 
           <div className="flex-1 min-w-0">
             {!hasFilters && collectibleListings.length > 0 && (
@@ -315,9 +263,7 @@ export default async function HomePage({ searchParams }: Props) {
             {listings.length > 0 ? (
               <>
                 {(() => {
-                  const totalPages = Math.ceil(listings.length / ITEMS_PER_PAGE);
-                  const start = (currentPage - 1) * ITEMS_PER_PAGE;
-                  const pageListings = listings.slice(start, start + ITEMS_PER_PAGE);
+                  const pageListings = listings;
                   const firstHalf = pageListings.slice(0, 10);
                   const secondHalf = pageListings.slice(10);
 
