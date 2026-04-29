@@ -45,11 +45,12 @@ interface DefaultLocation {
 
 interface Props {
   userId: string;
+  username?: string | null;
   existingPhone?: string | null;
   defaultLocation?: DefaultLocation | null;
 }
 
-export default function PublishForm({ userId, existingPhone, defaultLocation }: Props) {
+export default function PublishForm({ userId, username, existingPhone, defaultLocation }: Props) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -320,7 +321,7 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           {publishedListingId && (
             <Link
-              href={publishedSlug ? `/libro/${publishedSlug}` : `/listings/${publishedListingId}`}
+              href={publishedSlug && username ? `/libro/${username}/${publishedSlug}` : `/listings/${publishedListingId}`}
               className="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl text-sm transition-colors"
             >
               Ver publicación

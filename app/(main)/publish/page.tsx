@@ -15,7 +15,7 @@ export default async function PublishPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("phone, default_latitude, default_longitude, default_address")
+    .select("phone, username, default_latitude, default_longitude, default_address")
     .eq("id", user.id)
     .single();
 
@@ -182,6 +182,7 @@ export default async function PublishPage() {
       <main className="max-w-2xl mx-auto px-4 py-8">
         <PublishForm
           userId={user.id}
+          username={profile?.username ?? null}
           existingPhone={profile?.phone ?? null}
           defaultLocation={defaultLocation}
         />
