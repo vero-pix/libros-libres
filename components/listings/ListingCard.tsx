@@ -124,6 +124,7 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
               >
                 {(book as any).language}
               </span>
+            )}
             {listing.condition && listing.status !== "completed" && (
               <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm border ${
                 listing.condition === "new" ? "bg-green-50 text-green-700 border-green-200" :
@@ -220,6 +221,8 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
               </p>
             </div>
           )}
+        </div>
+
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-cream-dark/20">
           <Link
             href={`/vendedor/${listing.seller_id}`}

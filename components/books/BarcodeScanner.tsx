@@ -76,7 +76,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
           experimentalFeatures: {
             useBarCodeDetectorIfSupported: true
           }
-        },
+        } as any,
         (decodedText) => {
           if (detectedRef.current) return;
           
