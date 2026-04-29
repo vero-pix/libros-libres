@@ -640,6 +640,42 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 
 ---
 
+## 📚 Libros a buscar en ferias (Basado en demanda real - Abril 2026)
+
+**Contexto**: Análisis de top 20 visitados + datos de mercado chileno. Enfoque: demanda comprobada, conversión intencional.
+
+### Ficción Literaria (TOP DEMANDA)
+- **Autores chilenos**: Donoso, Bolaño, Cortázar, Allende, Maturana, Soto Hall
+- **Clásicos cortos** (sub $8k): Metamorfosis (Kafka), Bartleby (Melville), Crimen y Castigo
+- **Marquez, Cortázar, Bukowski** — búsquedas recurrentes
+- **Series completas**: Harry Potter (tomos faltantes), Percy Jackson, Crepúsculo (fanáticos buscan completar)
+
+### No-ficción Práctica (BUSCADORES INTENCIONALES)
+- Hábitos Atómicos (James Clear)
+- El arte de no preocuparse (Dale Carnegie)
+- Libros de productividad/mentalidad (Tim Ferriss, Cal Newport)
+- Filosofía accesible: Cartas a un Joven Poeta (Rilke), El Profeta (Gibran) — trending en top 20
+
+### Filosofía & Desarrollo Personal
+- Máximas y Aforismos (Khalil Gibran) — 7 visitas
+- Lecciones de Ciencias Ocultas (trending)
+- Textos de Carl Jung, Joseph Campbell (no tan académicos)
+
+### Evitar (Bajo engagement)
+- ❌ Libros de autoayuda genéricos sin autor célebre
+- ❌ Ediciones muy antiguas sin reimpresiones modernas
+- ❌ Textos académicos (ingeniería, medicina) — baja conversión en usado
+
+### Estrategia de compra
+1. **Prioridad 1**: Series populares (completistas pagan bien)
+2. **Prioridad 2**: Ficción literaria de autores trending (Marquez, Cortázar, Bukowski)
+3. **Prioridad 3**: No-ficción práctica con precio 5k-15k (sweet spot conversión)
+4. **Prioridad 4**: Filosofía/desarrollo personal bajo $10k
+
+**Nota**: Actualizar esta lista cada mes basada en top-listings-report (`scripts/top-listings-week.mjs`).
+
+---
+
 ## Documentos de referencia
 - `MODELO-NEGOCIO.md` — flujos de pago, planes, comisiones, ciclo arriendo
 - `CLAUDE.md` — convenciones del proyecto para Claude Code
