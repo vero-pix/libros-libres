@@ -31,6 +31,19 @@ const ITEMS_PER_PAGE = 20;
 
 // Queries cacheadas (datos públicos, no dependen de sesión).
 // Usan createPublicClient porque unstable_cache no permite cookies().
+const getTotalActiveCount = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { count } = await supabase
+      .from("listings")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active");
+    return count ?? 0;
+  },
+  ["total-active-count"],
+  { revalidate: 300 }
+);
+
 const getDefaultListings = unstable_cache(
   async () => {
     const supabase = createPublicClient();
@@ -149,10 +162,11 @@ export default async function HomePage({ searchParams }: Props) {
   const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || collectibleOnly);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
-  const [featuredListings, featuredSellers, collectibleListings] = await Promise.all([
+  const [featuredListings, featuredSellers, collectibleListings, totalActiveCount] = await Promise.all([
     getFeaturedListings() as unknown as Promise<ListingWithBook[]>,
     getFeaturedSellers(),
     getCollectibleListings() as unknown as Promise<ListingWithBook[]>,
+    getTotalActiveCount(),
   ]);
 
   // Listings principales: sin filtros ni sort custom → versión cacheada
@@ -262,7 +276,7 @@ export default async function HomePage({ searchParams }: Props) {
     <div className="min-h-screen bg-cream">
 
       <HomeShell
-        totalListings={totalListings}
+        totalListings={totalActiveCount}
         hasFilters={hasFilters}
         featuredRow={
           !hasFilters && (featuredListings.length > 0 || featuredSellers.length > 0) ? (

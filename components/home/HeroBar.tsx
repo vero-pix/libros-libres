@@ -18,26 +18,20 @@ export default function HeroBar({ totalListings, onToggleMap }: Props) {
               <span className="italic text-brand-600">los que ya leíste y los que te faltan.</span>
             </h1>
             <p className="text-ink-muted mt-2 sm:mt-3 text-sm sm:text-base max-w-2xl mx-auto lg:mx-0">
-              {totalListings > 0 ? (
-                <>
-                  {totalListings} ejemplares disponibles hoy, desde <strong className="text-ink">$3.000</strong>.
-                  Pago con MercadoPago, envío por courier a todo Chile o retiro en Santiago.
-                </>
-              ) : (
-                <>Cargando el catálogo…</>
-              )}
+              El marketplace chileno para hacer circular tus libros.
+              Compra y vende con pago seguro, envíos a todo Chile o retiro directo en tu ciudad.
             </p>
 
-            <div className="mt-5 flex flex-wrap gap-3 justify-center lg:justify-start">
+            <div className="mt-6 flex flex-wrap gap-3 justify-center lg:justify-start">
               <Link
                 href="/search"
-                className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-md hover:bg-brand-600 transition-colors shadow"
+                className="inline-flex items-center px-8 py-3.5 bg-brand-500 text-white text-sm font-bold rounded-xl hover:bg-brand-600 transition-all shadow-lg hover:shadow-brand-500/20 hover:-translate-y-0.5 active:translate-y-0"
               >
-                Ver {totalListings > 0 ? `${totalListings} libros` : "catálogo"}
+                Explorar catálogo
               </Link>
               <Link
                 href="/publish"
-                className="inline-flex items-center px-6 py-3 bg-white border border-ink/20 text-ink text-sm font-semibold rounded-md hover:border-brand-500 hover:text-brand-600 transition-colors"
+                className="inline-flex items-center px-8 py-3.5 bg-white border-2 border-brand-500 text-brand-600 text-sm font-bold rounded-xl hover:bg-brand-50 transition-all shadow-sm"
               >
                 Ofrecer mi libro
               </Link>
