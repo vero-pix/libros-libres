@@ -1,14 +1,17 @@
 "use client";
 
+import Link from "next/link";
+
 interface Props {
   title: string;
   author?: string | null;
   isbn?: string | null;
   currentPrice?: number | null;
   variant?: "seller" | "buyer";
+  listingId?: string;
 }
 
-export default function PriceCompare({ title, author, isbn, currentPrice, variant = "seller" }: Props) {
+export default function PriceCompare({ title, author, isbn, currentPrice, variant = "seller", listingId }: Props) {
   const searchTerm = isbn || `${title} ${author || ""}`.trim();
   const encodedTitle = encodeURIComponent(searchTerm);
   const mlSearch = encodeURIComponent(`${title} ${author || ""}`.trim());
@@ -42,12 +45,24 @@ export default function PriceCompare({ title, author, isbn, currentPrice, varian
       
       {variant === "buyer" ? (
         <p className="text-[11px] text-ink-muted mb-3 leading-relaxed">
-          <span className="font-bold text-ink">Compra protegida:</span> En Libros-Libres tu dinero está seguro. Si encuentras el libro más barato en otro sitio, recuerda que acá tienes garantía de devolución si el estado no es el prometido.
+          <span className="font-bold text-ink">Antes de comparar:</span> Pregunta aquí si tienes dudas sobre el estado, cantidad disponible o negociación del precio. A veces es más rápido hablar directamente.
         </p>
       ) : (
         <p className="text-[11px] text-ink-muted mb-3 leading-relaxed">
           <span className="font-bold text-ink">Sugerencia:</span> Revisa los precios de la competencia para asegurar que tu libro se venda rápido.
         </p>
+      )}
+
+      {variant === "buyer" && listingId && (
+        <Link
+          href={`/messages?listing_id=${listingId}`}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 mb-3 w-full bg-brand-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-700 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          Preguntar al Vendedor
+        </Link>
       )}
 
       <div className="flex flex-wrap gap-2">

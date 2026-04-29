@@ -234,6 +234,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             isbn={book.isbn}
             currentPrice={listing.price}
             variant={isOwner ? "seller" : "buyer"}
+            listingId={listing.id}
           />
 
 
