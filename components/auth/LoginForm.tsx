@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import SocialLoginButtons from "./SocialLoginButtons";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -14,16 +15,31 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (!captchaToken) {
+      setError("Por favor completa la verificación de seguridad.");
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: { captchaToken },
+    });
+
+    captchaRef.current?.resetCaptcha();
+    setCaptchaToken(null);
 
     if (error) {
-      setError("Correo o contraseña incorrectos. Verificá tus datos.");
+      setError("Correo o contraseña incorrectos. Verifica tus datos.");
       setLoading(false);
       return;
     }
@@ -67,6 +83,15 @@ export default function LoginForm() {
         <Link href="/forgot-password" className="text-xs text-brand-600 hover:underline">
           ¿Olvidaste tu contraseña?
         </Link>
+      </div>
+
+      <div className="flex justify-center">
+        <HCaptcha
+          ref={captchaRef}
+          sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+          onVerify={(token) => setCaptchaToken(token)}
+          onExpire={() => setCaptchaToken(null)}
+        />
       </div>
 
       {error && (
