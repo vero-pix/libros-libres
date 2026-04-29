@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { RecentItem } from "./RecentlyViewed";
+import { libroUrl } from "@/lib/urls";
 
 const STORAGE_KEY = "tuslibros_recently_viewed";
 
@@ -78,7 +79,7 @@ export default function Recommendations() {
           return (
             <Link
               key={listing.id}
-              href={listing.slug ? `/libro/${listing.slug}` : `/listings/${listing.id}`}
+              href={libroUrl(listing)}
               className="group bg-white overflow-hidden hover:shadow-xl transition-all duration-300"
             >
               <div className="relative aspect-[3/4] bg-cream-warm flex items-center justify-center overflow-hidden">

@@ -201,11 +201,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(olResult);
   }
 
-  // Notificar a Vero por Telegram si un libro no se encontró
-  // Esto ayuda a diagnosticar por qué el lector "anda pésimo"
+  // Notificar a Vero por Telegram si un libro no se encontró (non-blocking)
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
   if (token && chatId) {
+    // We don't await this to keep the response snappy
     fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

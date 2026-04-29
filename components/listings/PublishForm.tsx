@@ -366,9 +366,9 @@ export default function PublishForm({ userId, existingPhone, defaultLocation }: 
           ) : (
             <ISBNSearch onBookFound={(b) => { 
               setBook(b);
-              // Autocompletar categoría si el libro trae género
-              if (b.genre) {
-                const normalized = normalizeGenre(b.genre, b.title, b.description);
+              // Autocompletar categoría por señales del libro
+              const normalized = normalizeGenre(b.genre, b.title, b.description);
+              if (normalized) {
                 setCategorySlug(normalized.category);
                 setSubcategorySlug(normalized.subcategory);
               }

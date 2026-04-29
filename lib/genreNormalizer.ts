@@ -171,32 +171,55 @@ function detectCollectable(title: string, description?: string | null): Normaliz
  * Prioridad: coleccionable detectado > mapa exacto > fuzzy match > fallback.
  */
 export function normalizeGenre(
-  rawGenre: string,
+  rawGenre?: string | null,
   title?: string,
   description?: string | null,
-): NormalizedGenre {
-  // Prioridad 1: señales de coleccionable
+): NormalizedGenre | null {
+  const genre = rawGenre || "";
+  
+  // Prioridad 1: señales de coleccionable en título/descripción
   if (title) {
     const collectable = detectCollectable(title, description);
     if (collectable) return collectable;
   }
 
-  // Prioridad 2: match exacto en el mapa
-  const key = normalize(rawGenre);
-  if (GENRE_MAP[key]) return GENRE_MAP[key];
+  // Prioridad 2: match exacto en el mapa (si hay género raw)
+  if (genre) {
+    const key = normalize(genre);
+    if (GENRE_MAP[key]) return GENRE_MAP[key];
 
-  // Prioridad 3: match parcial
-  for (const [mapKey, value] of Object.entries(GENRE_MAP)) {
-    if (key.includes(mapKey) || mapKey.includes(key)) {
-      return value;
+    // Prioridad 3: match parcial en el género raw
+    for (const [mapKey, value] of Object.entries(GENRE_MAP)) {
+      if (key.includes(mapKey) || mapKey.includes(key)) {
+        return value;
+      }
     }
   }
 
-  // Prioridad 4: LCSH y otros formatos raros
-  if (key.includes("author") || key.includes("literary")) {
-    return { category: "ficcion", subcategory: "novela" };
+  // Prioridad 4: Señales en el TÍTULO (muy común cuando no hay género en la API)
+  if (title) {
+    const t = normalize(title);
+    if (t.includes("historia de") || t.includes("breve historia")) return { category: "no-ficcion", subcategory: "historia" };
+    if (t.includes("biografia") || t.includes("memorias de")) return { category: "no-ficcion", subcategory: "biografia" };
+    if (t.includes("cocina") || t.includes("recetas")) return { category: "no-ficcion", subcategory: "cocina" };
+    if (t.includes("cuentos") || t.includes("relatos")) return { category: "ficcion", subcategory: "cuentos" };
+    if (t.includes("poesia") || t.includes("poemas")) return { category: "ficcion", subcategory: "poesia" };
+    if (t.includes("novela") || t.includes("ficcion")) return { category: "ficcion", subcategory: "novela" };
+    if (t.includes("filosofia") || t.includes("etica")) return { category: "no-ficcion", subcategory: "filosofia" };
+    if (t.includes("diccionario") || t.includes("enciclopedia")) return { category: "no-ficcion", subcategory: "divulgacion" };
   }
 
-  // Fallback: ficción/novela (categoría más común)
-  return { category: "ficcion", subcategory: "novela" };
+  // Prioridad 5: LCSH y otros formatos raros en el género raw
+  if (genre) {
+    const key = normalize(genre);
+    if (key.includes("author") || key.includes("literary") || key.includes("romance") || key.includes("suspense")) {
+      return { category: "ficcion", subcategory: "novela" };
+    }
+    if (key.includes("self") && key.includes("help")) {
+      return { category: "no-ficcion", subcategory: "autoayuda" };
+    }
+  }
+
+  // Si no hay señales claras, no autocompletamos (mejor no fallar que llenar basura)
+  return null;
 }

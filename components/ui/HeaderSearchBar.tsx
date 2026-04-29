@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef, useTransition } from "react";
 import { libroUrl } from "@/lib/urls";
+import Image from "next/image";
 
 interface Suggestion {
   id: string;
@@ -129,11 +130,15 @@ export default function HeaderSearchBar() {
                 }`}
               >
                 {s.cover_url ? (
-                  <img
-                    src={s.cover_url}
-                    alt=""
-                    className="w-8 h-11 object-cover rounded-sm shrink-0"
-                  />
+                  <div className="w-8 h-11 relative rounded-sm overflow-hidden shrink-0">
+                    <Image
+                      src={s.cover_url}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="32px"
+                    />
+                  </div>
                 ) : (
                   <div className="w-8 h-11 bg-cream-dark/20 rounded-sm shrink-0 flex items-center justify-center text-[8px] text-ink-muted">
                     📚

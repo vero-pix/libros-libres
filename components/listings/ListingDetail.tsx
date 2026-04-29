@@ -12,6 +12,7 @@ import ShareButtons from "./ShareButtons";
 import ContactSellerButton from "@/components/messages/ContactSellerButton";
 import PriceCompare from "@/components/listings/PriceCompare";
 import SellerOtherListings from "./SellerOtherListings";
+import { libroUrl } from "@/lib/urls";
 
 function WhatsAppButton({ phone, title }: { phone: string | null; title: string }) {
   if (!phone) {
@@ -88,6 +89,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
       price: listing.price,
       genre: book.genre,
       author: book.author,
+      seller_username: listing.seller?.username,
     });
   }, [listing.id, book.title, coverUrl, listing.price, book.genre, book.author]);
 
@@ -277,7 +279,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             <ShareButtons
               title={book.title}
               author={book.author}
-              url={`https://tuslibros.cl/listings/${listing.id}`}
+              url={`https://tuslibros.cl${libroUrl(listing)}`}
               price={listing.price}
             />
           </div>

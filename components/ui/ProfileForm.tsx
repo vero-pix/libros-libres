@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { compressImage } from "@/lib/image-compress";
+import Image from "next/image";
 
 interface Props {
   userId: string;
@@ -178,7 +179,7 @@ export default function ProfileForm({
         <div className="px-6 py-5 flex items-center gap-4">
           <div className="relative">
             {avatarUrl ? (
-              <img src={avatarUrl} alt="Logo" className="w-20 h-20 rounded-full object-cover border-2 border-cream-dark" />
+              <Image src={avatarUrl} alt="Logo" width={80} height={80} className="rounded-full object-cover border-2 border-cream-dark" />
             ) : (
               <div className="w-20 h-20 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-2xl font-bold border-2 border-cream-dark">
                 {(fullName || "T")[0].toUpperCase()}

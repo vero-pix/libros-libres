@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { ListingWithBook } from "@/types";
+import { libroUrl } from "@/lib/urls";
 
 export default function SellerOtherListings({ sellerId, currentListingId }: { sellerId: string, currentListingId: string }) {
   const [others, setOthers] = useState<ListingWithBook[]>([]);
@@ -15,7 +16,7 @@ export default function SellerOtherListings({ sellerId, currentListingId }: { se
       const supabase = createClient();
       const { data } = await supabase
         .from("listings")
-        .select(`*, book:books(*)`)
+        .select(`*, book:books(*), seller:users(username)`)
         .eq("seller_id", sellerId)
         .neq("id", currentListingId)
         .eq("status", "active")
@@ -43,7 +44,7 @@ export default function SellerOtherListings({ sellerId, currentListingId }: { se
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {others.map((l) => (
-          <Link key={l.id} href={`/listings/${l.id}`} className="group">
+          <Link key={l.id} href={libroUrl(l)} className="group">
             <div className="aspect-[3/4] relative bg-cream rounded-xl border border-cream-dark/30 overflow-hidden mb-2 group-hover:shadow-md transition-all">
               {l.book.cover_url ? (
                 <Image src={l.book.cover_url} alt={l.book.title} fill className="object-cover" />

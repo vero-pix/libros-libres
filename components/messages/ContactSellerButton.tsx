@@ -30,7 +30,7 @@ export default function ContactSellerButton({ sellerId, listingId, sellerName }:
         const data = await res.json();
         router.push(`/mensajes/${data.conversation_id}`);
       } else if (res.status === 401) {
-        router.push(`/login?next=/listings/${listingId}`);
+        router.push(`/login?next=${encodeURIComponent(window.location.pathname)}`);
       }
     } catch {
       // silently fail

@@ -12,6 +12,7 @@ export interface RecentItem {
   price: number | null;
   genre?: string | null;
   author?: string | null;
+  seller_username?: string | null;
 }
 
 const STORAGE_KEY = "tuslibros_recently_viewed";
@@ -51,12 +52,17 @@ export default function RecentlyViewed() {
         Vistos recientemente
       </h2>
       <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
-        {items.map((item) => (
-          <Link
-            key={item.id}
-            href={item.slug ? `/libro/${item.slug}` : `/listings/${item.id}`}
-            className="flex-shrink-0 w-28 group"
-          >
+        {items.map((item) => {
+          const itemUrl = item.slug && item.seller_username 
+            ? `/libro/${item.seller_username}/${item.slug}`
+            : `/listings/${item.id}`;
+
+          return (
+            <Link
+              key={item.id}
+              href={itemUrl}
+              className="flex-shrink-0 w-28 group"
+            >
             <div className="relative aspect-[3/4] bg-cream-warm rounded-lg overflow-hidden">
               {item.cover_url ? (
                 <Image

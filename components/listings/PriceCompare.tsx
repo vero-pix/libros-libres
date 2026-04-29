@@ -12,25 +12,28 @@ interface Props {
 }
 
 export default function PriceCompare({ title, author, isbn, currentPrice, variant = "seller", listingId }: Props) {
-  const searchTerm = isbn || `${title} ${author || ""}`.trim();
-  const encodedTitle = encodeURIComponent(searchTerm);
-  const mlSearch = encodeURIComponent(`${title} ${author || ""}`.trim());
+  const encodedTitle = encodeURIComponent(`${title} ${author || ""}`.trim());
+  const isbnClean = isbn?.replace(/[-\s]/g, "").toUpperCase();
 
   const links = [
     {
       name: "Buscalibre",
-      url: `https://www.buscalibre.cl/libros/search?q=${encodedTitle}`,
-      color: "text-orange-600 border-orange-300 hover:bg-orange-50",
+      url: isbnClean 
+        ? `https://www.buscalibre.cl/libros/search?q=${isbnClean}`
+        : `https://www.buscalibre.cl/libros/search?q=${encodedTitle}`,
+      color: "text-orange-600 border-orange-200 hover:bg-orange-50 bg-white/50",
     },
     {
       name: "MercadoLibre",
-      url: `https://listado.mercadolibre.cl/${mlSearch.replace(/%20/g, "-")}`,
-      color: "text-yellow-700 border-yellow-300 hover:bg-yellow-50",
+      url: `https://listado.mercadolibre.cl/${encodedTitle.replace(/%20/g, "-")}`,
+      color: "text-yellow-700 border-yellow-200 hover:bg-yellow-50 bg-white/50",
     },
     {
-      name: "Facebook",
-      url: `https://www.facebook.com/marketplace/search/?query=${mlSearch}`,
-      color: "text-blue-600 border-blue-300 hover:bg-blue-50",
+      name: "Antartica",
+      url: isbnClean
+        ? `https://www.antartica.cl/catalogsearch/result/?q=${isbnClean}`
+        : `https://www.antartica.cl/catalogsearch/result/?q=${encodedTitle}`,
+      color: "text-red-700 border-red-200 hover:bg-red-50 bg-white/50",
     },
   ];
 
@@ -55,7 +58,7 @@ export default function PriceCompare({ title, author, isbn, currentPrice, varian
 
       {variant === "buyer" && listingId && (
         <Link
-          href={`/messages?listing_id=${listingId}`}
+          href={`/mensajes?listing_id=${listingId}`}
           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 mb-3 w-full bg-brand-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-700 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -65,30 +68,32 @@ export default function PriceCompare({ title, author, isbn, currentPrice, varian
         </Link>
       )}
 
-      <div className="flex flex-wrap gap-2">
-        {links.map((link) => (
-          <a
-            key={link.name}
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => {
-              // Track the click silently without blocking navigation
-              fetch("/api/analytics/external-click", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ store: link.name, bookTitle: title, url: link.url }),
-              }).catch(() => {});
-            }}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border rounded-lg transition-colors ${link.color}`}
-          >
-            {link.name}
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </a>
-        ))}
-      </div>
+      {variant === "seller" && (
+        <div className="flex flex-wrap gap-2">
+          {links.map((link) => (
+            <a
+              key={link.name}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                // Track the click silently without blocking navigation
+                fetch("/api/analytics/external-click", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ store: link.name, bookTitle: title, url: link.url }),
+                }).catch(() => {});
+              }}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border rounded-lg transition-colors ${link.color}`}
+            >
+              {link.name}
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

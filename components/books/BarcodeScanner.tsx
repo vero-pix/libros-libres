@@ -67,15 +67,18 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       .start(
         { facingMode: "environment" },
         {
-          fps: 20, // Increased for smoother detection
+          fps: 15, // Safer for most devices
           qrbox: { width: boxW, height: boxH },
-          aspectRatio: 1.0, // Square aspect ratio for the camera feed helps focus
           disableFlip: true,
         },
         (decodedText) => {
           if (detectedRef.current) return;
-          // Validar que sea un ISBN (10 o 13 dígitos). Ignorar códigos cortos o de otros tipos.
-          if (!/^\d{10}(\d{3})?$/.test(decodedText)) return;
+          
+          // Clean the text: only digits and X
+          const clean = decodedText.replace(/[-\s]/g, "").toUpperCase();
+          
+          // Validar que sea un ISBN (10 o 13 caracteres, permitiendo X al final del de 10).
+          if (!/^\d{9}[\dX](\d{3})?$/.test(clean)) return;
           
           detectedRef.current = true;
           setIsFlashing(true); // Visual feedback
@@ -84,7 +87,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
           if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
           
           setTimeout(() => {
-            stop().then(() => onDetected(decodedText));
+            stop().then(() => onDetected(clean));
           }, 300);
         },
         () => {

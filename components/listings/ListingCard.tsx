@@ -217,7 +217,7 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
             className="text-[11px] text-ink-muted hover:text-brand-600 transition-colors flex items-center gap-1"
           >
             {listing.seller?.avatar_url ? (
-              <img src={listing.seller.avatar_url} alt="" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+              <Image src={listing.seller.avatar_url} alt="" width={16} height={16} className="rounded-full object-cover flex-shrink-0" />
             ) : (
               <span className="w-4 h-4 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-[8px] font-bold flex-shrink-0">
                 {sellerName[0].toUpperCase()}

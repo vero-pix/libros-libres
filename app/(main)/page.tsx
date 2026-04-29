@@ -38,7 +38,8 @@ const getDefaultListings = unstable_cache(
       .from("listings")
       .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`)
       .in("status", ["active", "completed"])
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(60);
     return data ?? [];
   },
   ["home-default-listings"],
