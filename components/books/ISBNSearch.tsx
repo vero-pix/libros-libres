@@ -16,6 +16,7 @@ interface ManualForm {
   description: string;
   publisher: string;
   pages: string;
+  isbn: string;
 }
 
 export default function ISBNSearch({ onBookFound }: Props) {
@@ -23,7 +24,14 @@ export default function ISBNSearch({ onBookFound }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showManual, setShowManual] = useState(false);
-  const [manual, setManual] = useState<ManualForm>({ title: "", author: "", description: "", publisher: "", pages: "" });
+  const [manual, setManual] = useState<ManualForm>({ 
+    title: "", 
+    author: "", 
+    description: "", 
+    publisher: "", 
+    pages: "",
+    isbn: "",
+  });
   const [showScanner, setShowScanner] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -131,7 +139,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
     setShowManual(false);
     setError(null);
     setIsbn("");
-    setManual({ title: "", author: "", description: "", publisher: "", pages: "" });
+    setManual({ title: "", author: "", description: "", publisher: "", pages: "", isbn: "" });
   }
 
   return (
