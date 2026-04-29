@@ -11,7 +11,6 @@ const BLOCKED_COUNTRIES = new Set([
   "KP", // Corea del Norte
   "IR", // Irán
   "BY", // Bielorrusia
-  "UA", // Ucrania (bots, no bloquear si hay usuarios reales — revisar en 30 días)
 ]);
 
 // Herramientas de automatización / browser impersonation detectadas en el tráfico.
