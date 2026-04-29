@@ -51,7 +51,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
         if (res.status === 404) {
           setError("No encontramos ese ISBN en las bases de datos internacionales.");
           setShowManual(true);
-          setManual(m => ({ ...m, title: m.title || "", author: m.author || "" }));
+          setManual(m => ({ ...m, isbn: clean }));
         } else {
           setError(data.error ?? "Error al consultar el servicio.");
         }
@@ -66,12 +66,13 @@ export default function ISBNSearch({ onBookFound }: Props) {
           ...m,
           title: m.title || data.title || "",
           author: m.author || data.author || "",
+          isbn: clean, // Asegurar que el ISBN se pase
         }));
         return;
       }
 
       onBookFound(data);
-      setIsbn("");
+      setIsbn(clean); // Mantener el ISBN visible
       setError(null);
       setShowManual(false);
     } catch {
@@ -96,6 +97,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
         if (res.status === 404) {
           setError("Código detectado pero no está en nuestra base de datos.");
           setShowManual(true);
+          setManual(m => ({ ...m, isbn: clean })); // Pre-rellenar ISBN en manual
         } else {
           setError(data.error ?? "Error al buscar los datos del libro.");
         }
@@ -103,7 +105,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
       }
 
       onBookFound(data);
-      setIsbn("");
+      setIsbn(clean);
       setError(null);
       setShowManual(false);
     } catch {
@@ -114,14 +116,17 @@ export default function ISBNSearch({ onBookFound }: Props) {
   }
 
   function handleManualSubmit() {
-    if (!manual.title.trim() || !manual.author.trim()) return;
+    if (!manual.title.trim() || !manual.author.trim()) {
+      setError("El título y autor son obligatorios.");
+      return;
+    }
     onBookFound({
       title: manual.title.trim(),
       author: manual.author.trim(),
       description: manual.description.trim() || undefined,
       publisher: manual.publisher.trim() || null,
       pages: manual.pages ? Number(manual.pages) : null,
-      isbn: isbn.replace(/[-\s]/g, "") || undefined,
+      isbn: (manual.isbn || isbn).replace(/[-\s]/g, "").toUpperCase() || undefined,
     });
     setShowManual(false);
     setError(null);
@@ -190,9 +195,6 @@ export default function ISBNSearch({ onBookFound }: Props) {
             onChange={(e) => {
               setIsbn(formatISBN(e.target.value));
               setError(null);
-              // No cerrar el formulario manual por cambiar el ISBN: si el
-              // usuario ya empezó a llenar datos a mano (p.ej. libro antiguo
-              // sin ISBN claro), perder ese progreso es lo que reportó Felipe.
             }}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder="978-956-000-0000"
@@ -297,10 +299,10 @@ export default function ISBNSearch({ onBookFound }: Props) {
             </button>
             <button
               type="button"
-              onClick={() => { setShowManual(false); setError(null); }}
-              className="px-3 py-2 border border-gray-200 text-gray-500 text-sm rounded-lg hover:bg-white transition-colors"
+              onClick={() => setShowManual(!showManual)}
+              className="text-xs font-bold text-brand-600 hover:text-brand-700 underline underline-offset-4"
             >
-              Cancelar
+              {showManual ? "Cerrar formulario" : "Ingreso manual · Sin código"}
             </button>
           </div>
         </div>
