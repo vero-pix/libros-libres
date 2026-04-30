@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { OrderWithDetails } from "@/types";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -87,11 +88,15 @@ function BundleCard({ group }: { group: OrderGroup }) {
     >
       <div className="flex gap-4">
         {firstBook?.cover_url && (
-          <img
-            src={firstBook.cover_url}
-            alt={firstBook.title}
-            className="w-16 h-20 object-cover rounded shrink-0"
-          />
+          <div className="relative w-16 h-20 shrink-0">
+            <Image
+              src={firstBook.cover_url}
+              alt={firstBook.title}
+              fill
+              className="object-cover rounded"
+              sizes="64px"
+            />
+          </div>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">

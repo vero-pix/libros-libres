@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface CartListItem {
   listing_id: string;
@@ -155,12 +156,15 @@ export default function BuyerCartsSection({ carts }: Props) {
                         className="flex items-center gap-3 text-sm"
                       >
                         {item.cover_url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={item.cover_url}
-                            alt={item.title}
-                            className="w-8 h-11 object-cover rounded shrink-0"
-                          />
+                          <div className="relative w-8 h-11 shrink-0">
+                            <Image
+                              src={item.cover_url}
+                              alt={item.title}
+                              fill
+                              className="object-cover rounded"
+                              sizes="32px"
+                            />
+                          </div>
                         ) : (
                           <div className="w-8 h-11 bg-cream-dark/20 rounded shrink-0" />
                         )}

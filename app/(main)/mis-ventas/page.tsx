@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import type { Order, OrderStatus } from "@/types";
 import BuyerCartsSection from "@/components/sales/BuyerCartsSection";
 
@@ -302,11 +303,15 @@ export default async function MisVentasPage() {
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             {order.listing?.book?.cover_url && (
-                              <img
-                                src={order.listing.book.cover_url}
-                                alt=""
-                                className="w-8 h-11 object-cover rounded-sm"
-                              />
+                              <div className="relative w-8 h-11 shrink-0">
+                                <Image
+                                  src={order.listing.book.cover_url}
+                                  alt=""
+                                  fill
+                                  className="object-cover rounded-sm"
+                                  sizes="32px"
+                                />
+                              </div>
                             )}
                             <div className="min-w-0">
                               <p className="font-medium text-ink truncate">
@@ -434,11 +439,15 @@ export default async function MisVentasPage() {
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             {rental.listing?.book?.cover_url && (
-                              <img
-                                src={rental.listing.book.cover_url}
-                                alt=""
-                                className="w-8 h-11 object-cover rounded-sm"
-                              />
+                              <div className="relative w-8 h-11 shrink-0">
+                                <Image
+                                  src={rental.listing.book.cover_url}
+                                  alt=""
+                                  fill
+                                  className="object-cover rounded-sm"
+                                  sizes="32px"
+                                />
+                              </div>
                             )}
                             <div className="min-w-0">
                               <p className="font-medium text-ink truncate">
