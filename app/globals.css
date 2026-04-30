@@ -4,18 +4,19 @@
 
 @layer base {
   :root {
-    /* Paleta de Colores - tuslibros.cl (Editorial Refactor) */
-    --brand-500: #d4a017;
+    /* Paleta Oficial - tuslibros.cl (Brand Board Final) */
+    --brand-500: #d69b12;  /* Mostaza / Ocre */
     --brand-600: #b8860b;
     --brand-950: #3a2a05;
     
-    --ink: #213555;        /* Azul Oxford Editorial (Claramente Navy) */
-    --ink-light: #415575;
-    --ink-muted: #7185a5;
+    --ink: #1f2a44;        /* Azul Navy Profundo */
+    --ink-light: #3d6b5b;  /* Verde Bosque (como acento secundario) */
+    --ink-muted: #6b7280;  /* Gris Cálido */
     
-    --cream: #faf8f4;
-    --cream-warm: #f5f0e8;
-    --cream-dark: #e6e0d4;
+    --coral: #e86a5a;      /* Coral Suave */
+    --cream: #f7f3ec;      /* Fondo Papel / Hueso */
+    --cream-warm: #e7e1d6; /* Arena */
+    --cream-dark: #d6cfc3;
 
     --background: 40 33% 97%;
     --foreground: 222 47% 11%;

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, DM_Sans } from "next/font/google";
+import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import Footer from "@/components/ui/Footer";
@@ -12,14 +12,14 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
 
 export const viewport = {
-  themeColor: "#1a1a2e",
+  themeColor: "#1f2a44",
 };
 
 export const metadata: Metadata = {
@@ -97,7 +97,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${playfair.variable} ${dmSans.variable} font-sans antialiased flex flex-col min-h-screen bg-cream`}>
+      <body className={`${playfair.variable} ${inter.variable} font-sans antialiased flex flex-col min-h-screen bg-cream`}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

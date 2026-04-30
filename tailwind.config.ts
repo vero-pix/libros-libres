@@ -42,7 +42,7 @@ const config: Config = {
       },
       fontFamily: {
         display: ["var(--font-playfair)", "Georgia", "serif"],
-        sans: ["var(--font-dm-sans)", "sans-serif"],
+        sans: ["var(--font-inter)", "sans-serif"],
       },
       keyframes: {
         scan: {

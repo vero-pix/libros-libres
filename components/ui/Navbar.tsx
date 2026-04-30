@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "./Logo";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import NavbarClient from "./NavbarClient";
@@ -38,14 +39,8 @@ export default async function Navbar() {
       {/* Row 1: Logo + Search + Auth */}
       <div className="bg-cream px-4 py-3 sm:py-4">
         <div className="max-w-7xl mx-auto flex items-center gap-4 sm:gap-6">
-          <Link href="/" className="group whitespace-nowrap">
-            <span className="font-display text-2xl font-bold text-ink tracking-tight">
-              tuslibros
-            </span>
-            <span className="font-display text-2xl font-bold text-brand-600 tracking-tight group-hover:text-brand-500 transition-colors">
-              .cl
-            </span>
-          </Link>
+          <Logo withTagline className="hidden sm:flex" />
+          <Logo className="sm:hidden" />
 
           <div className="hidden md:flex flex-1 justify-center px-4">
             <Suspense>
