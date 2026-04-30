@@ -54,24 +54,22 @@ export default function ListingsTab({ listings, onUpdate }: { listings: AdminLis
   async function deleteListing(id: string) {
     if (!window.confirm("¿Eliminar esta publicación?")) return;
     
-    // Clean up dependencies (best effort)
     try {
-      await Promise.all([
-        supabase.from("listing_images").delete().eq("listing_id", id),
-        supabase.from("page_views").delete().eq("listing_id", id),
-        supabase.from("cart").delete().eq("listing_id", id),
-        supabase.from("book_requests").update({ fulfilled: false, fulfilled_listing_id: null }).eq("fulfilled_listing_id", id)
-      ]);
-    } catch (err) {
-      console.warn("Admin clean up failed", err);
-    }
+      const res = await fetch("/api/listings/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
 
-    const { error } = await supabase.from("listings").delete().eq("id", id);
-    if (!error) {
-      onUpdate(listings.filter((l) => l.id !== id));
-      setSelected((prev) => { const n = new Set(prev); n.delete(id); return n; });
-    } else {
-      alert(`No se pudo eliminar: ${error.message}`);
+      if (!res.ok) {
+        alert(data.error || "Error al eliminar");
+      } else {
+        onUpdate(listings.filter((l) => l.id !== id));
+        setSelected((prev) => { const n = new Set(prev); n.delete(id); return n; });
+      }
+    } catch {
+      alert("Error de conexión");
     }
   }
 

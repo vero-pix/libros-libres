@@ -101,25 +101,25 @@ export default function MyListings({ listings: initial }: Props) {
     if (!confirm("¿Eliminar esta publicación? Esta acción no se puede deshacer.")) return;
     setLoading(id);
     
-    // 1. Clean up dependencies that the user HAS permission to delete
-    // (Regular users can usually delete their own listing images)
     try {
-      await supabase.from("listing_images").delete().eq("listing_id", id);
-    } catch (err) {
-      console.warn("Images clean up failed", err);
-    }
+      const res = await fetch("/api/listings/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
 
-    // 2. Attempt to delete the listing itself
-    const { error } = await supabase.from("listings").delete().eq("id", id);
-    
-    if (error) {
-      console.error("Error deleting listing:", error);
-      // If it fails here, it's likely due to Orders or Messages (protected data)
-      alert(`No se pudo eliminar: ${error.message}. \n\nSi el libro tiene ventas, arriendos o mensajes activos, no se puede borrar por seguridad. Te recomendamos "Pausar" la publicación en su lugar.`);
-    } else {
-      setListings((prev) => prev.filter((l) => l.id !== id));
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Ocurrió un error al eliminar");
+      } else {
+        setListings((prev) => prev.filter((l) => l.id !== id));
+      }
+    } catch (err) {
+      alert("Error de conexión al intentar eliminar.");
+    } finally {
+      setLoading(null);
     }
-    setLoading(null);
   }
 
   if (listings.length === 0) {
