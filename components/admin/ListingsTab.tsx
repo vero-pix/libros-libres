@@ -53,10 +53,21 @@ export default function ListingsTab({ listings, onUpdate }: { listings: AdminLis
 
   async function deleteListing(id: string) {
     if (!window.confirm("¿Eliminar esta publicación?")) return;
+    
+    // Clean up dependencies
+    await Promise.all([
+      supabase.from("listing_images").delete().eq("listing_id", id),
+      supabase.from("page_views").delete().eq("listing_id", id),
+      supabase.from("cart").delete().eq("listing_id", id),
+      supabase.from("book_requests").update({ fulfilled: false, fulfilled_listing_id: null }).eq("fulfilled_listing_id", id)
+    ]);
+
     const { error } = await supabase.from("listings").delete().eq("id", id);
     if (!error) {
       onUpdate(listings.filter((l) => l.id !== id));
       setSelected((prev) => { const n = new Set(prev); n.delete(id); return n; });
+    } else {
+      alert(`No se pudo eliminar: ${error.message}`);
     }
   }
 
@@ -64,10 +75,21 @@ export default function ListingsTab({ listings, onUpdate }: { listings: AdminLis
     const ids = Array.from(selected);
     if (ids.length === 0) return;
     if (!window.confirm(`¿Eliminar ${ids.length} publicación(es)?`)) return;
+
+    // Clean up dependencies for all selected
+    await Promise.all([
+      supabase.from("listing_images").delete().in("listing_id", ids),
+      supabase.from("page_views").delete().in("listing_id", ids),
+      supabase.from("cart").delete().in("listing_id", ids),
+      supabase.from("book_requests").update({ fulfilled: false, fulfilled_listing_id: null }).in("fulfilled_listing_id", ids)
+    ]);
+
     const { error } = await supabase.from("listings").delete().in("id", ids);
     if (!error) {
       onUpdate(listings.filter((l) => !ids.includes(l.id)));
       setSelected(new Set());
+    } else {
+      alert(`Error al eliminar algunos elementos: ${error.message}`);
     }
   }
 
