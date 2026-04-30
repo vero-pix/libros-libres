@@ -71,7 +71,7 @@ export default async function Navbar() {
             <>
             <Link
               href="/mensajes"
-              className="text-[11px] sm:text-xs font-medium uppercase tracking-[0.1em] sm:tracking-[0.15em] px-2.5 sm:px-4 py-3 sm:py-3.5 hover:bg-brand-500 transition-colors whitespace-nowrap flex items-center"
+              className="text-[11px] sm:text-xs font-medium uppercase tracking-[0.1em] sm:tracking-[0.15em] px-2.5 sm:px-4 py-3 sm:py-3.5 hover:bg-brand-500/10 hover:text-brand-400 transition-colors whitespace-nowrap flex items-center"
             >
               Mensajes
               <UnreadBadge />

@@ -4,21 +4,21 @@
 
 @layer base {
   :root {
-    /* Paleta de Colores - tuslibros.cl */
+    /* Paleta de Colores - tuslibros.cl (Editorial Refactor) */
     --brand-500: #d4a017;
     --brand-600: #b8860b;
     --brand-950: #3a2a05;
     
-    --ink: #241a12;      /* Deep Coffee */
-    --ink-light: #5a4d44;
-    --ink-muted: #7a6d64;
+    --ink: #1a1b3a;        /* Azul Tinta Editorial */
+    --ink-light: #424566;
+    --ink-muted: #8487a3;
     
     --cream: #faf8f4;
     --cream-warm: #f5f0e8;
-    --cream-dark: #ede7db;
+    --cream-dark: #e6e0d4;
 
     --background: 40 33% 97%;
-    --foreground: 240 20% 14%;
+    --foreground: 222 47% 11%;
   }
 
   body {
