@@ -101,19 +101,12 @@ export default function MyListings({ listings: initial }: Props) {
     if (!confirm("¿Eliminar esta publicación? Esta acción no se puede deshacer.")) return;
     setLoading(id);
     
-    // 1. Clean up dependencies that are safe to delete
-    // (Images and views usually prevent deletion but are safe to clear)
+    // 1. Clean up dependencies that the user HAS permission to delete
+    // (Regular users can usually delete their own listing images)
     try {
-      await Promise.all([
-        supabase.from("listing_images").delete().eq("listing_id", id),
-        supabase.from("page_views").delete().eq("listing_id", id),
-        // Cart items are also safe to clear
-        supabase.from("cart").delete().eq("listing_id", id),
-        // Reset fulfilled requests so they can be fulfilled again
-        supabase.from("book_requests").update({ fulfilled: false, fulfilled_listing_id: null }).eq("fulfilled_listing_id", id)
-      ]);
+      await supabase.from("listing_images").delete().eq("listing_id", id);
     } catch (err) {
-      console.warn("Clean up failed, attempting listing deletion anyway", err);
+      console.warn("Images clean up failed", err);
     }
 
     // 2. Attempt to delete the listing itself

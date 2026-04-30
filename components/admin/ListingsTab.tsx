@@ -54,13 +54,17 @@ export default function ListingsTab({ listings, onUpdate }: { listings: AdminLis
   async function deleteListing(id: string) {
     if (!window.confirm("¿Eliminar esta publicación?")) return;
     
-    // Clean up dependencies
-    await Promise.all([
-      supabase.from("listing_images").delete().eq("listing_id", id),
-      supabase.from("page_views").delete().eq("listing_id", id),
-      supabase.from("cart").delete().eq("listing_id", id),
-      supabase.from("book_requests").update({ fulfilled: false, fulfilled_listing_id: null }).eq("fulfilled_listing_id", id)
-    ]);
+    // Clean up dependencies (best effort)
+    try {
+      await Promise.all([
+        supabase.from("listing_images").delete().eq("listing_id", id),
+        supabase.from("page_views").delete().eq("listing_id", id),
+        supabase.from("cart").delete().eq("listing_id", id),
+        supabase.from("book_requests").update({ fulfilled: false, fulfilled_listing_id: null }).eq("fulfilled_listing_id", id)
+      ]);
+    } catch (err) {
+      console.warn("Admin clean up failed", err);
+    }
 
     const { error } = await supabase.from("listings").delete().eq("id", id);
     if (!error) {
@@ -76,13 +80,17 @@ export default function ListingsTab({ listings, onUpdate }: { listings: AdminLis
     if (ids.length === 0) return;
     if (!window.confirm(`¿Eliminar ${ids.length} publicación(es)?`)) return;
 
-    // Clean up dependencies for all selected
-    await Promise.all([
-      supabase.from("listing_images").delete().in("listing_id", ids),
-      supabase.from("page_views").delete().in("listing_id", ids),
-      supabase.from("cart").delete().in("listing_id", ids),
-      supabase.from("book_requests").update({ fulfilled: false, fulfilled_listing_id: null }).in("fulfilled_listing_id", ids)
-    ]);
+    // Clean up dependencies for all selected (best effort)
+    try {
+      await Promise.all([
+        supabase.from("listing_images").delete().in("listing_id", ids),
+        supabase.from("page_views").delete().in("listing_id", ids),
+        supabase.from("cart").delete().in("listing_id", ids),
+        supabase.from("book_requests").update({ fulfilled: false, fulfilled_listing_id: null }).in("fulfilled_listing_id", ids)
+      ]);
+    } catch (err) {
+      console.warn("Admin mass clean up failed", err);
+    }
 
     const { error } = await supabase.from("listings").delete().in("id", ids);
     if (!error) {
