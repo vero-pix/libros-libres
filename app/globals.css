@@ -4,12 +4,25 @@
 
 @layer base {
   :root {
+    /* Paleta de Colores - tuslibros.cl */
+    --brand-500: #d4a017;
+    --brand-600: #b8860b;
+    --brand-950: #3a2a05;
+    
+    --ink: #241a12;      /* Deep Coffee */
+    --ink-light: #5a4d44;
+    --ink-muted: #7a6d64;
+    
+    --cream: #faf8f4;
+    --cream-warm: #f5f0e8;
+    --cream-dark: #ede7db;
+
     --background: 40 33% 97%;
     --foreground: 240 20% 14%;
   }
 
   body {
-    @apply text-ink antialiased;
+    @apply text-ink antialiased bg-cream;
   }
 
   /* Editorial selection color */
