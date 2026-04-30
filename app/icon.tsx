@@ -13,19 +13,22 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #d4a017, #b8860b)",
-          borderRadius: "96px",
+          background: "#1f2a44",
+          borderRadius: "128px",
         }}
       >
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <div style={{ fontSize: 200, color: "white", fontWeight: 800, fontFamily: "Georgia, serif", lineHeight: 1 }}>
-            LL
+          <div style={{ fontSize: 240, color: "white", fontWeight: 700, fontFamily: "serif" }}>
+            T
+          </div>
+          <div style={{ fontSize: 240, color: "#d69b12", fontWeight: 700, fontFamily: "serif", marginLeft: -20 }}>
+            L
           </div>
         </div>
       </div>

@@ -21,11 +21,33 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  alternates: {
-    canonical: "https://tuslibros.cl",
-  },
-};
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const { category, genre, author, tag, collectible } = searchParams;
+  
+  let title = "Libros Usados en Chile | Compra y Venta";
+  let description = "Haz circular los libros que ya leíste y encuentra los que te faltan en el marketplace chileno tuslibros.cl.";
+
+  if (category) {
+    title = `Libros de ${category} Usados en Chile | tuslibros.cl`;
+    description = `Encuentra la mejor selección de libros de ${category} usados. Compra seguro con envío a todo Chile.`;
+  } else if (genre) {
+    title = `Libros de ${genre} Usados | tuslibros.cl`;
+  } else if (author) {
+    title = `Libros de ${author} Usados | tuslibros.cl`;
+  } else if (collectible === "1") {
+    title = "Libros de Colección y Ediciones Raras | tuslibros.cl";
+  } else if (tag) {
+    title = `Libros sobre ${tag} | tuslibros.cl`;
+  }
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: "https://tuslibros.cl",
+    },
+  };
+}
 
 const ITEMS_PER_PAGE = 20;
 

@@ -10,9 +10,9 @@ interface LogoProps {
 
 export default function Logo({ className = "", withTagline = false }: LogoProps) {
   return (
-    <Link href="/" className={`flex items-center gap-2.5 group ${className}`}>
-      {/* Isotipo: Los libritos que te gustaron */}
-      <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 overflow-hidden">
+    <Link href="/" className={`flex items-center gap-3.5 group ${className}`}>
+      {/* Isotipo: Los libritos con más presencia */}
+      <div className="relative w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0">
         <Image
           src="/logo-books.png"
           alt="tuslibros.cl logo"
