@@ -49,7 +49,7 @@ export default function SearchResultsToggle({ listings, resultsCount, children }
           <button
             onClick={() => setView("grid")}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
-              view === "grid" ? "bg-ink text-cream" : "text-ink-muted hover:text-ink"
+              view === "grid" ? "bg-brand-500 text-white shadow-sm" : "text-ink-muted hover:text-ink"
             }`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -65,7 +65,7 @@ export default function SearchResultsToggle({ listings, resultsCount, children }
             onClick={() => setView("map")}
             className={`relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded transition-all ${
               view === "map"
-                ? "bg-ink text-cream"
+                ? "bg-brand-500 text-white shadow-sm"
                 : "bg-red-600 text-white shadow-sm hover:bg-red-700"
             }`}
           >

@@ -69,7 +69,7 @@ export default function TiendaToggle({ children, forceMap, onForceMapConsumed, h
             onClick={() => setView("grid")}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
               view === "grid"
-                ? "bg-ink text-cream"
+                ? "bg-brand-500 text-white shadow-sm"
                 : "text-ink-muted hover:text-ink"
             }`}
           >
@@ -82,7 +82,7 @@ export default function TiendaToggle({ children, forceMap, onForceMapConsumed, h
             onClick={() => setView("map")}
             className={`relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded transition-all ${
               view === "map"
-                ? "bg-ink text-cream"
+                ? "bg-brand-500 text-white shadow-sm"
                 : "bg-red-600 text-white shadow-sm hover:bg-red-700"
             }`}
           >

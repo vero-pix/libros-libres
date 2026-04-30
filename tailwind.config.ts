@@ -24,14 +24,14 @@ const config: Config = {
           950: "#3a2a05",
         },
         navy: {
-          DEFAULT: "#1a1a2e",
-          light: "#2d2d44",
-          dark: "#0f0f1a",
+          DEFAULT: "#241a12", // Deep Coffee
+          light: "#3a2d24",
+          dark: "#1a120b",
         },
         ink: {
-          DEFAULT: "#1a1a2e",
-          light: "#4a4a5a",
-          muted: "#6b6b7b",
+          DEFAULT: "#241a12", // Matching Navy for consistency
+          light: "#5a4d44",
+          muted: "#7a6d64",
         },
         cream: {
           DEFAULT: "#faf8f4",
