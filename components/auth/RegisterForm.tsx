@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import SocialLoginButtons from "./SocialLoginButtons";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 export default function RegisterForm() {
   const supabase = createClient();
@@ -18,8 +17,6 @@ export default function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaRef = useRef<HCaptcha>(null);
 
   useEffect(() => {
     const ref = searchParams.get("ref");
@@ -34,24 +31,14 @@ export default function RegisterForm() {
     setLoading(true);
     setError(null);
 
-    if (!captchaToken) {
-      setError("Por favor completa la verificación de seguridad.");
-      setLoading(false);
-      return;
-    }
-
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        captchaToken,
         data: { full_name: fullName },
         emailRedirectTo: `${window.location.origin}/api/auth/callback`,
       },
     });
-
-    captchaRef.current?.resetCaptcha();
-    setCaptchaToken(null);
 
     if (signUpError) {
       const msg =
@@ -70,7 +57,6 @@ export default function RegisterForm() {
         full_name: fullName,
       });
 
-      // Auto-suscribir al newsletter (no bloquear registro si falla)
       try {
         await fetch("/api/newsletter", {
           method: "POST",
@@ -86,9 +72,7 @@ export default function RegisterForm() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ referral_code: refCode.trim() }),
           });
-        } catch {
-          // no bloquear registro si falla el referido
-        }
+        } catch {}
       }
     }
 
@@ -185,15 +169,6 @@ export default function RegisterForm() {
             ¿Tienes un código de referido?
           </button>
         )}
-
-        <div className="flex justify-center">
-          <HCaptcha
-            ref={captchaRef}
-            sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-            onVerify={(token) => setCaptchaToken(token)}
-            onExpire={() => setCaptchaToken(null)}
-          />
-        </div>
 
         {error && (
           <p className="text-sm text-red-600 bg-red-50 border border-red-100 px-3 py-2 rounded-xl">
