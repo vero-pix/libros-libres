@@ -76,6 +76,13 @@ export default function RegisterForm() {
       }
     }
 
+    // Evento GA4
+    if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
+      (window as any).gtag('event', 'registro_completado', {
+        method: 'email'
+      });
+    }
+
     setSuccess(true);
     setLoading(false);
   }
