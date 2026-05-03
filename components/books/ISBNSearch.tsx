@@ -112,6 +112,19 @@ export default function ISBNSearch({ onBookFound }: Props) {
         return;
       }
 
+      // Mismo chequeo que handleSearch: si no hay título, pedir datos manuales
+      if (!data.title?.trim()) {
+        setError("Código detectado pero faltan datos. Complétalos a mano.");
+        setShowManual(true);
+        setManual((m) => ({
+          ...m,
+          title: m.title || data.title || "",
+          author: m.author || data.author || "",
+          isbn: clean,
+        }));
+        return;
+      }
+
       onBookFound(data);
       setIsbn(clean);
       setError(null);
