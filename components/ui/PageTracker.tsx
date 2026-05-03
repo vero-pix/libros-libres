@@ -3,6 +3,12 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
 function getSessionId(): string {
   if (typeof window === "undefined") return "";
   let sid = sessionStorage.getItem("_tl_sid");
@@ -35,10 +41,19 @@ export default function PageTracker() {
   const lastPath = useRef("");
 
   useEffect(() => {
-    if (pathname === lastPath.current) return;
-    lastPath.current = pathname;
+    const search = window.location.search.replace(/^\?/, "");
+    const pathWithSearch = search ? `${pathname}?${search}` : pathname;
+
+    if (pathWithSearch === lastPath.current) return;
+    lastPath.current = pathWithSearch;
 
     if (EXCLUDE_PATTERNS.some((re) => re.test(pathname))) return;
+
+    window.gtag?.("event", "page_view", {
+      page_path: pathWithSearch,
+      page_location: window.location.href,
+      page_title: document.title,
+    });
 
     // Si entra a una ficha /listings/UUID, guardamos listing_id.
     // Para /libro/:username/:slug no tenemos UUID acá — el ID se resolverá
@@ -47,7 +62,7 @@ export default function PageTracker() {
     const listing_id = listingMatch?.[1] ?? null;
 
     const data = JSON.stringify({
-      path: pathname,
+      path: pathWithSearch,
       referrer: document.referrer || null,
       listing_id,
       session_id: getSessionId(),

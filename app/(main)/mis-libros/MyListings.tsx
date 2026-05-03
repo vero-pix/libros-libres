@@ -478,18 +478,6 @@ function EditForm({
       bookUpdates.cover_url = coverUrl;
     }
 
-    const { error: bookErr } = await supabase
-      .from("books")
-      .update(bookUpdates)
-      .eq("id", book.id);
-
-    if (bookErr) {
-      setError(bookErr.message);
-      setSaving(false);
-      return;
-    }
-
-    // Update listing data
     const listingUpdates: Record<string, unknown> = {
       condition,
       modality,
@@ -503,25 +491,30 @@ function EditForm({
       listingUpdates.cover_image_url = coverUrl;
     }
 
-    const { error: listingErr } = await supabase
-      .from("listings")
-      .update(listingUpdates)
-      .eq("id", listing.id);
+    const res = await fetch(`/api/listings/${listing.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        book: bookUpdates,
+        listing: listingUpdates,
+      }),
+    });
+    const result = await res.json();
 
-    if (listingErr) {
-      setError(listingErr.message);
+    if (!res.ok) {
+      setError(result.error ?? "No se pudieron guardar los cambios.");
       setSaving(false);
       return;
     }
 
     onUpdated({
       ...listing,
-      ...listingUpdates,
-      price: listingUpdates.price as number | null,
-      condition: listingUpdates.condition as typeof listing.condition,
-      modality: listingUpdates.modality as typeof listing.modality,
-      notes: listingUpdates.notes as string | null,
-      book: { ...book, ...bookUpdates },
+      ...result.listing,
+      price: result.listing.price as number | null,
+      condition: result.listing.condition as typeof listing.condition,
+      modality: result.listing.modality as typeof listing.modality,
+      notes: result.listing.notes as string | null,
+      book: { ...book, ...result.book },
     });
     setSaving(false);
   }
