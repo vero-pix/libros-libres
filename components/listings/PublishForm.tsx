@@ -54,7 +54,12 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
   const router = useRouter();
   const supabase = createClient();
 
+  // book es metadata de prellenado opcional — ya NO bloquea el formulario
   const [book, setBook] = useState<BookData | null>(null);
+  // Campos siempre editables, independientes de si book fue identificado
+  const [bookTitle, setBookTitle] = useState("");
+  const [bookAuthor, setBookAuthor] = useState("");
+  const [bookDescription, setBookDescription] = useState("");
   const [categorySlug, setCategorySlug] = useState<string | null>(null);
   const [subcategorySlug, setSubcategorySlug] = useState<string | null>(null);
   const [binding, setBinding] = useState<string>("");
@@ -81,6 +86,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
   const [scanLoading, setScanLoading] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const scanInputRef = useRef<HTMLInputElement>(null);
+  const [draftSaved, setDraftSaved] = useState(false);
   const [publishedListingId, setPublishedListingId] = useState<string | null>(null);
   const [publishedSlug, setPublishedSlug] = useState<string | null>(null);
 
@@ -114,6 +120,31 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
     setPendingPreviews((prev) => [...prev, ...newPreviews]);
   }
 
+  function handleSaveDraft() {
+    const draft = {
+      book,
+      categorySlug,
+      subcategorySlug,
+      binding,
+      modality,
+      price,
+      originalPrice,
+      condition,
+      notes,
+      savedAt: new Date().toISOString(),
+    };
+    localStorage.setItem("tuslibros_draft", JSON.stringify(draft));
+    setDraftSaved(true);
+    setTimeout(() => setDraftSaved(false), 3000);
+  }
+
+  // Restaurar borrador al montar
+  // (puedes activar esto si quieres auto-restore)
+  // useEffect(() => {
+  //   const raw = localStorage.getItem("tuslibros_draft");
+  //   if (raw) { try { const d = JSON.parse(raw); setBook(d.book); ... } catch {} }
+  // }, []);
+
   async function handleScanCover(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -128,8 +159,11 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         setScanError(data.error ?? "No se pudo identificar el libro. Intenta con ISBN o ingreso manual.");
         return;
       }
-      // Éxito — pre-rellenar datos del libro
+      // Éxito — pre-rellenar datos del libro (nunca pisamos lo que el usuario ya escribió)
       setBook(data);
+      if (data.title?.trim()) setBookTitle(data.title.trim());
+      if (data.author?.trim()) setBookAuthor(data.author.trim());
+      if (data.description?.trim()) setBookDescription(data.description.trim());
       const normalized = normalizeGenre(data.genre, data.title, data.description);
       if (normalized) {
         setCategorySlug(normalized.category);
@@ -201,9 +235,8 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!book) { setError("Busca un libro por ISBN primero."); return; }
-    if (!book.title.trim()) { setError("El libro necesita un título. Complétalo antes de publicar."); return; }
-    if (!book.author.trim()) { setError("El libro necesita un autor. Complétalo antes de publicar."); return; }
+    if (!bookTitle.trim()) { setError("El libro necesita un título. Complétalo antes de publicar."); return; }
+    if (!bookAuthor.trim()) { setError("El libro necesita un autor. Complétalo antes de publicar."); return; }
     if (!location) { setError("Marca la ubicación del libro en el mapa."); return; }
     if (modality !== "loan" && !price) { setError("Ingresa el precio de venta."); return; }
     if (modality !== "sale" && !rentalPrice) { setError("Ingresa el precio de arriendo."); return; }
@@ -222,41 +255,41 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       // Si no, intentar inferir desde genre del libro (legacy path).
       let finalCategory: string | null = categorySlug;
       let finalSubcategory: string | null = subcategorySlug;
-      if (!finalCategory && book.genre) {
-        const normalized = normalizeGenre(book.genre, book.title, book.description);
+      if (!finalCategory && book?.genre) {
+        const normalized = normalizeGenre(book.genre, book?.title ?? bookTitle, book?.description);
         if (normalized) {
           finalCategory = normalized.category;
           finalSubcategory = normalized.subcategory;
         }
       }
       const tags = suggestTags({
-        title: book.title,
-        author: book.author,
+        title: bookTitle,
+        author: bookAuthor,
         category: finalCategory ?? undefined,
         subcategory: finalSubcategory ?? undefined,
-        description: book.description,
+        description: bookDescription || book?.description,
       });
 
       const bookPayload = {
-        isbn: book.isbn ?? null,
-        title: book.title,
-        author: book.author,
-        description: book.description ?? null,
-        cover_url: customCoverUrl ?? book.cover_url ?? null,
-        genre: book.genre || null,
+        isbn: book?.isbn ?? null,
+        title: bookTitle,
+        author: bookAuthor,
+        description: bookDescription || book?.description || null,
+        cover_url: customCoverUrl ?? book?.cover_url ?? null,
+        genre: book?.genre || null,
         category: finalCategory,
         subcategory: finalSubcategory,
         tags,
-        published_year: book.published_year ?? null,
-        publisher: book.publisher ?? null,
-        pages: book.pages ?? null,
+        published_year: book?.published_year ?? null,
+        publisher: book?.publisher ?? null,
+        pages: book?.pages ?? null,
         binding: binding || null,
         created_by: userId,
       };
 
       let bookId: string;
 
-      if (book.isbn) {
+      if (book?.isbn) {
         const { data: bookRow, error: bookErr } = await supabase
           .from("books")
           .upsert(bookPayload, { onConflict: "isbn", ignoreDuplicates: false })
@@ -276,7 +309,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
 
       // Insertar publicación
       // Generate unique slug
-      const baseSlug = slugify(book.title || "libro");
+      const baseSlug = slugify(bookTitle || "libro");
       let slug = baseSlug;
       const { count } = await supabase.from("listings").select("id", { count: "exact", head: true }).eq("slug", baseSlug);
       if (count && count > 0) slug = `${baseSlug}-${Date.now().toString(36).slice(-4)}`;
@@ -296,7 +329,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         latitude: location.lat,
         longitude: location.lng,
         address: location.address,
-        cover_image_url: customCoverUrl ?? book.cover_url ?? null,
+        cover_image_url: customCoverUrl ?? book?.cover_url ?? null,
         status: "active",
       }).select("id, slug").single();
 
@@ -389,70 +422,112 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
           </h2>
         </div>
         <div className="px-6 py-5">
-          {book ? (
-            <div className="flex gap-4 items-start">
-              <CoverUpload
-                currentUrl={customCoverUrl ?? book.cover_url}
-                onUploaded={setCustomCoverUrl}
-              />
-              <div className="flex-1 min-w-0">
-                <BookCard book={book} onClear={() => { setBook(null); setCategorySlug(null); setSubcategorySlug(null); setCustomCoverUrl(null); }} />
-              </div>
-            </div>
-          ) : (
-            <>
-              {/* Opción 0: Foto de portada → Claude Vision */}
-              <div className="mb-4">
-                <button
-                  type="button"
-                  onClick={() => scanInputRef.current?.click()}
-                  disabled={scanLoading}
-                  className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-brand-400 hover:border-brand-600 hover:bg-brand-50 text-brand-700 font-semibold rounded-xl text-sm transition-all disabled:opacity-50"
-                >
-                  {scanLoading ? (
-                    <><span className="w-4 h-4 border-2 border-brand-400 border-t-brand-700 rounded-full animate-spin" /> Analizando portada...</>
-                  ) : (
-                    <>📸 Identificar por foto de portada</>
-                  )}
-                </button>
+            {/* ── Identificación asistida: siempre visible, nunca bloqueante ── */}
+          <div className="flex gap-4 items-start mb-5">
+            <CoverUpload
+              currentUrl={customCoverUrl ?? book?.cover_url}
+              onUploaded={setCustomCoverUrl}
+            />
+            <div className="flex-1 min-w-0 space-y-2">
+              {/* Título — siempre editable */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Título <span className="text-red-400">*</span>
+                </label>
                 <input
-                  ref={scanInputRef}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  className="hidden"
-                  onChange={handleScanCover}
+                  type="text"
+                  value={bookTitle}
+                  onChange={(e) => setBookTitle(e.target.value)}
+                  placeholder="Ej: El nombre del viento"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                 />
-                {scanError && (
-                  <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg mt-2">
-                    ⚠ {scanError}
-                  </p>
+              </div>
+              {/* Autor — siempre editable */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Autor <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={bookAuthor}
+                  onChange={(e) => setBookAuthor(e.target.value)}
+                  placeholder="Ej: Patrick Rothfuss"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+                />
+              </div>
+              {/* Badge si fue identificado */}
+              {book && (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    ✓ Datos prellenados
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => { setBook(null); setCustomCoverUrl(null); }}
+                    className="text-xs text-gray-400 hover:text-gray-600 underline"
+                  >
+                    Cambiar
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ── Asistente de identificación: siempre disponible ── */}
+          {!book && (
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() => scanInputRef.current?.click()}
+                disabled={scanLoading}
+                className="w-full flex items-center justify-center gap-2 py-2.5 border border-dashed border-brand-300 hover:border-brand-500 hover:bg-brand-50 text-brand-600 font-medium rounded-xl text-sm transition-all disabled:opacity-50 mb-2"
+              >
+                {scanLoading ? (
+                  <><span className="w-3.5 h-3.5 border-2 border-brand-400 border-t-brand-700 rounded-full animate-spin" /> Analizando portada...</>
+                ) : (
+                  <>📸 Identificar por foto de portada</>
                 )}
-              </div>
-
-              <div className="flex items-center gap-2 text-xs text-gray-300 mb-3">
-                <span className="flex-1 border-t border-gray-200" />
-                o busca por ISBN
-                <span className="flex-1 border-t border-gray-200" />
-              </div>
-
-              <ISBNSearch onBookFound={(b) => { 
-                setBook(b);
-                // Autocompletar categoría por señales del libro
-                const normalized = normalizeGenre(b.genre, b.title, b.description);
-                if (normalized) {
-                  setCategorySlug(normalized.category);
-                  setSubcategorySlug(normalized.subcategory);
-                }
-              }} />
-            </>
+              </button>
+              <input
+                ref={scanInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={handleScanCover}
+              />
+              {/* Error de identificación: silencioso, sin tecnicismos */}
+              {scanError && (
+                <div className="mt-1 space-y-1.5">
+                  <p className="text-xs text-gray-500 text-center">No se pudo identificar automáticamente — completa los datos arriba.</p>
+                  <button
+                    type="button"
+                    onClick={handleSaveDraft}
+                    className="w-full py-2 border border-gray-200 text-gray-500 text-xs font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                  >
+                    {draftSaved ? "✅ Borrador guardado" : "💾 Guardar borrador"}
+                  </button>
+                </div>
+              )}
+            </div>
           )}
+
+          <ISBNSearch onBookFound={(b) => {
+              setBook(b);
+              if (b.title?.trim()) setBookTitle(b.title.trim());
+              if (b.author?.trim()) setBookAuthor(b.author.trim());
+              if (b.description?.trim()) setBookDescription(b.description.trim());
+              const normalized = normalizeGenre(b.genre, b.title, b.description);
+              if (normalized) {
+                setCategorySlug(normalized.category);
+                setSubcategorySlug(normalized.subcategory);
+              }
+            }} />
         </div>
       </section>
 
-      {/* ── Sección 1b: Categoría ── */}
-      {book && (
-        <section className="bg-white rounded-2xl border border-cream-dark shadow-sm overflow-hidden">
+      {/* ── Sección 1b: Categoría ── — siempre visible */}
+      <section className="bg-white rounded-2xl border border-cream-dark shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-cream-dark bg-cream-warm">
             <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
               Categoría
@@ -467,7 +542,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
                 setSubcategorySlug(v.subcategory);
               }}
             />
-            {book.genre && !categorySlug && (
+            {book?.genre && !categorySlug && (
               <p className="text-xs text-gray-400 mt-1.5">
                 Sugerencia según datos del libro: {book.genre}
               </p>
@@ -501,14 +576,14 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
           </div>
 
           {/* Info auto-completada */}
-          {(book.publisher || book.pages) && (
+          {(book?.publisher || book?.pages) && (
             <div className="mt-4 flex flex-wrap gap-2">
-              {book.publisher && (
+              {book?.publisher && (
                 <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
                   {book.publisher}
                 </span>
               )}
-              {book.pages && (
+              {book?.pages && (
                 <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
                   {book.pages} páginas
                 </span>
@@ -516,7 +591,6 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
             </div>
           )}
         </section>
-      )}
 
       {/* ── Sección 2: Modalidad y precio ── */}
       <section className="bg-white rounded-2xl border border-cream-dark shadow-sm overflow-hidden">
