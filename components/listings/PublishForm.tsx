@@ -400,50 +400,52 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
               </div>
             </div>
           ) : (
-            {/* Opción 0: Foto de portada → Claude Vision */}
-            <div className="mb-4">
-              <button
-                type="button"
-                onClick={() => scanInputRef.current?.click()}
-                disabled={scanLoading}
-                className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-brand-400 hover:border-brand-600 hover:bg-brand-50 text-brand-700 font-semibold rounded-xl text-sm transition-all disabled:opacity-50"
-              >
-                {scanLoading ? (
-                  <><span className="w-4 h-4 border-2 border-brand-400 border-t-brand-700 rounded-full animate-spin" /> Analizando portada...</>
-                ) : (
-                  <>📸 Identificar por foto de portada</>
+            <>
+              {/* Opción 0: Foto de portada → Claude Vision */}
+              <div className="mb-4">
+                <button
+                  type="button"
+                  onClick={() => scanInputRef.current?.click()}
+                  disabled={scanLoading}
+                  className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-brand-400 hover:border-brand-600 hover:bg-brand-50 text-brand-700 font-semibold rounded-xl text-sm transition-all disabled:opacity-50"
+                >
+                  {scanLoading ? (
+                    <><span className="w-4 h-4 border-2 border-brand-400 border-t-brand-700 rounded-full animate-spin" /> Analizando portada...</>
+                  ) : (
+                    <>📸 Identificar por foto de portada</>
+                  )}
+                </button>
+                <input
+                  ref={scanInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={handleScanCover}
+                />
+                {scanError && (
+                  <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg mt-2">
+                    ⚠ {scanError}
+                  </p>
                 )}
-              </button>
-              <input
-                ref={scanInputRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={handleScanCover}
-              />
-              {scanError && (
-                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg mt-2">
-                  ⚠ {scanError}
-                </p>
-              )}
-            </div>
+              </div>
 
-            <div className="flex items-center gap-2 text-xs text-gray-300 mb-3">
-              <span className="flex-1 border-t border-gray-200" />
-              o busca por ISBN
-              <span className="flex-1 border-t border-gray-200" />
-            </div>
+              <div className="flex items-center gap-2 text-xs text-gray-300 mb-3">
+                <span className="flex-1 border-t border-gray-200" />
+                o busca por ISBN
+                <span className="flex-1 border-t border-gray-200" />
+              </div>
 
-          <ISBNSearch onBookFound={(b) => { 
-              setBook(b);
-              // Autocompletar categoría por señales del libro
-              const normalized = normalizeGenre(b.genre, b.title, b.description);
-              if (normalized) {
-                setCategorySlug(normalized.category);
-                setSubcategorySlug(normalized.subcategory);
-              }
-            }} />
+              <ISBNSearch onBookFound={(b) => { 
+                setBook(b);
+                // Autocompletar categoría por señales del libro
+                const normalized = normalizeGenre(b.genre, b.title, b.description);
+                if (normalized) {
+                  setCategorySlug(normalized.category);
+                  setSubcategorySlug(normalized.subcategory);
+                }
+              }} />
+            </>
           )}
         </div>
       </section>

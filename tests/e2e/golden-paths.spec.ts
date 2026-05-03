@@ -49,9 +49,10 @@ test("pagina publish requiere login", async ({ page }) => {
 
 test("footer con links críticos visible", async ({ page }) => {
   await page.goto("/");
-  await page.locator("footer").first().scrollIntoViewIfNeeded();
-  await expect(page.locator("footer")).toBeVisible();
-  await expect(page.getByRole("link", { name: /términos/i })).toBeVisible();
+  const siteFooter = page.locator("body > footer");
+  await siteFooter.scrollIntoViewIfNeeded();
+  await expect(siteFooter).toBeVisible();
+  await expect(siteFooter.getByRole("link", { name: /términos/i })).toBeVisible();
 });
 
 // --- Navbar: los dropdowns DEBEN abrirse. Si rompe, nadie llega a publicar
@@ -79,7 +80,7 @@ test("dropdown Ayuda muestra el botón y es interactivo", async ({ page }) => {
 
 test("CTA 'Ver N libros' del hero navega a /search", async ({ page }) => {
   await page.goto("/");
-  const verLibrosLink = page.getByRole("link", { name: /ver.*libros|ver catálogo/i }).first();
+  const verLibrosLink = page.getByRole("link", { name: /ver.*libros|ver catálogo|explorar catálogo/i }).first();
   await expect(verLibrosLink).toBeVisible();
   const href = await verLibrosLink.getAttribute("href");
   expect(href).toMatch(/\/search/);
