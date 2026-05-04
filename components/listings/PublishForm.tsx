@@ -37,6 +37,16 @@ const CONDITION_OPTIONS: { value: Condition; label: string; color: string }[] = 
   { value: "poor", label: "Con detalles",  color: "text-red-700 bg-red-50 border-red-200" },
 ];
 
+const DESCRIPTION_FALLBACK = "Libro usado publicado en tuslibros.cl.";
+
+function publishErrorMessage(err: unknown) {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === "object" && "message" in err) {
+    return String((err as { message?: unknown }).message);
+  }
+  return "Ocurrió un error al publicar.";
+}
+
 interface DefaultLocation {
   lat: number;
   lng: number;
@@ -249,8 +259,8 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
     setError(null);
 
     try {
-      // Si el libro tiene ISBN, hacer upsert para evitar duplicados.
-      // Si no tiene ISBN (ingreso manual), hacer insert directo.
+      // Si el libro tiene ISBN, reutilizar el registro existente para evitar duplicados.
+      // Si no existe o no tiene ISBN (ingreso manual), hacer insert directo.
       // Si el usuario eligió explícitamente: usar esa selección.
       // Si no, intentar inferir desde genre del libro (legacy path).
       let finalCategory: string | null = categorySlug;
@@ -269,12 +279,13 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         subcategory: finalSubcategory ?? undefined,
         description: bookDescription || book?.description,
       });
+      const finalDescription = (bookDescription || book?.description || "").trim() || DESCRIPTION_FALLBACK;
 
       const bookPayload = {
         isbn: book?.isbn ?? null,
         title: bookTitle,
         author: bookAuthor,
-        description: bookDescription || book?.description || null,
+        description: finalDescription,
         cover_url: customCoverUrl ?? book?.cover_url ?? null,
         genre: book?.genre || null,
         category: finalCategory,
@@ -290,20 +301,31 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       let bookId: string;
 
       if (book?.isbn) {
-        const { data: bookRow, error: bookErr } = await supabase
+        const { data: existingBook, error: findBookErr } = await supabase
           .from("books")
-          .upsert(bookPayload, { onConflict: "isbn", ignoreDuplicates: false })
           .select("id")
-          .single();
-        if (bookErr) throw bookErr;
-        bookId = bookRow.id;
+          .eq("isbn", book.isbn)
+          .maybeSingle();
+        if (findBookErr) throw new Error(findBookErr.message);
+
+        if (existingBook?.id) {
+          bookId = existingBook.id;
+        } else {
+          const { data: bookRow, error: bookErr } = await supabase
+            .from("books")
+            .insert(bookPayload)
+            .select("id")
+            .single();
+          if (bookErr) throw new Error(bookErr.message);
+          bookId = bookRow.id;
+        }
       } else {
         const { data: bookRow, error: bookErr } = await supabase
           .from("books")
           .insert(bookPayload)
           .select("id")
           .single();
-        if (bookErr) throw bookErr;
+        if (bookErr) throw new Error(bookErr.message);
         bookId = bookRow.id;
       }
 
@@ -333,7 +355,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         status: "active",
       }).select("id, slug").single();
 
-      if (listingErr) throw listingErr;
+      if (listingErr) throw new Error(listingErr.message);
 
       // Gong Telegram (fire-and-forget) — Vero recibe notificación cuando alguien publica
       if (newListing?.id) {
@@ -358,7 +380,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       setPublishedSlug(newListing?.slug ?? null);
       setPublishSuccess(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Ocurrió un error al publicar.");
+      setError(publishErrorMessage(err));
     } finally {
       setLoading(false);
     }
