@@ -39,6 +39,15 @@ const CONDITION_OPTIONS: { value: Condition; label: string; color: string }[] = 
 
 const DESCRIPTION_FALLBACK = "Libro usado publicado en tuslibros.cl.";
 
+type BookDataWithDescriptionAliases = BookData & {
+  synopsis?: string | null;
+  summary?: string | null;
+};
+
+function getBookDescription(book?: BookDataWithDescriptionAliases | null) {
+  return (book?.description ?? book?.synopsis ?? book?.summary ?? "").trim();
+}
+
 function publishErrorMessage(err: unknown) {
   if (err instanceof Error) return err.message;
   if (err && typeof err === "object" && "message" in err) {
@@ -173,8 +182,9 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       setBook(data);
       if (data.title?.trim()) setBookTitle(data.title.trim());
       if (data.author?.trim()) setBookAuthor(data.author.trim());
-      if (data.description?.trim()) setBookDescription(data.description.trim());
-      const normalized = normalizeGenre(data.genre, data.title, data.description);
+      const incomingDescription = getBookDescription(data);
+      if (incomingDescription) setBookDescription(incomingDescription);
+      const normalized = normalizeGenre(data.genre, data.title, incomingDescription);
       if (normalized) {
         setCategorySlug(normalized.category);
         setSubcategorySlug(normalized.subcategory);
@@ -277,9 +287,9 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         author: bookAuthor,
         category: finalCategory ?? undefined,
         subcategory: finalSubcategory ?? undefined,
-        description: bookDescription || book?.description,
+        description: bookDescription || getBookDescription(book),
       });
-      const finalDescription = (bookDescription || book?.description || "").trim() || DESCRIPTION_FALLBACK;
+      const finalDescription = (bookDescription || getBookDescription(book)).trim() || DESCRIPTION_FALLBACK;
 
       const bookPayload = {
         isbn: book?.isbn ?? null,
@@ -477,6 +487,18 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
                   className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                 />
               </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Descripción / Sinopsis <span className="text-gray-400 font-normal">(opcional)</span>
+                </label>
+                <textarea
+                  value={bookDescription}
+                  onChange={(e) => setBookDescription(e.target.value)}
+                  rows={3}
+                  placeholder="Sinopsis o descripción del libro..."
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
+                />
+              </div>
               {/* Badge si fue identificado */}
               {book && (
                 <div className="flex items-center justify-between">
@@ -538,8 +560,9 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
               setBook(b);
               if (b.title?.trim()) setBookTitle(b.title.trim());
               if (b.author?.trim()) setBookAuthor(b.author.trim());
-              if (b.description?.trim()) setBookDescription(b.description.trim());
-              const normalized = normalizeGenre(b.genre, b.title, b.description);
+              const incomingDescription = getBookDescription(b);
+              if (incomingDescription) setBookDescription(incomingDescription);
+              const normalized = normalizeGenre(b.genre, b.title, incomingDescription);
               if (normalized) {
                 setCategorySlug(normalized.category);
                 setSubcategorySlug(normalized.subcategory);
