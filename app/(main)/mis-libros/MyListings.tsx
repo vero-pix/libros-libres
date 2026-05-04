@@ -9,6 +9,7 @@ import type { ListingWithBook, ListingStatus } from "@/types";
 import CategoryPicker from "@/components/listings/CategoryPicker";
 import CoverUpload from "@/components/books/CoverUpload";
 import ImageUploadMultiple from "@/components/listings/ImageUploadMultiple";
+import { libroUrl } from "@/lib/urls";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   active: { label: "Activo", color: "bg-green-100 text-green-700" },
@@ -252,7 +253,7 @@ function ListingRow({
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       <div className="flex gap-4 p-4">
         {/* Cover */}
-        <Link href={listing.slug ? `/libro/${listing.slug}` : `/listings/${listing.id}`} className="flex-shrink-0 relative w-16 h-22 sm:w-20 sm:h-28">
+        <Link href={libroUrl(listing)} className="flex-shrink-0 relative w-16 h-22 sm:w-20 sm:h-28">
           {coverUrl ? (
             <Image
               src={coverUrl}

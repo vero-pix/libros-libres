@@ -23,7 +23,7 @@ export default async function MisLibrosPage() {
 
   const { data } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone)`)
+    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, username)`)
     .eq("seller_id", user.id)
     .order("created_at", { ascending: false });
 

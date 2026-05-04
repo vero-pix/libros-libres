@@ -28,9 +28,10 @@ export default function LoginForm() {
       return;
     }
 
-    const next = searchParams.get("next") ?? "/";
-    router.push(next);
+    const rawNext = searchParams.get("next") ?? "/";
+    const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
     router.refresh();
+    window.location.assign(next);
   }
 
   return (

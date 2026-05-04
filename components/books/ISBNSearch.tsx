@@ -8,6 +8,7 @@ const BarcodeScanner = dynamic(() => import("@/components/books/BarcodeScanner")
 
 interface Props {
   onBookFound: (book: BookData) => void;
+  hideManualForm?: boolean;
 }
 
 interface ManualForm {
@@ -19,7 +20,7 @@ interface ManualForm {
   isbn: string;
 }
 
-export default function ISBNSearch({ onBookFound }: Props) {
+export default function ISBNSearch({ onBookFound, hideManualForm = false }: Props) {
   const [isbn, setIsbn] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +59,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
       if (!res.ok) {
         if (res.status === 404) {
           setError("No encontramos ese ISBN en las bases de datos internacionales.");
-          setShowManual(true);
+          setShowManual(!hideManualForm);
           setManual(m => ({ ...m, isbn: clean }));
         } else {
           setError(data.error ?? "Error al consultar el servicio.");
@@ -68,8 +69,8 @@ export default function ISBNSearch({ onBookFound }: Props) {
 
       // Si la API encontró el ISBN pero sin título, pedir datos manuales
       if (!data.title?.trim()) {
-        setError("Encontramos el código pero faltan datos. Complétalos a mano.");
-        setShowManual(true);
+        setError(hideManualForm ? "Encontramos el código pero faltan datos. Complétalos arriba." : "Encontramos el código pero faltan datos. Complétalos a mano.");
+        setShowManual(!hideManualForm);
         setManual((m) => ({
           ...m,
           title: m.title || data.title || "",
@@ -104,7 +105,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
       if (!res.ok) {
         if (res.status === 404) {
           setError("Código detectado pero no está en nuestra base de datos.");
-          setShowManual(true);
+          setShowManual(!hideManualForm);
           setManual(m => ({ ...m, isbn: clean })); // Pre-rellenar ISBN en manual
         } else {
           setError(data.error ?? "Error al buscar los datos del libro.");
@@ -114,8 +115,8 @@ export default function ISBNSearch({ onBookFound }: Props) {
 
       // Mismo chequeo que handleSearch: si no hay título, pedir datos manuales
       if (!data.title?.trim()) {
-        setError("Código detectado pero faltan datos. Complétalos a mano.");
-        setShowManual(true);
+        setError(hideManualForm ? "Código detectado pero faltan datos. Complétalos arriba." : "Código detectado pero faltan datos. Complétalos a mano.");
+        setShowManual(!hideManualForm);
         setManual((m) => ({
           ...m,
           title: m.title || data.title || "",
@@ -166,7 +167,7 @@ export default function ISBNSearch({ onBookFound }: Props) {
       )}
 
       {/* Scan + Manual buttons — same visual level */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div className={`grid grid-cols-1 ${hideManualForm ? "" : "sm:grid-cols-2"} gap-2`}>
         <button
           type="button"
           onClick={() => setShowScanner(true)}
@@ -183,17 +184,19 @@ export default function ISBNSearch({ onBookFound }: Props) {
           </svg>
           Escanear código de barras
         </button>
-        <button
-          type="button"
-          onClick={() => setShowManual(true)}
-          className="flex items-center justify-center gap-2 py-3 border-2 border-dashed border-brand-300 hover:border-brand-500 hover:bg-brand-50 text-brand-600 hover:text-brand-700 font-medium rounded-xl text-sm transition-all"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-            <path d="M12 20h9"/>
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-          </svg>
-          Sin ISBN · ingreso manual
-        </button>
+        {!hideManualForm && (
+          <button
+            type="button"
+            onClick={() => setShowManual(true)}
+            className="flex items-center justify-center gap-2 py-3 border-2 border-dashed border-brand-300 hover:border-brand-500 hover:bg-brand-50 text-brand-600 hover:text-brand-700 font-medium rounded-xl text-sm transition-all"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+              <path d="M12 20h9"/>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            Sin ISBN · ingreso manual
+          </button>
+        )}
       </div>
 
       <div className="flex items-center gap-2 text-xs text-gray-300">

@@ -512,7 +512,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
             </div>
           )}
 
-          <ISBNSearch onBookFound={(b) => {
+          <ISBNSearch hideManualForm onBookFound={(b) => {
               setBook(b);
               if (b.title?.trim()) setBookTitle(b.title.trim());
               if (b.author?.trim()) setBookAuthor(b.author.trim());
