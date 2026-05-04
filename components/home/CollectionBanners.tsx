@@ -14,14 +14,14 @@ const BANNERS: Banner[] = [
   {
     title: "Filosofía",
     subtitle: "Jaeger, Séneca, Plutarco, Urban",
-    href: "/?genre=Filosof%C3%ADa",
+    href: "/?category=no-ficcion&subcategory=filosofia",
     gradient: "from-[#3a445a] to-[#5a647a]",
     icon: "🏛️",
   },
   {
     title: "Novela Negra",
     subtitle: "Montalbán, Ellroy, Black",
-    href: "/?genre=Novela+Negra",
+    href: "/?category=ficcion&subcategory=novela-negra",
     gradient: "from-[#1e2a4a] to-[#3a4a6a]",
     icon: "🔍",
   },
@@ -42,14 +42,14 @@ const BANNERS: Banner[] = [
   {
     title: "Ficción Literaria",
     subtitle: "Borges, Kundera, Musil",
-    href: "/?genre=Ficcion+Literaria",
+    href: "/?category=ficcion&subcategory=novela",
     gradient: "from-[#4a5a8a] to-[#6a7a9a]",
     icon: "✨",
   },
   {
     title: "Ensayo e Historia",
     subtitle: "Hobsbawm, Krauze, Koestler",
-    href: "/?genre=Ensayo",
+    href: "/?category=no-ficcion",
     gradient: "from-stone-700 to-stone-500",
     icon: "📜",
   },

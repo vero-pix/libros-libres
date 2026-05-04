@@ -204,9 +204,11 @@ export default async function HomePage({ searchParams }: Props) {
   } else {
     let query = supabase
       .from("listings")
-      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`, { count: "exact" })
+      .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`, { count: "exact" })
       .in("status", ["active", "completed"]);
 
+    if (category) query = query.eq("book.category", category);
+    if (subcategory) query = query.eq("book.subcategory", subcategory);
     if (condition) query = query.eq("condition", condition);
     if (modality) query = query.in("modality", modality === "both" ? ["both"] : [modality, "both"]);
     if (price_min) query = query.gte("price", Number(price_min));
