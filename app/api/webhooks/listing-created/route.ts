@@ -84,9 +84,9 @@ export async function POST(req: Request) {
     const addr = (listing as any).address ?? "";
     const commune = addr.split(",").slice(-3, -2)[0]?.trim() ?? "";
 
-    const url = seller.username
+    const url = seller.username && listing.slug
       ? `https://tuslibros.cl/libro/${seller.username}/${listing.slug}`
-      : `https://tuslibros.cl/libro/${listing.slug}`;
+      : `https://tuslibros.cl/listings/${listing.id}`;
 
     const message =
       `🔔 <b>Nueva publicación</b>\n\n` +

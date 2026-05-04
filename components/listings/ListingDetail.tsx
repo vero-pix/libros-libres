@@ -84,6 +84,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
   useEffect(() => {
     addRecentlyViewed({
       id: listing.id,
+      slug: listing.slug,
       title: book.title,
       cover_url: coverUrl,
       price: listing.price,
@@ -91,7 +92,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
       author: book.author,
       seller_username: listing.seller?.username,
     });
-  }, [listing.id, book.title, coverUrl, listing.price, book.genre, book.author]);
+  }, [listing.id, listing.slug, book.title, coverUrl, listing.price, book.genre, book.author, listing.seller?.username]);
 
   const isSold = listing.status === "completed";
 
