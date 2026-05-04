@@ -287,8 +287,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
         </div>
       </div>
 
-      {/* Tabs */}
-      <DetailTabs listing={listing} />
+      <DescriptionSection listing={listing} />
 
       {/* Buy CTA */}
       {listing.price != null && listing.modality !== "loan" && (
@@ -346,7 +345,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
 
       {/* Contact CTA */}
       <div className="border-t border-gray-100 px-6 py-5 bg-green-50/50">
-        <p className="text-xs font-semibold text-gray-500 mb-2 text-center">¿Preguntas sobre el libro?</p>
+        <p className="text-xs font-semibold text-gray-500 mb-2 text-center">Contacta al vendedor</p>
         <div className="space-y-2">
           <WhatsAppButton
             phone={listing.seller?.phone ?? null}
@@ -415,50 +414,19 @@ export default function ListingDetail({ listing, images = [] }: Props) {
   );
 }
 
-function DetailTabs({ listing }: { listing: ListingWithBook }) {
-  const [activeTab, setActiveTab] = useState<"descripcion" | "preguntas" | "resenas">("descripcion");
+function DescriptionSection({ listing }: { listing: ListingWithBook }) {
   const { book } = listing;
-
-  // Lazy-load question and review components
-  const QuestionSection = activeTab === "preguntas" ? require("@/components/listings/QuestionSection").default : null;
-  const ReviewSection = activeTab === "resenas" ? require("@/components/listings/ReviewSection").default : null;
-
-  const tabs = [
-    { key: "descripcion" as const, label: "Descripción" },
-    { key: "preguntas" as const, label: "Preguntas" },
-    { key: "resenas" as const, label: "Reseñas" },
-  ];
 
   return (
     <div className="border-t border-gray-100">
-      <div className="flex border-b border-gray-100">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${
-              activeTab === tab.key
-                ? "text-brand-600 border-b-2 border-brand-500"
-                : "text-ink-muted hover:text-ink"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="px-5 sm:px-6 pt-4">
+        <h2 className="text-sm font-semibold text-ink">Descripción</h2>
       </div>
-      <div className="px-5 sm:px-6 py-4 min-h-[120px]">
-        {activeTab === "descripcion" && (
-          book.description ? (
-            <p className="text-sm text-gray-600 leading-relaxed">{book.description}</p>
-          ) : (
-            <p className="text-sm text-gray-400 italic">Sin sinopsis disponible. Consulta al vendedor por más detalles.</p>
-          )
-        )}
-        {activeTab === "preguntas" && QuestionSection && (
-          <QuestionSection listingId={listing.id} sellerId={listing.seller_id} />
-        )}
-        {activeTab === "resenas" && ReviewSection && (
-          <ReviewSection listingId={listing.id} />
+      <div className="px-5 sm:px-6 py-4">
+        {book.description ? (
+          <p className="text-sm text-gray-600 leading-relaxed">{book.description}</p>
+        ) : (
+          <p className="text-sm text-gray-400 italic">Sin sinopsis disponible. Consulta al vendedor por más detalles.</p>
         )}
       </div>
     </div>
