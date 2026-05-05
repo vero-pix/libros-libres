@@ -39,6 +39,19 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 const novedades: Entry[] = [
   {
     date: "5 mayo 2026",
+    title: "Vitrinas escolares y limpieza profunda para el lanzamiento 🚀",
+    description:
+      "Hoy preparamos la casa para la nueva fase de distribución. Reorganizamos la portada para destacar exclusivamente los textos de Lectura Complementaria (¡hola, Julito Cabello!). Además, limpiamos el mapa del sitio (Sitemap) eliminando 43 URLs conflictivas que confundían a Google, exterminamos cuentas bot de la base de datos, y arreglamos un bug que hacía que algunas categorías principales como 'Idiomas' mostraran 0 libros. La plataforma está rápida, limpia y lista para recibir a los nuevos lectores.",
+    tag: "Lanzamiento",
+    visual: {
+      kind: "milestone",
+      icon: "🧹",
+      metric: "Ready to launch",
+      detail: "SEO limpio y portada enfocada en colegios",
+    },
+  },
+  {
+    date: "5 mayo 2026",
     title: "🇨🇱 Nueva taxonomía literaria chilena",
     description:
       "Hoy dimos un salto gigante en la organización del catálogo. Estrenamos categorías específicas para el lector chileno: Poesía, Novela Negra/Policial, Teatro, Humanidades y una sección reforzada de Lectura Complementaria. Ahora es mucho más fácil encontrar esa joya literaria o el libro que piden en el colegio, con una estructura pensada en cómo buscamos libros nosotros.",
