@@ -222,8 +222,11 @@ export default function ProfileForm({
                 const { error: upErr } = await supabase.storage.from("covers").upload(path, compressed, { upsert: true });
                 if (upErr) throw upErr;
                 const { data: { publicUrl } } = supabase.storage.from("covers").getPublicUrl(path);
-                setAvatarUrl(publicUrl);
+                // Guardar URL limpia en BD, mostrar con cache-buster para forzar
+                // recarga en el navegador (la ruta es siempre la misma, el CDN
+                // cachea la imagen anterior si no agregamos el timestamp).
                 await supabase.from("users").update({ avatar_url: publicUrl }).eq("id", userId);
+                setAvatarUrl(`${publicUrl}?t=${Date.now()}`);
               } catch (err) {
                 console.error("Avatar upload error:", err);
               }
