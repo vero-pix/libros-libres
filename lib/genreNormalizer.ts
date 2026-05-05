@@ -48,8 +48,9 @@ const GENRE_MAP: Record<string, NormalizedGenre> = {
   "adventure":        { category: "general-adulto", subcategory: "general-adulto-novela" },
   "historica":        { category: "general-adulto", subcategory: "general-adulto-novela" },
   "historical fiction":{ category: "general-adulto", subcategory: "general-adulto-novela" },
-  "policial":         { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "detective":        { category: "general-adulto", subcategory: "general-adulto-novela" },
+  "policial":         { category: "general-adulto", subcategory: "general-adulto-novela-negra" },
+  "detective":        { category: "general-adulto", subcategory: "general-adulto-novela-negra" },
+  "crimen":           { category: "general-adulto", subcategory: "general-adulto-novela-negra" },
   "drama":            { category: "general-adulto", subcategory: "general-adulto-novela" },
   "cuentos":          { category: "general-adulto", subcategory: "general-adulto-novela" },
   "relatos":          { category: "general-adulto", subcategory: "general-adulto-novela" },
@@ -64,12 +65,18 @@ const GENRE_MAP: Record<string, NormalizedGenre> = {
   "legends":          { category: "general-adulto", subcategory: "general-adulto-novela" },
   "folklore":         { category: "general-adulto", subcategory: "general-adulto-novela" },
 
-  // ── Poesía / Teatro → Ensayo (lo más cercano) ──────────────────────────
-  "poesia":           { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "poesía":           { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "poetry":           { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "teatro":           { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "drama teatral":    { category: "general-adulto", subcategory: "general-adulto-ensayo" },
+  // ── Poesía / Teatro ──────────────────────────────────────────────────────
+  "poesia":           { category: "general-adulto", subcategory: "general-adulto-poesia" },
+  "poesía":           { category: "general-adulto", subcategory: "general-adulto-poesia" },
+  "poetry":           { category: "general-adulto", subcategory: "general-adulto-poesia" },
+  "teatro":           { category: "general-adulto", subcategory: "general-adulto-teatro" },
+  "drama teatral":    { category: "general-adulto", subcategory: "general-adulto-teatro" },
+  "play":             { category: "general-adulto", subcategory: "general-adulto-teatro" },
+  "plays":            { category: "general-adulto", subcategory: "general-adulto-teatro" },
+
+  // ── No ficción: Ensayo / Filosofía / Humanidades ────────────────────────
+  "humanidades":      { category: "general-adulto", subcategory: "general-adulto-humanidades" },
+  "humanities":       { category: "general-adulto", subcategory: "general-adulto-humanidades" },
 
   // ── No ficción: Ensayo / Filosofía / Política ───────────────────────────
   "no ficcion":       { category: "general-adulto", subcategory: "general-adulto-ensayo" },

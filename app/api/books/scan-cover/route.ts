@@ -71,10 +71,23 @@ IMPORTANTE:
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
       console.error("Anthropic error:", err);
-      // Si es error de créditos, retornar código especial
-      if (response.status === 529 || err?.error?.type === "overloaded_error") {
-        return NextResponse.json({ error: "Sin créditos disponibles." }, { status: 402 });
+      
+      const errType = err?.error?.type;
+      const errMsg = err?.error?.message?.toLowerCase() || "";
+      
+      // Si es error de créditos o facturación, retornar código 402 especial
+      if (
+        response.status === 429 || // Too many requests / Out of credits
+        response.status === 402 || 
+        response.status === 529 || // Overloaded
+        errType === "credit_balance_too_low" ||
+        errType === "insufficient_quota" ||
+        errMsg.includes("credit") ||
+        errMsg.includes("billing")
+      ) {
+        return NextResponse.json({ error: "Sin créditos disponibles en la IA." }, { status: 402 });
       }
+      
       return NextResponse.json({ error: "Error al analizar la imagen." }, { status: 500 });
     }
 
