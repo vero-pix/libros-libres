@@ -16,7 +16,8 @@ import type { ListingWithBook } from "@/types";
 interface Props {
   searchParams: {
     q?: string;
-    genre?: string;
+    category?: string;
+    subcategory?: string;
     sort?: string;
     price_min?: string;
     price_max?: string;
@@ -40,15 +41,15 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return {
     title: q
       ? { absolute: `${q} | TusLibros` }
-      : genre
-        ? `${genre} — tuslibros.cl`
+      : searchParams.category
+        ? `${translateGenre(searchParams.category)} — tuslibros.cl`
         : "Buscar libros — tuslibros.cl",
     description,
     alternates: {
       canonical: q
         ? `https://tuslibros.cl/search?q=${encodeURIComponent(q)}`
-        : genre
-          ? `https://tuslibros.cl/search?genre=${encodeURIComponent(genre)}`
+        : searchParams.category
+          ? `https://tuslibros.cl/search?category=${encodeURIComponent(searchParams.category)}`
           : "https://tuslibros.cl/search",
     },
   };
@@ -56,7 +57,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function SearchPage({ searchParams }: Props) {
   const supabase = await createClient();
-  const { q, genre, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max, city_id } = searchParams;
+  const { q, category, subcategory, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max, city_id } = searchParams;
 
   // Si hay búsqueda de texto, primero encontrar los book IDs que coincidan
   let matchingBookIds: string[] | null = null;
@@ -146,9 +147,14 @@ export default async function SearchPage({ searchParams }: Props) {
       .then(() => {});
   }
 
-  if (genre) {
+  if (category) {
     listings = listings.filter(
-      (l) => l.book.genre?.toLowerCase() === genre.toLowerCase()
+      (l) => l.book.category === category
+    );
+  }
+  if (subcategory) {
+    listings = listings.filter(
+      (l) => l.book.subcategory === subcategory
     );
   }
 
@@ -210,7 +216,11 @@ export default async function SearchPage({ searchParams }: Props) {
         </div>
 
         <div className="flex gap-8">
-          <CategoriesSidebar categoryTree={categoryTree} />
+          <CategoriesSidebar 
+            categoryTree={categoryTree} 
+            activeCategory={category} 
+            activeSubcategory={subcategory} 
+          />
 
           <div className="flex-1 min-w-0">
             <Suspense fallback={<div className="h-10 bg-gray-100 rounded-lg animate-pulse mb-4" />}>

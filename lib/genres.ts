@@ -1,114 +1,42 @@
-const GENRE_ES: Record<string, string> = {
-  "Fiction": "Ficción",
-  "Non-Fiction": "No ficción",
-  "Science": "Ciencia",
-  "Social Science": "Ciencias Sociales",
-  "History": "Historia",
-  "Chronology, Historical": "Historia",
-  "Biography & Autobiography": "Biografía",
-  "Philosophy": "Filosofía",
-  "Psychology": "Psicología",
-  "Religion": "Religión",
-  "Poetry": "Poesía",
-  "Drama": "Teatro",
-  "Art": "Arte",
-  "Music": "Música",
-  "Cooking": "Cocina",
-  "Education": "Educación",
-  "Business & Economics": "Negocios",
-  "Computers": "Computación",
-  "Technology & Engineering": "Tecnología",
-  "Medical": "Medicina",
-  "Law": "Derecho",
-  "Political Science": "Política",
-  "Mathematics": "Matemáticas",
-  "Nature": "Naturaleza",
-  "Travel": "Viajes",
-  "Sports & Recreation": "Deportes",
-  "Juvenile Fiction": "Infantil",
-  "Juvenile Nonfiction": "Juvenil",
-  "Young Adult Fiction": "Juvenil",
-  "Comics & Graphic Novels": "Cómics",
-  "Self-Help": "Autoayuda",
-  "Body, Mind & Spirit": "Espiritualidad",
-  "Family & Relationships": "Familia",
-  "Health & Fitness": "Salud",
-  "Humor": "Humor",
-  "Language Arts & Disciplines": "Lenguaje",
-  "Literary Criticism": "Crítica Literaria",
-  "Latin America": "Latinoamérica",
-  "True Crime": "Crimen Real",
-  "Transportation": "Transporte",
+/**
+ * lib/genres.ts
+ * Mapeo de categorías y traducciones para el marketplace.
+ * Actualizado a la taxonomía chilena 2026.
+ */
+
+export const CATEGORY_NAMES: Record<string, string> = {
+  'escolar': 'Escolar',
+  'lectura-complementaria': 'Lectura Complementaria',
+  'universitario': 'Universitario',
+  'tecnico-cft': 'Técnico / CFT',
+  'general-adulto': 'General / Adulto',
+  'idiomas': 'Idiomas',
+  'otros': 'Otros',
+  // Subcategorías comunes
+  'escolar-basica-1-6': 'Básica 1°–6°',
+  'escolar-basica-7-8': 'Básica 7°–8°',
+  'escolar-media': 'Media 1°–4°',
+  'general-adulto-novela': 'Novela y Ficción',
+  'general-adulto-ensayo': 'Ensayo y No Ficción',
 };
 
-export function translateGenre(genre: string): string {
-  return GENRE_ES[genre] ?? genre;
+/** Traduce un slug de categoría a nombre legible */
+export function translateGenre(slug: string): string {
+  return CATEGORY_NAMES[slug] ?? slug;
 }
 
-/** Categorías en español para selector manual */
-export const CATEGORY_OPTIONS = [
-  "Ficción",
-  "No ficción",
-  "Ciencia",
-  "Ciencias Sociales",
-  "Historia",
-  "Biografía",
-  "Filosofía",
-  "Psicología",
-  "Religión",
-  "Poesía",
-  "Teatro",
-  "Arte",
-  "Música",
-  "Cocina",
-  "Educación",
-  "Negocios",
-  "Computación",
-  "Tecnología",
-  "Medicina",
-  "Derecho",
-  "Política",
-  "Matemáticas",
-  "Naturaleza",
-  "Viajes",
-  "Deportes",
-  "Infantil",
-  "Juvenil",
-  "Cómics",
-  "Autoayuda",
-  "Espiritualidad",
-  "Familia",
-  "Salud",
-  "Humor",
-  "Novela",
-  "Cuentos",
-  "Ensayo",
-] as const;
-
-/** Agrupación de categorías para el sidebar */
-export const CATEGORY_GROUPS: { label: string; genres: string[] }[] = [
+/** Agrupación para menús y filtros */
+export const CATEGORY_GROUPS = [
   {
-    label: "Literatura",
-    genres: ["Ficción", "No ficción", "Novela", "Cuentos", "Poesía", "Teatro", "Ensayo", "Humor", "Cómics", "Crítica Literaria"],
+    label: "Escolar",
+    genres: ["escolar-basica-1-6", "escolar-basica-7-8", "escolar-media", "escolar-matematicas", "escolar-lenguaje"],
   },
   {
-    label: "Desarrollo personal",
-    genres: ["Autoayuda", "Espiritualidad", "Psicología", "Filosofía", "Salud", "Familia"],
+    label: "Superior",
+    genres: ["universitario-derecho", "universitario-ingenieria", "universitario-medicina", "tecnico-cft-administracion"],
   },
   {
-    label: "Ciencias y tecnología",
-    genres: ["Ciencia", "Ciencias Sociales", "Matemáticas", "Computación", "Tecnología", "Medicina", "Naturaleza"],
-  },
-  {
-    label: "Sociedad",
-    genres: ["Historia", "Biografía", "Política", "Derecho", "Educación", "Negocios", "Religión"],
-  },
-  {
-    label: "Arte y cultura",
-    genres: ["Arte", "Música", "Cocina", "Viajes", "Deportes"],
-  },
-  {
-    label: "Infantil y juvenil",
-    genres: ["Infantil", "Juvenil"],
+    label: "Literatura y Otros",
+    genres: ["general-adulto-novela", "general-adulto-ensayo", "lectura-complementaria-infantil", "otros-comics"],
   },
 ];

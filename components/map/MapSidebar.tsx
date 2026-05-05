@@ -33,11 +33,11 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
   const [sortMode, setSortMode] = useState<SortMode>("distance");
   const [filterGenre, setFilterGenre] = useState<string>("");
 
-  // Build genre list
-  const genres = useMemo(() => {
+  // Build category list
+  const categories = useMemo(() => {
     const set = new Set<string>();
     listings.forEach((l) => {
-      if (l.book.genre) set.add(l.book.genre);
+      if (l.book.category) set.add(l.book.category);
     });
     return Array.from(set).sort();
   }, [listings]);
@@ -46,7 +46,7 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
   const sorted = useMemo(() => {
     let filtered = listings;
     if (filterGenre) {
-      filtered = filtered.filter((l) => l.book.genre === filterGenre);
+      filtered = filtered.filter((l) => l.book.category === filterGenre);
     }
 
     return [...filtered].sort((a, b) => {
@@ -61,7 +61,7 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
         return (a.book.author ?? "").localeCompare(b.book.author ?? "");
       }
       if (sortMode === "genre") {
-        return (a.book.genre ?? "").localeCompare(b.book.genre ?? "");
+        return (a.book.category ?? "").localeCompare(b.book.category ?? "");
       }
       // Sin ubicación: coleccionables primero, luego featured, luego resto
       const colA = !!(a as any).is_collectible, colB = !!(b as any).is_collectible;
@@ -103,8 +103,8 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
             className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-400"
           >
             <option value="">Todas</option>
-            {genres.map((g) => (
-              <option key={g} value={g}>{translateGenre(g)}</option>
+            {categories.map((c) => (
+              <option key={c} value={c}>{translateGenre(c)}</option>
             ))}
           </select>
         </div>
@@ -172,9 +172,9 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
                             ${listing.price.toLocaleString("es-CL")}
                           </span>
                         )}
-                        {listing.book.genre && (
+                        {listing.book.category && (
                           <span className="text-xs text-gray-400">
-                            {translateGenre(listing.book.genre)}
+                            {translateGenre(listing.book.category)}
                           </span>
                         )}
                         {dist != null && (

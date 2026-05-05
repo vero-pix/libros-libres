@@ -76,8 +76,9 @@ export default function CategoriesSidebar({
       </ul>
 
       {categoryTree
-        .filter((group) => group.count >= 5 || group.slug === activeCategory)
         .map((group, idx) => {
+        // Nota: mostramos TODAS las categorías de la taxonomía curada,
+        // independiente del conteo. El count es solo informativo.
         const isOpen = openGroups.has(idx);
         return (
           <div key={group.slug} className="mt-3">
