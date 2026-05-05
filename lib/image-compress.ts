@@ -1,13 +1,17 @@
 /**
  * Ultra-light compression for AI scanning.
- * We don't need high res, just enough for the AI to read text.
- * Max 800px, 0.6 quality, JPG (most compatible).
+ * Forzamos JPEG porque iOS Safari no soporta codificación WebP en canvas
+ * — si se envía WebP declarado pero con contenido JPEG, Anthropic lo rechaza.
  */
 export async function compressScanImage(file: File): Promise<File> {
-  return compressImage(file, 800, 800, 0.6);
+  return compressToJpeg(file, 900, 900, 0.82);
 }
 
 export async function compressImage(file: File, maxWidth = 1200, maxHeight = 1600, quality = 0.8): Promise<File> {
+  return compressToJpeg(file, maxWidth, maxHeight, quality);
+}
+
+function compressToJpeg(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<File> {
   return new Promise((resolve) => {
     const img = new window.Image();
     img.onload = () => {
@@ -28,8 +32,8 @@ export async function compressImage(file: File, maxWidth = 1200, maxHeight = 160
       canvas.toBlob(
         (blob) => {
           if (blob) {
-            const compressed = new File([blob], file.name.replace(/\.\w+$/, ".webp"), {
-              type: "image/webp",
+            const compressed = new File([blob], file.name.replace(/\.\w+$/, ".jpg"), {
+              type: "image/jpeg",
               lastModified: Date.now(),
             });
             resolve(compressed);
@@ -37,7 +41,7 @@ export async function compressImage(file: File, maxWidth = 1200, maxHeight = 160
             resolve(file);
           }
         },
-        "image/webp",
+        "image/jpeg",
         quality
       );
     };
