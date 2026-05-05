@@ -6,9 +6,9 @@ import { libroUrl } from "@/lib/urls";
 import type { ListingWithBook } from "@/types";
 
 export const metadata = {
-  title: "Diario de tuslibros.cl — Abril 2026",
+  title: "Diario de tuslibros.cl — Mayo 2026",
   description:
-    "Lo que pasó estas dos semanas en tuslibros.cl: nuevo lector con flash, primer testimonio, primer envío a Concepción, limpieza de SEO y más.",
+    "Lo que pasó esta semana en tuslibros.cl: nueva taxonomía chilena, rediseño visual con colores fuertes, fix de perfiles y más.",
 };
 
 export const revalidate = 300;
@@ -37,6 +37,36 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 };
 
 const novedades: Entry[] = [
+  {
+    date: "5 mayo 2026",
+    title: "Nueva taxonomía chilena: Escolar, Universitario y Lectura Complementaria",
+    description:
+      "Hoy jubilamos las categorías genéricas por un sistema pensado 100% en el mercado chileno. Ahora puedes navegar directamente por Escolar (Básica 1°–8°, Media), Universitario (Derecho, Ingeniería, Medicina), Técnico / CFT e Idiomas. Reclasificamos automáticamente cerca de 200 libros del catálogo analizando sus títulos para que el buscador sea mucho más preciso. Es el cambio de arquitectura más grande que hemos hecho hasta ahora para que tuslibros.cl sea la herramienta definitiva para el regreso a clases y el estudio superior.",
+    tag: "Lanzamiento",
+    link: "/",
+    linkText: "Ver las nuevas categorías",
+    visual: {
+      kind: "milestone",
+      icon: "🇨🇱",
+      metric: "Taxonomía local",
+      detail: "Escolar · Universitario · CFT · Idiomas",
+    },
+  },
+  {
+    date: "5 mayo 2026",
+    title: "Identidad visual más fuerte y editorial",
+    description:
+      "Refrescamos la paleta de colores para buscar un look más vibrante y profesional. El azul navy ahora es un Royal Blue de alto contraste y el mostaza subió de tono para resaltar las acciones importantes. Además, arreglamos un bug molesto en el perfil: antes, cuando subías una foto nueva, el sitio te seguía mostrando la vieja por un problema de caché. Ahora el cambio es instantáneo. Tu vitrina personal ahora se ve mejor y funciona sin fricción.",
+    tag: "Mejora",
+    link: "/profile",
+    linkText: "Ver mi perfil",
+    visual: {
+      kind: "milestone",
+      icon: "🎨",
+      metric: "Royal Blue + Amber",
+      detail: "Colores más fuertes · Fix de avatar",
+    },
+  },
   {
     date: "29 abril 2026",
     title: "Nuevo lector con linterna (flash) y escaneo más sensible",
