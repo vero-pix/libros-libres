@@ -50,7 +50,11 @@ export async function buildCategoryTree(
         }))
         .sort((a, b) => b.count - a.count);
 
-      const count = catCount.get(root.slug) ?? 0;
+      // La cuenta del padre debe ser al menos la suma de sus hijos
+      const directCount = catCount.get(root.slug) ?? 0;
+      const childrenSum = children.reduce((sum, child) => sum + child.count, 0);
+      const count = Math.max(directCount, childrenSum);
+      
       return { slug: root.slug, name: root.name, count, children };
     });
 }

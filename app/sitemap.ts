@@ -83,40 +83,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Continue without seller pages
   }
 
-  // Category & Genre Hubs (SEO Powerhouses)
-  let categoryPages: MetadataRoute.Sitemap = [];
-  try {
-    const supabaseForCats = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { cookies: { getAll: () => [], setAll: () => {} } }
-    );
-
-    const { data: cats } = await supabaseForCats
-      .from("books")
-      .select("category, genre")
-      .not("category", "is", null);
-
-    const uniqueCategories = Array.from(new Set(cats?.map(c => c.category).filter(Boolean)));
-    const uniqueGenres = Array.from(new Set(cats?.map(c => c.genre).filter(Boolean)));
-
-    categoryPages = [
-      ...uniqueCategories.map(cat => ({
-        url: `${baseUrl}/?category=${encodeURIComponent(cat as string)}`,
-        lastModified: new Date(),
-        changeFrequency: "daily" as const,
-        priority: 0.85,
-      })),
-      ...uniqueGenres.map(gen => ({
-        url: `${baseUrl}/?genre=${encodeURIComponent(gen as string)}`,
-        lastModified: new Date(),
-        changeFrequency: "daily" as const,
-        priority: 0.8,
-      }))
-    ];
-  } catch {
-    // Fail silently
-  }
-
-  return [...staticPages, ...listingPages, ...sellerPages, ...categoryPages];
+  return [...staticPages, ...listingPages, ...sellerPages];
 }
