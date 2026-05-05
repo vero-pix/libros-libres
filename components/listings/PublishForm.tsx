@@ -185,14 +185,33 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       setBook(data);
       if (data.title) setBookTitle(data.title.trim());
       if (data.author) setBookAuthor(data.author.trim());
-      
+
       const incomingDescription = getBookDescription(data);
       if (incomingDescription) setBookDescription(incomingDescription);
-      
+
       const normalized = normalizeGenre(data.genre, data.title, incomingDescription);
       if (normalized) {
         setCategorySlug(normalized.category);
         setSubcategorySlug(normalized.subcategory);
+      }
+
+      // Subir la foto escaneada como portada si no hay una ya
+      if (!customCoverUrl) {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const path = `${user.id}/${Date.now()}.jpg`;
+            const { error: uploadErr } = await supabase.storage
+              .from("covers")
+              .upload(path, compressed, { upsert: true });
+            if (!uploadErr) {
+              const { data: { publicUrl } } = supabase.storage
+                .from("covers")
+                .getPublicUrl(path);
+              setCustomCoverUrl(publicUrl);
+            }
+          }
+        } catch { /* si falla la subida, no bloqueamos el flujo */ }
       }
     } catch {
       setScanError("Error de conexión. Usa ISBN o ingreso manual.");
