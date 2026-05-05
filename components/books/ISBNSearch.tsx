@@ -67,18 +67,24 @@ export default function ISBNSearch({ onBookFound, hideManualForm = false }: Prop
         return;
       }
 
-      // Si la API encontró el ISBN pero sin título, pedir datos manuales
-      if (!data.title?.trim()) {
-        setError(hideManualForm ? "Encontramos el código pero faltan datos. Complétalos arriba." : "Encontramos el código pero faltan datos. Complétalos a mano.");
-        setShowManual(!hideManualForm);
-        setManual((m) => ({
-          ...m,
-          title: m.title || data.title || "",
-          author: m.author || data.author || "",
-          isbn: clean, // Asegurar que el ISBN se pase
-        }));
+      // Si encontramos el libro, lo usamos aunque falten algunos campos menores
+      if (data.title?.trim()) {
+        onBookFound(data);
+        setIsbn(clean);
+        setError(null);
+        setShowManual(false);
         return;
       }
+
+      // Solo si no hay título ni autor, pedimos datos manuales
+      setError(hideManualForm ? "No pudimos obtener todos los datos. Por favor, complétalos arriba." : "No pudimos obtener los datos automáticamente. Ingresa el título y autor a mano.");
+      setShowManual(!hideManualForm);
+      setManual((m) => ({
+        ...m,
+        title: m.title || data.title || "",
+        author: m.author || data.author || "",
+        isbn: clean,
+      }));
 
       onBookFound(data);
       setIsbn(clean); // Mantener el ISBN visible
@@ -113,18 +119,24 @@ export default function ISBNSearch({ onBookFound, hideManualForm = false }: Prop
         return;
       }
 
-      // Mismo chequeo que handleSearch: si no hay título, pedir datos manuales
-      if (!data.title?.trim()) {
-        setError(hideManualForm ? "Código detectado pero faltan datos. Complétalos arriba." : "Código detectado pero faltan datos. Complétalos a mano.");
-        setShowManual(!hideManualForm);
-        setManual((m) => ({
-          ...m,
-          title: m.title || data.title || "",
-          author: m.author || data.author || "",
-          isbn: clean,
-        }));
+      // Si encontramos el libro por escaneo, lo usamos aunque falten datos menores
+      if (data.title?.trim()) {
+        onBookFound(data);
+        setIsbn(clean);
+        setError(null);
+        setShowManual(false);
         return;
       }
+
+      // Solo si no hay título ni autor, pedimos datos manuales
+      setError(hideManualForm ? "Código detectado pero no pudimos obtener los datos. Complétalos arriba." : "Código detectado pero no pudimos obtener los datos. Complétalos a mano.");
+      setShowManual(!hideManualForm);
+      setManual((m) => ({
+        ...m,
+        title: m.title || data.title || "",
+        author: m.author || data.author || "",
+        isbn: clean,
+      }));
 
       onBookFound(data);
       setIsbn(clean);
