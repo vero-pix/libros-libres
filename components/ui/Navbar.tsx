@@ -66,7 +66,7 @@ export default async function Navbar() {
             <>
             <Link
               href="/mensajes"
-              className="text-[11px] sm:text-xs font-medium uppercase tracking-[0.1em] sm:tracking-[0.15em] px-2.5 sm:px-4 py-3 sm:py-3.5 hover:bg-brand-500/10 hover:text-brand-400 transition-colors whitespace-nowrap flex items-center"
+              className="text-[11px] sm:text-xs font-medium uppercase tracking-[0.1em] sm:tracking-[0.15em] px-2.5 sm:px-4 py-4 sm:py-5 hover:bg-brand-500/10 hover:text-brand-400 transition-colors whitespace-nowrap flex items-center"
             >
               Mensajes
               <UnreadBadge />
@@ -102,7 +102,7 @@ export default async function Navbar() {
             href="https://wa.me/56994583067?text=Hola%2C%20tengo%20una%20consulta%20sobre%20tuslibros.cl"
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-auto text-[11px] sm:text-xs font-medium uppercase tracking-[0.1em] sm:tracking-[0.15em] px-2.5 sm:px-3 py-3 sm:py-3.5 hover:bg-white/10 transition-colors whitespace-nowrap flex items-center gap-1.5 text-green-400 hover:text-green-300"
+            className="ml-auto text-[11px] sm:text-xs font-medium uppercase tracking-[0.1em] sm:tracking-[0.15em] px-2.5 sm:px-3 py-4 sm:py-5 hover:bg-white/10 transition-colors whitespace-nowrap flex items-center gap-1.5 text-green-400 hover:text-green-300"
             title="Escríbenos por WhatsApp"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -127,7 +127,7 @@ function NavLink({ href, children, className = "" }: { href: string; children: R
   return (
     <Link
       href={href}
-      className={`text-[11px] sm:text-xs font-medium uppercase tracking-[0.1em] sm:tracking-[0.15em] px-2.5 sm:px-4 py-3 sm:py-3.5 hover:bg-white/10 transition-colors whitespace-nowrap inline-flex items-center ${className}`}
+      className={`text-[11px] sm:text-xs font-medium uppercase tracking-[0.1em] sm:tracking-[0.15em] px-2.5 sm:px-4 py-4 sm:py-5 hover:bg-white/10 transition-colors whitespace-nowrap inline-flex items-center ${className}`}
     >
       {children}
     </Link>

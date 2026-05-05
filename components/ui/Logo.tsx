@@ -12,7 +12,7 @@ export default function Logo({ className = "", withTagline = false }: LogoProps)
   return (
     <Link href="/" className={`flex items-center gap-3.5 group ${className}`}>
       {/* Isotipo: Los libritos con más presencia */}
-      <div className="relative w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0">
+      <div className="relative w-14 h-14 sm:w-20 sm:h-20 flex-shrink-0">
         <Image
           src="/logo-books.png"
           alt="tuslibros.cl logo"
@@ -25,10 +25,10 @@ export default function Logo({ className = "", withTagline = false }: LogoProps)
       {/* Logotipo: Texto */}
       <div className="flex flex-col">
         <div className="flex items-baseline">
-          <span className="font-display text-2xl font-bold text-ink tracking-tight">
+          <span className="font-display text-3xl font-bold text-ink tracking-tight">
             tuslibros
           </span>
-          <span className="font-display text-2xl font-bold text-brand-500">.cl</span>
+          <span className="font-display text-3xl font-bold text-brand-500">.cl</span>
         </div>
         {withTagline && (
           <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-ink-muted leading-none -mt-0.5">

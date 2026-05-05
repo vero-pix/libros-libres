@@ -19,6 +19,12 @@ export function hasCover(l: ListingWithBook): boolean {
   return !!(l.cover_image_url || l.book?.cover_url);
 }
 
+export function isPolitical(l: ListingWithBook): boolean {
+  const text = `${l.book?.title ?? ""} ${l.book?.author ?? ""} ${l.book?.description ?? ""}`.toLowerCase();
+  if (/\b(pinochet|allende|marx|comunismo|socialismo|dictadura|golpe|derecha|izquierda|revolución|capitalismo|marxismo)\b/.test(text)) return true;
+  return false;
+}
+
 /**
  * Orden de presentación: deprioritized al final, featured arriba,
  * con portada primero, español primero. Mantiene el orden del query
@@ -29,6 +35,11 @@ export function hasCover(l: ListingWithBook): boolean {
  */
 export function sortListingsForDisplay<T extends ListingWithBook>(listings: T[]): T[] {
   return [...listings].sort((a, b) => {
+    // 1. Política al final
+    const polA = isPolitical(a), polB = isPolitical(b);
+    if (polA !== polB) return polA ? 1 : -1;
+
+
     const depA = !!(a as any).deprioritized, depB = !!(b as any).deprioritized;
     if (depA !== depB) return depA ? 1 : -1;
     const fA = !!(a as any)._featured, fB = !!(b as any)._featured;
