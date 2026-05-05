@@ -21,6 +21,40 @@ function hasDiscount(listing: ListingWithBook) {
   return orig != null && Number(orig) > (listing.price ?? 0);
 }
 
+function cleanLocationPart(value: string) {
+  return value
+    .replace(/\b\d{5,}\b/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/\s+,/g, ",")
+    .replace(/,\s*$/g, "")
+    .trim();
+}
+
+function simplifyRegionName(value: string) {
+  if (/^regi[oó]n metropolitana(?: de santiago)?$/i.test(value)) {
+    return "Santiago";
+  }
+
+  return value
+    .replace(/^regi[oó]n\s+(?:de\s+|del\s+|de la\s+)?/i, "")
+    .trim();
+}
+
+function formatListingLocation(address?: string | null) {
+  if (!address) return "";
+
+  const parts = address
+    .split(",")
+    .map(cleanLocationPart)
+    .filter((part) => part && !/^\d+$/.test(part) && !/^chile$/i.test(part));
+
+  const locality = parts.find((part) => !/^regi[oó]n\b/i.test(part));
+  if (locality) return locality;
+
+  const region = parts.find((part) => /^regi[oó]n\b/i.test(part));
+  return region ? simplifyRegionName(region) : "";
+}
+
 interface Props {
   listing: ListingWithBook;
 }
@@ -63,6 +97,7 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
   }, [cartState, listing.id]);
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
+  const displayLocation = formatListingLocation(listing.address);
 
   const placeholder = (
     <div className="w-full h-full bg-gradient-to-br from-brand-50 to-cream-warm flex flex-col items-center justify-center gap-2 p-4">
@@ -187,7 +222,13 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
           </h3>
         </Link>
         {book.author && (
-          <p className="text-xs text-ink-muted mt-1 truncate">{book.author}</p>
+          <Link
+            href={`/search?q=${encodeURIComponent(book.author)}`}
+            className="block text-xs text-ink-muted hover:text-brand-600 transition-colors mt-1 truncate"
+            aria-label={`Buscar libros de ${book.author}`}
+          >
+            {book.author}
+          </Link>
         )}
         {(listing._review_count ?? 0) > 0 && (
           <div className="flex items-center gap-1 mt-1">
@@ -237,13 +278,13 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
             )}
             <span className="font-medium">{sellerName}</span>
           </Link>
-          {listing.address && (
+          {displayLocation && (
             <span className="text-[10px] text-ink-muted flex items-center gap-1">
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              {listing.address.split(",").slice(-2, -1)[0]?.trim() || listing.address.split(",")[0]}
+              {displayLocation}
             </span>
           )}
         </div>
