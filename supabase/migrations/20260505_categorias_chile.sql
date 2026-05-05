@@ -9,7 +9,14 @@
 -- No se cambia el esquema — solo el contenido.
 -- ============================================================
 
--- 1. Eliminar taxonomía anterior
+-- 1. Limpiar referencias en books antes de borrar categorías
+-- (books.category y books.subcategory tienen FK → categories.slug)
+-- Los libros existentes quedan sin categoría; se pueden reclasificar
+-- manualmente o al editar cada publicación.
+UPDATE public.books SET category = NULL, subcategory = NULL
+WHERE category IS NOT NULL OR subcategory IS NOT NULL;
+
+-- 2. Eliminar taxonomía anterior (ahora sin referencias activas)
 DELETE FROM public.categories;
 
 -- 2. Categorías raíz (parent_slug = null)
