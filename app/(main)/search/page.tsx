@@ -32,17 +32,16 @@ interface Props {
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const q = searchParams.q;
   const genre = searchParams.genre;
-  const title = q
-    ? `Resultados para "${q}" — tuslibros.cl`
-    : genre
-      ? `${genre} — tuslibros.cl`
-      : "Buscar libros — tuslibros.cl";
   const description = q
-    ? `Encuentra "${q}" en tuslibros.cl. Libros usados cerca de ti, pago seguro con MercadoPago.`
+    ? `Busca libros de "${q}" en TusLibros. Encuentra títulos y autores disponibles en Chile.`
     : "Busca libros usados cerca de ti en tuslibros.cl. Compra, vende y presta libros de forma segura.";
 
   return {
-    title,
+    title: q
+      ? { absolute: `${q} | TusLibros` }
+      : genre
+        ? `${genre} — tuslibros.cl`
+        : "Buscar libros — tuslibros.cl",
     description,
     alternates: {
       canonical: q
@@ -64,26 +63,25 @@ export default async function SearchPage({ searchParams }: Props) {
     // Normalizar guiones a espacios
     const clean = q.replace(/[-_]+/g, " ").replace(/[()]/g, "").replace(/\s+/g, " ").trim();
     const words = clean.split(" ").filter(w => w.length > 1);
-    
-    let bookQuery = supabase.from("books").select("id");
-    
-    if (words.length > 0) {
-      // Búsqueda por palabras: el título/autor debe contener TODAS las palabras (más preciso)
-      // o al menos matchear el string completo si es corto.
-      const filter = words.map(w => `title.ilike.%${w}%,author.ilike.%${w}%`).join(",");
-      const { data: matchedBooks } = await supabase
-        .from("books")
-        .select("id")
-        .or(filter);
-      matchingBookIds = matchedBooks?.map((b) => b.id) ?? [];
-    } else {
-      const term = `%${clean}%`;
-      const { data: matchedBooks } = await supabase
-        .from("books")
-        .select("id")
-        .or(`title.ilike.${term},author.ilike.${term},isbn.ilike.${term}`);
-      matchingBookIds = matchedBooks?.map((b) => b.id) ?? [];
-    }
+
+    const term = `%${clean}%`;
+    const filters = [
+      `title.ilike.${term}`,
+      `author.ilike.${term}`,
+      `isbn.ilike.${term}`,
+      ...words.flatMap((word) => [
+        `title.ilike.%${word}%`,
+        `author.ilike.%${word}%`,
+        `isbn.ilike.%${word}%`,
+      ]),
+    ].join(",");
+
+    const { data: matchedBooks } = await supabase
+      .from("books")
+      .select("id")
+      .or(filters);
+
+    matchingBookIds = Array.from(new Set(matchedBooks?.map((b) => b.id) ?? []));
   }
 
   let query = supabase
@@ -193,9 +191,16 @@ export default async function SearchPage({ searchParams }: Props) {
           ]}
         />
         {q && (
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">
-            Resultados para &ldquo;{q}&rdquo;
-          </h1>
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Resultados para &ldquo;{q}&rdquo;
+            </h1>
+            {listings.length > 0 && (
+              <p className="text-sm text-gray-500 mt-1">
+                {listings.length} {listings.length === 1 ? "resultado" : "resultados"}
+              </p>
+            )}
+          </div>
         )}
 
         <div className="mb-6">
