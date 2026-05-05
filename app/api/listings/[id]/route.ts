@@ -52,7 +52,7 @@ export async function PATCH(
   const book = body.book ?? {};
   const listingInput = body.listing ?? {};
 
-  const bookUpdates = {
+  const bookUpdates: any = {
     title: cleanText(book.title),
     author: cleanText(book.author),
     category: cleanText(book.category),
@@ -61,8 +61,11 @@ export async function PATCH(
     publisher: cleanText(book.publisher),
     pages: cleanNumber(book.pages),
     binding: cleanText(book.binding),
-    cover_url: cleanText(book.cover_url),
   };
+  
+  if (book.cover_url !== undefined) {
+    bookUpdates.cover_url = cleanText(book.cover_url);
+  }
 
   if (!bookUpdates.title || !bookUpdates.author) {
     return NextResponse.json({ error: "El libro necesita título y autor" }, { status: 400 });
@@ -77,7 +80,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Modalidad inválida" }, { status: 400 });
   }
 
-  const listingUpdates = {
+  const listingUpdates: any = {
     condition,
     modality,
     notes: cleanText(listingInput.notes),
@@ -85,8 +88,11 @@ export async function PATCH(
     original_price: cleanNumber(listingInput.original_price),
     rental_price: modality !== "sale" ? cleanNumber(listingInput.rental_price) : null,
     rental_deposit: modality !== "sale" ? cleanNumber(listingInput.rental_deposit) : null,
-    cover_image_url: cleanText(listingInput.cover_image_url),
   };
+
+  if (listingInput.cover_image_url !== undefined) {
+    listingUpdates.cover_image_url = cleanText(listingInput.cover_image_url);
+  }
 
   const { error: bookError } = await admin
     .from("books")

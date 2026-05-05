@@ -1,0 +1,21 @@
+-- ============================================================
+-- Fix Creación de Usuarios (Restaurar handle_new_user)
+-- Fecha: 2026-05-05
+-- ============================================================
+--
+-- PROBLEMA:
+-- La migración 20260429_security_hardening.sql revocó EXECUTE
+-- en handle_new_user() para anon y authenticated. 
+-- Aunque sea SECURITY DEFINER, el trigger se dispara bajo el
+-- rol que realiza la acción (anon durante el registro), y si
+-- ese rol no tiene permiso de ejecución, el trigger falla
+-- y el registro se cancela.
+--
+-- SOLUCIÓN:
+-- Restaurar el permiso de ejecución. La seguridad se mantiene
+-- porque la función es un trigger y no se puede llamar 
+-- maliciosamente con parámetros útiles desde el exterior
+-- sin pasar por el flujo de Auth.
+-- ============================================================
+
+GRANT EXECUTE ON FUNCTION public.handle_new_user() TO anon, authenticated;
