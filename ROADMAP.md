@@ -39,6 +39,7 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 - [x] ~~Optimización TBT Mobile~~ — ✅ Reducción de lag en celulares desactivando animaciones SVG pesadas y partículas de polvo en `ShelfTransformation`.
 - [x] ~~Limpieza de Contenido Estancado~~ — ✅ Eliminación de listings obsoletos o fuera de línea editorial (Kamasutra).
 - [x] ~~Fix Slugs Legacy~~ — ✅ Generación masiva de slugs para libros de Bárbara y otros vendedores antiguos para evitar URLs UUID.
+- [x] ~~Scan de portadas con Claude~~ — ✅ `ANTHROPIC_API_KEY` configurada en Vercel (prod + dev) + `.env.local`. Modelo actualizado de `claude-3-5-sonnet-20240620` → `claude-sonnet-4-6`. Commit `d296ffd`.
 
 ### Refinamiento Editorial y Taxonomía (5 Mayo 2026)
 - [x] ~~Taxonomía Chilena Completa~~ — ✅ Implementada en `lib/genres.ts` y DB (Poesía, Novela Negra, Teatro, Humanidades, etc.).
@@ -72,6 +73,13 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 - [ ] **3 DMs warm a ángeles** — pendiente desde 21 abril. Deck USD 80-120k listo en `docs/deck_valorizacion.pptx`.
 - [ ] **Ping a Alfredo Enrione** — mentor warm potencial. Ofrecer café/Zoom 30min framing "primer pilot run y lectura del modelo".
 - [ ] **Escribir a 3 librerías activadas** — acordado martes 22 abril, verificar si se hizo.
+
+### Nuevo — agregado 5 mayo 2026
+
+- [ ] **Full-text search en Supabase** — hoy el buscador usa `LIKE` sin índice. Con `pg_trgm` + `GIN index` la búsqueda sería 10-100x más rápida y soportaría typos. Alta prioridad cuando el catálogo supere los 500 libros activos.
+- [ ] **Sistema de ofertas entre usuarios** — la memoria y los commits mencionan "13 ofertas" pero son precios con `original_price` tachado, NO un sistema de negociación. Si se quiere que compradores propongan precio, hay que crear tabla `offers`, endpoint, y UI. Decidir si es prioridad.
+- [ ] **Flujo de devolución de arriendos** — el arriendo se crea y se cobra, pero no hay tracking de "libro debe devolverse en X días" ni flujo de confirmación de devolución.
+- [ ] **Rewards de referidos** — el código y las estadísticas funcionan pero no se entregan descuentos/créditos al cumplir. Sin incentivo real, el sistema no convierte.
 
 ### Nuevo — agregado 23 abril 2026 (SEO y Growth)
 - [ ] **Backlinks (Linkbuilding)** — enviar correos en frío (plantillas de ecología/universidades) a 5 blogs para apalancar la autoridad de dominio.
