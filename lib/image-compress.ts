@@ -1,9 +1,12 @@
 /**
- * Compress and resize an image file before uploading.
- * Outputs WebP for smaller file sizes and better quality.
- * Max dimensions: 1200x1600 (book cover proportions)
- * Quality: 0.8 — good balance between quality and size
+ * Ultra-light compression for AI scanning.
+ * We don't need high res, just enough for the AI to read text.
+ * Max 800px, 0.6 quality, JPG (most compatible).
  */
+export async function compressScanImage(file: File): Promise<File> {
+  return compressImage(file, 800, 800, 0.6);
+}
+
 export async function compressImage(file: File, maxWidth = 1200, maxHeight = 1600, quality = 0.8): Promise<File> {
   return new Promise((resolve) => {
     const img = new window.Image();

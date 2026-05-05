@@ -18,7 +18,7 @@ import Image from "next/image";
 import CategoryPicker from "@/components/listings/CategoryPicker";
 import CoverUpload from "@/components/books/CoverUpload";
 import ImageUploadMultiple from "@/components/listings/ImageUploadMultiple";
-import { compressImage } from "@/lib/image-compress";
+import { compressImage, compressScanImage } from "@/lib/image-compress";
 import Link from "next/link";
 import { trackEvent } from "@/utils/analytics";
 
@@ -171,9 +171,8 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
     setScanLoading(true);
     setScanError(null);
     try {
-      // Comprimimos la imagen antes de enviarla al escáner para evitar problemas de tamaño
-      // y asegurar que la IA reciba algo liviano pero legible.
-      const compressed = await compressImage(file);
+      // Comprimimos agresivamente para el escáner (evita error 500 en Vercel)
+      const compressed = await compressScanImage(file);
       const fd = new FormData();
       fd.append("image", compressed);
       const res = await fetch("/api/books/scan-cover", { method: "POST", body: fd });
