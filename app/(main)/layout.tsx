@@ -1,4 +1,5 @@
 import Navbar from "@/components/ui/Navbar";
+import PageTracker from "@/components/ui/PageTracker";
 
 export default function MainLayout({
   children,
@@ -7,6 +8,7 @@ export default function MainLayout({
 }) {
   return (
     <>
+      <PageTracker />
       <Navbar />
       {children}
     </>
