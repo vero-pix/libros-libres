@@ -171,8 +171,11 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
     setScanLoading(true);
     setScanError(null);
     try {
+      // Comprimimos la imagen antes de enviarla al escáner para evitar problemas de tamaño
+      // y asegurar que la IA reciba algo liviano pero legible.
+      const compressed = await compressImage(file);
       const fd = new FormData();
-      fd.append("image", file);
+      fd.append("image", compressed);
       const res = await fetch("/api/books/scan-cover", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) {

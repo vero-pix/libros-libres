@@ -43,6 +43,15 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // If user is logged in, redirect away from login/register pages
+  if (user && (request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/register")) {
+    const next = request.nextUrl.searchParams.get("next") || "/";
+    const url = request.nextUrl.clone();
+    url.pathname = next;
+    url.searchParams.delete("next");
+    return NextResponse.redirect(url);
+  }
+
   // Protect admin routes — check role in users table
   if (user && request.nextUrl.pathname.startsWith("/admin")) {
     try {
