@@ -184,10 +184,12 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       }
       // Éxito — pre-rellenar datos del libro (nunca pisamos lo que el usuario ya escribió)
       setBook(data);
-      if (data.title?.trim()) setBookTitle(data.title.trim());
-      if (data.author?.trim()) setBookAuthor(data.author.trim());
+      if (data.title) setBookTitle(data.title.trim());
+      if (data.author) setBookAuthor(data.author.trim());
+      
       const incomingDescription = getBookDescription(data);
       if (incomingDescription) setBookDescription(incomingDescription);
+      
       const normalized = normalizeGenre(data.genre, data.title, incomingDescription);
       if (normalized) {
         setCategorySlug(normalized.category);
@@ -571,11 +573,15 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
           </div>
 
           <ISBNSearch hideManualForm onBookFound={(b) => {
+              console.log("Book found:", b);
               setBook(b);
-              if (b.title?.trim()) setBookTitle(b.title.trim());
-              if (b.author?.trim()) setBookAuthor(b.author.trim());
+              // Forzamos el llenado de los campos principales
+              if (b.title) setBookTitle(b.title.trim());
+              if (b.author) setBookAuthor(b.author.trim());
+              
               const incomingDescription = getBookDescription(b);
               if (incomingDescription) setBookDescription(incomingDescription);
+              
               const normalized = normalizeGenre(b.genre, b.title, incomingDescription);
               if (normalized) {
                 setCategorySlug(normalized.category);
