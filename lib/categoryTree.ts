@@ -8,23 +8,33 @@ export interface CategoryNode {
 }
 
 /**
- * Construye el árbol de categorías con conteos de libros activos.
+ * Construye el árbol de categorías con conteos reales de TODO el inventario activo.
  */
 export async function buildCategoryTree(
   supabase: SupabaseClient,
-  listings: { book: { category?: string | null; subcategory?: string | null } }[],
+  _unusedListings?: any[], // Mantener firma para no romper tipos, pero no lo usamos
 ): Promise<CategoryNode[]> {
+  // 1. Traemos la taxonomía completa
   const { data: dbCategories } = await supabase
     .from("categories")
     .select("slug, name, parent_slug, sort_order")
     .order("sort_order", { ascending: true });
 
+  // 2. Traemos las categorías/subcategorías de TODOS los listings activos
+  const { data: activeListings } = await supabase
+    .from("listings")
+    .select("book:books(category, subcategory)")
+    .eq("status", "active");
+
   const catCount = new Map<string, number>();
   const subCount = new Map<string, number>();
-  for (const l of listings) {
-    const b = l.book as any;
-    if (b.category) catCount.set(b.category, (catCount.get(b.category) ?? 0) + 1);
-    if (b.subcategory) subCount.set(b.subcategory, (subCount.get(b.subcategory) ?? 0) + 1);
+
+  if (activeListings) {
+    for (const l of activeListings) {
+      const b = (l as any).book;
+      if (b?.category) catCount.set(b.category, (catCount.get(b.category) ?? 0) + 1);
+      if (b?.subcategory) subCount.set(b.subcategory, (subCount.get(b.subcategory) ?? 0) + 1);
+    }
   }
 
   return (dbCategories ?? [])
@@ -40,10 +50,7 @@ export async function buildCategoryTree(
         }))
         .sort((a, b) => b.count - a.count);
 
-      // El conteo del padre incluye todos los libros de esa categoría,
-      // incluso los que no tienen subcategoría asignada
       const count = catCount.get(root.slug) ?? 0;
-
       return { slug: root.slug, name: root.name, count, children };
     });
 }
