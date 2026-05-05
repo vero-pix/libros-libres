@@ -10,6 +10,7 @@ import PromoBanner from "@/components/ui/PromoBanner";
 import BookRequestForm from "@/components/listings/BookRequestForm";
 import SearchEventTracker from "@/components/analytics/SearchEventTracker";
 import { sortListingsForDisplay } from "@/lib/sortListings";
+import { translateGenre } from "@/lib/genres";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 
