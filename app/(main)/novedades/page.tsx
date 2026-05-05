@@ -39,17 +39,17 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 const novedades: Entry[] = [
   {
     date: "5 mayo 2026",
-    title: "Nueva taxonomía chilena: Escolar, Universitario y Lectura Complementaria",
+    title: "🇨🇱 Nueva taxonomía chilena y Super-Escáner con IA",
     description:
-      "Hoy jubilamos las categorías genéricas por un sistema pensado 100% en el mercado chileno. Ahora puedes navegar directamente por Escolar (Básica 1°–8°, Media), Universitario (Derecho, Ingeniería, Medicina), Técnico / CFT e Idiomas. Reclasificamos automáticamente cerca de 200 libros del catálogo analizando sus títulos para que el buscador sea mucho más preciso. Es el cambio de arquitectura más grande que hemos hecho hasta ahora para que tuslibros.cl sea la herramienta definitiva para el regreso a clases y el estudio superior.",
+      "Hoy dimos un salto gigante para adaptarnos 100% al mercado nacional. Estrenamos una nueva arquitectura de categorías (Escolar, Lectura Complementaria, Superior, etc.) y actualizamos nuestro escáner de fotos a Claude 3.5 Sonnet. Ahora puedes identificar casi cualquier libro chileno solo con una foto, ¡aunque sea una edición rara sin ISBN! También corregimos errores críticos en el registro de usuarios y en la edición de fotos, asegurando que tus publicaciones se mantengan siempre con su imagen correcta.",
     tag: "Lanzamiento",
     link: "/",
-    linkText: "Ver las nuevas categorías",
+    linkText: "Probar el nuevo escáner",
     visual: {
       kind: "milestone",
-      icon: "🇨🇱",
-      metric: "Taxonomía local",
-      detail: "Escolar · Universitario · CFT · Idiomas",
+      icon: "⚡️",
+      metric: "Claude 3.5 Sonnet",
+      detail: "Identificación visual ultra-precisa",
     },
   },
   {

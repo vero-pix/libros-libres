@@ -58,7 +58,7 @@ export default function ISBNSearch({ onBookFound, hideManualForm = false }: Prop
 
       if (!res.ok) {
         if (res.status === 404) {
-          setError("No encontramos ese ISBN en las bases de datos internacionales.");
+          setError("No lo encontramos por código. Prueba con el botón '📸 Identificar por foto' de arriba, ¡funciona muy bien!");
           setShowManual(!hideManualForm);
           setManual(m => ({ ...m, isbn: clean }));
         } else {

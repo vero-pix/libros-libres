@@ -30,8 +30,8 @@ export async function POST(request: NextRequest) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-haiku-4-5",
-        max_tokens: 300,
+        model: "claude-3-5-sonnet-20240620",
+        max_tokens: 400,
         messages: [
           {
             role: "user",
@@ -46,14 +46,16 @@ export async function POST(request: NextRequest) {
               },
               {
                 type: "text",
-                text: `Analiza esta portada de libro. Responde SOLO con JSON sin texto adicional ni backticks:
+                text: `Analiza esta portada de libro. Extrae la información para completar un formulario de venta. 
+Responde ÚNICAMENTE con un objeto JSON válido, sin explicaciones ni bloques de código markdown:
 {
-  "title": "título exacto del libro",
-  "author": "nombre completo del autor",
-  "publisher": "editorial o null",
-  "published_year": año como número o null
+  "title": "título del libro",
+  "author": "autor",
+  "publisher": "editorial",
+  "published_year": 2024,
+  "description": "una breve sinopsis de 2 frases basada en el libro si lo conoces"
 }
-Si no puedes leer algún campo con certeza, usa null. Prioriza título y autor.`,
+Si no ves algún campo, invéntalo solo si estás 99% seguro por el contexto, si no usa null.`,
               },
             ],
           },
@@ -75,11 +77,21 @@ Si no puedes leer algún campo con certeza, usa null. Prioriza título y autor.`
     const text = data.content?.[0]?.text ?? "";
     const clean = text.replace(/```json|```/g, "").trim();
 
-    let parsed: { title?: string; author?: string; publisher?: string | null; published_year?: number | null };
+    let parsed: { title?: string; author?: string; publisher?: string | null; published_year?: number | null; description?: string | null };
     try {
       parsed = JSON.parse(clean);
     } catch {
-      return NextResponse.json({ error: "No se pudo leer la portada." }, { status: 422 });
+      // Intento de rescate si Claude puso texto antes o después del JSON
+      const match = clean.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          parsed = JSON.parse(match[0]);
+        } catch {
+          return NextResponse.json({ error: "No se pudo leer la portada." }, { status: 422 });
+        }
+      } else {
+        return NextResponse.json({ error: "No se pudo leer la portada." }, { status: 422 });
+      }
     }
 
     if (!parsed.title?.trim()) {
@@ -91,8 +103,8 @@ Si no puedes leer algún campo con certeza, usa null. Prioriza título y autor.`
       author: parsed.author?.trim() ?? "",
       publisher: parsed.publisher ?? null,
       published_year: parsed.published_year ?? null,
+      description: parsed.description ?? null,
       isbn: undefined,
-      description: undefined,
       cover_url: null,
       genre: null,
       pages: null,

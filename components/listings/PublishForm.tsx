@@ -531,12 +531,15 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
                 type="button"
                 onClick={() => scanInputRef.current?.click()}
                 disabled={scanLoading}
-                className="w-full flex items-center justify-center gap-2 py-2.5 border border-dashed border-brand-300 hover:border-brand-500 hover:bg-brand-50 text-brand-600 font-medium rounded-xl text-sm transition-all disabled:opacity-50 mb-2"
+                className="w-full flex items-center justify-center gap-2 py-3.5 bg-brand-50 border-2 border-brand-200 hover:border-brand-400 hover:bg-brand-100 text-brand-700 font-bold rounded-2xl text-sm transition-all shadow-sm group"
               >
                 {scanLoading ? (
-                  <><span className="w-3.5 h-3.5 border-2 border-brand-400 border-t-brand-700 rounded-full animate-spin" /> Analizando portada...</>
+                  <><span className="w-4 h-4 border-2 border-brand-400 border-t-brand-700 rounded-full animate-spin" /> Analizando portada...</>
                 ) : (
-                  <>📸 Identificar por foto de portada</>
+                  <>
+                    <span className="text-xl group-hover:scale-110 transition-transform">📸</span> 
+                    Identificar por foto de portada
+                  </>
                 )}
               </button>
               <input
@@ -547,21 +550,22 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
                 className="hidden"
                 onChange={handleScanCover}
               />
-              {/* Error de identificación: silencioso, sin tecnicismos */}
+              <p className="text-[10px] text-center text-ink-muted mt-2 px-4">
+                La forma más rápida: sácale una foto a la portada y nuestra IA completará todo por ti.
+              </p>
               {scanError && (
-                <div className="mt-1 space-y-1.5">
-                  <p className="text-xs text-gray-500 text-center">No se pudo identificar automáticamente — completa los datos arriba.</p>
-                  <button
-                    type="button"
-                    onClick={handleSaveDraft}
-                    className="w-full py-2 border border-gray-200 text-gray-500 text-xs font-medium rounded-xl hover:bg-gray-50 transition-colors"
-                  >
-                    {draftSaved ? "✅ Borrador guardado" : "💾 Guardar borrador"}
-                  </button>
+                <div className="mt-2 text-center">
+                  <p className="text-xs text-red-500 font-medium">No se pudo identificar automáticamente — intenta con ISBN o ingreso manual.</p>
                 </div>
               )}
             </div>
           )}
+
+          <div className="relative flex items-center gap-3 my-6">
+            <div className="flex-1 border-t border-cream-dark/40" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-ink-muted">o por código</span>
+            <div className="flex-1 border-t border-cream-dark/40" />
+          </div>
 
           <ISBNSearch hideManualForm onBookFound={(b) => {
               setBook(b);
