@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { AdminListing } from "./types";
 import { FilterBtn, SmallBtn, EmptyState } from "./SharedUI";
@@ -15,11 +16,13 @@ const LISTING_STATUS_LABELS: Record<string, { label: string; color: string }> = 
 };
 
 export default function ListingsTab({ listings, onUpdate }: { listings: AdminListing[]; onUpdate: (l: AdminListing[]) => void }) {
+  const router = useRouter();
   const supabase = createClient();
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [backfilling, setBackfilling] = useState(false);
   const [backfillResult, setBackfillResult] = useState<string | null>(null);
+  const [updatingFeatured, setUpdatingFeatured] = useState<Set<string>>(new Set());
 
   const filtered = filter === "all" ? listings : listings.filter((l) => l.status === filter);
   const allSelected = filtered.length > 0 && filtered.every((l) => selected.has(l.id));
@@ -45,10 +48,34 @@ export default function ListingsTab({ listings, onUpdate }: { listings: AdminLis
   }
 
   async function toggleFeatured(id: string, current: boolean) {
-    const { error } = await supabase.from("listings").update({ featured: !current }).eq("id", id);
-    if (!error) {
-      onUpdate(listings.map((l) => (l.id === id ? { ...l, featured: !current } : l)));
+    if (updatingFeatured.has(id)) return;
+
+    const nextFeatured = !Boolean(current);
+    setUpdatingFeatured((prev) => new Set(prev).add(id));
+    onUpdate(listings.map((l) => (l.id === id ? { ...l, featured: nextFeatured } : l)));
+
+    const res = await fetch(`/api/admin/listings/${id}/featured`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ featured: nextFeatured }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    setUpdatingFeatured((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+
+    if (!res.ok) {
+      onUpdate(listings);
+      alert(`No pude actualizar destacado: ${data.error ?? "Error desconocido"}`);
+      return;
     }
+
+    onUpdate(listings.map((l) => (l.id === id ? { ...l, featured: Boolean(data.listing?.featured) } : l)));
+    router.refresh();
   }
 
   async function deleteListing(id: string) {
@@ -171,8 +198,9 @@ export default function ListingsTab({ listings, onUpdate }: { listings: AdminLis
 
             <button
               onClick={() => toggleFeatured(listing.id, listing.featured)}
+              disabled={updatingFeatured.has(listing.id)}
               title={listing.featured ? "Quitar destacado" : "Destacar"}
-              className={`flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full transition-colors ${listing.featured ? "bg-amber-100 text-amber-500" : "bg-gray-100 text-gray-300 hover:text-amber-400"}`}
+              className={`flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full transition-colors disabled:opacity-60 ${listing.featured ? "bg-amber-100 text-amber-500" : "bg-gray-100 text-gray-300 hover:text-amber-400"}`}
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
