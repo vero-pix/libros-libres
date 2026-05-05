@@ -33,7 +33,7 @@ interface Props {
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const q = searchParams.q;
-  const genre = searchParams.genre;
+  const genre = searchParams.category;
   const description = q
     ? `Busca libros de "${q}" en TusLibros. Encuentra títulos y autores disponibles en Chile.`
     : "Busca libros usados cerca de ti en tuslibros.cl. Compra, vende y presta libros de forma segura.";
