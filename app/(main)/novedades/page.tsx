@@ -39,32 +39,45 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 const novedades: Entry[] = [
   {
     date: "5 mayo 2026",
-    title: "🇨🇱 Nueva taxonomía chilena y Super-Escáner con IA",
+    title: "🇨🇱 Nueva taxonomía literaria chilena",
     description:
-      "Hoy dimos un salto gigante para adaptarnos 100% al mercado nacional. Estrenamos una nueva arquitectura de categorías (Escolar, Lectura Complementaria, Superior, etc.) y actualizamos nuestro escáner de fotos a Claude 3.5 Sonnet. Ahora puedes identificar casi cualquier libro chileno solo con una foto, ¡aunque sea una edición rara sin ISBN! También corregimos errores críticos en el registro de usuarios y en la edición de fotos, asegurando que tus publicaciones se mantengan siempre con su imagen correcta.",
+      "Hoy dimos un salto gigante en la organización del catálogo. Estrenamos categorías específicas para el lector chileno: Poesía, Novela Negra/Policial, Teatro, Humanidades y una sección reforzada de Lectura Complementaria. Ahora es mucho más fácil encontrar esa joya literaria o el libro que piden en el colegio, con una estructura pensada en cómo buscamos libros nosotros.",
     tag: "Lanzamiento",
     link: "/",
-    linkText: "Probar el nuevo escáner",
+    linkText: "Explorar categorías",
     visual: {
       kind: "milestone",
-      icon: "⚡️",
-      metric: "Claude 3.5 Sonnet",
-      detail: "Identificación visual ultra-precisa",
+      icon: "📚",
+      metric: "Taxonomía Pro",
+      detail: "Poesía, Policial, Teatro y más",
     },
   },
   {
     date: "5 mayo 2026",
-    title: "Identidad visual más fuerte y editorial",
+    title: "Descubre por 'vibras': Nueva Nube de Temas",
     description:
-      "Refrescamos la paleta de colores para buscar un look más vibrante y profesional. El azul navy ahora es un Royal Blue de alto contraste y el mostaza subió de tono para resaltar las acciones importantes. Además, arreglamos un bug molesto en el perfil: antes, cuando subías una foto nueva, el sitio te seguía mostrando la vieja por un problema de caché. Ahora el cambio es instantáneo. Tu vitrina personal ahora se ve mejor y funciona sin fricción.",
-    tag: "Mejora",
-    link: "/profile",
-    linkText: "Ver mi perfil",
+      "¿No sabes qué buscar? Estrenamos una 'Nube de Temas sugeridos' en la barra lateral. Ahora puedes saltar directo a #NovelaChilena, #Suspenso, #Borges o #PrimeraEdición con un solo clic. Etiquetamos automáticamente más de 100 libros del catálogo para que estas etiquetas siempre tengan contenido fresco esperándote.",
+    tag: "Nuevo",
+    link: "/",
+    linkText: "Ver temas sugeridos",
     visual: {
       kind: "milestone",
-      icon: "🎨",
-      metric: "Royal Blue + Amber",
-      detail: "Colores más fuertes · Fix de avatar",
+      icon: "🏷️",
+      metric: "#Temas",
+      detail: "Navegación por etiquetas visuales",
+    },
+  },
+  {
+    date: "5 mayo 2026",
+    title: "Más rápido que nunca en tu celular",
+    description:
+      "Escuchamos a la comunidad: algunos celulares se sentían 'pegados' al navegar. Aplicamos una optimización de choque eliminando procesos invisibles y simplificando animaciones en móviles. El resultado es un sitio que vuela, con un tiempo de respuesta mucho más bajo para que puedas comprar y vender sin lag, estés donde estés.",
+    tag: "Mejora",
+    visual: {
+      kind: "milestone",
+      icon: "⚡️",
+      metric: "Speed Boost",
+      detail: "Optimización de TBT en móviles",
     },
   },
   {

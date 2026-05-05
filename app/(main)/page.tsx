@@ -118,14 +118,27 @@ const getCollectibleListings = unstable_cache(
 const getFeaturedSellers = unstable_cache(
   async () => {
     const supabase = createPublicClient();
+    const BARBARA_ID = "b075dd7f-bb0c-4379-8e60-1585bebdcb44";
+    
+    // 1. Buscamos a los destacados pero priorizando a Barbara
     const { data } = await supabase
       .from("users")
       .select("id, full_name, avatar_url, city, bio")
       .eq("featured", true)
       .limit(10);
+      
     if (!data) return [];
+    
+    // 2. Mover a Barbara al inicio si está en la lista, o asegurar que esté
+    let sortedSellers = [...data];
+    const barbaraIndex = sortedSellers.findIndex(s => s.id === BARBARA_ID);
+    if (barbaraIndex > -1) {
+      const [barbara] = sortedSellers.splice(barbaraIndex, 1);
+      sortedSellers.unshift(barbara);
+    }
+
     return Promise.all(
-      data.map(async (seller) => {
+      sortedSellers.map(async (seller) => {
         const { count } = await supabase
           .from("listings")
           .select("id", { count: "exact", head: true })
@@ -135,7 +148,7 @@ const getFeaturedSellers = unstable_cache(
       })
     );
   },
-  ["home-featured-sellers"],
+  ["home-featured-sellers-v2"],
   { revalidate: 300 }
 );
 

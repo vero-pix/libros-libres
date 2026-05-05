@@ -14,6 +14,7 @@ import PriceCompare from "@/components/listings/PriceCompare";
 import SellerOtherListings from "./SellerOtherListings";
 import { libroUrl } from "@/lib/urls";
 import { trackEvent } from "@/utils/analytics";
+import { translateGenre } from "@/lib/genres";
 
 function WhatsAppButton({
   phone,
@@ -138,6 +139,23 @@ export default function ListingDetail({ listing, images = [] }: Props) {
 
         {/* Info */}
         <div className="flex-1">
+          {/* Breadcrumbs locales de categoría */}
+          {(book as any).category && (
+            <div className="flex items-center gap-1.5 mb-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-brand-600/70">
+              <Link href={`/search?category=${(book as any).category}`} className="hover:text-brand-600 transition-colors">
+                {translateGenre((book as any).category)}
+              </Link>
+              {(book as any).subcategory && (
+                <>
+                  <span className="text-gray-300">/</span>
+                  <Link href={`/search?subcategory=${(book as any).subcategory}`} className="hover:text-brand-600 transition-colors">
+                    {translateGenre((book as any).subcategory)}
+                  </Link>
+                </>
+              )}
+            </div>
+          )}
+
           <div className="flex items-start justify-between gap-2">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{book.title}</h1>
             {isOwner && (

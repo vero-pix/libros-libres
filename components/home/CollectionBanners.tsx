@@ -12,53 +12,53 @@ interface Banner {
 
 const BANNERS: Banner[] = [
   {
-    title: "Filosofía",
-    subtitle: "Jaeger, Séneca, Plutarco, Urban",
-    href: "/?category=no-ficcion&subcategory=filosofia",
-    gradient: "from-[#3a445a] to-[#5a647a]",
-    icon: "🏛️",
+    title: "Libros Escolares",
+    subtitle: "Básica, Media y textos de estudio",
+    href: "/search?category=escolar",
+    gradient: "from-[#1a2b4b] to-[#2e4a8a]", // Azul Oxford académico
+    icon: "🎒",
   },
   {
-    title: "Novela Negra",
-    subtitle: "Montalbán, Ellroy, Black",
-    href: "/?category=ficcion&subcategory=novela-negra",
-    gradient: "from-[#1e2a4a] to-[#3a4a6a]",
+    title: "Lectura Complementaria",
+    subtitle: "Listas MINEDUC e infantil",
+    href: "/search?category=lectura-complementaria",
+    gradient: "from-[#2d5a4c] to-[#4a8a6a]", // Verde bosque elegante
+    icon: "📚",
+  },
+  {
+    title: "Poesía y Teatro",
+    subtitle: "Clásicos y contemporáneos",
+    href: "/search?subcategory=general-adulto-poesia",
+    gradient: "from-[#6b2d5a] to-[#8a4a7a]", // Púrpura editorial
+    icon: "🖋️",
+  },
+  {
+    title: "Novela Policial",
+    subtitle: "Suspenso, Thriller y Crimen",
+    href: "/search?subcategory=general-adulto-policial",
+    gradient: "from-[#151522] to-[#2d2d4a]", // Negro/Azul noche profundo
     icon: "🔍",
   },
   {
-    title: "Menos de $5.000",
-    subtitle: "Lectura accesible",
-    href: "/?price_max=5000",
-    gradient: "from-amber-600 to-amber-500",
-    icon: "💰",
-  },
-  {
-    title: "Arrienda un libro",
-    subtitle: "Léelo y devuélvelo",
-    href: "/?modality=loan",
-    gradient: "from-brand-700 to-brand-500",
-    icon: "📖",
-  },
-  {
-    title: "Ficción Literaria",
+    title: "Novela y Ficción",
     subtitle: "Borges, Kundera, Musil",
-    href: "/?category=ficcion&subcategory=novela",
+    href: "/search?subcategory=general-adulto-novela",
     gradient: "from-[#4a5a8a] to-[#6a7a9a]",
     icon: "✨",
   },
   {
-    title: "Ensayo e Historia",
-    subtitle: "Hobsbawm, Krauze, Koestler",
-    href: "/?category=no-ficcion",
-    gradient: "from-stone-700 to-stone-500",
-    icon: "📜",
+    title: "Arrienda un libro",
+    subtitle: "Léelo y devuélvelo",
+    href: "/search?modality=loan",
+    gradient: "from-brand-700 to-brand-500",
+    icon: "📖",
   },
   {
-    title: "Piezas de colección",
-    subtitle: "Ediciones raras y antiguas",
-    href: "/?price_min=15000",
-    gradient: "from-yellow-700 to-amber-500",
-    icon: "👑",
+    title: "Menos de $5.000",
+    subtitle: "Lectura accesible para todos",
+    href: "/search?price_max=5000",
+    gradient: "from-amber-600 to-amber-500",
+    icon: "💰",
   },
 ];
 

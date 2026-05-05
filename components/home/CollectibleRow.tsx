@@ -46,11 +46,6 @@ export default function CollectibleRow({ listings }: Props) {
                     {book.title}
                   </div>
                 )}
-                <div className="absolute top-1.5 left-1.5">
-                  <span className="bg-ink text-cream text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded">
-                    Colección
-                  </span>
-                </div>
               </div>
               <p className="text-xs font-semibold text-ink mt-2 line-clamp-2 leading-tight group-hover:text-brand-600 transition-colors">
                 {book.title}

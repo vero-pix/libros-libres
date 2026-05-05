@@ -28,6 +28,7 @@ const VALID_TAGS = new Set([
   "CienciaFiccion", "NovelaNegra", "NovelaHistorica", "Ensayo",
   "Autoayuda", "Espiritualidad", "Historia", "Ciencia", "Arte",
   "Biografia", "Politica", "Negocios", "Infantil", "Juvenil",
+  "Suspenso", "Humanidades", "Comics", "Novela y Ficción"
 ]);
 
 function norm(s: string): string {
@@ -75,31 +76,24 @@ export function suggestTags(book: BookInput): string[] {
 
   // Por subcategoría
   const sub = book.subcategory;
-  if (sub === "filosofia") tags.add("Filosofia");
-  if (sub === "cuentos") tags.add("Cuentos");
-  if (sub === "primeras-ediciones") { tags.add("PrimeraEdicion"); tags.add("Coleccionable"); }
-  if (sub === "ediciones-especiales") { tags.add("EdicionLimitada"); tags.add("Coleccionable"); }
-  if (sub === "biblioteca-de-babel") { tags.add("BibliotecaDeBabel"); tags.add("Coleccionable"); }
-  if (sub === "novela-negra") tags.add("NovelaNegra");
-  if (sub === "novela-historica") tags.add("NovelaHistorica");
-  if (sub === "ciencia-ficcion") tags.add("CienciaFiccion");
-  if (sub === "ensayo") tags.add("Ensayo");
-  if (sub === "autoayuda") tags.add("Autoayuda");
-  if (sub === "espiritualidad") tags.add("Espiritualidad");
-  if (sub === "historia") tags.add("Historia");
-  if (sub === "ciencia") tags.add("Ciencia");
-  if (sub === "arte") tags.add("Arte");
-  if (sub === "biografia") tags.add("Biografia");
-  if (sub === "politica") tags.add("Politica");
-  if (sub === "negocios") tags.add("Negocios");
-  if (sub === "infantil") tags.add("Infantil");
-  if (sub === "juvenil") tags.add("Juvenil");
-  if (sub === "clasicos") tags.add("Clasico");
+  if (sub === "general-adulto-poesia") tags.add("Poesia");
+  if (sub === "general-adulto-policial") { tags.add("NovelaNegra"); tags.add("Suspenso"); }
+  if (sub === "general-adulto-teatro") tags.add("Teatro");
+  if (sub === "general-adulto-biografia") tags.add("Biografia");
+  if (sub === "general-adulto-historia") tags.add("Historia");
+  if (sub === "general-adulto-novela") tags.add("Novela y Ficción");
+  if (sub === "general-adulto-ensayo") tags.add("Ensayo");
+  if (sub === "general-adulto-humanidades") tags.add("Humanidades");
+  if (sub === "lectura-complementaria-infantil") tags.add("Infantil");
+  if (sub === "lectura-complementaria-juvenil") tags.add("Juvenil");
+  if (sub === "otros-comics") tags.add("Comics");
 
   // Señales en texto
   if (text.includes("poesia") || text.includes("poema") || text.includes("versos")) tags.add("Poesia");
   if (text.includes("teatro") || text.includes("obra dramatica")) tags.add("Teatro");
   if (text.includes("premio nobel")) tags.add("PremioNobel");
+  if (text.includes("suspenso") || text.includes("thriller") || text.includes("crimen")) tags.add("Suspenso");
+  if (text.includes("misterio") || text.includes("detective") || text.includes("policial")) tags.add("NovelaNegra");
 
   // Filtrar solo tags válidos y limitar a 8
   return Array.from(tags).filter((t) => VALID_TAGS.has(t)).slice(0, 8);

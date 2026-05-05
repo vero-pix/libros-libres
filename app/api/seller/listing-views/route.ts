@@ -40,21 +40,39 @@ export async function GET() {
 
   // Use service role client to query page_views (bypasses RLS).
   const serviceClient = createServiceRoleClient();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
   const { data: views, error: viewError } = await serviceClient
     .from("page_views")
-    .select("listing_id")
+    .select("listing_id, created_at")
     .in("listing_id", listingIds);
 
   if (viewError) {
     return NextResponse.json({ error: viewError.message }, { status: 500 });
   }
 
-  // Aggregate: { listingId -> count }
+  // Aggregate: { listingId -> count } and calculate weekly total
   const viewMap: Record<string, number> = {};
+  const weeklyMap: Record<string, number> = {};
+  let totalWeeklyViews = 0;
+
   for (const row of views ?? []) {
     if (!row.listing_id) continue;
+    
+    // Total count
     viewMap[row.listing_id] = (viewMap[row.listing_id] ?? 0) + 1;
+    
+    // Weekly count
+    if (new Date(row.created_at) >= sevenDaysAgo) {
+      weeklyMap[row.listing_id] = (weeklyMap[row.listing_id] ?? 0) + 1;
+      totalWeeklyViews++;
+    }
   }
 
-  return NextResponse.json({ views: viewMap });
+  return NextResponse.json({ 
+    views: viewMap, 
+    weeklyViews: weeklyMap,
+    totalWeekly: totalWeeklyViews 
+  });
 }

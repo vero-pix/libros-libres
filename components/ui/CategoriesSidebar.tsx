@@ -12,11 +12,17 @@ interface CategoryNode {
 
 const FEATURED_TAGS = [
   { tag: "Coleccionable", label: "Coleccionable" },
+  { tag: "Poesia", label: "Poesía" },
+  { tag: "Suspenso", label: "Suspenso" },
+  { tag: "NovelaChilena", label: "Novela Chilena" },
   { tag: "BibliotecaDeBabel", label: "Biblioteca de Babel" },
   { tag: "Clasico", label: "Clásico" },
-  { tag: "PrimeraEdicion", label: "Primera edición" },
+  { tag: "PrimeraEdicion", label: "1ª Edición" },
   { tag: "Borges", label: "Borges" },
-  { tag: "NovelaNegra", label: "Novela negra" },
+  { tag: "NovelaNegra", label: "Novela Negra" },
+  { tag: "Biografia", label: "Biografías" },
+  { tag: "Comics", label: "Cómics" },
+  { tag: "Humanidades", label: "Humanidades" },
 ];
 
 interface Props {
@@ -172,6 +178,28 @@ export default function CategoriesSidebar({
               className="block text-sm py-1.5 px-3 rounded-lg text-ink-muted hover:bg-cream-warm hover:text-ink transition-colors"
             >
               {cond.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Temas Sugeridos (Tag Cloud) */}
+      <div className="mt-8 pt-4 border-t border-cream-dark/20">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-ink-muted/80 px-3 mb-3">
+          Temas sugeridos
+        </p>
+        <div className="flex flex-wrap gap-1.5 px-1">
+          {FEATURED_TAGS.map((item) => (
+            <Link
+              key={item.tag}
+              href={`/search?tag=${item.tag}`}
+              className={`text-[10px] font-medium px-2 py-1 rounded-full border transition-all ${
+                activeTag === item.tag
+                  ? "bg-brand-500 text-white border-brand-600 shadow-sm"
+                  : "bg-cream-warm text-ink-muted border-cream-dark/30 hover:bg-white hover:text-brand-600 hover:border-brand-200"
+              }`}
+            >
+              #{item.label}
             </Link>
           ))}
         </div>

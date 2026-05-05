@@ -21,6 +21,7 @@ export default function ClasificadorPage() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     async function checkAdmin() {
@@ -92,11 +93,26 @@ export default function ClasificadorPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-ink">Clasificador de Huérfanos</h1>
-          <p className="text-ink-muted">Hay <span className="font-bold text-brand-600">{books.length}</span> libros esperando categoría.</p>
+          <p className="text-ink-muted">
+            {search ? (
+              <>Mostrando <span className="font-bold text-brand-600">{books.filter(b => b.title.toLowerCase().includes(search.toLowerCase()) || b.author.toLowerCase().includes(search.toLowerCase())).length}</span> resultados de la búsqueda.</>
+            ) : (
+              <>Hay <span className="font-bold text-brand-600">{books.length}</span> libros esperando categoría.</>
+            )}
+          </p>
         </div>
-        <Link href="/admin" className="text-sm font-medium text-brand-600 hover:underline">
-          Volver al Admin
-        </Link>
+        <div className="flex items-center gap-4">
+          <input 
+            type="text"
+            placeholder="Buscar por título o autor..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-64 bg-white border border-cream-dark/50 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 shadow-sm"
+          />
+          <Link href="/admin" className="text-sm font-medium text-brand-600 hover:underline">
+            Volver al Admin
+          </Link>
+        </div>
       </div>
 
       {loading ? (
@@ -118,7 +134,12 @@ export default function ClasificadorPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {books.map((book) => (
+              {books
+                .filter(b => 
+                  b.title.toLowerCase().includes(search.toLowerCase()) || 
+                  b.author.toLowerCase().includes(search.toLowerCase())
+                )
+                .map((book) => (
                 <tr key={book.id} className={savingId === book.id ? "opacity-50 pointer-events-none" : ""}>
                   <td className="px-6 py-4">
                     <div className="flex gap-3">

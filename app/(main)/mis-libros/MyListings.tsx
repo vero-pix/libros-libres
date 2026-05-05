@@ -41,12 +41,16 @@ export default function MyListings({ listings: initial }: Props) {
 
   // Map of listingId -> total page views for this seller's listings.
   const [viewMap, setViewMap] = useState<Record<string, number>>({});
+  const [weeklyTotal, setWeeklyTotal] = useState<number | null>(null);
 
   // Fetch view counts once on mount from the seller-scoped API.
   useEffect(() => {
     fetch("/api/seller/listing-views")
       .then((r) => r.json())
-      .then((d) => { if (d.views) setViewMap(d.views); })
+      .then((d) => { 
+        if (d.views) setViewMap(d.views); 
+        if (d.totalWeekly !== undefined) setWeeklyTotal(d.totalWeekly);
+      })
       .catch(() => {}); // Silently fail — views are informational only.
   }, []);
 
@@ -140,6 +144,30 @@ export default function MyListings({ listings: initial }: Props) {
 
   return (
     <div className="space-y-4">
+      {/* Weekly Stats Summary */}
+      {weeklyTotal !== null && (
+        <div className="bg-brand-50 border border-brand-100 rounded-xl p-4 flex items-center gap-4">
+          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-brand-600 shadow-sm shrink-0">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+          </div>
+          <div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-bold text-brand-700">{weeklyTotal}</span>
+              <span className="text-sm font-medium text-brand-600">visitas</span>
+            </div>
+            <p className="text-xs text-brand-600/80">en tus libros los últimos 7 días. ¡Sigue así!</p>
+          </div>
+          <Link 
+            href="/publish" 
+            className="ml-auto hidden sm:inline-flex bg-white text-brand-600 hover:bg-brand-50 border border-brand-200 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors"
+          >
+            Publicar más
+          </Link>
+        </div>
+      )}
+
       {/* Filter tabs */}
       <div className="flex gap-1 bg-white rounded-xl border border-gray-200 p-1">
         {(["all", "active", "paused", "completed"] as const).map((f) => (

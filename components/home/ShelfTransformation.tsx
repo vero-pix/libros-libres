@@ -123,21 +123,23 @@ export default function ShelfTransformation() {
             <div className="w-[190px] h-2 bg-amber-800/20 rounded-sm shadow-inner" />
           </div>
 
-          {/* Dust particles */}
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full bg-amber-700/10 animate-pulse"
-              style={{
-                width: 2 + Math.random() * 3,
-                height: 2 + Math.random() * 3,
-                left: `${20 + Math.random() * 60}%`,
-                top: `${30 + Math.random() * 50}%`,
-                animationDelay: `${i * 0.4}s`,
-                animationDuration: `${2 + Math.random() * 2}s`,
-              }}
-            />
-          ))}
+          {/* Dust particles - Ocultos en mobile para ahorrar CPU */}
+          <div className="hidden sm:block">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full bg-amber-700/10 animate-pulse"
+                style={{
+                  width: 2 + Math.random() * 3,
+                  height: 2 + Math.random() * 3,
+                  left: `${20 + Math.random() * 60}%`,
+                  top: `${30 + Math.random() * 50}%`,
+                  animationDelay: `${i * 0.4}s`,
+                  animationDuration: `${2 + Math.random() * 2}s`,
+                }}
+              />
+            ))}
+          </div>
 
           <p className="mt-5 text-xs text-ink-muted/60 italic">
             Millones de libros acumulando polvo...
@@ -199,14 +201,7 @@ export default function ShelfTransformation() {
                 y2={NODES[b].y}
                 stroke="url(#lineGrad)"
                 strokeWidth="1.5"
-              >
-                <animate
-                  attributeName="opacity"
-                  values="0.2;0.6;0.2"
-                  dur={`${2 + i * 0.3}s`}
-                  repeatCount="indefinite"
-                />
-              </line>
+              />
             ))}
 
             {/* Nodes — each is a book location */}
@@ -214,18 +209,11 @@ export default function ShelfTransformation() {
               const book = BOOKS[i % BOOKS.length];
               return (
                 <g key={i}>
-                  {/* Pulse */}
-                  <circle cx={node.x} cy={node.y} r="8" fill={book.color} opacity="0.15">
+                  {/* Pulse - Solo en desktop o simplificado */}
+                  <circle cx={node.x} cy={node.y} r="8" fill={book.color} opacity="0.1" className="hidden sm:block">
                     <animate
                       attributeName="r"
                       values="8;18;8"
-                      dur="3s"
-                      begin={`${i * 0.35}s`}
-                      repeatCount="indefinite"
-                    />
-                    <animate
-                      attributeName="opacity"
-                      values="0.15;0;0.15"
                       dur="3s"
                       begin={`${i * 0.35}s`}
                       repeatCount="indefinite"
@@ -244,24 +232,7 @@ export default function ShelfTransformation() {
                     strokeWidth="1.5"
                     className="drop-shadow-sm"
                   />
-                  <line
-                    x1={node.x - 3}
-                    y1={node.y - 6}
-                    x2={node.x + 4}
-                    y2={node.y - 6}
-                    stroke="white"
-                    strokeWidth="1"
-                    opacity="0.6"
-                  />
-                  <line
-                    x1={node.x - 3}
-                    y1={node.y - 3}
-                    x2={node.x + 2}
-                    y2={node.y - 3}
-                    stroke="white"
-                    strokeWidth="0.8"
-                    opacity="0.4"
-                  />
+                  <line x1={node.x - 3} y1={node.y - 6} x2={node.x + 4} y2={node.y - 6} stroke="white" strokeWidth="1" opacity="0.6" />
 
                   {/* Label */}
                   <text
@@ -276,26 +247,6 @@ export default function ShelfTransformation() {
                 </g>
               );
             })}
-
-            {/* Traveling book animation */}
-            {CONNECTIONS.slice(0, 4).map(([a, b], i) => (
-              <circle key={`travel-${i}`} r="2.5" fill="#d4a017">
-                <animateMotion
-                  dur={`${2 + i * 0.5}s`}
-                  repeatCount="indefinite"
-                  begin={`${i * 0.8}s`}
-                  path={`M${NODES[a].x},${NODES[a].y} L${NODES[b].x},${NODES[b].y}`}
-                />
-                <animate
-                  attributeName="opacity"
-                  values="0;1;1;0"
-                  dur={`${2 + i * 0.5}s`}
-                  repeatCount="indefinite"
-                  begin={`${i * 0.8}s`}
-                />
-              </circle>
-            ))}
-
           </svg>
         </div>
       </div>

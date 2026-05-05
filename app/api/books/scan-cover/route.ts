@@ -46,16 +46,21 @@ export async function POST(request: NextRequest) {
               },
               {
                 type: "text",
-                text: `Analiza esta portada de libro. Extrae la información para completar un formulario de venta. 
-Responde ÚNICAMENTE con un objeto JSON válido, sin explicaciones ni bloques de código markdown:
+                text: `Actúa como un bibliotecario experto con visión perfecta. Analiza esta portada de libro (posiblemente del mercado chileno). 
+Extrae toda la información posible para una ficha técnica profesional. Si el texto es algo borroso, usa tu conocimiento literario para identificar el título y autor correcto.
+
+Responde ÚNICAMENTE con un objeto JSON válido:
 {
-  "title": "título del libro",
-  "author": "autor",
+  "title": "título oficial completo",
+  "author": "nombre completo del autor",
   "publisher": "editorial",
   "published_year": 2024,
-  "description": "una breve sinopsis de 2 frases basada en el libro si lo conoces"
+  "description": "Una sinopsis atractiva de 2 a 3 frases. Si conoces el libro, aporta datos reales de su contenido para ayudar a la venta."
 }
-Si no ves algún campo, invéntalo solo si estás 99% seguro por el contexto, si no usa null.`,
+
+IMPORTANTE: 
+- Prioriza la exactitud sobre el silencio. Si ves "DIBUJANDO EL COSMOS" y a "José Maza", identifícalo con seguridad.
+- Si no estás seguro de la editorial o año, deja esos campos como null, pero el TÍTULO y AUTOR son obligatorios si son legibles.`,
               },
             ],
           },

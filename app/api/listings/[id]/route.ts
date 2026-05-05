@@ -29,7 +29,7 @@ export async function PATCH(
   const admin = createServiceRoleClient();
   const { data: listing, error: listingError } = await admin
     .from("listings")
-    .select("id, book_id, seller_id")
+    .select("id, book_id, seller_id, slug")
     .eq("id", params.id)
     .single();
 
@@ -101,6 +101,24 @@ export async function PATCH(
 
   if (bookError) {
     return NextResponse.json({ error: bookError.message }, { status: 500 });
+  }
+
+  // Asegurar que tenga slug si no existe (retrocompatibilidad)
+  if (!listing.slug) {
+    const { slugify } = await import("@/lib/slugify");
+    const baseSlug = slugify(bookUpdates.title || "libro");
+    let slug = baseSlug;
+    
+    // Verificar unicidad básica
+    const { count } = await admin
+      .from("listings")
+      .select("id", { count: "exact", head: true })
+      .eq("slug", baseSlug);
+      
+    if (count && count > 0) {
+      slug = `${baseSlug}-${Math.random().toString(36).slice(-4)}`;
+    }
+    listingUpdates.slug = slug;
   }
 
   const { error: updateListingError } = await admin

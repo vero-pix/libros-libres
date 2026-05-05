@@ -1,6 +1,6 @@
 # tuslibros.cl — Master Plan
 
-Última actualización: 23 abril 2026 — tarde (SEO y Growth)
+Última actualización: 5 mayo 2026 — Sesión Editorial y Optimización Móvil
 
 ---
 
@@ -35,10 +35,18 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 
 ## Roadmap vivo (Actualizado 27 Abril 2026)
 
-### Optimizaciones de Funnel (27 Abril 2026)
-- [x] ~~Sticky Buy Bar (Mobile)~~ — ✅ implementado en `ListingDetail.tsx` para mejorar la conversión en vistas de celular.
-- [x] ~~Tracking Clicks Competencia~~ — ✅ implementado endpoint `/api/analytics/external-click` que avisa por Telegram si un usuario clica Buscalibre/MercadoLibre.
-- [x] ~~Gong Telegram Demanda Insatisfecha~~ — ✅ `BookRequestForm` ahora pega a `/api/requests` gatillando un Telegram instantáneo al admin para recuperar venta.
+### Urgente & Performance (5 Mayo 2026)
+- [x] ~~Optimización TBT Mobile~~ — ✅ Reducción de lag en celulares desactivando animaciones SVG pesadas y partículas de polvo en `ShelfTransformation`.
+- [x] ~~Limpieza de Contenido Estancado~~ — ✅ Eliminación de listings obsoletos o fuera de línea editorial (Kamasutra).
+- [x] ~~Fix Slugs Legacy~~ — ✅ Generación masiva de slugs para libros de Bárbara y otros vendedores antiguos para evitar URLs UUID.
+
+### Refinamiento Editorial y Taxonomía (5 Mayo 2026)
+- [x] ~~Taxonomía Chilena Completa~~ — ✅ Implementada en `lib/genres.ts` y DB (Poesía, Novela Negra, Teatro, Humanidades, etc.).
+- [x] ~~Clasificador Admin Pro~~ — ✅ Buscador en tiempo real integrado en la herramienta de clasificación para manejo de volumen.
+- [x] ~~Backfill de Tags Inteligente~~ — ✅ Script ejecutado para poblar tags en +100 libros que estaban sin metadatos.
+- [x] ~~Nube de Tags (Vibras)~~ — ✅ Implementada en la barra lateral para descubrimiento fortuito.
+- [x] ~~Home de Temporada~~ — ✅ Banners nuevos para "Escolares" y "Lectura Complementaria" con paleta editorial Oxford/Forest.
+- [x] ~~Vendedores Destacados~~ — ✅ Lógica de prioridad para destacar a Bárbara Barcia como #1 en la Home.
 
 ### Urgente (romper = detener flujo de usuarios)
 - [x] ~~Fix mobile navbar sin romper dropdowns~~ — ✅ confirmado 21 abril por Vero, funciona bien

@@ -176,7 +176,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       const res = await fetch("/api/books/scan-cover", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) {
-        setScanError(data.error ?? "No se pudo identificar el libro. Intenta con ISBN o ingreso manual.");
+        setScanError(data.error ?? "¡Casi lo tenemos! Intenta sacando la foto con más luz o enfocando mejor el título.");
         return;
       }
       // Éxito — pre-rellenar datos del libro (nunca pisamos lo que el usuario ya escribió)
