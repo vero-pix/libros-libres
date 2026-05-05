@@ -60,7 +60,7 @@ export default function PriceCompare({ title, author, isbn, currentPrice, varian
       
       <div className="p-4">
         <p className="text-xs text-gray-500 mb-4 leading-relaxed italic">
-          "Creemos en la transparencia total. No te pedimos que nos creas: te damos los links para que compares este libro con el mercado real."
+          &quot;Creemos en la transparencia total. No te pedimos que nos creas: te damos los links para que compares este libro con el mercado real.&quot;
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -102,7 +102,5 @@ export default function PriceCompare({ title, author, isbn, currentPrice, varian
         )}
       </div>
     </div>
-  );
-}
   );
 }
