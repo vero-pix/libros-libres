@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import { trackEvent } from "@/utils/analytics";
 
 interface Props {
   user: User | null;
@@ -93,6 +94,7 @@ export default function NavbarClient({ user, displayName, initialCartCount = 0 }
       </Link>
       <Link
         href="/publish"
+        onClick={() => trackEvent("click_offer_book")}
         className="text-sm bg-brand-500 hover:bg-brand-600 text-white font-medium px-3 py-1.5 rounded-md transition-colors whitespace-nowrap"
       >
         + Publicar libro

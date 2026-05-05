@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { trackEvent } from "@/utils/analytics";
 
 interface Props {
   totalListings: number;
@@ -31,6 +32,7 @@ export default function HeroBar({ totalListings, onToggleMap }: Props) {
               </Link>
               <Link
                 href="/publish"
+                onClick={() => trackEvent("click_offer_book")}
                 className="inline-flex items-center px-8 py-3.5 bg-white border-2 border-brand-500 text-brand-600 text-sm font-bold rounded-xl hover:bg-brand-50 transition-all shadow-sm"
               >
                 Ofrecer mi libro

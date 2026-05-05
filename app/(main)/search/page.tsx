@@ -8,6 +8,7 @@ import ListingCard from "@/components/listings/ListingCard";
 import SearchResultsToggle from "@/components/listings/SearchResultsToggle";
 import PromoBanner from "@/components/ui/PromoBanner";
 import BookRequestForm from "@/components/listings/BookRequestForm";
+import SearchEventTracker from "@/components/analytics/SearchEventTracker";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
@@ -183,6 +184,7 @@ export default async function SearchPage({ searchParams }: Props) {
 
   return (
     <div className="min-h-screen bg-white">
+      <SearchEventTracker query={q} />
       <main className="max-w-7xl mx-auto px-4 py-6">
         <Breadcrumbs
           items={[

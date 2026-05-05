@@ -13,8 +13,17 @@ import ContactSellerButton from "@/components/messages/ContactSellerButton";
 import PriceCompare from "@/components/listings/PriceCompare";
 import SellerOtherListings from "./SellerOtherListings";
 import { libroUrl } from "@/lib/urls";
+import { trackEvent } from "@/utils/analytics";
 
-function WhatsAppButton({ phone, title }: { phone: string | null; title: string }) {
+function WhatsAppButton({
+  phone,
+  title,
+  listingId,
+}: {
+  phone: string | null;
+  title: string;
+  listingId: string;
+}) {
   if (!phone) {
     return (
       <p className="text-center text-sm text-gray-400 py-1">
@@ -35,6 +44,12 @@ function WhatsAppButton({ phone, title }: { phone: string | null; title: string 
       href={waUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent("click_contact", {
+          listing_id: listingId,
+          book_title: title,
+        });
+      }}
       className="flex items-center justify-center gap-2 w-full border-2 border-green-500 text-green-600 hover:bg-green-50 font-semibold py-3 rounded-xl transition-colors"
     >
       <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
@@ -82,6 +97,12 @@ export default function ListingDetail({ listing, images = [] }: Props) {
   }, [listing.seller_id]);
 
   useEffect(() => {
+    trackEvent("view_listing", {
+      listing_id: listing.id,
+      book_title: book.title,
+      author: book.author,
+    });
+
     addRecentlyViewed({
       id: listing.id,
       slug: listing.slug,
@@ -320,6 +341,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
                   <WhatsAppButton
                     phone={listing.seller?.phone ?? null}
                     title={book.title}
+                    listingId={listing.id}
                   />
                 </div>
               )}
@@ -340,6 +362,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
           sellerId={listing.seller_id}
           listingId={listing.id}
           sellerName={sellerName}
+          bookTitle={book.title}
         />
       </div>
 
@@ -350,12 +373,19 @@ export default function ListingDetail({ listing, images = [] }: Props) {
           <WhatsAppButton
             phone={listing.seller?.phone ?? null}
             title={book.title}
+            listingId={listing.id}
           />
           {listing.seller?.instagram && (
             <a
               href={`https://instagram.com/${listing.seller.instagram}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackEvent("click_contact", {
+                  listing_id: listing.id,
+                  book_title: book.title,
+                });
+              }}
               className="flex items-center justify-center gap-2 w-full border-2 border-pink-400 text-pink-500 hover:bg-pink-50 font-semibold py-3 rounded-xl transition-colors"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
@@ -367,6 +397,12 @@ export default function ListingDetail({ listing, images = [] }: Props) {
           {listing.seller?.public_email && (
             <a
               href={`mailto:${listing.seller.public_email}?subject=${encodeURIComponent(`Consulta sobre "${book.title}" en tuslibros.cl`)}`}
+              onClick={() => {
+                trackEvent("click_contact", {
+                  listing_id: listing.id,
+                  book_title: book.title,
+                });
+              }}
               className="flex items-center justify-center gap-2 w-full border-2 border-blue-400 text-blue-500 hover:bg-blue-50 font-semibold py-3 rounded-xl transition-colors"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current" xmlns="http://www.w3.org/2000/svg" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -405,6 +441,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               <WhatsAppButton
                 phone={listing.seller?.phone ?? null}
                 title={book.title}
+                listingId={listing.id}
               />
             )}
           </div>

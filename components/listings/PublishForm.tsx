@@ -20,6 +20,7 @@ import CoverUpload from "@/components/books/CoverUpload";
 import ImageUploadMultiple from "@/components/listings/ImageUploadMultiple";
 import { compressImage } from "@/lib/image-compress";
 import Link from "next/link";
+import { trackEvent } from "@/utils/analytics";
 
 type Modality = "sale" | "loan" | "both";
 type Condition = "new" | "good" | "fair" | "poor";
@@ -384,6 +385,12 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       // Upload pending additional images
       if (newListing?.id && pendingImages.length > 0) {
         await uploadPendingImages(newListing.id);
+      }
+
+      if (newListing?.id) {
+        trackEvent("listing_created", {
+          listing_id: newListing.id,
+        });
       }
 
       setPublishedListingId(newListing?.id ?? null);

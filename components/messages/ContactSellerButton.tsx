@@ -2,18 +2,25 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { trackEvent } from "@/utils/analytics";
 
 interface Props {
   sellerId: string;
   listingId: string;
   sellerName: string;
+  bookTitle: string;
 }
 
-export default function ContactSellerButton({ sellerId, listingId, sellerName }: Props) {
+export default function ContactSellerButton({ sellerId, listingId, sellerName, bookTitle }: Props) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   async function handleClick() {
+    trackEvent("click_contact", {
+      listing_id: listingId,
+      book_title: bookTitle,
+    });
+
     setLoading(true);
     try {
       const res = await fetch("/api/messages", {
