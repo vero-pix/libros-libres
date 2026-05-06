@@ -591,7 +591,6 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
           </div>
 
           <ISBNSearch hideManualForm onBookFound={(b) => {
-              console.log("Book found:", b);
               setBook(b);
               // Forzamos el llenado de los campos principales
               if (b.title) setBookTitle(b.title.trim());

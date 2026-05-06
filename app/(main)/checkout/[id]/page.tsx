@@ -7,6 +7,8 @@ interface Props {
   params: { id: string };
 }
 
+export const metadata = { title: "Finalizar compra — tuslibros.cl", robots: { index: false } };
+
 export default async function CheckoutPage({ params }: Props) {
   const supabase = await createClient();
 

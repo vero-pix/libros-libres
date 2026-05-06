@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import OrderTabs from "./OrderTabs";
 import { OrderWithDetails } from "@/types";
 
-export const metadata = { title: "Mis Pedidos | tuslibros.cl" };
+export const metadata = { title: "Mis Pedidos — tuslibros.cl", robots: { index: false } };
 
 const ORDER_SELECT = `
   *,

@@ -5,7 +5,7 @@ import MyListings from "./MyListings";
 import WantedBounty from "@/components/listings/WantedBounty";
 import type { ListingWithBook } from "@/types";
 
-export const metadata = { title: "Mis Libros — tuslibros.cl" };
+export const metadata = { title: "Mis Libros — tuslibros.cl", robots: { index: false } };
 
 export default async function MisLibrosPage() {
   const supabase = await createClient();

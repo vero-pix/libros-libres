@@ -8,6 +8,7 @@ import BuyerCartsSection from "@/components/sales/BuyerCartsSection";
 export const metadata = {
   title: "Mis Ventas — tuslibros.cl",
   description: "Dashboard de ventas y comisiones",
+  robots: { index: false },
 };
 
 const STATUS_LABELS: Record<OrderStatus, { label: string; class: string }> = {

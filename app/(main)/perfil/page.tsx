@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import ProfileForm from "@/components/ui/ProfileForm";
 import MercadoPagoConnect from "@/components/ui/MercadoPagoConnect";
 
+export const metadata = { title: "Mi Perfil — tuslibros.cl", robots: { index: false } };
+
 export default async function PerfilPage() {
   const supabase = await createClient();
   const {

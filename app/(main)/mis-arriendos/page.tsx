@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import RentalsList from "./RentalsList";
 
+export const metadata = { title: "Mis Arriendos — tuslibros.cl", robots: { index: false } };
+
 export default async function MisArriendosPage() {
   const supabase = await createClient();
   const {

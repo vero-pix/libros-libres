@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Invita y gana — tuslibros.cl",
   description: "Invita amigos a tuslibros.cl y gana descuentos en despacho.",
   alternates: { canonical: "https://tuslibros.cl/referidos" },
+  robots: { index: false },
 };
 
 export default async function ReferidosPage() {

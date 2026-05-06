@@ -4,6 +4,7 @@ import CartView from "./CartView";
 
 export const metadata = {
   title: "Mi Carrito — tuslibros.cl",
+  robots: { index: false },
 };
 
 export default async function CarritoPage() {

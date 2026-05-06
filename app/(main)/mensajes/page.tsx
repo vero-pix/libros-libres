@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ConversationList from "@/components/messages/ConversationList";
 
-export const metadata = { title: "Mensajes — tuslibros.cl" };
+export const metadata = { title: "Mensajes — tuslibros.cl", robots: { index: false } };
 
 interface Props {
   searchParams: { to?: string };
