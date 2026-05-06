@@ -5,9 +5,8 @@
  * interna de tuslibros.cl almacenada en la tabla `categories`.
  *
  * Convención de slugs:
- *   - Categoría raíz:   escolar | lectura-complementaria | universitario |
- *                       tecnico-cft | general-adulto | idiomas | otros
- *   - Subcategoría:     <raiz>-<nombre>  (ej: escolar-matematicas)
+ *   - Categoría raíz:   ficcion | no-ficcion | idiomas | infantil-juvenil | academico | otros
+ *   - Subcategoría:     <raiz>-<nombre>  (ej: ficcion-novela, no-ficcion-historia)
  *
  * Prioridad de resolución:
  *   1. Señales de libro escolar/universitario en título
@@ -26,158 +25,158 @@ export interface NormalizedGenre {
 const GENRE_MAP: Record<string, NormalizedGenre> = {
 
   // ── Ficción adulta ──────────────────────────────────────────────────────
-  "ficcion":          { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "ficcion literaria":{ category: "general-adulto", subcategory: "general-adulto-novela" },
-  "fiction":          { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "novela":           { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "novel":            { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "narrativa":        { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "thriller":         { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "misterio":         { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "mystery":          { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "terror":           { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "horror":           { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "fantasia":         { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "fantasy":          { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "ciencia ficcion":  { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "science fiction":  { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "sci-fi":           { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "romance":          { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "romantico":        { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "aventura":         { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "adventure":        { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "historica":        { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "historical fiction":{ category: "general-adulto", subcategory: "general-adulto-novela" },
-  "policial":         { category: "general-adulto", subcategory: "general-adulto-novela-negra" },
-  "detective":        { category: "general-adulto", subcategory: "general-adulto-novela-negra" },
-  "crimen":           { category: "general-adulto", subcategory: "general-adulto-novela-negra" },
-  "drama":            { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "cuentos":          { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "relatos":          { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "short stories":    { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "mitologia":        { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "mitología":        { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "mythology":        { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "myths":            { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "mito":             { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "mitos":            { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "leyendas":         { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "legends":          { category: "general-adulto", subcategory: "general-adulto-novela" },
-  "folklore":         { category: "general-adulto", subcategory: "general-adulto-novela" },
+  "ficcion":          { category: "ficcion", subcategory: "ficcion-novela" },
+  "ficcion literaria":{ category: "ficcion", subcategory: "ficcion-novela" },
+  "fiction":          { category: "ficcion", subcategory: "ficcion-novela" },
+  "novela":           { category: "ficcion", subcategory: "ficcion-novela" },
+  "novel":            { category: "ficcion", subcategory: "ficcion-novela" },
+  "narrativa":        { category: "ficcion", subcategory: "ficcion-novela" },
+  "thriller":         { category: "ficcion", subcategory: "ficcion-novela" },
+  "misterio":         { category: "ficcion", subcategory: "ficcion-novela" },
+  "mystery":          { category: "ficcion", subcategory: "ficcion-novela" },
+  "terror":           { category: "ficcion", subcategory: "ficcion-novela" },
+  "horror":           { category: "ficcion", subcategory: "ficcion-novela" },
+  "fantasia":         { category: "ficcion", subcategory: "ficcion-novela" },
+  "fantasy":          { category: "ficcion", subcategory: "ficcion-novela" },
+  "ciencia ficcion":  { category: "ficcion", subcategory: "ficcion-novela" },
+  "science fiction":  { category: "ficcion", subcategory: "ficcion-novela" },
+  "sci-fi":           { category: "ficcion", subcategory: "ficcion-novela" },
+  "romance":          { category: "ficcion", subcategory: "ficcion-novela" },
+  "romantico":        { category: "ficcion", subcategory: "ficcion-novela" },
+  "aventura":         { category: "ficcion", subcategory: "ficcion-novela" },
+  "adventure":        { category: "ficcion", subcategory: "ficcion-novela" },
+  "historica":        { category: "ficcion", subcategory: "ficcion-novela" },
+  "historical fiction":{ category: "ficcion", subcategory: "ficcion-novela" },
+  "policial":         { category: "ficcion", subcategory: "ficcion-policial" },
+  "detective":        { category: "ficcion", subcategory: "ficcion-policial" },
+  "crimen":           { category: "ficcion", subcategory: "ficcion-policial" },
+  "drama":            { category: "ficcion", subcategory: "ficcion-novela" },
+  "cuentos":          { category: "ficcion", subcategory: "ficcion-novela" },
+  "relatos":          { category: "ficcion", subcategory: "ficcion-novela" },
+  "short stories":    { category: "ficcion", subcategory: "ficcion-novela" },
+  "mitologia":        { category: "ficcion", subcategory: "ficcion-novela" },
+  "mitología":        { category: "ficcion", subcategory: "ficcion-novela" },
+  "mythology":        { category: "ficcion", subcategory: "ficcion-novela" },
+  "myths":            { category: "ficcion", subcategory: "ficcion-novela" },
+  "mito":             { category: "ficcion", subcategory: "ficcion-novela" },
+  "mitos":            { category: "ficcion", subcategory: "ficcion-novela" },
+  "leyendas":         { category: "ficcion", subcategory: "ficcion-novela" },
+  "legends":          { category: "ficcion", subcategory: "ficcion-novela" },
+  "folklore":         { category: "ficcion", subcategory: "ficcion-novela" },
 
   // ── Poesía / Teatro ──────────────────────────────────────────────────────
-  "poesia":           { category: "general-adulto", subcategory: "general-adulto-poesia" },
-  "poesía":           { category: "general-adulto", subcategory: "general-adulto-poesia" },
-  "poetry":           { category: "general-adulto", subcategory: "general-adulto-poesia" },
-  "teatro":           { category: "general-adulto", subcategory: "general-adulto-teatro" },
-  "drama teatral":    { category: "general-adulto", subcategory: "general-adulto-teatro" },
-  "play":             { category: "general-adulto", subcategory: "general-adulto-teatro" },
-  "plays":            { category: "general-adulto", subcategory: "general-adulto-teatro" },
+  "poesia":           { category: "ficcion", subcategory: "ficcion-poesia" },
+  "poesía":           { category: "ficcion", subcategory: "ficcion-poesia" },
+  "poetry":           { category: "ficcion", subcategory: "ficcion-poesia" },
+  "teatro":           { category: "ficcion", subcategory: "ficcion-teatro" },
+  "drama teatral":    { category: "ficcion", subcategory: "ficcion-teatro" },
+  "play":             { category: "ficcion", subcategory: "ficcion-teatro" },
+  "plays":            { category: "ficcion", subcategory: "ficcion-teatro" },
 
   // ── No ficción: Ensayo / Filosofía / Humanidades ────────────────────────
-  "humanidades":      { category: "general-adulto", subcategory: "general-adulto-humanidades" },
-  "humanities":       { category: "general-adulto", subcategory: "general-adulto-humanidades" },
+  "humanidades":      { category: "no-ficcion", subcategory: "no-ficcion-humanidades" },
+  "humanities":       { category: "no-ficcion", subcategory: "no-ficcion-humanidades" },
 
   // ── No ficción: Ensayo / Filosofía / Política ───────────────────────────
-  "no ficcion":       { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "no ficción":       { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "nonfiction":       { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "ensayo":           { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "essay":            { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "filosofia":        { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "filosofía":        { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "philosophy":       { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "politica":         { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "política":         { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "politics":         { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "sociologia":       { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "sociology":        { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "biografia":        { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "biografía":        { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "biography":        { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "memorias":         { category: "general-adulto", subcategory: "general-adulto-ensayo" },
-  "memoir":           { category: "general-adulto", subcategory: "general-adulto-ensayo" },
+  "no ficcion":       { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "no ficción":       { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "nonfiction":       { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "ensayo":           { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "essay":            { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "filosofia":        { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "filosofía":        { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "philosophy":       { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "politica":         { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "política":         { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "politics":         { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "sociologia":       { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "sociology":        { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "biografia":        { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "biografía":        { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "biography":        { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "memorias":         { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
+  "memoir":           { category: "no-ficcion", subcategory: "no-ficcion-ensayo" },
 
   // ── Historia ────────────────────────────────────────────────────────────
-  "historia":         { category: "general-adulto", subcategory: "general-adulto-historia" },
-  "history":          { category: "general-adulto", subcategory: "general-adulto-historia" },
-  "historia de chile":{ category: "general-adulto", subcategory: "general-adulto-historia" },
-  "historia universal":{ category: "general-adulto", subcategory: "general-adulto-historia" },
+  "historia":         { category: "no-ficcion", subcategory: "no-ficcion-historia" },
+  "history":          { category: "no-ficcion", subcategory: "no-ficcion-historia" },
+  "historia de chile":{ category: "no-ficcion", subcategory: "no-ficcion-historia" },
+  "historia universal":{ category: "no-ficcion", subcategory: "no-ficcion-historia" },
 
   // ── Autoayuda ───────────────────────────────────────────────────────────
-  "autoayuda":        { category: "general-adulto", subcategory: "general-adulto-autoayuda" },
-  "self-help":        { category: "general-adulto", subcategory: "general-adulto-autoayuda" },
-  "desarrollo personal":{ category: "general-adulto", subcategory: "general-adulto-autoayuda" },
-  "liderazgo":        { category: "general-adulto", subcategory: "general-adulto-autoayuda" },
-  "motivacion":       { category: "general-adulto", subcategory: "general-adulto-autoayuda" },
-  "cocina":           { category: "general-adulto", subcategory: "general-adulto-autoayuda" },
-  "cooking":          { category: "general-adulto", subcategory: "general-adulto-autoayuda" },
-  "recetas":          { category: "general-adulto", subcategory: "general-adulto-autoayuda" },
-  "salud y bienestar":{ category: "general-adulto", subcategory: "general-adulto-autoayuda" },
-  "wellness":         { category: "general-adulto", subcategory: "general-adulto-autoayuda" },
+  "autoayuda":        { category: "no-ficcion", subcategory: "no-ficcion-autoayuda" },
+  "self-help":        { category: "no-ficcion", subcategory: "no-ficcion-autoayuda" },
+  "desarrollo personal":{ category: "no-ficcion", subcategory: "no-ficcion-autoayuda" },
+  "liderazgo":        { category: "no-ficcion", subcategory: "no-ficcion-autoayuda" },
+  "motivacion":       { category: "no-ficcion", subcategory: "no-ficcion-autoayuda" },
+  "cocina":           { category: "no-ficcion", subcategory: "no-ficcion-autoayuda" },
+  "cooking":          { category: "no-ficcion", subcategory: "no-ficcion-autoayuda" },
+  "recetas":          { category: "no-ficcion", subcategory: "no-ficcion-autoayuda" },
+  "salud y bienestar":{ category: "no-ficcion", subcategory: "no-ficcion-autoayuda" },
+  "wellness":         { category: "no-ficcion", subcategory: "no-ficcion-autoayuda" },
 
   // ── Ciencia y Divulgación ───────────────────────────────────────────────
-  "ciencia":          { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "science":          { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "divulgacion":      { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "divulgación":      { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "tecnologia":       { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "technology":       { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "matematicas":      { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "mathematics":      { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "fisica":           { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "physics":          { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "quimica":          { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "chemistry":        { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "biologia":         { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "biology":          { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "naturaleza":       { category: "general-adulto", subcategory: "general-adulto-ciencia" },
-  "nature":           { category: "general-adulto", subcategory: "general-adulto-ciencia" },
+  "ciencia":          { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "science":          { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "divulgacion":      { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "divulgación":      { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "tecnologia":       { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "technology":       { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "matematicas":      { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "mathematics":      { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "fisica":           { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "physics":          { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "quimica":          { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "chemistry":        { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "biologia":         { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "biology":          { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "naturaleza":       { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
+  "nature":           { category: "no-ficcion", subcategory: "no-ficcion-ciencia" },
 
   // ── Arte y Fotografía ───────────────────────────────────────────────────
-  "arte":             { category: "general-adulto", subcategory: "general-adulto-arte" },
-  "art":              { category: "general-adulto", subcategory: "general-adulto-arte" },
-  "fotografia":       { category: "general-adulto", subcategory: "general-adulto-arte" },
-  "photography":      { category: "general-adulto", subcategory: "general-adulto-arte" },
-  "cine":             { category: "general-adulto", subcategory: "general-adulto-arte" },
-  "cinema":           { category: "general-adulto", subcategory: "general-adulto-arte" },
-  "cine y fotografia":{ category: "general-adulto", subcategory: "general-adulto-arte" },
-  "musica":           { category: "general-adulto", subcategory: "general-adulto-arte" },
-  "music":            { category: "general-adulto", subcategory: "general-adulto-arte" },
-  "arquitectura":     { category: "general-adulto", subcategory: "general-adulto-arte" },
-  "architecture":     { category: "general-adulto", subcategory: "general-adulto-arte" },
-  "diseno":           { category: "general-adulto", subcategory: "general-adulto-arte" },
-  "design":           { category: "general-adulto", subcategory: "general-adulto-arte" },
+  "arte":             { category: "no-ficcion", subcategory: "no-ficcion-arte" },
+  "art":              { category: "no-ficcion", subcategory: "no-ficcion-arte" },
+  "fotografia":       { category: "no-ficcion", subcategory: "no-ficcion-arte" },
+  "photography":      { category: "no-ficcion", subcategory: "no-ficcion-arte" },
+  "cine":             { category: "no-ficcion", subcategory: "no-ficcion-arte" },
+  "cinema":           { category: "no-ficcion", subcategory: "no-ficcion-arte" },
+  "cine y fotografia":{ category: "no-ficcion", subcategory: "no-ficcion-arte" },
+  "musica":           { category: "no-ficcion", subcategory: "no-ficcion-arte" },
+  "music":            { category: "no-ficcion", subcategory: "no-ficcion-arte" },
+  "arquitectura":     { category: "no-ficcion", subcategory: "no-ficcion-arte" },
+  "architecture":     { category: "no-ficcion", subcategory: "no-ficcion-arte" },
+  "diseno":           { category: "no-ficcion", subcategory: "no-ficcion-arte" },
+  "design":           { category: "no-ficcion", subcategory: "no-ficcion-arte" },
 
-  // ── Universitario / Profesional ─────────────────────────────────────────
-  "derecho":          { category: "universitario", subcategory: "universitario-derecho" },
-  "law":              { category: "universitario", subcategory: "universitario-derecho" },
-  "juridico":         { category: "universitario", subcategory: "universitario-derecho" },
-  "ingenieria":       { category: "universitario", subcategory: "universitario-ingenieria" },
-  "engineering":      { category: "universitario", subcategory: "universitario-ingenieria" },
-  "medicina":         { category: "universitario", subcategory: "universitario-medicina" },
-  "medical":          { category: "universitario", subcategory: "universitario-medicina" },
-  "enfermeria":       { category: "universitario", subcategory: "universitario-medicina" },
-  "nursing":          { category: "universitario", subcategory: "universitario-medicina" },
-  "administracion":   { category: "universitario", subcategory: "universitario-administracion" },
-  "business":         { category: "universitario", subcategory: "universitario-administracion" },
-  "negocios":         { category: "universitario", subcategory: "universitario-administracion" },
-  "economia":         { category: "universitario", subcategory: "universitario-administracion" },
-  "economics":        { category: "universitario", subcategory: "universitario-administracion" },
-  "contabilidad":     { category: "universitario", subcategory: "universitario-administracion" },
-  "psicologia":       { category: "universitario", subcategory: "universitario-psicologia" },
-  "psychology":       { category: "universitario", subcategory: "universitario-psicologia" },
+  // ── Académico / Profesional ─────────────────────────────────────────────
+  "derecho":          { category: "academico", subcategory: "academico-universitario" },
+  "law":              { category: "academico", subcategory: "academico-universitario" },
+  "juridico":         { category: "academico", subcategory: "academico-universitario" },
+  "ingenieria":       { category: "academico", subcategory: "academico-universitario" },
+  "engineering":      { category: "academico", subcategory: "academico-universitario" },
+  "medicina":         { category: "academico", subcategory: "academico-universitario" },
+  "medical":          { category: "academico", subcategory: "academico-universitario" },
+  "enfermeria":       { category: "academico", subcategory: "academico-universitario" },
+  "nursing":          { category: "academico", subcategory: "academico-universitario" },
+  "administracion":   { category: "academico", subcategory: "academico-universitario" },
+  "business":         { category: "academico", subcategory: "academico-universitario" },
+  "negocios":         { category: "academico", subcategory: "academico-universitario" },
+  "economia":         { category: "academico", subcategory: "academico-universitario" },
+  "economics":        { category: "academico", subcategory: "academico-universitario" },
+  "contabilidad":     { category: "academico", subcategory: "academico-universitario" },
+  "psicologia":       { category: "academico", subcategory: "academico-universitario" },
+  "psychology":       { category: "academico", subcategory: "academico-universitario" },
 
   // ── Lectura Complementaria ──────────────────────────────────────────────
-  "literatura infantil":  { category: "lectura-complementaria", subcategory: "lectura-complementaria-infantil" },
-  "children":             { category: "lectura-complementaria", subcategory: "lectura-complementaria-infantil" },
-  "children's":           { category: "lectura-complementaria", subcategory: "lectura-complementaria-infantil" },
-  "cuentos infantiles":   { category: "lectura-complementaria", subcategory: "lectura-complementaria-infantil" },
-  "picture book":         { category: "lectura-complementaria", subcategory: "lectura-complementaria-infantil" },
-  "literatura juvenil":   { category: "lectura-complementaria", subcategory: "lectura-complementaria-juvenil" },
-  "young adult":          { category: "lectura-complementaria", subcategory: "lectura-complementaria-juvenil" },
-  "ya":                   { category: "lectura-complementaria", subcategory: "lectura-complementaria-juvenil" },
-  "juvenil":              { category: "lectura-complementaria", subcategory: "lectura-complementaria-juvenil" },
+  "literatura infantil":  { category: "infantil-juvenil", subcategory: "infantil-juvenil-infantil" },
+  "children":             { category: "infantil-juvenil", subcategory: "infantil-juvenil-infantil" },
+  "children's":           { category: "infantil-juvenil", subcategory: "infantil-juvenil-infantil" },
+  "cuentos infantiles":   { category: "infantil-juvenil", subcategory: "infantil-juvenil-infantil" },
+  "picture book":         { category: "infantil-juvenil", subcategory: "infantil-juvenil-infantil" },
+  "literatura juvenil":   { category: "infantil-juvenil", subcategory: "infantil-juvenil-juvenil" },
+  "young adult":          { category: "infantil-juvenil", subcategory: "infantil-juvenil-juvenil" },
+  "ya":                   { category: "infantil-juvenil", subcategory: "infantil-juvenil-juvenil" },
+  "juvenil":              { category: "infantil-juvenil", subcategory: "infantil-juvenil-juvenil" },
 
   // ── Idiomas ─────────────────────────────────────────────────────────────
   "ingles":           { category: "idiomas", subcategory: "idiomas-ingles" },
@@ -254,20 +253,20 @@ function detectEscolar(title: string): NormalizedGenre | null {
   const t = normalize(title);
   // Patrones de nivel escolar
   if (t.match(/\b(1|2|3|4|5|6|7|8)°?\s*(basico|basica|b[áa]sico)\b/))
-    return { category: "escolar", subcategory: "escolar-basica-1-6" };
+    return { category: "academico", subcategory: "academico-escolar" };
   if (t.match(/\b(7|8)°?\s*(basico|basica)\b/))
-    return { category: "escolar", subcategory: "escolar-basica-7-8" };
+    return { category: "academico", subcategory: "academico-escolar" };
   if (t.match(/\b(1|2|3|4)°?\s*(medio|media)\b/))
-    return { category: "escolar", subcategory: "escolar-media" };
+    return { category: "academico", subcategory: "academico-escolar" };
   // Asignaturas comunes
   if (t.includes("lenguaje") && (t.includes("basico") || t.includes("medio")))
-    return { category: "escolar", subcategory: "escolar-lenguaje" };
+    return { category: "academico", subcategory: "academico-escolar" };
   if (t.includes("matematica") && (t.includes("basico") || t.includes("medio")))
-    return { category: "escolar", subcategory: "escolar-matematicas" };
+    return { category: "academico", subcategory: "academico-escolar" };
   if (t.includes("historia") && (t.includes("basico") || t.includes("medio")))
-    return { category: "escolar", subcategory: "escolar-historia" };
+    return { category: "academico", subcategory: "academico-escolar" };
   if (t.includes("ciencias") && (t.includes("basico") || t.includes("medio")))
-    return { category: "escolar", subcategory: "escolar-ciencias" };
+    return { category: "academico", subcategory: "academico-escolar" };
   return null;
 }
 
@@ -317,19 +316,19 @@ export function normalizeGenre(
   if (title) {
     const t = normalize(title);
     if (t.includes("historia de") || t.includes("breve historia"))
-      return { category: "general-adulto", subcategory: "general-adulto-historia" };
+      return { category: "no-ficcion", subcategory: "no-ficcion-historia" };
     if (t.includes("biografia") || t.includes("memorias de"))
-      return { category: "general-adulto", subcategory: "general-adulto-ensayo" };
+      return { category: "no-ficcion", subcategory: "no-ficcion-ensayo" };
     if (t.includes("cocina") || t.includes("recetas"))
-      return { category: "general-adulto", subcategory: "general-adulto-autoayuda" };
+      return { category: "no-ficcion", subcategory: "no-ficcion-autoayuda" };
     if (t.includes("cuentos") || t.includes("relatos"))
-      return { category: "general-adulto", subcategory: "general-adulto-novela" };
+      return { category: "ficcion", subcategory: "ficcion-novela" };
     if (t.includes("poesia") || t.includes("poemas"))
-      return { category: "general-adulto", subcategory: "general-adulto-ensayo" };
+      return { category: "ficcion", subcategory: "ficcion-poesia" };
     if (t.includes("novela") || t.includes("ficcion"))
-      return { category: "general-adulto", subcategory: "general-adulto-novela" };
+      return { category: "ficcion", subcategory: "ficcion-novela" };
     if (t.includes("filosofia") || t.includes("etica"))
-      return { category: "general-adulto", subcategory: "general-adulto-ensayo" };
+      return { category: "no-ficcion", subcategory: "no-ficcion-ensayo" };
     if (t.includes("diccionario") || t.includes("enciclopedia"))
       return { category: "otros", subcategory: "otros-enciclopedias" };
     if (t.includes("manga") || t.includes("comic"))
@@ -347,16 +346,16 @@ export function normalizeGenre(
       key.includes("romance") ||
       key.includes("suspense")
     ) {
-      return { category: "general-adulto", subcategory: "general-adulto-novela" };
+      return { category: "ficcion", subcategory: "ficcion-novela" };
     }
     if (key.includes("self") && key.includes("help")) {
-      return { category: "general-adulto", subcategory: "general-adulto-autoayuda" };
+      return { category: "no-ficcion", subcategory: "no-ficcion-autoayuda" };
     }
     if (key.includes("juvenile") || key.includes("young")) {
-      return { category: "lectura-complementaria", subcategory: "lectura-complementaria-juvenil" };
+      return { category: "infantil-juvenil", subcategory: "infantil-juvenil-juvenil" };
     }
     if (key.includes("child")) {
-      return { category: "lectura-complementaria", subcategory: "lectura-complementaria-infantil" };
+      return { category: "infantil-juvenil", subcategory: "infantil-juvenil-infantil" };
     }
   }
 

@@ -76,16 +76,16 @@ export function suggestTags(book: BookInput): string[] {
 
   // Por subcategoría
   const sub = book.subcategory;
-  if (sub === "general-adulto-poesia") tags.add("Poesia");
-  if (sub === "general-adulto-policial") { tags.add("NovelaNegra"); tags.add("Suspenso"); }
-  if (sub === "general-adulto-teatro") tags.add("Teatro");
-  if (sub === "general-adulto-biografia") tags.add("Biografia");
-  if (sub === "general-adulto-historia") tags.add("Historia");
-  if (sub === "general-adulto-novela") tags.add("Novela y Ficción");
-  if (sub === "general-adulto-ensayo") tags.add("Ensayo");
-  if (sub === "general-adulto-humanidades") tags.add("Humanidades");
-  if (sub === "lectura-complementaria-infantil") tags.add("Infantil");
-  if (sub === "lectura-complementaria-juvenil") tags.add("Juvenil");
+  if (sub === "ficcion-poesia") tags.add("Poesia");
+  if (sub === "ficcion-policial") { tags.add("NovelaNegra"); tags.add("Suspenso"); }
+  if (sub === "ficcion-teatro") tags.add("Teatro");
+  if (sub === "no-ficcion-biografia") tags.add("Biografia");
+  if (sub === "no-ficcion-historia") tags.add("Historia");
+  if (sub === "ficcion-novela") tags.add("Novela y Ficción");
+  if (sub === "no-ficcion-ensayo") tags.add("Ensayo");
+  if (sub === "no-ficcion-humanidades") tags.add("Humanidades");
+  if (sub === "infantil-juvenil-infantil") tags.add("Infantil");
+  if (sub === "infantil-juvenil-juvenil") tags.add("Juvenil");
   if (sub === "otros-comics") tags.add("Comics");
 
   // Señales en texto
