@@ -96,5 +96,38 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // GONG: Detectar scraping — 8+ páginas en 90 segundos por sesión
+  // Dispara solo una vez por sesión (cuando el contador llega exactamente a 8)
+  if (session_id && !user?.id) {
+    const since = new Date(Date.now() - 90_000).toISOString();
+    const { count } = await supabase
+      .from("page_views")
+      .select("id", { count: "exact", head: true })
+      .eq("session_id", session_id)
+      .gte("created_at", since);
+
+    if (count === 8) {
+      const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "desconocida";
+      const { data: recentPages } = await supabase
+        .from("page_views")
+        .select("path, created_at")
+        .eq("session_id", session_id)
+        .gte("created_at", since)
+        .order("created_at", { ascending: true });
+
+      const pageList = (recentPages ?? [])
+        .map((p) => `• ${escapeHtml(p.path)}`)
+        .join("\n");
+
+      sendGong(
+        `🤖 <b>Posible scraping detectado</b>\n\n` +
+        `8 páginas en menos de 90 segundos (sesión anónima).\n\n` +
+        `<b>IP:</b> ${ip}\n` +
+        `<b>UA:</b> ${escapeHtml(ua.slice(0, 120))}\n\n` +
+        `<b>Páginas visitadas:</b>\n${pageList}`
+      ).catch(() => {});
+    }
+  }
+
   return NextResponse.json({ ok: true });
 }
