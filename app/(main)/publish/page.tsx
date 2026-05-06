@@ -2,8 +2,13 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import PublishForm from "@/components/listings/PublishForm";
+import type { BookData } from "@/types";
 
-export default async function PublishPage() {
+interface Props {
+  searchParams: { book_id?: string };
+}
+
+export default async function PublishPage({ searchParams }: Props) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -18,6 +23,17 @@ export default async function PublishPage() {
     .select("phone, username, default_latitude, default_longitude, default_address")
     .eq("id", user.id)
     .single();
+
+  // Pre-llenar el formulario si viene de "Publicar uno igual"
+  let initialBook: BookData | null = null;
+  if (searchParams.book_id) {
+    const { data: bookData } = await supabase
+      .from("books")
+      .select("*")
+      .eq("id", searchParams.book_id)
+      .single();
+    if (bookData) initialBook = bookData as unknown as BookData;
+  }
 
   const defaultLocation =
     profile?.default_latitude != null && profile?.default_longitude != null
@@ -185,6 +201,7 @@ export default async function PublishPage() {
           username={profile?.username ?? null}
           existingPhone={profile?.phone ?? null}
           defaultLocation={defaultLocation}
+          initialBook={initialBook}
         />
       </main>
     </div>

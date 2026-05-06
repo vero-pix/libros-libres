@@ -3,6 +3,63 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+function CategoryRequestButton() {
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSend() {
+    if (!text.trim()) return;
+    setLoading(true);
+    await fetch("/api/category-request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ suggestion: text }),
+    });
+    setSent(true);
+    setLoading(false);
+  }
+
+  if (sent) {
+    return <p className="text-xs text-green-600 mt-1">¡Gracias! Lo revisamos pronto.</p>;
+  }
+
+  return (
+    <div className="mt-1">
+      {!open ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="text-xs text-brand-500 hover:text-brand-700 hover:underline"
+        >
+          ¿No encuentras tu categoría? Sugiérela
+        </button>
+      ) : (
+        <div className="flex gap-2 items-center mt-1">
+          <input
+            type="text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Ej: Manga, Arquitectura..."
+            className="flex-1 px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-400"
+            autoFocus
+          />
+          <button
+            type="button"
+            onClick={handleSend}
+            disabled={loading || !text.trim()}
+            className="text-xs bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg"
+          >
+            {loading ? "…" : "Enviar"}
+          </button>
+          <button type="button" onClick={() => setOpen(false)} className="text-xs text-gray-400 hover:text-gray-600">✕</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export interface CategoryPickerValue {
   category: string | null;
   subcategory: string | null;
@@ -94,6 +151,7 @@ export default function CategoryPicker({ value, onChange, className = "" }: Prop
           </select>
         </div>
       )}
+      <CategoryRequestButton />
     </div>
   );
 }

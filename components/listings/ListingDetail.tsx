@@ -436,6 +436,19 @@ export default function ListingDetail({ listing, images = [] }: Props) {
         </p>
       </div>
 
+      {/* Publicar uno igual */}
+      <div className="border-t border-gray-100 px-6 py-4 bg-cream-warm/30">
+        <Link
+          href={`/publish?book_id=${listing.book_id}`}
+          className="flex items-center justify-center gap-2 w-full text-sm text-ink-muted hover:text-brand-600 hover:bg-brand-50 border border-dashed border-gray-300 hover:border-brand-300 py-2.5 rounded-xl transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          ¿Tienes uno igual? Publícalo
+        </Link>
+      </div>
+
       <div className="px-6 sm:px-8 pb-4">
         <SellerOtherListings sellerId={listing.seller_id} currentListingId={listing.id} />
       </div>

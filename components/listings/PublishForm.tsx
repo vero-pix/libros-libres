@@ -68,21 +68,26 @@ interface Props {
   username?: string | null;
   existingPhone?: string | null;
   defaultLocation?: DefaultLocation | null;
+  initialBook?: BookData | null;
 }
 
-export default function PublishForm({ userId, username, existingPhone, defaultLocation }: Props) {
+export default function PublishForm({ userId, username, existingPhone, defaultLocation, initialBook }: Props) {
   const router = useRouter();
   const supabase = createClient();
 
+  // Inicializar desde initialBook si viene de "Publicar uno igual"
+  const _initDesc = getBookDescription(initialBook as BookDataWithDescriptionAliases | null);
+  const _initNormalized = initialBook ? normalizeGenre(initialBook.genre, initialBook.title, _initDesc) : null;
+
   // book es metadata de prellenado opcional — ya NO bloquea el formulario
-  const [book, setBook] = useState<BookData | null>(null);
+  const [book, setBook] = useState<BookData | null>(initialBook ?? null);
   // Campos siempre editables, independientes de si book fue identificado
-  const [bookTitle, setBookTitle] = useState("");
-  const [bookAuthor, setBookAuthor] = useState("");
-  const [bookDescription, setBookDescription] = useState("");
-  const [categorySlug, setCategorySlug] = useState<string | null>(null);
-  const [subcategorySlug, setSubcategorySlug] = useState<string | null>(null);
-  const [binding, setBinding] = useState<string>("");
+  const [bookTitle, setBookTitle] = useState(initialBook?.title?.trim() ?? "");
+  const [bookAuthor, setBookAuthor] = useState(initialBook?.author?.trim() ?? "");
+  const [bookDescription, setBookDescription] = useState(_initDesc);
+  const [categorySlug, setCategorySlug] = useState<string | null>(_initNormalized?.category ?? null);
+  const [subcategorySlug, setSubcategorySlug] = useState<string | null>(_initNormalized?.subcategory ?? null);
+  const [binding, setBinding] = useState<string>((initialBook as any)?.binding ?? "");
   const [customCoverUrl, setCustomCoverUrl] = useState<string | null>(null);
   const [modality, setModality] = useState<Modality>("sale");
   const [originalPrice, setOriginalPrice] = useState("");
