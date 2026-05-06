@@ -108,6 +108,7 @@ export async function POST(req: NextRequest) {
           publisher: publisher ?? null,
           published_year: published_year ?? null,
           description: description ?? null,
+          binding: binding ?? null,
           category: normalized?.category ?? null,
           subcategory: normalized?.subcategory ?? null,
           tags,
@@ -130,7 +131,6 @@ export async function POST(req: NextRequest) {
       price: Number(price),
       condition,
       modality,
-      binding: binding ?? null,
       city_id: city_id ?? null,
       status: "active",
     })
