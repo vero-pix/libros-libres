@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { permanentRedirect } from "next/navigation";
 import ListingDetail from "@/components/listings/ListingDetail";
 import ListingCard from "@/components/listings/ListingCard";
+import ListingViewTracker from "@/components/listings/ListingViewTracker";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import { buildCategoryTree } from "@/lib/categoryTree";
@@ -240,6 +241,7 @@ export default async function LibroPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-cream">
+      <ListingViewTracker listingId={listing.id} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(bookJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />

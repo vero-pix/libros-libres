@@ -34,6 +34,7 @@ const EXCLUDE_PATTERNS = [
   /^\/forgot-password/,
   /^\/reset-password/,
   /^\/orders\//,
+  /^\/libro\//, // Tracked by ListingViewTracker with correct listing_id
 ];
 
 export default function PageTracker() {

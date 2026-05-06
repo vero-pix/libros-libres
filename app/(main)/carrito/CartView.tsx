@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { libroUrl } from "@/lib/urls";
 
 interface CartItem {
   id: string;
@@ -25,6 +26,15 @@ interface CartItem {
   };
 }
 
+interface FeaturedListing {
+  id: string;
+  slug: string | null;
+  price: number | null;
+  cover_image_url: string | null;
+  book: { title: string; author: string; cover_url: string | null };
+  seller: { id: string; username: string | null; full_name: string | null } | null;
+}
+
 interface SellerGroup {
   sellerId: string;
   sellerName: string;
@@ -37,8 +47,10 @@ interface SellerGroup {
 
 export default function CartView({
   items: initialItems,
+  featured = [],
 }: {
   items: CartItem[];
+  featured?: FeaturedListing[];
 }) {
   const [items, setItems] = useState(initialItems);
   const [removing, setRemoving] = useState<string | null>(null);
@@ -103,14 +115,52 @@ export default function CartView({
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-16">
-        <p className="text-ink-muted text-lg">Tu carrito está vacío</p>
-        <Link
-          href="/"
-          className="inline-block mt-4 text-brand-600 font-medium hover:underline text-sm"
-        >
-          Explorar libros
-        </Link>
+      <div>
+        <div className="text-center py-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-cream-warm rounded-full mb-4">
+            <svg className="w-8 h-8 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+            </svg>
+          </div>
+          <p className="font-display text-xl font-bold text-ink mb-1">Tu carrito está vacío</p>
+          <p className="text-ink-muted text-sm mb-5">Agrega libros que te interesen y los encontrarás acá.</p>
+          <Link
+            href="/search"
+            className="inline-block bg-brand-500 hover:bg-brand-600 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors"
+          >
+            Explorar libros
+          </Link>
+        </div>
+
+        {featured.length > 0 && (
+          <div className="mt-2">
+            <p className="text-xs font-bold uppercase tracking-wider text-ink-muted mb-3">Recién publicados</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {featured.map((l) => {
+                const cover = l.cover_image_url ?? l.book.cover_url;
+                const href = libroUrl({ id: l.id, slug: l.slug, seller: { username: l.seller?.username ?? null } });
+                return (
+                  <Link key={l.id} href={href} className="bg-white rounded-xl border border-cream-dark/20 overflow-hidden hover:border-brand-300 hover:shadow-sm transition-all group">
+                    <div className="relative aspect-[2/3] bg-cream-warm overflow-hidden">
+                      {cover ? (
+                        <Image src={cover} alt={l.book.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width:640px) 50vw, 33vw" />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-3xl">📚</div>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <p className="text-xs font-semibold text-ink truncate">{l.book.title}</p>
+                      <p className="text-xs text-ink-muted truncate">{l.book.author}</p>
+                      {l.price && (
+                        <p className="text-sm font-bold text-brand-600 mt-1">${l.price.toLocaleString("es-CL")}</p>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
