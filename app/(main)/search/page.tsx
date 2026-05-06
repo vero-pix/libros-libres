@@ -19,6 +19,7 @@ interface Props {
     q?: string;
     category?: string;
     subcategory?: string;
+    tag?: string;
     sort?: string;
     price_min?: string;
     price_max?: string;
@@ -34,31 +35,37 @@ interface Props {
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const q = searchParams.q;
-  const genre = searchParams.category;
+  const tag = searchParams.tag;
   const description = q
     ? `Busca libros de "${q}" en TusLibros. Encuentra títulos y autores disponibles en Chile.`
-    : "Busca libros usados cerca de ti en tuslibros.cl. Compra, vende y presta libros de forma segura.";
+    : tag
+      ? `Libros con el tema #${tag} en tuslibros.cl. Compra libros usados en Chile.`
+      : "Busca libros usados cerca de ti en tuslibros.cl. Compra, vende y presta libros de forma segura.";
 
   return {
     title: q
       ? { absolute: `${q} | TusLibros` }
-      : searchParams.category
-        ? `${translateGenre(searchParams.category)} — tuslibros.cl`
-        : "Buscar libros — tuslibros.cl",
+      : tag
+        ? { absolute: `#${tag} — tuslibros.cl` }
+        : searchParams.category
+          ? `${translateGenre(searchParams.category)} — tuslibros.cl`
+          : "Buscar libros — tuslibros.cl",
     description,
     alternates: {
       canonical: q
         ? `https://tuslibros.cl/search?q=${encodeURIComponent(q)}`
-        : searchParams.category
-          ? `https://tuslibros.cl/search?category=${encodeURIComponent(searchParams.category)}`
-          : "https://tuslibros.cl/search",
+        : tag
+          ? `https://tuslibros.cl/search?tag=${encodeURIComponent(tag)}`
+          : searchParams.category
+            ? `https://tuslibros.cl/search?category=${encodeURIComponent(searchParams.category)}`
+            : "https://tuslibros.cl/search",
     },
   };
 }
 
 export default async function SearchPage({ searchParams }: Props) {
   const supabase = await createClient();
-  const { q, category, subcategory, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max, city_id } = searchParams;
+  const { q, category, subcategory, tag, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max, city_id } = searchParams;
 
   // Si hay búsqueda de texto, primero encontrar los book IDs que coincidan
   let matchingBookIds: string[] | null = null;
@@ -148,6 +155,11 @@ export default async function SearchPage({ searchParams }: Props) {
       .then(() => {});
   }
 
+  if (tag) {
+    listings = listings.filter(
+      (l) => (l.book as any).tags?.includes(tag)
+    );
+  }
   if (category) {
     listings = listings.filter(
       (l) => l.book.category === category
@@ -196,13 +208,13 @@ export default async function SearchPage({ searchParams }: Props) {
         <Breadcrumbs
           items={[
             { label: "Inicio", href: "/" },
-            { label: q ? `Resultados para "${q}"` : "Búsqueda" },
+            { label: q ? `Resultados para "${q}"` : tag ? `#${tag}` : "Búsqueda" },
           ]}
         />
-        {q && (
+        {(q || tag) && (
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900">
-              Resultados para &ldquo;{q}&rdquo;
+              {q ? <>Resultados para &ldquo;{q}&rdquo;</> : <>#{ tag}</>}
             </h1>
             {listings.length > 0 && (
               <p className="text-sm text-gray-500 mt-1">
@@ -217,10 +229,11 @@ export default async function SearchPage({ searchParams }: Props) {
         </div>
 
         <div className="flex gap-8">
-          <CategoriesSidebar 
-            categoryTree={categoryTree} 
-            activeCategory={category} 
-            activeSubcategory={subcategory} 
+          <CategoriesSidebar
+            categoryTree={categoryTree}
+            activeCategory={category}
+            activeSubcategory={subcategory}
+            activeTag={tag}
           />
 
           <div className="flex-1 min-w-0">
