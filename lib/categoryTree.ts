@@ -1,4 +1,24 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { unstable_cache } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/public";
+
+export const getAvailableTags = unstable_cache(
+  async (): Promise<string[]> => {
+    const supabase = createPublicClient();
+    const { data } = await supabase
+      .from("books")
+      .select("tags")
+      .not("tags", "is", null);
+    if (!data) return [];
+    const set = new Set<string>();
+    for (const row of data) {
+      if (Array.isArray(row.tags)) row.tags.forEach((t: string) => set.add(t));
+    }
+    return Array.from(set);
+  },
+  ["available-tags"],
+  { revalidate: 300 }
+);
 
 export interface CategoryNode {
   slug: string;

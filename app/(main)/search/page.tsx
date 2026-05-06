@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
-import { buildCategoryTree } from "@/lib/categoryTree";
+import { buildCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
@@ -212,7 +212,10 @@ export default async function SearchPage({ searchParams }: Props) {
   }
 
   const allListings = (rawListings as unknown as ListingWithBook[]) ?? [];
-  const categoryTree = await buildCategoryTree(supabase, allListings as any);
+  const [categoryTree, availableTags] = await Promise.all([
+    buildCategoryTree(supabase, allListings as any),
+    getAvailableTags(),
+  ]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -251,6 +254,7 @@ export default async function SearchPage({ searchParams }: Props) {
             activeCategory={category}
             activeSubcategory={subcategory}
             activeTag={tag}
+            availableTags={availableTags}
           />
 
           <div className="flex-1 min-w-0">

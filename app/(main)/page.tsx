@@ -10,7 +10,7 @@ import RecentlyViewed from "@/components/listings/RecentlyViewed";
 import Recommendations from "@/components/listings/Recommendations";
 import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
-import { buildCategoryTree } from "@/lib/categoryTree";
+import { buildCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import FeaturedRow from "@/components/home/FeaturedRow";
 import CollectibleRow from "@/components/home/CollectibleRow";
 import TestimonialBanner from "@/components/home/TestimonialBanner";
@@ -200,11 +200,12 @@ export default async function HomePage({ searchParams }: Props) {
   const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || collectibleOnly);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
-  const [featuredListings, featuredSellers, collectibleListings, totalActiveCount] = await Promise.all([
+  const [featuredListings, featuredSellers, collectibleListings, totalActiveCount, availableTags] = await Promise.all([
     getFeaturedListings() as unknown as Promise<ListingWithBook[]>,
     getFeaturedSellers(),
     getCollectibleListings() as unknown as Promise<ListingWithBook[]>,
     getTotalActiveCount(),
+    getAvailableTags(),
   ]);
 
   // Listings principales: sin filtros ni sort custom → versión cacheada
@@ -286,7 +287,7 @@ export default async function HomePage({ searchParams }: Props) {
           ...(tag ? [{ label: `#${tag}` }] : []),
         ]} />
         <div className="flex gap-10">
-          <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalCount} />
+          <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalCount} availableTags={availableTags} />
 
           <div className="flex-1 min-w-0">
             {!hasFilters && collectibleListings.length > 0 && (

@@ -11,17 +11,22 @@ interface CategoryNode {
 }
 
 const FEATURED_TAGS = [
-  { tag: "Coleccionable", label: "Coleccionable" },
+  { tag: "Novela y Ficción", label: "Novela y Ficción" },
+  { tag: "Clasico", label: "Clásico" },
+  { tag: "NovelaNegra", label: "Novela Negra" },
   { tag: "Poesia", label: "Poesía" },
   { tag: "Suspenso", label: "Suspenso" },
-  { tag: "NovelaChilena", label: "Novela Chilena" },
+  { tag: "Historia", label: "Historia" },
+  { tag: "Ensayo", label: "Ensayo" },
+  { tag: "Coleccionable", label: "Coleccionable" },
   { tag: "BibliotecaDeBabel", label: "Biblioteca de Babel" },
-  { tag: "Clasico", label: "Clásico" },
-  { tag: "PrimeraEdicion", label: "1ª Edición" },
   { tag: "Borges", label: "Borges" },
-  { tag: "NovelaNegra", label: "Novela Negra" },
-  { tag: "Biografia", label: "Biografías" },
+  { tag: "PremioNobel", label: "Premio Nobel" },
   { tag: "Comics", label: "Cómics" },
+  { tag: "Infantil", label: "Infantil" },
+  { tag: "NovelaChilena", label: "Novela Chilena" },
+  { tag: "PrimeraEdicion", label: "1ª Edición" },
+  { tag: "Biografia", label: "Biografías" },
   { tag: "Humanidades", label: "Humanidades" },
 ];
 
@@ -31,6 +36,7 @@ interface Props {
   activeSubcategory?: string;
   activeTag?: string;
   totalCount?: number;
+  availableTags?: string[];
 }
 
 export default function CategoriesSidebar({
@@ -39,7 +45,9 @@ export default function CategoriesSidebar({
   activeSubcategory,
   activeTag,
   totalCount,
+  availableTags,
 }: Props) {
+  const tagSet = availableTags ? new Set(availableTags) : null;
   // Open the group that contains the active subcategory
   const activeGroupIdx = activeCategory
     ? categoryTree.findIndex((c) => c.slug === activeCategory)
@@ -189,7 +197,7 @@ export default function CategoriesSidebar({
           Temas sugeridos
         </p>
         <div className="flex flex-wrap gap-1.5 px-1">
-          {FEATURED_TAGS.map((item) => (
+          {FEATURED_TAGS.filter((item) => !tagSet || tagSet.has(item.tag)).map((item) => (
             <Link
               key={item.tag}
               href={`/search?tag=${item.tag}`}
