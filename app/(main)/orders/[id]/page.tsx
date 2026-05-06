@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import PurchaseTracker from "@/components/analytics/PurchaseTracker";
 
 interface Props {
   params: { id: string };
@@ -85,6 +86,13 @@ export default async function OrderPage({ params, searchParams }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {paymentStatus === "success" && (
+        <PurchaseTracker
+          orderId={order.bundle_id ?? order.id}
+          total={bundleTotal}
+          itemCount={bundleOrders.length}
+        />
+      )}
       <main className="max-w-xl mx-auto px-4 py-12">
         <div className="bg-white rounded-lg border border-gray-200 p-8">
           <h1 className={`text-2xl font-bold mb-2 text-center ${config.color}`}>

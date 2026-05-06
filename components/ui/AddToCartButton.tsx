@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { trackEvent } from "@/utils/analytics";
 
 interface Props {
   listingId: string;
+  price?: number;
+  title?: string;
 }
 
-export default function AddToCartButton({ listingId }: Props) {
+export default function AddToCartButton({ listingId, price, title }: Props) {
   const [status, setStatus] = useState<"idle" | "loading" | "added">("idle");
 
   async function handleAdd() {
@@ -20,6 +23,12 @@ export default function AddToCartButton({ listingId }: Props) {
       if (res.ok) {
         setStatus("added");
         window.dispatchEvent(new CustomEvent("cart-updated"));
+        trackEvent("add_to_cart", {
+          currency: "CLP",
+          value: price ?? 0,
+          listing_id: listingId,
+          item_name: title ?? "",
+        });
         setTimeout(() => setStatus("idle"), 2000);
       } else {
         const data = await res.json();

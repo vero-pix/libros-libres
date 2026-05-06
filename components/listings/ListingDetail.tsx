@@ -349,7 +349,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
                     </svg>
                     Comprar — ${listing.price.toLocaleString("es-CL")}
                   </Link>
-                  <AddToCartButton listingId={listing.id} />
+                  <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
                 </>
               ) : (
                 <div className="space-y-3">

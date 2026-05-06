@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { libroUrl } from "@/lib/urls";
+import { trackEvent } from "@/utils/analytics";
 
 interface CartItem {
   id: string;
@@ -328,6 +329,12 @@ export default function CartView({
               {group.sellerHasMP && (
                 <Link
                   href={checkoutHref}
+                  onClick={() => trackEvent("begin_checkout", {
+                    currency: "CLP",
+                    value: group.subtotal,
+                    items: group.items.length,
+                    method: "mercadopago",
+                  })}
                   className="block w-full text-center bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold py-3 rounded-xl transition-all text-sm shadow-md"
                 >
                   Comprar {group.items.length}{" "}
@@ -340,6 +347,12 @@ export default function CartView({
                   href={`https://wa.me/${group.sellerPhone.replace(/\D/g, "")}?text=${waMessage()}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackEvent("begin_checkout", {
+                    currency: "CLP",
+                    value: group.subtotal,
+                    items: group.items.length,
+                    method: "whatsapp",
+                  })}
                   className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#1da851] text-white font-medium py-2.5 rounded-xl text-sm transition-colors"
                 >
                   Coordinar por WhatsApp
