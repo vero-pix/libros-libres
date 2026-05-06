@@ -196,7 +196,7 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
         </Link>
         {book.author && (
           <Link
-            href={`/search?q=${encodeURIComponent(book.author)}`}
+            href={`/search?author=${encodeURIComponent(book.author)}`}
             className="block text-xs text-ink-muted hover:text-brand-600 transition-colors mt-1 truncate"
             aria-label={`Buscar libros de ${book.author}`}
           >

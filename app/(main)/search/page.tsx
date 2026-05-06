@@ -17,6 +17,7 @@ import type { ListingWithBook } from "@/types";
 interface Props {
   searchParams: {
     q?: string;
+    author?: string;
     category?: string;
     subcategory?: string;
     tag?: string;
@@ -36,36 +37,43 @@ interface Props {
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const q = searchParams.q;
   const tag = searchParams.tag;
-  const description = q
-    ? `Busca libros de "${q}" en TusLibros. Encuentra títulos y autores disponibles en Chile.`
-    : tag
-      ? `Libros con el tema #${tag} en tuslibros.cl. Compra libros usados en Chile.`
-      : "Busca libros usados cerca de ti en tuslibros.cl. Compra, vende y presta libros de forma segura.";
+  const author = searchParams.author;
+  const description = author
+    ? `Libros de ${author} disponibles en tuslibros.cl. Compra libros usados en Chile.`
+    : q
+      ? `Busca libros de "${q}" en TusLibros. Encuentra títulos y autores disponibles en Chile.`
+      : tag
+        ? `Libros con el tema #${tag} en tuslibros.cl. Compra libros usados en Chile.`
+        : "Busca libros usados cerca de ti en tuslibros.cl. Compra, vende y presta libros de forma segura.";
 
   return {
-    title: q
-      ? { absolute: `${q} | TusLibros` }
-      : tag
-        ? { absolute: `#${tag} — tuslibros.cl` }
-        : searchParams.category
-          ? `${translateGenre(searchParams.category)} — tuslibros.cl`
-          : "Buscar libros — tuslibros.cl",
+    title: author
+      ? { absolute: `${author} — tuslibros.cl` }
+      : q
+        ? { absolute: `${q} | TusLibros` }
+        : tag
+          ? { absolute: `#${tag} — tuslibros.cl` }
+          : searchParams.category
+            ? `${translateGenre(searchParams.category)} — tuslibros.cl`
+            : "Buscar libros — tuslibros.cl",
     description,
     alternates: {
-      canonical: q
-        ? `https://tuslibros.cl/search?q=${encodeURIComponent(q)}`
-        : tag
-          ? `https://tuslibros.cl/search?tag=${encodeURIComponent(tag)}`
-          : searchParams.category
-            ? `https://tuslibros.cl/search?category=${encodeURIComponent(searchParams.category)}`
-            : "https://tuslibros.cl/search",
+      canonical: author
+        ? `https://tuslibros.cl/search?author=${encodeURIComponent(author)}`
+        : q
+          ? `https://tuslibros.cl/search?q=${encodeURIComponent(q)}`
+          : tag
+            ? `https://tuslibros.cl/search?tag=${encodeURIComponent(tag)}`
+            : searchParams.category
+              ? `https://tuslibros.cl/search?category=${encodeURIComponent(searchParams.category)}`
+              : "https://tuslibros.cl/search",
     },
   };
 }
 
 export default async function SearchPage({ searchParams }: Props) {
   const supabase = await createClient();
-  const { q, category, subcategory, tag, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max, city_id } = searchParams;
+  const { q, author, category, subcategory, tag, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max, city_id } = searchParams;
 
   // Si hay búsqueda de texto, primero encontrar los book IDs que coincidan
   let matchingBookIds: string[] | null = null;
@@ -155,6 +163,11 @@ export default async function SearchPage({ searchParams }: Props) {
       .then(() => {});
   }
 
+  if (author) {
+    listings = listings.filter(
+      (l) => l.book.author?.toLowerCase() === author.toLowerCase()
+    );
+  }
   if (tag) {
     listings = listings.filter(
       (l) => (l.book as any).tags?.includes(tag)
@@ -208,13 +221,17 @@ export default async function SearchPage({ searchParams }: Props) {
         <Breadcrumbs
           items={[
             { label: "Inicio", href: "/" },
-            { label: q ? `Resultados para "${q}"` : tag ? `#${tag}` : "Búsqueda" },
+            { label: author ? author : q ? `Resultados para "${q}"` : tag ? `#${tag}` : "Búsqueda" },
           ]}
         />
-        {(q || tag) && (
+        {(q || tag || author) && (
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900">
-              {q ? <>Resultados para &ldquo;{q}&rdquo;</> : <>#{ tag}</>}
+              {author
+                ? <>Libros de {author}</>
+                : q
+                  ? <>Resultados para &ldquo;{q}&rdquo;</>
+                  : <>#{ tag}</>}
             </h1>
             {listings.length > 0 && (
               <p className="text-sm text-gray-500 mt-1">
