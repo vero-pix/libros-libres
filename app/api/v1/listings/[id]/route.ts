@@ -56,8 +56,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (updates.condition && !["new", "good", "fair"].includes(updates.condition))
     return Response.json({ error: "condition debe ser: new | good | fair" }, { status: 400 });
 
-  if (updates.status && !["active", "inactive"].includes(updates.status))
-    return Response.json({ error: "status debe ser: active | inactive" }, { status: 400 });
+  if (updates.status && !["active", "paused"].includes(updates.status))
+    return Response.json({ error: "status debe ser: active | paused" }, { status: 400 });
 
   const { data: updated, error: updateErr } = await supabase
     .from("listings")
@@ -81,7 +81,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
   const { error: updateErr } = await supabase
     .from("listings")
-    .update({ status: "inactive" })
+    .update({ status: "paused" })
     .eq("id", params.id);
 
   if (updateErr) return Response.json({ error: updateErr.message }, { status: 500 });
