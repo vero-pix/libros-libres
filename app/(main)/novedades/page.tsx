@@ -8,7 +8,7 @@ import type { ListingWithBook } from "@/types";
 export const metadata = {
   title: "Diario de tuslibros.cl — Mayo 2026",
   description:
-    "Lo que pasó esta semana en tuslibros.cl: nueva taxonomía chilena, rediseño visual con colores fuertes, fix de perfiles y más.",
+    "Lo que pasó esta semana en tuslibros.cl: API para librerías, nueva taxonomía chilena, tags dinámicos y más.",
 };
 
 export const revalidate = 300;
@@ -37,6 +37,34 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 };
 
 const novedades: Entry[] = [
+  {
+    date: "6 mayo 2026",
+    title: "API para librerías: sincroniza tu catálogo desde cualquier sistema",
+    description:
+      "Si tienes una librería con inventario en otro sistema — PrestaShop, Shopify, una base propia — ahora puedes conectarla a tuslibros.cl por código. Con la nueva API REST v1 puedes listar tus publicaciones, crear nuevas, actualizar precios y condición, y pausar libros cuando los vendas en otro canal. Todo con una API key que generas desde tu perfil. El caso de uso más útil: vender un libro en MercadoLibre o Instagram y, en el mismo momento, mandar un PATCH a tuslibros para pausar esa publicación automáticamente — así no le vendes el mismo libro a dos personas. Si te interesa integrar tu catálogo, avísame por WhatsApp.",
+    tag: "Nueva herramienta",
+    link: "/perfil",
+    linkText: "Generar mi API key",
+    visual: {
+      kind: "milestone",
+      icon: "🔌",
+      metric: "API v1",
+      detail: "listar · crear · pausar · sincronizar stock",
+    },
+  },
+  {
+    date: "6 mayo 2026",
+    title: "Tags que siempre tienen libros: adiós a los clicks vacíos",
+    description:
+      "Los tags del sidebar (Poesía, Historia, PremioNobel, etc.) ahora solo aparecen si hay al menos un libro activo con esa etiqueta. Se calcula en tiempo real desde el catálogo y se refresca cada 5 minutos. Antes podías hacer click en \"#Suspenso\" y llegar a cero resultados. Ya no.",
+    tag: "Fix",
+    visual: {
+      kind: "milestone",
+      icon: "🏷️",
+      metric: "Tags dinámicos",
+      detail: "solo muestran lo que existe en el catálogo hoy",
+    },
+  },
   {
     date: "5 mayo 2026",
     title: "Vitrinas escolares y limpieza profunda para el lanzamiento 🚀",
@@ -982,24 +1010,24 @@ export default async function NovedadesPage() {
           <div className="flex items-center gap-3 mb-6 animate-fade-in-up">
             <span className="h-px w-10 bg-amber-300/70" />
             <p className="text-[11px] uppercase tracking-[0.32em] text-amber-300 font-semibold">
-              Diario de tuslibros.cl · Abril 2026
+              Diario de tuslibros.cl · Mayo 2026
             </p>
           </div>
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[1.05] text-cream mb-6 animate-fade-in-up" style={{ animationDelay: "60ms" }}>
-            Día 25 — ya <em className="text-amber-300 not-italic font-normal italic">pasaron cosas</em>.
+            Día 40 — ya <em className="text-amber-300 not-italic font-normal italic">somos plataforma</em>.
           </h1>
           <p className="text-base md:text-lg text-cream/80 max-w-2xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "120ms" }}>
-            Tres compradores reales, once libros vendidos, primer envío a región, el único dominio del
-            sector subiendo en SEO, ofertas reales para el Día del Libro, registro en 3 campos y un
-            formulario de publicar más humano. Esto es lo que fue pasando, contado por orden de
-            importancia y no solo cronológico. Lo escribo yo. — Vero
+            API para librerías, nueva taxonomía chilena, tags que siempre tienen contenido, tres
+            compradores reales, envío a región, el único dominio del sector subiendo en SEO y la primera
+            librería indie profesional publicando. Esto es lo que fue pasando, en orden de lo que más
+            importa. Lo escribo yo. — Vero
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 animate-fade-in-up" style={{ animationDelay: "180ms" }}>
             {[
               { big: "3", small: "compradores reales" },
-              { big: "11", small: "libros vendidos" },
+              { big: "API v1", small: "para librerías externas" },
               { big: "+2.19%", small: "SEO — único del sector subiendo" },
-              { big: "13", small: "libros con hasta 50% off" },
+              { big: "2", small: "librerías indie publicando" },
             ].map((s) => (
               <div key={s.small} className="border-l-2 border-amber-300/40 pl-4">
                 <p className="font-display text-3xl md:text-4xl text-cream leading-none">{s.big}</p>
@@ -1014,14 +1042,14 @@ export default async function NovedadesPage() {
         {/* SPOTLIGHT — tres momentos grandes */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 animate-fade-in-up" style={{ animationDelay: "240ms" }}>
           <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Oferta · 22 abr</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">Día del Libro con 50% off</p>
-            <p className="text-xs text-ink-muted">13 libros con ofertas reales — Yourcenar, Borges, Mann, Wilber.</p>
+            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Nueva herramienta · 6 may</p>
+            <p className="font-display text-lg text-ink leading-snug mb-2">API para librerías externas</p>
+            <p className="text-xs text-ink-muted">Conecta tu sistema de inventario a tuslibros.cl y sincroniza stock en tiempo real.</p>
           </div>
           <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Hito · 22 abr</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">Segundo testimonio en la home</p>
-            <p className="text-xs text-ink-muted">Camilo, el comprador del envío a Concepción, cuenta que llegaron rápido y con sorpresa.</p>
+            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Hito · 23 abr</p>
+            <p className="font-display text-lg text-ink leading-snug mb-2">Dos librerías indie publicando</p>
+            <p className="text-xs text-ink-muted">Buhardilla y cimlibros: primera señal de que librerías reales están eligiendo tuslibros.</p>
           </div>
           <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
             <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Señal · 22 abr</p>
