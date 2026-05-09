@@ -61,20 +61,20 @@ export default function ImageUploadMultiple({ listingId, existingImages, onImage
       if (row) newImages.push(row);
     }
 
-    // If the listing has no cover, use the first uploaded image as cover
-    if (newImages.length > 0) {
+    // Si subió fotos y no hay una foto propia (solo URL externa de API), usar la primera foto subida como portada
+    if (newImages.length > 0 && images.length === 0) {
       const { data: listing } = await supabase
         .from("listings")
-        .select("cover_image_url, book:books(cover_url)")
+        .select("cover_image_url")
         .eq("id", listingId)
         .single();
 
-      const hasCover = listing?.cover_image_url || (listing?.book as any)?.cover_url;
-      if (!hasCover) {
-        const firstUrl = images.length > 0 ? images[0].image_url : newImages[0].image_url;
+      const supabaseStorageBase = process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage";
+      const hasOwnCover = listing?.cover_image_url?.startsWith(supabaseStorageBase ?? "https://");
+      if (!hasOwnCover) {
         await supabase
           .from("listings")
-          .update({ cover_image_url: firstUrl })
+          .update({ cover_image_url: newImages[0].image_url })
           .eq("id", listingId);
       }
     }
