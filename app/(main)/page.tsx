@@ -13,6 +13,7 @@ import HomeShell from "@/components/home/HomeShell";
 import { buildCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import FeaturedRow from "@/components/home/FeaturedRow";
 import CollectibleRow from "@/components/home/CollectibleRow";
+import RecentRow from "@/components/home/RecentRow";
 import TestimonialBanner from "@/components/home/TestimonialBanner";
 import RequestsRow from "@/components/home/RequestsRow";
 import HeroRequestStrip from "@/components/home/HeroRequestStrip";
@@ -115,6 +116,27 @@ const getCollectibleListings = unstable_cache(
   { revalidate: 120 }
 );
 
+const EXCLUDED_SUBCATEGORIES = ["no-ficcion-ensayo", "no-ficcion-humanidades"];
+
+const getRecentListings = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { data } = await supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
+      .eq("status", "active")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(40);
+    return (data ?? []).filter(
+      (l) => l.book && !EXCLUDED_SUBCATEGORIES.includes(l.book.subcategory ?? "")
+    ).slice(0, 20);
+  },
+  ["home-recent-listings"],
+  { revalidate: 300 }
+);
+
 const getFeaturedSellers = unstable_cache(
   async () => {
     const supabase = createPublicClient();
@@ -200,10 +222,11 @@ export default async function HomePage({ searchParams }: Props) {
   const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || collectibleOnly);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
-  const [featuredListings, featuredSellers, collectibleListings, totalActiveCount, availableTags] = await Promise.all([
+  const [featuredListings, featuredSellers, collectibleListings, recentListings, totalActiveCount, availableTags] = await Promise.all([
     getFeaturedListings() as unknown as Promise<ListingWithBook[]>,
     getFeaturedSellers(),
     getCollectibleListings() as unknown as Promise<ListingWithBook[]>,
+    getRecentListings() as unknown as Promise<ListingWithBook[]>,
     getTotalActiveCount(),
     getAvailableTags(),
   ]);
@@ -290,6 +313,10 @@ export default async function HomePage({ searchParams }: Props) {
           <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalCount} availableTags={availableTags} />
 
           <div className="flex-1 min-w-0">
+            {!hasFilters && recentListings.length > 0 && (
+              <RecentRow listings={recentListings} />
+            )}
+
             {!hasFilters && collectibleListings.length > 0 && (
               <CollectibleRow listings={collectibleListings} />
             )}
