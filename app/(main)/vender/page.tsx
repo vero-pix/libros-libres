@@ -69,6 +69,33 @@ const benefits = [
   },
 ];
 
+const faqItems = [
+  {
+    q: "¿Dónde puedo vender libros usados en Chile?",
+    a: "En tuslibros.cl puedes publicar tus libros usados gratis y llegar a compradores en todo Chile. Escaneas el código de barras, pones el precio y tu libro aparece en el catálogo al instante con portada, descripción y tu tienda personal.",
+  },
+  {
+    q: "¿Cuánto cuesta publicar?",
+    a: "Cero. Siempre. Publica uno o mil, da igual — es gratis y va a seguir siendo gratis.",
+  },
+  {
+    q: "¿Cuándo se aplican comisiones?",
+    a: "Las comisiones solo aplican cuando usas las herramientas integradas: pago con MercadoPago o despacho por courier (Starken, Chilexpress, Blue Express). Si coordinas todo por WhatsApp y entregas en persona, no pagas nada.",
+  },
+  {
+    q: "¿Qué libros se venden mejor?",
+    a: "Los libros raros, descatalogados y de autores chilenos tienen alta demanda. También las series completas y libros escolares en temporada. El precio es clave: entre 40% y 60% menos que en librerías nuevas convierte muy bien.",
+  },
+  {
+    q: "¿Puedo publicar muchos libros a la vez?",
+    a: "Sí, todos los que quieras. Si tienes una biblioteca grande, también tenemos un importador por CSV para subir todo de una sola vez.",
+  },
+  {
+    q: "¿Necesito facturar para vender en tuslibros.cl?",
+    a: "No. Tuslibros.cl es una plataforma para personas que venden sus propios libros, no un negocio formal. No necesitas inicio de actividades ni boleta electrónica para publicar.",
+  },
+];
+
 export default function VenderPage() {
   return (
     <div className="min-h-screen bg-cream">
@@ -161,6 +188,24 @@ export default function VenderPage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="max-w-3xl mx-auto px-4 py-16">
+        <h2 className="font-display text-2xl sm:text-3xl font-bold text-ink text-center mb-10">
+          Preguntas frecuentes
+        </h2>
+        <div className="space-y-4">
+          {faqItems.map((item) => (
+            <details key={item.q} className="group bg-white border border-cream-dark/30 rounded-xl p-5 cursor-pointer">
+              <summary className="font-semibold text-ink list-none flex items-center justify-between gap-4">
+                {item.q}
+                <span className="text-brand-500 text-lg group-open:rotate-45 transition-transform duration-200 shrink-0">+</span>
+              </summary>
+              <p className="mt-3 text-sm text-ink-muted leading-relaxed">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
       {/* CTA bottom */}
       <section className="max-w-4xl mx-auto px-4 py-16 text-center">
         <h2 className="font-display text-2xl sm:text-3xl font-bold text-ink mb-4">
@@ -176,6 +221,21 @@ export default function VenderPage() {
           Publicar mi primer libro
         </Link>
       </section>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqItems.map((item) => ({
+              "@type": "Question",
+              name: item.q,
+              acceptedAnswer: { "@type": "Answer", text: item.a },
+            })),
+          }),
+        }}
+      />
     </div>
   );
 }

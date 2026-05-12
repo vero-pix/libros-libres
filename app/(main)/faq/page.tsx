@@ -313,6 +313,26 @@ export default function FAQPage() {
         </div>
 
       </main>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqSections.flatMap((s) =>
+              s.questions.map((item) => ({
+                "@type": "Question",
+                name: item.q,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: typeof item.a === "string" ? item.a : item.q,
+                },
+              }))
+            ),
+          }),
+        }}
+      />
     </div>
   );
 }
