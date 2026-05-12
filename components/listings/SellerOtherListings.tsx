@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { ListingWithBook } from "@/types";
 import { libroUrl } from "@/lib/urls";
 
-export default function SellerOtherListings({ sellerId, currentListingId }: { sellerId: string, currentListingId: string }) {
+export default function SellerOtherListings({ sellerId, sellerUsername, currentListingId }: { sellerId: string, sellerUsername?: string | null, currentListingId: string }) {
   const [others, setOthers] = useState<ListingWithBook[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,7 +37,7 @@ export default function SellerOtherListings({ sellerId, currentListingId }: { se
           <h3 className="font-display text-lg font-bold text-ink">Aprovecha el envío</h3>
           <p className="text-xs text-ink-muted">Agrega otros libros de este vendedor y paga un solo despacho.</p>
         </div>
-        <Link href={`/vendedor/${sellerId}`} className="text-xs font-bold text-brand-600 hover:underline">
+        <Link href={`/vendedor/${sellerUsername ?? sellerId}`} className="text-xs font-bold text-brand-600 hover:underline">
           Ver todo →
         </Link>
       </div>

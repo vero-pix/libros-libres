@@ -9,6 +9,7 @@ interface FeaturedSeller {
   avatar_url: string | null;
   city?: string | null;
   bio?: string | null;
+  username?: string | null;
   _listing_count?: number;
 }
 
@@ -89,7 +90,7 @@ export default function FeaturedRow({ featuredListings, featuredSellers }: Props
             {featuredSellers.map((seller) => (
               <Link
                 key={seller.id}
-                href={`/vendedor/${seller.id}`}
+                href={`/vendedor/${seller.username ?? seller.id}`}
                 className="group flex items-center gap-4 bg-white rounded-xl border border-cream-dark/30 p-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
               >
                 <div className="relative w-14 h-14 rounded-full bg-brand-100 flex items-center justify-center overflow-hidden border-2 border-amber-300 shrink-0 group-hover:border-brand-500 transition-colors">

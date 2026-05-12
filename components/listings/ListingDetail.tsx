@@ -289,7 +289,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
 
           {/* Vendedor */}
           <Link
-            href={`/vendedor/${listing.seller_id}`}
+            href={`/vendedor/${listing.seller?.username ?? listing.seller_id}`}
             className="inline-flex items-center gap-2 mt-4 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
           >
             <div className="w-7 h-7 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
@@ -450,7 +450,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
       </div>
 
       <div className="px-6 sm:px-8 pb-4">
-        <SellerOtherListings sellerId={listing.seller_id} currentListingId={listing.id} />
+        <SellerOtherListings sellerId={listing.seller_id} sellerUsername={listing.seller?.username} currentListingId={listing.id} />
       </div>
 
       {/* Mobile Sticky Buy Bar */}

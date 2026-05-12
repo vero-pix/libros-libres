@@ -86,7 +86,7 @@ const ListingCardList = memo(function ListingCardList({ listing }: Props) {
               </p>
             )}
             <Link
-              href={`/vendedor/${listing.seller_id}`}
+              href={`/vendedor/${listing.seller?.username ?? listing.seller_id}`}
               className="text-[10px] text-ink-muted uppercase tracking-wider hover:text-brand-600 transition-colors"
             >
               {sellerName}

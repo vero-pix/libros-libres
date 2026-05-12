@@ -12,13 +12,16 @@ interface Props {
   searchParams: { sort?: string };
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+async function resolveSeller(supabase: Awaited<ReturnType<typeof createClient>>, idOrUsername: string) {
+  const col = UUID_RE.test(idOrUsername) ? "id" : "username";
+  return supabase.from("users").select("*").eq(col, idOrUsername).single();
+}
+
 export async function generateMetadata({ params }: Props) {
   const supabase = await createClient();
-  const { data: seller } = await supabase
-    .from("users")
-    .select("full_name, comuna, bio")
-    .eq("id", params.id)
-    .single();
+  const { data: seller } = await resolveSeller(supabase, params.id);
 
   const name = seller?.full_name ?? "Vendedor";
   const location = seller?.comuna ? ` en ${seller.comuna}` : "";
@@ -45,11 +48,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
   const supabase = await createClient();
 
   // Seller profile
-  const { data: seller } = await supabase
-    .from("users")
-    .select("id, full_name, avatar_url, city, bio, created_at, phone, public_email, instagram, mercadopago_user_id")
-    .eq("id", params.id)
-    .single();
+  const { data: seller } = await resolveSeller(supabase, params.id);
 
   if (!seller) notFound();
 
@@ -57,7 +56,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
   const { data } = await supabase
     .from("listings")
     .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram, username, mercadopago_user_id)`)
-    .eq("seller_id", params.id)
+    .eq("seller_id", seller.id)
     .eq("status", "active")
     .order("created_at", { ascending: false });
 

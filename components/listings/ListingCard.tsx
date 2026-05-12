@@ -239,7 +239,7 @@ const ListingCard = memo(function ListingCard({ listing }: Props) {
 
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-cream-dark/20">
           <Link
-            href={`/vendedor/${listing.seller_id}`}
+            href={`/vendedor/${listing.seller?.username ?? listing.seller_id}`}
             className="text-[11px] text-ink-muted hover:text-brand-600 transition-colors flex items-center gap-1.5"
           >
             {listing.seller?.avatar_url ? (

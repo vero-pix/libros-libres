@@ -234,7 +234,7 @@ export default async function LibroPage({ params }: Props) {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Inicio", item: "https://tuslibros.cl" },
-      { "@type": "ListItem", position: 2, name: listing.seller?.full_name || "Vendedor", item: `https://tuslibros.cl/vendedor/${listing.seller_id}` },
+      { "@type": "ListItem", position: 2, name: listing.seller?.full_name || "Vendedor", item: `https://tuslibros.cl/vendedor/${listing.seller?.username ?? listing.seller_id}` },
       { "@type": "ListItem", position: 3, name: listing.book.title, item: canonicalUrl },
     ],
   };
@@ -249,7 +249,7 @@ export default async function LibroPage({ params }: Props) {
         <Breadcrumbs
           items={[
             { label: "Inicio", href: "/" },
-            { label: listing.seller?.full_name || "Vendedor", href: `/vendedor/${listing.seller_id}` },
+            { label: listing.seller?.full_name || "Vendedor", href: `/vendedor/${listing.seller?.username ?? listing.seller_id}` },
             { label: listing.book.title },
           ]}
         />

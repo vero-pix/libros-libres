@@ -57,6 +57,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Falta el título del libro" }, { status: 400 });
   }
 
+  // Si el título parece un ISBN (10 o 13 dígitos), resolverlo automáticamente
+  const isbnPattern = /^\d{10}(\d{3})?$/;
+  let resolvedTitle = title.trim();
+  let resolvedAuthor = author?.trim() || null;
+  let resolvedIsbn = isbn?.trim() || null;
+
+  if (isbnPattern.test(title.trim().replace(/-/g, ""))) {
+    const isbnClean = title.trim().replace(/-/g, "");
+    resolvedIsbn = isbnClean;
+    try {
+      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbnClean}&maxResults=1`);
+      const json = await res.json();
+      const info = json?.items?.[0]?.volumeInfo;
+      if (info?.title) {
+        resolvedTitle = info.title;
+        if (!resolvedAuthor && info.authors?.[0]) resolvedAuthor = info.authors[0];
+      } else {
+        return NextResponse.json({ error: "No encontramos un libro con ese ISBN. Ingresa el título directamente." }, { status: 400 });
+      }
+    } catch {
+      return NextResponse.json({ error: "No pudimos resolver el ISBN. Ingresa el título directamente." }, { status: 400 });
+    }
+  }
+
   // Tomar el usuario logueado si existe
   const ssrClient = await createClient();
   const {
@@ -72,9 +96,9 @@ export async function POST(req: NextRequest) {
   const { data, error } = await admin
     .from("book_requests")
     .insert({
-      title: title.trim(),
-      author: author?.trim() || null,
-      isbn: isbn?.trim() || null,
+      title: resolvedTitle,
+      author: resolvedAuthor,
+      isbn: resolvedIsbn,
       notes: notes?.trim() || null,
       requester_name: requester_name?.trim() || null,
       requester_email: requester_email?.trim() || null,

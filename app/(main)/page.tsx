@@ -145,7 +145,7 @@ const getFeaturedSellers = unstable_cache(
     // 1. Buscamos a los destacados pero priorizando a Barbara
     const { data } = await supabase
       .from("users")
-      .select("id, full_name, avatar_url, city, bio")
+      .select("id, full_name, avatar_url, city, bio, username")
       .eq("featured", true)
       .limit(10);
       

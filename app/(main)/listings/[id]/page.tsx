@@ -110,7 +110,7 @@ export default async function ListingByIdPage({ params }: Props) {
         <Breadcrumbs
           items={[
             { label: "Inicio", href: "/" },
-            { label: listing.seller?.full_name || "Vendedor", href: `/vendedor/${listing.seller_id}` },
+            { label: listing.seller?.full_name || "Vendedor", href: `/vendedor/${listing.seller?.username ?? listing.seller_id}` },
             { label: listing.book.title },
           ]}
         />
