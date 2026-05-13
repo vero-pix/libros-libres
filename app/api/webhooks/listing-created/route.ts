@@ -219,11 +219,14 @@ export async function POST(req: Request) {
             }
 
             // Marcar solicitud como cumplida
-            await supabase
-              .from("book_requests")
-              .update({ fulfilled: true, fulfilled_listing_id: listingId, fulfilled_at: new Date().toISOString() })
-              .eq("id", req.id)
-              .catch((e: any) => console.error("Error marking request fulfilled:", e));
+            try {
+              await supabase
+                .from("book_requests")
+                .update({ fulfilled: true, fulfilled_listing_id: listingId, fulfilled_at: new Date().toISOString() })
+                .eq("id", req.id);
+            } catch (e: any) {
+              console.error("Error marking request fulfilled:", e);
+            }
           }
         }
       }
