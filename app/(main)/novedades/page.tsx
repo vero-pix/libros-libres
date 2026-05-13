@@ -58,7 +58,7 @@ const novedades: Entry[] = [
     tag: "UX",
     visual: {
       kind: "covers",
-      match: (l) => !!l.featured,
+      match: (l) => !!(l as any).featured,
       limit: 6,
     },
   },
