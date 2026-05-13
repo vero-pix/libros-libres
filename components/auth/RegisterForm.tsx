@@ -58,6 +58,14 @@ export default function RegisterForm() {
       });
 
       try {
+        await fetch("/api/users/generate-username", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: data.user.id, fullName }),
+        });
+      } catch {}
+
+      try {
         await fetch("/api/newsletter", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
