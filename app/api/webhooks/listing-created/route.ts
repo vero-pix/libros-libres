@@ -52,6 +52,9 @@ export async function POST(req: Request) {
       "comunismo", "socialismo", "marxismo", "capital marx",
       "fascismo", "nazi", "militar chile", "corbalán",
       "mitos de la democracia", "memoria histórica",
+      // Contenido adulto / sexual explícito
+      "shibari", "bondage", "kamasutra", "kama sutra",
+      "erotico", "erótico", "pornograf",
     ];
     const matchesPolitical = (text: string) => {
       const t = (text || "").toLowerCase();
