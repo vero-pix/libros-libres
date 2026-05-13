@@ -126,6 +126,7 @@ const getRecentListings = unstable_cache(
       .from("listings")
       .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
       .eq("status", "active")
+      .neq("deprioritized", true)
       .gte("created_at", since)
       .order("created_at", { ascending: false })
       .limit(40);
