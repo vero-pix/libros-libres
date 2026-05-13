@@ -33,7 +33,38 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 
 ---
 
-## Roadmap vivo (Actualizado 27 Abril 2026)
+## Roadmap vivo (Actualizado 13 Mayo 2026)
+
+### Semana 12-13 Mayo 2026 — Hitos
+- [x] ~~URLs amigables vendedor~~ — ✅ `/vendedor/username` resuelve por username O UUID. Todos los componentes actualizados. 5 vendedores sin username corregidos en BD + emails enviados.
+- [x] ~~#1 Google "vender libros usados Chile"~~ — ✅ FAQ section + FAQPage schema en `/vender`. Saltó de posición 11 a #1 en menos de 24h. Visibilidad 100% en SEMrush.
+- [x] ~~Block /search en robots.txt~~ — ✅ URLs `/search?q=...` ya no se indexan. Crawl budget redirigido a fichas de libros.
+- [x] ~~Marquee libros destacados~~ — ✅ Auto-scroll en loop, pausa al hover. CSS puro, sin librerías.
+- [x] ~~Aviso automático match Se Busca~~ — ✅ Webhook marca `fulfilled=true` tras enviar email. Primer match real: El gato negro (Buhardilla → sushizanahoria@gmail.com).
+- [x] ~~Scripts integración PrestaShop~~ — ✅ `import_prestashop.mjs` + `sync_prestashop.mjs` en `/scripts`. Primer uso: Álvaro / Librería Comuna Literaria.
+- [x] ~~Limpieza spam BD~~ — ✅ 21 usuarios bot eliminados. Newsletter_subscribers depurado.
+- [x] ~~Newsletter 106 destinatarios~~ — ✅ Enviado 13 mayo. Subject: "Somos #1 en Google".
+
+### Álvaro (Librería Comuna Literaria) — en curso
+- [ ] **Álvaro registra cuenta y conecta MP** — acordado 13 mayo. Prueba con 10 títulos manuales, luego conectar PrestaShop.
+- [ ] **Configurar courier para Álvaro** — no usa Chilexpress. Vero coordina qué courier usar.
+- [ ] **Multiplicador de precio** — Álvaro pidió factor automático en formulario (ej. ×1.05 para absorber comisión). Pendiente implementar.
+- [ ] **Comisión especial Álvaro** — 1% primeras 10 ventas, luego 5%. Implementar en BD cuando confirme inicio.
+
+### Pendientes SEO (post #1)
+- [ ] **Monitorear posición "donde vender libros usados"** — entró al top 10, verificar consolidación en 7 días.
+- [ ] **librolibre.cl** — dominio vence 24 mayo 2026. Titular: Cinta Carmesí. Si no renueva, registrar al tiro ($9.990/año, NIC Chile, 30 días gracia post-vencimiento).
+
+### Features pedidos por libreros
+- [ ] **Reputación por vendedor** — Álvaro y otros piden sistema tipo ML donde cada librería construya historial independiente. Tabla `reviews` existe pero vacía. UI básica en perfil vendedor existe pero sin datos.
+- [ ] **Carrito abandonado** — email automático a quien deja libros sin comprar. Álvaro lo pidió explícitamente.
+- [ ] **Retargeting por email** — sugerencias basadas en lo que el usuario miró. Pedido por Álvaro (audio 3).
+
+### Vendedores nuevos activos
+- **Mónica Espinoza** — registrada 12 mayo. Email con Excel 47 libros enviado. Pendiente que suba el catálogo.
+- **Patricio Bustos Barros** — 1 libro activo (Sombra 81, $17.990). URL: `/vendedor/patricio.bustos.b`.
+
+
 
 ### Urgente & Performance (5 Mayo 2026)
 - [x] ~~Optimización TBT Mobile~~ — ✅ Reducción de lag en celulares desactivando animaciones SVG pesadas y partículas de polvo en `ShelfTransformation`.
