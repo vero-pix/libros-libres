@@ -38,6 +38,49 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "13 mayo 2026",
+    title: "Posición #1 en Google para \"vender libros usados Chile\"",
+    description:
+      "Ayer estábamos en posición 11. Hoy Google nos puso en el primer lugar para la búsqueda \"vender libros usados Chile\". El salto fue de 10 posiciones en menos de 24 horas, con visibilidad del 100% según SEMrush. Lo que lo desencadenó: agregamos preguntas frecuentes a la página /vender con el formato que Google prefiere para mostrar respuestas directas en los resultados. Si alguien busca dónde vender sus libros, tuslibros.cl aparece primero.",
+    tag: "SEO",
+    visual: {
+      kind: "milestone",
+      icon: "🥇",
+      metric: "#1 en Google",
+      detail: "\"vender libros usados Chile\" — salto de 89 posiciones",
+    },
+  },
+  {
+    date: "13 mayo 2026",
+    title: "Libros destacados con movimiento",
+    description:
+      "La fila de libros destacados en la portada ahora se desplaza sola. Los libros circulan en loop para que siempre haya algo nuevo a la vista. El scroll se pausa si pasas el mouse encima.",
+    tag: "UX",
+    visual: {
+      kind: "covers",
+      match: (l) => !!l.featured,
+      limit: 6,
+    },
+  },
+  {
+    date: "12 mayo 2026",
+    title: "Tiendas de vendedores con URL propia",
+    description:
+      "Cada vendedor tiene ahora su propia dirección web con nombre: tuslibros.cl/vendedor/buhardilla, tuslibros.cl/vendedor/cimlibros, etc. Antes la URL era una cadena de letras y números que nadie podía recordar ni compartir. Ahora es tu nombre.",
+    tag: "Mejora",
+    link: "/vendedor/buhardilla",
+    linkText: "Ver ejemplo",
+  },
+  {
+    date: "12 mayo 2026",
+    title: "Aviso automático cuando aparece un libro que buscabas",
+    description:
+      "Si pediste un libro en la sección \"Se busca\" y alguien lo publica, te llega un email al tiro con el link directo. Sin que tengas que volver a revisar el sitio. Hoy funcionó por primera vez: alguien pidió El gato negro de Poe, Libros De La Buhardilla lo publicó y el buscador recibió el aviso en minutos.",
+    tag: "Nuevo",
+    link: "/solicitudes",
+    linkText: "Pedir un libro",
+  },
+  {
     date: "6 mayo 2026",
     title: "API para librerías: sincroniza tu catálogo desde cualquier sistema",
     description:
