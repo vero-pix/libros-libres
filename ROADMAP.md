@@ -4,6 +4,16 @@
 
 ---
 
+## Reglas permanentes (bugs que no pueden volver)
+
+| Bug | Fix de raíz | Fecha |
+|---|---|---|
+| Vendedor nuevo sin username → URL UUID | Trigger DB `auto_username_on_insert` + endpoint `/api/users/generate-username` | 13 mayo 2026 |
+
+Cuando aparezca un bug de este tipo: **no solo backfillear — siempre tapar el origen**.
+
+---
+
 ## Checklist pre-deploy (obligatorio)
 
 Antes de mergear a `main` cualquier cambio a **componentes críticos** (Navbar, HomeShell, HeroBar, ListingDetail, checkout, publish, auth):
