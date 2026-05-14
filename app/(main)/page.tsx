@@ -77,6 +77,7 @@ const getDefaultListings = unstable_cache(
       .from("listings")
       .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`)
       .in("status", ["active", "completed"])
+      .neq("deprioritized", true)
       .order("created_at", { ascending: false })
       .range(start, end);
     return data ?? [];
@@ -243,7 +244,8 @@ export default async function HomePage({ searchParams }: Props) {
     let query = supabase
       .from("listings")
       .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`, { count: "exact" })
-      .in("status", ["active", "completed"]);
+      .in("status", ["active", "completed"])
+      .neq("deprioritized", true);
 
     if (category) query = query.eq("book.category", category);
     if (subcategory) query = query.eq("book.subcategory", subcategory);
