@@ -14,35 +14,35 @@ const BANNERS: Banner[] = [
   {
     title: "Libros Escolares",
     subtitle: "Básica, Media y textos de estudio",
-    href: "/search?category=escolar",
-    gradient: "from-[#1a2b4b] to-[#2e4a8a]", // Azul Oxford académico
+    href: "/search?subcategory=academico-escolar",
+    gradient: "from-[#1a2b4b] to-[#2e4a8a]",
     icon: "🎒",
   },
   {
     title: "Lectura Complementaria",
     subtitle: "Listas MINEDUC e infantil",
-    href: "/search?category=lectura-complementaria",
-    gradient: "from-[#2d5a4c] to-[#4a8a6a]", // Verde bosque elegante
+    href: "/search?subcategory=infantil-juvenil-infantil",
+    gradient: "from-[#2d5a4c] to-[#4a8a6a]",
     icon: "📚",
   },
   {
     title: "Poesía y Teatro",
     subtitle: "Clásicos y contemporáneos",
-    href: "/search?subcategory=general-adulto-poesia",
-    gradient: "from-[#6b2d5a] to-[#8a4a7a]", // Púrpura editorial
+    href: "/search?subcategory=ficcion-poesia",
+    gradient: "from-[#6b2d5a] to-[#8a4a7a]",
     icon: "🖋️",
   },
   {
     title: "Novela Policial",
     subtitle: "Suspenso, Thriller y Crimen",
-    href: "/search?subcategory=general-adulto-policial",
-    gradient: "from-[#151522] to-[#2d2d4a]", // Negro/Azul noche profundo
+    href: "/search?subcategory=ficcion-policial",
+    gradient: "from-[#151522] to-[#2d2d4a]",
     icon: "🔍",
   },
   {
     title: "Novela y Ficción",
     subtitle: "Borges, Kundera, Musil",
-    href: "/search?subcategory=general-adulto-novela",
+    href: "/search?subcategory=ficcion-novela",
     gradient: "from-[#4a5a8a] to-[#6a7a9a]",
     icon: "✨",
   },
