@@ -92,11 +92,19 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 7. Schemas: FAQPage + BreadcrumbList + HowTo o ItemList
 8. Agregar al sitemap con priority 0.8
 
+**Cadencia recomendada:** una landing cada 5–7 días. Submitir en GSC manualmente después de cada deploy. Esperar indexación antes de publicar la siguiente.
+
+**Orden ajustado:**
+1. `/libros-usados-santiago` — mayor volumen RM (esta semana)
+2. `/libros-usados-providencia` — semana del 22 mayo ⚠️ Gran parte del catálogo está en Providencia → ángulo genuinamente diferente de Santiago, no duplicado
+3. `/comprar-libros-usados` — espejo comprador de `/vender-libros-usados`
+4. `/libros-escolares-usados` — antes de julio (temporada crítica)
+
 **Notas por landing:**
-- `/libros-usados-santiago` — mostrar libros con lat/lng en RM, angle local (retiro en mano, sin despacho)
-- `/libros-usados-providencia` — ángulo hiperlocal, mencionar barrios (Manuel Montt, Baquedano, Pedro de Valdivia)
-- `/comprar-libros-usados` — espejo de `/vender-libros-usados` pero para compradores, mostrar grid de libros destacados
-- `/libros-escolares-usados` — temporada crítica marzo–abril y julio–agosto, filtrar por `subcategory=academico-escolar`
+- `/libros-usados-santiago` — libros con lat/lng en RM, ángulo local (retiro en mano, sin despacho)
+- `/libros-usados-providencia` — hiperlocal real: Vero vive ahí, catálogo concentrado ahí. Mencionar barrios (Manuel Montt, Baquedano, Pedro de Valdivia). Mostrar libros reales de vendedores en Providencia.
+- `/comprar-libros-usados` — grid de libros destacados, FAQ comprador
+- `/libros-escolares-usados` — filtrar por `subcategory=academico-escolar`, temporada marzo–abril y julio–agosto
 
 ---
 
