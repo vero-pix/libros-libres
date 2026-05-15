@@ -83,5 +83,69 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Continue without seller pages
   }
 
-  return [...staticPages, ...listingPages, ...sellerPages];
+  // Category pages — subcategorías con al menos 1 libro activo
+  let categoryPages: MetadataRoute.Sitemap = [];
+  try {
+    const supabaseForCats = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { cookies: { getAll: () => [], setAll: () => {} } }
+    );
+
+    // Subcategorías con libros
+    const { data: subcatData } = await supabaseForCats
+      .from("books")
+      .select("subcategory, category")
+      .not("subcategory", "is", null);
+
+    if (subcatData) {
+      // Contar libros por subcategoría
+      const subCounts = new Map<string, { category: string; count: number }>();
+      for (const row of subcatData) {
+        if (!row.subcategory) continue;
+        const existing = subCounts.get(row.subcategory);
+        if (existing) {
+          existing.count++;
+        } else {
+          subCounts.set(row.subcategory, { category: row.category ?? "", count: 1 });
+        }
+      }
+
+      // Subcategorías con al menos 3 libros
+      Array.from(subCounts.entries())
+        .filter(([, { count }]) => count >= 3)
+        .forEach(([sub, { category }]) => {
+          const qs = category
+            ? `?category=${encodeURIComponent(category)}&subcategory=${encodeURIComponent(sub)}`
+            : `?subcategory=${encodeURIComponent(sub)}`;
+          categoryPages.push({
+            url: `${baseUrl}/${qs}`,
+            lastModified: new Date(),
+            changeFrequency: "weekly" as const,
+            priority: 0.7,
+          });
+        });
+
+      // Categorías raíz con al menos 1 libro
+      const catCounts = new Map<string, number>();
+      for (const row of subcatData) {
+        if (!row.category) continue;
+        catCounts.set(row.category, (catCounts.get(row.category) ?? 0) + 1);
+      }
+      Array.from(catCounts.entries())
+        .filter(([, count]) => count >= 1)
+        .forEach(([cat]) => {
+          categoryPages.push({
+            url: `${baseUrl}/?category=${encodeURIComponent(cat)}`,
+            lastModified: new Date(),
+            changeFrequency: "weekly" as const,
+            priority: 0.75,
+          });
+        });
+    }
+  } catch {
+    // Sitemap still works without category pages
+  }
+
+  return [...staticPages, ...categoryPages, ...listingPages, ...sellerPages];
 }
