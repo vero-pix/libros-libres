@@ -41,9 +41,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return full.slice(0, 59).trimEnd() + "…";
   };
   const title = buildTitle();
-  const description = listing.book.description
-    ? (listing.book.description.length <= 160 ? listing.book.description : listing.book.description.slice(0, 157) + "…")
-    : `${listing.book.title} de ${listing.book.author} — libro usado${priceStr ? ` desde ${priceStr}` : ""}. Envío por courier o retiro en Chile. tuslibros.cl`;
+  const sellerName = listing.seller?.full_name || "un vendedor de tuslibros.cl";
+  // Sufijo único por listing: precio + vendedor. Evita meta descriptions
+  // duplicadas cuando varios libros comparten la misma descripción editorial.
+  const suffix = `${priceStr ? `Disponible por ${priceStr}` : "Disponible"}. Vendido por ${sellerName} en tuslibros.cl. Envío a todo Chile.`;
+  const description = (() => {
+    const rawDesc = listing.book.description;
+    if (!rawDesc) {
+      return `${listing.book.title} de ${listing.book.author} — libro usado${priceStr ? ` a ${priceStr}` : ""}. Vendido por ${sellerName} en tuslibros.cl. Envío por courier o retiro en persona.`;
+    }
+    const maxIntroLen = 160 - suffix.length - 2; // 2 = ". "
+    const intro =
+      rawDesc.length <= maxIntroLen
+        ? rawDesc
+        : rawDesc.slice(0, rawDesc.lastIndexOf(" ", maxIntroLen - 1)).trimEnd() + "…";
+    return `${intro}. ${suffix}`;
+  })();
+
   const image = listing.cover_image_url || listing.book.cover_url || "/og-image.png";
 
   return {

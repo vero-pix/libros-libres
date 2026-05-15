@@ -68,9 +68,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = buildTitle();
   const rawDesc = listing.book.description;
   const sellerName = listing.seller?.full_name || "un vendedor de tuslibros.cl";
-  const description = rawDesc
-    ? (rawDesc.length <= 160 ? rawDesc : rawDesc.slice(0, rawDesc.lastIndexOf(" ", 157)) + "…")
-    : `${listing.book.title} de ${listing.book.author} — libro usado${priceStr ? ` desde ${priceStr}` : ""}. Publicado por ${sellerName} en tuslibros.cl. Envío por courier o retiro en mano en Chile.`;
+  // Sufijo único por listing: precio + vendedor. Garantiza que libros con la
+  // misma descripción editorial no generen meta descriptions duplicadas.
+  const suffix = `${priceStr ? `Disponible por ${priceStr}` : "Disponible"}. Vendido por ${sellerName} en tuslibros.cl. Envío a todo Chile.`;
+  const description = (() => {
+    if (!rawDesc) {
+      // Sin descripción: construir desde cero con datos únicos del listing.
+      return `${listing.book.title} de ${listing.book.author} — libro usado${priceStr ? ` a ${priceStr}` : ""}. Vendido por ${sellerName} en tuslibros.cl. Envío por courier o retiro en persona.`;
+    }
+    // Con descripción: usar como intro truncada y añadir sufijo único.
+    // El total debe caber en ≤160 chars.
+    const maxIntroLen = 160 - suffix.length - 2; // 2 = ". "
+    const intro =
+      rawDesc.length <= maxIntroLen
+        ? rawDesc
+        : rawDesc.slice(0, rawDesc.lastIndexOf(" ", maxIntroLen - 1)).trimEnd() + "…";
+    return `${intro}. ${suffix}`;
+  })();
+
   const image = listing.cover_image_url || listing.book.cover_url || "/og-image.png";
   const url = `https://tuslibros.cl/libro/${params.username}/${params.slug}`;
 
