@@ -404,7 +404,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                   value={discountInput}
                   onChange={(e) => setDiscountInput(e.target.value.toUpperCase())}
                   onKeyDown={(e) => e.key === "Enter" && handleApplyCode()}
-                  placeholder="Ej: VECINOS20"
+                  placeholder="Ej: MIDESCUENTO"
                   disabled={!!discountCode}
                   className="flex-1 px-3 py-2 border border-cream-dark rounded-lg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white disabled:bg-cream disabled:text-ink-muted"
                 />
