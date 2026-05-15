@@ -147,23 +147,33 @@ export default async function LibroPage({ params }: Props) {
   const bookImage = listing.cover_image_url || listing.book.cover_url || undefined;
   const bookDescription = listing.book.description || `${listing.book.title} de ${listing.book.author}. Libro usado publicado en tuslibros.cl.`;
 
+  // Schema único de tipo Book (schema.org/Book).
+  // Propiedades como author, inLanguage y bookFormat son válidas aquí
+  // pero NO en Product, lo que generaba errores en Google/Semrush.
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product",
-    name: `${listing.book.title} — ${listing.book.author}`,
+    "@type": "Book",
+    name: listing.book.title,
     description: bookDescription,
     image: bookImage,
-    brand: { "@type": "Brand", name: "tuslibros.cl" },
-    itemCondition: bookCondition,
     author: { "@type": "Person", name: listing.book.author },
     isbn: listing.book.isbn || undefined,
     inLanguage: bookLanguage,
     bookFormat,
+    publisher: (listing.book as any).publisher || undefined,
+    datePublished: listing.book.published_year
+      ? String(listing.book.published_year)
+      : undefined,
+    numberOfPages: (listing.book as any).pages || undefined,
     offers: {
       "@type": "Offer",
       price: listing.price,
       priceCurrency: "CLP",
-      availability: listing.status === "active" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+      availability:
+        listing.status === "active"
+          ? "https://schema.org/InStock"
+          : "https://schema.org/SoldOut",
+      itemCondition: bookCondition,
       seller: { "@type": "Person", name: listing.seller?.full_name },
       url: canonicalUrl,
       shippingDetails: {
@@ -196,36 +206,12 @@ export default async function LibroPage({ params }: Props) {
       hasMerchantReturnPolicy: {
         "@type": "MerchantReturnPolicy",
         applicableCountry: "CL",
-        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        returnPolicyCategory:
+          "https://schema.org/MerchantReturnFiniteReturnWindow",
         merchantReturnDays: 7,
         returnMethod: "https://schema.org/ReturnByMail",
         returnFees: "https://schema.org/FreeReturn",
-        returnPolicySeasonalOverride: undefined,
       },
-    },
-  };
-
-  const bookJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Book",
-    name: listing.book.title,
-    author: { "@type": "Person", name: listing.book.author },
-    isbn: listing.book.isbn || undefined,
-    bookFormat,
-    inLanguage: bookLanguage,
-    image: bookImage,
-    description: bookDescription,
-    publisher: (listing.book as any).publisher || undefined,
-    datePublished: listing.book.published_year ? String(listing.book.published_year) : undefined,
-    numberOfPages: (listing.book as any).pages || undefined,
-    offers: {
-      "@type": "Offer",
-      price: listing.price,
-      priceCurrency: "CLP",
-      availability: listing.status === "active" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
-      itemCondition: bookCondition,
-      seller: { "@type": "Person", name: listing.seller?.full_name },
-      url: canonicalUrl,
     },
   };
 
@@ -242,8 +228,8 @@ export default async function LibroPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-cream">
       <ListingViewTracker listingId={listing.id} />
+      {/* Schema Book consolidado (reemplaza el anterior Product duplicado) */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(bookJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <main className="max-w-7xl mx-auto px-6 py-10">
         <Breadcrumbs
