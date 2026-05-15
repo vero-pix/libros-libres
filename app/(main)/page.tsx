@@ -21,22 +21,70 @@ import { sortListingsForDisplay } from "@/lib/sortListings";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
+import { categoriaUrl } from "@/lib/urls";
+
+// Nombres legibles para slugs de categoría/subcategoría usados en metadata
+const CATEGORY_NAMES: Record<string, string> = {
+  "general-adulto": "Literatura General",
+  "escolar": "Libros Escolares",
+  "lectura-complementaria": "Lectura Complementaria",
+  "universitario": "Universitario",
+  "tecnico-cft": "Técnico y CFT",
+  "idiomas": "Idiomas",
+  "otros": "Otros",
+  // Subcategorías frecuentes
+  "ficcion-novela": "Novela y Ficción",
+  "no-ficcion-ensayo": "Ensayo y Divulgación",
+  "no-ficcion-historia": "Historia",
+  "no-ficcion-ciencia": "Ciencia y Divulgación",
+  "no-ficcion-biografia": "Biografías y Memorias",
+  "ficcion-policial": "Novela Policial y Suspenso",
+  "ficcion-poesia": "Poesía",
+  "idiomas-aleman": "Alemán",
+  "idiomas-ingles": "Inglés",
+  "idiomas-frances": "Francés",
+  "academico-escolar": "Escolar",
+  "academico-universitario": "Universitario",
+  "infantil-juvenil-infantil": "Infantil y Juvenil",
+  "otros-comics": "Cómics y Manga",
+  "general-adulto-novela": "Novela y Ficción",
+  "general-adulto-policial": "Novela Policial",
+  "general-adulto-poesia": "Poesía",
+  "general-adulto-historia": "Historia",
+  "general-adulto-ensayo": "Ensayo",
+};
+
+function slugToName(slug: string): string {
+  return CATEGORY_NAMES[slug] ?? slug.replace(/-/g, " ");
+}
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  const { category, genre, author, tag, collectible } = searchParams;
-  
+  const { category, subcategory, genre, author, tag, collectible } = searchParams;
+  const base = "https://tuslibros.cl";
+
   let title = "Libros Usados en Chile | Compra y Venta";
   let description = "Haz circular los libros que ya leíste y encuentra los que te faltan en el marketplace chileno tuslibros.cl.";
+  let canonical = base;
 
-  if (category) {
-    title = `Libros de ${category} Usados en Chile | tuslibros.cl`;
-    description = `Encuentra la mejor selección de libros de ${category} usados. Compra seguro con envío a todo Chile.`;
+  if (subcategory) {
+    const name = slugToName(subcategory);
+    title = `${name} — Libros Usados en Chile | tuslibros.cl`;
+    description = `Encuentra libros usados de ${name}. Compra seguro con envío a todo Chile en tuslibros.cl.`;
+    canonical = category
+      ? `${base}${categoriaUrl(category, subcategory)}`
+      : `${base}/categoria/${subcategory}`;
+  } else if (category) {
+    const name = slugToName(category);
+    title = `${name} — Libros Usados en Chile | tuslibros.cl`;
+    description = `Encuentra la mejor selección de libros de ${name} usados. Compra seguro con envío a todo Chile.`;
+    canonical = `${base}${categoriaUrl(category)}`;
   } else if (genre) {
     title = `Libros de ${genre} Usados | tuslibros.cl`;
   } else if (author) {
     title = `Libros de ${author} Usados | tuslibros.cl`;
   } else if (collectible === "1") {
     title = "Libros de Colección y Ediciones Raras | tuslibros.cl";
+    canonical = `${base}/?collectible=1`;
   } else if (tag) {
     title = `Libros sobre ${tag} | tuslibros.cl`;
   }
@@ -44,9 +92,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return {
     title,
     description,
-    alternates: {
-      canonical: "https://tuslibros.cl",
-    },
+    alternates: { canonical },
   };
 }
 

@@ -23,10 +23,10 @@ export default function Footer() {
           <div>
             <h4 className="font-display font-bold text-ink mb-4 text-sm">Categorías</h4>
             <ul className="space-y-2.5 text-ink-muted">
-              <li><Link href="/?category=ficcion" className="hover:text-brand-600 transition-colors">Ficción</Link></li>
-              <li><Link href="/?category=no-ficcion" className="hover:text-brand-600 transition-colors">No ficción</Link></li>
-              <li><Link href="/?category=academicos" className="hover:text-brand-600 transition-colors">Académicos</Link></li>
-              <li><Link href="/?category=coleccionables" className="hover:text-brand-600 transition-colors">Coleccionables</Link></li>
+              <li><Link href="/?subcategory=ficcion-novela" className="hover:text-brand-600 transition-colors">Novela y Ficción</Link></li>
+              <li><Link href="/?subcategory=no-ficcion-ensayo" className="hover:text-brand-600 transition-colors">Ensayo</Link></li>
+              <li><Link href="/?subcategory=no-ficcion-historia" className="hover:text-brand-600 transition-colors">Historia</Link></li>
+              <li><Link href="/?collectible=1" className="hover:text-brand-600 transition-colors">Coleccionables</Link></li>
             </ul>
           </div>
           <div>
