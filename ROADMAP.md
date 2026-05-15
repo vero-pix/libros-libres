@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 13 mayo 2026
+Última actualización: 15 mayo 2026
 
 ---
 
@@ -65,6 +65,38 @@ Primer librero pro externo. Trato 1%/10 ventas → 5%. Scripts PrestaShop listos
 
 - **Mónica Espinoza** — registrada 12 mayo. Email con Excel 47 libros enviado. Pendiente que suba el catálogo.
 - **Patricio Bustos Barros** — 1 libro activo (Sombra 81, $17.990). URL: `/vendedor/patricio.bustos.b`.
+
+---
+
+### SEO — Landings estratégicas
+
+Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword con intención clara, usa FAQPage + HowTo + BreadcrumbList schema, y se agrega al sitemap. Modelo base: `/vender-libros-usados` (deployada 15 mayo).
+
+| Ruta | Keyword objetivo | Vol | KD | Intent | Estado |
+|---|---|---|---|---|---|
+| `/libros-usados-chile` | libros usados chile | — | — | comprador genérico | ✅ Deployada |
+| `/vender` | vender libros usados en chile | — | — | vendedor | ✅ Deployada |
+| `/vender-libros-usados` | vender libros usados | 140 | 23 | vendedor informacional | ✅ 15 mayo |
+| `/libros-usados-santiago` | libros usados santiago | — | — | comprador local RM | ⬜ Pendiente |
+| `/libros-usados-providencia` | libros usados providencia | — | — | comprador local Providencia | ⬜ Pendiente |
+| `/comprar-libros-usados` | comprar libros usados | — | — | comprador informacional | ⬜ Pendiente |
+| `/libros-escolares-usados` | libros escolares usados | — | — | temporada escolar | ⬜ Pendiente |
+
+**Patrón por landing:**
+1. H1 con keyword exacta en forma natural
+2. Intro editorial (no genérica)
+3. Pasos o explicación corta
+4. Grid de libros reales de la BD (si aplica)
+5. FAQ con intención de búsqueda (7+ preguntas)
+6. Internal links a `/search`, `/vender`, `/como-funciona`
+7. Schemas: FAQPage + BreadcrumbList + HowTo o ItemList
+8. Agregar al sitemap con priority 0.8
+
+**Notas por landing:**
+- `/libros-usados-santiago` — mostrar libros con lat/lng en RM, angle local (retiro en mano, sin despacho)
+- `/libros-usados-providencia` — ángulo hiperlocal, mencionar barrios (Manuel Montt, Baquedano, Pedro de Valdivia)
+- `/comprar-libros-usados` — espejo de `/vender-libros-usados` pero para compradores, mostrar grid de libros destacados
+- `/libros-escolares-usados` — temporada crítica marzo–abril y julio–agosto, filtrar por `subcategory=academico-escolar`
 
 ---
 
