@@ -249,6 +249,7 @@ export default async function HomePage({ searchParams }: Props) {
 
     if (category) query = query.eq("book.category", category);
     if (subcategory) query = query.eq("book.subcategory", subcategory);
+    if (tag) query = query.contains("book.tags", [tag]);
     if (condition) query = query.eq("condition", condition);
     if (modality) query = query.in("modality", modality === "both" ? ["both"] : [modality, "both"]);
     if (price_min) query = query.gte("price", Number(price_min));
