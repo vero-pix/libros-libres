@@ -90,12 +90,14 @@ export async function POST(req: NextRequest) {
     shipping_service,
     shipping_courier,
     buyer_address,
+    discount_code,
   } = body as {
     shipping_speed: "standard" | "express";
     shipping_cost_override?: number;
     shipping_service?: string;
     shipping_courier?: string;
     buyer_address?: string;
+    discount_code?: string;
   };
 
   if (rawListingIds.length === 0 || !shipping_speed) {
@@ -163,11 +165,42 @@ export async function POST(req: NextRequest) {
     plan: "free" | "librero" | "libreria";
   };
 
+  // Validar y aplicar código de descuento
+  let discountPct = 0;
+  let discountAmount = 0;
+  if (discount_code) {
+    const adminSb = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } }
+    );
+    const { data: codeData } = await adminSb
+      .from("discount_codes")
+      .select("id, discount_pct, max_uses, uses_count, active, expires_at")
+      .eq("code", discount_code.toUpperCase())
+      .single();
+    if (
+      codeData &&
+      codeData.active &&
+      (!codeData.expires_at || new Date(codeData.expires_at) > new Date()) &&
+      (codeData.max_uses === null || codeData.uses_count < codeData.max_uses)
+    ) {
+      discountPct = codeData.discount_pct;
+      // Incrementar usos
+      await adminSb
+        .from("discount_codes")
+        .update({ uses_count: codeData.uses_count + 1 })
+        .eq("id", codeData.id);
+    }
+  }
+
   // Cálculos
-  const totalBookPrice = listings.reduce(
+  const rawBookPrice = listings.reduce(
     (sum: number, l: any) => sum + (l.price ?? 0),
     0
   );
+  discountAmount = Math.round(rawBookPrice * discountPct / 100);
+  const totalBookPrice = rawBookPrice - discountAmount;
   const shippingCost =
     shipping_cost_override ??
     SHIPPING_COSTS[shipping_speed] ??
@@ -193,14 +226,17 @@ export async function POST(req: NextRequest) {
   // Crear N orders, shipping/fee solo en la primera (prorrateo "cabeza del bundle")
   const orderRows = listings.map((l: any, idx: number) => {
     const isFirst = idx === 0;
+    const rawItemPrice = l.price ?? 0;
+    const itemDiscount = isFirst ? discountAmount : 0;
+    const discountedItemPrice = rawItemPrice - itemDiscount;
     const itemShipping = isFirst ? shippingCost : 0;
     const itemFee = isFirst ? serviceFee : 0;
-    const itemTotal = (l.price ?? 0) + itemShipping + itemFee;
+    const itemTotal = discountedItemPrice + itemShipping + itemFee;
     return {
       listing_id: l.id,
       buyer_id: user.id,
       seller_id: sellerId,
-      book_price: l.price ?? 0,
+      book_price: discountedItemPrice,
       shipping_cost: itemShipping,
       service_fee: itemFee,
       total: itemTotal,
@@ -209,6 +245,8 @@ export async function POST(req: NextRequest) {
       courier,
       buyer_address: buyer_address ?? null,
       bundle_id: bundleId,
+      discount_code: discount_code?.toUpperCase() ?? null,
+      discount_amount: itemDiscount,
     };
   });
 

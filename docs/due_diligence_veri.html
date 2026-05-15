@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<title>tuslibros.cl — Due Diligence para Inversión · Mayo 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1f2a44;
+    --gold: #d69b12;
+    --cream: #f7f3ec;
+    --muted: #6b7280;
+    --green: #16a34a;
+    --red: #dc2626;
+    --amber: #d97706;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+    color: var(--navy);
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+  header {
+    border-bottom: 3px solid var(--navy);
+    padding-bottom: 28px;
+    margin-bottom: 40px;
+  }
+  header .label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  header .sub {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .callout {
+    background: #fef9ee;
+    border-left: 4px solid var(--gold);
+    padding: 16px 20px;
+    margin: 32px 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .callout strong { color: var(--navy); }
+  .callout.red { background: #fff5f5; border-color: var(--red); }
+  .callout.green { background: #f0fdf4; border-color: var(--green); }
+  section {
+    margin-bottom: 48px;
+  }
+  section h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--navy);
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 10px;
+    margin-bottom: 24px;
+  }
+  .qa {
+    margin-bottom: 22px;
+  }
+  .qa .q {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .qa .a {
+    color: #374151;
+    font-size: 14.5px;
+  }
+  .qa .a .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .tag.sin-datos { background: #f3f4f6; color: #6b7280; }
+  .tag.existe { background: #d1fae5; color: #065f46; }
+  .tag.honesto { background: #fee2e2; color: #991b1b; }
+  .tag.proyectado { background: #fef3c7; color: #92400e; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin-top: 12px;
+  }
+  th {
+    background: var(--navy);
+    color: #fff;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #f9fafb; }
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .metric-box {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+  .metric-box .big {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .metric-box .small {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .scenario-table td:first-child { font-weight: 600; }
+  .bear { color: var(--red); }
+  .bull { color: var(--green); }
+  .base { color: var(--amber); }
+  footer {
+    margin-top: 60px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 24px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  @media print {
+    body { padding: 24px; }
+    section { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">Due Diligence · Inversión Familiar · Confidencial</div>
+  <h1>tuslibros.cl<br>Respuestas a Preguntas de Inversión</h1>
+  <div class="sub">Preparado por Verónica Velasquez · Mayo 2026 · Para uso exclusivo de Veri Velasquez</div>
+</header>
+
+<div class="callout">
+  <strong>Nota de honestidad.</strong> Este documento responde todas las preguntas con los datos reales disponibles al 8 de mayo de 2026. Donde no existen datos (la plataforma tiene 40 días live), se indica explícitamente y se muestra la proyección con su probabilidad estimada. No se inflan cifras. Toda inversión tiene riesgo real de pérdida total.
+</div>
+
+<!-- CONTEXTO -->
+<section>
+  <h2>Contexto del negocio</h2>
+  <p style="margin-bottom:16px;">tuslibros.cl es un marketplace peer-to-peer de libros usados en Chile. Los vendedores publican sus libros, los compradores los encuentran y pagan. La plataforma cobra una comisión del 8% sobre cada venta. El vendedor despacha directamente al comprador (courier puerta a puerta) o coordina entrega presencial.</p>
+  <p style="margin-bottom:16px;"><strong>Modelo de negocio:</strong> igual al de Airbnb o Rappi — no se compran ni almacenan libros. La plataforma conecta oferta y demanda, cobra comisión y gestiona el pago. El margen escala sin costo adicional.</p>
+  <div class="metric-grid">
+    <div class="metric-box"><div class="big">40</div><div class="small">Días live al 8 mayo</div></div>
+    <div class="metric-box"><div class="big">40</div><div class="small">Usuarios registrados</div></div>
+    <div class="metric-box"><div class="big">8%</div><div class="small">Comisión por venta</div></div>
+    <div class="metric-box"><div class="big">3</div><div class="small">Compradores confirmados</div></div>
+    <div class="metric-box"><div class="big">$45k</div><div class="small">CLP costo fijo mensual</div></div>
+    <div class="metric-box"><div class="big">$0</div><div class="small">Deuda actual</div></div>
+  </div>
+</section>
+
+<!-- INGRESOS Y VENTAS -->
+<section>
+  <h2>1. Ingresos y ventas</h2>
+
+  <div class="qa">
+    <div class="q">¿Cuál es la facturación mensual promedio actual?</div>
+    <div class="a">
+      <span class="tag existe">Dato real</span>
+      GMV (valor total transado) acumulado en 40 días: <strong>$120.000 CLP</strong> (~$130 USD). Comisión cobrada (8%): <strong>$9.600 CLP</strong> (~$10 USD) en total acumulado. El equivalente mensual actual es ~$7.200 CLP en comisiones. Esto es pre-escala y completamente normal para una plataforma marketplace de 40 días.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuál fue la evolución de las ventas en los últimos 6 a 12 meses?</div>
+    <div class="a">
+      <span class="tag sin-datos">Sin datos</span>
+      La plataforma tiene 40 días. No existe historial de 6–12 meses. El comparador válido no es la historia pasada sino la velocidad de adopción: 3 compradores en 40 días con $0 invertido en publicidad.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuál es la estacionalidad del negocio?</div>
+    <div class="a">
+      <span class="tag proyectado">Proyectado, sin datos propios aún</span>
+      Basado en el mercado del libro en Chile: <strong>picos</strong> en marzo–abril (vuelta al colegio, Día del Libro 23 abril), agosto (inicio segundo semestre escolar), noviembre–diciembre (regalos). <strong>Valle</strong> en enero–febrero (verano). La estacionalidad favorece libros de texto y lectura complementaria en los picos.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuál es el ticket promedio por cliente?</div>
+    <div class="a">
+      <span class="tag existe">Dato real</span>
+      $120.000 CLP ÷ 3 transacciones = <strong>~$40.000 CLP por transacción</strong> (~$43 USD). Incluye desde compras individuales ($5.000) hasta bundles de varios libros ($48.000). El ticket puede escalar cuando se incorporen librerías con catálogos más grandes.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuál es el volumen promedio de pedidos por mes?</div>
+    <div class="a">
+      <span class="tag honesto">Muy temprano</span>
+      ~2–3 pedidos/mes. No es representativo. Con 40 usuarios registrados y $0 en publicidad, este número es el piso, no el promedio esperado.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuál es la tasa de crecimiento mensual/anual?</div>
+    <div class="a">
+      <span class="tag sin-datos">Sin datos suficientes</span>
+      40 días de historia no permiten calcular tasa de crecimiento confiable. La proyección del modelo financiero asume 10% mensual (escenario conservador) o 30% mensual (escenario optimista). Ver sección de Escalabilidad.
+    </div>
+  </div>
+</section>
+
+<!-- RENTABILIDAD -->
+<section>
+  <h2>2. Rentabilidad y márgenes</h2>
+
+  <div class="qa">
+    <div class="q">¿Cuál es el margen bruto promedio?</div>
+    <div class="a">
+      <span class="tag existe">Calculado</span>
+      <strong>~81% sobre ingresos.</strong> Por cada $40.000 que paga un comprador: la plataforma recibe $3.200 de comisión (8%), de los cuales ~$600 son costos variables (pasarela, courier API, misc). Margen bruto por transacción: ~$2.600 CLP.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuál es el margen neto real después de todos los costos?</div>
+    <div class="a">
+      <span class="tag honesto">Negativo, con razón</span>
+      Hoy el costo fijo de infraestructura es $45.000 CLP/mes. Con ingresos actuales de ~$7.200 CLP/mes, el margen neto es profundamente negativo. <strong>Esto es esperado y normal para un marketplace pre-escala.</strong> El break-even operacional (sin salario fundadora) se proyecta en el mes ~14 en escenario optimista. Con salario de mercado de la fundadora incluido, el break-even se traslada al mes ~48.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuál es la rentabilidad por libro vendido?</div>
+    <div class="a">
+      <span class="tag existe">Calculado</span>
+      Con ticket promedio $40.000 CLP y comisión 8%: <strong>$3.200 CLP por libro (~$3,5 USD).</strong> Con volumen el costo variable baja y el margen sube. A 50.000 libros transados/año (~4.200/mes a $40k promedio) el GMV anual sería ~$2.000M CLP y la comisión ~$160M CLP (~$175k USD).
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Qué categorías generan mayor margen?</div>
+    <div class="a">
+      <span class="tag sin-datos">Sin datos segmentados aún</span>
+      El margen es igual por categoría (8% fijo). Donde sí hay diferencia es en ticket: libros raros y coleccionables tienen tickets 3–5× más altos que libros de texto, lo que genera más comisión absoluta por transacción.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Qué porcentaje corresponde a libros raros vs. libros usados comunes?</div>
+    <div class="a">
+      <span class="tag honesto">Observación cualitativa</span>
+      En las 3 transacciones reales, el patrón es claro: <strong>lo que vende son libros raros a precios 40–60% bajo IberLibro y Buscalibre</strong>, no los libros comunes que se encuentran en cualquier librería. Esto define el diferencial competitivo real. No hay dato porcentual estadístico aún.
+    </div>
+  </div>
+</section>
+
+<!-- COSTOS -->
+<section>
+  <h2>3. Costos y estructura financiera</h2>
+
+  <table>
+    <tr><th>Ítem</th><th>Costo mensual CLP</th><th>Equivalente USD</th><th>Naturaleza</th></tr>
+    <tr><td>Infraestructura (Supabase Pro + Vercel Pro)</td><td>$45.000</td><td>~$49</td><td>Fijo</td></tr>
+    <tr><td>Salario fundadora (situación actual)</td><td>$0</td><td>$0</td><td>Subsidiado por fundadora</td></tr>
+    <tr><td>Marketing (situación actual)</td><td>$0</td><td>$0</td><td>100% orgánico</td></tr>
+    <tr><td>Costos variables (% GMV)</td><td>~$1.800</td><td>~$2</td><td>Variable (1,5% del GMV)</td></tr>
+    <tr><td><strong>TOTAL ACTUAL</strong></td><td><strong>~$46.800</strong></td><td><strong>~$51</strong></td><td></td></tr>
+    <tr><td colspan="4" style="background:#fef9ee; font-size:13px; padding:10px 12px;">Si se incorpora salario de mercado para la fundadora ($3–5M CLP/mes) y marketing ($150–350k CLP/mes), el costo total sube a $3,2–5,4M CLP/mes. Eso requiere capital externo.</td></tr>
+  </table>
+
+  <div class="qa" style="margin-top:20px;">
+    <div class="q">¿La empresa tiene deudas?</div>
+    <div class="a"><span class="tag existe">Confirmado</span> <strong>Ninguna deuda.</strong> Sin financiamiento externo hasta la fecha. Sin mezcla de gastos personales y empresariales.</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuál es el punto de equilibrio mensual?</div>
+    <div class="a">
+      <span class="tag proyectado">Proyectado</span>
+      <strong>Sin salario fundadora:</strong> con costos fijos de $45k CLP/mes, el break-even requiere GMV de ~$562.500 CLP/mes (~30 transacciones de $18k o 14 de $40k). Proyección: mes 14 en escenario Bull. <strong>Con salario fundadora de $5M CLP/mes:</strong> break-even requiere GMV de ~$65M CLP/mes. Esto requiere escala de librería mediana. Proyección: mes 48–54.
+    </div>
+  </div>
+</section>
+
+<!-- STOCK -->
+<section>
+  <h2>4. Stock e inventario</h2>
+
+  <div class="qa">
+    <div class="q">¿Cuál es el valor total del inventario?</div>
+    <div class="a">
+      <span class="tag existe">Dato estructural importante</span>
+      <strong>La plataforma no tiene inventario propio.</strong> Es un marketplace: los libros son de los vendedores. El inventario no está en el balance de tuslibros.cl. Esto elimina el riesgo de stock parado, depreciación y capital de trabajo en libros. Es el mismo modelo de Airbnb (no tiene inmuebles) o Rappi (no tiene cocinas).
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuánto tiempo tarda un libro en venderse?</div>
+    <div class="a">
+      <span class="tag sin-datos">Sin estadística confiable aún</span>
+      Con solo 3 transacciones no hay data estadística. Lo que sí se observa: los libros raros a precios competitivos se venden en días. Los libros más comunes pueden tardar semanas.
+    </div>
+  </div>
+</section>
+
+<!-- CLIENTES -->
+<section>
+  <h2>5. Clientes y mercado</h2>
+
+  <div class="qa">
+    <div class="q">¿Cuántos clientes activos existen hoy?</div>
+    <div class="a"><span class="tag existe">Dato real</span> <strong>40 usuarios registrados. 3 compradores confirmados.</strong> El embudo de activación (registrado → comprador) está en ~7,5%. Referencia: Airbnb en sus primeros meses tenía tasas similares antes de escalar.</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuál es la tasa de recompra?</div>
+    <div class="a"><span class="tag sin-datos">Sin datos</span> 40 días de historia es insuficiente para medir recompra. Es la métrica que más va a importar en el mes 6.</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cómo llega el cliente al negocio?</div>
+    <div class="a">
+      <span class="tag existe">Dato real</span>
+      100% orgánico: Google (SEO), Reddit Chile (post de validación con 6.400 impresiones), boca a boca. Sin publicidad pagada hasta la fecha. La visibilidad SEO subió +2,19% mientras los 7 competidores del sector bajaron (dato SEMrush, semana del 15–22 abril).
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuál es el diferencial competitivo frente a otros vendedores?</div>
+    <div class="a">
+      <span class="tag existe">Validado</span>
+      <strong>1. Único marketplace peer-to-peer de libros usados en Chile</strong> (Buscalibre y otros venden libros nuevos; IberLibro es internacional sin foco local).<br>
+      <strong>2. Comisión 8%</strong> vs 17% de MercadoLibre — ventaja directa para libreros.<br>
+      <strong>3. Libros raros a precios 40–60% bajo IberLibro</strong> — es el patrón de lo que vende.<br>
+      <strong>4. API para integración de inventario</strong> — las librerías pueden sincronizar catálogos automáticamente (diferenciador técnico que ML y Buscalibre no tienen para librerías independientes).
+    </div>
+  </div>
+</section>
+
+<!-- MARKETING -->
+<section>
+  <h2>6. Marketing y redes sociales</h2>
+
+  <div class="qa">
+    <div class="q">¿Cuántos seguidores tiene Instagram? ¿Engagement? ¿Ventas desde Instagram?</div>
+    <div class="a">
+      <span class="tag honesto">Riesgo operacional temporal</span>
+      317 seguidores en @tuslibros.cl. La cuenta está en proceso de recuperación de acceso desde el 23 de abril (bloqueo de Meta en revisión). <strong>Esto es un riesgo operacional real pero temporal y no afecta la plataforma técnica ni las ventas.</strong> Ventas desde Instagram: 0 confirmadas (canal en desarrollo).
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Ya se realizaron campañas pagadas?</div>
+    <div class="a"><span class="tag existe">Confirmado</span> <strong>Ninguna.</strong> Todos los resultados actuales son 100% orgánicos. El crecimiento SEO y las 3 ventas se lograron sin invertir un peso en publicidad.</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Existe base de clientes por WhatsApp o e-mail?</div>
+    <div class="a"><span class="tag existe">Existe</span> Newsletter de 19 destinatarios, base en crecimiento. WhatsApp directo con compradores y vendedores activos. Canal de comunicación funcional aunque pequeño.</div>
+  </div>
+</section>
+
+<!-- ADQUISICION -->
+<section>
+  <h2>7. Adquisición de clientes</h2>
+
+  <div class="qa">
+    <div class="q">¿Cuál es el CAC (Costo de Adquisición de Cliente)?</div>
+    <div class="a"><span class="tag existe">Calculado</span> <strong>$0 hoy</strong> (100% orgánico). El costo por usuario registrado es el costo de infraestructura dividido por usuarios: $45.000 ÷ 40 = <strong>$1.125 CLP por usuario registrado</strong>. Con inversión en marketing el CAC subiría pero también el volumen.</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuál es la conversión de visitantes en compradores?</div>
+    <div class="a">
+      <span class="tag proyectado">En medición</span>
+      El bounce rate bajó de 72% a ~26% tras el rediseño del home (mejora de 3×). La conversión visitante → comprador es la métrica más importante a medir en los próximos 60 días. Aún no hay dato confiable.
+    </div>
+  </div>
+</section>
+
+<!-- FLUJO DE CAJA -->
+<section>
+  <h2>8. Flujo de caja</h2>
+
+  <div class="qa">
+    <div class="q">¿Existe reserva de emergencia? ¿Por cuántos meses sobrevive sin ventas?</div>
+    <div class="a">
+      <span class="tag honesto">Transparencia total</span>
+      Con costos actuales de $46.800 CLP/mes (sin salario fundadora), la plataforma puede operar por tiempo indefinido con costo mínimo. <strong>Si la fundadora quiere pagarse un salario de mercado ($3–5M CLP/mes), necesita capital externo. Ese es el uso principal de una inversión.</strong>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>El punto crítico del flujo de caja.</strong> El modelo de negocio es rentable unitariamente desde el primer libro vendido. El problema no es el margen: es que con 3 ventas/mes el ingreso total no cubre ni el salario de mercado de quien lo construye. La inversión financia el tiempo de la fundadora mientras la plataforma escala.
+  </div>
+</section>
+
+<!-- ESCALABILIDAD -->
+<section>
+  <h2>9. Escalabilidad</h2>
+
+  <div class="qa">
+    <div class="q">¿Qué limita el crecimiento actualmente?</div>
+    <div class="a">
+      <span class="tag existe">Diagnóstico claro</span>
+      <strong>Volumen de libros disponibles.</strong> Con ~300–400 libros activos la selección es limitada. Según Álvaro de Librería Comuna Literaria (15 años, Providencia), se necesitan ~50.000 libros para ser competencia real con Buscalibre. La API de inventario construida esta semana resuelve exactamente este problema: las librerías pueden integrar su catálogo completo automáticamente.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿El negocio puede crecer sin aumentar mucho los costos?</div>
+    <div class="a">
+      <span class="tag existe">Sí, por diseño</span>
+      <strong>Sí. Es la ventaja central del modelo marketplace.</strong> 10× más libros no requiere 10× más costo. La infraestructura escala con volumen sin cambio estructural de costos hasta ~$50M CLP de GMV mensual. Cada nueva librería que conecta la API agrega miles de libros con costo marginal cercano a cero.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Existe automatización de procesos?</div>
+    <div class="a"><span class="tag existe">Sí</span> Publicación por scanner de código de barras, categorización automática por IA, API REST para integración de inventario, sistema de pagos split automático con MercadoPago. El vendedor escanea, el sistema hace el resto.</div>
+  </div>
+</section>
+
+<!-- PROYECCION FINANCIERA -->
+<section>
+  <h2>10. Proyección financiera — 3 escenarios</h2>
+
+  <p style="margin-bottom:16px; font-size:14px;">Basado en modelo financiero con supuestos documentados. Tasa de comisión real: 8% (el modelo fue construido con 10% — las cifras reales son ~20% más conservadoras que las mostradas aquí).</p>
+
+  <table class="scenario-table">
+    <tr>
+      <th>Escenario</th>
+      <th>Probabilidad</th>
+      <th>Supuesto clave</th>
+      <th>Break-even</th>
+      <th>NPV a 36 meses</th>
+    </tr>
+    <tr>
+      <td class="bear">Bear (conservador)</td>
+      <td>35%</td>
+      <td>Crecimiento 10%/mes, sin alianzas</td>
+      <td>Mes ~40+ (con salario)</td>
+      <td class="bear">-$80.000 USD</td>
+    </tr>
+    <tr>
+      <td class="base">Base</td>
+      <td>45%</td>
+      <td>Crecimiento 15–20%/mes, 10–15 librerías</td>
+      <td>Mes ~28 (con salario)</td>
+      <td class="base">-$50.000 USD</td>
+    </tr>
+    <tr>
+      <td class="bull">Bull (optimista)</td>
+      <td>20%</td>
+      <td>Crecimiento 30%/mes, 50+ librerías vía API</td>
+      <td>Mes ~14 (sin salario) / Mes ~48 (con salario)</td>
+      <td class="bull">+$550.000 USD</td>
+    </tr>
+    <tr>
+      <td><strong>Valor esperado ponderado</strong></td>
+      <td>100%</td>
+      <td></td>
+      <td></td>
+      <td><strong>+$59.500 USD</strong></td>
+    </tr>
+  </table>
+
+  <div class="callout red" style="margin-top:20px;">
+    <strong>¿De dónde viene el número de $500.000 USD?</strong><br>
+    El escenario Bull tiene un NPV proyectado de $550.000 USD. Ese es el número de mejor caso con 20% de probabilidad. El valor esperado ponderado es $59.500 USD. La inversión tiene sentido si el inversionista cree que la probabilidad Bull es mayor que 20%, o si valora el equity futuro de la siguiente ronda seed (USD 500k–1M, proyectada para el mes 12–18).
+  </div>
+</section>
+
+<!-- LICENCIA -->
+<section>
+  <h2>11. Licencia gubernamental</h2>
+
+  <div class="qa">
+    <div class="q">¿Qué licencia es necesaria exactamente?</div>
+    <div class="a">
+      <span class="tag proyectado">Pendiente confirmar</span>
+      Para operar legalmente como marketplace en Chile se requiere: (1) patente comercial municipal, (2) RUT empresarial (SpA o EIRL, costo ~$50 USD de constitución), (3) inicio de actividades en SII. Ninguno de estos es una barrera real ni tiene costo significativo. <br><br>
+      Si la pregunta se refiere a alguna licencia específica mencionada en conversaciones anteriores, <strong>Verónica debe completar esta respuesta con el detalle concreto que tienes en mente.</strong>
+    </div>
+  </div>
+</section>
+
+<!-- RIESGO -->
+<section>
+  <h2>12. Riesgos reales</h2>
+
+  <table>
+    <tr><th>Riesgo</th><th>Probabilidad</th><th>Mitigación</th></tr>
+    <tr>
+      <td><strong>No alcanza escala</strong> — sigue con 300 libros y no crece</td>
+      <td>Media</td>
+      <td>API para librerías (en producción). Primer prospecto: Álvaro, 10.000+ libros, reunión 8 mayo.</td>
+    </tr>
+    <tr>
+      <td><strong>Competidor grande entra al mercado</strong> (Buscalibre, ML)</td>
+      <td>Baja–Media</td>
+      <td>ML cobra 17% — no puede bajar sin perder margen. Buscalibre es libros nuevos. El nicho peer-to-peer es desinteresante para ellos.</td>
+    </tr>
+    <tr>
+      <td><strong>Dependencia del fundador</strong></td>
+      <td>Alta (hoy)</td>
+      <td>El negocio hoy depende de Verónica. La inversión financia contratar primer colaborador. La plataforma técnica ya funciona sin intervención diaria.</td>
+    </tr>
+    <tr>
+      <td><strong>Pérdida de capital total</strong></td>
+      <td>Real</td>
+      <td>El escenario Bear tiene NPV negativo. Una inversión en pre-seed siempre tiene riesgo de pérdida total. Invertir solo lo que se puede perder.</td>
+    </tr>
+    <tr>
+      <td><strong>Instagram bloqueada</strong></td>
+      <td>Ocurriendo (temporal)</td>
+      <td>No afecta ventas ni plataforma. Canal secundario en recuperación.</td>
+    </tr>
+  </table>
+</section>
+
+<!-- USO DEL CAPITAL -->
+<section>
+  <h2>13. Uso del capital y condiciones de inversión</h2>
+
+  <div class="qa">
+    <div class="q">¿Cuánto capital necesita exactamente? ¿Para qué?</div>
+    <div class="a">
+      <span class="tag existe">Documentado</span>
+      El modelo contempla <strong>USD 80–120k</strong> para un runway de 12–18 meses. Uso:
+      <ul style="margin-top:8px; padding-left:20px; font-size:14px;">
+        <li>Salario fundadora (~70%): permite que Verónica se dedique full-time sin subsidiar su propio tiempo</li>
+        <li>Marketing digital (~15%): primeras campañas pagadas para adquisición de vendedores y compradores</li>
+        <li>Infraestructura y desarrollo (~10%): escalar la plataforma para 10× el volumen actual</li>
+        <li>Capital de trabajo (~5%): gastos operacionales misceláneos</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Qué retorno esperado existe? ¿En cuánto tiempo?</div>
+    <div class="a">
+      <span class="tag proyectado">Proyectado, no garantizado</span>
+      Dos escenarios de retorno:<br>
+      <strong>Escenario A (dividendos):</strong> Si la plataforma alcanza break-even operacional sin salario fundadora (~mes 14, escenario Bull), el flujo libre comienza a existir. Retorno sobre inversión en el plazo proyectado: no es el modelo óptimo para retorno rápido.<br>
+      <strong>Escenario B (equity + ronda seed):</strong> Una inversión hoy a cambio de equity (% de la empresa) se valoriza cuando se levante la siguiente ronda seed (USD 500k–1M, proyectada mes 12–18) a una valoración pre-money mayor. El retorno está en la apreciación del equity, no en dividendos inmediatos.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cómo se medirá el éxito del aporte?</div>
+    <div class="a">
+      <span class="tag existe">Propuesta</span>
+      Métricas de éxito a 12 meses:
+      <ul style="margin-top:8px; padding-left:20px; font-size:14px;">
+        <li>GMV mensual: $5M+ CLP/mes (hoy: $120k total en 40 días)</li>
+        <li>Libros activos: 5.000+ (hoy: ~400)</li>
+        <li>Librerías integradas vía API: 5+ (hoy: en negociación)</li>
+        <li>Usuarios registrados: 500+ (hoy: 40)</li>
+        <li>CAC < $5.000 CLP por comprador activo</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">¿Cuál sería el peor escenario posible?</div>
+    <div class="a">
+      <span class="tag honesto">Honestidad total</span>
+      <strong>Pérdida total del capital invertido.</strong> Si la plataforma no logra masa crítica de libros, no atrae suficientes compradores, y el modelo no escala en 18 meses, la operación se cierra. La plataforma técnica existe y tiene valor residual (puede venderse o pivotar), pero el capital invertido en salario no se recupera. Este es un riesgo real que cualquier inversión en una startup en etapa pre-seed lleva implícito.
+    </div>
+  </div>
+</section>
+
+<!-- OPORTUNIDAD ÁLVARO -->
+<section>
+  <h2>14. Oportunidad inmediata: integración con librería física</h2>
+
+  <div class="callout green">
+    <strong>Señal más importante de esta semana.</strong> Álvaro, dueño de Librería Comuna Literaria (15 años en Providencia, MercadoLíder Gold, potencial de 10.000+ libros), se reunió el 8 de mayo y planteó: "con 50.000 libros pueden ser competencia real con Buscalibre". MercadoLibre le cobra 17%. Tuslibros cobra 8%. La API de inventario construida esta semana le permite sincronizar su catálogo completo automáticamente. Si se cierra esta integración, el catálogo de la plataforma podría multiplicarse por 25× en semanas.
+  </div>
+</section>
+
+<footer>
+  <p><strong>tuslibros.cl</strong> · Documento preparado por Verónica Velasquez · 8 de mayo de 2026 · Confidencial — solo para uso de Veri Velasquez en evaluación de inversión familiar.</p>
+  <p style="margin-top:8px;">Los proyecciones financieras son estimaciones basadas en supuestos documentados y no constituyen garantía de retorno. Toda inversión en startup pre-seed conlleva riesgo de pérdida total.</p>
+</footer>
+
+</body>
+</html>

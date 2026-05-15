@@ -47,6 +47,12 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [discountInput, setDiscountInput] = useState("");
+  const [discountCode, setDiscountCode] = useState<string | null>(null);
+  const [discountPct, setDiscountPct] = useState(0);
+  const [discountError, setDiscountError] = useState<string | null>(null);
+  const [validatingCode, setValidatingCode] = useState(false);
+
   const isGuest = !buyerName;
 
   // Shipping quotes
@@ -57,11 +63,13 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
 
   const { book } = listing;
   const bookPrice = listing.price ?? 0;
+  const discountAmount = Math.round(bookPrice * discountPct / 100);
+  const discountedBookPrice = bookPrice - discountAmount;
 
   const isCourier = deliveryMethod === "courier";
   const selectedQuote = isCourier ? quotes.find((q) => q.serviceCode === selectedService) : null;
   const shippingCost = selectedQuote?.price ?? 0;
-  const total = bookPrice + shippingCost;
+  const total = discountedBookPrice + shippingCost;
 
   const fetchQuotes = useCallback(
     async (addr: string) => {
@@ -113,6 +121,33 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
     }
   }, [buyerAddress, fetchQuotes]);
 
+  async function handleApplyCode() {
+    if (!discountInput.trim()) return;
+    setValidatingCode(true);
+    setDiscountError(null);
+    try {
+      const res = await fetch("/api/discount-codes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: discountInput.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setDiscountError(data.error ?? "Código no válido");
+        setDiscountCode(null);
+        setDiscountPct(0);
+      } else {
+        setDiscountCode(data.code);
+        setDiscountPct(data.discount_pct);
+        setDiscountError(null);
+      }
+    } catch {
+      setDiscountError("Error al validar el código");
+    } finally {
+      setValidatingCode(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (isCourier && !selectedQuote) return;
@@ -140,6 +175,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
           shipping_service: isCourier ? selectedQuote!.service : deliveryMethod === "in_person" ? "Entrega en persona" : "Punto de retiro",
           shipping_courier: isCourier ? selectedQuote!.courier : undefined,
           buyer_address: isCourier ? address : deliveryMethod,
+          discount_code: discountCode ?? undefined,
           guest_info: isGuest ? {
             name: guestName,
             email: guestEmail,
@@ -359,10 +395,61 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
           </div>
 
           <div className="p-6 bg-cream-warm/30 space-y-3">
+            {/* Código de descuento */}
+            <div className="pb-3 border-b border-cream-dark">
+              <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider mb-2">¿Tienes un código de descuento?</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={discountInput}
+                  onChange={(e) => setDiscountInput(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => e.key === "Enter" && handleApplyCode()}
+                  placeholder="Ej: VECINOS20"
+                  disabled={!!discountCode}
+                  className="flex-1 px-3 py-2 border border-cream-dark rounded-lg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white disabled:bg-cream disabled:text-ink-muted"
+                />
+                {discountCode ? (
+                  <button
+                    type="button"
+                    onClick={() => { setDiscountCode(null); setDiscountPct(0); setDiscountInput(""); }}
+                    className="px-3 py-2 text-xs font-bold text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+                  >
+                    Quitar
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleApplyCode}
+                    disabled={validatingCode || !discountInput.trim()}
+                    className="px-3 py-2 text-xs font-bold bg-ink text-white rounded-lg hover:bg-black disabled:opacity-40 transition-colors"
+                  >
+                    {validatingCode ? "..." : "Aplicar"}
+                  </button>
+                )}
+              </div>
+              {discountError && <p className="text-[11px] text-red-600 mt-1">{discountError}</p>}
+              {discountCode && (
+                <p className="text-[11px] text-green-700 font-semibold mt-1">
+                  ✓ {discountCode} — {discountPct}% de descuento aplicado
+                </p>
+              )}
+            </div>
+
             <div className="flex justify-between text-sm">
               <span className="text-ink-muted font-medium">Libro</span>
-              <span className="text-ink font-bold">${bookPrice.toLocaleString("es-CL")}</span>
+              <div className="text-right">
+                {discountAmount > 0 && (
+                  <span className="text-xs text-ink-muted line-through mr-1">${bookPrice.toLocaleString("es-CL")}</span>
+                )}
+                <span className="text-ink font-bold">${discountedBookPrice.toLocaleString("es-CL")}</span>
+              </div>
             </div>
+            {discountAmount > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-green-700 font-medium">Descuento ({discountPct}%)</span>
+                <span className="text-green-700 font-bold">−${discountAmount.toLocaleString("es-CL")}</span>
+              </div>
+            )}
             <div className="flex justify-between text-sm">
               <span className="text-ink-muted font-medium">
                 {isCourier ? "Envío" : "Entrega"}

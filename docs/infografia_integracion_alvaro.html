@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<title>PrestaShop + tuslibros.cl · Infografía</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1f2a44;
+    --gold: #d69b12;
+    --cream: #f7f3ec;
+    --muted: #6b7280;
+    --green: #16a34a;
+    --green-light: #dcfce7;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+    --brand: #2563eb;
+    --brand-light: #dbeafe;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+    color: var(--navy);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 32px 64px;
+  }
+
+  /* Header */
+  .hero {
+    text-align: center;
+    padding: 40px 20px 32px;
+    background: var(--navy);
+    border-radius: 16px;
+    margin-bottom: 48px;
+    color: #fff;
+  }
+  .hero .label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #93c5fd;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .hero p {
+    font-size: 14px;
+    color: #bfdbfe;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* Flow diagram */
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 0 0 48px;
+    flex-wrap: wrap;
+  }
+  .flow-box {
+    text-align: center;
+    padding: 24px 28px;
+    border-radius: 14px;
+    min-width: 200px;
+  }
+  .flow-box.ps {
+    background: #fffbeb;
+    border: 2px solid #fcd34d;
+  }
+  .flow-box.tl {
+    background: var(--brand-light);
+    border: 2px solid #60a5fa;
+  }
+  .flow-box .ico {
+    font-size: 36px;
+    margin-bottom: 8px;
+  }
+  .flow-box h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .flow-box p {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .arrow-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+  }
+  .arrow-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--green);
+    text-align: center;
+    max-width: 100px;
+    line-height: 1.3;
+  }
+  .arrow-label.down {
+    color: #f59e0b;
+  }
+  .arrow-svg {
+    fill: var(--navy);
+    opacity: 0.3;
+  }
+
+  /* Compare */
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+  .compare-box {
+    border-radius: 14px;
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .compare-box.bad {
+    background: var(--red-light);
+    border: 2px solid #fca5a5;
+  }
+  .compare-box.good {
+    background: var(--green-light);
+    border: 2px solid #86efac;
+  }
+  .compare-box .pct {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .compare-box.bad .pct { color: var(--red); }
+  .compare-box.good .pct { color: var(--green); }
+  .compare-box .platform { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .compare-box .note { font-size: 12px; color: var(--muted); }
+  .compare-box .save-badge {
+    margin-top: 16px;
+    background: var(--green);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 16px;
+    display: inline-block;
+  }
+
+  /* Steps visual */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+  .step-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px 14px 16px;
+    text-align: center;
+  }
+  .step-card .num {
+    width: 32px;
+    height: 32px;
+    background: var(--navy);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    margin: 0 auto 12px;
+  }
+  .step-card .ico { font-size: 22px; margin-bottom: 8px; }
+  .step-card h4 { font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--navy); }
+  .step-card p { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  /* Sync visual */
+  .sync-section {
+    background: #f8faff;
+    border: 1px solid #bfdbfe;
+    border-radius: 14px;
+    padding: 32px;
+    margin-bottom: 48px;
+  }
+  .sync-section h2 { margin-bottom: 8px; text-align: left; }
+  .sync-section .sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+  .sync-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .sync-pill {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 130px;
+    text-align: center;
+  }
+  .sync-pill.stock-si { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+  .sync-pill.stock-no { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+  .sync-arrow { font-size: 18px; color: var(--muted); }
+  .sync-pill.active { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+  .sync-pill.paused { background: #f3f4f6; color: var(--muted); border: 1px solid #d1d5db; }
+  .sync-note { font-size: 12px; color: var(--muted); margin-left: 8px; }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .stat-box {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .stat-box .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-box .stat-label { font-size: 12px; color: var(--muted); }
+
+  /* CTA */
+  .cta {
+    background: var(--navy);
+    color: #fff;
+    border-radius: 16px;
+    padding: 36px 40px;
+    text-align: center;
+  }
+  .cta h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .cta p { font-size: 14px; color: #bfdbfe; margin-bottom: 20px; }
+  .cta .contact { font-size: 15px; font-weight: 600; color: #93c5fd; }
+
+  @media print {
+    body { padding: 16px; }
+    .hero { page-break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="label">tuslibros.cl · Integración de librerías</div>
+  <h1>Tu catálogo PrestaShop,<br>publicado en tuslibros</h1>
+  <p>Importación automática, sincronización de stock en tiempo real, y 8% de comisión solo cuando vendes.</p>
+</div>
+
+<!-- Flow -->
+<h2>¿Cómo funciona?</h2>
+<div class="flow">
+  <div class="flow-box ps">
+    <div class="ico">🏪</div>
+    <h3>Tu tienda PrestaShop</h3>
+    <p>Catálogo, stock y precios</p>
+  </div>
+  <div class="arrow-wrap">
+    <div class="arrow-label">Importación<br>inicial</div>
+    <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
+      <path d="M2 12h52m0 0l-8-8m8 8l-8 8" stroke="#1f2a44" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="arrow-label down">Sync cada<br>30 min</div>
+    <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
+      <path d="M58 12H6m0 0l8-8M6 12l8 8" stroke="#1f2a44" stroke-opacity="0.35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 3"/>
+    </svg>
+  </div>
+  <div class="flow-box tl">
+    <div class="ico">📚</div>
+    <h3>tuslibros.cl</h3>
+    <p>Listados publicados + compradores</p>
+  </div>
+  <div class="arrow-wrap">
+    <div class="arrow-label">Venta<br>concretada</div>
+    <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
+      <path d="M2 12h52m0 0l-8-8m8 8l-8 8" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="flow-box tl" style="background: #f0fdf4; border-color: #86efac;">
+    <div class="ico">💰</div>
+    <h3>Pago a tu cuenta</h3>
+    <p>Neto: precio − 8% comisión</p>
+  </div>
+</div>
+
+<!-- Comparación comisión -->
+<h2>Comparación de comisiones</h2>
+<div class="compare">
+  <div class="compare-box bad">
+    <div class="platform">Mercado Libre</div>
+    <div class="pct">17%</div>
+    <div class="note">Por cada venta, más costos de envío y fulfillment. Sin control sobre tu catálogo.</div>
+  </div>
+  <div class="compare-box good">
+    <div class="platform">tuslibros.cl</div>
+    <div class="pct">8%</div>
+    <div class="note">Solo cuando se vende. Sin cuota mensual ni costo de publicación.</div>
+    <div class="save-badge">Ahorra 9 puntos por venta</div>
+  </div>
+</div>
+<div style="text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 48px;">
+  En un libro de $20.000: MercadoLibre cobra $3.400 · tuslibros cobra $1.600 · <strong>ahorro de $1.800 por transacción</strong>
+</div>
+
+<!-- 5 pasos -->
+<h2>5 pasos para conectar tu tienda</h2>
+<div class="steps-grid">
+  <div class="step-card">
+    <div class="num">1</div>
+    <div class="ico">⚙️</div>
+    <h4>Activa Webservice</h4>
+    <p>En PrestaShop: Parámetros Avanzados → Webservice</p>
+  </div>
+  <div class="step-card">
+    <div class="num">2</div>
+    <div class="ico">🔑</div>
+    <h4>Crea API Key PS</h4>
+    <p>Permisos GET en products y stock_availables</p>
+  </div>
+  <div class="step-card">
+    <div class="num">3</div>
+    <div class="ico">🪪</div>
+    <h4>Obtén API Key TL</h4>
+    <p>Desde tu perfil en tuslibros.cl → sección API</p>
+  </div>
+  <div class="step-card">
+    <div class="num">4</div>
+    <div class="ico">📤</div>
+    <h4>Importa catálogo</h4>
+    <p>Script de importación: lee PS → crea listados en TL</p>
+  </div>
+  <div class="step-card">
+    <div class="num">5</div>
+    <div class="ico">🔄</div>
+    <h4>Activa sync cron</h4>
+    <p>Cada 30 min sincroniza stock automáticamente</p>
+  </div>
+</div>
+
+<!-- Sync automático -->
+<div class="sync-section">
+  <h2>Sincronización automática de stock</h2>
+  <div class="sub">El script compara tu stock en PrestaShop con el estado de los listados en tuslibros cada 30 minutos.</div>
+
+  <div class="sync-row">
+    <div class="sync-pill stock-si">Stock PS: 3 unidades</div>
+    <div class="sync-arrow">→</div>
+    <div class="sync-pill active">tuslibros: ACTIVO</div>
+    <div class="sync-note">✓ Sin cambio — libro visible y comprable</div>
+  </div>
+
+  <div class="sync-row">
+    <div class="sync-pill stock-no">Stock PS: 0 unidades</div>
+    <div class="sync-arrow">→</div>
+    <div class="sync-pill paused">tuslibros: PAUSADO</div>
+    <div class="sync-note">⏸ Libro oculto automáticamente</div>
+  </div>
+
+  <div class="sync-row">
+    <div class="sync-pill stock-si">Stock PS: volvió a 2</div>
+    <div class="sync-arrow">→</div>
+    <div class="sync-pill active">tuslibros: ACTIVO</div>
+    <div class="sync-note">▶️ Reactivado automáticamente</div>
+  </div>
+</div>
+
+<!-- Stats clave -->
+<h2>tuslibros.cl hoy</h2>
+<div class="stats">
+  <div class="stat-box">
+    <div class="stat-num">8%</div>
+    <div class="stat-label">Comisión sobre precio de venta.<br>Sin costos fijos.</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num">30 min</div>
+    <div class="stat-label">Frecuencia recomendada<br>de sincronización de stock</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num">~1h</div>
+    <div class="stat-label">Tiempo estimado para<br>configuración completa</div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta">
+  <h2>¿Empezamos?</h2>
+  <p>La primera configuración la hacemos juntos. Envíame tu URL de PrestaShop y en una hora tienes tu catálogo publicado.</p>
+  <div class="contact">Veronica · vero@tuslibros.cl · tuslibros.cl</div>
+</div>
+
+</body>
+</html>
