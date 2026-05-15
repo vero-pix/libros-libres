@@ -50,3 +50,4 @@ public/hero-libros-old.jpg
 /test-results/
 /tests/playwright-report/
 /playwright/.cache/
+.env.production.tmp
