@@ -60,15 +60,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const image = listing.cover_image_url || listing.book.cover_url || "/og-image.png";
 
+  // Canonical: apunta a URL amigable si existe, de lo contrario a la UUID
+  const canonicalUrl = listing.slug && listing.seller?.username
+    ? `https://tuslibros.cl/libro/${listing.seller.username}/${listing.slug}`
+    : `https://tuslibros.cl/listings/${params.id}`;
+
   return {
     title,
     description,
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       title,
       description,
       siteName: "tuslibros.cl",
-      type: "article",
+      type: "book",
       locale: "es_CL",
+      url: canonicalUrl,
       images: [{ url: image, width: 600, height: 900, alt: listing.book.title }],
     },
     twitter: { card: "summary_large_image", title, description, images: [image] },
@@ -84,9 +91,10 @@ export default async function ListingByIdPage({ params }: Props) {
   // Google actualice y el usuario aterrice en algo útil en vez de un 404.
   if (!listing) permanentRedirect("/");
 
-  // Si tiene URL amigable, redirigir
+  // Si tiene URL amigable, redirigir de forma permanente (308)
+  // para que Google consolide PageRank hacia /libro/[username]/[slug]
   if (listing.slug && listing.seller?.username) {
-    redirect(`/libro/${listing.seller.username}/${listing.slug}`);
+    permanentRedirect(`/libro/${listing.seller.username}/${listing.slug}`);
   }
 
   // Sin username — mostrar el libro directamente
@@ -118,8 +126,75 @@ export default async function ListingByIdPage({ params }: Props) {
         .slice(0, 5)
     : [];
 
+  // JSON-LD para fichas sin URL amigable (mismo schema que /libro/[username]/[slug])
+  const fallbackUrl = `https://tuslibros.cl/listings/${listing.id}`;
+  const bookCondition = listing.condition === "new"
+    ? "https://schema.org/NewCondition"
+    : "https://schema.org/UsedCondition";
+  const bookFormat = (listing.book as any).binding === "hardcover"
+    ? "https://schema.org/Hardcover"
+    : "https://schema.org/Paperback";
+  const bookDescription = listing.book.description
+    || `${listing.book.title} de ${listing.book.author}. Libro usado publicado en tuslibros.cl.`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Book",
+    name: listing.book.title,
+    description: bookDescription,
+    image: listing.cover_image_url || listing.book.cover_url || undefined,
+    author: { "@type": "Person", name: listing.book.author },
+    isbn: listing.book.isbn || undefined,
+    inLanguage: (listing.book as any).language || "es",
+    bookFormat,
+    publisher: (listing.book as any).publisher || undefined,
+    datePublished: listing.book.published_year ? String(listing.book.published_year) : undefined,
+    numberOfPages: (listing.book as any).pages || undefined,
+    offers: {
+      "@type": "Offer",
+      price: listing.price,
+      priceCurrency: "CLP",
+      availability: listing.status === "active"
+        ? "https://schema.org/InStock"
+        : "https://schema.org/SoldOut",
+      itemCondition: bookCondition,
+      seller: { "@type": "Person", name: listing.seller?.full_name },
+      url: fallbackUrl,
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: { "@type": "MonetaryAmount", value: "3500", currency: "CLP" },
+        shippingDestination: { "@type": "DefinedRegion", addressCountry: "CL" },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 2, unitCode: "DAY" },
+          transitTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 5, unitCode: "DAY" },
+        },
+      },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "CL",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 7,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn",
+      },
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio", item: "https://tuslibros.cl" },
+      { "@type": "ListItem", position: 2, name: listing.seller?.full_name || "Vendedor", item: `https://tuslibros.cl/vendedor/${listing.seller?.username ?? listing.seller_id}` },
+      { "@type": "ListItem", position: 3, name: listing.book.title, item: fallbackUrl },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-cream">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <main className="max-w-7xl mx-auto px-6 py-10">
         <Breadcrumbs
           items={[
