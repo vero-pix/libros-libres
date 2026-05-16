@@ -13,6 +13,10 @@ const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   async redirects() {
     return [
+      // SEO landing pages — libros de alta demanda con página dedicada.
+      // Redirigen ANTES que el middleware para transferir link equity (308).
+      { source: '/libro/algebra-de-baldor', destination: '/algebra-de-baldor', permanent: true },
+      { source: '/libro/algebra-de-baldor/', destination: '/algebra-de-baldor', permanent: true },
       // WordPress legacy URLs → new routes
       // NOTA: /libro/:slug ya NO se redirige acá — el middleware lo resuelve a /libro/[username]/[slug]
       // Recuperación de tráfico: el slug legacy se traduce a búsqueda (hay intent recuperable)
