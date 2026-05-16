@@ -162,6 +162,17 @@ export interface ShipitOrderInput {
   orderId: string;
   /** Cantidad de productos en el paquete (bundle). Default 1. */
   itemCount?: number;
+  /** Dirección de origen (vendedor). Si no se pasa, Shipit usa la de la cuenta. */
+  origin?: {
+    street: string;
+    number: number;
+    complement?: string;
+    commune_id?: number;
+    commune_name: string;
+    full_name: string;
+    email: string;
+    phone: string;
+  };
   /** Datos del destino */
   destiny: {
     street: string;
@@ -231,9 +242,13 @@ function extractLabelUrl(data: any): string | undefined {
  * Docs: POST https://orders.shipit.cl/v/orders
  */
 export async function createShipitOrder(input: ShipitOrderInput): Promise<ShipitOrderResult> {
-  const { orderId, itemCount, destiny, sizes, courier } = input;
+  const { orderId, itemCount, origin, destiny, sizes, courier } = input;
 
-  const destCommuneId = destiny.commune_id || (await findCommuneId(destiny.commune_name));
+  const [destCommuneId, originCommuneId] = await Promise.all([
+    destiny.commune_id || findCommuneId(destiny.commune_name),
+    origin ? (origin.commune_id || findCommuneId(origin.commune_name)) : Promise.resolve(null),
+  ]);
+
   if (!destCommuneId) {
     return { id: 0, state: "error", error: `Comuna destino no encontrada: ${destiny.commune_name}` };
   }
@@ -241,7 +256,7 @@ export async function createShipitOrder(input: ShipitOrderInput): Promise<Shipit
   const items = Math.max(1, itemCount ?? 1);
   const resolvedSizes = sizes ?? estimateBookPackageSize(items);
 
-  const body = {
+  const body: Record<string, any> = {
     order: {
       kind: 0,
       platform: 2,
@@ -277,6 +292,19 @@ export async function createShipitOrder(input: ShipitOrderInput): Promise<Shipit
       },
     },
   };
+
+  if (origin && originCommuneId) {
+    body.order.origin = {
+      street: origin.street,
+      number: origin.number,
+      complement: origin.complement ?? "",
+      commune_id: originCommuneId,
+      commune_name: origin.commune_name.toUpperCase(),
+      full_name: origin.full_name,
+      email: origin.email,
+      phone: origin.phone,
+    };
+  }
 
   try {
     const res = await fetch(`${ORDERS_URL}/orders`, {

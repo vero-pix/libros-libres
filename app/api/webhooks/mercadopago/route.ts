@@ -122,20 +122,38 @@ export async function POST(req: NextRequest) {
             headOrder.courier === "Punto de retiro";
 
           if (headOrder.buyer_address && !isInPerson) {
-            const { data: buyer } = await supabase
-              .from("users")
-              .select("full_name, email, phone")
-              .eq("id", headOrder.buyer_id)
-              .single();
+            const [{ data: buyer }, { data: sellerData }, { data: listingData }] = await Promise.all([
+              supabase.from("users").select("full_name, email, phone").eq("id", headOrder.buyer_id).single(),
+              supabase.from("users").select("full_name, email, phone, default_address").eq("id", headOrder.seller_id).single(),
+              supabase.from("listings").select("address").eq("id", headOrder.listing_id).single(),
+            ]);
 
             const commune = extractCommune(headOrder.buyer_address);
             const addressParts = headOrder.buyer_address.split(",")[0]?.trim() ?? "";
             const streetMatch = addressParts.match(/^(.+?)\s+(\d+)/);
 
+            // Origen: dirección del listing (más precisa) o fallback a default_address del vendedor
+            const originRaw = listingData?.address || sellerData?.default_address;
+            let shipitOrigin: Parameters<typeof createShipitOrder>[0]["origin"] | undefined;
+            if (originRaw) {
+              const originCommune = extractCommune(originRaw);
+              const originParts = originRaw.split(",")[0]?.trim() ?? "";
+              const originStreetMatch = originParts.match(/^(.+?)\s+(\d+)/);
+              shipitOrigin = {
+                street: originStreetMatch?.[1] ?? originParts,
+                number: parseInt(originStreetMatch?.[2] ?? "0", 10),
+                commune_name: originCommune,
+                full_name: sellerData?.full_name ?? "Vendedor",
+                email: sellerData?.email ?? "",
+                phone: sellerData?.phone ?? "",
+              };
+            }
+
             const shipitResult = await createShipitOrder({
               orderId: headOrder.id,
               itemCount: bundleOrders.length,
               sizes: estimateBookPackageSize(bundleOrders.length),
+              origin: shipitOrigin,
               destiny: {
                 street: streetMatch?.[1] ?? addressParts,
                 number: parseInt(streetMatch?.[2] ?? "0", 10),
@@ -328,7 +346,7 @@ export async function POST(req: NextRequest) {
         try {
           const { data: shipitOrder } = await supabase
             .from("orders")
-            .select("id, buyer_id, buyer_address, shipping_cost, courier")
+            .select("id, buyer_id, seller_id, listing_id, buyer_address, shipping_cost, courier")
             .eq("id", order.id)
             .single();
 
@@ -337,18 +355,35 @@ export async function POST(req: NextRequest) {
             shipitOrder?.courier === "Punto de retiro";
 
           if (shipitOrder?.buyer_address && !isInPerson) {
-            const { data: buyer } = await supabase
-              .from("users")
-              .select("full_name, email, phone")
-              .eq("id", shipitOrder.buyer_id)
-              .single();
+            const [{ data: buyer }, { data: sellerData }, { data: listingData }] = await Promise.all([
+              supabase.from("users").select("full_name, email, phone").eq("id", shipitOrder.buyer_id).single(),
+              supabase.from("users").select("full_name, email, phone, default_address").eq("id", shipitOrder.seller_id).single(),
+              supabase.from("listings").select("address").eq("id", shipitOrder.listing_id).single(),
+            ]);
 
             const commune = extractCommune(shipitOrder.buyer_address);
             const addressParts = shipitOrder.buyer_address.split(",")[0]?.trim() ?? "";
             const streetMatch = addressParts.match(/^(.+?)\s+(\d+)/);
 
+            const originRaw = listingData?.address || sellerData?.default_address;
+            let shipitOrigin: Parameters<typeof createShipitOrder>[0]["origin"] | undefined;
+            if (originRaw) {
+              const originCommune = extractCommune(originRaw);
+              const originParts = originRaw.split(",")[0]?.trim() ?? "";
+              const originStreetMatch = originParts.match(/^(.+?)\s+(\d+)/);
+              shipitOrigin = {
+                street: originStreetMatch?.[1] ?? originParts,
+                number: parseInt(originStreetMatch?.[2] ?? "0", 10),
+                commune_name: originCommune,
+                full_name: sellerData?.full_name ?? "Vendedor",
+                email: sellerData?.email ?? "",
+                phone: sellerData?.phone ?? "",
+              };
+            }
+
             const shipitResult = await createShipitOrder({
               orderId: order.id,
+              origin: shipitOrigin,
               destiny: {
                 street: streetMatch?.[1] ?? addressParts,
                 number: parseInt(streetMatch?.[2] ?? "0", 10),
