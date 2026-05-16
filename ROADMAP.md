@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 15 mayo 2026
+Última actualización: 16 mayo 2026
 
 ---
 
@@ -48,6 +48,16 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 ### 🔴 Urgente / Con fecha límite
 
 - [ ] **Dominio librolibre.cl** — vence 24 mayo 2026. Titular: Cinta Carmesí. Si no renueva, registrar al tiro ($9.990/año, NIC Chile, 30 días gracia post-vencimiento).
+- [ ] **Restaurar dirección Shipit** — cambiar de vuelta a San Pio X 2555, Providencia, vero@economics.cl después del envío de cim.
+
+---
+
+### CIMLibros — primera venta (15 mayo 2026)
+
+- [x] Primera venta procesada — $15.000, Starken, retiro La Florida → Providencia (Zdravko)
+- [x] Etiqueta generada, email enviado a cimlibros@gmail.com con instrucciones
+- [ ] **Probar flujo Shipit punta a punta para vendedores externos** — problema detectado: dirección de origen toma la de Vero por defecto, no la del vendedor. Solución manual por ahora (editar origen en Shipit antes de crear envío). Pendiente solución estructural en código o guía para vendedores.
+- [ ] **Agregar dirección de cim en Shipit como origen permanente** — Santa Julia 732, La Florida, +56 9 8903 1517, cimlibros@gmail.com
 
 ---
 
