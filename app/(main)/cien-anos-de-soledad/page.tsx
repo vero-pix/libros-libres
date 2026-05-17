@@ -76,7 +76,9 @@ export default async function CienAnosDeSoledadPage() {
 
   const combined = [...(raw ?? []), ...(rawByAuthor ?? [])];
   const unique = combined.filter((item, idx, arr) => arr.findIndex((i: any) => i.id === (item as any).id) === idx);
-  const listings = sortListingsForDisplay((unique as unknown as ListingWithBook[]) ?? []).slice(0, 8);
+  const listings = sortListingsForDisplay(
+    (unique.filter((item: any) => item.book !== null) as unknown as ListingWithBook[])
+  ).slice(0, 8);
 
   const bookJsonLd = {
     "@context": "https://schema.org",

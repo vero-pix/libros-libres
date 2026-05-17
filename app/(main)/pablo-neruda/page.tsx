@@ -68,7 +68,7 @@ export default async function PabloNerudaPage() {
     .limit(20);
 
   const listings = sortListingsForDisplay(
-    (raw as unknown as ListingWithBook[]) ?? []
+    ((raw ?? []).filter((item: any) => item.book !== null) as unknown as ListingWithBook[])
   ).slice(0, 8);
 
   const personJsonLd = {
