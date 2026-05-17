@@ -77,7 +77,7 @@ export default async function AlgebraDeBaldorPage() {
     .limit(20);
 
   const baldorListings = sortListingsForDisplay(
-    (baldorRaw as unknown as ListingWithBook[]) ?? []
+    ((baldorRaw ?? []).filter((item: any) => item.book !== null) as unknown as ListingWithBook[])
   ).slice(0, 8);
 
   // Schema del libro (Book + Offer agregado)
