@@ -1,0 +1,45 @@
+# tuslibros.cl
+
+> tuslibros.cl es el marketplace chileno de libros usados. Compra y vende libros de segunda mano en Chile con envío a todo el país o retiro en mano. Pago seguro con MercadoPago. Comisión del 8% solo cuando el libro se vende.
+
+## Qué es tuslibros.cl
+
+tuslibros.cl conecta a compradores y vendedores de libros usados en todo Chile. El catálogo incluye novela, poesía, ensayo, libros de texto universitarios, libros infantiles y más. Publicar es gratis. La plataforma usa MercadoPago para pagos seguros y Starken, Chilexpress y otros couriers para envíos.
+
+## Páginas principales
+
+- [Inicio — catálogo completo](https://tuslibros.cl/): Libros usados disponibles en Chile
+- [Cómo funciona](https://tuslibros.cl/como-funciona): Guía de compra y venta
+- [Preguntas frecuentes](https://tuslibros.cl/faq): Dudas sobre envíos, pagos y devoluciones
+- [Solicitar un libro](https://tuslibros.cl/solicitudes): Pide un libro que no está en el catálogo
+- [Sobre tuslibros.cl](https://tuslibros.cl/sobre-nosotros): Historia y modelo del negocio
+
+## Páginas de autores y títulos destacados
+
+- [Pablo Neruda — libros usados](https://tuslibros.cl/pablo-neruda)
+- [Mario Vargas Llosa — libros usados](https://tuslibros.cl/mario-vargas-llosa)
+- [Álgebra de Baldor — usado en Chile](https://tuslibros.cl/algebra-de-baldor)
+- [Rayuela de Cortázar — usado en Chile](https://tuslibros.cl/rayuela)
+- [Cien años de soledad — usado en Chile](https://tuslibros.cl/cien-anos-de-soledad)
+- [El Arte de Amar de Fromm — usado en Chile](https://tuslibros.cl/el-arte-de-amar)
+- [Libros usados en Chile — guía general](https://tuslibros.cl/libros-usados-chile)
+
+## Categorías
+
+- Novela y ficción
+- Poesía
+- Ensayo y divulgación
+- Historia
+- Libros universitarios y de texto
+- Libros infantiles y juveniles
+- Idiomas
+- Colección y ediciones raras
+
+## Información de contacto y operación
+
+- País de operación: Chile
+- Moneda: Peso chileno (CLP)
+- Medios de pago: MercadoPago
+- Envíos: Starken, Chilexpress, Blue Express, 99 Minutos
+- Comisión de venta: 8% sobre el precio del libro cuando se vende con MercadoPago
+- Publicar un libro: gratis
