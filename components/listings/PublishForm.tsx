@@ -88,6 +88,8 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
   const [categorySlug, setCategorySlug] = useState<string | null>(_initNormalized?.category ?? null);
   const [subcategorySlug, setSubcategorySlug] = useState<string | null>(_initNormalized?.subcategory ?? null);
   const [binding, setBinding] = useState<string>((initialBook as any)?.binding ?? "");
+  const [publisher, setPublisher] = useState<string>((initialBook as any)?.publisher ?? "");
+  const [pages, setPages] = useState<string>((initialBook as any)?.pages ? String((initialBook as any).pages) : "");
   const [customCoverUrl, setCustomCoverUrl] = useState<string | null>(null);
   const [modality, setModality] = useState<Modality>("sale");
   const [originalPrice, setOriginalPrice] = useState("");
@@ -190,6 +192,8 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       setBook(data);
       if (data.title) setBookTitle(data.title.trim());
       if (data.author) setBookAuthor(data.author.trim());
+      if ((data as any).publisher) setPublisher((data as any).publisher);
+      if ((data as any).pages) setPages(String((data as any).pages));
 
       const incomingDescription = getBookDescription(data);
       if (incomingDescription) setBookDescription(incomingDescription);
@@ -331,8 +335,8 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         subcategory: finalSubcategory,
         tags,
         published_year: book?.published_year ?? null,
-        publisher: book?.publisher ?? null,
-        pages: book?.pages ?? null,
+        publisher: publisher.trim() || book?.publisher || null,
+        pages: pages ? parseInt(pages, 10) || null : book?.pages ?? null,
         binding: binding || null,
         created_by: userId,
       };
@@ -600,7 +604,9 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
               // Forzamos el llenado de los campos principales
               if (b.title) setBookTitle(b.title.trim());
               if (b.author) setBookAuthor(b.author.trim());
-              
+              if ((b as any).publisher) setPublisher((b as any).publisher);
+              if ((b as any).pages) setPages(String((b as any).pages));
+
               const incomingDescription = getBookDescription(b);
               if (incomingDescription) setBookDescription(incomingDescription);
               
@@ -662,21 +668,34 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
             </div>
           </div>
 
-          {/* Info auto-completada */}
-          {(book?.publisher || book?.pages) && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {book?.publisher && (
-                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-                  {book.publisher}
-                </span>
-              )}
-              {book?.pages && (
-                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-                  {book.pages} páginas
-                </span>
-              )}
+          {/* Editorial y Páginas */}
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Editorial <span className="text-gray-400 font-normal">(opcional)</span>
+              </label>
+              <input
+                type="text"
+                value={publisher}
+                onChange={(e) => setPublisher(e.target.value)}
+                placeholder="Ej: Alfaguara"
+                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+              />
             </div>
-          )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Páginas <span className="text-gray-400 font-normal">(opcional)</span>
+              </label>
+              <input
+                type="number"
+                value={pages}
+                onChange={(e) => setPages(e.target.value)}
+                placeholder="Ej: 320"
+                min={1}
+                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+              />
+            </div>
+          </div>
         </section>
 
       {/* ── Sección 2: Modalidad y precio ── */}
