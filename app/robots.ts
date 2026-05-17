@@ -36,6 +36,7 @@ export default function robots(): MetadataRoute.Robots {
     "/pitch/",
     "/login",
     "/register",
+    "/publish",
   ];
 
   return {
