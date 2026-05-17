@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 16 mayo 2026
+Última actualización: 16 mayo 2026 (sesión tarde)
 
 ---
 
@@ -56,7 +56,9 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 
 - [x] Primera venta procesada — $15.000, Starken, retiro La Florida → Providencia (Zdravko)
 - [x] Etiqueta generada, email enviado a cimlibros@gmail.com con instrucciones
-- [ ] **Probar flujo Shipit punta a punta para vendedores externos** — problema detectado: dirección de origen toma la de Vero por defecto, no la del vendedor. Solución manual por ahora (editar origen en Shipit antes de crear envío). Pendiente solución estructural en código o guía para vendedores.
+- [x] **Fix origen en etiqueta Shipit** — commit 8308c5d. Ahora pasa `origin` del listing/vendedor al crear la orden. Ya no toma la dirección de Vero por defecto.
+- [ ] **Probar flujo punta a punta con venta real de vendedor externo** — verificar que la etiqueta generada muestre la dirección correcta del vendedor.
+- [ ] **Definir tipo de recogida con Shipit (lunes 19 mayo)** — revisar con la API si el campo `kind` del origin controla si un héroe va a retirar al domicilio del vendedor o si el vendedor debe ir a una sucursal. Sesión conjunta.
 - [ ] **Agregar dirección de cim en Shipit como origen permanente** — Santa Julia 732, La Florida, +56 9 8903 1517, cimlibros@gmail.com
 
 ---
@@ -225,7 +227,11 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 
 ## Completado
 
-### Hitos recientes (mayo 2026)
+### Hitos recientes (mayo 2026 — sesión tarde 16 mayo)
+- [x] **Fix Shipit origen vendedor** — commit 8308c5d. La etiqueta ya muestra la dirección del vendedor real, no la de Vero.
+- [x] **Fix sitemap.xml** — eliminadas URLs con `&` que rompían el XML (categorías como query params). Vendedores usan username. `/search` removida. `/libros-usados-chile` agregada.
+- [x] **6 landings SEO** — `/algebra-de-baldor`, `/pablo-neruda`, `/mario-vargas-llosa`, `/rayuela`, `/cien-anos-de-soledad`, `/el-arte-de-amar`. Redirect 308 desde URLs legacy en `next.config.mjs`.
+- [x] **Comparador de precios honesto** — renombrado a "Compara los precios", eliminada etiqueta "Neutral" hardcodeada. Links funcionan, sin promesas falsas. Comparador automático ML descartado (API no pública en Chile).
 - [x] URLs amigables vendedor — `/vendedor/username` resuelve por username O UUID. 5 vendedores sin username corregidos.
 - [x] #1 Google "vender libros usados Chile" — FAQ section + FAQPage schema en `/vender`. Saltó de pos 11 a #1 en <24h.
 - [x] Block /search en robots.txt — URLs `/search?q=…` ya no se indexan.
