@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 19 mayo 2026
+Última actualización: 19 mayo 2026 (sesión noche)
 
 ---
 
@@ -227,7 +227,17 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 
 ## Completado
 
-### Hitos recientes (mayo 2026 — 19 mayo)
+### Hitos recientes (mayo 2026 — 19 mayo, sesión noche)
+
+**Handoff de diseño UI — aplicado completo**
+
+- [x] **PR1 · ListingCard refactor** — jerarquía simplificada, 1 badge (sin apilamiento), botones siempre visibles en mobile, precio con descuento tachado, rating solo si hay reviews. Lógica de arriendo eliminada (segmento pendiente). `bg-coral` como CSS var, `address` parseado para mostrar comuna.
+- [x] **PR4 · Home editorial calmo (variación A)** — Hero dos columnas (editorial + buscador), H1 "Cada estantería es una librería", quote de Vero inline, chips de categoría con scroll horizontal, CTAs "Explorar libros" / "Publicar uno mío". Secciones renombradas: "Esta semana en el velador · Curado por Vero", "Librerías de confianza", "Recién subidos". Manifiesto con tabla de planes visible.
+- [x] **Fix · comuna en card** — extraída del campo `address` (segundo segmento). `city` no existe en BD.
+- [ ] **PR2 · distance_km en API** — haversine entre user.location y listing.location. Pendiente para cuando catálogo > 1.000 libros y distancia sea relevante.
+- [ ] **PR3 · Toggle compra/arriendo en ficha** — descartado por ahora. Segmento bibliotecas/universidades aún no abordado.
+
+### Hitos recientes (mayo 2026 — 19 mayo, sesión mañana)
 - [x] **Editorial y Páginas en formulario de publicación** — pedido de CIM. Antes solo disponibles al editar. Ahora aparecen al publicar y se pre-llenan si el ISBN scanner los detecta.
 - [x] **Fix slug Economía** — corregido a `no-ficcion-economia` (estaba como `economia` suelto, sin prefijo de categoría padre).
 - [x] **Fix landings SEO** — filtrar listings sin `book` antes de `sortListingsForDisplay` (bug en las 6 landings de clusters).
