@@ -132,12 +132,17 @@ const ListingCard = memo(function ListingCard({
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
   const sellerHref = `/vendedor/${listing.seller?.username ?? listing.seller_id}`;
-  const displayLocation = (listing as ListingWithBook & { city?: string | null }).city?.trim() || null;
 
   const distanceKm = (listing as unknown as Record<string, unknown>).distance_km as number | undefined;
   const distanceLabel = showDistance ? formatDistance(distanceKm) : null;
 
   const originalPrice = (listing as unknown as Record<string, unknown>).original_price as number | undefined;
+
+  // Extraer comuna del address: "Calle 123, Providencia, Región..." → "Providencia"
+  const address = (listing as unknown as Record<string, unknown>).address as string | undefined;
+  const displayLocation = address
+    ? address.split(",")[1]?.trim() || null
+    : null;
 
   const badge = pickPrimaryBadge(listing);
 
