@@ -212,6 +212,17 @@ export default async function SearchPage({ searchParams }: Props) {
     listings = sortListingsForDisplay(listings);
   }
 
+  let popularListings: ListingWithBook[] = [];
+  if (listings.length === 0) {
+    const { data } = await supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users!inner(id, full_name, avatar_url, username)`)
+      .eq("status", "active")
+      .eq("featured", true)
+      .limit(5);
+    popularListings = sortListingsForDisplay((data as unknown as ListingWithBook[]) ?? []);
+  }
+
   const allListings = (rawListings as unknown as ListingWithBook[]) ?? [];
   const [categoryTree, availableTags] = await Promise.all([
     buildCategoryTree(supabase, allListings as any),
@@ -272,17 +283,39 @@ export default async function SearchPage({ searchParams }: Props) {
                 </div>
               </SearchResultsToggle>
             ) : (
-              <div className="py-8">
-                <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mb-8">
-                  <p className="text-xl font-display font-bold text-ink">No encontramos este libro aún</p>
-                  <p className="text-gray-500 mt-2 max-w-md mx-auto">
-                    Nuestro catálogo crece día a día. ¿Quieres que te avisemos cuando alguien lo publique?
+              <div className="py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* Economy Inversa CTA */}
+                <div className="bg-amber-50 rounded-2xl border border-amber-200 p-8 mb-12 shadow-sm text-center">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-100 text-amber-600 rounded-full mb-4">
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl font-display font-bold text-ink mb-2">
+                    Todavía no lo tenemos
+                  </h2>
+                  <p className="text-ink-muted max-w-lg mx-auto mb-8 text-lg">
+                    Pero no te preocupes. Nuestra comunidad está constantemente publicando joyas. 
+                    <strong className="text-ink font-semibold"> Déjanos tu pedido</strong> y te avisaremos apenas alguien lo suba a la plataforma.
                   </p>
+                  
+                  <div className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-sm border border-cream-dark text-left relative z-10">
+                    <BookRequestForm initialTitle={q} />
+                  </div>
                 </div>
-                
-                <div className="max-w-xl mx-auto">
-                  <BookRequestForm initialTitle={q} />
-                </div>
+
+                {popularListings.length > 0 && (
+                  <div>
+                    <h3 className="font-display text-2xl font-bold text-ink mb-6">
+                      Mientras tanto, quizás te interese...
+                    </h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                      {popularListings.map((listing) => (
+                        <ListingCard key={listing.id} listing={listing} />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
