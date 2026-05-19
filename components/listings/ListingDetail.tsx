@@ -139,15 +139,15 @@ export default function ListingDetail({ listing, images = [] }: Props) {
 
         {/* Info */}
         <div className="flex-1">
-          {/* Breadcrumbs locales de categoría */}
+          {/* Breadcrumb categoría */}
           {(book as any).category && (
-            <div className="flex items-center gap-1.5 mb-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-brand-600/70">
+            <div className="flex items-center gap-1.5 mb-3 text-[10px] font-mono uppercase tracking-widest text-ink-muted">
               <Link href={`/search?category=${(book as any).category}`} className="hover:text-brand-600 transition-colors">
                 {translateGenre((book as any).category)}
               </Link>
               {(book as any).subcategory && (
                 <>
-                  <span className="text-gray-300">/</span>
+                  <span>/</span>
                   <Link href={`/search?subcategory=${(book as any).subcategory}`} className="hover:text-brand-600 transition-colors">
                     {translateGenre((book as any).subcategory)}
                   </Link>
@@ -156,8 +156,9 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             </div>
           )}
 
+          {/* Título + editar */}
           <div className="flex items-start justify-between gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{book.title}</h1>
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-ink leading-tight">{book.title}</h1>
             {isOwner && (
               <Link
                 href={`/mis-libros?edit=${listing.id}`}
@@ -167,13 +168,18 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               </Link>
             )}
           </div>
-          <Link href={`/search?author=${encodeURIComponent(book.author)}`} className="text-gray-600 mt-1 text-sm sm:text-base hover:text-brand-600 transition-colors">
+          <Link
+            href={`/search?author=${encodeURIComponent(book.author)}`}
+            className="block font-display italic text-sm text-ink-muted hover:text-brand-600 transition-colors mt-1"
+          >
             {book.author}
+            {(book as any).publisher && <span className="not-italic"> · {(book as any).publisher}</span>}
+            {book.published_year && <span className="not-italic"> · {book.published_year}</span>}
           </Link>
 
           {/* Tags */}
           {((book as any).tags ?? []).length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-2">
+            <div className="flex flex-wrap gap-1.5 mt-3">
               {((book as any).tags as string[]).map((tag: string) => (
                 <Link
                   key={tag}
@@ -186,43 +192,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             </div>
           )}
 
-          <div className="flex flex-wrap gap-2 mt-3">
-            {book.genre && (
-              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-brand-50 text-brand-600 border border-brand-100">
-                {book.genre}
-              </span>
-            )}
-            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-200">
-              {CONDITION_LABELS[listing.condition] ?? listing.condition}
-            </span>
-            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-brand-100 text-brand-700 border border-brand-200">
-              {MODALITY_LABELS[listing.modality]}
-            </span>
-            {(book as any).binding && (
-              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-200">
-                {(book as any).binding === "hardcover" ? "Tapa dura" : "Tapa blanda"}
-              </span>
-            )}
-          </div>
-
-          {/* Detalles bibliográficos */}
-          {((book as any).publisher || (book as any).pages || book.published_year || book.isbn) && (
-            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-gray-500">
-              {(book as any).publisher && (
-                <span>Editorial: <span className="text-gray-700">{(book as any).publisher}</span></span>
-              )}
-              {(book as any).pages && (
-                <span>{(book as any).pages} páginas</span>
-              )}
-              {book.published_year && (
-                <span>Año: {book.published_year}</span>
-              )}
-              {book.isbn && (
-                <span>ISBN: <span className="text-gray-700 font-mono">{book.isbn}</span></span>
-              )}
-            </div>
-          )}
-
+          {/* Precio — grande, con descuento */}
           {listing.price != null && listing.modality !== "loan" && (() => {
             const originalPrice = (listing as unknown as Record<string, unknown>).original_price != null
               ? Number((listing as unknown as Record<string, unknown>).original_price)
@@ -231,45 +201,97 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             const discountPct = hasDiscount
               ? Math.round(((originalPrice - listing.price) / originalPrice) * 100)
               : 0;
-
             return (
-              <div className="mt-4 inline-flex items-center gap-2 flex-wrap">
-                {hasDiscount && (
-                  <span className="text-base sm:text-lg text-gray-400 line-through">
-                    ${originalPrice.toLocaleString("es-CL")}
-                  </span>
-                )}
-                <span className="bg-brand-500 text-white font-bold text-lg sm:text-xl px-4 py-1.5 rounded-lg">
+              <div className="mt-5 flex items-baseline gap-3 flex-wrap">
+                <span className="font-display text-3xl sm:text-4xl font-bold text-ink tabular-nums">
                   ${listing.price.toLocaleString("es-CL")}
                 </span>
                 {hasDiscount && (
-                  <span className="text-xs font-bold px-2 py-1 rounded-full bg-red-100 text-red-600">
-                    -{discountPct}%
-                  </span>
+                  <>
+                    <span className="text-base text-ink-muted line-through tabular-nums">
+                      ${originalPrice!.toLocaleString("es-CL")}
+                    </span>
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[--coral]/10 text-[--coral]">
+                      -{discountPct}%
+                    </span>
+                  </>
                 )}
-                <span className="text-xs text-gray-400 uppercase tracking-wider">Precio de venta</span>
               </div>
             );
           })()}
 
-          {(listing as ListingWithRentalFields).rental_price != null && listing.modality !== "sale" && (
-            <p className="text-sm text-brand-600 font-semibold mt-1">
-              Arriendo: ${Number((listing as ListingWithRentalFields).rental_price).toLocaleString("es-CL")} / {(listing as ListingWithRentalFields).rental_period_days ?? 14} días
-              {(listing as ListingWithRentalFields).rental_deposit != null && (
-                <span className="text-gray-400 font-normal">
-                  {" "}+ ${Number((listing as ListingWithRentalFields).rental_deposit).toLocaleString("es-CL")} garantía
-                </span>
-              )}
-            </p>
-          )}
+          {/* Grid de metadata */}
+          <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3">
+            {listing.condition && (
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">Estado</p>
+                <p className="text-sm font-medium text-ink mt-0.5">{CONDITION_LABELS[listing.condition] ?? listing.condition}</p>
+              </div>
+            )}
+            {(book as any).binding && (
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">Encuadernación</p>
+                <p className="text-sm font-medium text-ink mt-0.5">{(book as any).binding === "hardcover" ? "Tapa dura" : "Tapa blanda"}</p>
+              </div>
+            )}
+            {(book as any).publisher && (
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">Editorial</p>
+                <p className="text-sm font-medium text-ink mt-0.5">{(book as any).publisher}</p>
+              </div>
+            )}
+            {(book as any).pages && (
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">Páginas</p>
+                <p className="text-sm font-medium text-ink mt-0.5">{(book as any).pages}</p>
+              </div>
+            )}
+            {book.published_year && (
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">Año</p>
+                <p className="text-sm font-medium text-ink mt-0.5">{book.published_year}</p>
+              </div>
+            )}
+            {book.isbn && (
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">ISBN</p>
+                <p className="text-sm font-mono text-ink mt-0.5">{book.isbn}</p>
+              </div>
+            )}
+          </div>
 
+          {/* Nota del vendedor — styled como quote */}
           {listing.notes && (
-            <div className="mt-4 bg-gray-50 rounded-xl p-3">
-              <p className="text-xs font-semibold text-gray-500 mb-1">Notas del vendedor</p>
-              <p className="text-sm text-gray-600">{listing.notes}</p>
-            </div>
+            <blockquote className="mt-5 pl-4 border-l-2 border-brand-200">
+              <p className="font-display italic text-sm text-ink-muted leading-relaxed">{listing.notes}</p>
+              <footer className="text-[11px] font-mono text-ink-muted mt-1">— {sellerName}, dueño del libro</footer>
+            </blockquote>
           )}
 
+          {/* Opciones de entrega */}
+          <div className="mt-5">
+            <p className="text-[10px] font-mono uppercase tracking-wider text-ink-muted mb-2">Cómo lo recibes</p>
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-cream-dark bg-cream-warm/40">
+                <span className="text-base">🤝</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-ink">Encuentro en persona</p>
+                  <p className="text-[11px] text-ink-muted">Coordina lugar y hora con el vendedor</p>
+                </div>
+                <span className="text-xs font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Gratis</span>
+              </div>
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-cream-dark">
+                <span className="text-base">📦</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-ink">Despacho courier</p>
+                  <p className="text-[11px] text-ink-muted">Starken · Chilexpress · 24-48h</p>
+                </div>
+                <span className="text-[11px] font-mono text-ink-muted">cotiza al comprar</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Comparador de precios */}
           <PriceCompare
             title={book.title}
             author={book.author}
@@ -279,40 +301,33 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             listingId={listing.id}
           />
 
-
-          {listing.address && (
-            <p className="text-sm text-gray-500 mt-3 flex items-start gap-1">
-              <span className="mt-0.5">📍</span>
-              <span>{listing.address.split(",").slice(1, 2).join("").trim() || listing.address.split(",")[0]}</span>
-            </p>
-          )}
-
-          {/* Vendedor */}
-          <Link
-            href={`/vendedor/${listing.seller?.username ?? listing.seller_id}`}
-            className="inline-flex items-center gap-2 mt-4 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
-          >
-            <div className="w-7 h-7 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
-              {sellerName[0].toUpperCase()}
+          {/* Seller card */}
+          <div className="mt-5 flex items-center gap-3 p-4 bg-cream-warm/50 rounded-xl border border-cream-dark/50">
+            <div className="w-10 h-10 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden">
+              {listing.seller?.avatar_url ? (
+                <Image src={listing.seller.avatar_url} alt={sellerName} width={40} height={40} className="object-cover w-full h-full" />
+              ) : (
+                sellerName[0].toUpperCase()
+              )}
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-700 group-hover:text-brand-600 transition-colors">
-                {sellerName}
-              </p>
-              <p className="text-[10px] text-gray-400">Ver todos sus libros</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-ink truncate">{listing.seller?.full_name ?? sellerName}</p>
+              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                {listing.address && (
+                  <span className="text-[11px] text-ink-muted">{listing.address.split(",")[1]?.trim()}</span>
+                )}
+                {listing.seller?.mercadopago_user_id && (
+                  <span className="text-[10px] font-semibold text-[#009EE3]">· Pago seguro</span>
+                )}
+              </div>
             </div>
-            {listing.seller?.mercadopago_user_id && (
-              <span
-                className="ml-auto inline-flex items-center gap-1 bg-[#009EE3]/10 text-[#009EE3] px-2 py-0.5 rounded-full border border-[#009EE3]/25 text-[10px] font-semibold"
-                title="Pago seguro con MercadoPago — tu compra queda protegida"
-              >
-                <svg viewBox="0 0 24 24" className="w-3 h-3" fill="currentColor" aria-hidden="true">
-                  <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 14.414L6.586 12 8 10.586l3 3 5-5L17.414 10l-6.414 6.414z" />
-                </svg>
-                Pago seguro
-              </span>
-            )}
-          </Link>
+            <Link
+              href={`/vendedor/${listing.seller?.username ?? listing.seller_id}`}
+              className="flex-shrink-0 text-xs font-semibold text-brand-600 hover:underline"
+            >
+              Ver tienda →
+            </Link>
+          </div>
 
           {/* Share */}
           <div className="mt-4">
@@ -328,42 +343,30 @@ export default function ListingDetail({ listing, images = [] }: Props) {
 
       <DescriptionSection listing={listing} />
 
-      {/* Buy CTA */}
+      {/* Buybox */}
       {listing.price != null && listing.modality !== "loan" && (
-        <div className="border-t border-gray-100 px-6 py-4 bg-gray-50 space-y-3">
+        <div className="border-t border-cream-dark px-6 py-5 space-y-3">
           {isSold ? (
             <div className="text-center py-4">
-              <p className="text-lg font-bold text-red-600">Este libro ya fue vendido</p>
-              <p className="text-sm text-gray-500 mt-1">Pero puedes buscar otros similares o contactar al vendedor por si tiene más.</p>
+              <p className="font-display text-xl font-bold text-[--coral]">Este libro ya fue vendido</p>
+              <p className="text-sm text-ink-muted mt-1">Busca otros similares o contacta al vendedor por si tiene más.</p>
             </div>
-          ) : (
+          ) : (listing.seller as any)?.mercadopago_user_id ? (
             <>
-              {(listing.seller as any)?.mercadopago_user_id ? (
-                <>
-                  <Link
-                    href={`/checkout/${listing.id}`}
-                    className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold py-4 rounded-xl transition-all text-lg shadow-md hover:shadow-lg"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-                    </svg>
-                    Comprar — ${listing.price.toLocaleString("es-CL")}
-                  </Link>
-                  <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
-                </>
-              ) : (
-                <div className="space-y-3">
-                  <p className="text-[11px] text-amber-800 font-bold uppercase tracking-wider text-center bg-amber-50 py-2 rounded-lg border border-amber-100">
-                    Acuerda la compra directamente con el vendedor
-                  </p>
-                  <WhatsAppButton
-                    phone={listing.seller?.phone ?? null}
-                    title={book.title}
-                    listingId={listing.id}
-                  />
-                </div>
-              )}
+              <Link
+                href={`/checkout/${listing.id}`}
+                className="flex items-center justify-center gap-2 w-full bg-[--coral] hover:bg-[--coral]/90 text-white font-bold py-4 rounded-xl transition-all text-base shadow-sm"
+              >
+                Comprar con MercadoPago — ${listing.price.toLocaleString("es-CL")}
+              </Link>
+              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} />
+              <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
             </>
+          ) : (
+            <div className="space-y-2">
+              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} />
+              <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
+            </div>
           )}
         </div>
       )}
@@ -372,69 +375,6 @@ export default function ListingDetail({ listing, images = [] }: Props) {
       {(listing as ListingWithRentalFields).rental_price != null && listing.modality !== "sale" && (
         <RentalSection listing={listing as ListingWithRentalFields} />
       )}
-
-      {/* Messaging CTA */}
-      <div className="border-t border-gray-100 px-6 py-5 bg-brand-50/30">
-        <p className="text-xs font-semibold text-gray-500 mb-2 text-center">Envía un mensaje al vendedor</p>
-        <ContactSellerButton
-          sellerId={listing.seller_id}
-          listingId={listing.id}
-          sellerName={sellerName}
-          bookTitle={book.title}
-        />
-      </div>
-
-      {/* Contact CTA */}
-      <div className="border-t border-gray-100 px-6 py-5 bg-green-50/50">
-        <p className="text-xs font-semibold text-gray-500 mb-2 text-center">Contacta al vendedor</p>
-        <div className="space-y-2">
-          <WhatsAppButton
-            phone={listing.seller?.phone ?? null}
-            title={book.title}
-            listingId={listing.id}
-          />
-          {listing.seller?.instagram && (
-            <a
-              href={`https://instagram.com/${listing.seller.instagram}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                trackEvent("click_contact", {
-                  listing_id: listing.id,
-                  book_title: book.title,
-                });
-              }}
-              className="flex items-center justify-center gap-2 w-full border-2 border-pink-400 text-pink-500 hover:bg-pink-50 font-semibold py-3 rounded-xl transition-colors"
-            >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-              </svg>
-              Contactar por Instagram
-            </a>
-          )}
-          {listing.seller?.public_email && (
-            <a
-              href={`mailto:${listing.seller.public_email}?subject=${encodeURIComponent(`Consulta sobre "${book.title}" en tuslibros.cl`)}`}
-              onClick={() => {
-                trackEvent("click_contact", {
-                  listing_id: listing.id,
-                  book_title: book.title,
-                });
-              }}
-              className="flex items-center justify-center gap-2 w-full border-2 border-blue-400 text-blue-500 hover:bg-blue-50 font-semibold py-3 rounded-xl transition-colors"
-            >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current" xmlns="http://www.w3.org/2000/svg" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="4" width="20" height="16" rx="2" />
-                <path d="M22 4l-10 8L2 4" />
-              </svg>
-              Contactar por Email
-            </a>
-          )}
-        </div>
-        <p className="text-[11px] text-gray-400 text-center mt-2">
-          Consulta dudas con el vendedor. La compra se completa arriba con pago protegido por MercadoPago.
-        </p>
-      </div>
 
       {/* Publicar uno igual — solo visible para quien NO es el dueño */}
       {!isOwner && (
