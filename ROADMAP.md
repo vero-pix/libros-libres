@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 16 mayo 2026 (sesión tarde)
+Última actualización: 19 mayo 2026
 
 ---
 
@@ -226,6 +226,15 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 ---
 
 ## Completado
+
+### Hitos recientes (mayo 2026 — 19 mayo)
+- [x] **Editorial y Páginas en formulario de publicación** — pedido de CIM. Antes solo disponibles al editar. Ahora aparecen al publicar y se pre-llenan si el ISBN scanner los detecta.
+- [x] **Fix slug Economía** — corregido a `no-ficcion-economia` (estaba como `economia` suelto, sin prefijo de categoría padre).
+- [x] **Fix landings SEO** — filtrar listings sin `book` antes de `sortListingsForDisplay` (bug en las 6 landings de clusters).
+- [x] **`/publish` bloqueada en robots.txt** — evita que crawlers sigan el 307 de auth.
+- [x] **`llms.txt`** — agrega descripción del sitio para motores de búsqueda con IA (Perplexity, ChatGPT, etc.).
+- [x] **Fix ads.txt en middleware** — excluido del middleware para que Google AdSense pueda validarlo correctamente.
+- [x] **6 landings SEO indexadas en GSC** — `/algebra-de-baldor`, `/pablo-neruda`, `/mario-vargas-llosa`, `/rayuela`, `/cien-anos-de-soledad`, `/el-arte-de-amar` solicitadas a Google.
 
 ### Hitos recientes (mayo 2026 — sesión tarde 16 mayo)
 - [x] **Fix Shipit origen vendedor** — commit 8308c5d. La etiqueta ya muestra la dirección del vendedor real, no la de Vero.
