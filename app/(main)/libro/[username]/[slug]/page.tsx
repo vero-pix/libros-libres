@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { permanentRedirect } from "next/navigation";
+import Link from "next/link";
 import ListingDetail from "@/components/listings/ListingDetail";
 import ListingCard from "@/components/listings/ListingCard";
 import ListingViewTracker from "@/components/listings/ListingViewTracker";
@@ -127,14 +128,24 @@ export default async function LibroPage({ params }: Props) {
     .eq("listing_id", listing.id)
     .order("sort_order", { ascending: true });
 
-  const [relatedResult, allActiveResult] = await Promise.all([
+  const [authorResult, categoryResult, allActiveResult] = await Promise.all([
+    listing.book?.author
+      ? supabase
+          .from("listings")
+          .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username)`)
+          .eq("status", "active")
+          .neq("id", listing.id)
+          .ilike("book.author", listing.book.author)
+          .limit(4)
+      : Promise.resolve({ data: null }),
     listing.book?.genre
       ? supabase
           .from("listings")
-          .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username)`)
+          .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username)`)
           .eq("status", "active")
           .neq("id", listing.id)
-          .limit(20)
+          .ilike("book.genre", listing.book.genre)
+          .limit(8)
       : Promise.resolve({ data: null }),
     supabase
       .from("listings")
@@ -142,11 +153,11 @@ export default async function LibroPage({ params }: Props) {
       .eq("status", "active"),
   ]);
 
-  const relatedListings: ListingWithBook[] = listing.book?.genre
-    ? ((relatedResult.data as unknown as ListingWithBook[]) ?? [])
-        .filter((l) => l.book.genre?.toLowerCase() === listing.book.genre.toLowerCase())
-        .slice(0, 5)
-    : [];
+  const authorListings: ListingWithBook[] = ((authorResult.data as unknown as ListingWithBook[]) ?? []);
+  
+  const authorListingIds = new Set(authorListings.map(l => l.id));
+  const categoryListingsRaw: ListingWithBook[] = ((categoryResult.data as unknown as ListingWithBook[]) ?? []);
+  const categoryListings = categoryListingsRaw.filter(l => !authorListingIds.has(l.id)).slice(0, 4);
 
   const categoryTree = await buildCategoryTree(supabase, (allActiveResult.data ?? []) as any);
 
@@ -260,11 +271,28 @@ export default async function LibroPage({ params }: Props) {
           <div className="flex-1 min-w-0">
             <ListingDetail listing={listing} images={(images ?? []) as any} />
 
-            {relatedListings.length > 0 && (
-              <section className="mt-10">
-                <h2 className="font-display text-xl font-bold text-ink mb-4">Libros similares</h2>
+            {authorListings.length > 0 && (
+              <section className="mt-12">
+                <div className="flex justify-between items-end mb-6">
+                  <h2 className="font-display text-2xl font-bold text-ink">Más libros de {listing.book.author}</h2>
+                  <Link href={`/search?q=${encodeURIComponent(listing.book.author)}`} className="text-sm font-semibold text-brand-600 hover:text-brand-700">Ver todos →</Link>
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {relatedListings.map((l) => (
+                  {authorListings.map((l) => (
+                    <ListingCard key={l.id} listing={l} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {categoryListings.length > 0 && (
+              <section className="mt-12">
+                <div className="flex justify-between items-end mb-6">
+                  <h2 className="font-display text-2xl font-bold text-ink">Otros libros de {listing.book.genre}</h2>
+                  <Link href={`/search?q=${encodeURIComponent(listing.book.genre)}`} className="text-sm font-semibold text-brand-600 hover:text-brand-700">Ver todos →</Link>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {categoryListings.map((l) => (
                     <ListingCard key={l.id} listing={l} />
                   ))}
                 </div>

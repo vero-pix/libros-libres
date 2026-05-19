@@ -60,7 +60,11 @@ export default function Footer() {
       {/* Bottom */}
       <div className="border-t border-cream-dark bg-cream-warm">
         <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-muted">
-          <span>© {new Date().getFullYear()} tuslibros.cl</span>
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <span>© {new Date().getFullYear()} tuslibros.cl</span>
+            <span className="hidden sm:inline">·</span>
+            <span>Santiago, Chile</span>
+          </div>
           <div className="flex items-center gap-4">
             <a
               href="https://www.linkedin.com/company/tuslibros/"
