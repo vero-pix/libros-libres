@@ -78,20 +78,23 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
           <div className="max-w-6xl mx-auto px-6 py-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
               <div className="text-center lg:text-left">
-                <p className="text-xs font-medium tracking-[0.3em] uppercase text-brand-600 mb-3">
-                  Por qué existimos
+                <p className="text-[11px] font-mono tracking-[0.25em] uppercase text-brand-600 mb-3">
+                  Por qué existe esto
                 </p>
                 <h2 className="font-display text-xl sm:text-2xl font-bold text-ink leading-tight mb-3">
-                  Tus libros merecen circular.{" "}
-                  <span className="italic text-brand-600">Yo los conecto contigo.</span>
+                  En Chile hay millones de libros{" "}
+                  <em className="italic text-brand-600">durmiendo en estanterías.</em>
                 </h2>
                 <p className="text-sm text-ink-muted leading-relaxed max-w-lg mx-auto lg:mx-0">
-                  En Chile hay millones de libros durmiendo en estanterías. Cada
-                  casa es una librería que nadie puede ver. Acá las hacemos
-                  visibles — por ubicación, por cercanía, por el título que
-                  andas buscando y que probablemente está más cerca de lo que
-                  crees.
+                  Cada casa es una librería que nadie puede ver. Acá las hacemos
+                  visibles. Publicas en 5 minutos, cobras con MercadoPago y el
+                  libro viaja donde tiene que ir — sin intermediarios raros.
                 </p>
+                <div className="mt-5 flex flex-wrap gap-6 text-xs font-mono text-ink-muted">
+                  <span>Plan Libre · <strong className="text-ink">8%</strong> por venta</span>
+                  <span>Librero · <strong className="text-ink">5%</strong></span>
+                  <span>Librería · <strong className="text-ink">3%</strong></span>
+                </div>
               </div>
               <ShelfTransformation />
             </div>

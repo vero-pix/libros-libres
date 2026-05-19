@@ -14,10 +14,10 @@ export default function RecentRow({ listings }: Props) {
     <section className="mb-8">
       <div className="flex items-baseline gap-3 mb-4">
         <span className="inline-block w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-        <h2 className="text-sm font-semibold text-ink uppercase tracking-wide">
-          Recién llegados
+        <h2 className="font-display text-base font-semibold text-ink">
+          Recién subidos
         </h2>
-        <p className="text-xs text-ink-muted">últimos 7 días</p>
+        <p className="text-xs text-ink-muted font-mono">últimos 7 días</p>
       </div>
       <div className="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide">
         {listings.filter((l) => l.book).map((listing) => {
