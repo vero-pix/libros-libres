@@ -39,6 +39,19 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 const novedades: Entry[] = [
   {
     date: "19 mayo 2026",
+    title: "Nunca te vas con las manos vacías: Rediseño de Búsquedas",
+    description:
+      "Cuando buscabas un libro que no teníamos, la página se veía un poco triste (literalmente decía \"No lo encontramos\" y te dejaba una pantalla en blanco). Rediseñamos esa experiencia: ahora el buscador te invita amigablemente a dejar tu pedido para que la comunidad lo vea, y mientras tanto, te muestra una selección curada de libros destacados de la semana para que descubras algo nuevo.",
+    tag: "Mejora",
+    visual: {
+      kind: "milestone",
+      icon: "🎨",
+      metric: "UX Search",
+      detail: "rediseño del empty state + recomendaciones",
+    },
+  },
+  {
+    date: "19 mayo 2026",
     title: "Más fáciles de encontrar en Google: Landings locales y de nicho",
     description:
       "Publicamos tres páginas maestras para el buscador. Una dedicada a \"Libros antiguos y coleccionables\", y dos enfocadas en la búsqueda local más fuerte: \"Libros usados en Santiago\" y la hiperlocal \"Libros usados en Providencia\" (donde se concentra nuestro catálogo). Además, ahora cada vez que ves un libro, la misma página te recomienda más libros del mismo autor o género, conectando todo el catálogo de forma automática. Google ahora puede rastrear tus libros de forma más plana y rápida.",

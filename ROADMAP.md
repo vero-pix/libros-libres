@@ -129,7 +129,7 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 
 **Catálogo y búsqueda**
 - [ ] **Full-text search con `pg_trgm` + GIN index** — hoy el buscador usa `LIKE` sin índice. 10-100x más rápido y soporta typos. Alta prioridad cuando catálogo supere 500 libros activos.
-- [ ] **Search empty state review** — 80% bounce en /search. Auditar qué ve alguien cuando busca algo que no existe.
+- [x] **Search empty state review** — 80% bounce en /search. Rediseñado con CTA de economía inversa (Se busca) y sugerencias dinámicas de libros destacados.
 - [ ] **Rotación automática FeaturedRow** — 191 de 240 listings sin una sola visita en 30d. Exponer los enterrados con pool rotativo.
 
 **Reputación**
