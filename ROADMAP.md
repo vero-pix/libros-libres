@@ -90,7 +90,7 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 | `/vender` | vender libros usados en chile | — | — | vendedor | ✅ Deployada |
 | `/vender-libros-usados` | vender libros usados | 140 | 23 | vendedor informacional | ✅ 15 mayo |
 | `/libros-usados-santiago` | libros usados santiago | — | — | comprador local RM | ✅ 19 mayo |
-| `/libros-usados-providencia` | libros usados providencia | — | — | comprador local Providencia | ⬜ Pendiente |
+| `/libros-usados-providencia` | libros usados providencia | — | — | comprador local Providencia | ✅ 19 mayo |
 | `/comprar-libros-usados` | comprar libros usados | — | — | comprador informacional | ⬜ Pendiente |
 | `/libros-escolares-usados` | libros escolares usados | — | — | temporada escolar | ⬜ Pendiente |
 

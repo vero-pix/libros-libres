@@ -41,7 +41,7 @@ const novedades: Entry[] = [
     date: "19 mayo 2026",
     title: "Más fáciles de encontrar en Google: Landings locales y de nicho",
     description:
-      "Publicamos dos páginas maestras para el buscador. Una dedicada a \"Libros antiguos y coleccionables\", y otra enfocada en la búsqueda local más fuerte: \"Libros usados en Santiago\". Además, ahora cada vez que ves un libro, la misma página te recomienda más libros del mismo autor o género, conectando todo el catálogo de forma automática. Google ahora puede rastrear tus libros de forma más plana y rápida.",
+      "Publicamos tres páginas maestras para el buscador. Una dedicada a \"Libros antiguos y coleccionables\", y dos enfocadas en la búsqueda local más fuerte: \"Libros usados en Santiago\" y la hiperlocal \"Libros usados en Providencia\" (donde se concentra nuestro catálogo). Además, ahora cada vez que ves un libro, la misma página te recomienda más libros del mismo autor o género, conectando todo el catálogo de forma automática. Google ahora puede rastrear tus libros de forma más plana y rápida.",
     tag: "Lanzamiento",
     visual: {
       kind: "milestone",
