@@ -377,6 +377,11 @@ export default async function HomePage({ searchParams }: Props) {
                   subtitle="Curado por Vero · lectura lenta, sin apuro"
                 />
                 <ColeccionRow
+                  tag="literatura-chilena"
+                  title="Literatura chilena"
+                  subtitle="Escritoras y escritores de acá"
+                />
+                <ColeccionRow
                   tag="latinoamerica-contemp"
                   title="Latinoamérica contemporánea"
                   subtitle="Lo que se está escribiendo ahora mismo"
@@ -385,6 +390,36 @@ export default async function HomePage({ searchParams }: Props) {
                   tag="historia-chile"
                   title="Historia de Chile"
                   subtitle="Memoria, política, identidad"
+                />
+                <ColeccionRow
+                  tag="clasicos"
+                  title="Clásicos que no caducan"
+                  subtitle="Los que siempre vuelven"
+                />
+                <ColeccionRow
+                  tag="novela-negra"
+                  title="Novela negra y suspenso"
+                  subtitle="Para no soltar el libro"
+                />
+                <ColeccionRow
+                  tag="filosofia"
+                  title="Filosofía accesible"
+                  subtitle="Pensar sin sufrir"
+                />
+                <ColeccionRow
+                  tag="ensayo"
+                  title="Ensayo y pensamiento"
+                  subtitle="Ideas que cambian cómo ves las cosas"
+                />
+                <ColeccionRow
+                  tag="ciencia-divulgacion"
+                  title="Ciencia y divulgación"
+                  subtitle="Para entender el mundo sin título universitario"
+                />
+                <ColeccionRow
+                  tag="para-regalar"
+                  title="Para regalar"
+                  subtitle="Libros que no fallan como regalo"
                 />
               </>
             )}
