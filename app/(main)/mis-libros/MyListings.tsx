@@ -643,8 +643,22 @@ function EditForm({
             placeholder="tarde-de-lluvia, latinoamerica-contemp, historia-chile"
             className={inputClass}
           />
-          <p className="text-[10px] text-gray-400 mt-1">
-            Para colecciones editoriales del home usa: <code className="bg-gray-100 px-1 rounded">tarde-de-lluvia</code> · <code className="bg-gray-100 px-1 rounded">latinoamerica-contemp</code> · <code className="bg-gray-100 px-1 rounded">historia-chile</code>
+          <p className="text-[10px] text-gray-400 mt-1 leading-relaxed">
+            Tags de colección del home:{" "}
+            {[
+              "tarde-de-lluvia",
+              "literatura-chilena",
+              "latinoamerica-contemp",
+              "historia-chile",
+              "clasicos",
+              "novela-negra",
+              "filosofia",
+              "ensayo",
+              "ciencia-divulgacion",
+              "para-regalar",
+            ].map((t) => (
+              <code key={t} className="bg-gray-100 px-1 rounded mr-1 inline-block mb-0.5">{t}</code>
+            ))}
           </p>
         </div>
       </div>
