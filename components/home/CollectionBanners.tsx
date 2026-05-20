@@ -47,18 +47,18 @@ const BANNERS: Banner[] = [
     icon: "✨",
   },
   {
-    title: "Arrienda un libro",
-    subtitle: "Léelo y devuélvelo",
-    href: "/search?modality=loan",
-    gradient: "from-brand-700 to-brand-500",
-    icon: "📖",
+    title: "Historia y Ensayo",
+    subtitle: "Política, memoria, ideas",
+    href: "/search?subcategory=no-ficcion-historia",
+    gradient: "from-amber-700 to-amber-600",
+    icon: "🗺️",
   },
   {
     title: "Menos de $5.000",
-    subtitle: "Lectura accesible para todos",
+    subtitle: "Libros buenos, precio honesto",
     href: "/search?price_max=5000",
-    gradient: "from-amber-600 to-amber-500",
-    icon: "💰",
+    gradient: "from-green-800 to-green-700",
+    icon: "💚",
   },
 ];
 
@@ -66,8 +66,8 @@ export default function CollectionBanners() {
   return (
     <section className="py-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display text-lg font-bold text-ink">Colecciones</h2>
-        <span className="text-xs text-ink-muted">Desliza →</span>
+        <h2 className="font-display text-base font-semibold text-ink">Para cuando sabes lo que buscas</h2>
+        <span className="text-[11px] font-mono text-ink-muted uppercase tracking-wider">Desliza →</span>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin snap-x snap-mandatory">
         {BANNERS.map((banner) => (
