@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 19 mayo 2026 (sesión noche)
+Última actualización: 20 mayo 2026
 
 ---
 
@@ -227,15 +227,18 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 
 ## Completado
 
-### Hitos recientes (mayo 2026 — 19 mayo, sesión noche)
+### Hitos recientes (mayo 2026 — 20 mayo)
 
 **Handoff de diseño UI — aplicado completo**
 
 - [x] **PR1 · ListingCard refactor** — jerarquía simplificada, 1 badge (sin apilamiento), botones siempre visibles en mobile, precio con descuento tachado, rating solo si hay reviews. Lógica de arriendo eliminada (segmento pendiente). `bg-coral` como CSS var, `address` parseado para mostrar comuna.
-- [x] **PR4 · Home editorial calmo (variación A)** — Hero dos columnas (editorial + buscador), H1 "Cada estantería es una librería", quote de Vero inline, chips de categoría con scroll horizontal, CTAs "Explorar libros" / "Publicar uno mío". Secciones renombradas: "Esta semana en el velador · Curado por Vero", "Librerías de confianza", "Recién subidos". Manifiesto con tabla de planes visible.
-- [x] **Fix · comuna en card** — extraída del campo `address` (segundo segmento). `city` no existe en BD.
-- [ ] **PR2 · distance_km en API** — haversine entre user.location y listing.location. Pendiente para cuando catálogo > 1.000 libros y distancia sea relevante.
-- [ ] **PR3 · Toggle compra/arriendo en ficha** — descartado por ahora. Segmento bibliotecas/universidades aún no abordado.
+- [x] **PR4 · Home editorial calmo (variación A)** — Hero dos columnas editorial, H1 "Cada estantería es una librería", quote de Vero, chips de categoría, CTAs claros. Secciones con voz: "Esta semana en el velador", "Librerías de confianza", "Recién subidos". Buscador duplicado eliminado.
+- [x] **Fix · Ficha del libro (§04)** — Precio grande con tachado y pill -X%, grid de metadata (Estado/Encuadernación/Editorial/Páginas/Año/ISBN), notas del vendedor como quote editorial, tarjetas de entrega (Encuentro gratis / Courier cotiza), seller card con "Ver tienda →", buybox consolidado con botón coral principal. CTAs duplicados eliminados.
+- [x] **Colecciones editoriales** — 10 colecciones en home curadas por tag: `tarde-de-lluvia`, `literatura-chilena`, `latinoamerica-contemp`, `historia-chile`, `clasicos`, `novela-negra`, `filosofia`, `ensayo`, `ciencia-divulgacion`, `para-regalar`. Se muestran solo si hay ≥3 libros. 202 libros taggeados automáticamente desde BD. Campo de tags editable en `/mis-libros`.
+- [x] **CollectionBanners** — eliminado banner "Arrienda un libro", reemplazado por "Historia y Ensayo". Título con voz editorial.
+- [ ] **PR2 · distance_km en API** — pendiente para cuando catálogo > 1.000 libros.
+- [ ] **PR3 · Toggle compra/arriendo** — descartado. Segmento bibliotecas/universidades sin abordar.
+- [ ] **Barra de planes (8%/5%/3%)** — pendiente para cuando haya ≥2.000 libros activos.
 
 ### Hitos recientes (mayo 2026 — 19 mayo, sesión mañana)
 - [x] **Editorial y Páginas en formulario de publicación** — pedido de CIM. Antes solo disponibles al editar. Ahora aparecen al publicar y se pre-llenan si el ISBN scanner los detecta.
