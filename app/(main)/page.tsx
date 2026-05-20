@@ -14,6 +14,7 @@ import { buildCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import FeaturedRow from "@/components/home/FeaturedRow";
 import CollectibleRow from "@/components/home/CollectibleRow";
 import RecentRow from "@/components/home/RecentRow";
+import ColeccionRow from "@/components/home/ColeccionRow";
 import TestimonialBanner from "@/components/home/TestimonialBanner";
 import RequestsRow from "@/components/home/RequestsRow";
 import HeroRequestStrip from "@/components/home/HeroRequestStrip";
@@ -365,6 +366,27 @@ export default async function HomePage({ searchParams }: Props) {
           <div className="flex-1 min-w-0">
             {!hasFilters && recentListings.length > 0 && (
               <RecentRow listings={recentListings} />
+            )}
+
+            {/* Colecciones editoriales curadas por Vero — se muestran solo si hay ≥3 libros con el tag */}
+            {!hasFilters && (
+              <>
+                <ColeccionRow
+                  tag="tarde-de-lluvia"
+                  title="Para una tarde de lluvia"
+                  subtitle="Curado por Vero · lectura lenta, sin apuro"
+                />
+                <ColeccionRow
+                  tag="latinoamerica-contemp"
+                  title="Latinoamérica contemporánea"
+                  subtitle="Lo que se está escribiendo ahora mismo"
+                />
+                <ColeccionRow
+                  tag="historia-chile"
+                  title="Historia de Chile"
+                  subtitle="Memoria, política, identidad"
+                />
+              </>
             )}
 
             {!hasFilters && collectibleListings.length > 0 && (
