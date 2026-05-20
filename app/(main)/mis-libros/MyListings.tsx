@@ -437,6 +437,7 @@ function EditForm({
   const [publisher, setPublisher] = useState((book as any).publisher ?? "");
   const [pages, setPages] = useState(((book as any).pages ?? "").toString());
   const [binding, setBinding] = useState((book as any).binding ?? "");
+  const [tagsInput, setTagsInput] = useState(((book as any).tags as string[] ?? []).join(", "));
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
 
   // Additional images
@@ -493,6 +494,11 @@ function EditForm({
     setError(null);
 
     // Update book data
+    const parsedTags = tagsInput
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+
     const bookUpdates: Record<string, unknown> = {
       title: title.trim(),
       author: author.trim(),
@@ -502,6 +508,7 @@ function EditForm({
       publisher: publisher.trim() || null,
       pages: pages ? parseInt(pages) : null,
       binding: binding || null,
+      tags: parsedTags.length > 0 ? parsedTags : null,
     };
     if (coverUrl) {
       bookUpdates.cover_url = coverUrl;
@@ -624,6 +631,21 @@ function EditForm({
             placeholder="Describe de qué trata el libro..."
             className={`${inputClass} resize-none`}
           />
+        </div>
+        <div className="mt-3">
+          <label className="block text-xs font-medium text-gray-500 mb-1">
+            Colecciones / etiquetas
+            <span className="ml-1 text-gray-400 font-normal">(separadas por coma)</span>
+          </label>
+          <input
+            value={tagsInput}
+            onChange={(e) => setTagsInput(e.target.value)}
+            placeholder="tarde-de-lluvia, latinoamerica-contemp, historia-chile"
+            className={inputClass}
+          />
+          <p className="text-[10px] text-gray-400 mt-1">
+            Para colecciones editoriales del home usa: <code className="bg-gray-100 px-1 rounded">tarde-de-lluvia</code> · <code className="bg-gray-100 px-1 rounded">latinoamerica-contemp</code> · <code className="bg-gray-100 px-1 rounded">historia-chile</code>
+          </p>
         </div>
       </div>
 
