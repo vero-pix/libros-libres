@@ -61,7 +61,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     // TODO: agregar /categoria/[slug] cuando existan las rutas reales (Fase 2)
-    // TODO: agregar /ciudad/[slug] cuando existan las landings de ciudad
   } catch {
     // Sitemap still works without dynamic pages
   }
@@ -98,5 +97,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // no páginas reales. El & en esas URLs rompe el XML del sitemap. Se agregarán cuando
   // existan landings dedicadas (/libros-de-historia, etc.).
 
-  return [...staticPages, ...listingPages, ...sellerPages];
+  const ciudadPages: MetadataRoute.Sitemap = [
+    "santiago", "valparaiso", "vina-del-mar", "concepcion", "temuco", "antofagasta", "la-serena",
+  ].map((c) => ({
+    url: `${baseUrl}/ciudad/${c}`,
+    lastModified: new Date(),
+    changeFrequency: "daily" as const,
+    priority: 0.9,
+  }));
+
+  return [...staticPages, ...ciudadPages, ...listingPages, ...sellerPages];
 }
