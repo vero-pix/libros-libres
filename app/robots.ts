@@ -48,6 +48,7 @@ export default function robots(): MetadataRoute.Robots {
           ...privateSections,
           // Búsquedas con parámetros — sin valor SEO, gastan crawl budget
           "/search",
+          "/search?",
           // Block filtered/sorted URLs to prevent crawl of thousands of param combos
           "/*?*sort=",
           "/*?*page=",
