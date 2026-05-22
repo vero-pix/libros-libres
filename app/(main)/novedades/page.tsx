@@ -8,7 +8,7 @@ import type { ListingWithBook } from "@/types";
 export const metadata = {
   title: "Diario de tuslibros.cl — Mayo 2026",
   description:
-    "Lo que pasó esta semana en tuslibros.cl: API para librerías, nueva taxonomía chilena, tags dinámicos y más.",
+    "Lo que pasó esta semana en tuslibros.cl: bloqueo de bots por país, rate limiting, API para librerías, nueva taxonomía chilena y más.",
 };
 
 export const revalidate = 300;
@@ -37,6 +37,32 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 };
 
 const novedades: Entry[] = [
+  {
+    date: "21 mayo 2026",
+    title: "Bloqueamos bots de Vietnam, India y Filipinas",
+    description:
+      "Google Analytics mostró algo raro: 195 usuarios de Vietnam en 7 días — el doble que Chile. Para un marketplace chileno de libros, eso no es tráfico real. Activamos reglas en el Vercel Firewall para bloquear tráfico de Vietnam, India y Filipinas a nivel de plataforma, antes de que los requests consuman recursos. Brasil y México los dejamos pasar porque son hispanohablantes y podrían tener compradores reales.",
+    tag: "Mejora",
+    visual: {
+      kind: "milestone",
+      icon: "🛡️",
+      metric: "3 países bloqueados",
+      detail: "Vietnam · India · Filipinas — tráfico bot eliminado",
+    },
+  },
+  {
+    date: "21 mayo 2026",
+    title: "Rate limiting en todos los endpoints de la API",
+    description:
+      "Agregamos un límite de 60 requests por minuto por IP en todas las rutas /api/*. En modo monitoreo por ahora: registra pero no bloquea, para detectar si algún cliente legítimo podría verse afectado. En 48 horas, si no hay falsos positivos, lo pasamos a bloqueo real con error 429.",
+    tag: "Mejora",
+    visual: {
+      kind: "milestone",
+      icon: "⚡️",
+      metric: "60 req/min",
+      detail: "rate limit por IP en /api — en modo log",
+    },
+  },
   {
     date: "19 mayo 2026",
     title: "Nunca te vas con las manos vacías: Rediseño de Búsquedas",
@@ -1083,18 +1109,17 @@ export default async function NovedadesPage() {
             </p>
           </div>
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[1.05] text-cream mb-6 animate-fade-in-up" style={{ animationDelay: "60ms" }}>
-            Día 40 — ya <em className="text-amber-300 not-italic font-normal italic">somos plataforma</em>.
+            Día 42 — <em className="text-amber-300 not-italic font-normal italic">infraestructura que cuida</em>.
           </h1>
           <p className="text-base md:text-lg text-cream/80 max-w-2xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "120ms" }}>
-            API para librerías, nueva taxonomía chilena, tags que siempre tienen contenido, tres
-            compradores reales, envío a región, el único dominio del sector subiendo en SEO y la primera
-            librería indie profesional publicando. Esto es lo que fue pasando, en orden de lo que más
+            Bots bloqueados, API protegida, buscador rediseñado y más puertas de entrada en Google.
+            Un marketplace que crece también tiene que defenderse. Esto es lo que fue pasando, en orden de lo que más
             importa. Lo escribo yo. — Vero
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 animate-fade-in-up" style={{ animationDelay: "180ms" }}>
             {[
-              { big: "3", small: "compradores reales" },
-              { big: "API v1", small: "para librerías externas" },
+              { big: "3", small: "países de bots bloqueados" },
+              { big: "60/min", small: "rate limit por IP en la API" },
               { big: "+2.19%", small: "SEO — único del sector subiendo" },
               { big: "2", small: "librerías indie publicando" },
             ].map((s) => (
