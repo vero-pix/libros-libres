@@ -38,6 +38,21 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "22 mayo 2026",
+    title: "101 personas entraron hoy — y 4 llegaron desde ChatGPT",
+    description:
+      "289 páginas vistas, 101 sesiones únicas, 7 usuarios logueados. Lo más visitado después del home: /publish con 22 visitas, lo que significa que hay gente queriendo publicar libros hoy. Y algo que me pareció importante registrar: 4 sesiones llegaron con utm_source=chatgpt.com — alguien le preguntó a ChatGPT dónde comprar libros usados en Chile y tuslibros.cl apareció como respuesta. El llms.txt que publicamos hace unas semanas está funcionando.",
+    tag: "Señal",
+    visual: {
+      kind: "stat",
+      stats: [
+        { big: "101", small: "sesiones únicas hoy" },
+        { big: "22", small: "visitas a /publish" },
+        { big: "4", small: "llegaron desde ChatGPT" },
+      ],
+    },
+  },
+  {
     date: "21 mayo 2026",
     title: "Bloqueamos bots de Vietnam, India y Filipinas",
     description:
@@ -1118,8 +1133,8 @@ export default async function NovedadesPage() {
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 animate-fade-in-up" style={{ animationDelay: "180ms" }}>
             {[
-              { big: "3", small: "países de bots bloqueados" },
-              { big: "60/min", small: "rate limit por IP en la API" },
+              { big: "4", small: "llegaron desde ChatGPT hoy" },
+              { big: "101", small: "sesiones únicas hoy" },
               { big: "+2.19%", small: "SEO — único del sector subiendo" },
               { big: "2", small: "librerías indie publicando" },
             ].map((s) => (
