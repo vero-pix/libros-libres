@@ -68,6 +68,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
               ? `https://tuslibros.cl/search?category=${encodeURIComponent(searchParams.category)}`
               : "https://tuslibros.cl/search",
     },
+    robots: { index: false, follow: true },
   };
 }
 
