@@ -13,6 +13,13 @@ const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   async redirects() {
     return [
+      // www → apex (301 permanente para consolidar link equity)
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.tuslibros.cl' }],
+        destination: 'https://tuslibros.cl/:path*',
+        permanent: true,
+      },
       // SEO landing pages — libros de alta demanda con página dedicada.
       // Redirigen ANTES que el middleware para transferir link equity (308).
       { source: '/libro/algebra-de-baldor', destination: '/algebra-de-baldor', permanent: true },

@@ -28,14 +28,17 @@ export async function generateMetadata({ params }: Props) {
   const bio = seller?.bio ? ` ${seller.bio.slice(0, 100)}` : "";
   const title = `${name} — Libros usados${location} | tuslibros.cl`;
   const description = `Compra libros de ${name}${location}.${bio} Envío seguro con MercadoPago o coordinación por WhatsApp.`;
+  const slug = seller?.username ?? params.id;
+  const canonicalUrl = `https://tuslibros.cl/vendedor/${slug}`;
 
   return {
     title,
     description,
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       title,
       description,
-      url: `https://tuslibros.cl/vendedor/${params.id}`,
+      url: canonicalUrl,
       siteName: "tuslibros.cl",
       type: "profile",
       locale: "es_CL",
