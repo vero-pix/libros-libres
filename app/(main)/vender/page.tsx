@@ -3,7 +3,7 @@ import RequestsRow from "@/components/home/RequestsRow";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Vender Libros Usados en Chile | tuslibros.cl",
+  title: "Vender libros usados en Chile | tuslibros.cl",
   description:
     "¿Quieres vender libros usados en Chile? Publica en 10 segundos. Escanea el código de barras, ponle precio y listo. Pago seguro con MercadoPago y envío a todo el país.",
   alternates: { canonical: "https://tuslibros.cl/vender" },
@@ -112,10 +112,10 @@ export default function VenderPage() {
         <div className="relative max-w-4xl mx-auto px-4 py-20 sm:py-28 text-center">
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight animate-fade-in-up">
             Vende tus libros usados<br />
-            <span className="text-brand-400">en 10 segundos</span>
+            <span className="text-brand-400">en Chile</span>
           </h1>
           <p className="mt-6 text-lg sm:text-xl text-white/80 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
-            Solo escanea el código de barras. Sin fotos perfectas. ¡Listo!
+            Publica en 10 segundos. Solo escanea el código de barras, ponle precio y listo.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
             <Link
@@ -202,6 +202,48 @@ export default function VenderPage() {
               </summary>
               <p className="mt-3 text-sm text-ink-muted leading-relaxed">{item.a}</p>
             </details>
+          ))}
+        </div>
+      </section>
+
+      {/* Testimonios de vendedores */}
+      <section className="max-w-4xl mx-auto px-4 py-16">
+        <h2 className="font-display text-2xl sm:text-3xl font-bold text-ink text-center mb-10">
+          Vendedores que ya circulan sus libros
+        </h2>
+        <div className="grid sm:grid-cols-3 gap-6">
+          {[
+            {
+              name: "CIMLibros",
+              location: "La Florida, Santiago",
+              books: "78 libros",
+              quote: "Empecé subiendo 10 libros para probar. En dos semanas ya había vendido cuatro. Ahora tengo todo el catálogo acá.",
+            },
+            {
+              name: "Libros De La Buhardilla",
+              location: "Santiago",
+              books: "37 libros",
+              quote: "Lo que me convenció fue el despacho: el courier pasa a buscar a mi casa. No tengo que salir a ninguna oficina.",
+            },
+            {
+              name: "María Soledad",
+              location: "Santiago",
+              books: "20 libros",
+              quote: "Tenía libros que ya no leía acumulando polvo. En tuslibros.cl llegaron a compradores que los buscaban. Simple y seguro.",
+            },
+          ].map((t) => (
+            <blockquote
+              key={t.name}
+              className="relative bg-white border border-cream-dark/30 rounded-2xl px-6 py-6"
+            >
+              <span aria-hidden className="absolute -top-3 left-6 text-5xl font-serif text-brand-400 leading-none select-none">&ldquo;</span>
+              <p className="font-serif italic text-sm text-ink leading-relaxed mb-4">{t.quote}</p>
+              <footer className="text-xs text-ink-muted">
+                <span className="font-semibold text-ink not-italic">{t.name}</span>
+                <span className="mx-1.5">·</span>{t.location}
+                <span className="mx-1.5">·</span>{t.books}
+              </footer>
+            </blockquote>
           ))}
         </div>
       </section>
