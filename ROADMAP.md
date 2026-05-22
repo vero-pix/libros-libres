@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 20 mayo 2026
+Última actualización: 21 mayo 2026
 
 ---
 
@@ -49,6 +49,7 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 
 - [ ] **Dominio librolibre.cl** — vence 24 mayo 2026. Titular: Cinta Carmesí. Si no renueva, registrar al tiro ($9.990/año, NIC Chile, 30 días gracia post-vencimiento).
 - [ ] **Restaurar dirección Shipit** — cambiar de vuelta a San Pio X 2555, Providencia, vero@economics.cl después del envío de cim.
+- [x] **Rate limit /api en deny** — 60 req/min por IP, acción deny (403). Activado 21 mayo 2026.
 
 ---
 
@@ -366,6 +367,9 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 ---
 
 ## Historial de sesiones
+
+### 21 mayo 2026
+Vercel Firewall: bloqueados Vietnam, India, Filipinas (deny). Rate limit 60 req/min en /api (modo log — pasar a deny en ~48h tras revisar dashboard). Curación "Esta semana en el velador" renovada: 9 libros adultos literarios (Poe, Huxley, Padura, Enders, Laborde, Bonnefoy, Hurtado, Porché, Osses). Vendedores destacados: agregados Librería Huertas (fabian, 32 libros) y María Soledad (20 libros). Fix crítico: next revertido de 9.3.3 accidental → 14.2.35. Novedades actualizadas a Día 42. Alias `actualizar` en ~/.zshrc.
 
 ### 13 mayo 2026
 URLs amigables, FAQ #1 Google, block /search robots.txt, marquee destacados, match automático Se Busca, scripts PrestaShop para Álvaro, limpieza 21 bots, newsletter 106 destinatarios. Nuevos vendedores: Mónica Espinoza (47 libros pendientes) y Patricio Bustos Barros (1 libro activo).
