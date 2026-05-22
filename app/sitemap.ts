@@ -31,7 +31,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Dynamic listing pages
   let listingPages: MetadataRoute.Sitemap = [];
-  let categoryPages: MetadataRoute.Sitemap = [];
   try {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -61,36 +60,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       };
     });
 
-    // Category pages — /categoria/[slug] (Fase 2: rutas reales pendientes)
-    const { data: cats } = await supabase
-      .from("books")
-      .select("category, subcategory")
-      .not("category", "is", null);
-
-    const seen = new Set<string>();
-    for (const b of cats ?? []) {
-      if (b.category && !seen.has(b.category)) {
-        seen.add(b.category);
-        categoryPages.push({
-          url: `${baseUrl}/categoria/${b.category}`,
-          lastModified: new Date(),
-          changeFrequency: "weekly" as const,
-          priority: 0.9,
-        });
-      }
-      if (b.subcategory && !seen.has(b.subcategory)) {
-        seen.add(b.subcategory);
-        const sub = b.subcategory.startsWith(`${b.category}-`)
-          ? b.subcategory.slice(b.category.length + 1)
-          : b.subcategory;
-        categoryPages.push({
-          url: `${baseUrl}/categoria/${b.category}/${sub}`,
-          lastModified: new Date(),
-          changeFrequency: "weekly" as const,
-          priority: 0.9,
-        });
-      }
-    }
+    // TODO: agregar /categoria/[slug] cuando existan las rutas reales (Fase 2)
+    // TODO: agregar /ciudad/[slug] cuando existan las landings de ciudad
   } catch {
     // Sitemap still works without dynamic pages
   }
@@ -127,5 +98,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // no páginas reales. El & en esas URLs rompe el XML del sitemap. Se agregarán cuando
   // existan landings dedicadas (/libros-de-historia, etc.).
 
-  return [...staticPages, ...categoryPages, ...listingPages, ...sellerPages];
+  return [...staticPages, ...listingPages, ...sellerPages];
 }
