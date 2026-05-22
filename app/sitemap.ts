@@ -31,6 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Dynamic listing pages
   let listingPages: MetadataRoute.Sitemap = [];
+  let categoryPages: MetadataRoute.Sitemap = [];
   try {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -40,7 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const { data: listings } = await supabase
       .from("listings")
-      .select("id, slug, updated_at, seller:users(username)")
+      .select("id, slug, updated_at, seller:users(username), book:books(updated_at)")
       .eq("status", "active")
       .order("updated_at", { ascending: false })
       .limit(1000);
@@ -51,13 +52,45 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         username && l.slug
           ? `${baseUrl}/libro/${username}/${l.slug}`
           : `${baseUrl}/listings/${l.id}`;
+      const bookUpdatedAt = l.book?.updated_at ?? l.updated_at;
       return {
         url,
-        lastModified: new Date(l.updated_at),
+        lastModified: new Date(bookUpdatedAt),
         changeFrequency: "weekly" as const,
-        priority: 0.9,
+        priority: 0.8,
       };
     });
+
+    // Category pages — /categoria/[slug] (Fase 2: rutas reales pendientes)
+    const { data: cats } = await supabase
+      .from("books")
+      .select("category, subcategory")
+      .not("category", "is", null);
+
+    const seen = new Set<string>();
+    for (const b of cats ?? []) {
+      if (b.category && !seen.has(b.category)) {
+        seen.add(b.category);
+        categoryPages.push({
+          url: `${baseUrl}/categoria/${b.category}`,
+          lastModified: new Date(),
+          changeFrequency: "weekly" as const,
+          priority: 0.9,
+        });
+      }
+      if (b.subcategory && !seen.has(b.subcategory)) {
+        seen.add(b.subcategory);
+        const sub = b.subcategory.startsWith(`${b.category}-`)
+          ? b.subcategory.slice(b.category.length + 1)
+          : b.subcategory;
+        categoryPages.push({
+          url: `${baseUrl}/categoria/${b.category}/${sub}`,
+          lastModified: new Date(),
+          changeFrequency: "weekly" as const,
+          priority: 0.9,
+        });
+      }
+    }
   } catch {
     // Sitemap still works without dynamic pages
   }
@@ -94,5 +127,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // no páginas reales. El & en esas URLs rompe el XML del sitemap. Se agregarán cuando
   // existan landings dedicadas (/libros-de-historia, etc.).
 
-  return [...staticPages, ...listingPages, ...sellerPages];
+  return [...staticPages, ...categoryPages, ...listingPages, ...sellerPages];
 }
