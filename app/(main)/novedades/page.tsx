@@ -9,6 +9,7 @@ export const metadata = {
   title: "Diario de tuslibros.cl — Mayo 2026",
   description:
     "Lo que pasó esta semana en tuslibros.cl: bloqueo de bots por país, rate limiting, API para librerías, nueva taxonomía chilena y más.",
+  alternates: { canonical: "https://tuslibros.cl/novedades" },
 };
 
 export const revalidate = 300;

@@ -42,6 +42,9 @@ export const metadata: Metadata = {
     "arriendo libros Chile",
     "librería circular",
   ],
+  alternates: {
+    canonical: "https://tuslibros.cl",
+  },
   openGraph: {
     title: "tuslibros.cl — Libros usados en Chile con envío o retiro",
     description:

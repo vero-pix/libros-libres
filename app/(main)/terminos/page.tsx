@@ -6,6 +6,7 @@ import Image from "next/image";
 
 export const metadata = {
   title: "Términos y Condiciones — tuslibros.cl",
+  alternates: { canonical: "https://tuslibros.cl/terminos" },
 };
 
 export default async function TerminosPage() {
