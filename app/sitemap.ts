@@ -13,8 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/vender`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/vender-libros-usados`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/libros-usados-chile`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
-    { url: `${baseUrl}/libros-usados-santiago`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
-    { url: `${baseUrl}/libros-usados-providencia`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${baseUrl}/libros-usados`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
     { url: `${baseUrl}/libros-antiguos`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/solicitudes`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.7 },
     { url: `${baseUrl}/alianzas`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
@@ -98,9 +97,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // existan landings dedicadas (/libros-de-historia, etc.).
 
   const ciudadPages: MetadataRoute.Sitemap = [
-    "santiago", "valparaiso", "vina-del-mar", "concepcion", "temuco", "antofagasta", "la-serena",
+    "santiago", "providencia", "las-condes", "nunoa",
+    "valparaiso", "vina-del-mar", "concepcion", "temuco", "antofagasta", "la-serena",
   ].map((c) => ({
-    url: `${baseUrl}/ciudad/${c}`,
+    url: `${baseUrl}/libros-usados/${c}`,
     lastModified: new Date(),
     changeFrequency: "daily" as const,
     priority: 0.9,

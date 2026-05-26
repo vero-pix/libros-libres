@@ -24,6 +24,11 @@ const nextConfig = {
       // Redirigen ANTES que el middleware para transferir link equity (308).
       { source: '/libro/algebra-de-baldor', destination: '/algebra-de-baldor', permanent: true },
       { source: '/libro/algebra-de-baldor/', destination: '/algebra-de-baldor', permanent: true },
+      // Consolidación geo SEO → patrón canónico único /libros-usados/[ciudad].
+      // 301 desde rutas legacy y desde /ciudad/[slug] para eliminar canibalización.
+      { source: '/libros-usados-santiago', destination: '/libros-usados/santiago', permanent: true },
+      { source: '/libros-usados-providencia', destination: '/libros-usados/providencia', permanent: true },
+      { source: '/ciudad/:slug', destination: '/libros-usados/:slug', permanent: true },
       // WordPress legacy URLs → new routes
       // NOTA: /libro/:slug ya NO se redirige acá — el middleware lo resuelve a /libro/[username]/[slug]
       // Recuperación de tráfico: el slug legacy se traduce a búsqueda (hay intent recuperable)

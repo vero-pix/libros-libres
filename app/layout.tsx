@@ -31,17 +31,6 @@ export const metadata: Metadata = {
   },
   description:
     "Haz circular los libros que ya leíste y encuentra los que te faltan. El marketplace chileno para comprar y vender con pago seguro, envíos a todo Chile o retiro en mano. Publica gratis tu biblioteca.",
-  keywords: [
-    "libros que ya leíste",
-    "marketplace de libros",
-    "economía circular libros",
-    "comunidad de lectores Chile",
-    "vender libros leídos",
-    "intercambio de libros",
-    "libros segunda mano Chile",
-    "arriendo libros Chile",
-    "librería circular",
-  ],
   alternates: {
     canonical: "https://tuslibros.cl",
   },
