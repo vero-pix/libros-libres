@@ -31,7 +31,7 @@ export default function ImageUploadMultiple({ listingId, existingImages, onImage
     const newImages: { id: string; image_url: string }[] = [];
 
     for (const rawFile of Array.from(files)) {
-      if (!rawFile.type.startsWith("image/")) continue;
+      if (!rawFile.type.startsWith("image/") && !/\.heic$|\.heif$/i.test(rawFile.name)) continue;
       if (rawFile.size > 10 * 1024 * 1024) continue; // 10MB raw max, will compress
 
       const file = await compressImage(rawFile);

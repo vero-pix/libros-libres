@@ -11,7 +11,32 @@ export async function compressImage(file: File, maxWidth = 1200, maxHeight = 160
   return compressToJpeg(file, maxWidth, maxHeight, quality);
 }
 
-function compressToJpeg(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<File> {
+// HEIC/HEIF (fotos de iPhone y Samsung) no se decodifican en <canvas> en
+// Chrome/Android/Windows, así que el archivo se subía sin convertir y el
+// navegador no podía mostrarlo. Lo convertimos a JPEG antes de comprimir.
+function isHeic(file: File): boolean {
+  return /image\/heic|image\/heif/i.test(file.type) || /\.heic$|\.heif$/i.test(file.name);
+}
+
+async function heicToJpeg(file: File): Promise<File> {
+  try {
+    const heic2any = (await import("heic2any")).default;
+    const blob = (await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 })) as Blob;
+    return new File([blob], file.name.replace(/\.\w+$/, ".jpg"), {
+      type: "image/jpeg",
+      lastModified: Date.now(),
+    });
+  } catch {
+    return file; // si falla la conversión, seguimos con el original
+  }
+}
+
+async function compressToJpeg(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<File> {
+  const input = isHeic(file) ? await heicToJpeg(file) : file;
+  return canvasCompress(input, maxWidth, maxHeight, quality);
+}
+
+function canvasCompress(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<File> {
   return new Promise((resolve) => {
     const img = new window.Image();
     img.onload = () => {

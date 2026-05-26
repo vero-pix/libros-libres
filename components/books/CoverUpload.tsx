@@ -20,8 +20,8 @@ export default function CoverUpload({ currentUrl, onUploaded }: Props) {
   const displayUrl = preview ?? currentUrl;
 
   async function handleFile(file: File) {
-    if (!file.type.startsWith("image/")) {
-      setError("Solo se permiten imágenes (JPG, PNG, WebP).");
+    if (!file.type.startsWith("image/") && !/\.heic$|\.heif$/i.test(file.name)) {
+      setError("Solo se permiten imágenes (JPG, PNG, WebP, HEIC).");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
