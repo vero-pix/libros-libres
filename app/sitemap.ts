@@ -39,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const { data: listings } = await supabase
       .from("listings")
-      .select("id, slug, updated_at, seller:users(username), book:books(updated_at)")
+      .select("id, slug, updated_at, seller:users(username)")
       .eq("status", "active")
       .order("updated_at", { ascending: false })
       .limit(1000);
@@ -50,10 +50,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         username && l.slug
           ? `${baseUrl}/libro/${username}/${l.slug}`
           : `${baseUrl}/listings/${l.id}`;
-      const bookUpdatedAt = l.book?.updated_at ?? l.updated_at;
       return {
         url,
-        lastModified: new Date(bookUpdatedAt),
+        lastModified: new Date(l.updated_at),
         changeFrequency: "weekly" as const,
         priority: 0.8,
       };
