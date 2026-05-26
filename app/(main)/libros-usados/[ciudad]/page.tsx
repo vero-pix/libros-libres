@@ -20,6 +20,16 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): nu
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+const norm = (s: string) =>
+  s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+// La comuna real de cada ficha vive en listings.address ("Calle 123, Providencia, ...").
+// Comparamos contra el label de la ciudad para priorizar el match exacto.
+function comunaDeFicha(listing: ListingWithBook): string | null {
+  const address = (listing as unknown as Record<string, unknown>).address as string | undefined;
+  return address ? address.split(",")[1]?.trim() ?? null : null;
+}
+
 export function generateStaticParams() {
   return Object.keys(CIUDADES).map((ciudad) => ({ ciudad }));
 }
@@ -46,7 +56,7 @@ export async function generateMetadata({ params }: { params: { ciudad: string } 
   };
 }
 
-async function getListings(slug: string): Promise<ListingWithBook[]> {
+async function getListings(slug: string, label: string): Promise<ListingWithBook[]> {
   const geo = COORDS[slug];
   if (!geo) return [];
   const { lat, lng, radiusKm } = geo;
@@ -75,7 +85,16 @@ async function getListings(slug: string): Promise<ListingWithBook[]> {
     return lLat != null && lLng != null && haversineKm(lat, lng, lLat, lLng) <= radiusKm;
   });
 
-  return sortListingsForDisplay(near).slice(0, 18);
+  // Comuna exacta primero (evita que el listado parezca doorway page: encabezado
+  // dice una comuna pero las fichas son de otra). Dentro de cada grupo, orden de display.
+  const target = norm(label);
+  const exactas = near.filter((l) => {
+    const c = comunaDeFicha(l);
+    return c != null && norm(c) === target;
+  });
+  const resto = near.filter((l) => !exactas.includes(l));
+
+  return [...sortListingsForDisplay(exactas), ...sortListingsForDisplay(resto)].slice(0, 18);
 }
 
 export default async function LibrosUsadosCiudadPage({ params }: { params: { ciudad: string } }) {
@@ -84,7 +103,7 @@ export default async function LibrosUsadosCiudadPage({ params }: { params: { ciu
 
   const slug = params.ciudad;
   const url = `https://tuslibros.cl/libros-usados/${slug}`;
-  const listings = await getListings(slug);
+  const listings = await getListings(slug, city.label);
   const otras = ORDEN.filter((s) => s !== slug);
 
   return (
@@ -127,7 +146,7 @@ export default async function LibrosUsadosCiudadPage({ params }: { params: { ciu
             <section className="mb-16">
               <div className="flex justify-between items-end mb-6">
                 <h2 className="font-display text-3xl font-bold text-ink">
-                  Disponibles ahora en {city.label}
+                  Disponibles en {city.label} y alrededores
                 </h2>
                 <Link
                   href="/search"
