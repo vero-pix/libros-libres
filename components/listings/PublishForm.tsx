@@ -137,7 +137,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
     const newFiles: File[] = [];
     const newPreviews: string[] = [];
     for (const f of Array.from(files)) {
-      if (!f.type.startsWith("image/")) continue;
+      if (!f.type.startsWith("image/") && !/\.heic$|\.heif$/i.test(f.name)) continue;
       if (f.size > 10 * 1024 * 1024) continue;
       if (pendingImages.length + newFiles.length >= 5) break;
       newFiles.push(f);

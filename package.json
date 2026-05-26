@@ -24,6 +24,7 @@
     "@vercel/analytics": "^2.0.1",
     "google-trends-api": "^4.9.2",
     "gray-matter": "^4.0.3",
+    "heic2any": "^0.0.4",
     "html5-qrcode": "^2.3.8",
     "mapbox-gl": "^3.10.0",
     "mercadopago": "^2.12.0",
