@@ -41,10 +41,10 @@ const CLASSIC_AUTHORS = new Set([
 ]);
 
 const VALID_TAGS = new Set([
-  "BibliotecaDeBabel", "Borges", "Clasico", "Filosofia", "Cuentos",
+  "BibliotecaDeBabel", "Borges", "clasicos", "Filosofia", "Cuentos",
   "Coleccionable", "PrimeraEdicion", "EdicionLimitada", "NovelaChilena",
   "LatinoamericanoEsencial", "PremioNobel", "Poesia", "Teatro",
-  "CienciaFiccion", "NovelaNegra", "NovelaHistorica", "Ensayo",
+  "CienciaFiccion", "novela-negra", "NovelaHistorica", "ensayo",
   "Autoayuda", "Espiritualidad", "Historia", "Ciencia", "Arte",
   "Biografia", "Politica", "Negocios", "Infantil", "Juvenil",
   "Suspenso", "Humanidades", "Comics", "Novela y Ficción"
@@ -67,20 +67,20 @@ function suggestTags(book) {
   }
   if (author.includes("borges")) {
     tags.add("Borges");
-    tags.add("Clasico");
+    tags.add("clasicos");
   }
   for (const a of CLASSIC_AUTHORS) {
-    if (author.includes(a)) { tags.add("Clasico"); break; }
+    if (author.includes(a)) { tags.add("clasicos"); break; }
   }
   if (book.category === "coleccionables") tags.add("Coleccionable");
   const sub = book.subcategory;
   if (sub === "ficcion-poesia")               { tags.add("Poesia"); }
-  if (sub === "ficcion-policial")             { tags.add("NovelaNegra"); tags.add("Suspenso"); }
+  if (sub === "ficcion-policial")             { tags.add("novela-negra"); tags.add("Suspenso"); }
   if (sub === "ficcion-teatro")               { tags.add("Teatro"); }
   if (sub === "no-ficcion-biografia")         { tags.add("Biografia"); }
   if (sub === "no-ficcion-historia")          { tags.add("Historia"); }
   if (sub === "ficcion-novela")               { tags.add("Novela y Ficción"); }
-  if (sub === "no-ficcion-ensayo")            { tags.add("Ensayo"); }
+  if (sub === "no-ficcion-ensayo")            { tags.add("ensayo"); }
   if (sub === "no-ficcion-humanidades")       { tags.add("Humanidades"); }
   if (sub === "infantil-juvenil-infantil")    { tags.add("Infantil"); }
   if (sub === "infantil-juvenil-juvenil")     { tags.add("Juvenil"); }
@@ -99,7 +99,7 @@ function suggestTags(book) {
   if (text.includes("teatro") || text.includes("obra dramatica")) tags.add("Teatro");
   if (text.includes("premio nobel")) tags.add("PremioNobel");
   if (text.includes("suspenso") || text.includes("thriller") || text.includes("crimen")) tags.add("Suspenso");
-  if (text.includes("misterio") || text.includes("detective") || text.includes("policial")) tags.add("NovelaNegra");
+  if (text.includes("misterio") || text.includes("detective") || text.includes("policial")) tags.add("novela-negra");
 
   return Array.from(tags).filter(t => VALID_TAGS.has(t)).slice(0, 8);
 }
