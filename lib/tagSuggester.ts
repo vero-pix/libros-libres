@@ -87,6 +87,16 @@ export function suggestTags(book: BookInput): string[] {
   if (sub === "infantil-juvenil-infantil") tags.add("Infantil");
   if (sub === "infantil-juvenil-juvenil") tags.add("Juvenil");
   if (sub === "otros-comics") tags.add("Comics");
+  if (sub === "no-ficcion-autoayuda") tags.add("Autoayuda");
+  if (sub === "no-ficcion-arte") tags.add("Arte");
+  if (sub === "no-ficcion-ciencia") tags.add("Ciencia");
+  if (sub === "otros-religion") tags.add("Espiritualidad");
+
+  // Fallback por categoría cuando no hubo señal de subcategoría
+  if (tags.size === 0) {
+    if (book.category === "ficcion") tags.add("Novela y Ficción");
+    if (book.category === "infantil-juvenil") tags.add("Infantil");
+  }
 
   // Señales en texto
   if (text.includes("poesia") || text.includes("poema") || text.includes("versos")) tags.add("Poesia");

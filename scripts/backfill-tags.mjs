@@ -85,6 +85,15 @@ function suggestTags(book) {
   if (sub === "infantil-juvenil-infantil")    { tags.add("Infantil"); }
   if (sub === "infantil-juvenil-juvenil")     { tags.add("Juvenil"); }
   if (sub === "otros-comics")                 { tags.add("Comics"); }
+  if (sub === "no-ficcion-autoayuda")         { tags.add("Autoayuda"); }
+  if (sub === "no-ficcion-arte")              { tags.add("Arte"); }
+  if (sub === "no-ficcion-ciencia")           { tags.add("Ciencia"); }
+  if (sub === "otros-religion")               { tags.add("Espiritualidad"); }
+
+  if (tags.size === 0) {
+    if (book.category === "ficcion") tags.add("Novela y Ficción");
+    if (book.category === "infantil-juvenil") tags.add("Infantil");
+  }
 
   if (text.includes("poesia") || text.includes("poema") || text.includes("versos")) tags.add("Poesia");
   if (text.includes("teatro") || text.includes("obra dramatica")) tags.add("Teatro");
@@ -104,11 +113,14 @@ const { data: books, error } = await supabase
 
 if (error) { console.error("Error:", error); process.exit(1); }
 
-const toUpdate = books; // re-procesar todos para corregir slugs viejos
-const alreadyTagged = books.filter(b => b.tags?.length > 0).length;
+// Solo libros SIN tags. No reprocesar los que ya tienen tags curados
+// (las colecciones del home usan slugs como novela-negra/historia-chile que
+//  el suggester no genera; reprocesarlos los borraría).
+const toUpdate = books.filter(b => !b.tags || b.tags.length === 0);
+const alreadyTagged = books.length - toUpdate.length;
 
 console.log(`Total books: ${books.length}`);
-console.log(`Ya tienen tags: ${alreadyTagged}`);
+console.log(`Ya tienen tags (intactos): ${alreadyTagged}`);
 console.log(`Sin tags (a procesar): ${toUpdate.length}`);
 
 if (toUpdate.length === 0) {
