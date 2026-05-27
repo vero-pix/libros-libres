@@ -39,6 +39,19 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "27 mayo 2026",
+    title: "Ordené el catálogo por dentro: colecciones más llenas",
+    description:
+      "Me puse a limpiar el detrás de escena. Había libros tirados en la categoría \"otros\" que en realidad eran historia, arte o ficción, y los reubiqué donde corresponde. También arreglé las etiquetas: el mismo tema aparecía escrito de dos formas distintas (\"ensayo\" y \"Ensayo\", \"clásicos\" y \"Clasico\"), así que partía la colección en dos y mostraba filtros repetidos. Las unifiqué. ¿Resultado? Pasé de 43 etiquetas a 33, sin repetidas, y las colecciones del home quedaron más llenas: ahora cuando entras a \"Clásicos\" o \"Ensayo\" aparecen todos los libros, no la mitad. Aburrido de explicar, pero se nota al navegar.",
+    tag: "Mejora",
+    visual: {
+      kind: "milestone",
+      icon: "🏷️",
+      metric: "43 → 33 etiquetas",
+      detail: "sin duplicadas — colecciones del home más completas",
+    },
+  },
+  {
     date: "22 mayo 2026",
     title: "101 personas entraron hoy — y 4 llegaron desde ChatGPT",
     description:
