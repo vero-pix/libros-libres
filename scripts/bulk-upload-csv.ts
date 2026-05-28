@@ -24,6 +24,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync, existsSync, readdirSync } from "fs";
 import { resolve, join, basename, extname } from "path";
+import { normalizeGenre } from "../lib/genreNormalizer";
 
 // Load .env.local manually
 const envPath = resolve(process.cwd(), ".env.local");
@@ -63,6 +64,17 @@ const CONTENT_TYPES: Record<string, string> = {
   ".webp": "image/webp",
 };
 const STORAGE_BUCKET = "covers";
+
+// La plataforma guarda condición/modalidad en inglés (ver PublishForm.tsx).
+// La plantilla viene en español → traducir TODOS los valores, no solo algunos.
+const CONDITION_MAP: Record<string, string> = {
+  como_nuevo: "new", buen_estado: "good", estado_regular: "fair", con_detalles: "poor",
+  new: "new", good: "good", fair: "fair", poor: "poor",
+};
+const MODALITY_MAP: Record<string, string> = {
+  venta: "sale", arriendo: "loan", ambos: "both",
+  sale: "sale", loan: "loan", both: "both",
+};
 // Coordenadas se resuelven desde el perfil del vendedor en Supabase
 let SELLER_LAT = -33.4489;
 let SELLER_LNG = -70.6693;
@@ -277,8 +289,14 @@ async function main() {
     let publisher = row.editorial || null;
     let pages = row.pages ? parseInt(row.pages, 10) || null : null;
     const binding = row.encuadernacion || null;
-    const condition = row.condicion === "buen_estado" ? "good" : row.condicion || "good";
-    const modality = row.tipo === "venta" ? "sale" : row.tipo === "both" ? "both" : row.tipo || "sale";
+    const condRaw = (row.condicion || "").trim().toLowerCase();
+    const tipoRaw = (row.tipo || "").trim().toLowerCase();
+    const condition = CONDITION_MAP[condRaw] ?? "good";
+    const modality = MODALITY_MAP[tipoRaw] ?? "sale";
+    if (condRaw && !CONDITION_MAP[condRaw])
+      console.warn(`    ⚠️  condición "${row.condicion}" no reconocida en "${title}" → uso "good"`);
+    if (tipoRaw && !MODALITY_MAP[tipoRaw])
+      console.warn(`    ⚠️  tipo "${row.tipo}" no reconocido en "${title}" → uso "sale"`);
     const rowPrice = row.precio ? parseInt(row.precio, 10) : DEFAULT_PRICE;
     const rentalPrice = modality !== "sale" ? Math.round(rowPrice * 0.4) : null;
 
@@ -287,6 +305,12 @@ async function main() {
       skipped++;
       continue;
     }
+
+    // Clasificar a slug de categoría (igual que el publish form). Sin esto el
+    // libro queda con category=null → invisible en los filtros por categoría.
+    const normalized = normalizeGenre(genre, title, description);
+    const category = normalized?.category ?? "otros";
+    const subcategory = normalized?.subcategory ?? null;
 
     // Resolver fotos propias del vendedor (si se pasó --photos)
     const photoPaths = resolvePhotosForRow(row, isbn);
@@ -300,7 +324,7 @@ async function main() {
       const fotos = PHOTOS_DIR
         ? ` — ${photoPaths.length} foto(s): ${photoPaths.map((p) => basename(p)).join(", ") || "ninguna"}`
         : "";
-      console.log(`  • ${title} — ${author}${fotos}`);
+      console.log(`  • ${title} — ${author} [${condition}/${modality}, ${category}, $${rowPrice}]${fotos}`);
       created++;
       continue;
     }
@@ -352,6 +376,8 @@ async function main() {
             description,
             cover_url: coverUrl,
             genre,
+            category,
+            subcategory,
             published_year: year,
             publisher,
             pages,
