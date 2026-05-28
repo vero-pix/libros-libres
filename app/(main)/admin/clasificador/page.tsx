@@ -145,7 +145,7 @@ export default function ClasificadorPage() {
                     <div className="flex gap-3">
                       {book.cover_url ? (
                         <div className="relative w-10 h-14 flex-shrink-0">
-                          <Image src={book.cover_url} alt="" fill className="object-cover rounded shadow-sm" />
+                          <Image src={book.cover_url} alt={`Portada de ${book.title}`} fill className="object-cover rounded shadow-sm" />
                         </div>
                       ) : (
                         <div className="w-10 h-14 bg-gray-100 rounded flex items-center justify-center text-[10px] text-gray-400">Sin foto</div>

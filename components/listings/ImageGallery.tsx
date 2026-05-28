@@ -54,6 +54,12 @@ export default function ImageGallery({ mainImage, images, alt, author }: Props) 
   const safeIdx = activeIdx < visibleImages.length ? activeIdx : 0;
   const current = visibleImages[safeIdx];
 
+  // Alt descriptivo para SEO de imágenes: "Título — Autor, libro usado".
+  // Solo numeramos cuando hay más de una foto, para no ensuciar el alt principal.
+  const baseAlt = `${alt}${author ? ` — ${author}` : ""}, libro usado`;
+  const imgAlt = (i: number) =>
+    visibleImages.length > 1 ? `${baseAlt} (foto ${i + 1} de ${visibleImages.length})` : baseAlt;
+
   return (
     <div className="flex flex-col items-center gap-3">
       {/* Main image */}
@@ -61,7 +67,7 @@ export default function ImageGallery({ mainImage, images, alt, author }: Props) 
         <Image
           key={current.id}
           src={current.image_url}
-          alt={`${alt} - foto ${safeIdx + 1}`}
+          alt={imgAlt(safeIdx)}
           fill
           className="object-cover rounded-lg shadow-md"
           sizes="280px"
@@ -115,7 +121,7 @@ export default function ImageGallery({ mainImage, images, alt, author }: Props) 
                 i === safeIdx ? "border-brand-500" : "border-transparent opacity-60 hover:opacity-100"
               }`}
             >
-              <Image src={img.image_url} alt={`${alt} - miniatura ${i + 1}`} fill className="object-cover" sizes="48px" />
+              <Image src={img.image_url} alt={`${baseAlt} — miniatura ${i + 1}`} fill className="object-cover" sizes="48px" />
             </button>
           ))}
         </div>
