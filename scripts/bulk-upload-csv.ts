@@ -285,10 +285,13 @@ async function main() {
     let description = row.descripcion || null;
     let coverUrl = row.cover_google || row.cover_openlibrary || null;
     let genre = row.categoria || null;
-    let year = row.year ? parseInt(row.year, 10) || null : null;
+    // Acepta nombres en inglés (year/pages) y en español (año/anio/paginas/páginas)
+    const yearRaw = row.year || row["año"] || row["anio"] || "";
+    let year = yearRaw ? parseInt(yearRaw, 10) || null : null;
     let publisher = row.editorial || null;
-    let pages = row.pages ? parseInt(row.pages, 10) || null : null;
-    const binding = row.encuadernacion || null;
+    const pagesRaw = row.pages || row.paginas || row["páginas"] || "";
+    let pages = pagesRaw ? parseInt(pagesRaw, 10) || null : null;
+    const binding = row.encuadernacion || row.encuadernación || null;
     const condRaw = (row.condicion || "").trim().toLowerCase();
     const tipoRaw = (row.tipo || "").trim().toLowerCase();
     const condition = CONDITION_MAP[condRaw] ?? "good";
@@ -324,7 +327,8 @@ async function main() {
       const fotos = PHOTOS_DIR
         ? ` — ${photoPaths.length} foto(s): ${photoPaths.map((p) => basename(p)).join(", ") || "ninguna"}`
         : "";
-      console.log(`  • ${title} — ${author} [${condition}/${modality}, ${category}, $${rowPrice}]${fotos}`);
+      const meta = [publisher, year, pages ? `${pages}p` : null].filter(Boolean).join(" · ");
+      console.log(`  • ${title} — ${author} [${condition}/${modality}, ${category}, $${rowPrice}]${meta ? ` · ${meta}` : ""}${fotos}`);
       created++;
       continue;
     }

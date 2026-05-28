@@ -1,4 +1,5 @@
-titulo,autor,isbn,precio,condicion,tipo,categoria
-Cien Años de Soledad,Gabriel García Márquez,9780307474728,8000,buen_estado,venta,Ficción
-El Túnel,Ernesto Sabato,9788432216152,5000,como_nuevo,venta,Ficción
-La Casa de los Espíritus,Isabel Allende,9788401352836,7000,buen_estado,venta,Ficción
+titulo,autor,isbn,precio,condicion,tipo,categoria,editorial,año,paginas
+Cien Años de Soledad,Gabriel García Márquez,9780307474728,8000,buen_estado,venta,Ficción,Sudamericana,1967,471
+El Túnel,Ernesto Sabato,9788432216152,5000,como_nuevo,venta,Ficción,Seix Barral,1948,158
+La Casa de los Espíritus,Isabel Allende,9788401352836,7000,buen_estado,venta,Ficción,Plaza & Janés,1982,448
+Arica Puerta Nueva,Luis Urzúa Urzúa,,15000,buen_estado,venta,Historia,Andrés Bello,1968,320
