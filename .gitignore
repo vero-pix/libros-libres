@@ -46,6 +46,10 @@ docs/maigret.jpg
 linda*
 public/hero-libros-old.jpg
 
+# Supabase CLI local state (no es código, cambia solo)
+supabase/.temp/
+supabase/.branches/
+
 # Playwright
 /test-results/
 /tests/playwright-report/
