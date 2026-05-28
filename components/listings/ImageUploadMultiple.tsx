@@ -100,7 +100,7 @@ export default function ImageUploadMultiple({ listingId, existingImages, onImage
       <div className="flex flex-wrap gap-2">
         {images.map((img) => (
           <div key={img.id} className="relative w-16 h-20 rounded overflow-hidden border border-gray-200">
-            <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+            <img src={img.image_url} alt="Foto adicional del libro" className="w-full h-full object-cover" />
             <button
               type="button"
               onClick={() => handleRemove(img.id)}

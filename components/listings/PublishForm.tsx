@@ -901,7 +901,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
           <div className="flex flex-wrap gap-2">
             {pendingPreviews.map((src, i) => (
               <div key={i} className="relative w-16 h-20 rounded overflow-hidden border border-gray-200">
-                <img src={src} alt="" className="w-full h-full object-cover" />
+                <img src={src} alt={`Foto ${i + 1} del libro${bookTitle ? `: ${bookTitle}` : ""}`} className="w-full h-full object-cover" />
                 <button
                   type="button"
                   onClick={() => removePendingImage(i)}
