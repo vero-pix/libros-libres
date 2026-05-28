@@ -2,10 +2,13 @@ import { createClient } from '@supabase/supabase-js';
 import { readFileSync } from 'fs';
 
 const env = Object.fromEntries(
-  readFileSync('.env.local', 'utf8').split('\n').filter(l => l.includes('=')).map(l => {
-    const i = l.indexOf('=');
-    return [l.slice(0, i), l.slice(i + 1)];
-  })
+  readFileSync('.env.local', 'utf8').split('\n')
+    .filter(l => l.includes('=') && !l.trimStart().startsWith('#'))
+    .map(l => {
+      const i = l.indexOf('=');
+      // .trim() + quitar comillas envolventes (.env.local suele traer KEY="valor")
+      return [l.slice(0, i).trim(), l.slice(i + 1).trim().replace(/^["']|["']$/g, '')];
+    })
 );
 
 const supa = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
@@ -15,10 +18,25 @@ const supa = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROL
 const now = Date.now();
 const d = (days) => new Date(now - days * 864e5).toISOString();
 
-// === VISITAS (page_views) ===
-const { data: pv30 } = await supa.from('page_views').select('session_id, created_at, path, user_id').gte('created_at', d(30));
-const { data: pv7 } = await supa.from('page_views').select('session_id, created_at, path, user_id').gte('created_at', d(7));
-const { data: pv1 } = await supa.from('page_views').select('session_id, created_at, path, user_id').gte('created_at', d(1));
+// Supabase corta en 1000 filas por query → paginar para no sub-reportar.
+async function fetchAll(table, select, sinceIso) {
+  const all = [];
+  const PAGE = 1000;
+  for (let from = 0; ; from += PAGE) {
+    let q = supa.from(table).select(select).order('created_at', { ascending: true }).range(from, from + PAGE - 1);
+    if (sinceIso) q = q.gte('created_at', sinceIso);
+    const { data, error } = await q;
+    if (error) { console.error(`fetch ${table} error:`, error.message); break; }
+    all.push(...(data ?? []));
+    if (!data || data.length < PAGE) break;
+  }
+  return all;
+}
+
+// === VISITAS (page_views) — paginado ===
+const pv30 = await fetchAll('page_views', 'session_id, created_at, path, user_id', d(30));
+const pv7 = await fetchAll('page_views', 'session_id, created_at, path, user_id', d(7));
+const pv1 = await fetchAll('page_views', 'session_id, created_at, path, user_id', d(1));
 
 const uniq = (arr) => new Set(arr.map(v => v.session_id).filter(Boolean)).size;
 const topPaths = (arr) => {
@@ -41,7 +59,8 @@ console.log(`\n=== USUARIOS ===`);
 console.log(`total: ${totalUsers}  |  registrados 30d: ${recentUsers?.length ?? 0}`);
 
 // === ORDERS ===
-const { data: orders } = await supa.from('orders').select('id, status, total_amount, buyer_id, created_at, listing_id').order('created_at', { ascending: false });
+const { data: orders, error: ordersErr } = await supa.from('orders').select('id, status, total, buyer_id, created_at, listing_id').order('created_at', { ascending: false });
+if (ordersErr) console.error('orders error:', ordersErr.message);
 const byStatus = {};
 for (const o of orders ?? []) byStatus[o.status] = (byStatus[o.status] || 0) + 1;
 console.log(`\n=== ORDERS ===`);
@@ -53,7 +72,7 @@ if (pending.length) {
   console.log(`\n→ ${pending.length} orders pendientes de pago:`);
   for (const o of pending.slice(0, 10)) {
     const age = Math.round((now - new Date(o.created_at).getTime()) / 3600e3);
-    console.log(`  ${o.id.slice(0, 8)}  $${o.total_amount}  hace ${age}h`);
+    console.log(`  ${o.id.slice(0, 8)}  $${o.total}  hace ${age}h`);
   }
 }
 
