@@ -34,6 +34,11 @@ const nextConfig = {
       // Recuperación de tráfico: el slug legacy se traduce a búsqueda (hay intent recuperable)
       { source: '/producto/:slug', destination: '/search?q=:slug', permanent: true },
       { source: '/product/:slug', destination: '/search?q=:slug', permanent: true },
+      // Tags legacy de WooCommerce indexados en Google (rebotaban 100% en 404).
+      // Los slugs viejos no calzan con los tags curados → usamos ?q= (busca
+      // título/autor; si no hay match cae en el empty-state, nunca en 404).
+      { source: '/product-tag/:slug', destination: '/search?q=:slug', permanent: true },
+      { source: '/product-tag/:slug/page/:page', destination: '/search?q=:slug', permanent: true },
       { source: '/categoria-producto/:slug', destination: '/?genre=:slug', permanent: true },
       { source: '/product-category/:slug', destination: '/?genre=:slug', permanent: true },
       { source: '/product-category/:slug/:sub', destination: '/?genre=:sub', permanent: true },
