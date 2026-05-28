@@ -126,6 +126,9 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 
 ### 🟡 Alta prioridad (impacto directo en conversión)
 
+**Conversión a registro / publicación (sesión propia con smoke test)**
+- [ ] **Reducir fricción `/publish` → registro** — `/publish` es el path #2 del sitio (784 views/30d, 28 may), o sea hay MUCHA intención de publicar, pero el logueado-fuera rebota. Diagnóstico (28 may): (1) `/publish` no autenticado hace `redirect("/login?next=/publish")` directo, sin mostrar el pitch "Publica tu libro · Siempre gratis"; (2) el login dice *"Bienvenido de vuelta · Inicia sesión"* — mensaje de quien vuelve, no de un vendedor nuevo; (3) el link "Regístrate" del `LoginForm` va a `/register` pelado, **pierde el `next`**; (4) el registro usa confirmación por email (`emailRedirectTo → /api/auth/callback`) y NO arrastra `next` → tras confirmar no vuelve a `/publish`. **Fix (toca auth → requiere smoke test):** copy contextual en login/register según `next`, threadear `next` por register→callback, y opcional landing logged-out de `/publish` con value-prop + CTA registrarse. Conecta directo con la preocupación de pocos registros.
+
 **Ciclo de vida del usuario**
 - [ ] **Re-engage email 3 días post-registro** — si user no publicó ni compró en 3 días, email recordatorio con link a ISBN scanner o libro destacado relevante.
 - [ ] **Carrito abandonado** — email automático a quien deja libros sin comprar. Álvaro lo pidió explícitamente.
@@ -157,6 +160,8 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 - [ ] **Componente testimonios escalable** — hoy TestimonialBanner hardcodeado. Cuando haya ≥3, migrar a tabla `testimonials` + widget.
 
 **Datos y calidad**
+- [ ] **Bug revenue admin "Negocio" = $0** — `app/api/admin/business-metrics/route.ts` consulta `orders.total_amount`, pero la columna real es **`total`** (ver `supabase/migrations/20260402_create_orders.sql`). El query falla en silencio → la pestaña Negocio muestra revenue 0 aunque hay ventas. Fix de una palabra (`total_amount` → `total`). Detectado 28 may al arreglar `scripts/audit-funnel.mjs` (mismo bug, ya corregido ahí).
+- [ ] **`/search` como entrada: bounce alto, baja prioridad** — `/search` pelado (sin query) muestra el catálogo completo (no está roto); ~40 entradas/30d, rebote en parte natural de página-catálogo. Opcional: chips de categorías/colecciones arriba para dar punto de entrada. No urgente (28 may).
 - [ ] **Hobsbawm "Un tiempo de rupturas"** — quedó con `featured=true` sin `featured_rank`. Limpiar: `update listings set featured=false where featured_rank is null and featured=true;`
 
 ---
