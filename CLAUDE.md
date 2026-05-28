@@ -62,7 +62,7 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 
 ## Memoria y contexto histórico
 
-La memoria persistente del asistente vive en `~/.claude/projects/-Users-veronicavelasquez-libros-libres/memory/`. `MEMORY.md` es el índice — arranca por ahí para entender sesiones previas, feedback acumulado y pendientes. No duplicar en este archivo lo que ya está en memoria: este CLAUDE.md es para convenciones estables; la memoria es para contexto evolutivo.
+La memoria persistente del asistente vive en `~/.claude/projects/-Users-veronicavelasquez-dev-libros-libres/memory/` (consolidada el 28 may 2026 desde las carpetas previas de iCloud/Desktop; las antiguas quedaron de respaldo). `MEMORY.md` es el índice — arranca por ahí para entender sesiones previas, feedback acumulado y pendientes. No duplicar en este archivo lo que ya está en memoria: este CLAUDE.md es para convenciones estables; la memoria es para contexto evolutivo.
 
 ## Roadmap y decisiones
 

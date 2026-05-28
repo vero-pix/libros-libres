@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 21 mayo 2026
+Última actualización: 28 mayo 2026
 
 ---
 
@@ -47,7 +47,10 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 
 ### 🔴 Urgente / Con fecha límite
 
-- [ ] **Dominio librolibre.cl** — vence 24 mayo 2026. Titular: Cinta Carmesí. Si no renueva, registrar al tiro ($9.990/año, NIC Chile, 30 días gracia post-vencimiento).
+- [ ] **Dominio librolibre.cl** — venció 24 mayo 2026. Titular sigue siendo **Cinta Carmesí** (NO Vero). En período de recuperación: se libera el **24 junio 2026**; si Cinta Carmesí no lo restaura antes, pasa a eliminación y queda disponible para inscripción.
+  - ⚠️ **NO clickear "Restaurar ahora" en NIC Chile** — ese botón renueva el dominio para el titular actual (Cinta Carmesí), no lo transfiere a Vero. Sería pagarle la renovación a ella.
+  - ✅ **Acción real**: esperar al **25 junio 2026** y, si quedó liberado, inscribirlo a nombre de Vero ($9.990/año, NIC Chile). Riesgo: si hay >1 solicitante al liberarse, NIC lo manda a remate/subasta (riesgo bajo para dominio de nicho).
+  - Nameservers actuales: Cloudflare. Sitio activo en `www.librolibre.cl` al 28 mayo.
 - [ ] **Restaurar dirección Shipit** — cambiar de vuelta a San Pio X 2555, Providencia, vero@economics.cl después del envío de cim.
 - [x] **Rate limit /api en deny** — 60 req/min por IP, acción deny (403). Activado 21 mayo 2026.
 
@@ -147,6 +150,7 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 - [ ] **PostHog session replay** — para entender POR QUÉ rebotan (hoy solo sabemos CUÁNTO). Activar cuando haya presupuesto.
 
 **Modelo de negocio**
+- [ ] **Venta en pack / lote (lado vendedor)** — pedido por Carlos (CIM Libros, 28 may). Publicar varios libros como **una sola unidad** que se vende junta: packs (ej. 4 Lafourcade) y obras **multitomo** (ej. "Historia de la Vida Privada - Tomo 1..N"). ⚠️ Distinto del bundle checkout actual (`bundle_id`), que es lado **comprador** (varios listings sueltos del mismo vendedor pagados juntos). Acá el lote es atómico: no se compra un libro suelto del pack. Scope a diseñar: modelo de datos (`listing` tipo lote + `listing_items`, o flag `is_bundle`), publish form, ficha, carrito, checkout y etiqueta Shipit (peso/volumen del lote). Sesión dedicada.
 - [ ] **Sistema de ofertas entre usuarios** — tabla `offers`, endpoint y UI para que compradores propongan precio. Decidir si es prioridad. ⚠️ Los "13 ofertas" del commit de abril son precios con `original_price` tachado, NO negociación.
 - [ ] **Flujo de devolución de arriendos** — arriendo se crea y cobra pero no hay tracking "libro debe devolverse en X días" ni confirmación de devolución.
 - [ ] **Rewards de referidos** — código y estadísticas funcionan pero no se entregan descuentos/créditos al cumplir. Sin incentivo real, no convierte.
