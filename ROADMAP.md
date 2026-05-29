@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 28 mayo 2026
+Última actualización: 29 mayo 2026
 
 ---
 
@@ -127,7 +127,8 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 ### 🟡 Alta prioridad (impacto directo en conversión)
 
 **Conversión a registro / publicación (sesión propia con smoke test)**
-- [ ] **Reducir fricción `/publish` → registro** — `/publish` es el path #2 del sitio (784 views/30d, 28 may), o sea hay MUCHA intención de publicar, pero el logueado-fuera rebota. Diagnóstico (28 may): (1) `/publish` no autenticado hace `redirect("/login?next=/publish")` directo, sin mostrar el pitch "Publica tu libro · Siempre gratis"; (2) el login dice *"Bienvenido de vuelta · Inicia sesión"* — mensaje de quien vuelve, no de un vendedor nuevo; (3) el link "Regístrate" del `LoginForm` va a `/register` pelado, **pierde el `next`**; (4) el registro usa confirmación por email (`emailRedirectTo → /api/auth/callback`) y NO arrastra `next` → tras confirmar no vuelve a `/publish`. **Fix (toca auth → requiere smoke test):** copy contextual en login/register según `next`, threadear `next` por register→callback, y opcional landing logged-out de `/publish` con value-prop + CTA registrarse. Conecta directo con la preocupación de pocos registros.
+- [x] **Reducir fricción `/publish` → registro** — ✅ deployado 29 may (commit `239fc1d`, oportuno para Furia del Libro). El `next` ahora se encadena de punta a punta: link a register lo propaga, `emailRedirectTo` lo arrastra al callback, y si el signUp devuelve sesión inmediata redirige directo a `/publish`. Copy contextual en login/register cuando `next` apunta a publicar ("Inicia sesión para publicar" / "Crea tu cuenta y publica"). Verificado en prod por curl (cadena de URLs + copy + no-regresión). **Pendiente menor:** confirmar el submit real con correo descartable (camino sesión-inmediata no se ejerció para no crear usuario en prod). Ver memoria `project_publish_next_threading`.
+- [ ] **(opcional) Landing logged-out de `/publish`** — hoy el deslogueado va directo a `/login?next=/publish` sin ver el pitch "Publica tu libro · Siempre gratis". Mostrar primero la value-prop con CTA a registrarse podría subir más la conversión. Bajo esfuerzo; medir primero si el fix del `next` ya movió la aguja.
 
 **Ciclo de vida del usuario**
 - [ ] **Re-engage email 3 días post-registro** — si user no publicó ni compró en 3 días, email recordatorio con link a ISBN scanner o libro destacado relevante.
