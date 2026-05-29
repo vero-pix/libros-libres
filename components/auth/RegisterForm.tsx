@@ -26,17 +26,29 @@ export default function RegisterForm() {
     }
   }, [searchParams]);
 
+  // Destino al que volver tras registrarse (ej. /publish). Validado para evitar open redirects.
+  const rawNext = searchParams.get("next") ?? "/";
+  const safeNext = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
+  const loginHref =
+    safeNext !== "/" ? `/login?next=${encodeURIComponent(safeNext)}` : "/login";
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    // Encadenar el destino (ej. /publish) en el callback de confirmación de correo.
+    const callbackUrl =
+      safeNext !== "/"
+        ? `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(safeNext)}`
+        : `${window.location.origin}/api/auth/callback`;
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: `${window.location.origin}/api/auth/callback`,
+        emailRedirectTo: callbackUrl,
       },
     });
 
@@ -91,6 +103,13 @@ export default function RegisterForm() {
       });
     }
 
+    // Si la confirmación de correo está OFF, signUp devuelve sesión inmediata:
+    // llevamos al usuario directo a donde quería ir (ej. /publish), sin re-loguearse.
+    if (data.session && safeNext !== "/") {
+      window.location.assign(safeNext);
+      return;
+    }
+
     setSuccess(true);
     setLoading(false);
   }
@@ -104,7 +123,7 @@ export default function RegisterForm() {
           Tu cuenta ha sido creada exitosamente. Ya puedes empezar a comprar, vender o prestar libros.
         </p>
         <Link
-          href="/login"
+          href={loginHref}
           className="inline-block w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-colors shadow-sm"
         >
           Iniciar sesión ahora
@@ -205,7 +224,7 @@ export default function RegisterForm() {
 
         <p className="text-center text-sm text-gray-500 pt-2">
           ¿Ya tienes cuenta?{" "}
-          <Link href="/login" className="text-brand-600 hover:underline font-medium">
+          <Link href={loginHref} className="text-brand-600 hover:underline font-medium">
             Inicia sesión
           </Link>
         </p>

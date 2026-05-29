@@ -3,7 +3,19 @@ import Link from "next/link";
 import LoginForm from "@/components/auth/LoginForm";
 import AuthWantedList from "@/components/auth/AuthWantedList";
 
-export default function LoginPage() {
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams: { next?: string };
+}) {
+  const wantsToPublish = (searchParams.next ?? "").includes("publish");
+  const heading = wantsToPublish
+    ? "Inicia sesión para publicar"
+    : "Bienvenido de vuelta";
+  const subheading = wantsToPublish
+    ? "Ya casi: entra y sube tu libro en un par de minutos"
+    : "Inicia sesión para acceder a tu cuenta";
+
   return (
     <div className="min-h-screen flex">
       {/* Left — branding panel */}
@@ -66,10 +78,10 @@ export default function LoginPage() {
           <div className="w-full max-w-sm">
             <div className="mb-8">
               <h1 className="font-display text-2xl font-bold text-ink">
-                Bienvenido de vuelta
+                {heading}
               </h1>
               <p className="text-ink-muted text-sm mt-2">
-                Inicia sesión para acceder a tu cuenta
+                {subheading}
               </p>
             </div>
 

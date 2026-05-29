@@ -28,11 +28,15 @@ export default function LoginForm() {
       return;
     }
 
-    const rawNext = searchParams.get("next") ?? "/";
-    const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
     router.refresh();
-    window.location.assign(next);
+    window.location.assign(safeNext);
   }
+
+  // Validar el destino para evitar open redirects (mismo criterio en toda la cadena de auth)
+  const rawNext = searchParams.get("next") ?? "/";
+  const safeNext = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
+  const registerHref =
+    safeNext !== "/" ? `/register?next=${encodeURIComponent(safeNext)}` : "/register";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -86,7 +90,7 @@ export default function LoginForm() {
 
       <p className="text-center text-sm text-gray-500">
         ¿No tienes cuenta?{" "}
-        <Link href="/register" className="text-brand-600 hover:underline font-medium">
+        <Link href={registerHref} className="text-brand-600 hover:underline font-medium">
           Regístrate gratis
         </Link>
       </p>

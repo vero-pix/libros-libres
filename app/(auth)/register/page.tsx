@@ -3,7 +3,17 @@ import { Suspense } from "react";
 import RegisterForm from "@/components/auth/RegisterForm";
 import AuthWantedList from "@/components/auth/AuthWantedList";
 
-export default function RegisterPage() {
+export default function RegisterPage({
+  searchParams,
+}: {
+  searchParams: { next?: string };
+}) {
+  const wantsToPublish = (searchParams.next ?? "").includes("publish");
+  const heading = wantsToPublish ? "Crea tu cuenta y publica" : "Crea tu cuenta";
+  const subheading = wantsToPublish
+    ? "Es gratis. En un minuto estás subiendo tu libro"
+    : "Es gratis y tarda menos de un minuto";
+
   return (
     <div className="min-h-screen flex">
       {/* Left — branding panel */}
@@ -65,10 +75,10 @@ export default function RegisterPage() {
           <div className="w-full max-w-sm">
             <div className="mb-8">
               <h1 className="font-display text-2xl font-bold text-ink">
-                Crea tu cuenta
+                {heading}
               </h1>
               <p className="text-ink-muted text-sm mt-2">
-                Es gratis y tarda menos de un minuto
+                {subheading}
               </p>
             </div>
 
