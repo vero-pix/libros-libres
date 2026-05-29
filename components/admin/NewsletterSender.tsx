@@ -4,6 +4,49 @@ import { useState } from "react";
 
 const NEWSLETTER_TEMPLATES = [
   {
+    name: "Furia del Libro — buen momento para vender",
+    subject: "Tus libros guardados tienen más ojos encima esta semana",
+    html: `
+<div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background: #faf8f4;">
+  <h1 style="font-size: 28px; color: #1a1a2e; margin-bottom: 4px;">tuslibros.cl</h1>
+  <p style="font-size: 13px; color: #d4a017; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px;">Donde los libros encuentran nuevos lectores</p>
+
+  <p style="font-size: 16px; color: #333; line-height: 1.7;">Hola 👋</p>
+
+  <p style="font-size: 16px; color: #333; line-height: 1.7;">
+    Está la <strong>Furia del Libro</strong> y se nota: Chile anda con ganas de libros estos días. Más gente buscando, hojeando, comprando. Y cuando hay más lectores dando vueltas, <strong>tus libros publicados tienen más ojos encima</strong>.
+  </p>
+
+  <p style="font-size: 16px; color: #333; line-height: 1.7;">
+    Si tienes libros guardados juntando polvo, este es un buen momento para subirlos. No tienes que hacer nada especial: <strong>publicar es gratis y toma un par de minutos</strong>. Escaneas el ISBN o lo escribes a mano, y nosotros completamos la portada, la sinopsis y la categoría. Tú solo le pones precio.
+  </p>
+
+  <p style="font-size: 16px; color: #333; line-height: 1.7;">
+    Cuando alguien lo compre, el pago llega protegido por MercadoPago y el courier de Shipit retira el libro en tu casa. Sin vueltas.
+  </p>
+
+  <div style="text-align: center; margin: 32px 0;">
+    <a href="https://tuslibros.cl/publish" style="display: inline-block; background: #d4a017; color: #fff; font-weight: bold; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-size: 15px;">Publicar mis libros →</a>
+  </div>
+
+  <div style="background: #fff; border: 1px solid #ede7db; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <p style="font-size: 14px; color: #444; line-height: 1.6; margin: 0;">
+      <strong>¿Tienes una ruma entera?</strong> No pierdas la tarde subiéndolos de a uno: mándame un Excel con los títulos, o una foto de la pila, por <a href="https://wa.me/56994583067?text=Hola%20Vero%2C%20tengo%20varios%20libros%20para%20publicar%20en%20tuslibros.cl" style="color: #d4a017;">WhatsApp</a>, y yo los cargo por ti.
+    </p>
+  </div>
+
+  <p style="font-size: 16px; color: #333; line-height: 1.7; margin-top: 28px;">
+    Nos vemos adentro,<br>
+    <strong>Vero</strong> · tuslibros.cl
+  </p>
+
+  <p style="font-size: 13px; color: #999; text-align: center; margin-top: 32px; border-top: 1px solid #ede7db; padding-top: 16px;">
+    Recibiste este correo porque eres parte de tuslibros.cl.<br>
+    <a href="https://tuslibros.cl" style="color: #d4a017;">tuslibros.cl</a> — Donde los libros encuentran nuevos lectores
+  </p>
+</div>`,
+  },
+  {
     name: "Lanzamiento — El Uber de los libros",
     subject: "tuslibros.cl ya está en vivo — el Uber de los libros",
     html: `
@@ -66,11 +109,11 @@ const NEWSLETTER_TEMPLATES = [
 
 export default function NewsletterSender({ subscriberCount }: { subscriberCount: number }) {
   const [sending, setSending] = useState(false);
-  const [result, setResult] = useState<{ sent: number; failed: number } | null>(null);
+  const [result, setResult] = useState<{ sent: number; failed: number; total: number } | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState(0);
 
   async function handleSend() {
-    if (!confirm("¿Enviar newsletter a " + subscriberCount + " suscriptores?")) return;
+    if (!confirm("¿Enviar newsletter a toda la base (registrados + suscriptores, sin duplicar)?")) return;
     setSending(true);
     setResult(null);
 
@@ -127,16 +170,19 @@ export default function NewsletterSender({ subscriberCount }: { subscriberCount:
 
       {result && (
         <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-700">
-          Enviados: {result.sent} | Fallidos: {result.failed}
+          Enviados: {result.sent} | Fallidos: {result.failed} | Total: {result.total}
         </div>
       )}
 
+      <p className="text-xs text-gray-500 mb-2">
+        Se envía a la unión de <strong>usuarios registrados</strong> + <strong>suscriptores</strong> del newsletter, sin correos duplicados. ({subscriberCount} suscriptores en lista)
+      </p>
       <button
         onClick={handleSend}
         disabled={sending}
         className="w-full bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors"
       >
-        {sending ? "Enviando..." : "Enviar a " + subscriberCount + " suscriptores"}
+        {sending ? "Enviando..." : "Enviar a registrados + suscriptores"}
       </button>
     </div>
   );
