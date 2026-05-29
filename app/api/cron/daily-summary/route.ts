@@ -49,7 +49,7 @@ export async function POST() {
   ] = await Promise.all([
     supabase.from("users").select("id, full_name, email, city").gte("created_at", sinceUTC).lte("created_at", untilUTC),
     supabase.from("listings").select("id, price, deprioritized, book:books(title, author), seller:users(full_name, username)").gte("created_at", sinceUTC).lte("created_at", untilUTC),
-    supabase.from("orders").select("id, total_amount, status, created_at").gte("created_at", sinceUTC).lte("created_at", untilUTC),
+    supabase.from("orders").select("id, total, status, created_at").gte("created_at", sinceUTC).lte("created_at", untilUTC),
     supabase.from("search_queries").select("query, count").gte("last_searched_at", sinceUTC).lte("last_searched_at", untilUTC).order("count", { ascending: false }).limit(10),
     supabase.from("listings").select("id, book:books(title, author), seller:users(full_name)").eq("deprioritized", true).gte("created_at", sinceUTC).lte("created_at", untilUTC),
   ]);
@@ -61,7 +61,7 @@ export async function POST() {
   const flagged = deprioritizedToday ?? [];
 
   const paidOrders = allOrders.filter((o) => o.status === "paid" || o.status === "delivered");
-  const totalRevenue = paidOrders.reduce((sum, o) => sum + (o.total_amount ?? 0), 0);
+  const totalRevenue = paidOrders.reduce((sum, o) => sum + (o.total ?? 0), 0);
   const normalListings = listings.filter((l) => !l.deprioritized);
 
   // --- HTML ---
@@ -118,7 +118,7 @@ export async function POST() {
     ? `<p style="color:#8b8b9c;font-size:14px">Sin órdenes.</p>`
     : allOrders.map((o: any) => row(
         `Orden ${o.id.slice(0, 8)}…`,
-        `${o.status} · ${o.total_amount ? "$" + Number(o.total_amount).toLocaleString("es-CL") : "—"}`
+        `${o.status} · ${o.total ? "$" + Number(o.total).toLocaleString("es-CL") : "—"}`
       )).join("");
 
   const html = `
