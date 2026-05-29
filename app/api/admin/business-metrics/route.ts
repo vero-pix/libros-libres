@@ -29,7 +29,7 @@ export async function GET() {
   ] = await Promise.all([
     supabase.from("page_views").select("session_id").gte("created_at", since30),
     supabase.from("users").select("id", { count: "exact", head: true }),
-    supabase.from("orders").select("id, status, total_amount, buyer_id, created_at, buyer:users!buyer_id(full_name, email)").order("created_at", { ascending: false }),
+    supabase.from("orders").select("id, status, total, buyer_id, created_at, buyer:users!buyer_id(full_name, email)").order("created_at", { ascending: false }),
     supabase.from("cart_items").select("id, added_at, listing:listings(price, book:books(title)), user:users(full_name, email)").order("added_at", { ascending: false }),
     supabase.from("listings").select("seller_id, status, seller:users(full_name, username)"),
   ]);
@@ -44,7 +44,7 @@ export async function GET() {
   const buyersWithOrder = new Set(allOrders.map((o: any) => o.buyer_id));
   const buyersWithPaid = new Set(paidOrders.map((o: any) => o.buyer_id));
 
-  const totalPaid = paidOrders.reduce((s: number, o: any) => s + (o.total_amount ?? 0), 0);
+  const totalPaid = paidOrders.reduce((s: number, o: any) => s + (o.total ?? 0), 0);
 
   const funnel = {
     visitors30d: uniqueSessions30d,
@@ -74,7 +74,7 @@ export async function GET() {
     daysOld: Math.floor((Date.now() - new Date(o.created_at).getTime()) / 864e5),
     buyer: o.buyer?.full_name ?? "?",
     email: o.buyer?.email ?? "?",
-    total: o.total_amount ?? 0,
+    total: o.total ?? 0,
   }));
 
   // Top sellers
