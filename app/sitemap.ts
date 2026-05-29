@@ -16,6 +16,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/comprar-libros-usados`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/libros-usados`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
     { url: `${baseUrl}/libros-antiguos`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
+    // Landings SEO de libros de alta demanda (páginas dedicadas, ya en producción).
+    // Estaban fuera del sitemap → dependían de pedir indexación a mano. Adentro para
+    // que Google las descubra solo.
+    { url: `${baseUrl}/algebra-de-baldor`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: `${baseUrl}/pablo-neruda`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: `${baseUrl}/mario-vargas-llosa`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: `${baseUrl}/rayuela`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: `${baseUrl}/cien-anos-de-soledad`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: `${baseUrl}/el-arte-de-amar`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${baseUrl}/solicitudes`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.7 },
     { url: `${baseUrl}/alianzas`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${baseUrl}/como-funciona`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.6 },
