@@ -30,8 +30,11 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Redirect unauthenticated users trying to access protected routes
-  const protectedPaths = ["/listings/new", "/publish", "/profile", "/perfil", "/checkout", "/orders", "/mis-pedidos", "/mis-libros", "/mensajes", "/referidos", "/admin"];
+  // Redirect unauthenticated users trying to access protected routes.
+  // OJO: /publish NO está acá a propósito — la página maneja el caso sin sesión
+  // mostrando la landing "Publica tu libro · Siempre gratis" con CTA a registrarse
+  // (el form y las APIs de publicación siguen exigiendo auth server-side).
+  const protectedPaths = ["/listings/new", "/profile", "/perfil", "/checkout", "/orders", "/mis-pedidos", "/mis-libros", "/mensajes", "/referidos", "/admin"];
   const isProtected = protectedPaths.some((p) =>
     request.nextUrl.pathname.startsWith(p)
   );
