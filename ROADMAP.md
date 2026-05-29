@@ -95,7 +95,7 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 | `/vender-libros-usados` | vender libros usados | 140 | 23 | vendedor informacional | ✅ 15 mayo |
 | `/libros-usados-santiago` | libros usados santiago | — | — | comprador local RM | ✅ 19 mayo |
 | `/libros-usados-providencia` | libros usados providencia | — | — | comprador local Providencia | ✅ 19 mayo |
-| `/comprar-libros-usados` | comprar libros usados | — | — | comprador informacional | ⬜ Pendiente |
+| `/comprar-libros-usados` | comprar libros usados | — | — | comprador informacional | ✅ 29 may (commit, pendiente push) |
 | `/libros-escolares-usados` | libros escolares usados | — | — | temporada escolar | ⬜ Pendiente |
 
 **Patrón por landing:**
@@ -128,7 +128,7 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 
 **Conversión a registro / publicación (sesión propia con smoke test)**
 - [x] **Reducir fricción `/publish` → registro** — ✅ deployado 29 may (commit `239fc1d`, oportuno para Furia del Libro). El `next` ahora se encadena de punta a punta: link a register lo propaga, `emailRedirectTo` lo arrastra al callback, y si el signUp devuelve sesión inmediata redirige directo a `/publish`. Copy contextual en login/register cuando `next` apunta a publicar ("Inicia sesión para publicar" / "Crea tu cuenta y publica"). Verificado en prod por curl (cadena de URLs + copy + no-regresión). **Pendiente menor:** confirmar el submit real con correo descartable (camino sesión-inmediata no se ejerció para no crear usuario en prod). Ver memoria `project_publish_next_threading`.
-- [ ] **(opcional) Landing logged-out de `/publish`** — hoy el deslogueado va directo a `/login?next=/publish` sin ver el pitch "Publica tu libro · Siempre gratis". Mostrar primero la value-prop con CTA a registrarse podría subir más la conversión. Bajo esfuerzo; medir primero si el fix del `next` ya movió la aguja.
+- [x] **Landing logged-out de `/publish`** — ✅ 29 may (commit, pendiente push). El deslogueado ya no va seco a `/login`: ve el pitch "Publica tu libro · Siempre gratis" + CTA a registrarse (`next=/publish`). Sacado de `protectedPaths` del middleware; el form/API siguen exigiendo auth. Smoke test: landing 200, CTAs con next, resto de rutas protegidas sin regresión.
 
 **Ciclo de vida del usuario**
 - [ ] **Re-engage email 3 días post-registro** — si user no publicó ni compró en 3 días, email recordatorio con link a ISBN scanner o libro destacado relevante.
@@ -161,9 +161,9 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 - [ ] **Componente testimonios escalable** — hoy TestimonialBanner hardcodeado. Cuando haya ≥3, migrar a tabla `testimonials` + widget.
 
 **Datos y calidad**
-- [ ] **Bug revenue admin "Negocio" = $0** — `app/api/admin/business-metrics/route.ts` consulta `orders.total_amount`, pero la columna real es **`total`** (ver `supabase/migrations/20260402_create_orders.sql`). El query falla en silencio → la pestaña Negocio muestra revenue 0 aunque hay ventas. Fix de una palabra (`total_amount` → `total`). Detectado 28 may al arreglar `scripts/audit-funnel.mjs` (mismo bug, ya corregido ahí).
+- [x] **Bug revenue admin "Negocio" = $0** — ✅ 29 may (commit, pendiente push). Era `orders.total_amount` (columna inexistente; la real es `total`). Estaba en DOS archivos: el admin `business-metrics/route.ts` Y el cron `daily-summary/route.ts` (o sea el resumen diario también mostraba $0). Corregidas las 3 ocurrencias de cada uno.
 - [ ] **`/search` como entrada: bounce alto, baja prioridad** — `/search` pelado (sin query) muestra el catálogo completo (no está roto); ~40 entradas/30d, rebote en parte natural de página-catálogo. Opcional: chips de categorías/colecciones arriba para dar punto de entrada. No urgente (28 may).
-- [ ] **Hobsbawm "Un tiempo de rupturas"** — quedó con `featured=true` sin `featured_rank`. Limpiar: `update listings set featured=false where featured_rank is null and featured=true;`
+- [x] **Hobsbawm "Un tiempo de rupturas"** — ✅ 29 may. Verificado en BD: 0 listings con `featured=true` + `featured_rank null`. Ya estaba limpio, nada que hacer.
 
 ---
 
