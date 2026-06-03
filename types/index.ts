@@ -49,6 +49,8 @@ export interface UserProfile {
   public_email: string | null;
   instagram: string | null;
   username: string | null;
+  on_vacation: boolean;
+  vacation_message: string | null;
 }
 
 
@@ -72,7 +74,7 @@ export interface Listing {
 
 export interface ListingWithBook extends Listing {
   book: Book;
-  seller?: Pick<UserProfile, "id" | "full_name" | "avatar_url" | "phone" | "mercadopago_user_id" | "plan" | "public_email" | "instagram" | "username">;
+  seller?: Pick<UserProfile, "id" | "full_name" | "avatar_url" | "phone" | "mercadopago_user_id" | "plan" | "public_email" | "instagram" | "username" | "on_vacation" | "vacation_message">;
   _avg_rating?: number;
   _review_count?: number;
   _featured?: boolean;

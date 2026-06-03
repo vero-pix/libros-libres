@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
   const { data: listings, error: listingsError } = await supabase
     .from("listings")
     .select(
-      `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_access_token, mercadopago_user_id, plan)`
+      `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_access_token, mercadopago_user_id, plan, on_vacation)`
     )
     .in("id", listingIds)
     .eq("status", "active");
@@ -131,6 +131,17 @@ export async function POST(req: NextRequest) {
       {
         error:
           "Uno o más libros ya no están disponibles. Vuelve al carrito y verifica.",
+      },
+      { status: 409 }
+    );
+  }
+
+  // Bloquear compra si el vendedor está en modo vacaciones
+  const vacationSeller = listings.find((l: any) => l.seller?.on_vacation);
+  if (vacationSeller) {
+    return NextResponse.json(
+      {
+        error: `${(vacationSeller as any).seller?.full_name ?? "El vendedor"} está en modo vacaciones. Sus libros volverán a estar disponibles cuando regrese.`,
       },
       { status: 409 }
     );

@@ -198,6 +198,15 @@ const ListingCard = memo(function ListingCard({
               </div>
             )}
 
+            {/* MODO VACACIONES overlay */}
+            {listing.status !== "completed" && (listing.seller as any)?.on_vacation && (
+              <div className="absolute inset-0 z-[1] bg-amber-900/25 flex items-center justify-center">
+                <span className="text-white font-bold text-[11px] uppercase tracking-wider bg-amber-600 px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+                  🌴 En vacaciones
+                </span>
+              </div>
+            )}
+
             {/* 1 BADGE primario, top-left, sin apilamiento */}
             {badge && (
               <span className={`absolute top-3 left-3 z-[2] inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm ${badge.className}`}>
@@ -214,7 +223,7 @@ const ListingCard = memo(function ListingCard({
             )}
 
             {/* QUICK VIEW + ADD TO CART — visible siempre en mobile, hover en desktop */}
-            {listing.status !== "completed" && (
+            {listing.status !== "completed" && !(listing.seller as any)?.on_vacation && (
               <div className="absolute bottom-3 right-3 z-[3] flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
                 <button
                   type="button"

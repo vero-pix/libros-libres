@@ -17,6 +17,8 @@ export interface Database {
           email: string | null;
           created_at: string;
           updated_at: string;
+          on_vacation: boolean;
+          vacation_message: string | null;
         };
         Insert: {
           id: string;
@@ -25,6 +27,8 @@ export interface Database {
           email?: string | null;
           created_at?: string;
           updated_at?: string;
+          on_vacation?: boolean;
+          vacation_message?: string | null;
         };
         Update: {
           id?: string;
@@ -32,6 +36,8 @@ export interface Database {
           avatar_url?: string | null;
           email?: string | null;
           updated_at?: string;
+          on_vacation?: boolean;
+          vacation_message?: string | null;
         };
       };
       books: {
