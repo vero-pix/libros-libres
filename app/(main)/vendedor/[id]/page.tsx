@@ -194,6 +194,21 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
           </div>
         </div>
 
+        {/* Aviso de modo vacaciones */}
+        {(seller as any).on_vacation && (
+          <div className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-5 flex items-start gap-3">
+            <span className="text-2xl leading-none mt-0.5" aria-hidden>🌴</span>
+            <div>
+              <h2 className="text-sm font-semibold text-amber-900 mb-1">Esta tienda está en modo vacaciones</h2>
+              <p className="text-sm text-amber-800 leading-relaxed">
+                {(seller as any).vacation_message?.trim()
+                  ? (seller as any).vacation_message
+                  : "El vendedor volverá pronto. Puedes ver sus libros, pero las compras quedan en pausa hasta su regreso."}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Bio */}
         {(seller as any).bio && (
           <div className="mb-8 bg-cream-warm rounded-xl p-5 border border-cream-dark/30">

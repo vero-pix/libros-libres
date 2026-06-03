@@ -351,6 +351,21 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               <p className="font-display text-xl font-bold text-[--coral]">Este libro ya fue vendido</p>
               <p className="text-sm text-ink-muted mt-1">Busca otros similares o contacta al vendedor por si tiene más.</p>
             </div>
+          ) : (listing.seller as any)?.on_vacation ? (
+            <div className="space-y-3">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+                <span className="text-2xl leading-none mt-0.5" aria-hidden>🌴</span>
+                <div>
+                  <p className="font-display text-base font-bold text-amber-900">El vendedor está en modo vacaciones</p>
+                  <p className="text-sm text-amber-800 mt-1 leading-relaxed">
+                    {(listing.seller as any)?.vacation_message?.trim()
+                      ? (listing.seller as any).vacation_message
+                      : "Vuelve pronto. Por ahora este libro no se puede comprar, pero puedes escribirle y dejar tu interés para cuando regrese."}
+                  </p>
+                </div>
+              </div>
+              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} />
+            </div>
           ) : (listing.seller as any)?.mercadopago_user_id ? (
             <>
               <Link

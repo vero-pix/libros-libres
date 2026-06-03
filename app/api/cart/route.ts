@@ -31,6 +31,19 @@ export async function POST(req: NextRequest) {
   const { listing_id } = await req.json();
   if (!listing_id) return NextResponse.json({ error: "Falta listing_id" }, { status: 400 });
 
+  // Bloquear si el vendedor está en modo vacaciones
+  const { data: listing } = await supabase
+    .from("listings")
+    .select("seller:users(on_vacation)")
+    .eq("id", listing_id)
+    .single();
+  if ((listing?.seller as any)?.on_vacation) {
+    return NextResponse.json(
+      { error: "Este vendedor está en modo vacaciones. Sus libros volverán a estar disponibles cuando regrese." },
+      { status: 409 }
+    );
+  }
+
   const { error } = await supabase
     .from("cart_items")
     .upsert({ user_id: user.id, listing_id }, { onConflict: "user_id,listing_id" });
