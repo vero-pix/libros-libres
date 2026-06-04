@@ -31,6 +31,7 @@ interface RentalItem {
   end_date: string | null;
   created_at: string;
   listing: {
+    cover_image_url: string | null;
     book: { title: string; author: string; cover_url: string | null };
   };
   owner?: { id: string; full_name: string | null; phone: string | null };
@@ -103,6 +104,7 @@ export default function RentalsList({ asRenter, asOwner, userId }: Props) {
         <div className="space-y-3">
           {rentals.map((r) => {
             const { book } = r.listing;
+            const cover = r.listing.cover_image_url ?? book.cover_url;
             const statusInfo = STATUS_LABELS[r.status] ?? { label: r.status, color: "bg-gray-100 text-gray-600" };
             const otherPerson = tab === "renter" ? r.owner : r.renter;
 
@@ -111,8 +113,8 @@ export default function RentalsList({ asRenter, asOwner, userId }: Props) {
                 <div className="flex gap-3">
                   {/* Cover */}
                   <div className="relative w-12 h-16 bg-gray-50 rounded flex-shrink-0 overflow-hidden flex items-center justify-center">
-                    {book.cover_url ? (
-                      <Image src={book.cover_url} alt={book.title} fill className="object-cover" sizes="48px" />
+                    {cover ? (
+                      <Image src={cover} alt={book.title} fill className="object-cover" sizes="48px" />
                     ) : (
                       <span className="text-lg">📚</span>
                     )}

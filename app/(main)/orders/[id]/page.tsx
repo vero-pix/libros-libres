@@ -109,11 +109,12 @@ export default async function OrderPage({ params, searchParams }: Props) {
             <div className="space-y-3">
               {bundleOrders.map((o: any) => {
                 const book = o.listing?.book;
+                const cover = o.listing?.cover_image_url ?? book?.cover_url;
                 return (
                   <div key={o.id} className="flex items-center gap-3">
-                    {book?.cover_url && (
+                    {cover && (
                       <img
-                        src={book.cover_url}
+                        src={cover}
                         alt={book.title}
                         className="w-10 h-14 object-cover rounded shrink-0"
                       />

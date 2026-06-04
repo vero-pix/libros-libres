@@ -189,9 +189,9 @@ export default function BundleCheckoutForm({
           {listings.map((l) => (
             <div key={l.id} className="flex gap-3 items-center">
               <div className="w-12 h-16 bg-gray-50 rounded flex-shrink-0 flex items-center justify-center overflow-hidden">
-                {l.book.cover_url ? (
+                {(l.cover_image_url ?? l.book.cover_url) ? (
                   <Image
-                    src={l.book.cover_url}
+                    src={(l.cover_image_url ?? l.book.cover_url) as string}
                     alt={l.book.title}
                     width={48}
                     height={64}

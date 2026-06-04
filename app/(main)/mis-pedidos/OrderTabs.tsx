@@ -71,7 +71,9 @@ function groupByBundle(orders: OrderWithDetails[]): OrderGroup[] {
 }
 
 function BundleCard({ group }: { group: OrderGroup }) {
-  const firstBook = group.orders[0].listing?.book;
+  const firstListing = group.orders[0].listing;
+  const firstBook = firstListing?.book;
+  const firstCover = (firstListing as any)?.cover_image_url ?? firstBook?.cover_url;
   const date = new Date(group.firstOrder.created_at).toLocaleDateString("es-CL", {
     day: "numeric",
     month: "short",
@@ -87,10 +89,10 @@ function BundleCard({ group }: { group: OrderGroup }) {
       className="block border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow"
     >
       <div className="flex gap-4">
-        {firstBook?.cover_url && (
+        {firstCover && (
           <div className="relative w-16 h-20 shrink-0">
             <Image
-              src={firstBook.cover_url}
+              src={firstCover}
               alt={firstBook.title}
               fill
               className="object-cover rounded"
