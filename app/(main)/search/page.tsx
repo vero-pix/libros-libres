@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { accentInsensitiveRegex } from "@/lib/accentSearch";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import { buildCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -83,16 +84,19 @@ export default async function SearchPage({ searchParams }: Props) {
     const clean = q.replace(/[-_]+/g, " ").replace(/[()]/g, "").replace(/\s+/g, " ").trim();
     const words = clean.split(" ").filter(w => w.length > 1);
 
-    const term = `%${clean}%`;
+    const rx = accentInsensitiveRegex(clean);
     const filters = [
-      `title.ilike.${term}`,
-      `author.ilike.${term}`,
-      `isbn.ilike.${term}`,
-      ...words.flatMap((word) => [
-        `title.ilike.%${word}%`,
-        `author.ilike.%${word}%`,
-        `isbn.ilike.%${word}%`,
-      ]),
+      `title.imatch.${rx}`,
+      `author.imatch.${rx}`,
+      `isbn.ilike.%${clean}%`,
+      ...words.flatMap((word) => {
+        const wr = accentInsensitiveRegex(word);
+        return [
+          `title.imatch.${wr}`,
+          `author.imatch.${wr}`,
+          `isbn.ilike.%${word}%`,
+        ];
+      }),
     ].join(",");
 
     const { data: matchedBooks } = await supabase

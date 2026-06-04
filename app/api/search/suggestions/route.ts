@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { accentInsensitiveRegex } from "@/lib/accentSearch";
 
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim();
@@ -11,13 +12,13 @@ export async function GET(req: NextRequest) {
   // Strip parentheses that break PostgREST or() syntax
   const clean = q.replace(/[()]/g, "").trim();
   if (!clean) return NextResponse.json([]);
-  const term = `%${clean}%`;
+  const rx = accentInsensitiveRegex(clean);
 
   const { data: listings } = await supabase
     .from("listings")
     .select("id, slug, cover_image_url, book:books!inner(id, title, author, cover_url), seller:users(username)")
     .eq("status", "active")
-    .or(`title.ilike.${term},author.ilike.${term}`, { referencedTable: "books" })
+    .or(`title.imatch.${rx},author.imatch.${rx}`, { referencedTable: "books" })
     .limit(8);
 
   const suggestions = (listings ?? []).map((l: any) => ({
