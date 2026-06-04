@@ -49,7 +49,7 @@ export default async function MisVentasPage() {
     .select(`
       id, buyer_id, book_price, shipping_cost, service_fee, total, status,
       courier, tracking_code, shipping_label_url, shipping_status, buyer_address, created_at,
-      listing:listings(id, book:books(title, author, cover_url)),
+      listing:listings(id, cover_image_url, book:books(title, author, cover_url)),
       buyer:users!orders_buyer_id_fkey(full_name, email)
     `)
     .eq("seller_id", user.id)
@@ -63,7 +63,7 @@ export default async function MisVentasPage() {
     .select(`
       id, rental_price, deposit, commission, total, status,
       period_days, start_date, end_date, created_at,
-      listing:listings(id, book:books(title, author, cover_url)),
+      listing:listings(id, cover_image_url, book:books(title, author, cover_url)),
       renter:users!rentals_renter_id_fkey(full_name, email)
     `)
     .eq("owner_id", user.id)
@@ -114,7 +114,7 @@ export default async function MisVentasPage() {
       .select(
         `
         user_id, listing_id, added_at,
-        listing:listings(id, price,
+        listing:listings(id, price, cover_image_url,
           book:books(title, author, cover_url)),
         buyer:users(id, full_name, email, phone)
       `
@@ -164,7 +164,7 @@ export default async function MisVentasPage() {
         title: listing.book?.title ?? "Libro",
         author: listing.book?.author ?? "",
         price: Number(listing.price ?? 0),
-        cover_url: listing.book?.cover_url ?? null,
+        cover_url: (listing as any).cover_image_url ?? listing.book?.cover_url ?? null,
         added_at: row.added_at,
       });
       entry.total += Number(listing.price ?? 0);
@@ -303,10 +303,10 @@ export default async function MisVentasPage() {
                       <tr key={order.id} className="hover:bg-cream-warm/30 align-top">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            {order.listing?.book?.cover_url && (
+                            {(order.listing?.cover_image_url ?? order.listing?.book?.cover_url) && (
                               <div className="relative w-8 h-11 shrink-0">
                                 <Image
-                                  src={order.listing.book.cover_url}
+                                  src={(order.listing.cover_image_url ?? order.listing.book.cover_url) as string}
                                   alt=""
                                   fill
                                   className="object-cover rounded-sm"
@@ -439,10 +439,10 @@ export default async function MisVentasPage() {
                       <tr key={rental.id} className="hover:bg-cream-warm/30">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            {rental.listing?.book?.cover_url && (
+                            {(rental.listing?.cover_image_url ?? rental.listing?.book?.cover_url) && (
                               <div className="relative w-8 h-11 shrink-0">
                                 <Image
-                                  src={rental.listing.book.cover_url}
+                                  src={(rental.listing.cover_image_url ?? rental.listing.book.cover_url) as string}
                                   alt=""
                                   fill
                                   className="object-cover rounded-sm"

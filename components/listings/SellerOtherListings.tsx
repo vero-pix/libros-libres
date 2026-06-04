@@ -46,8 +46,8 @@ export default function SellerOtherListings({ sellerId, sellerUsername, currentL
         {others.map((l) => (
           <Link key={l.id} href={libroUrl(l)} className="group">
             <div className="aspect-[3/4] relative bg-cream rounded-xl border border-cream-dark/30 overflow-hidden mb-2 group-hover:shadow-md transition-all">
-              {l.book.cover_url ? (
-                <Image src={l.book.cover_url} alt={l.book.title} fill className="object-cover" />
+              {(l.cover_image_url || l.book.cover_url) ? (
+                <Image src={(l.cover_image_url || l.book.cover_url) as string} alt={l.book.title} fill className="object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-2xl">📚</div>
               )}

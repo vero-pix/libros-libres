@@ -373,9 +373,9 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
             <h2 className="text-sm font-bold text-ink uppercase tracking-wider mb-4">Resumen del pedido</h2>
             <div className="flex gap-4">
               <div className="w-16 h-20 relative bg-cream rounded-lg overflow-hidden border border-cream-dark/30 flex-shrink-0">
-                {book.cover_url ? (
+                {(listing.cover_image_url ?? book.cover_url) ? (
                   <Image
-                    src={book.cover_url}
+                    src={(listing.cover_image_url ?? book.cover_url) as string}
                     alt={book.title}
                     fill
                     className="object-cover"
