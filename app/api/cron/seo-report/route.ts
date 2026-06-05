@@ -39,13 +39,22 @@ export async function GET(request: Request) {
   const chileNow = new Date(now - 4 * 60 * 60 * 1000);
   const startToday = new Date(Date.UTC(chileNow.getUTCFullYear(), chileNow.getUTCMonth(), chileNow.getUTCDate()) + 4 * 60 * 60 * 1000).toISOString();
 
-  // Detalle de 7 días (una sola query liviana) para sesiones/bounce/fuentes/paths
-  const { data: rows7 } = await supabase
-    .from("page_views")
-    .select("session_id, path, referrer, created_at")
-    .gte("created_at", d7)
-    .limit(8000);
-  const views7 = rows7 ?? [];
+  // Detalle de 7 días para sesiones/bounce/fuentes/paths.
+  // PostgREST topa cada request a ~1000 filas, así que paginamos con range()
+  // hasta traer todo (7d ≈ 2 mil filas → 2-3 páginas).
+  const views7: { session_id: string; path: string | null; referrer: string | null; created_at: string }[] = [];
+  const PAGE = 1000;
+  for (let from = 0; from < 30000; from += PAGE) {
+    const { data } = await supabase
+      .from("page_views")
+      .select("session_id, path, referrer, created_at")
+      .gte("created_at", d7)
+      .order("created_at", { ascending: false })
+      .range(from, from + PAGE - 1);
+    if (!data || data.length === 0) break;
+    views7.push(...(data as typeof views7));
+    if (data.length < PAGE) break;
+  }
 
   // Totales 30d y hoy con count exacto (sin traer filas)
   const { count: pv30 } = await supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", d30);
