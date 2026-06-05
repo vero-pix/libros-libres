@@ -71,6 +71,21 @@ export async function GET(request: Request) {
     }
   }
 
+  // ── Reactivación programada de modo vacaciones (one-off) ──
+  // Felipe (Libros De La Buhardilla) vuelve del sur el lunes 8 jun 2026.
+  // Este bloque se dispara en la primera corrida en/después de esa fecha y se
+  // auto-limpia (al quedar on_vacation=false, las siguientes corridas no hacen nada).
+  let reactivated: string | null = null;
+  if (!dry && Date.now() >= Date.parse("2026-06-08T08:00:00Z")) {
+    const { data: buh } = await supabase
+      .from("users").select("id, on_vacation").eq("username", "buhardilla").maybeSingle();
+    if (buh?.on_vacation) {
+      await supabase.from("users").update({ on_vacation: false, vacation_message: null }).eq("id", buh.id);
+      reactivated = "buhardilla";
+      console.log("[cron/cleanup-bots] Buhardilla reactivado (fin de modo vacaciones)");
+    }
+  }
+
   console.log(`[cron/cleanup-bots] ${dry ? "DRY " : ""}borrados=${deleted.length} saltados=${skipped.length}`);
-  return NextResponse.json({ dry, deletedCount: deleted.length, deleted, skipped });
+  return NextResponse.json({ dry, deletedCount: deleted.length, deleted, skipped, reactivated });
 }
