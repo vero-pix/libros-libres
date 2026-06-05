@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/cleanup-bots",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/seo-report",
+      "schedule": "0 13 * * *"
     }
   ]
 }
