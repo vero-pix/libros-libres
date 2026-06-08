@@ -81,6 +81,9 @@ Primer librero pro externo. Trato 1%/10 ventas → 5%. Scripts PrestaShop listos
 
 - **Mónica Espinoza** — registrada 12 mayo. Email con Excel 47 libros enviado. Pendiente que suba el catálogo.
 - **Patricio Bustos Barros** — 1 libro activo (Sombra 81, $17.990). URL: `/vendedor/patricio.bustos.b`.
+- **Nicole Sepúlveda** (Talca) — 22 libros cargados 3 jun, destacada, MP conectado. 7 con portada de lomo pendientes de foto frontal.
+- **Lorena Cortés** (Concepción) — orgánica, registrada 4 jun. 39 novelas (Sparks, Steel, Maxwell + clásicos). Destacada, categorizada `ficcion`, MP conectado, email de bienvenida enviado (8 jun). Sin actividad de seguimiento aún.
+- **Nicolás — "Libros del Bardo"** (Melipeuco) — orgánico, registrado 5 jun. Historia de Chile/mundo. Destacado, MP conectado, email de bienvenida enviado (8 jun).
 
 ---
 
@@ -148,6 +151,7 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 ### 🟠 Media prioridad
 
 **UX y features**
+- [x] **Modo vacaciones (libros visibles pero no comprables)** — ✅ deployado 3 jun (commit `c98423d`). En vez de pausar (que vaciaba la tienda), `users.on_vacation=true` deja los libros **visibles** pero no comprables: banner en perfil, aviso en ficha, overlay "🌴 En vacaciones" en tarjetas, bloqueo server-side en `/api/cart` y `/api/orders`. Buhardilla lo estrenó; **reactivada automáticamente el 8 jun** vía bloque fechado en el cron `cleanup-bots`. **Pendiente (autoservicio):** toggle en `/mis-libros` para que el vendedor lo active/desactive solo + fecha de regreso automática (hoy se setea por backend).
 - [ ] **Fix HeroBar simplificado** — sacar las 5 cards horizontales (redundan con feature sections ya movidas). Alto impacto, bajo esfuerzo.
 - [ ] **Fix Libros Huertas avatar** — removido temporalmente del carrusel de vendedores destacados. Pedirle foto por WhatsApp para reactivar.
 - [ ] **Navbar mobile: Inicio/Novedades en dropdown hamburger** — libera la nav row en mobile.
@@ -377,6 +381,9 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 ---
 
 ## Historial de sesiones
+
+### 8 junio 2026
+Dos vendedores **orgánicos** llegaron solos (Lorena Cortés, 39 novelas, Concepción; Nicolás "Libros del Bardo", historia, Melipeuco) — no spam. Onboardeados: destacados, libros de Lorena categorizados `ficcion`, emails de bienvenida en voz de Vero. Buhardilla reactivada sola del modo vacaciones (cron, 5am). **Bug descubierto:** la columna MP real es `mercadopago_access_token`, no `mp_access_token` → todos los chequeos viejos de "sin MP" daban falsos negativos. Respuesta correcta: 14 de 29 vendedores activos sin MP. **Backfill de `city`** a los 42 usuarios que la tenían en NULL, extraída de `default_address` (0 activos sin ciudad ahora). Estrategia de Vero este mes: visibilidad primero, monetizar después.
 
 ### 21 mayo 2026
 Vercel Firewall: bloqueados Vietnam, India, Filipinas (deny). Rate limit 60 req/min en /api (modo log — pasar a deny en ~48h tras revisar dashboard). Curación "Esta semana en el velador" renovada: 9 libros adultos literarios (Poe, Huxley, Padura, Enders, Laborde, Bonnefoy, Hurtado, Porché, Osses). Vendedores destacados: agregados Librería Huertas (fabian, 32 libros) y María Soledad (20 libros). Fix crítico: next revertido de 9.3.3 accidental → 14.2.35. Novedades actualizadas a Día 42. Alias `actualizar` en ~/.zshrc.
