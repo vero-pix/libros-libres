@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 29 mayo 2026
+Última actualización: 12 junio 2026
 
 ---
 
@@ -381,6 +381,9 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 ---
 
 ## Historial de sesiones
+
+### 12 junio 2026
+Auditoría de vendedores activos con la columna MP correcta (`mercadopago_access_token`): **30 activos, 15 con MP / 15 sin**. De los 16 nuevos (últimos 30d), 9 sin MP. Onboardeados a mano **Josefa Cerda** (10 libros, juvenil/romance), **Fabián Sagredo** (Talca, 21 libros, historia+clásicos — categoricé sus 19 NULL) y **Sol PG** (Temuco, 7 libros autoayuda) — destacados + email de bienvenida en voz de Vero con botón "Conectar MercadoPago". **Nuevo cron `/api/cron/mp-nudge`** (`0 14 * * *`, 10am Chile): empuja a conectar MP a vendedores 48-72h post-registro que ya publicaron pero no tienen MP. Diseño sin columna de estado (la ventana de 24h se cruza una sola vez → un correo, sin spam); recap a Vero. **SEO sano:** tráfico 7d 2.925 vistas (▲48% vs semana previa), bounce 6%, 5,1 pág/sesión, 28% desde buscadores, ChatGPT ya aparece como fuente. Oportunidades anotadas: `/publish` 2ª página más vista (cuello de botella = conectar MP), Concepción y el sur (Temuco/Melipeuco) desatendidos.
 
 ### 8 junio 2026
 Dos vendedores **orgánicos** llegaron solos (Lorena Cortés, 39 novelas, Concepción; Nicolás "Libros del Bardo", historia, Melipeuco) — no spam. Onboardeados: destacados, libros de Lorena categorizados `ficcion`, emails de bienvenida en voz de Vero. Buhardilla reactivada sola del modo vacaciones (cron, 5am). **Bug descubierto:** la columna MP real es `mercadopago_access_token`, no `mp_access_token` → todos los chequeos viejos de "sin MP" daban falsos negativos. Respuesta correcta: 14 de 29 vendedores activos sin MP. **Backfill de `city`** a los 42 usuarios que la tenían en NULL, extraída de `default_address` (0 activos sin ciudad ahora). Estrategia de Vero este mes: visibilidad primero, monetizar después.

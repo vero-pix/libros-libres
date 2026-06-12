@@ -39,6 +39,21 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "12 junio 2026",
+    title: "Están llegando vendedores de todo Chile (y el tráfico subió 48%)",
+    description:
+      "Esta semana me tocó la mejor pega: dar la bienvenida a vendedores nuevos que llegaron solos, sin que yo saliera a buscarlos. Josefa con novela juvenil y romance, Fabián desde Talca con harta historia de Chile y clásicos, Sol desde Temuco con psicología y crecimiento personal, además de Lorena en Concepción y Nicolás en Melipeuco. Me senté a ordenar cada catálogo por dentro —categoricé libro por libro para que se encuentren— y los dejé destacados en la portada. Y mientras hacía eso, miré los números: 2.925 páginas vistas en 7 días, un 48% más que la semana anterior, con la gente quedándose a navegar (6% de rebote, 5 páginas por visita). Despacio, pero pasa.",
+    tag: "Señal",
+    visual: {
+      kind: "stat",
+      stats: [
+        { big: "+48%", small: "tráfico vs. semana anterior" },
+        { big: "5", small: "vendedores nuevos de regiones" },
+        { big: "6%", small: "tasa de rebote" },
+      ],
+    },
+  },
+  {
     date: "27 mayo 2026",
     title: "Ordené el catálogo por dentro: colecciones más llenas",
     description:
