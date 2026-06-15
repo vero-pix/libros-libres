@@ -80,11 +80,6 @@ export default function RootLayout({
           {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-N243GH70EQ',{send_page_view:false});`}
         </Script>
         <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7953415124311211"
-          crossOrigin="anonymous"
-        />
-        <script
           dangerouslySetInnerHTML={{
             __html: `if("serviceWorker" in navigator){setTimeout(()=>{navigator.serviceWorker.register("/sw.js")},3000)}`,
           }}
