@@ -11,9 +11,14 @@
  *   (bucket "covers" + tabla listing_images), igual que el formulario web.
  *   - La PRIMERA foto de cada libro queda como portada (cover_image_url).
  *   - El resto va a la galería (listing_images), sin duplicar la portada.
- *   Mapeo de fotos a cada libro (dos formas):
- *   a) Columna `fotos` en el CSV: nombres separados por ; → "tapa.jpg;lomo.jpg"
- *   b) Por nombre de archivo = ISBN: 9788401352836.jpg, 9788401352836-2.jpg, ...
+ *   Mapeo de fotos a cada libro (tres formas, en orden de prioridad):
+ *   a) Columnas separadas (formato CIM):
+ *        - `foto_portada`: 1 nombre de archivo → la portada
+ *        - `resto_fotos`: hasta 5 nombres separados por ; → la galería
+ *      Ej: foto_portada="tapa.jpg"  resto_fotos="lomo.jpg;contra.jpg"
+ *   b) Columna `fotos` (todo junto): nombres separados por ; → "tapa.jpg;lomo.jpg"
+ *      (la 1ª es la portada, el resto la galería)
+ *   c) Por nombre de archivo = ISBN: 9788401352836.jpg, 9788401352836-2.jpg, ...
  *   Formatos soportados: jpg, jpeg, png, webp. HEIC NO (exportar a JPEG antes).
  *
  * Usage:
@@ -161,25 +166,59 @@ function loadPhotoDir() {
   console.log(`📷 Carpeta de fotos: ${PHOTOS_DIR} (${photoDirFiles.length} imágenes)`);
 }
 
+// Resuelve un nombre de archivo a su ruta absoluta dentro de PHOTOS_DIR.
+// Devuelve null (y avisa) si no existe.
+function resolvePhotoName(name: string): string | null {
+  const full = join(PHOTOS_DIR!, name);
+  if (existsSync(full)) return full;
+  console.warn(`    ⚠️  Foto no encontrada: ${name}`);
+  return null;
+}
+
+// Máximo de fotos de galería (aparte de la portada). Propuesto por CIM.
+const MAX_GALLERY_PHOTOS = 5;
+
 // Resuelve las fotos de un libro. Prioridad:
-//   1) columna `fotos` del CSV (nombres separados por ;)
-//   2) por nombre de archivo = ISBN (isbn.jpg, isbn-2.jpg, isbn_3.png, ...)
+//   1) columnas separadas `foto_portada` (1) + `resto_fotos` (hasta 5, sep. por ;)
+//   2) columna `fotos` del CSV (todo junto: la 1ª es portada, sep. por ;)
+//   3) por nombre de archivo = ISBN (isbn.jpg, isbn-2.jpg, isbn_3.png, ...)
+// En todos los casos el resultado es [portada, ...galería] en ese orden.
 function resolvePhotosForRow(row: Record<string, string>, isbn: string): string[] {
   if (!PHOTOS_DIR) return [];
 
-  // a) Columna explícita `fotos`
-  if (row.fotos?.trim()) {
-    const names = row.fotos.split(";").map((n) => n.trim()).filter(Boolean);
+  // a) Columnas separadas: foto_portada + resto_fotos (formato CIM)
+  const portadaName = (row.foto_portada || row.portada || "").trim();
+  const restoRaw = (row.resto_fotos || row.fotos_resto || row.fotos_galeria || "").trim();
+  if (portadaName || restoRaw) {
     const paths: string[] = [];
-    for (const name of names) {
-      const full = join(PHOTOS_DIR, name);
-      if (existsSync(full)) paths.push(full);
-      else console.warn(`    ⚠️  Foto no encontrada: ${name}`);
+    if (portadaName) {
+      const p = resolvePhotoName(portadaName);
+      if (p) paths.push(p);
+    }
+    if (restoRaw) {
+      const restNames = restoRaw.split(";").map((n) => n.trim()).filter(Boolean);
+      if (restNames.length > MAX_GALLERY_PHOTOS)
+        console.warn(`    ⚠️  ${restNames.length} fotos en resto_fotos (máx ${MAX_GALLERY_PHOTOS}); uso las primeras ${MAX_GALLERY_PHOTOS}.`);
+      for (const name of restNames.slice(0, MAX_GALLERY_PHOTOS)) {
+        const p = resolvePhotoName(name);
+        if (p) paths.push(p);
+      }
     }
     return paths;
   }
 
-  // b) Por ISBN: archivos cuyo nombre (sin un sufijo -N / _N) es el ISBN.
+  // b) Columna explícita `fotos` (todo junto, la 1ª es la portada)
+  if (row.fotos?.trim()) {
+    const names = row.fotos.split(";").map((n) => n.trim()).filter(Boolean);
+    const paths: string[] = [];
+    for (const name of names) {
+      const p = resolvePhotoName(name);
+      if (p) paths.push(p);
+    }
+    return paths;
+  }
+
+  // c) Por ISBN: archivos cuyo nombre (sin un sufijo -N / _N) es el ISBN.
   //    9788432216152.jpg (portada), 9788432216152-2.jpg, 9788432216152_3.png, ...
   if (isbn) {
     const clean = isbn.replace(/[-\s]/g, "");
