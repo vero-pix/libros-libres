@@ -6,7 +6,7 @@ import { libroUrl } from "@/lib/urls";
 import type { ListingWithBook } from "@/types";
 
 export const metadata = {
-  title: "Diario de tuslibros.cl — Mayo 2026",
+  title: "Diario de tuslibros.cl — Junio 2026",
   description:
     "Lo que pasó esta semana en tuslibros.cl: bloqueo de bots por país, rate limiting, API para librerías, nueva taxonomía chilena y más.",
   alternates: { canonical: "https://tuslibros.cl/novedades" },
@@ -38,6 +38,21 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 };
 
 const novedades: Entry[] = [
+  {
+    date: "15 junio 2026",
+    title: "Ahora subes tus libros con tus propias fotos, de a montones",
+    description:
+      "Esta la pidió Carlos, de CIM Libros, uno de los vendedores que más se la juega acá. Me escribió un sábado con una propuesta concreta para que la carga masiva fuera más rápida: poder decir, en el mismo archivo, qué foto va de portada y cuáles van en la galería de cada libro. Tenía toda la razón. Así que rehíce el importador: ahora subes tu planilla CSV y, al lado, todas tus fotos de una vez. El sistema las calza solas con cada libro por el nombre del archivo —una columna para la portada, otra para el resto— y si subes fotos desde el iPhone (esos HEIC odiosos) las convierte sin que tengas que hacer nada. Antes, para usar tus propias fotos, tenías que mandármelas y yo las cargaba a mano. Ya no: lo haces tú, completo, en dos clics.",
+    tag: "Mejora",
+    link: "/mis-libros/importar",
+    linkText: "Ir al importador",
+    visual: {
+      kind: "milestone",
+      icon: "📚",
+      metric: "CSV + fotos propias",
+      detail: "portada y galería se calzan solas por nombre de archivo",
+    },
+  },
   {
     date: "12 junio 2026",
     title: "Están llegando vendedores de todo Chile (y el tráfico subió 48%)",
