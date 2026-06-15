@@ -66,6 +66,56 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No se recibió archivo" }, { status: 400 });
   }
 
+  // Mapa opcional de fotos: { "nombre_archivo.jpg": "https://...url-publica" }.
+  // El cliente sube las fotos a Storage y nos manda solo el mapeo nombre→URL,
+  // así evitamos límites de tamaño/timeout de subir las imágenes por la API.
+  // Claves normalizadas a minúsculas para matchear sin importar mayúsculas.
+  const photoMap: Record<string, string> = {};
+  const photoMapRaw = formData.get("photoMap");
+  if (typeof photoMapRaw === "string" && photoMapRaw.trim()) {
+    try {
+      const parsed = JSON.parse(photoMapRaw) as Record<string, string>;
+      for (const [k, v] of Object.entries(parsed)) {
+        if (typeof v === "string" && v) photoMap[k.trim().toLowerCase()] = v;
+      }
+    } catch {
+      return NextResponse.json({ error: "photoMap inválido" }, { status: 400 });
+    }
+  }
+
+  const MAX_GALLERY_PHOTOS = 5;
+  // Resuelve { cover, gallery } de una fila usando el photoMap.
+  // Prioridad de columnas: foto_portada + resto_fotos  →  fotos (todo junto).
+  function resolveRowPhotos(row: Record<string, string>): { cover: string | null; gallery: string[] } {
+    if (Object.keys(photoMap).length === 0) return { cover: null, gallery: [] };
+    const lookup = (name: string) => photoMap[name.trim().toLowerCase()] ?? null;
+
+    const portadaName = (row.foto_portada || row.portada || "").trim();
+    const restoRaw = (row.resto_fotos || row.fotos_resto || row.fotos_galeria || "").trim();
+    if (portadaName || restoRaw) {
+      const cover = portadaName ? lookup(portadaName) : null;
+      const gallery = restoRaw
+        .split(";").map((n) => n.trim()).filter(Boolean)
+        .slice(0, MAX_GALLERY_PHOTOS)
+        .map(lookup).filter((u): u is string => !!u);
+      // Si no se nombró portada pero sí hay galería, la 1ª pasa a portada.
+      if (!cover && gallery.length > 0) return { cover: gallery.shift()!, gallery };
+      return { cover, gallery };
+    }
+
+    // Columna `fotos` (todo junto, la 1ª es portada)
+    const fotosRaw = (row.fotos || "").trim();
+    if (fotosRaw) {
+      const urls = fotosRaw
+        .split(";").map((n) => n.trim()).filter(Boolean)
+        .map(lookup).filter((u): u is string => !!u);
+      const cover = urls.shift() ?? null;
+      return { cover, gallery: urls.slice(0, MAX_GALLERY_PHOTOS) };
+    }
+
+    return { cover: null, gallery: [] };
+  }
+
   const text = await file.text();
   const lines = text.split("\n").filter((l) => l.trim());
 
@@ -151,7 +201,9 @@ export async function POST(req: NextRequest) {
 
     // Create listing
     const address = profile?.default_address || [profile?.comuna, profile?.region].filter(Boolean).join(", ") || "Chile";
-    const coverUrl = buildCoverUrl(isbn);
+    // Foto propia del vendedor si la mapeó en el CSV; si no, portada de Google.
+    const { cover: ownCover, gallery } = resolveRowPhotos(row);
+    const coverUrl = ownCover || buildCoverUrl(isbn);
 
     const { data: inserted, error: listErr } = await supabase
       .from("listings")
@@ -174,6 +226,16 @@ export async function POST(req: NextRequest) {
       results.push({ title, status: "error", message: listErr.message });
     } else {
       results.push({ title, status: "ok" });
+      // Galería: el resto de fotos propias (la portada ya quedó en el listing).
+      if (inserted?.id && gallery.length > 0) {
+        await supabase.from("listing_images").insert(
+          gallery.map((url, idx) => ({
+            listing_id: inserted.id,
+            image_url: url,
+            sort_order: idx,
+          }))
+        );
+      }
       // Gong Telegram (fire-and-forget)
       if (inserted?.id) {
         fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://tuslibros.cl"}/api/webhooks/listing-created`, {
