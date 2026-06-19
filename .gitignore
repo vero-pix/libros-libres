@@ -46,6 +46,11 @@ docs/maigret.jpg
 linda*
 public/hero-libros-old.jpg
 
+# Credenciales y salidas de los scripts SEO (GSC) — NUNCA commitear
+*-service-account.json
+scripts/seo/output/
+scripts/seo/input/
+
 # Supabase CLI local state (no es código, cambia solo)
 supabase/.temp/
 supabase/.branches/
@@ -56,3 +61,6 @@ supabase/.branches/
 /playwright/.cache/
 .env.production.tmp
 .env*
+
+# Llaves locales (service accounts, etc.)
+.secrets/

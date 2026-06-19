@@ -12,7 +12,10 @@
     "qa:prod": "QA_BASE_URL=https://tuslibros.cl playwright test",
     "qa:ui": "playwright test --ui",
     "smoke": "playwright test golden-paths",
-    "predeploy": "npm run build && npm run smoke"
+    "predeploy": "npm run build && npm run smoke",
+    "seo:gsc": "tsx scripts/seo/gsc-report.ts",
+    "seo:sitemaps": "tsx scripts/seo/sitemaps.ts",
+    "seo:audit-404": "tsx scripts/seo/audit-404.ts"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
@@ -43,8 +46,10 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.35",
+    "googleapis": "^173.0.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.22.4",
     "typescript": "^5.8.3"
   }
 }
