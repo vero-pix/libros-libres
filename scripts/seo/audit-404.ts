@@ -103,7 +103,7 @@ async function main() {
   try {
     const res = await fetch(`${BASE}/sitemap.xml`);
     const xml = await res.text();
-    const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => toPath(m[1]));
+    const locs = Array.from(xml.matchAll(/<loc>([^<]+)<\/loc>/g), (m) => toPath(m[1]));
     sitemapPaths = new Set(locs);
   } catch {
     console.log("⚠️  No se pudo descargar el sitemap (sigo sin Set A).");
@@ -132,7 +132,7 @@ async function main() {
   //   - existe pero pausada/vendida → renderiza 200 (SoldOut). Inconsistencia
   //     menor: el sitemap de prod está cacheado/stale; se corrige al revalidar.
   //   - no existe (borrada) → 308→home = soft-404. Sí hay que sacarla del sitemap.
-  for (const p of sitemapPaths) {
+  for (const p of Array.from(sitemapPaths)) {
     if (!p.startsWith("/libro/") || livePaths.has(p)) continue;
     const st = statusByPath.get(p);
     if (st && st !== "active") {
