@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 12 junio 2026
+Última actualización: 19 junio 2026
 
 ---
 
@@ -84,6 +84,7 @@ Primer librero pro externo. Trato 1%/10 ventas → 5%. Scripts PrestaShop listos
 - **Nicole Sepúlveda** (Talca) — 22 libros cargados 3 jun, destacada, MP conectado. 7 con portada de lomo pendientes de foto frontal.
 - **Lorena Cortés** (Concepción) — orgánica, registrada 4 jun. 39 novelas (Sparks, Steel, Maxwell + clásicos). Destacada, categorizada `ficcion`, MP conectado, email de bienvenida enviado (8 jun). Sin actividad de seguimiento aún.
 - **Nicolás — "Libros del Bardo"** (Melipeuco) — orgánico, registrado 5 jun. Historia de Chile/mundo. Destacado, MP conectado, email de bienvenida enviado (8 jun).
+- **Ruth Díaz** (@ruth.diaz) — orgánica por WhatsApp, registrada 19 jun, **MP conectado**. Colección grande de **romance/YA**: 70 libros (Jojo Moyes, Nicholas Sparks x15, Colleen Hoover, Sarah J. Maas, Ariana Godoy, Darlis Stefany, saga Auschwitz…). Catálogo armado desde sus fotos+video → `docs/carga_ruth_jun2026.csv` ($713.000). **Email-propuesta enviado** con preview. ⏳ Esperando que confirme precios estimados (43 de 70), estado y comuna para subir los 70 a su cuenta. Faltan ~13 de una repisa que quedó oscura en la foto.
 
 ---
 
@@ -173,6 +174,10 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 
 ### SEO
 
+- [x] **Migración de medición SEO a Google Search Console API** (19 jun) — SEMrush expiró. Tooling nuevo en `scripts/seo/` (`npm run seo:gsc` / `seo:sitemaps` / `seo:audit-404`) con service account (proyecto Cloud `libros2026`, propiedad dominio `sc-domain:tuslibros.cl`). Línea base congelada 26-may en `baseline.ts`. Ver `scripts/seo/README.md`.
+- [x] **Limpieza de sitemaps zombis** (19 jun) — causa raíz de los ~1.154 404 de GSC: había 10 sitemaps del WordPress viejo (`www.tuslibros.cl/...`, 2020) declarando ~970 URLs muertas. Borrados de GSC → quedó solo `tuslibros.cl/sitemap.xml` (858 URLs reales). Esperar 2-4 semanas a que bajen los 404.
+- [ ] **Revisar keywords de Baldor** — en el primer corte GSC (19 jun) todas las de baldor (baldor, algebra de baldor, baldor matematica…) **desaparecieron** de las consultas. Antes estaban posicionadas. Verificar si las landings perdieron tracción o es ruido de datos.
+- [ ] **Correr `seo:audit-404` con input real** — exportar de GSC la lista de 404 a `scripts/seo/input/404-gsc.csv` para clasificar los que no venían del sitemap (legacy / enlaces rotos). Opcional ahora que se atacó la raíz.
 - [ ] **Monitorear posición "donde vender libros usados"** — entró al top 10, verificar consolidación en 7 días.
 - [ ] **Medir impacto landing `/libros-usados-chile`** — monitorear en GSC en 3-4 semanas.
 - [ ] **Backlinks (linkbuilding)** — correos en frío a 5 blogs (ecología/universidades) para apalancar autoridad de dominio.
@@ -381,6 +386,9 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 ---
 
 ## Historial de sesiones
+
+### 19 junio 2026
+Día doble: SEO + primera vendedora cargada con flujo nuevo. **SEO:** migré la medición a Google Search Console API (SEMrush expiró) — tooling reproducible en `scripts/seo/` (commit `0c1d329`), service account en proyecto Cloud `libros2026`. El `seo:audit-404` cazó la causa raíz de los ~1.154 404 de GSC: **10 sitemaps zombis del WordPress de 2020** (`www.tuslibros.cl/...`) declarando ~970 URLs muertas; Vero los borró todos de GSC → quedó solo el sitemap real (858 URLs). Primer corte GSC: 11 keywords mejoraron desde mayo (Temuco +70, Viña/Santiago/Providencia +11/+14), las de baldor desaparecieron (revisar). Bug evitado: el commit de los scripts rompía `next build` (spread de iteradores con el target del tsconfig) — cazado y corregido (`9703a53`) antes de que reventara Vercel. **Ruth Díaz:** vendedora orgánica por WhatsApp con 70 libros de romance/YA. Flujo nuevo replicable: leí los lomos de sus fotos con visión + saqué precios de un video con `ffmpeg`, armé el CSV completo (`docs/carga_ruth_jun2026.csv`, $713.000), generé un preview visual (`preview_ruth.png`, portadas vía Open Library) y le envié una **propuesta por email** (Resend) para que confirme precios/estado/comuna. Pendiente: subir los 70 cuando responda. `/novedades` actualizada con la limpieza de SEO en voz de Vero.
 
 ### 12 junio 2026
 Auditoría de vendedores activos con la columna MP correcta (`mercadopago_access_token`): **30 activos, 15 con MP / 15 sin**. De los 16 nuevos (últimos 30d), 9 sin MP. Onboardeados a mano **Josefa Cerda** (10 libros, juvenil/romance), **Fabián Sagredo** (Talca, 21 libros, historia+clásicos — categoricé sus 19 NULL) y **Sol PG** (Temuco, 7 libros autoayuda) — destacados + email de bienvenida en voz de Vero con botón "Conectar MercadoPago". **Nuevo cron `/api/cron/mp-nudge`** (`0 14 * * *`, 10am Chile): empuja a conectar MP a vendedores 48-72h post-registro que ya publicaron pero no tienen MP. Diseño sin columna de estado (la ventana de 24h se cruza una sola vez → un correo, sin spam); recap a Vero. **SEO sano:** tráfico 7d 2.925 vistas (▲48% vs semana previa), bounce 6%, 5,1 pág/sesión, 28% desde buscadores, ChatGPT ya aparece como fuente. Oportunidades anotadas: `/publish` 2ª página más vista (cuello de botella = conectar MP), Concepción y el sur (Temuco/Melipeuco) desatendidos.
