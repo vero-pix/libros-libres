@@ -39,6 +39,19 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "19 junio 2026",
+    title: "Limpié 970 enlaces muertos que confundían a Google desde 2020",
+    description:
+      "Me metí a las tripas del SEO —esa parte invisible que decide si Google te muestra o no— y me encontré con un fantasma. Resulta que cuando armé este sitio, antes vivía acá otro tuslibros.cl, uno viejo en WordPress del 2020. Ese sitio ya no existe, pero Google seguía teniendo anotadas casi mil direcciones suyas: categorías, páginas de autores, etiquetas… todas rotas, todas tirando error. O sea, Google gastaba su tiempo persiguiendo páginas que murieron hace años en vez de mirar los libros que ustedes publican hoy. Lo encontré armando un sistema nuevo para medir el SEO (el que usaba antes se me venció, así que me pasé a las propias herramientas de Google). Borré los 10 mapas viejos de una: pasamos de 1.829 direcciones declaradas a 858, todas reales. Traducido a algo útil para ti: Google deja de distraerse y se concentra en tu catálogo, así tus libros aparecen mejor en las búsquedas. Y de yapa, los números ya venían subiendo —\"libros usados Temuco\", \"Viña\", \"Santiago\" y \"Providencia\" treparon harto desde mayo.",
+    tag: "Mejora",
+    visual: {
+      kind: "milestone",
+      icon: "🧹",
+      metric: "970 enlaces muertos fuera",
+      detail: "Google deja de perseguir fantasmas y mira tu catálogo real",
+    },
+  },
+  {
     date: "15 junio 2026",
     title: "Ahora subes tus libros con tus propias fotos, de a montones",
     description:
