@@ -126,12 +126,16 @@ function compareBaseline(queryRows: Row[], endDate: string): void {
     baselineKeys.add(norm);
     const row = current.get(norm);
     if (!row) {
+      // OJO: el reporte trae el top 1000 por impresiones. Una keyword de muy bajo
+      // volumen puede quedar FUERA de ese corte sin estar realmente perdida.
+      // Para confirmar si desapareció de verdad, consultar GSC con filtro directo
+      // por esa query (operator "contains"). No asumir pérdida desde acá.
       comp.push({
         keyword: kw,
         posBase,
         posActual: null,
         delta: null,
-        estado: "PERDIDA (no aparece en GSC)",
+        estado: "fuera del top 1000 (vol. bajo — verificar con filtro)",
         clicks: 0,
         impressions: 0,
       });
@@ -178,9 +182,9 @@ function compareBaseline(queryRows: Row[], endDate: string): void {
 
   const mejoraron = comp.filter((c) => c.estado === "MEJORÓ").length;
   const empeoraron = comp.filter((c) => c.estado === "EMPEORÓ").length;
-  const perdidas = comp.filter((c) => c.estado.startsWith("PERDIDA")).length;
+  const fueraTop = comp.filter((c) => c.estado.startsWith("fuera del top")).length;
   console.log(
-    `\nResumen: ${mejoraron} mejoraron · ${empeoraron} empeoraron · ${perdidas} perdidas · ${nuevas.length} nuevas relevantes`
+    `\nResumen: ${mejoraron} mejoraron · ${empeoraron} empeoraron · ${fueraTop} fuera del top 1000 (vol. bajo) · ${nuevas.length} nuevas relevantes`
   );
 
   if (nuevas.length) {
