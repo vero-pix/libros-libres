@@ -83,6 +83,20 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Índice por nombre SIN extensión: muchos vendedores escriben en el CSV el
+  // nombre del archivo sin el ".jpg" (caso CIM/Carlos). Así calza igual.
+  const stripExt = (n: string) => n.trim().toLowerCase().replace(/\.[a-z0-9]+$/i, "");
+  const photoMapNoExt: Record<string, string> = {};
+  for (const [k, v] of Object.entries(photoMap)) {
+    const ne = stripExt(k);
+    if (ne && !photoMapNoExt[ne]) photoMapNoExt[ne] = v;
+  }
+  // Busca una URL tolerando: mayúsculas, espacios, y extensión ausente/distinta.
+  const lookupPhoto = (name: string): string | null => {
+    const key = name.trim().toLowerCase();
+    return photoMap[key] ?? photoMapNoExt[stripExt(name)] ?? null;
+  };
+
   const MAX_GALLERY_PHOTOS = 5;
   // Nombres de archivo que el CSV referencia en una fila (para detectar los que
   // no encontraron foto subida y avisar al vendedor).
@@ -99,16 +113,20 @@ export async function POST(req: NextRequest) {
   // Prioridad de columnas: foto_portada + resto_fotos  →  fotos (todo junto).
   function resolveRowPhotos(row: Record<string, string>): { cover: string | null; gallery: string[] } {
     if (Object.keys(photoMap).length === 0) return { cover: null, gallery: [] };
-    const lookup = (name: string) => photoMap[name.trim().toLowerCase()] ?? null;
+    // Quita URLs duplicadas conservando el orden (algunos CSV repiten el mismo nombre).
+    const dedupe = (urls: string[]) => Array.from(new Set(urls));
 
     const portadaName = (row.foto_portada || row.portada || "").trim();
     const restoRaw = (row.resto_fotos || row.fotos_resto || row.fotos_galeria || "").trim();
     if (portadaName || restoRaw) {
-      const cover = portadaName ? lookup(portadaName) : null;
-      const gallery = restoRaw
-        .split(";").map((n) => n.trim()).filter(Boolean)
-        .slice(0, MAX_GALLERY_PHOTOS)
-        .map(lookup).filter((u): u is string => !!u);
+      const cover = portadaName ? lookupPhoto(portadaName) : null;
+      const gallery = dedupe(
+        restoRaw
+          .split(";").map((n) => n.trim()).filter(Boolean)
+          .map(lookupPhoto).filter((u): u is string => !!u)
+      )
+        .filter((u) => u !== cover)
+        .slice(0, MAX_GALLERY_PHOTOS);
       // Si no se nombró portada pero sí hay galería, la 1ª pasa a portada.
       if (!cover && gallery.length > 0) return { cover: gallery.shift()!, gallery };
       return { cover, gallery };
@@ -117,9 +135,11 @@ export async function POST(req: NextRequest) {
     // Columna `fotos` (todo junto, la 1ª es portada)
     const fotosRaw = (row.fotos || "").trim();
     if (fotosRaw) {
-      const urls = fotosRaw
-        .split(";").map((n) => n.trim()).filter(Boolean)
-        .map(lookup).filter((u): u is string => !!u);
+      const urls = dedupe(
+        fotosRaw
+          .split(";").map((n) => n.trim()).filter(Boolean)
+          .map(lookupPhoto).filter((u): u is string => !!u)
+      );
       const cover = urls.shift() ?? null;
       return { cover, gallery: urls.slice(0, MAX_GALLERY_PHOTOS) };
     }
@@ -225,7 +245,7 @@ export async function POST(req: NextRequest) {
     // Si el vendedor subió fotos, detectar nombres del CSV que no encontraron archivo.
     if (photosProvided > 0) {
       for (const name of referencedNames(row)) {
-        if (!photoMap[name.trim().toLowerCase()]) unmatchedRefs.add(name);
+        if (!lookupPhoto(name)) unmatchedRefs.add(name);
       }
     }
     if (ownCover) coversFromOwnPhotos++;
