@@ -84,6 +84,17 @@ export async function POST(req: NextRequest) {
   }
 
   const MAX_GALLERY_PHOTOS = 5;
+  // Nombres de archivo que el CSV referencia en una fila (para detectar los que
+  // no encontraron foto subida y avisar al vendedor).
+  function referencedNames(row: Record<string, string>): string[] {
+    const raw = [
+      row.foto_portada || row.portada || "",
+      row.resto_fotos || row.fotos_resto || row.fotos_galeria || "",
+      row.fotos || "",
+    ].join(";");
+    return raw.split(";").map((n) => n.trim()).filter(Boolean);
+  }
+
   // Resuelve { cover, gallery } de una fila usando el photoMap.
   // Prioridad de columnas: foto_portada + resto_fotos  →  fotos (todo junto).
   function resolveRowPhotos(row: Record<string, string>): { cover: string | null; gallery: string[] } {
@@ -126,6 +137,12 @@ export async function POST(req: NextRequest) {
   const header = parseCsvLine(lines[0]).map((h) => h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
 
   const results: { title: string; status: "ok" | "error" | "skip"; message?: string }[] = [];
+
+  // Estadísticas de fotos para devolver feedback claro al vendedor.
+  const photosProvided = Object.keys(photoMap).length;
+  let coversFromOwnPhotos = 0;
+  let galleryImagesAdded = 0;
+  const unmatchedRefs = new Set<string>();
 
   for (let i = 1; i < lines.length; i++) {
     const vals = parseCsvLine(lines[i]);
@@ -205,6 +222,14 @@ export async function POST(req: NextRequest) {
     const { cover: ownCover, gallery } = resolveRowPhotos(row);
     const coverUrl = ownCover || buildCoverUrl(isbn);
 
+    // Si el vendedor subió fotos, detectar nombres del CSV que no encontraron archivo.
+    if (photosProvided > 0) {
+      for (const name of referencedNames(row)) {
+        if (!photoMap[name.trim().toLowerCase()]) unmatchedRefs.add(name);
+      }
+    }
+    if (ownCover) coversFromOwnPhotos++;
+
     const { data: inserted, error: listErr } = await supabase
       .from("listings")
       .insert({
@@ -235,6 +260,7 @@ export async function POST(req: NextRequest) {
             sort_order: idx,
           }))
         );
+        galleryImagesAdded += gallery.length;
       }
       // Gong Telegram (fire-and-forget)
       if (inserted?.id) {
@@ -251,5 +277,16 @@ export async function POST(req: NextRequest) {
   const skipped = results.filter((r) => r.status === "skip").length;
   const failed = results.filter((r) => r.status === "error").length;
 
-  return NextResponse.json({ created, skipped, failed, results });
+  return NextResponse.json({
+    created,
+    skipped,
+    failed,
+    results,
+    photos: {
+      provided: photosProvided,
+      coversFromOwnPhotos,
+      galleryImagesAdded,
+      unmatched: Array.from(unmatchedRefs),
+    },
+  });
 }
