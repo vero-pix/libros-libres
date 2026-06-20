@@ -21,7 +21,13 @@ export default function ImportForm() {
   const [photos, setPhotos] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<string | null>(null);
-  const [results, setResults] = useState<{ created: number; skipped: number; failed: number; results: ImportResult[] } | null>(null);
+  const [results, setResults] = useState<{
+    created: number;
+    skipped: number;
+    failed: number;
+    results: ImportResult[];
+    photos?: { provided: number; coversFromOwnPhotos: number; galleryImagesAdded: number; unmatched: string[] };
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -329,6 +335,27 @@ export default function ImportForm() {
               </span>
             )}
           </div>
+          {/* Feedback de fotos: clave para saber si las imágenes se asociaron */}
+          {results.photos && (
+            results.photos.provided > 0 ? (
+              <div className="mb-4 text-sm bg-cream-warm/60 border border-cream-dark/30 rounded-lg px-3 py-2.5 space-y-1">
+                <p className="text-ink">
+                  📷 {results.photos.coversFromOwnPhotos} portada{results.photos.coversFromOwnPhotos === 1 ? "" : "s"} propia{results.photos.coversFromOwnPhotos === 1 ? "" : "s"} asociada{results.photos.coversFromOwnPhotos === 1 ? "" : "s"}
+                  {results.photos.galleryImagesAdded > 0 && ` · ${results.photos.galleryImagesAdded} de galería`}
+                  {" "}(de {results.photos.provided} foto{results.photos.provided === 1 ? "" : "s"} subida{results.photos.provided === 1 ? "" : "s"})
+                </p>
+                {results.photos.unmatched.length > 0 && (
+                  <p className="text-yellow-700">
+                    ⚠️ {results.photos.unmatched.length} nombre{results.photos.unmatched.length === 1 ? "" : "s"} del CSV no encontró archivo: {results.photos.unmatched.slice(0, 6).join(", ")}{results.photos.unmatched.length > 6 ? "…" : ""}. Revisa que el nombre en el CSV sea idéntico al del archivo (incluida la extensión).
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="mb-4 text-sm bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2.5 text-yellow-800">
+                ℹ️ No subiste fotos propias, así que se usó la portada del catálogo (por ISBN). Si quieres tus propias fotos, vuelve a importar adjuntándolas en el paso 2 y nombrándolas igual que en las columnas <strong>foto_portada</strong> / <strong>resto_fotos</strong>.
+              </div>
+            )
+          )}
           <div className="space-y-1 max-h-64 overflow-y-auto">
             {results.results.map((r, i) => (
               <div key={i} className="flex items-center gap-2 text-sm">
