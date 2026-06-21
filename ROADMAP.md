@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 19 junio 2026
+Última actualización: 20 junio 2026
 
 ---
 
@@ -84,7 +84,7 @@ Primer librero pro externo. Trato 1%/10 ventas → 5%. Scripts PrestaShop listos
 - **Nicole Sepúlveda** (Talca) — 22 libros cargados 3 jun, destacada, MP conectado. 7 con portada de lomo pendientes de foto frontal.
 - **Lorena Cortés** (Concepción) — orgánica, registrada 4 jun. 39 novelas (Sparks, Steel, Maxwell + clásicos). Destacada, categorizada `ficcion`, MP conectado, email de bienvenida enviado (8 jun). Sin actividad de seguimiento aún.
 - **Nicolás — "Libros del Bardo"** (Melipeuco) — orgánico, registrado 5 jun. Historia de Chile/mundo. Destacado, MP conectado, email de bienvenida enviado (8 jun).
-- **Ruth Díaz** (@ruth.diaz) — orgánica por WhatsApp, registrada 19 jun, **MP conectado**. Colección grande de **romance/YA**: 70 libros (Jojo Moyes, Nicholas Sparks x15, Colleen Hoover, Sarah J. Maas, Ariana Godoy, Darlis Stefany, saga Auschwitz…). Catálogo armado desde sus fotos+video → `docs/carga_ruth_jun2026.csv` ($713.000). **Email-propuesta enviado** con preview. ⏳ Esperando que confirme precios estimados (43 de 70), estado y comuna para subir los 70 a su cuenta. Faltan ~13 de una repisa que quedó oscura en la foto.
+- **Ruth Díaz** (@ruth.diaz, Puerto Varas) — orgánica por WhatsApp, registrada 19 jun, **MP conectado**. Colección grande de **romance/YA**. ✅ **70 libros publicados** (20 jun): 3 que subió ella + 67 cargados con `scripts/_upload_ruth.mjs` desde `docs/carga_ruth_jun2026.csv`, portadas vía Open Library. **Notificada por email.** Pendiente menor: 13 libros sin portada (Open Library no las tenía) → pedirle foto; confirmar/ajustar precios estimados; la repisa oscura (~13 libros que no entraron al CSV) si manda foto con luz.
 
 ---
 
@@ -386,6 +386,9 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 ---
 
 ## Historial de sesiones
+
+### 20 junio 2026
+**Ruth Díaz publicada:** subí sus 70 libros de romance/YA (`scripts/_upload_ruth.mjs`, saltando los 3 que ella ya tenía), portadas vía Open Library, origen Puerto Varas. Notificada por email. 13 quedaron sin portada (pendiente foto). **Importador — 2 fixes desplegados** a partir del test real de Carlos (CIM): (1) feedback de fotos en pantalla — cuántas portadas asoció + nombres del CSV sin archivo (commit `ffc7f91`); (2) match tolerante a la extensión — el CSV de Carlos nombraba las fotos sin `.jpg` y por eso no calzaban; ahora funciona igual + deduplica galería (commit `c1edbc2`). Carlos ya tenía sus 9 libros publicados sin portada → email-guía para que borre y reimporte él mismo. **Baldor:** falsa alarma (bajo volumen, no perdido) + canibalización `/search?q=` vs landing; reporte ajustado.
 
 ### 19 junio 2026
 Día doble: SEO + primera vendedora cargada con flujo nuevo. **SEO:** migré la medición a Google Search Console API (SEMrush expiró) — tooling reproducible en `scripts/seo/` (commit `0c1d329`), service account en proyecto Cloud `libros2026`. El `seo:audit-404` cazó la causa raíz de los ~1.154 404 de GSC: **10 sitemaps zombis del WordPress de 2020** (`www.tuslibros.cl/...`) declarando ~970 URLs muertas; Vero los borró todos de GSC → quedó solo el sitemap real (858 URLs). Primer corte GSC: 11 keywords mejoraron desde mayo (Temuco +70, Viña/Santiago/Providencia +11/+14), las de baldor desaparecieron (revisar). Bug evitado: el commit de los scripts rompía `next build` (spread de iteradores con el target del tsconfig) — cazado y corregido (`9703a53`) antes de que reventara Vercel. **Ruth Díaz:** vendedora orgánica por WhatsApp con 70 libros de romance/YA. Flujo nuevo replicable: leí los lomos de sus fotos con visión + saqué precios de un video con `ffmpeg`, armé el CSV completo (`docs/carga_ruth_jun2026.csv`, $713.000), generé un preview visual (`preview_ruth.png`, portadas vía Open Library) y le envié una **propuesta por email** (Resend) para que confirme precios/estado/comuna. Pendiente: subir los 70 cuando responda. `/novedades` actualizada con la limpieza de SEO en voz de Vero.
