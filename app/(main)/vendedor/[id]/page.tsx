@@ -61,6 +61,10 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
     .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram, username, mercadopago_user_id)`)
     .eq("seller_id", seller.id)
     .eq("status", "active")
+    // Por defecto: más vistos primero (trending_score = proxy de visitas),
+    // con created_at como desempate. sortListingsForDisplay luego respeta este
+    // orden dentro de cada tier (mantiene político al final, destacados arriba).
+    .order("trending_score", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
 
   let listings = (data as unknown as ListingWithBook[]) ?? [];
@@ -280,7 +284,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
               </h2>
               <div className="flex gap-1.5 text-xs">
                 {[
-                  { key: "", label: "Recientes" },
+                  { key: "", label: "Más vistos" },
                   { key: "price_asc", label: "Precio ↑" },
                   { key: "price_desc", label: "Precio ↓" },
                   { key: "title", label: "Título" },
