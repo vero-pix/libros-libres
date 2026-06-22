@@ -21,6 +21,13 @@ interface Props {
 export default function FeaturedRow({ featuredListings, featuredSellers }: Props) {
   if (featuredListings.length === 0 && featuredSellers.length === 0) return null;
 
+  // Orden aleatorio en cada carga para que ningún vendedor quede siempre arriba.
+  const shuffledSellers = [...featuredSellers];
+  for (let i = shuffledSellers.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledSellers[i], shuffledSellers[j]] = [shuffledSellers[j], shuffledSellers[i]];
+  }
+
   return (
     <div className="space-y-8 mb-8">
       {/* Libros destacados */}
@@ -84,13 +91,15 @@ export default function FeaturedRow({ featuredListings, featuredSellers }: Props
         <section>
           <div className="flex items-center gap-2 mb-4">
             <h2 className="font-display text-base font-semibold text-ink">Librerías de confianza</h2>
+            <span className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">· {featuredSellers.length} tiendas</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {featuredSellers.map((seller) => (
+          <div className="overflow-hidden -mx-2 px-2">
+            <div className="marquee-track flex gap-4 w-max pb-2">
+            {[...shuffledSellers, ...shuffledSellers].map((seller, i) => (
               <Link
-                key={seller.id}
+                key={`${seller.id}-${i}`}
                 href={`/vendedor/${seller.username ?? seller.id}`}
-                className="group flex items-center gap-4 bg-white rounded-xl border border-cream-dark/30 p-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+                className="group flex-shrink-0 w-64 flex items-center gap-3 bg-white rounded-xl border border-cream-dark/30 p-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
               >
                 <div className="relative w-14 h-14 rounded-full bg-brand-100 flex items-center justify-center overflow-hidden border-2 border-amber-300 shrink-0 group-hover:border-brand-500 transition-colors">
                   {seller.avatar_url ? (
@@ -127,6 +136,7 @@ export default function FeaturedRow({ featuredListings, featuredSellers }: Props
                 </div>
               </Link>
             ))}
+            </div>
           </div>
         </section>
       )}
