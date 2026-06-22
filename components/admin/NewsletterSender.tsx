@@ -4,6 +4,47 @@ import { useState } from "react";
 
 const NEWSLETTER_TEMPLATES = [
   {
+    name: "Vacaciones de invierno — liquido mi estantería al 50%",
+    subject: "Liquido mi estantería: todos mis libros al 50% estas vacaciones",
+    html: `
+<div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background: #faf8f4;">
+  <h1 style="font-size: 28px; color: #1a1a2e; margin-bottom: 4px;">tuslibros.cl</h1>
+  <p style="font-size: 13px; color: #d4a017; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px;">Vacaciones de invierno</p>
+
+  <p style="font-size: 16px; color: #333; line-height: 1.7;">Hola 👋</p>
+
+  <p style="font-size: 16px; color: #333; line-height: 1.7;">
+    Voy a ser honesta: tengo una estantería entera de libros que ya leí y que quiero que vuelvan a circular. Así que esta semana de vacaciones de invierno <strong>los estoy liquidando todos al 50%</strong> — los míos, de TusLibros.
+  </p>
+
+  <p style="font-size: 16px; color: #333; line-height: 1.7;">
+    Novela, poesía, historia, ensayo, policiales, clásicos. Y también <strong>mis joyas raras</strong>: La Araucana en dos tomos, los Plutarco, la Biblioteca de Babel de Borges, un Pascal de 1866 en francés. Todo a mitad de precio, <strong>desde $1.500</strong>.
+  </p>
+
+  <p style="font-size: 16px; color: #333; line-height: 1.7;">
+    Si tienes niños en casa estas vacaciones, es buen momento para llenar la mesa de lectura sin gastar una fortuna. Y si eres de los que coleccionan, los raros no van a estar a este precio para siempre.
+  </p>
+
+  <div style="text-align: center; margin: 32px 0;">
+    <a href="https://tuslibros.cl/vendedor/vero" style="display: inline-block; background: #d4a017; color: #fff; font-weight: bold; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-size: 15px;">Ver la liquidación →</a>
+  </div>
+
+  <p style="font-size: 16px; color: #333; line-height: 1.7;">
+    El pago llega protegido por MercadoPago y el libro viaja con courier a todo Chile, o lo retiras en mano si estamos cerca.
+  </p>
+
+  <p style="font-size: 16px; color: #333; line-height: 1.7; margin-top: 28px;">
+    Nos leemos,<br>
+    <strong>Vero</strong> · tuslibros.cl
+  </p>
+
+  <p style="font-size: 13px; color: #999; text-align: center; margin-top: 32px; border-top: 1px solid #ede7db; padding-top: 16px;">
+    Recibiste este correo porque eres parte de tuslibros.cl.<br>
+    <a href="https://tuslibros.cl" style="color: #d4a017;">tuslibros.cl</a> — Donde los libros encuentran nuevos lectores
+  </p>
+</div>`,
+  },
+  {
     name: "Furia del Libro — buen momento para vender",
     subject: "Tus libros guardados tienen más ojos encima esta semana",
     html: `

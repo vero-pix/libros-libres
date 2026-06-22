@@ -24,8 +24,10 @@ export default function Footer() {
             <h4 className="font-display font-bold text-ink mb-4 text-sm">Categorías</h4>
             <ul className="space-y-2.5 text-ink-muted">
               <li><Link href="/?subcategory=ficcion-novela" className="hover:text-brand-600 transition-colors">Novela y Ficción</Link></li>
+              <li><Link href="/?subcategory=ficcion-poesia" className="hover:text-brand-600 transition-colors">Poesía</Link></li>
               <li><Link href="/?subcategory=no-ficcion-ensayo" className="hover:text-brand-600 transition-colors">Ensayo</Link></li>
               <li><Link href="/?subcategory=no-ficcion-historia" className="hover:text-brand-600 transition-colors">Historia</Link></li>
+              <li><Link href="/?category=escolar" className="hover:text-brand-600 transition-colors">Libros escolares</Link></li>
               <li><Link href="/?collectible=1" className="hover:text-brand-600 transition-colors">Coleccionables</Link></li>
             </ul>
           </div>
@@ -37,6 +39,7 @@ export default function Footer() {
               <li><Link href="/como-funciona" className="hover:text-brand-600 transition-colors">Cómo funciona</Link></li>
               <li><Link href="/faq" className="hover:text-brand-600 transition-colors">FAQ</Link></li>
               <li><Link href="/alianzas" className="hover:text-brand-600 transition-colors">Alianzas</Link></li>
+              <li><Link href="/gente-de-confianza" className="hover:text-brand-600 transition-colors">Gente de confianza</Link></li>
             </ul>
           </div>
           <div>
@@ -48,9 +51,13 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="font-display font-bold text-ink mb-4 text-sm">Accesos</h4>
+            <h4 className="font-display font-bold text-ink mb-4 text-sm">Descubre</h4>
             <ul className="space-y-2.5 text-ink-muted">
-              <li><Link href="/publish" className="hover:text-brand-600 transition-colors">Vende tu libro</Link></li>
+              <li><Link href="/solicitudes" className="font-semibold text-brand-600 hover:text-brand-700 transition-colors">Se busca · economía inversa</Link></li>
+              <li><Link href="/comprar-libros-usados" className="hover:text-brand-600 transition-colors">Comprar libros usados</Link></li>
+              <li><Link href="/vender" className="hover:text-brand-600 transition-colors">Vende tu libro</Link></li>
+              <li><Link href="/mapa" className="hover:text-brand-600 transition-colors">Mapa de librerías</Link></li>
+              <li><Link href="/novedades" className="hover:text-brand-600 transition-colors">Novedades</Link></li>
               <li><Link href="/search" className="hover:text-brand-600 transition-colors">Buscar</Link></li>
             </ul>
           </div>

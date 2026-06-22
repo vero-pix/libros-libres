@@ -16,10 +16,11 @@ interface Props {
   testimonialBanner?: ReactNode;
   requestsRow?: ReactNode;
   heroRequestStrip?: ReactNode;
+  liquidacionBanner?: ReactNode;
   children: ReactNode;
 }
 
-export default function HomeShell({ totalListings, hasFilters, featuredRow, testimonialBanner, requestsRow, heroRequestStrip, children }: Props) {
+export default function HomeShell({ totalListings, hasFilters, featuredRow, testimonialBanner, requestsRow, heroRequestStrip, liquidacionBanner, children }: Props) {
   const [forceMap, setForceMap] = useState(false);
 
   const handleToggleMap = useCallback(() => {
@@ -45,6 +46,9 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
       ) : (
         <h1 className="sr-only">Libros usados en Chile — tuslibros.cl</h1>
       )}
+
+      {/* Caluga liquidación 50% — arriba del fold, alto tráfico */}
+      {!hasFilters && liquidacionBanner}
 
       {/* Economía inversa: se busca (Prioridad Alta para activar el sitio) */}
       {!hasFilters && requestsRow}
