@@ -41,7 +41,7 @@ function FanBook({ b }: { b: (typeof HERO_BOOKS)[number] }) {
   );
 }
 
-export default function HeroBar({ totalListings }: Props) {
+export default function HeroBar({}: Props) {
   return (
     <section className="bg-cream-warm border-b border-line overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 pt-12 pb-10 sm:pt-16 sm:pb-12">
@@ -74,20 +74,16 @@ export default function HeroBar({ totalListings }: Props) {
 
             {/* Stats */}
             <div className="mt-9 flex items-center gap-6 pt-6 border-t border-line">
-              <div className="flex flex-col gap-0.5">
-                <span className="font-display text-3xl text-ink leading-none">{totalListings}</span>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">ejemplares hoy</span>
-              </div>
-              <div className="w-px h-9 bg-line-strong" />
-              <div className="flex flex-col gap-0.5">
-                <span className="font-display text-3xl text-ink leading-none">16</span>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">librerías reales</span>
-              </div>
-              <div className="w-px h-9 bg-line-strong" />
-              <div className="flex flex-col gap-0.5">
-                <span className="font-display text-3xl text-ink leading-none">$3.000</span>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">desde</span>
-              </div>
+              <Link
+                href="/?sort=price_asc"
+                className="group/stat flex flex-col gap-0.5 transition-colors"
+                aria-label="Ver los libros más baratos, desde $3.000"
+              >
+                <span className="font-display text-3xl text-ink leading-none group-hover/stat:text-coral transition-colors">$3.000</span>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted group-hover/stat:text-coral transition-colors">
+                  desde · ver los más baratos →
+                </span>
+              </Link>
             </div>
           </div>
 
