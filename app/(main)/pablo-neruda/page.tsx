@@ -9,9 +9,9 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Libros de Pablo Neruda Usados en Chile | tuslibros.cl",
+  title: "Veinte Poemas de Amor y otros Libros de Pablo Neruda Usados | tuslibros.cl",
   description:
-    "Compra libros de Pablo Neruda usados en Chile. Veinte poemas, Canto General, Odas Elementales y más. Envío a todo el país o retiro en mano. Pago seguro con MercadoPago.",
+    "Compra Veinte Poemas de Amor y una Canción Desesperada, Canto General, Odas Elementales y más libros de Pablo Neruda usados en Chile. Envío a todo el país o retiro en mano. Pago seguro con MercadoPago.",
   alternates: { canonical: "https://tuslibros.cl/pablo-neruda" },
   keywords: [
     "pablo neruda",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "canto general neruda",
   ],
   openGraph: {
-    title: "Libros de Pablo Neruda Usados en Chile | tuslibros.cl",
+    title: "Veinte Poemas de Amor y otros Libros de Pablo Neruda Usados | tuslibros.cl",
     description:
       "Libros de Pablo Neruda usados en Chile. Envío a todo el país o retiro en mano.",
     url: "https://tuslibros.cl/pablo-neruda",
