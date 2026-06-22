@@ -63,6 +63,7 @@ const config: Config = {
           strong: "var(--line-strong)",
         },
         link: "#8b5e3c",
+        "black-soft": "#33302b",
       },
       fontFamily: {
         display: ["var(--font-newsreader)", "Georgia", "serif"],
