@@ -119,9 +119,9 @@ export default function ListingDetail({ listing, images = [] }: Props) {
   const isSold = listing.status === "completed";
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden relative pb-24 sm:pb-0">
+    <div className="bg-paper-card rounded-2xl border border-line overflow-hidden relative pb-24 sm:pb-0">
       {isSold && (
-        <div className="absolute top-4 right-4 z-10 bg-red-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg uppercase tracking-wider">
+        <div className="absolute top-4 right-4 z-10 bg-coral text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg uppercase tracking-wider">
           Vendido
         </div>
       )}
@@ -272,7 +272,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
           <div className="mt-5">
             <p className="text-[10px] font-mono uppercase tracking-wider text-ink-muted mb-2">Cómo lo recibes</p>
             <div className="space-y-2">
-              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-cream-dark bg-cream-warm/40">
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-line bg-cream-warm/40">
                 <span className="text-base">🤝</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-ink">Encuentro en persona</p>
@@ -280,7 +280,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
                 </div>
                 <span className="text-xs font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Gratis</span>
               </div>
-              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-cream-dark">
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-line">
                 <span className="text-base">📦</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-ink">Despacho courier</p>
@@ -302,8 +302,8 @@ export default function ListingDetail({ listing, images = [] }: Props) {
           />
 
           {/* Seller card */}
-          <div className="mt-5 flex items-center gap-3 p-4 bg-cream-warm/50 rounded-xl border border-cream-dark/50">
-            <div className="w-10 h-10 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden">
+          <div className="mt-5 flex items-center gap-3 p-4 bg-paper-card rounded-xl border border-line">
+            <div className="w-10 h-10 rounded-full bg-ink text-white flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden">
               {listing.seller?.avatar_url ? (
                 <Image src={listing.seller.avatar_url} alt={sellerName} width={40} height={40} className="object-cover w-full h-full" />
               ) : (
@@ -345,7 +345,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
 
       {/* Buybox */}
       {listing.price != null && listing.modality !== "loan" && (
-        <div className="border-t border-cream-dark px-6 py-5 space-y-3">
+        <div className="border-t border-line px-6 py-5 space-y-3">
           {isSold ? (
             <div className="text-center py-4">
               <p className="font-display text-xl font-bold text-[--coral]">Este libro ya fue vendido</p>
@@ -370,7 +370,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             <>
               <Link
                 href={`/checkout/${listing.id}`}
-                className="flex items-center justify-center gap-2 w-full bg-[--coral] hover:bg-[--coral]/90 text-white font-bold py-4 rounded-xl transition-all text-base shadow-sm"
+                className="flex items-center justify-center gap-2 w-full bg-coral hover:bg-coral-deep text-white font-bold py-4 rounded-xl transition-all text-base shadow-sm"
               >
                 Comprar con MercadoPago — ${listing.price.toLocaleString("es-CL")}
               </Link>
@@ -393,10 +393,10 @@ export default function ListingDetail({ listing, images = [] }: Props) {
 
       {/* Publicar uno igual — solo visible para quien NO es el dueño */}
       {!isOwner && (
-        <div className="border-t border-gray-100 px-6 py-4 bg-cream-warm/30">
+        <div className="border-t border-line px-6 py-4 bg-cream-warm/30">
           <Link
             href={`/publish?book_id=${(listing.book as any)?.id ?? (listing as any).book_id}`}
-            className="flex items-center justify-center gap-2 w-full text-sm text-ink-muted hover:text-brand-600 hover:bg-brand-50 border border-dashed border-gray-300 hover:border-brand-300 py-2.5 rounded-xl transition-colors"
+            className="flex items-center justify-center gap-2 w-full text-sm text-ink-muted hover:text-brand-600 hover:bg-brand-50 border border-dashed border-line-strong hover:border-coral/40 py-2.5 rounded-xl transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -412,16 +412,16 @@ export default function ListingDetail({ listing, images = [] }: Props) {
 
       {/* Mobile Sticky Buy Bar */}
       {listing.price != null && listing.modality !== "loan" && !isSold && (
-        <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-[0_-8px_16px_rgba(0,0,0,0.05)] z-50 flex items-center justify-between gap-4 animate-in slide-in-from-bottom-full duration-300">
+        <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-paper-card border-t border-line shadow-[0_-8px_16px_rgba(0,0,0,0.05)] z-50 flex items-center justify-between gap-4 animate-in slide-in-from-bottom-full duration-300">
           <div className="flex flex-col">
             <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Precio</span>
-            <span className="text-xl font-black text-gray-900 leading-none">${listing.price.toLocaleString("es-CL")}</span>
+            <span className="text-xl font-bold text-black leading-none">${listing.price.toLocaleString("es-CL")}</span>
           </div>
           <div className="flex-1">
             {listing.seller?.mercadopago_user_id ? (
               <Link
                 href={`/checkout/${listing.id}`}
-                className="flex items-center justify-center w-full bg-brand-600 active:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-base"
+                className="flex items-center justify-center w-full bg-coral active:bg-coral-deep text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-base"
               >
                 Comprar ahora
               </Link>
@@ -443,15 +443,15 @@ function DescriptionSection({ listing }: { listing: ListingWithBook }) {
   const { book } = listing;
 
   return (
-    <div className="border-t border-gray-100">
+    <div className="border-t border-line">
       <div className="px-5 sm:px-6 pt-4">
         <h2 className="text-sm font-semibold text-ink">Descripción</h2>
       </div>
       <div className="px-5 sm:px-6 py-4">
         {book.description ? (
-          <p className="text-sm text-gray-600 leading-relaxed">{book.description}</p>
+          <p className="text-sm text-black-soft leading-relaxed">{book.description}</p>
         ) : (
-          <p className="text-sm text-gray-400 italic">Sin sinopsis disponible. Consulta al vendedor por más detalles.</p>
+          <p className="text-sm text-ink-muted italic">Sin sinopsis disponible. Consulta al vendedor por más detalles.</p>
         )}
       </div>
     </div>
@@ -508,7 +508,7 @@ function RentalSection({ listing }: { listing: ListingWithRentalFields }) {
   }
 
   return (
-    <div className="border-t border-gray-100 px-6 py-5 bg-brand-50/50">
+    <div className="border-t border-line px-6 py-5 bg-brand-50/50">
       <h3 className="font-semibold text-gray-900 mb-3">Arrendar este libro</h3>
 
       {/* Período */}
@@ -578,7 +578,7 @@ function RentalSection({ listing }: { listing: ListingWithRentalFields }) {
             <span className="text-gray-900">${deposit.toLocaleString("es-CL")}</span>
           </div>
         )}
-        <div className="flex justify-between font-bold border-t border-gray-100 pt-1">
+        <div className="flex justify-between font-bold border-t border-line pt-1">
           <span>Total</span>
           <span>${(rentalPrice + deposit).toLocaleString("es-CL")}</span>
         </div>
