@@ -8,6 +8,8 @@ interface BookRequest {
   requester_location: string | null;
 }
 
+// Tira "Se busca" estilo demo: navy, deslizante (marquee), con los últimos
+// pedidos reales de la economía inversa. Linkea a /solicitudes.
 export default async function HeroRequestStrip() {
   const supabase = createPublicClient();
   const { data } = await supabase
@@ -15,36 +17,50 @@ export default async function HeroRequestStrip() {
     .select("id, title, author, requester_location")
     .eq("fulfilled", false)
     .order("created_at", { ascending: false })
-    .limit(1);
+    .limit(12);
 
-  const req = (data as BookRequest[] | null)?.[0];
-  if (!req) return null;
+  const reqs = (data as BookRequest[] | null) ?? [];
+  if (reqs.length === 0) return null;
 
-  const params = new URLSearchParams({ title: req.title });
-  if (req.author) params.set("author", req.author);
-  const publishHref = `/publish?${params.toString()}`;
-
-  const location = req.requester_location?.trim();
+  // Duplicamos para que el marquee loopee sin cortes.
+  const loop = [...reqs, ...reqs];
 
   return (
     <Link
-      href={publishHref}
-      className="group block bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 border-b border-amber-600/40 hover:brightness-105 transition-all"
+      href="/solicitudes"
+      className="group block bg-ink text-white border-b border-ink-deep/60 hover:brightness-110 transition-all"
+      aria-label="Ver todos los libros que se buscan"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-center gap-3 text-center">
-        <span className="text-[10px] sm:text-xs uppercase tracking-[0.2em] font-bold text-amber-900 bg-white/70 px-2 py-0.5 rounded-full whitespace-nowrap shrink-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center h-9">
+        {/* Etiqueta fija */}
+        <span className="shrink-0 flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-coral pr-3 sm:pr-4 mr-3 sm:mr-4 border-r border-white/15">
+          <span className="w-1.5 h-1.5 rounded-full bg-coral animate-pulse" />
           Se busca
         </span>
-        <p className="text-sm sm:text-[15px] text-amber-950 leading-snug">
-          <span className="font-semibold">
-            {location ? `Alguien en ${location} busca` : "Alguien busca"}
-          </span>{" "}
-          <span className="italic font-serif">«{req.title}»</span>
-          {req.author && <span className="text-amber-900/80"> de {req.author}</span>}
-          <span className="hidden sm:inline text-amber-900 font-bold ml-2 group-hover:translate-x-1 inline-block transition-transform">
-            ¿Lo tienes? Publícalo →
-          </span>
-        </p>
+
+        {/* Marquee */}
+        <div className="overflow-hidden flex-1">
+          <div className="marquee-track flex items-center gap-7 w-max">
+            {loop.map((r, i) => {
+              const loc = r.requester_location?.trim();
+              return (
+                <span key={`${r.id}-${i}`} className="flex items-center gap-2 whitespace-nowrap text-[13px]">
+                  <span className="font-display italic text-white">«{r.title}»</span>
+                  {r.author && <span className="text-white/55 hidden sm:inline">de {r.author}</span>}
+                  {loc && (
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-white/45">— {loc}</span>
+                  )}
+                  <span aria-hidden className="text-coral/60">·</span>
+                </span>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Ver todo */}
+        <span className="shrink-0 ml-3 sm:ml-4 pl-3 sm:pl-4 border-l border-white/15 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-[0.12em] text-white/80 group-hover:text-coral transition-colors whitespace-nowrap">
+          Ver todo <span className="inline-block group-hover:translate-x-0.5 transition-transform">→</span>
+        </span>
       </div>
     </Link>
   );
