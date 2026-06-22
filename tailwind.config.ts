@@ -23,6 +23,10 @@ const config: Config = {
           900: "#5e4408",
           950: "var(--brand-950)",
         },
+        gold: {
+          DEFAULT: "var(--gold)",
+          deep: "var(--gold-deep)",
+        },
         navy: {
           DEFAULT: "var(--ink)",
           light: "var(--ink-light)",
@@ -30,19 +34,44 @@ const config: Config = {
         },
         ink: {
           DEFAULT: "var(--ink)",
+          deep: "var(--ink-deep)",
+          night: "var(--ink-night)",
           light: "var(--ink-light)",
           muted: "var(--ink-muted)",
+        },
+        coral: {
+          DEFAULT: "var(--coral)",
+          deep: "var(--coral-deep)",
+        },
+        green: {
+          DEFAULT: "var(--green)",
+          deep: "var(--green-deep)",
+        },
+        paper: {
+          DEFAULT: "var(--paper)",
+          2: "var(--paper-2)",
+          card: "var(--paper-card)",
+          edge: "var(--paper-edge)",
         },
         cream: {
           DEFAULT: "var(--cream)",
           warm: "var(--cream-warm)",
           dark: "var(--cream-dark)",
         },
+        line: {
+          DEFAULT: "var(--line)",
+          strong: "var(--line-strong)",
+        },
         link: "#8b5e3c",
       },
       fontFamily: {
-        display: ["var(--font-playfair)", "Georgia", "serif"],
-        sans: ["var(--font-inter)", "sans-serif"],
+        display: ["var(--font-newsreader)", "Georgia", "serif"],
+        sans: ["var(--font-hanken)", "system-ui", "sans-serif"],
+        mono: ["var(--font-jetbrains)", "ui-monospace", "Menlo", "monospace"],
+      },
+      boxShadow: {
+        book: "0 2px 2px rgba(23,20,16,.04), 0 12px 22px -10px rgba(23,20,16,.30), 0 30px 50px -28px rgba(23,20,16,.34)",
+        card: "0 1px 2px rgba(23,20,16,.04), 0 14px 30px -18px rgba(23,20,16,.22)",
       },
       keyframes: {
         scan: {

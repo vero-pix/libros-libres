@@ -15,7 +15,6 @@ import FeaturedRow from "@/components/home/FeaturedRow";
 import CollectibleRow from "@/components/home/CollectibleRow";
 import RecentRow from "@/components/home/RecentRow";
 import ColeccionRow from "@/components/home/ColeccionRow";
-import TestimonialBanner from "@/components/home/TestimonialBanner";
 import RequestsRow from "@/components/home/RequestsRow";
 import HeroRequestStrip from "@/components/home/HeroRequestStrip";
 import LiquidacionBanner from "@/components/home/LiquidacionBanner";
@@ -344,13 +343,7 @@ export default async function HomePage({ searchParams }: Props) {
             <FeaturedRow featuredListings={featuredListings} featuredSellers={featuredSellers} />
           ) : null
         }
-        testimonialBanner={
-          !hasFilters ? (
-            <div className="lg:hidden">
-              <TestimonialBanner />
-            </div>
-          ) : null
-        }
+        testimonialBanner={null /* testimonios viejos (Z./Camilo, abr) ocultos hasta tener nuevos */}
         requestsRow={!hasFilters ? <RequestsRow /> : null}
         heroRequestStrip={!hasFilters ? <HeroRequestStrip /> : null}
         liquidacionBanner={!hasFilters ? <LiquidacionBanner /> : null}
