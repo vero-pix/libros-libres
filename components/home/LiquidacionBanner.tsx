@@ -55,7 +55,7 @@ export default async function LiquidacionBanner() {
                 Toda mi estantería{" "}
                 <span className="italic text-[--coral]">a mitad de precio</span>
               </h2>
-              <p className="mt-3 text-sm sm:text-[15px] text-cream/70 max-w-xl mx-auto md:mx-0 leading-relaxed">
+              <p className="mt-3 text-sm sm:text-[15px] text-white/70 max-w-xl mx-auto md:mx-0 leading-relaxed">
                 Liquido mis libros — los míos, de TusLibros — al{" "}
                 <span className="font-semibold text-cream">50%</span>. Para llenar
                 las vacaciones de lectura y para que vuelvan a circular.

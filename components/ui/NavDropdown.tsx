@@ -49,7 +49,7 @@ export default function NavDropdown({ label, items }: Props) {
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
-        className={`text-xs font-medium uppercase tracking-[0.15em] px-4 py-3.5 hover:bg-white/10 transition-colors whitespace-nowrap flex items-center gap-1 ${open ? "bg-white/10" : ""}`}
+        className={`text-[14px] font-medium text-black-soft px-3 py-2 rounded-full hover:bg-black/[0.05] transition-colors whitespace-nowrap flex items-center gap-1 ${open ? "bg-black/[0.05]" : ""}`}
       >
         {label}
         <svg className={`w-3 h-3 opacity-60 transition-transform duration-200 ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -58,7 +58,7 @@ export default function NavDropdown({ label, items }: Props) {
       </button>
 
       <div
-        className={`absolute top-full left-0 bg-white border border-cream-dark/30 rounded-lg shadow-xl py-1.5 min-w-[200px] z-[60] transition-all duration-200 ${
+        className={`absolute top-full right-0 bg-paper-card border border-line rounded-xl shadow-card py-1.5 min-w-[210px] z-[60] transition-all duration-200 ${
           open ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-1"
         }`}
       >
@@ -67,7 +67,7 @@ export default function NavDropdown({ label, items }: Props) {
             key={item.href}
             href={item.href}
             onClick={() => setOpen(false)}
-            className="block px-4 py-2.5 text-sm text-ink hover:bg-cream-warm hover:text-brand-600 transition-colors"
+            className="block px-4 py-2.5 text-sm text-ink hover:bg-cream-warm/50 hover:text-coral transition-colors"
           >
             {item.label}
           </Link>
