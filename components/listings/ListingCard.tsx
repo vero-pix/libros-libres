@@ -18,6 +18,29 @@ const QuickViewModal = dynamic(() => import("./QuickViewModal"), {
 const BLUR_PLACEHOLDER =
   "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI2NyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjVmMGU4Ii8+PC9zdmc+";
 
+/* Paletas de cubierta para el objeto-libro SIN foto (fallback con identidad). */
+const COVER_GRADIENTS: Record<string, string> = {
+  ink: "linear-gradient(160deg,#23489f,#16307a)",
+  coral: "linear-gradient(160deg,#df5239,#a8331f)",
+  gold: "linear-gradient(160deg,#e0990c,#9e6a00)",
+  green: "linear-gradient(160deg,#33684f,#1b3d2e)",
+  ox: "linear-gradient(160deg,#8a3131,#5e1d1d)",
+  night: "linear-gradient(160deg,#1c2333,#0c1018)",
+  cream: "linear-gradient(160deg,#f3ead7,#ddcfb2)",
+  teal: "linear-gradient(160deg,#1f5f63,#0f3a3d)",
+  sand: "linear-gradient(160deg,#cda86a,#9c7a3e)",
+  plum: "linear-gradient(160deg,#5b3a72,#3a2350)",
+};
+const COVER_KEYS = Object.keys(COVER_GRADIENTS);
+const LIGHT_COVERS = new Set(["cream", "sand", "gold"]);
+
+/* Variante estable por título → mismo libro, mismo color siempre. */
+function coverVariant(seed: string): string {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return COVER_KEYS[h % COVER_KEYS.length];
+}
+
 function isRecent(createdAt: string) {
   const diff = Date.now() - new Date(createdAt).getTime();
   return diff < 7 * 24 * 60 * 60 * 1000;
@@ -50,7 +73,7 @@ function pickPrimaryBadge(listing: ListingWithBook): Badge | null {
 
   // 1. Featured
   if (listing._featured) {
-    return { label: "Destacado", className: "bg-brand-500 text-brand-950" };
+    return { label: "Destacado", className: "bg-gold text-[#3a2700]" };
   }
 
   // 2. Oferta (descuento activo)
@@ -60,18 +83,18 @@ function pickPrimaryBadge(listing: ListingWithBook): Badge | null {
     const off = orig > 0 ? Math.round(((orig - price) / orig) * 100) : 0;
     return {
       label: off > 0 ? `-${off}%` : "Oferta",
-      className: "bg-[--coral] text-white",
+      className: "bg-coral text-white",
     };
   }
 
   // 3. Recién publicado
   if (isRecent(listing.created_at)) {
-    return { label: "Nuevo aquí", className: "bg-ink text-cream" };
+    return { label: "Nuevo aquí", className: "bg-ink text-white" };
   }
 
   // 4. Coleccionable
   if ((listing as unknown as Record<string, unknown>).is_collectible) {
-    return { label: "Colección", className: "bg-ink-light text-white" };
+    return { label: "Colección", className: "bg-green text-white" };
   }
 
   return null;
@@ -140,22 +163,33 @@ const ListingCard = memo(function ListingCard({
 
   // Extraer comuna del address: "Calle 123, Providencia, Región..." → "Providencia"
   const address = (listing as unknown as Record<string, unknown>).address as string | undefined;
-  const displayLocation = address
-    ? address.split(",")[1]?.trim() || null
-    : null;
+  const displayLocation = address ? address.split(",")[1]?.trim() || null : null;
 
   const badge = pickPrimaryBadge(listing);
 
-  /* ---------- Portada placeholder ---------- */
+  /* ---------- Objeto-libro: cubierta dibujada (fallback sin foto) ---------- */
 
-  const placeholder = (
-    <div className="w-full h-full bg-gradient-to-br from-brand-50 to-cream-warm flex flex-col items-center justify-center gap-2 p-4">
-      <svg className="w-12 h-12 text-brand-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.331 0 4.473.89 6.074 2.356M12 6.042a8.968 8.968 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.356M12 6.042V20.356" />
-      </svg>
-      <span className="text-[10px] text-brand-400 font-medium text-center leading-tight font-display italic">
-        {book.title}
+  const variant = coverVariant(book.title || String(listing.id));
+  const light = LIGHT_COVERS.has(variant);
+  const drawnCover = (
+    <div
+      className="w-full h-full flex flex-col justify-between p-3"
+      style={{ background: COVER_GRADIENTS[variant] }}
+    >
+      <span className={`font-mono text-[8px] uppercase tracking-[0.16em] font-semibold ${light ? "text-black/55" : "text-white/70"}`}>
+        tuslibros
       </span>
+      <div>
+        <span className={`block w-7 h-px mb-2 ${light ? "bg-black/40" : "bg-white/55"}`} />
+        <h4 className={`font-display ${light ? "text-ink" : "text-white"} text-[13px] leading-[1.08] font-medium ${light ? "italic" : ""}`}>
+          {book.title}
+        </h4>
+        {book.author && (
+          <div className={`font-mono text-[8px] uppercase tracking-wider mt-1.5 ${light ? "text-ink/60" : "text-white/75"}`}>
+            {book.author.split(" ").slice(-1)[0]}
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -163,36 +197,44 @@ const ListingCard = memo(function ListingCard({
 
   return (
     <>
-      <article className="group relative bg-white rounded-lg border border-cream-dark/30 overflow-hidden transition-shadow duration-200 hover:shadow-lg">
+      <article className="group relative bg-paper-card rounded-[3px] border border-line overflow-hidden transition-all duration-200 hover:shadow-card hover:-translate-y-0.5 hover:border-line-strong">
         <Link
           href={libroUrl(listing)}
-          className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[--coral]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-lg"
+          className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-coral/60 focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-[3px]"
         >
-          {/* PORTADA + OVERLAYS */}
-          <div className="relative aspect-[3/4] bg-cream-warm flex items-center justify-center overflow-hidden">
-            {coverUrl && !imgError ? (
-              <Image
-                src={coverUrl}
-                alt={book.title}
-                fill
-                className="object-contain p-3 transition-transform duration-500 group-hover:scale-[1.03]"
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                placeholder="blur"
-                blurDataURL={BLUR_PLACEHOLDER}
-                onError={() => setImgError(true)}
-                onLoad={(e) => {
-                  const img = e.currentTarget as HTMLImageElement;
-                  if (img.naturalWidth < 10 || img.naturalHeight < 10) setImgError(true);
-                }}
+          {/* PORTADA = OBJETO-LIBRO sobre fondo papel */}
+          <div className="relative px-5 pt-5 pb-3.5 bg-gradient-to-b from-[#f6f0e4] to-[#efe7d6] flex justify-center overflow-hidden">
+            {/* el libro */}
+            <div className="relative w-[64%] aspect-[148/225] rounded-[2px_4px_4px_2px] shadow-book overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+              {coverUrl && !imgError ? (
+                <Image
+                  src={coverUrl}
+                  alt={book.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 32vw, (max-width: 1024px) 22vw, 13vw"
+                  placeholder="blur"
+                  blurDataURL={BLUR_PLACEHOLDER}
+                  onError={() => setImgError(true)}
+                  onLoad={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    if (img.naturalWidth < 10 || img.naturalHeight < 10) setImgError(true);
+                  }}
+                />
+              ) : (
+                drawnCover
+              )}
+              {/* lomo */}
+              <span
+                aria-hidden
+                className="absolute inset-y-0 left-0 w-2 z-[2] bg-gradient-to-r from-black/30 via-white/10 to-black/10"
               />
-            ) : (
-              placeholder
-            )}
+            </div>
 
             {/* VENDIDO overlay */}
             {listing.status === "completed" && (
-              <div className="absolute inset-0 z-[1] bg-black/40 flex items-center justify-center">
-                <span className="text-white font-bold text-sm uppercase tracking-wider bg-[--coral] px-4 py-1.5 rounded-full shadow-lg">
+              <div className="absolute inset-0 z-[3] bg-black/40 flex items-center justify-center">
+                <span className="text-white font-bold text-sm uppercase tracking-wider bg-coral px-4 py-1.5 rounded-full shadow-lg">
                   Vendido
                 </span>
               </div>
@@ -200,31 +242,31 @@ const ListingCard = memo(function ListingCard({
 
             {/* MODO VACACIONES overlay */}
             {listing.status !== "completed" && (listing.seller as any)?.on_vacation && (
-              <div className="absolute inset-0 z-[1] bg-amber-900/25 flex items-center justify-center">
+              <div className="absolute inset-0 z-[3] bg-amber-900/25 flex items-center justify-center">
                 <span className="text-white font-bold text-[11px] uppercase tracking-wider bg-amber-600 px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
                   🌴 En vacaciones
                 </span>
               </div>
             )}
 
-            {/* 1 BADGE primario, top-left, sin apilamiento */}
+            {/* 1 BADGE primario, top-left */}
             {badge && (
-              <span className={`absolute top-3 left-3 z-[2] inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm ${badge.className}`}>
+              <span className={`absolute top-3 left-3 z-[4] inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm ${badge.className}`}>
                 {badge.label}
               </span>
             )}
 
             {/* DISTANCIA — visible si disponible (diferenciador del producto) */}
             {distanceLabel && listing.status !== "completed" && (
-              <span className="absolute bottom-3 left-3 z-[2] inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/95 text-ink shadow-sm backdrop-blur-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-ink-light" />
+              <span className="absolute bottom-3 left-3 z-[4] inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/95 text-ink shadow-sm backdrop-blur-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-coral" />
                 A {distanceLabel}
               </span>
             )}
 
             {/* QUICK VIEW + ADD TO CART — visible siempre en mobile, hover en desktop */}
             {listing.status !== "completed" && !(listing.seller as any)?.on_vacation && (
-              <div className="absolute bottom-3 right-3 z-[3] flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
+              <div className="absolute bottom-3 right-3 z-[4] flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -250,7 +292,7 @@ const ListingCard = memo(function ListingCard({
                   }}
                   disabled={cartState === "loading"}
                   className={`w-9 h-9 flex items-center justify-center rounded-full shadow-md text-white transition-colors ${
-                    cartState === "added" ? "bg-ink-light" : "bg-[--coral] hover:bg-[--coral]/90"
+                    cartState === "added" ? "bg-green" : "bg-coral hover:bg-coral-deep"
                   } disabled:opacity-70`}
                   title={cartState === "added" ? "Agregado al carrito" : "Agregar al carrito"}
                   aria-label={cartState === "added" ? "Agregado al carrito" : "Agregar al carrito"}
@@ -273,7 +315,7 @@ const ListingCard = memo(function ListingCard({
         {/* CUERPO */}
         <div className="p-4">
           <Link href={libroUrl(listing)} className="block">
-            <h3 className="font-display text-[15px] leading-tight font-medium text-ink line-clamp-2 tracking-tight group-hover:text-[--coral] transition-colors">
+            <h3 className="font-display text-[16px] leading-[1.14] font-medium text-ink line-clamp-2 tracking-[-0.01em] group-hover:text-coral transition-colors">
               {book.title}
             </h3>
           </Link>
@@ -281,7 +323,7 @@ const ListingCard = memo(function ListingCard({
           {book.author && (
             <Link
               href={`/search?author=${encodeURIComponent(book.author)}`}
-              className="block font-display italic text-xs text-ink-muted hover:text-ink mt-0.5 truncate transition-colors"
+              className="block font-display italic text-[13px] text-ink-muted hover:text-ink mt-0.5 truncate transition-colors"
               aria-label={`Buscar libros de ${book.author}`}
             >
               {book.author}
@@ -291,7 +333,7 @@ const ListingCard = memo(function ListingCard({
           {/* PRECIO */}
           {listing.price != null && (
             <div className="mt-3 flex items-baseline gap-2 flex-wrap">
-              <span className="font-mono text-[15px] font-semibold text-ink tabular-nums">
+              <span className="font-mono text-[16px] font-semibold text-black tabular-nums">
                 {formatCLP(listing.price)}
               </span>
               {originalPrice != null && originalPrice > listing.price && (
@@ -303,21 +345,21 @@ const ListingCard = memo(function ListingCard({
           )}
 
           {/* META FOOTER — vendedor + ciudad */}
-          <div className="mt-3 pt-3 border-t border-cream-dark/30 flex items-center justify-between gap-2">
+          <div className="mt-3 pt-3 border-t border-line flex items-center justify-between gap-2">
             <Link
               href={sellerHref}
-              className="flex items-center gap-1.5 min-w-0 text-[11px] text-ink-muted hover:text-ink transition-colors"
+              className="flex items-center gap-1.5 min-w-0 text-[12px] text-ink-muted hover:text-ink transition-colors"
             >
               {listing.seller?.avatar_url ? (
                 <Image
                   src={listing.seller.avatar_url}
                   alt=""
-                  width={18}
-                  height={18}
+                  width={20}
+                  height={20}
                   className="rounded-full object-cover flex-shrink-0"
                 />
               ) : (
-                <span className="w-[18px] h-[18px] rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-[9px] font-bold flex-shrink-0">
+                <span className="w-5 h-5 rounded-full bg-ink text-white flex items-center justify-center text-[9px] font-bold flex-shrink-0 font-mono">
                   {sellerName[0]?.toUpperCase() ?? "?"}
                 </span>
               )}
