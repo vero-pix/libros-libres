@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import SponsorCard from "@/components/home/SponsorCard";
 import SponsorRequestForm from "@/components/sponsor/SponsorRequestForm";
 
 export const metadata: Metadata = {
@@ -30,23 +29,18 @@ export default function GenteDeConfianzaPage() {
         </div>
       </section>
 
-      <section className="max-w-5xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <SponsorCard
-            name="Jose María Ruiz de Gamboa Velásquez"
-            tagline="Profesor · Excel · Power BI · VBA · Portugués"
-            avatarInitials="JM"
-            rating={5.0}
-            reviewsCount={13}
-            bio="Economista con +5 años en mercados financieros y +10 años de experiencia docente. Clases prácticas, adaptadas a tu nivel y objetivo real. Desde fórmulas básicas hasta dashboards avanzados, automatización y análisis estratégico de datos. También clases de portugués para todos los niveles."
-            stats={[
-              { label: "Experiencia", value: "+10 años" },
-              { label: "Nivel", value: "Todos" },
-              { label: "1ra clase", value: "Gratis", highlight: true },
-            ]}
-            tags={["Excel", "Power BI", "VBA", "Análisis de datos", "Portugués"]}
-            whatsapp="+55 11 97694-4948"
-          />
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <div className="rounded-2xl border border-dashed border-line-strong bg-paper-card px-6 py-14 text-center">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-coral font-semibold mb-3">
+            Próximamente
+          </p>
+          <h2 className="font-display text-2xl sm:text-3xl text-ink mb-3">
+            Estoy eligiendo a quiénes mostrar acá.
+          </h2>
+          <p className="text-ink-muted max-w-xl mx-auto leading-relaxed">
+            Muy pronto vas a ver acá a las personas y servicios de confianza que
+            uso y recomiendo. Si crees que encajas, déjame tus datos más abajo.
+          </p>
         </div>
       </section>
 
