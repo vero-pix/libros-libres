@@ -161,19 +161,7 @@ export default async function LibrosUsadosChilePage() {
             </div>
           </section>
 
-          {/* Testimonio */}
-          <section className="mb-16 bg-white rounded-2xl p-8 md:p-10 border border-cream-dark">
-            <p className="text-xs uppercase tracking-widest text-brand-600 font-semibold mb-4">
-              Compraron y cuentan
-            </p>
-            <blockquote className="font-serif italic text-xl md:text-2xl text-ink leading-snug">
-              &ldquo;Fácil y sin complicaciones. Muy buena disposición por parte del
-              vendedor, volvería a comprar sin ningún problema.&rdquo;
-            </blockquote>
-            <p className="mt-4 text-sm text-ink-muted">
-              — <span className="font-semibold text-ink">Z.</span> · compró <em>La Marina en la Historia de Chile · Tomo I</em> · 7 abril 2026
-            </p>
-          </section>
+          {/* Testimonio viejo (Z., abr 2026) oculto hasta tener testimonios nuevos */}
 
           {/* Libros destacados */}
           {featured.length > 0 && (

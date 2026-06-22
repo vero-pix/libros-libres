@@ -4,19 +4,40 @@
 
 @layer base {
   :root {
-    /* Paleta Oficial - tuslibros.cl (Brand Board Final — v2 Bold) */
-    --brand-500: #e8a000;  /* Mostaza Vivo — más saturado y fuerte */
-    --brand-600: #c78800;  /* Mostaza Oscuro */
-    --brand-950: #2a1d02;  /* Café Oscuro Profundo */
+    /* ===== Paleta tuslibros.cl — v3 "Cada estantería es una librería" =====
+       Evolución sobre la v2 Bold: coral y mostaza levemente afinados +
+       tokens nuevos (tinta profunda/noche, verde, papel, líneas). */
 
-    --ink: #1a3da0;        /* Royal Blue fuerte — navbar y texto principal */
-    --ink-light: #2d5e4a;  /* Verde Bosque Intenso */
-    --ink-muted: #5a6273;  /* Gris Cálido con más contraste */
+    /* Mostaza / oro */
+    --brand-500: #e0990c;  /* antes #e8a000 — un punto más cálido */
+    --brand-600: #c78800;
+    --brand-950: #2a1d02;
+    --gold: #e0990c;
+    --gold-deep: #a86e00;
 
-    --coral: #e05a47;      /* Coral más intenso */
-    --cream: #f6f0e8;      /* Fondo Papel — ligeramente más cálido */
-    --cream-warm: #e4ddd1; /* Arena */
+    /* Tinta (azul de marca) */
+    --ink: #1a3da0;
+    --ink-deep: #102a73;
+    --ink-night: #0c1a44;  /* bandas oscuras / footer */
+    --ink-light: #2d5e4a;  /* verde-tinta (ya existía) */
+    --ink-muted: #5a6273;
+
+    /* Acentos */
+    --coral: #df5239;      /* antes #e05a47 */
+    --coral-deep: #b53d28;
+    --green: #2d5e4a;
+    --green-deep: #1b3d2e;
+
+    /* Papel / neutros cálidos */
+    --paper: #f4eee2;       /* fondo base nuevo */
+    --paper-2: #ece4d3;     /* fondo alterno */
+    --paper-card: #fbf7ee;  /* tarjetas */
+    --paper-edge: #e7dcc6;
+    --cream: #f6f0e8;
+    --cream-warm: #e4ddd1;
     --cream-dark: #d0c9bc;
+    --line: #e0d6c2;
+    --line-strong: #cbbd9f;
 
     --background: 40 33% 97%;
     --foreground: 222 47% 11%;

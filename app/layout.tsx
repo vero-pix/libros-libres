@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Newsreader, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
@@ -7,15 +7,25 @@ import Footer from "@/components/ui/Footer";
 import BackToTop from "@/components/ui/BackToTop";
 import PageTracker from "@/components/ui/PageTracker";
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const hanken = Hanken_Grotesk({
+  variable: "--font-hanken",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -85,7 +95,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${playfair.variable} ${inter.variable} font-sans antialiased flex flex-col min-h-screen bg-cream`}>
+      <body className={`${newsreader.variable} ${hanken.variable} ${jetbrains.variable} font-sans antialiased flex flex-col min-h-screen bg-cream`}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
