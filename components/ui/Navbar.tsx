@@ -60,6 +60,7 @@ export default async function Navbar() {
           <NavLink href="/" className="hidden sm:inline-flex">Inicio</NavLink>
           <NavLink href="/#tienda">Explorar</NavLink>
           <NavLink href="/publish">Vender</NavLink>
+          <NavLink href="/solicitudes">Se busca</NavLink>
           <NavLink href="/novedades" className="hidden sm:inline-flex">Novedades</NavLink>
 
           {user && (
