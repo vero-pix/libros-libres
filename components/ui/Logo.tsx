@@ -10,9 +10,9 @@ interface LogoProps {
 
 export default function Logo({ className = "", withTagline = false }: LogoProps) {
   return (
-    <Link href="/" className={`flex items-center gap-3.5 group ${className}`}>
-      {/* Isotipo: Los libritos con más presencia */}
-      <div className="relative w-16 h-16 sm:w-24 sm:h-24 flex-shrink-0">
+    <Link href="/" className={`flex items-center gap-2.5 group ${className}`}>
+      {/* Isotipo compacto */}
+      <div className="relative w-9 h-9 sm:w-10 sm:h-10 flex-shrink-0">
         <Image
           src="/logo-books.png"
           alt="tuslibros.cl logo"
@@ -22,16 +22,16 @@ export default function Logo({ className = "", withTagline = false }: LogoProps)
         />
       </div>
 
-      {/* Logotipo: Texto */}
-      <div className="flex flex-col">
+      {/* Logotipo */}
+      <div className="flex flex-col leading-none">
         <div className="flex items-baseline">
-          <span className="font-display text-4xl font-bold text-ink tracking-tight">
+          <span className="font-display text-[22px] sm:text-[25px] font-medium text-ink tracking-[-0.02em]">
             tuslibros
           </span>
-          <span className="font-display text-4xl font-bold text-brand-500">.cl</span>
+          <span className="font-display text-[22px] sm:text-[25px] font-medium italic text-coral">.cl</span>
         </div>
         {withTagline && (
-          <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-ink-muted leading-none -mt-0.5">
+          <span className="font-mono text-[8.5px] uppercase tracking-[0.18em] text-ink-muted mt-1">
             Los que ya leíste, los que te faltan
           </span>
         )}

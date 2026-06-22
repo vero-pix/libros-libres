@@ -46,12 +46,12 @@ export default function HomeMapSection() {
           <h1 className="font-display text-lg sm:text-xl font-bold text-cream leading-tight">
             Libros a la vuelta de la esquina
           </h1>
-          <p className="text-cream/70 text-xs mt-1">
+          <p className="text-white/70 text-xs mt-1">
             {listings.length > 0
               ? `${listings.length} ${listings.length === 1 ? "libro" : "libros"} esperando lector en Santiago`
               : "Cargando el mapa…"}
           </p>
-          <div className="flex items-center gap-3 mt-2 text-[10px] text-cream/60">
+          <div className="flex items-center gap-3 mt-2 text-[10px] text-white/60">
             <span className="flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded-full bg-ink border-2 border-[#d4a017]" />
               Colección
