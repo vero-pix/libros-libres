@@ -3,10 +3,18 @@ import RequestsRow from "@/components/home/RequestsRow";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Vender libros usados en Chile | tuslibros.cl",
+  title: "Venta de libros usados en Chile — vende los tuyos en minutos | tuslibros.cl",
   description:
-    "¿Quieres vender libros usados en Chile? Publica en 10 segundos. Escanea el código de barras, ponle precio y listo. Pago seguro con MercadoPago y envío a todo el país.",
+    "La venta de libros usados más simple de Chile. ¿Quieres vender libros usados? Publica en 10 segundos: escanea el código de barras, ponle precio y listo. Pago seguro con MercadoPago y envío a todo el país.",
   alternates: { canonical: "https://tuslibros.cl/vender" },
+  keywords: [
+    "venta de libros",
+    "venta de libros usados",
+    "venta de libros usados Chile",
+    "vender libros usados",
+    "vender libros usados Chile",
+    "vender libros",
+  ],
 };
 
 const steps = [
