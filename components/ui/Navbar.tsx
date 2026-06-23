@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import NavbarClient from "./NavbarClient";
 import NavDropdown from "./NavDropdown";
 import HeaderSearchBar from "./HeaderSearchBar";
+import MobileMenu from "./MobileMenu";
 import UnreadBadge from "@/components/messages/UnreadBadge";
 
 export default async function Navbar() {
@@ -115,6 +116,9 @@ export default async function Navbar() {
             </span>
 
             <NavbarClient user={user} displayName={displayName} initialCartCount={cartCount} />
+
+            {/* Menú para <lg, donde la <nav> está oculta (restituye Mensajes/Mis ventas/etc.) */}
+            <MobileMenu loggedIn={!!user} />
           </div>
         </div>
       </div>
