@@ -6,22 +6,22 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Libros usados baratos en Chile — desde $1.000 | tuslibros.cl",
+  title: "Comprar libros usados baratos en Chile — desde $1.000 | tuslibros.cl",
   description:
-    "Libros usados baratos en Chile desde $1.000. Cientos de ofertas y libros de segunda mano hasta 60% bajo el precio nuevo. Pago protegido con MercadoPago, retiro en mano gratis o despacho a todo Chile.",
+    "Compra libros usados baratos en Chile desde $1.000. Cientos de ofertas y libros de segunda mano hasta 60% bajo el precio nuevo. Pago protegido con MercadoPago, retiro en mano gratis o despacho a todo Chile.",
   alternates: { canonical: "https://tuslibros.cl/libros-usados-baratos" },
   keywords: [
+    "comprar libros usados baratos",
+    "comprar libros baratos Chile",
     "libros usados baratos",
     "libros baratos Chile",
-    "libros usados baratos Chile",
     "ofertas de libros",
     "libros de segunda mano baratos",
     "libros economicos Chile",
-    "libros usados en oferta",
     "comprar libros baratos online",
   ],
   openGraph: {
-    title: "Libros usados baratos en Chile — desde $1.000 | tuslibros.cl",
+    title: "Comprar libros usados baratos en Chile — desde $1.000 | tuslibros.cl",
     description:
       "Cientos de libros usados baratos y en oferta, hasta 60% bajo el precio nuevo. Pago protegido y despacho a todo Chile.",
     url: "https://tuslibros.cl/libros-usados-baratos",
@@ -98,7 +98,7 @@ export default async function LibrosUsadosBaratosPage() {
           {/* Hero */}
           <section className="mt-8 mb-16 max-w-3xl">
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-ink leading-[1.05] tracking-tight">
-              Libros usados baratos en Chile —<br />
+              Compra libros usados baratos en Chile —<br />
               <span className="italic text-brand-600">desde $1.000.</span>
             </h1>
             <p className="mt-6 text-lg text-ink-muted leading-relaxed">
