@@ -22,6 +22,9 @@ export const COORDS: Record<string, { lat: number; lng: number; radiusKm: number
   temuco: { lat: -38.7359, lng: -72.5904, radiusKm: 15 },
   antofagasta: { lat: -23.6509, lng: -70.3975, radiusKm: 15 },
   "la-serena": { lat: -29.9027, lng: -71.2519, radiusKm: 25 },
+  talca: { lat: -35.4264, lng: -71.6554, radiusKm: 25 },
+  "puerto-montt": { lat: -41.4693, lng: -72.9424, radiusKm: 25 },
+  coquimbo: { lat: -29.9533, lng: -71.3436, radiusKm: 15 },
 };
 
 export const CIUDADES: Record<string, Ciudad> = {
@@ -243,9 +246,73 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
     ],
   },
+  talca: {
+    label: "Talca",
+    match: "Talca",
+    heroSub: "Libros usados en el corazón del Maule.",
+    intro:
+      "Libros usados en Talca y la Región del Maule. Vendedores locales con retiro en mano y despacho a todo Chile, además de universitarios que liquidan sus textos cada semestre. Pago protegido con MercadoPago.",
+    faqs: [
+      {
+        q: "¿Puedo retirar en persona en Talca?",
+        a: "Sí, cuando el vendedor lo ofrece. Coordinan el punto de entrega directamente al concretar la compra, sin pagar despacho.",
+      },
+      {
+        q: "¿Encuentro textos universitarios en Talca?",
+        a: "Sí. Con la UTalca y la UCM en la ciudad, es común encontrar textos de estudio y manuales de segunda mano a buen precio.",
+      },
+      {
+        q: "¿Cómo protegen mi pago?",
+        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
+      },
+    ],
+  },
+  "puerto-montt": {
+    label: "Puerto Montt",
+    match: "Puerto Montt",
+    heroSub: "Libros usados en la puerta de la Patagonia.",
+    intro:
+      "Libros usados en Puerto Montt y la Región de Los Lagos. Lectores y libreros del sur con catálogo propio, retiro en mano y despacho por courier a todo Chile. Pago protegido con MercadoPago.",
+    faqs: [
+      {
+        q: "¿Puedo retirar en persona en Puerto Montt?",
+        a: "Sí, cuando el vendedor lo ofrece. Coordinan el punto de entrega directamente al concretar la compra.",
+      },
+      {
+        q: "¿Llega por courier al sur si vivo más lejos?",
+        a: "Sí. Los vendedores despachan a todo Chile, incluida la zona sur y austral; el costo de envío se calcula al pagar según destino.",
+      },
+      {
+        q: "¿Cómo protegen mi pago?",
+        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
+      },
+    ],
+  },
+  coquimbo: {
+    label: "Coquimbo",
+    match: "Coquimbo",
+    heroSub: "Libros usados en la bahía.",
+    intro:
+      "Libros usados en Coquimbo y la conurbación con La Serena. Retiro en mano entre vecinos y despacho a todo Chile. Pago protegido con MercadoPago.",
+    faqs: [
+      {
+        q: "¿Puedo retirar en persona en Coquimbo o La Serena?",
+        a: "Sí. Coquimbo y La Serena están pegadas, así que muchos vendedores coordinan retiro en mano en cualquiera de las dos ciudades.",
+      },
+      {
+        q: "¿Llega por courier a Coquimbo?",
+        a: "Sí. Los vendedores despachan a todo Chile; el costo de envío se calcula al pagar.",
+      },
+      {
+        q: "¿Cómo protegen mi pago?",
+        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
+      },
+    ],
+  },
 };
 
 export const ORDEN = [
   "santiago", "providencia", "las-condes", "nunoa",
   "valparaiso", "vina-del-mar", "concepcion", "temuco", "antofagasta", "la-serena",
+  "talca", "puerto-montt", "coquimbo",
 ];
