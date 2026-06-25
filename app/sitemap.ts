@@ -113,6 +113,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const ciudadPages: MetadataRoute.Sitemap = [
     "santiago", "providencia", "las-condes", "nunoa",
     "valparaiso", "vina-del-mar", "concepcion", "temuco", "antofagasta", "la-serena",
+    "talca", "puerto-montt", "coquimbo",
   ].map((c) => ({
     url: `${baseUrl}/libros-usados/${c}`,
     lastModified: new Date(),
