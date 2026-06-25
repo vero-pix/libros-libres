@@ -41,9 +41,9 @@ export const metadata: Metadata = {
   },
   description:
     "Haz circular los libros que ya leíste y encuentra los que te faltan. El marketplace chileno para comprar y vender con pago seguro, envíos a todo Chile o retiro en mano. Publica gratis tu biblioteca.",
-  alternates: {
-    canonical: "https://tuslibros.cl",
-  },
+  // Sin canonical global: forzaba a TODA página sin canonical propio (ej. /mapa,
+  // /historia) a apuntar a la home → "URL no canónica" en el sitemap. Cada página
+  // define el suyo; las que no, quedan auto-canónicas (Google usa su propia URL).
   openGraph: {
     title: "tuslibros.cl — Libros usados en Chile con envío o retiro",
     description:
