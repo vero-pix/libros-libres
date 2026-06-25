@@ -78,6 +78,7 @@ export default function Footer() {
             <ul className="space-y-2.5 text-ink-muted">
               <li><Link href="/solicitudes" className="font-semibold text-coral hover:text-coral-deep transition-colors">Se busca · economía inversa</Link></li>
               <li><Link href="/comprar-libros-usados" className="hover:text-coral transition-colors">Comprar libros usados</Link></li>
+              <li><Link href="/libros-usados-baratos" className="hover:text-coral transition-colors">Libros usados baratos</Link></li>
               <li><Link href="/vender" className="hover:text-coral transition-colors">Vende tu libro</Link></li>
               <li><Link href="/mapa" className="hover:text-coral transition-colors">Mapa de librerías</Link></li>
               <li><Link href="/novedades" className="hover:text-coral transition-colors">Novedades</Link></li>
