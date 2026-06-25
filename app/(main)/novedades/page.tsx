@@ -39,6 +39,21 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "25 junio 2026",
+    title: "Abrí vitrinas por tema y por ciudad para que encuentres más rápido",
+    description:
+      "Estuve mirando qué busca la gente que entra y me di cuenta de algo: muchos llegan con una idea clara —\"quiero historia de Chile\", \"ando buscando novela negra\", \"algo barato nomás\"— pero después tenían que rebuscar en todo el catálogo. Así que armé vitrinas dedicadas para los temas que más se piden. Ahora hay una sección de Historia de Chile (con la Unidad Popular, la dictadura, la Guerra del Pacífico, el mundo mapuche, el salitre… mucho de eso ya ni se reimprime, solo circula usado acá), otra de Novela negra y policial (Simenon y su comisario Maigret, Camilleri, Christie y todos los del género), y una de Megan Maxwell para las que siguen sus sagas. Sumé también una vitrina de libros baratos —desde $1.000— para cuando andas con el presupuesto justo. Y porque me llegan vendedores de todo Chile, abrí páginas para Talca, Puerto Montt y Coquimbo, así la gente de esas zonas encuentra lo que está cerca y retira en mano sin pagar despacho. Todo se arma solo con los libros reales que ustedes publican: mientras más suben, más llenas quedan estas vitrinas.",
+    tag: "Mejora",
+    link: "/libros-de-historia-de-chile",
+    linkText: "Ver Historia de Chile",
+    visual: {
+      kind: "milestone",
+      icon: "🗂️",
+      metric: "6 vitrinas nuevas",
+      detail: "por tema (historia, policial, ofertas) y por ciudad (Talca, Pto Montt, Coquimbo)",
+    },
+  },
+  {
     date: "19 junio 2026",
     title: "Limpié 970 enlaces muertos que confundían a Google desde 2020",
     description:
