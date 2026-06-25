@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 20 junio 2026
+Última actualización: 25 junio 2026
 
 ---
 
@@ -99,8 +99,15 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 | `/vender-libros-usados` | vender libros usados | 140 | 23 | vendedor informacional | ✅ 15 mayo |
 | `/libros-usados-santiago` | libros usados santiago | — | — | comprador local RM | ✅ 19 mayo |
 | `/libros-usados-providencia` | libros usados providencia | — | — | comprador local Providencia | ✅ 19 mayo |
-| `/comprar-libros-usados` | comprar libros usados | — | — | comprador informacional | ✅ 29 may (commit, pendiente push) |
+| `/comprar-libros-usados` | comprar libros usados | — | — | comprador informacional | ✅ 29 may |
+| `/libros-usados-baratos` | comprar libros usados baratos | — | — | comprador precio | ✅ 25 jun (con verbo "comprar") |
+| `/libros-usados/talca` · `/puerto-montt` · `/coquimbo` | libros usados [ciudad] | — | — | comprador local | ✅ 25 jun (stock verificado) |
+| `/libros-de-historia-de-chile` | libros de historia de chile | — | — | comprador nicho | ✅ 25 jun (75 libros, 12 búsq/30d) |
+| `/megan-maxwell-libros` | megan maxwell usados | — | — | comprador autora | ✅ 25 jun (29 libros) |
+| `/novela-negra-policial` | novela negra usada | — | — | comprador género | ✅ 25 jun (118 libros) |
 | `/libros-escolares-usados` | libros escolares usados | — | — | temporada escolar | ⬜ Pendiente |
+
+> **Método validado (25 jun):** antes de crear una landing de ciudad/tema, verificar stock real con script (geolocalización o needles). Crear solo si ≥~15 libros para evitar thin content. De 9 ciudades candidatas, 6 tenían 0 stock → descartadas. Cruzar siempre con búsquedas reales (`page_views /search?q=`) para priorizar por demanda.
 
 **Patrón por landing:**
 1. H1 con keyword exacta en forma natural
