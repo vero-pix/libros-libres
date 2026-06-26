@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
       (requester_email ? `Email: ${escapeHtml(requester_email)}\n` : "") +
       (requester_whatsapp ? `WA: ${escapeHtml(requester_whatsapp)}\n` : "") +
       (notes ? `Notas: <i>${escapeHtml(notes)}</i>\n` : "") +
-      `\n<a href="https://tuslibros.cl/admin/requests">Ver solicitudes →</a>`
+      `\n<a href="https://tuslibros.cl/admin?tab=requests">Ver solicitudes →</a>`
     ).catch(() => {});
   });
 
