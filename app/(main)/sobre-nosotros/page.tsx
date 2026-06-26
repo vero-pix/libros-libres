@@ -17,8 +17,23 @@ const values = [
 ];
 
 export default function SobreNosotrosPage() {
+  const personSchema = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Verónica Velásquez Portilla",
+    jobTitle: "Economista y emprendedora",
+    description: "Economista e ingeniera comercial chilena, fundadora y desarrolladora de tuslibros.cl.",
+    url: "https://tuslibros.cl/sobre-nosotros",
+    worksFor: { "@type": "Organization", name: "tuslibros.cl", url: "https://tuslibros.cl" },
+    sameAs: [
+      "https://www.linkedin.com/in/economista-veronica-velasquez/",
+      "https://economics.cl",
+      "https://x.com/tuslibroscl",
+    ],
+  };
   return (
     <div className="min-h-screen bg-cream">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }} />
 
       {/* Hero */}
       <div className="relative h-64 overflow-hidden">
@@ -67,6 +82,32 @@ export default function SobreNosotrosPage() {
               Así nació tuslibros.cl. Una segunda oportunidad para esa idea, ahora con mejores herramientas y con menos ego. Si llegaste hasta acá leyendo, probablemente eres parte de lo que estoy intentando construir.
             </p>
             <p className="text-right text-sm italic text-ink">— Vero</p>
+          </div>
+        </section>
+
+        {/* Quién soy — fundadora */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-ink mb-4 border-b-2 border-brand-600 pb-2 inline-block">
+            Un poco más de mí
+          </h2>
+          <div className="bg-white rounded-xl shadow-sm border border-cream-dark p-6 sm:flex sm:items-start sm:gap-6">
+            <Image
+              src="/vero.jpg"
+              alt="Verónica Velásquez, fundadora de tuslibros.cl"
+              width={112}
+              height={112}
+              className="w-28 h-28 rounded-full object-cover border-2 border-brand-600/30 shrink-0 mx-auto sm:mx-0 mb-4 sm:mb-0"
+            />
+            <div className="space-y-4 text-ink-muted leading-relaxed">
+              <p>
+                Soy economista e ingeniera comercial, y llevo años emprendiendo. tuslibros.cl lo construí yo misma —sí, programando— apoyándome en inteligencia artificial para hacer sola lo que antes habría necesitado un equipo entero. Me gusta esa idea: una persona con una obsesión y las herramientas de hoy alcanzan para construir algo real.
+              </p>
+              <p>
+                Cuando no estoy acá entre libros, trabajo en{" "}
+                <a href="https://economics.cl" target="_blank" rel="noopener" className="text-brand-600 hover:text-brand-700 underline">economics.cl</a>, asesorando empresas con la misma cabeza con que armé esto: mirar los números sin perder lo humano.
+              </p>
+              <p className="text-right text-sm italic text-ink">— Vero</p>
+            </div>
           </div>
         </section>
 
