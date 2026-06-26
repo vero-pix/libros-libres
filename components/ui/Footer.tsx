@@ -95,6 +95,8 @@ export default function Footer() {
             <span>© {new Date().getFullYear()} tuslibros.cl</span>
             <span className="hidden sm:inline">·</span>
             <span>Santiago, Chile</span>
+            <span className="hidden sm:inline">·</span>
+            <a href="/sobre-nosotros" className="hover:text-coral transition-colors">Un proyecto de Verónica Velásquez</a>
           </div>
           <div className="flex items-center gap-4">
             <a
