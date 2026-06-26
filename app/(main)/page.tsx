@@ -17,7 +17,6 @@ import RecentRow from "@/components/home/RecentRow";
 import ColeccionRow from "@/components/home/ColeccionRow";
 import RequestsRow from "@/components/home/RequestsRow";
 import HeroRequestStrip from "@/components/home/HeroRequestStrip";
-import LiquidacionBanner from "@/components/home/LiquidacionBanner";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
@@ -346,7 +345,7 @@ export default async function HomePage({ searchParams }: Props) {
         testimonialBanner={null /* testimonios viejos (Z./Camilo, abr) ocultos hasta tener nuevos */}
         requestsRow={!hasFilters ? <RequestsRow /> : null}
         heroRequestStrip={!hasFilters ? <HeroRequestStrip /> : null}
-        liquidacionBanner={!hasFilters ? <LiquidacionBanner /> : null}
+        liquidacionBanner={null /* campaña liquidación 50% vacaciones terminada (26 jun) — descuento revertido */}
       >
         <Breadcrumbs items={[
           { label: "Inicio", href: "/" },
