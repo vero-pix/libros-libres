@@ -27,7 +27,12 @@ interface Props {
 type Tab = "orders" | "listings" | "users" | "messages" | "subscribers" | "categories" | "requests" | "analytics" | "business" | "searches" | "tools";
 
 export default function AdminDashboard({ orders: initOrders, listings: initListings, users: initUsers, messages = [], subscribers = [], categories: initCategories = [], bookRequests: initRequests = [] }: Props) {
-  const [tab, setTab] = useState<Tab>("orders");
+  const [tab, setTab] = useState<Tab>(() => {
+    if (typeof window === "undefined") return "orders";
+    const valid: Tab[] = ["orders", "listings", "users", "messages", "subscribers", "categories", "requests", "analytics", "business", "searches", "tools"];
+    const requested = new URLSearchParams(window.location.search).get("tab") as Tab | null;
+    return requested && valid.includes(requested) ? requested : "orders";
+  });
   const [orders, setOrders] = useState(initOrders);
   const [listings, setListings] = useState(initListings);
   const [users, setUsers] = useState(initUsers);
