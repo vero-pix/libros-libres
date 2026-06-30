@@ -39,6 +39,19 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "30 junio 2026",
+    title: "Puse el sitio a volar de nuevo (y la búsqueda ahora se pagina)",
+    description:
+      "Hoy, un martes que suele ser de los buenos, sentí el sitio pesado al abrirlo. Me puse a escarbar y era cosa mía: a medida que ustedes suben más y más libros, un par de páginas estaban trayendo el catálogo entero cada vez que alguien entraba, sin guardarse nada en memoria. Con poca gente no se notaba; con harta gente y harto libro, se empezaba a arrastrar. Así que me metí a la cocina: ahora la portada y el buscador guardan en memoria lo pesado por un ratito, en vez de rehacer todo el trabajo en cada visita. La home pasó de tardar casi dos segundos a abrir en menos de uno, y el buscador —que era el más lento, llegaba a tres segundos— ahora responde en menos de uno. De paso le agregué algo que faltaba hace rato: cuando buscas algo con muchos resultados, ya no te tira una lista infinita de una sola vez, sino que se reparte en páginas ordenadas. Más liviano para tu teléfono y más fácil de mirar. Lo mejor: mientras más crezca el catálogo, este arreglo aguanta. Era justo lo que necesitaba antes de seguir llenándolo de libros.",
+    tag: "Mejora",
+    visual: {
+      kind: "milestone",
+      icon: "⚡",
+      metric: "3× más rápido",
+      detail: "portada y buscador abren en menos de un segundo, aunque entren todos juntos",
+    },
+  },
+  {
     date: "25 junio 2026",
     title: "Abrí vitrinas por tema y por ciudad para que encuentres más rápido",
     description:
