@@ -113,24 +113,6 @@ const getTotalActiveCount = unstable_cache(
   { revalidate: 300 }
 );
 
-const getDefaultListings = unstable_cache(
-  async (page: number) => {
-    const supabase = createPublicClient();
-    const start = (page - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE - 1;
-    
-    const { data } = await supabase
-      .from("listings")
-      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`)
-      .in("status", ["active", "completed"])
-      .neq("deprioritized", true)
-      .order("created_at", { ascending: false })
-      .range(start, end);
-    return data ?? [];
-  },
-  ["home-default-listings-paged"],
-  { revalidate: 60 }
-);
 
 const getFeaturedListings = unstable_cache(
   async () => {
@@ -375,6 +357,10 @@ export default async function HomePage({ searchParams }: Props) {
   const collections = collectionsRaw
     .map((c) => ({ ...c, listings: c.listings.filter((l) => !usedRowIds.has(l.id)) }))
     .filter((c) => c.listings.length >= 3);
+  // Todo lo ya visible en filas + colecciones → se excluye de la grilla principal
+  // para que no se repita justo debajo (la grilla rellena con los siguientes reales).
+  const shownAboveIds = new Set<string>(usedRowIds);
+  collections.forEach((c) => c.listings.forEach((l) => shownAboveIds.add(l.id)));
 
   // Listings principales: sin filtros ni sort custom → versión cacheada
   const hasCustomSort = sort === "price_asc" || sort === "price_desc" || sort === "distance";
@@ -382,7 +368,19 @@ export default async function HomePage({ searchParams }: Props) {
   let totalCount = totalActiveCount;
 
   if (!hasFilters && !hasCustomSort) {
-    rawListings = await getDefaultListings(currentPage);
+    // Grilla principal sin lo ya mostrado arriba (filas + colecciones) → cero repetidos.
+    const excludeIds = Array.from(shownAboveIds);
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    let gridQuery = supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`, { count: "exact" })
+      .in("status", ["active", "completed"])
+      .neq("deprioritized", true)
+      .order("created_at", { ascending: false });
+    if (excludeIds.length) gridQuery = gridQuery.not("id", "in", `(${excludeIds.join(",")})`);
+    const { data, count } = await gridQuery.range(start, start + ITEMS_PER_PAGE - 1);
+    rawListings = data ?? [];
+    totalCount = count ?? totalActiveCount;
   } else {
     let query = supabase
       .from("listings")
