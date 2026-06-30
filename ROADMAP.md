@@ -47,7 +47,7 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 
 ### 🔴 Urgente / Con fecha límite
 
-- [ ] **Dominio librolibre.cl** — venció 24 mayo 2026. Titular sigue siendo **Cinta Carmesí** (NO Vero). En período de recuperación: se libera el **24 junio 2026**; si Cinta Carmesí no lo restaura antes, pasa a eliminación y queda disponible para inscripción.
+- [ ] **Dominio librolibre.cl — EN ELIMINACIÓN (29 jun)** — confirmado por Vero: pasó a proceso de eliminación. Titular aún **Cinta Carmesí** (NO Vero). Revisar **casi a diario** en nic.cl hasta que quede "disponible para inscripción" → inscribir YA a nombre de Vero. **Recordatorio diario automático activo** (rutina `trig_01Pp1kHk1h8APSxqC4VBs1fx`, 9am Chile, push). Borrar la rutina al inscribirlo.
   - ⚠️ **NO clickear "Restaurar ahora" en NIC Chile** — ese botón renueva el dominio para el titular actual (Cinta Carmesí), no lo transfiere a Vero. Sería pagarle la renovación a ella.
   - ✅ **Acción real**: esperar al **25 junio 2026** y, si quedó liberado, inscribirlo a nombre de Vero ($9.990/año, NIC Chile). Riesgo: si hay >1 solicitante al liberarse, NIC lo manda a remate/subasta (riesgo bajo para dominio de nicho).
   - Nameservers actuales: Cloudflare. Sitio activo en `www.librolibre.cl` al 28 mayo.
