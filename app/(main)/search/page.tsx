@@ -9,6 +9,7 @@ import ListingCard from "@/components/listings/ListingCard";
 import SearchResultsToggle from "@/components/listings/SearchResultsToggle";
 import PromoBanner from "@/components/ui/PromoBanner";
 import BookRequestForm from "@/components/listings/BookRequestForm";
+import Pagination from "@/components/ui/Pagination";
 import SearchEventTracker from "@/components/analytics/SearchEventTracker";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import { translateGenre } from "@/lib/genres";
@@ -32,8 +33,11 @@ interface Props {
     pages_min?: string;
     pages_max?: string;
     city_id?: string;
+    page?: string;
   };
 }
+
+const ITEMS_PER_PAGE = 24;
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const q = searchParams.q;
@@ -75,7 +79,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function SearchPage({ searchParams }: Props) {
   const supabase = createPublicClient();
-  const { q, author, category, subcategory, tag, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max, city_id } = searchParams;
+  const { q, author, category, subcategory, tag, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max, city_id, page } = searchParams;
+  const currentPage = Math.max(1, parseInt(page ?? "1", 10) || 1);
 
   // Si hay búsqueda de texto, primero encontrar los book IDs que coincidan
   let matchingBookIds: string[] | null = null;
@@ -109,6 +114,9 @@ export default async function SearchPage({ searchParams }: Props) {
 
   // inner join: filtrar por campos del libro (category/subcategory/tag) en la BD
   // en vez de traer TODO el catálogo y filtrar en JS. Listings sin book (rotos) se omiten.
+  // inner join + TODOS los filtros del libro empujados a la BD. Antes varios
+  // (author/binding/publisher/pages) se aplicaban en JS sobre el catálogo entero;
+  // con paginación real el conteo tiene que ser exacto en la BD, no post-fetch.
   let query = supabase
     .from("listings")
     .select(
@@ -116,7 +124,8 @@ export default async function SearchPage({ searchParams }: Props) {
       *,
       book:books!inner(*),
       seller:users(id, full_name, avatar_url, phone, username, mercadopago_user_id)
-    `
+    `,
+      { count: "exact" }
     )
     .in("status", ["active", "completed"])
     .neq("deprioritized", true);
@@ -134,6 +143,11 @@ export default async function SearchPage({ searchParams }: Props) {
   if (category) query = query.eq("book.category", category);
   if (subcategory) query = query.eq("book.subcategory", subcategory);
   if (tag) query = query.contains("book.tags", [tag]);
+  if (author) query = query.ilike("book.author", author); // ilike sin comodín = exacto, case-insensitive
+  if (binding) query = query.ilike("book.binding", binding);
+  if (publisher) query = query.ilike("book.publisher", `%${publisher}%`); // contiene
+  if (pages_min) query = query.gte("book.pages", Number(pages_min));
+  if (pages_max) query = query.lte("book.pages", Number(pages_max));
 
   if (condition) {
     query = query.eq("condition", condition);
@@ -160,11 +174,14 @@ export default async function SearchPage({ searchParams }: Props) {
     query = query.order("created_at", { ascending: false });
   }
 
-  // Tope de seguridad: /search no tiene paginación y antes traía la tabla completa.
-  query = query.limit(200);
+  // Paginación real en la BD (antes traía hasta 200 sin paginar).
+  const start = (currentPage - 1) * ITEMS_PER_PAGE;
+  query = query.range(start, start + ITEMS_PER_PAGE - 1);
 
-  const { data: rawListings } = await query;
+  const { data: rawListings, count } = await query;
   let listings = (rawListings as unknown as ListingWithBook[]) ?? [];
+  const totalCount = count ?? 0;
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   // Trackear la búsqueda (fire-and-forget, no bloquea render)
   if (q) {
@@ -174,36 +191,9 @@ export default async function SearchPage({ searchParams }: Props) {
       .insert({
         query: q,
         normalized_query: normalized,
-        results_count: listings.length,
+        results_count: totalCount,
       })
       .then(() => {});
-  }
-
-  if (author) {
-    listings = listings.filter(
-      (l) => l.book.author?.toLowerCase() === author.toLowerCase()
-    );
-  }
-
-  if (binding) {
-    listings = listings.filter(
-      (l) => l.book.binding?.toLowerCase() === binding.toLowerCase()
-    );
-  }
-  if (publisher) {
-    listings = listings.filter(
-      (l) => l.book.publisher?.toLowerCase().includes(publisher.toLowerCase())
-    );
-  }
-  if (pages_min) {
-    listings = listings.filter(
-      (l) => l.book.pages != null && l.book.pages >= Number(pages_min)
-    );
-  }
-  if (pages_max) {
-    listings = listings.filter(
-      (l) => l.book.pages != null && l.book.pages <= Number(pages_max)
-    );
   }
 
   // Si no hay sort custom por precio, aplicar el orden de presentación
@@ -213,7 +203,7 @@ export default async function SearchPage({ searchParams }: Props) {
   }
 
   let popularListings: ListingWithBook[] = [];
-  if (listings.length === 0) {
+  if (totalCount === 0) {
     const { data } = await supabase
       .from("listings")
       .select(`*, book:books(*), seller:users!inner(id, full_name, avatar_url, username)`)
@@ -227,6 +217,22 @@ export default async function SearchPage({ searchParams }: Props) {
     getCachedCategoryTree(),
     getAvailableTags(),
   ]);
+
+  // Mantiene todos los filtros actuales y solo cambia el número de página.
+  const buildHref = (p: number) => {
+    const params = new URLSearchParams();
+    const entries: [string, string | undefined][] = [
+      ["q", q], ["author", author], ["category", category], ["subcategory", subcategory],
+      ["tag", tag], ["sort", sort], ["price_min", price_min], ["price_max", price_max],
+      ["condition", condition], ["modality", modality], ["binding", binding],
+      ["publisher", publisher], ["pages_min", pages_min], ["pages_max", pages_max],
+      ["city_id", city_id],
+    ];
+    for (const [k, v] of entries) if (v) params.set(k, v);
+    if (p > 1) params.set("page", String(p));
+    const qs = params.toString();
+    return qs ? `/search?${qs}` : "/search";
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -247,9 +253,9 @@ export default async function SearchPage({ searchParams }: Props) {
                   ? <>Resultados para &ldquo;{q}&rdquo;</>
                   : <>#{ tag}</>}
             </h1>
-            {listings.length > 0 && (
+            {totalCount > 0 && (
               <p className="text-sm text-gray-500 mt-1">
-                {listings.length} {listings.length === 1 ? "resultado" : "resultados"}
+                {totalCount} {totalCount === 1 ? "resultado" : "resultados"}
               </p>
             )}
           </div>
@@ -274,13 +280,16 @@ export default async function SearchPage({ searchParams }: Props) {
             </Suspense>
 
             {listings.length > 0 ? (
-              <SearchResultsToggle listings={listings} resultsCount={listings.length}>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
-                  {listings.map((listing) => (
-                    <ListingCard key={listing.id} listing={listing} />
-                  ))}
-                </div>
-              </SearchResultsToggle>
+              <>
+                <SearchResultsToggle listings={listings} resultsCount={totalCount}>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {listings.map((listing) => (
+                      <ListingCard key={listing.id} listing={listing} />
+                    ))}
+                  </div>
+                </SearchResultsToggle>
+                <Pagination currentPage={currentPage} totalPages={totalPages} buildHref={buildHref} />
+              </>
             ) : (
               <div className="py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Economy Inversa CTA */}
