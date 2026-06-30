@@ -17,17 +17,62 @@ const CATEGORY_CHIPS = [
   { label: "Ofertas", href: "/?sort=price_asc" },
 ];
 
-/* Abanico decorativo (sin datos — puro CSS). */
-const HERO_BOOKS = [
-  { t: "Los detectives salvajes", a: "Bolaño", pub: "Anagrama", bg: "linear-gradient(160deg,#8a3131,#5e1d1d)", light: false, pos: "left-0 top-7 w-[150px] rotate-[-7deg] z-[2]" },
-  { t: "Tala", a: "G. Mistral", pub: "Lumen", bg: "linear-gradient(160deg,#f3ead7,#ddcfb2)", light: true, pos: "left-[25%] top-0 w-[162px] rotate-[-2deg] z-[4]" },
-  { t: "Elogio de la sombra", a: "Borges", pub: "Emecé", bg: "linear-gradient(160deg,#23489f,#16307a)", light: false, pos: "left-[53%] top-5 w-[150px] rotate-[4deg] z-[3]" },
-  { t: "Poemas y antipoemas", a: "Parra", pub: "Tajamar", bg: "linear-gradient(160deg,#33684f,#1b3d2e)", light: false, pos: "left-[6%] top-[215px] w-[136px] rotate-[-4deg] z-[3]" },
-  { t: "Conversación en La Catedral", a: "Vargas Llosa", pub: "Seix Barral", bg: "linear-gradient(160deg,#df5239,#a8331f)", light: false, pos: "left-[40%] top-[210px] w-[140px] rotate-[3deg] z-[5]" },
-  { t: "Casa de campo", a: "Donoso", pub: "Alfaguara", bg: "linear-gradient(160deg,#e0990c,#9e6a00)", light: true, pos: "left-[64%] top-[230px] w-[132px] rotate-[-6deg] z-[2]" },
+/* Abanico decorativo (puro CSS). Los 6 espacios (posición + color) son fijos;
+   los títulos rotan semanalmente desde HERO_POOL para que el hero se sienta vivo. */
+const HERO_SLOTS = [
+  { bg: "linear-gradient(160deg,#8a3131,#5e1d1d)", light: false, pos: "left-0 top-7 w-[150px] rotate-[-7deg] z-[2]" },
+  { bg: "linear-gradient(160deg,#f3ead7,#ddcfb2)", light: true, pos: "left-[25%] top-0 w-[162px] rotate-[-2deg] z-[4]" },
+  { bg: "linear-gradient(160deg,#23489f,#16307a)", light: false, pos: "left-[53%] top-5 w-[150px] rotate-[4deg] z-[3]" },
+  { bg: "linear-gradient(160deg,#33684f,#1b3d2e)", light: false, pos: "left-[6%] top-[215px] w-[136px] rotate-[-4deg] z-[3]" },
+  { bg: "linear-gradient(160deg,#df5239,#a8331f)", light: false, pos: "left-[40%] top-[210px] w-[140px] rotate-[3deg] z-[5]" },
+  { bg: "linear-gradient(160deg,#e0990c,#9e6a00)", light: true, pos: "left-[64%] top-[230px] w-[132px] rotate-[-6deg] z-[2]" },
 ];
 
-function FanBook({ b }: { b: (typeof HERO_BOOKS)[number] }) {
+/* Clásicos chilenos y latinoamericanos. El abanico toma 6 consecutivos por semana. */
+const HERO_POOL = [
+  { t: "Los detectives salvajes", a: "Bolaño", pub: "Anagrama" },
+  { t: "Tala", a: "G. Mistral", pub: "Lumen" },
+  { t: "Elogio de la sombra", a: "Borges", pub: "Emecé" },
+  { t: "Poemas y antipoemas", a: "Parra", pub: "Tajamar" },
+  { t: "Conversación en La Catedral", a: "Vargas Llosa", pub: "Seix Barral" },
+  { t: "Casa de campo", a: "Donoso", pub: "Alfaguara" },
+  { t: "Canto general", a: "Neruda", pub: "Losada" },
+  { t: "La amortajada", a: "M. L. Bombal", pub: "Andrés Bello" },
+  { t: "Hijo de ladrón", a: "Manuel Rojas", pub: "Zig-Zag" },
+  { t: "Sub terra", a: "Baldomero Lillo", pub: "Lom" },
+  { t: "El obsceno pájaro de la noche", a: "Donoso", pub: "Seix Barral" },
+  { t: "Papelucho", a: "Marcela Paz", pub: "Universitaria" },
+  { t: "Cien años de soledad", a: "García Márquez", pub: "Sudamericana" },
+  { t: "Rayuela", a: "Cortázar", pub: "Sudamericana" },
+  { t: "Pedro Páramo", a: "Juan Rulfo", pub: "FCE" },
+  { t: "Ficciones", a: "Borges", pub: "Emecé" },
+  { t: "La ciudad y los perros", a: "Vargas Llosa", pub: "Seix Barral" },
+  { t: "La tregua", a: "Benedetti", pub: "Sudamericana" },
+  { t: "Aura", a: "Carlos Fuentes", pub: "Era" },
+  { t: "El llano en llamas", a: "Juan Rulfo", pub: "FCE" },
+  { t: "Residencia en la tierra", a: "Neruda", pub: "Cruz del Sur" },
+  { t: "Desierto", a: "Raúl Zurita", pub: "Tácitas" },
+  { t: "El reino de este mundo", a: "Carpentier", pub: "EDIASA" },
+  { t: "Mistral en verso", a: "G. Mistral", pub: "Universitaria" },
+];
+
+/* Número de semana ISO — server y cliente caen en la misma semana → sin mismatch. */
+function isoWeek(d: Date): number {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = (date.getUTCDay() + 6) % 7;
+  date.setUTCDate(date.getUTCDate() - dayNum + 3);
+  const firstThursday = new Date(Date.UTC(date.getUTCFullYear(), 0, 4));
+  return Math.floor((date.getTime() - firstThursday.getTime()) / 604800000);
+}
+
+function weeklyHeroBooks() {
+  // Avanza de a HERO_SLOTS.length por semana → cada semana un set completo distinto
+  // (con 24 libros y 6 espacios, 4 sets sin solape que se repiten cada 4 semanas).
+  const offset = (isoWeek(new Date()) * HERO_SLOTS.length) % HERO_POOL.length;
+  return HERO_SLOTS.map((slot, i) => ({ ...slot, ...HERO_POOL[(offset + i) % HERO_POOL.length] }));
+}
+
+function FanBook({ b }: { b: ReturnType<typeof weeklyHeroBooks>[number] }) {
   return (
     <div className={`absolute aspect-[148/225] rounded-[2px_4px_4px_2px] shadow-book overflow-hidden flex flex-col justify-between p-3.5 ${b.pos}`} style={{ background: b.bg }}>
       <span aria-hidden className="absolute inset-y-0 left-0 w-2 z-[2] bg-gradient-to-r from-black/30 via-white/10 to-black/10" />
@@ -87,9 +132,9 @@ export default function HeroBar({}: Props) {
             </div>
           </div>
 
-          {/* Abanico de libros (decorativo, solo desktop) */}
+          {/* Abanico de libros (decorativo, solo desktop) — rota por semana */}
           <div className="relative h-[460px] hidden lg:block">
-            {HERO_BOOKS.map((b) => (
+            {weeklyHeroBooks().map((b) => (
               <FanBook key={b.t} b={b} />
             ))}
             <div className="absolute z-[6] left-[40%] top-[188px] rotate-[2deg] bg-white border border-line rounded-full px-3.5 py-2 shadow-card flex items-center gap-2.5 font-mono text-[11px] font-semibold text-ink whitespace-nowrap">
