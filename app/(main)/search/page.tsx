@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 import { createPublicClient } from "@/lib/supabase/public";
 import { accentInsensitiveRegex } from "@/lib/accentSearch";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
@@ -82,6 +83,22 @@ export default async function SearchPage({ searchParams }: Props) {
   const { q, author, category, subcategory, tag, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max, city_id, page } = searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10) || 1);
 
+  // Mantiene todos los filtros actuales y solo cambia el número de página.
+  const buildHref = (p: number) => {
+    const params = new URLSearchParams();
+    const entries: [string, string | undefined][] = [
+      ["q", q], ["author", author], ["category", category], ["subcategory", subcategory],
+      ["tag", tag], ["sort", sort], ["price_min", price_min], ["price_max", price_max],
+      ["condition", condition], ["modality", modality], ["binding", binding],
+      ["publisher", publisher], ["pages_min", pages_min], ["pages_max", pages_max],
+      ["city_id", city_id],
+    ];
+    for (const [k, v] of entries) if (v) params.set(k, v);
+    if (p > 1) params.set("page", String(p));
+    const qs = params.toString();
+    return qs ? `/search?${qs}` : "/search";
+  };
+
   // Si hay búsqueda de texto, primero encontrar los book IDs que coincidan
   let matchingBookIds: string[] | null = null;
   if (q) {
@@ -112,75 +129,76 @@ export default async function SearchPage({ searchParams }: Props) {
     matchingBookIds = Array.from(new Set(matchedBooks?.map((b) => b.id) ?? []));
   }
 
-  // inner join: filtrar por campos del libro (category/subcategory/tag) en la BD
-  // en vez de traer TODO el catálogo y filtrar en JS. Listings sin book (rotos) se omiten.
+  // Si el texto de búsqueda no calzó con ningún libro, forzamos resultado vacío.
+  if (matchingBookIds !== null && matchingBookIds.length === 0) {
+    matchingBookIds = ["00000000-0000-0000-0000-000000000000"];
+  }
+
   // inner join + TODOS los filtros del libro empujados a la BD. Antes varios
   // (author/binding/publisher/pages) se aplicaban en JS sobre el catálogo entero;
   // con paginación real el conteo tiene que ser exacto en la BD, no post-fetch.
-  let query = supabase
-    .from("listings")
-    .select(
-      `
-      *,
-      book:books!inner(*),
-      seller:users(id, full_name, avatar_url, phone, username, mercadopago_user_id)
-    `,
-      { count: "exact" }
-    )
-    .in("status", ["active", "completed"])
-    .neq("deprioritized", true);
+  // Se arma con un builder reusable para poder recontar (head) sin duplicar filtros.
+  const buildFiltered = (opts?: { head?: boolean }) => {
+    let qb = supabase
+      .from("listings")
+      .select(
+        `
+        *,
+        book:books!inner(*),
+        seller:users(id, full_name, avatar_url, phone, username, mercadopago_user_id)
+      `,
+        { count: "exact", head: opts?.head ?? false }
+      )
+      .in("status", ["active", "completed"])
+      .neq("deprioritized", true);
 
-  // Filtrar por book IDs encontrados en la búsqueda de texto
-  if (matchingBookIds !== null) {
-    if (matchingBookIds.length === 0) {
-      // No hay resultados, devolvemos vacío
-      matchingBookIds = ["00000000-0000-0000-0000-000000000000"];
-    }
-    query = query.in("book_id", matchingBookIds);
-  }
+    if (matchingBookIds !== null) qb = qb.in("book_id", matchingBookIds);
+    if (category) qb = qb.eq("book.category", category);
+    if (subcategory) qb = qb.eq("book.subcategory", subcategory);
+    if (tag) qb = qb.contains("book.tags", [tag]);
+    if (author) qb = qb.ilike("book.author", author); // ilike sin comodín = exacto, case-insensitive
+    if (binding) qb = qb.ilike("book.binding", binding);
+    if (publisher) qb = qb.ilike("book.publisher", `%${publisher}%`); // contiene
+    if (pages_min) qb = qb.gte("book.pages", Number(pages_min));
+    if (pages_max) qb = qb.lte("book.pages", Number(pages_max));
+    if (condition) qb = qb.eq("condition", condition);
+    if (modality) qb = qb.eq("modality", modality);
+    if (city_id) qb = qb.eq("city_id", city_id);
+    if (price_min) qb = qb.gte("price", Number(price_min));
+    if (price_max) qb = qb.lte("price", Number(price_max));
+    return qb;
+  };
 
-  // Filtros del libro empujados a la BD (antes se aplicaban en JS sobre todo el catálogo)
-  if (category) query = query.eq("book.category", category);
-  if (subcategory) query = query.eq("book.subcategory", subcategory);
-  if (tag) query = query.contains("book.tags", [tag]);
-  if (author) query = query.ilike("book.author", author); // ilike sin comodín = exacto, case-insensitive
-  if (binding) query = query.ilike("book.binding", binding);
-  if (publisher) query = query.ilike("book.publisher", `%${publisher}%`); // contiene
-  if (pages_min) query = query.gte("book.pages", Number(pages_min));
-  if (pages_max) query = query.lte("book.pages", Number(pages_max));
-
-  if (condition) {
-    query = query.eq("condition", condition);
-  }
-  if (modality) {
-    query = query.eq("modality", modality);
-  }
-  if (city_id) {
-    query = query.eq("city_id", city_id);
-  }
-  if (price_min) {
-    query = query.gte("price", Number(price_min));
-  }
-  if (price_max) {
-    query = query.lte("price", Number(price_max));
-  }
-
-  query = query.order("deprioritized", { ascending: true });
+  let dataQuery = buildFiltered().order("deprioritized", { ascending: true });
   if (sort === "price_asc") {
-    query = query.order("price", { ascending: true });
+    dataQuery = dataQuery.order("price", { ascending: true });
   } else if (sort === "price_desc") {
-    query = query.order("price", { ascending: false });
+    dataQuery = dataQuery.order("price", { ascending: false });
   } else {
-    query = query.order("created_at", { ascending: false });
+    dataQuery = dataQuery.order("created_at", { ascending: false });
   }
 
   // Paginación real en la BD (antes traía hasta 200 sin paginar).
   const start = (currentPage - 1) * ITEMS_PER_PAGE;
-  query = query.range(start, start + ITEMS_PER_PAGE - 1);
+  dataQuery = dataQuery.range(start, start + ITEMS_PER_PAGE - 1);
 
-  const { data: rawListings, count } = await query;
+  const { data: rawListings, count } = await dataQuery;
   let listings = (rawListings as unknown as ListingWithBook[]) ?? [];
-  const totalCount = count ?? 0;
+  let totalCount = count ?? 0;
+
+  // Página fuera de rango: cuando el range supera el total, PostgREST no devuelve count
+  // (queda null) y la data viene vacía. En página >1 eso solo puede ser fuera de rango,
+  // así que recontamos sin range y, si hay resultados, mandamos a la última página válida
+  // (URL escrita a mano, o se borraron libros y quedaron menos páginas). Si de verdad hay
+  // 0 resultados, totalCount queda en 0 y cae al CTA real de "todavía no lo tenemos".
+  if (currentPage > 1 && listings.length === 0) {
+    const { count: realCount } = await buildFiltered({ head: true });
+    totalCount = realCount ?? 0;
+    if (totalCount > 0) {
+      redirect(buildHref(Math.ceil(totalCount / ITEMS_PER_PAGE)));
+    }
+  }
+
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   // Trackear la búsqueda (fire-and-forget, no bloquea render)
@@ -217,22 +235,6 @@ export default async function SearchPage({ searchParams }: Props) {
     getCachedCategoryTree(),
     getAvailableTags(),
   ]);
-
-  // Mantiene todos los filtros actuales y solo cambia el número de página.
-  const buildHref = (p: number) => {
-    const params = new URLSearchParams();
-    const entries: [string, string | undefined][] = [
-      ["q", q], ["author", author], ["category", category], ["subcategory", subcategory],
-      ["tag", tag], ["sort", sort], ["price_min", price_min], ["price_max", price_max],
-      ["condition", condition], ["modality", modality], ["binding", binding],
-      ["publisher", publisher], ["pages_min", pages_min], ["pages_max", pages_max],
-      ["city_id", city_id],
-    ];
-    for (const [k, v] of entries) if (v) params.set(k, v);
-    if (p > 1) params.set("page", String(p));
-    const qs = params.toString();
-    return qs ? `/search?${qs}` : "/search";
-  };
 
   return (
     <div className="min-h-screen bg-white">
