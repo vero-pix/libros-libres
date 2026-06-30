@@ -117,13 +117,15 @@ export default async function PabloNerudaPage() {
 
           <section className="mt-8 mb-12 max-w-3xl">
             <h1 className="font-display text-4xl sm:text-5xl font-bold text-ink leading-[1.05] tracking-tight">
-              Libros de Pablo Neruda —{" "}
+              Poemas y libros de Pablo Neruda —{" "}
               <span className="italic text-brand-600">usados, en Chile.</span>
             </h1>
             <p className="mt-5 text-lg text-ink-muted leading-relaxed">
-              El mayor poeta chileno del siglo XX. Premio Nobel 1971. Sus libros circulan
-              en Chile desde hace décadas — en librerías de viejo, en estantes universitarios,
-              en cajas de mudanza. Acá los encuentras con envío a todo el país.
+              El mayor poeta chileno del siglo XX. Premio Nobel 1971. Desde{" "}
+              <em>Veinte poemas de amor y una canción desesperada</em> hasta el{" "}
+              <em>Canto General</em>, sus libros circulan en Chile desde hace décadas —
+              en librerías de viejo, en estantes universitarios, en cajas de mudanza.
+              Acá los encuentras usados, con envío a todo el país.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/search?q=neruda" className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 transition-colors shadow-sm">
@@ -156,6 +158,27 @@ export default async function PabloNerudaPage() {
               </Link>
             </section>
           )}
+
+          <section className="mb-16 bg-white border border-cream-dark rounded-2xl p-6 md:p-8">
+            <h2 className="font-display text-2xl font-bold text-ink mb-3">
+              Veinte poemas de amor y una canción desesperada
+            </h2>
+            <p className="text-sm text-ink-muted leading-relaxed max-w-2xl mb-5">
+              El libro más buscado de Pablo Neruda y el poemario en español más vendido de
+              todos los tiempos. Lo publicó en 1924, a los 19 años. Circula en decenas de
+              ediciones usadas — desde las de bolsillo modernas hasta las primeras ediciones
+              chilenas de Nascimento, las más cotizadas por coleccionistas. Acá puedes comprar
+              tu ejemplar usado o pedir que te avisemos cuando aparezca uno.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/search?q=veinte%20poemas%20de%20amor" className="inline-flex items-center px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition-colors">
+                Ver Veinte poemas de amor →
+              </Link>
+              <Link href="/solicitudes" className="inline-flex items-center px-5 py-2.5 bg-cream border border-ink/15 text-ink text-sm font-semibold rounded-lg hover:border-brand-500 hover:text-brand-600 transition-colors">
+                Avisarme cuando llegue uno
+              </Link>
+            </div>
+          </section>
 
           <section className="mb-16">
             <h2 className="font-display text-2xl font-bold text-ink mb-4">Sus libros más buscados</h2>
