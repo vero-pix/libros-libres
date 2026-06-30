@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { createPublicClient } from "@/lib/supabase/public";
 import { libroUrl } from "@/lib/urls";
 import type { ListingWithBook } from "@/types";
 
@@ -8,22 +7,12 @@ interface Props {
   tag: string;
   title: string;
   subtitle: string;
-  limit?: number;
+  listings: ListingWithBook[];
 }
 
-export default async function ColeccionRow({ tag, title, subtitle, limit = 8 }: Props) {
-  const supabase = createPublicClient();
-
-  const { data } = await supabase
-    .from("listings")
-    .select(`*, book:books!inner(*), seller:users(id, username, full_name, avatar_url)`)
-    .eq("status", "active")
-    .contains("book.tags", [tag])
-    .order("featured_rank", { ascending: true, nullsFirst: false })
-    .limit(limit);
-
-  const listings = (data ?? []).filter((l) => l.book) as ListingWithBook[];
-  if (listings.length < 3) return null;
+// Presentacional: los listings (ya deduplicados entre colecciones y filas) llegan por prop.
+export default function ColeccionRow({ tag, title, subtitle, listings }: Props) {
+  if (!listings || listings.length < 3) return null;
 
   return (
     <section className="mb-8">
