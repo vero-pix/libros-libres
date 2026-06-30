@@ -14,6 +14,15 @@ const CLASSES: Record<string, string> = {
   n: "[nñ]", c: "[cç]",
 };
 
+/**
+ * Versión client-side: "aplana" un texto quitándole tildes/ñ para comparar en JS
+ * (p.ej. filtros `includes` sobre listings ya cargados, como el panel del vendedor).
+ * "Inquisición" y "Inquisicion" colapsan al mismo string.
+ */
+export function foldAccents(input: string): string {
+  return input.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+}
+
 export function accentInsensitiveRegex(input: string): string {
   // Quitar diacríticos del término y pasar a minúscula → base "plana".
   // (ñ y vocales acentuadas quedan en su letra base; abajo se re-expanden.)
