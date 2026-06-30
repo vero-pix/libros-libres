@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { unstable_cache } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
 import { createPublicClient } from "@/lib/supabase/public";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import ListingToolbar from "@/components/listings/ListingToolbar";
@@ -286,6 +285,36 @@ const getFeaturedSellers = unstable_cache(
   { revalidate: 300 }
 );
 
+// Grilla principal (home sin filtros ni sort custom) — datos públicos, cacheable.
+// Antes corría con el cliente con cookies en CADA visita (no-store) y era el query
+// más pesado del camino caliente. excludeIds entra como parte de la key del cache;
+// como se deriva de filas ya cacheadas, es estable dentro de la ventana de revalidate.
+const getMainGridListings = unstable_cache(
+  async (currentPage: number, excludeIds: string[]) => {
+    const supabase = createPublicClient();
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    let gridQuery = supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`, { count: "exact" })
+      .in("status", ["active", "completed"])
+      .neq("deprioritized", true)
+      .order("created_at", { ascending: false });
+    if (excludeIds.length) gridQuery = gridQuery.not("id", "in", `(${excludeIds.join(",")})`);
+    const { data, count } = await gridQuery.range(start, start + ITEMS_PER_PAGE - 1);
+    return { data: data ?? [], count: count ?? 0 };
+  },
+  ["home-main-grid-v1"],
+  { revalidate: 120 }
+);
+
+// Árbol de categorías con conteos reales — no depende de filtros ni de sesión.
+// Corría en cada request; ahora cacheado (buildCategoryTree ignora los listings de muestra).
+const getCategoryTreeCached = unstable_cache(
+  async () => buildCategoryTree(createPublicClient()),
+  ["home-category-tree-v1"],
+  { revalidate: 300 }
+);
+
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -323,7 +352,6 @@ interface Props {
 }
 
 export default async function HomePage({ searchParams }: Props) {
-  const supabase = await createClient();
   const { genre, category, subcategory, tag, sort, price_min, price_max, condition, modality, author, binding, publisher, pages_min, pages_max, page, view, lat, lng, collectible } = searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10) || 1);
   const viewMode = view === "list" ? "list" : "grid";
@@ -369,19 +397,13 @@ export default async function HomePage({ searchParams }: Props) {
 
   if (!hasFilters && !hasCustomSort) {
     // Grilla principal sin lo ya mostrado arriba (filas + colecciones) → cero repetidos.
+    // Versión cacheada (datos públicos): saca el query más pesado del camino caliente.
     const excludeIds = Array.from(shownAboveIds);
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    let gridQuery = supabase
-      .from("listings")
-      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`, { count: "exact" })
-      .in("status", ["active", "completed"])
-      .neq("deprioritized", true)
-      .order("created_at", { ascending: false });
-    if (excludeIds.length) gridQuery = gridQuery.not("id", "in", `(${excludeIds.join(",")})`);
-    const { data, count } = await gridQuery.range(start, start + ITEMS_PER_PAGE - 1);
-    rawListings = data ?? [];
-    totalCount = count ?? totalActiveCount;
+    const { data, count } = await getMainGridListings(currentPage, excludeIds);
+    rawListings = data;
+    totalCount = count || totalActiveCount;
   } else {
+    const supabase = createPublicClient();
     let query = supabase
       .from("listings")
       .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id, plan), reviews:reviews(rating)`, { count: "exact" })
@@ -423,7 +445,7 @@ export default async function HomePage({ searchParams }: Props) {
 
   // For the sidebar category tree, we use the current page's listings as a sample 
   // or we could fetch a slightly larger set if needed, but let's keep it lean.
-  const categoryTree = await buildCategoryTree(supabase, rawListings as any);
+  const categoryTree = await getCategoryTreeCached();
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   return (
