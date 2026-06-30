@@ -1,8 +1,8 @@
 import { Suspense } from "react";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { accentInsensitiveRegex } from "@/lib/accentSearch";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
-import { buildCategoryTree, getAvailableTags } from "@/lib/categoryTree";
+import { getCachedCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
@@ -74,7 +74,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 export default async function SearchPage({ searchParams }: Props) {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { q, author, category, subcategory, tag, sort, price_min, price_max, condition, modality, binding, publisher, pages_min, pages_max, city_id } = searchParams;
 
   // Si hay búsqueda de texto, primero encontrar los book IDs que coincidan
@@ -107,12 +107,14 @@ export default async function SearchPage({ searchParams }: Props) {
     matchingBookIds = Array.from(new Set(matchedBooks?.map((b) => b.id) ?? []));
   }
 
+  // inner join: filtrar por campos del libro (category/subcategory/tag) en la BD
+  // en vez de traer TODO el catálogo y filtrar en JS. Listings sin book (rotos) se omiten.
   let query = supabase
     .from("listings")
     .select(
       `
       *,
-      book:books(*),
+      book:books!inner(*),
       seller:users(id, full_name, avatar_url, phone, username, mercadopago_user_id)
     `
     )
@@ -127,6 +129,11 @@ export default async function SearchPage({ searchParams }: Props) {
     }
     query = query.in("book_id", matchingBookIds);
   }
+
+  // Filtros del libro empujados a la BD (antes se aplicaban en JS sobre todo el catálogo)
+  if (category) query = query.eq("book.category", category);
+  if (subcategory) query = query.eq("book.subcategory", subcategory);
+  if (tag) query = query.contains("book.tags", [tag]);
 
   if (condition) {
     query = query.eq("condition", condition);
@@ -153,6 +160,9 @@ export default async function SearchPage({ searchParams }: Props) {
     query = query.order("created_at", { ascending: false });
   }
 
+  // Tope de seguridad: /search no tiene paginación y antes traía la tabla completa.
+  query = query.limit(200);
+
   const { data: rawListings } = await query;
   let listings = (rawListings as unknown as ListingWithBook[]) ?? [];
 
@@ -172,21 +182,6 @@ export default async function SearchPage({ searchParams }: Props) {
   if (author) {
     listings = listings.filter(
       (l) => l.book.author?.toLowerCase() === author.toLowerCase()
-    );
-  }
-  if (tag) {
-    listings = listings.filter(
-      (l) => (l.book as any).tags?.includes(tag)
-    );
-  }
-  if (category) {
-    listings = listings.filter(
-      (l) => l.book.category === category
-    );
-  }
-  if (subcategory) {
-    listings = listings.filter(
-      (l) => l.book.subcategory === subcategory
     );
   }
 
@@ -228,9 +223,8 @@ export default async function SearchPage({ searchParams }: Props) {
     popularListings = sortListingsForDisplay((data as unknown as ListingWithBook[]) ?? []);
   }
 
-  const allListings = (rawListings as unknown as ListingWithBook[]) ?? [];
   const [categoryTree, availableTags] = await Promise.all([
-    buildCategoryTree(supabase, allListings as any),
+    getCachedCategoryTree(),
     getAvailableTags(),
   ]);
 

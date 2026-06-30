@@ -9,7 +9,7 @@ import RecentlyViewed from "@/components/listings/RecentlyViewed";
 import Recommendations from "@/components/listings/Recommendations";
 import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
-import { buildCategoryTree, getAvailableTags } from "@/lib/categoryTree";
+import { getCachedCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import FeaturedRow from "@/components/home/FeaturedRow";
 import CollectibleRow from "@/components/home/CollectibleRow";
 import RecentRow from "@/components/home/RecentRow";
@@ -307,14 +307,6 @@ const getMainGridListings = unstable_cache(
   { revalidate: 120 }
 );
 
-// Árbol de categorías con conteos reales — no depende de filtros ni de sesión.
-// Corría en cada request; ahora cacheado (buildCategoryTree ignora los listings de muestra).
-const getCategoryTreeCached = unstable_cache(
-  async () => buildCategoryTree(createPublicClient()),
-  ["home-category-tree-v1"],
-  { revalidate: 300 }
-);
-
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -445,7 +437,7 @@ export default async function HomePage({ searchParams }: Props) {
 
   // For the sidebar category tree, we use the current page's listings as a sample 
   // or we could fetch a slightly larger set if needed, but let's keep it lean.
-  const categoryTree = await getCategoryTreeCached();
+  const categoryTree = await getCachedCategoryTree();
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   return (
