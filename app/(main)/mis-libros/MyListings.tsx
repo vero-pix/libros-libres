@@ -10,6 +10,7 @@ import CategoryPicker from "@/components/listings/CategoryPicker";
 import CoverUpload from "@/components/books/CoverUpload";
 import ImageUploadMultiple from "@/components/listings/ImageUploadMultiple";
 import { libroUrl } from "@/lib/urls";
+import { foldAccents } from "@/lib/accentSearch";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   active: { label: "Activo", color: "bg-green-100 text-green-700" },
@@ -67,8 +68,8 @@ export default function MyListings({ listings: initial }: Props) {
   const filtered = (filter === "all" ? listings : listings.filter((l) => l.status === filter))
     .filter((l) => {
       if (!search.trim()) return true;
-      const q = search.toLowerCase();
-      return l.book.title.toLowerCase().includes(q) || l.book.author.toLowerCase().includes(q);
+      const q = foldAccents(search);
+      return foldAccents(l.book.title).includes(q) || foldAccents(l.book.author).includes(q);
     })
     .sort((a, b) => {
       if (sortBy === "views_desc") {
