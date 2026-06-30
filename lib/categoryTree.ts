@@ -74,7 +74,19 @@ export async function buildCategoryTree(
       const directCount = catCount.get(root.slug) ?? 0;
       const childrenSum = children.reduce((sum, child) => sum + child.count, 0);
       const count = Math.max(directCount, childrenSum);
-      
+
       return { slug: root.slug, name: root.name, count, children };
     });
 }
+
+/**
+ * Versión cacheada del árbol de categorías. El árbol es global (conteos de TODO el
+ * inventario activo, no depende de filtros ni de la búsqueda actual), así que se cachea
+ * una sola vez y se reusa en home y search. Antes corría un full-scan de listings en
+ * CADA carga de ambas páginas.
+ */
+export const getCachedCategoryTree = unstable_cache(
+  async (): Promise<CategoryNode[]> => buildCategoryTree(createPublicClient()),
+  ["category-tree-v1"],
+  { revalidate: 300 }
+);
