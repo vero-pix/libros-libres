@@ -135,16 +135,49 @@ const getDefaultListings = unstable_cache(
 const getFeaturedListings = unstable_cache(
   async () => {
     const supabase = createPublicClient();
-    const { data } = await supabase
+    const SEL = `*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`;
+
+    // 1. Curados manualmente (los que Vero destaca a mano)
+    const { data: curated } = await supabase
       .from("listings")
-      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
+      .select(SEL)
       .eq("status", "active")
       .eq("featured", true)
       .order("featured_rank", { ascending: true, nullsFirst: false })
       .limit(10);
-    return data ?? [];
+
+    // 2. Descubrimientos rotativos: libros NO destacados (mayoría sin una sola visita).
+    //    Ventana diaria sobre el catálogo ordenado por antigüedad → cada día expone otros.
+    const DISCOVERIES = 6;
+    const { count } = await supabase
+      .from("listings")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active")
+      .eq("featured", false)
+      .neq("deprioritized", true);
+
+    let discoveries: any[] = [];
+    if (count && count > 0) {
+      const day = Math.floor(Date.now() / 86_400_000);
+      const offset = (day * DISCOVERIES) % count;
+      const { data: win } = await supabase
+        .from("listings")
+        .select(SEL)
+        .eq("status", "active")
+        .eq("featured", false)
+        .neq("deprioritized", true) // no exponer contenido despriorizado (p.ej. Mein Kampf)
+        .order("created_at", { ascending: true })
+        .range(offset, offset + DISCOVERIES * 2 - 1); // buffer para filtrar sin portada
+      discoveries = (win ?? [])
+        .filter((l) => l.book && (l.cover_image_url || l.book.cover_url))
+        .slice(0, DISCOVERIES);
+    }
+
+    // 3. Combinar sin duplicar (curados primero)
+    const seen = new Set((curated ?? []).map((l) => l.id));
+    return [...(curated ?? []), ...discoveries.filter((l) => !seen.has(l.id))];
   },
-  ["home-featured-listings-v2"],
+  ["home-featured-listings-v3"],
   { revalidate: 120 }
 );
 
@@ -279,6 +312,15 @@ export default async function HomePage({ searchParams }: Props) {
     getAvailableTags(),
   ]);
 
+  // Dedupe entre filas de la portada: un libro no puede salir en dos filas.
+  // Prioridad: Destacados › Recién subidos › Coleccionables.
+  const usedRowIds = new Set<string>();
+  const dedupeRow = (arr: ListingWithBook[]) =>
+    arr.filter((l) => (usedRowIds.has(l.id) ? false : (usedRowIds.add(l.id), true)));
+  const featuredRowListings = dedupeRow(featuredListings);
+  const recentRowListings = dedupeRow(recentListings);
+  const collectibleRowListings = dedupeRow(collectibleListings);
+
   // Listings principales: sin filtros ni sort custom → versión cacheada
   const hasCustomSort = sort === "price_asc" || sort === "price_desc" || sort === "distance";
   let rawListings: any[] = [];
@@ -338,8 +380,8 @@ export default async function HomePage({ searchParams }: Props) {
         totalListings={totalActiveCount}
         hasFilters={hasFilters}
         featuredRow={
-          !hasFilters && (featuredListings.length > 0 || featuredSellers.length > 0) ? (
-            <FeaturedRow featuredListings={featuredListings} featuredSellers={featuredSellers} />
+          !hasFilters && (featuredRowListings.length > 0 || featuredSellers.length > 0) ? (
+            <FeaturedRow featuredListings={featuredRowListings} featuredSellers={featuredSellers} />
           ) : null
         }
         testimonialBanner={null /* testimonios viejos (Z./Camilo, abr) ocultos hasta tener nuevos */}
@@ -358,8 +400,8 @@ export default async function HomePage({ searchParams }: Props) {
           <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalCount} availableTags={availableTags} />
 
           <div className="flex-1 min-w-0">
-            {!hasFilters && recentListings.length > 0 && (
-              <RecentRow listings={recentListings} />
+            {!hasFilters && recentRowListings.length > 0 && (
+              <RecentRow listings={recentRowListings} />
             )}
 
             {/* Colecciones editoriales curadas por Vero — se muestran solo si hay ≥3 libros con el tag */}
@@ -418,8 +460,8 @@ export default async function HomePage({ searchParams }: Props) {
               </>
             )}
 
-            {!hasFilters && collectibleListings.length > 0 && (
-              <CollectibleRow listings={collectibleListings} />
+            {!hasFilters && collectibleRowListings.length > 0 && (
+              <CollectibleRow listings={collectibleRowListings} />
             )}
 
             <Suspense fallback={<div className="h-10 bg-gray-100 rounded-lg animate-pulse mb-4" />}>
