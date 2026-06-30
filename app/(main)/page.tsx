@@ -198,6 +198,55 @@ const getCollectibleListings = unstable_cache(
 
 const EXCLUDED_SUBCATEGORIES = ["no-ficcion-ensayo", "no-ficcion-humanidades"];
 
+// Colecciones editoriales curadas por Vero (orden = prioridad al deduplicar).
+const COLLECTION_CONFIGS = [
+  { tag: "tarde-de-lluvia", title: "Para una tarde de lluvia", subtitle: "Curado por Vero · lectura lenta, sin apuro" },
+  { tag: "literatura-chilena", title: "Literatura chilena", subtitle: "Escritoras y escritores de acá" },
+  { tag: "latinoamerica-contemp", title: "Latinoamérica contemporánea", subtitle: "Lo que se está escribiendo ahora mismo" },
+  { tag: "historia-chile", title: "Historia de Chile", subtitle: "Memoria, política, identidad" },
+  { tag: "clasicos", title: "Clásicos que no caducan", subtitle: "Los que siempre vuelven" },
+  { tag: "novela-negra", title: "Novela negra y suspenso", subtitle: "Para no soltar el libro" },
+  { tag: "filosofia", title: "Filosofía accesible", subtitle: "Pensar sin sufrir" },
+  { tag: "ensayo", title: "Ensayo y pensamiento", subtitle: "Ideas que cambian cómo ves las cosas" },
+  { tag: "ciencia-divulgacion", title: "Ciencia y divulgación", subtitle: "Para entender el mundo sin título universitario" },
+  { tag: "para-regalar", title: "Para regalar", subtitle: "Libros que no fallan como regalo" },
+];
+
+// Trae todas las colecciones y deduplica: un libro va a la PRIMERA colección que lo
+// contiene (por orden de COLLECTION_CONFIGS), nunca a dos. Antes cada ColeccionRow
+// buscaba aislada y un libro multi-tag salía repetido en varias filas.
+const getCollections = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const SEL = `*, book:books!inner(*), seller:users(id, username, full_name, avatar_url)`;
+    const raw = await Promise.all(
+      COLLECTION_CONFIGS.map((c) =>
+        supabase
+          .from("listings")
+          .select(SEL)
+          .eq("status", "active")
+          .neq("deprioritized", true)
+          .contains("book.tags", [c.tag])
+          .order("featured_rank", { ascending: true, nullsFirst: false })
+          .limit(16)
+          .then((r) => ({ ...c, items: (r.data ?? []).filter((l: any) => l.book) }))
+      )
+    );
+    const used = new Set<string>();
+    return raw.map((c) => {
+      const listings: any[] = [];
+      for (const l of c.items) {
+        if (used.has(l.id) || listings.length >= 8) continue;
+        used.add(l.id);
+        listings.push(l);
+      }
+      return { tag: c.tag, title: c.title, subtitle: c.subtitle, listings };
+    });
+  },
+  ["home-collections-v1"],
+  { revalidate: 300 }
+);
+
 const getRecentListings = unstable_cache(
   async () => {
     const supabase = createPublicClient();
@@ -303,11 +352,12 @@ export default async function HomePage({ searchParams }: Props) {
   const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || collectibleOnly);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
-  const [featuredListings, featuredSellers, collectibleListings, recentListings, totalActiveCount, availableTags] = await Promise.all([
+  const [featuredListings, featuredSellers, collectibleListings, recentListings, collectionsRaw, totalActiveCount, availableTags] = await Promise.all([
     getFeaturedListings() as unknown as Promise<ListingWithBook[]>,
     getFeaturedSellers(),
     getCollectibleListings() as unknown as Promise<ListingWithBook[]>,
     getRecentListings() as unknown as Promise<ListingWithBook[]>,
+    getCollections() as unknown as Promise<{ tag: string; title: string; subtitle: string; listings: ListingWithBook[] }[]>,
     getTotalActiveCount(),
     getAvailableTags(),
   ]);
@@ -320,6 +370,11 @@ export default async function HomePage({ searchParams }: Props) {
   const featuredRowListings = dedupeRow(featuredListings);
   const recentRowListings = dedupeRow(recentListings);
   const collectibleRowListings = dedupeRow(collectibleListings);
+  // Las colecciones ya vienen deduplicadas entre sí; además les quitamos lo que ya
+  // apareció en las filas de arriba y ocultamos las que queden con <3.
+  const collections = collectionsRaw
+    .map((c) => ({ ...c, listings: c.listings.filter((l) => !usedRowIds.has(l.id)) }))
+    .filter((c) => c.listings.length >= 3);
 
   // Listings principales: sin filtros ni sort custom → versión cacheada
   const hasCustomSort = sort === "price_asc" || sort === "price_desc" || sort === "distance";
@@ -404,61 +459,11 @@ export default async function HomePage({ searchParams }: Props) {
               <RecentRow listings={recentRowListings} />
             )}
 
-            {/* Colecciones editoriales curadas por Vero — se muestran solo si hay ≥3 libros con el tag */}
-            {!hasFilters && (
-              <>
-                <ColeccionRow
-                  tag="tarde-de-lluvia"
-                  title="Para una tarde de lluvia"
-                  subtitle="Curado por Vero · lectura lenta, sin apuro"
-                />
-                <ColeccionRow
-                  tag="literatura-chilena"
-                  title="Literatura chilena"
-                  subtitle="Escritoras y escritores de acá"
-                />
-                <ColeccionRow
-                  tag="latinoamerica-contemp"
-                  title="Latinoamérica contemporánea"
-                  subtitle="Lo que se está escribiendo ahora mismo"
-                />
-                <ColeccionRow
-                  tag="historia-chile"
-                  title="Historia de Chile"
-                  subtitle="Memoria, política, identidad"
-                />
-                <ColeccionRow
-                  tag="clasicos"
-                  title="Clásicos que no caducan"
-                  subtitle="Los que siempre vuelven"
-                />
-                <ColeccionRow
-                  tag="novela-negra"
-                  title="Novela negra y suspenso"
-                  subtitle="Para no soltar el libro"
-                />
-                <ColeccionRow
-                  tag="filosofia"
-                  title="Filosofía accesible"
-                  subtitle="Pensar sin sufrir"
-                />
-                <ColeccionRow
-                  tag="ensayo"
-                  title="Ensayo y pensamiento"
-                  subtitle="Ideas que cambian cómo ves las cosas"
-                />
-                <ColeccionRow
-                  tag="ciencia-divulgacion"
-                  title="Ciencia y divulgación"
-                  subtitle="Para entender el mundo sin título universitario"
-                />
-                <ColeccionRow
-                  tag="para-regalar"
-                  title="Para regalar"
-                  subtitle="Libros que no fallan como regalo"
-                />
-              </>
-            )}
+            {/* Colecciones editoriales curadas por Vero — deduplicadas entre sí y contra las filas */}
+            {!hasFilters &&
+              collections.map((c) => (
+                <ColeccionRow key={c.tag} tag={c.tag} title={c.title} subtitle={c.subtitle} listings={c.listings} />
+              ))}
 
             {!hasFilters && collectibleRowListings.length > 0 && (
               <CollectibleRow listings={collectibleRowListings} />
