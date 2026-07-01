@@ -117,18 +117,24 @@ export default function HeroBar({}: Props) {
               </Link>
             </div>
 
-            {/* Stats */}
-            <div className="mt-9 flex items-center gap-6 pt-6 border-t border-line">
-              <Link
-                href="/?sort=price_asc"
-                className="group/stat flex flex-col gap-0.5 transition-colors"
-                aria-label="Ver los libros más baratos, desde $3.000"
-              >
-                <span className="font-display text-3xl text-ink leading-none group-hover/stat:text-coral transition-colors">$3.000</span>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted group-hover/stat:text-coral transition-colors">
-                  desde · ver los más baratos →
+            {/* Diferenciadores de confianza — antes acá lideraba el ancla de precio
+                "$3.000 · más baratos", que cheapeaba la marca. La cercanía, el pago
+                protegido y la gente real son lo que sube valor y ataca la desconfianza
+                (nuestro cuello de conversión). Los números viven en el contador de abajo. */}
+            <div className="mt-9 flex flex-wrap items-center gap-x-3 gap-y-2 pt-6 border-t border-line">
+              {[
+                { icon: "📍", label: "Cerca de ti" },
+                { icon: "🛡️", label: "Pago protegido" },
+                { icon: "👤", label: "Gente real" },
+              ].map((b, i) => (
+                <span key={b.label} className="flex items-center gap-3">
+                  {i > 0 && <span className="text-ink-muted/40" aria-hidden>·</span>}
+                  <span className="flex items-center gap-1.5 text-sm text-ink">
+                    <span aria-hidden>{b.icon}</span>
+                    <span className="font-medium">{b.label}</span>
+                  </span>
                 </span>
-              </Link>
+              ))}
             </div>
           </div>
 
