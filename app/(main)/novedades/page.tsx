@@ -40,6 +40,21 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 const novedades: Entry[] = [
   {
     date: "1 julio 2026",
+    title: "Comprar quedó más claro y seguro",
+    description:
+      "Estuve mirando por qué mucha gente entra a ver un libro y después no lo compra, y me di cuenta de que la culpa era mía: la ficha no dejaba claro lo importante. Primero, el pago: cuando compras acá tu plata no se la lleva el vendedor al tiro — queda protegida en MercadoPago y él la recibe recién cuando confirmas que el libro te llegó bien. Eso siempre fue así, pero no lo estaba diciendo en el momento en que importa, así que ahora lo ves junto al botón de comprar. Segundo, el envío: antes decía \"cotiza al comprar\" y el costo te aparecía como sorpresa al final; ahora te muestro desde la ficha que el despacho parte en $2.900 — o gratis si lo retiras en persona y coordinas con el vendedor. Y bajé el ruido: dejé el botón de comprar como protagonista y corrí a un costado las otras opciones. Menos vueltas, más claro de dónde a dónde va tu plata.",
+    tag: "Mejora",
+    link: "/libros-usados-chile",
+    linkText: "Ver libros",
+    visual: {
+      kind: "milestone",
+      icon: "🛡️",
+      metric: "Compra protegida",
+      detail: "tu pago queda en MercadoPago hasta que recibes el libro",
+    },
+  },
+  {
+    date: "1 julio 2026",
     title: "Saqué el trámite que había antes de publicar tu primer libro",
     description:
       "Me puse a mirar por qué entraba gente nueva pero pocos subían su primer libro, y me di cuenta de que yo misma les había puesto una tranca. Cuando te registrabas y apretabas \"publicar\", antes de dejarte ver el formulario te mandaba a otra página a \"completar tu perfil\": teléfono y dirección obligatorios, arrastrar un pin en un mapa… todo antes de haber subido nada. Un montón se bajaba ahí no más, y con razón: viniste a publicar un libro, no a llenar una ficha. Así que lo saqué. Ahora entras directo a subir el libro: le sacas una foto a la portada o escaneas el código, yo completo el resto y tú le pones precio. La ubicación te la sigo pidiendo —es lo que deja que el comprador calcule el envío o pase a buscarlo—, pero ahí mismo, en una sola pantalla, sin desvíos. Y el WhatsApp ahora es opcional: si publicas sin ponerlo te aviso que los compradores no van a poder escribirte, pero tú decides. Menos trámite, más libros. Si te habías quedado a medio camino, es buen momento para volver.",
