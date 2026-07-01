@@ -30,7 +30,7 @@ async function getListing(username: string, slug: string) {
 
   const { data } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram, username, mercadopago_user_id, on_vacation, vacation_message)`)
+    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram, username, mercadopago_user_id, on_vacation, vacation_message, pickup_points)`)
     .eq("slug", slug)
     .eq("seller_id", seller.id)
     .single();
