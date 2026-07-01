@@ -4,6 +4,7 @@ import { useState } from "react";
 
 export default function NewsletterForm() {
   const [email, setEmail] = useState("");
+  const [company, setCompany] = useState(""); // honeypot: los humanos lo dejan vacío
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   async function handleSubmit(e: React.FormEvent) {
@@ -15,7 +16,7 @@ export default function NewsletterForm() {
       const res = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ email: email.trim(), company }),
       });
       if (res.ok) {
         setStatus("success");
@@ -38,6 +39,17 @@ export default function NewsletterForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full md:w-auto gap-0">
+      {/* Honeypot anti-bot: oculto para humanos, los bots lo rellenan */}
+      <input
+        type="text"
+        name="company"
+        value={company}
+        onChange={(e) => setCompany(e.target.value)}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="hidden"
+      />
       <input
         type="email"
         value={email}
