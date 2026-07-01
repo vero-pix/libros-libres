@@ -367,6 +367,23 @@ export default function ListingDetail({ listing, images = [] }: Props) {
 
       <DescriptionSection listing={listing} />
 
+      {/* Sin precio publicado: NUNCA dejar la ficha en blanco (se ve rota y no se puede
+          comprar). Es un error de datos, pero acá damos salida: aviso + contacto. */}
+      {listing.price == null && listing.modality !== "loan" && !isSold && (
+        <div className="border-t border-line px-6 py-5 space-y-3">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <p className="font-display text-base font-bold text-amber-900">
+              Este libro todavía no tiene precio publicado
+            </p>
+            <p className="text-sm text-amber-800 mt-1 leading-relaxed">
+              El vendedor aún no le puso precio. Escríbele para acordarlo y comprarlo.
+            </p>
+          </div>
+          <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} />
+          <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
+        </div>
+      )}
+
       {/* Buybox */}
       {listing.price != null && listing.modality !== "loan" && (
         <div className="border-t border-line px-6 py-5 space-y-3">
