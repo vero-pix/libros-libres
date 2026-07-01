@@ -112,6 +112,22 @@ const getTotalActiveCount = unstable_cache(
   { revalidate: 300 }
 );
 
+// Contador de confianza del home: tiendas activas (vendedores con ≥1 libro) y visitas
+// totales (page_views). Cacheado para no pegarle a la BD en cada carga.
+const getPublicStats = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const [{ data: sellers }, { count: views }] = await Promise.all([
+      supabase.from("listings").select("seller_id").eq("status", "active"),
+      supabase.from("page_views").select("*", { count: "exact", head: true }),
+    ]);
+    const stores = new Set((sellers ?? []).map((l) => l.seller_id)).size;
+    return { stores, views: views ?? 0 };
+  },
+  ["home-public-stats-v1"],
+  { revalidate: 300 }
+);
+
 
 const getFeaturedListings = unstable_cache(
   async () => {
@@ -354,7 +370,7 @@ export default async function HomePage({ searchParams }: Props) {
   const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || collectibleOnly);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
-  const [featuredListings, featuredSellers, collectibleListings, recentListings, collectionsRaw, totalActiveCount, availableTags] = await Promise.all([
+  const [featuredListings, featuredSellers, collectibleListings, recentListings, collectionsRaw, totalActiveCount, availableTags, publicStats] = await Promise.all([
     getFeaturedListings() as unknown as Promise<ListingWithBook[]>,
     getFeaturedSellers(),
     getCollectibleListings() as unknown as Promise<ListingWithBook[]>,
@@ -362,6 +378,7 @@ export default async function HomePage({ searchParams }: Props) {
     getCollections() as unknown as Promise<{ tag: string; title: string; subtitle: string; listings: ListingWithBook[] }[]>,
     getTotalActiveCount(),
     getAvailableTags(),
+    getPublicStats(),
   ]);
 
   // Dedupe entre filas de la portada: un libro no puede salir en dos filas.
@@ -445,6 +462,8 @@ export default async function HomePage({ searchParams }: Props) {
 
       <HomeShell
         totalListings={totalActiveCount}
+        stores={publicStats.stores}
+        views={publicStats.views}
         hasFilters={hasFilters}
         featuredRow={
           !hasFilters && (featuredRowListings.length > 0 || featuredSellers.length > 0) ? (

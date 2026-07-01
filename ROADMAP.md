@@ -47,10 +47,7 @@ Si alguno falla, **no mergear**. Investigar root cause primero.
 
 ### 🔴 Urgente / Con fecha límite
 
-- [ ] **Dominio librolibre.cl — EN ELIMINACIÓN (29 jun)** — confirmado por Vero: pasó a proceso de eliminación. Titular aún **Cinta Carmesí** (NO Vero). Revisar **casi a diario** en nic.cl hasta que quede "disponible para inscripción" → inscribir YA a nombre de Vero. **Recordatorio diario automático activo** (rutina `trig_01Pp1kHk1h8APSxqC4VBs1fx`, 9am Chile, push). Borrar la rutina al inscribirlo.
-  - ⚠️ **NO clickear "Restaurar ahora" en NIC Chile** — ese botón renueva el dominio para el titular actual (Cinta Carmesí), no lo transfiere a Vero. Sería pagarle la renovación a ella.
-  - ✅ **Acción real**: esperar al **25 junio 2026** y, si quedó liberado, inscribirlo a nombre de Vero ($9.990/año, NIC Chile). Riesgo: si hay >1 solicitante al liberarse, NIC lo manda a remate/subasta (riesgo bajo para dominio de nicho).
-  - Nameservers actuales: Cloudflare. Sitio activo en `www.librolibre.cl` al 28 mayo.
+- [x] **Dominio librolibre.cl — INSCRITO por Vero (1 jul 2026)** ✅ — se liberó del titular anterior (Cinta Carmesí) y Vero lo inscribió a su nombre en NIC Chile ese día, apenas quedó disponible. Recordatorio diario (rutina `trig_01Pp1kHk1h8APSxqC4VBs1fx`) **borrado**. Pendiente opcional: decidir si redirige 301 → tuslibros.cl o se deja guardado como dominio defensivo/marca.
 - [ ] **Restaurar dirección Shipit** — cambiar de vuelta a San Pio X 2555, Providencia, vero@economics.cl después del envío de cim.
 - [x] **Rate limit /api en deny** — 60 req/min por IP, acción deny (403). Activado 21 mayo 2026.
 
@@ -149,7 +146,7 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 **Catálogo y búsqueda**
 - [ ] **Full-text search con `pg_trgm` + GIN index** — hoy el buscador usa `LIKE` sin índice. 10-100x más rápido y soporta typos. Alta prioridad cuando catálogo supere 500 libros activos.
 - [x] **Search empty state review** — 80% bounce en /search. Rediseñado con CTA de economía inversa (Se busca) y sugerencias dinámicas de libros destacados.
-- [ ] **Rotación automática FeaturedRow** — 191 de 240 listings sin una sola visita en 30d. Exponer los enterrados con pool rotativo.
+- [x] **Rotación automática FeaturedRow** — ✅ 30 jun. Con 1.058 listings, 776 sin una sola visita. Destacados ahora = 10 curados + 6 "descubrimientos" rotativos por día (enterrados con portada, excluye deprioritized). HeroBar rota 24 clásicos por semana. Además se eliminaron TODOS los repetidos de la portada (colecciones multi-tag + grilla vs recientes) — ver memoria `feedback_portada_sin_repetidos`. Simulador `scripts/_sim_full_home.mjs`.
 
 **Reputación**
 - [ ] **Sistema de reputación por vendedor** — tabla `reviews` existe pero vacía. UI básica en perfil existe sin datos. Álvaro y otros lo piden: historial independiente por librería, estilo ML.
@@ -157,6 +154,12 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 ---
 
 ### 🟠 Media prioridad
+
+**Feedback CIMLibros / Carlos (1 jul 2026)** — su vendedor más activo
+- [x] **Contador de confianza en el home** — ✅ 1 jul. Prueba social arriba del fold: libros publicados (1.076) · tiendas activas (40) · visitas totales (~31k). Componente `components/home/StatsBar.tsx`, datos cacheados (`getPublicStats` en page.tsx). **Sin "vendidos" a propósito** (hoy ~0 / off-platform → delataría el problema). Incluye link "Mira lo nuevo →" a /novedades (Carlos dijo que las novedades quedan poco visibles).
+- [ ] **Ranking de tiendas** — por publicaciones/visitas (NO por ventas mientras sea ~0). Reusar lógica de `getFeaturedSellers`. Esfuerzo medio.
+- [ ] **Varios puntos de entrega por tienda** — Carlos entrega en varios lugares. Necesita modelo de datos (`pickup_points` o JSON en users/listings) + publish form + ficha + checkout + cercanía. Sesión propia.
+- **Insight clave (Carlos):** "mucha gente me ubica por fuera y concreta fuera de la página" → confirma la fuga off-platform (ventas reales por WhatsApp que no dejan comisión). Su cuenta SÍ puede cobrar, así que es fuga por costumbre, no por MP roto. Evidencia directa para el trabajo de conversión ("Comprar manda"). Ver [[project_conversion_compra_jul2026]].
 
 **UX y features**
 - [x] **Modo vacaciones (libros visibles pero no comprables)** — ✅ deployado 3 jun (commit `c98423d`). En vez de pausar (que vaciaba la tienda), `users.on_vacation=true` deja los libros **visibles** pero no comprables: banner en perfil, aviso en ficha, overlay "🌴 En vacaciones" en tarjetas, bloqueo server-side en `/api/cart` y `/api/orders`. Buhardilla lo estrenó; **reactivada automáticamente el 8 jun** vía bloque fechado en el cron `cleanup-bots`. **Pendiente (autoservicio):** toggle en `/mis-libros` para que el vendedor lo active/desactive solo + fecha de regreso automática (hoy se setea por backend).
