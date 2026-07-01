@@ -3,6 +3,7 @@
 import { useState, useCallback, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import HeroBar from "./HeroBar";
+import StatsBar from "./StatsBar";
 import TiendaToggle from "./TiendaToggle";
 import CollectionBanners from "./CollectionBanners";
 import LeadCaptureBar from "@/components/ui/LeadCaptureBar";
@@ -11,6 +12,8 @@ const ShelfTransformation = dynamic(() => import("./ShelfTransformation"));
 
 interface Props {
   totalListings: number;
+  stores: number;
+  views: number;
   hasFilters: boolean;
   featuredRow?: ReactNode;
   testimonialBanner?: ReactNode;
@@ -20,7 +23,7 @@ interface Props {
   children: ReactNode;
 }
 
-export default function HomeShell({ totalListings, hasFilters, featuredRow, testimonialBanner, requestsRow, heroRequestStrip, liquidacionBanner, children }: Props) {
+export default function HomeShell({ totalListings, stores, views, hasFilters, featuredRow, testimonialBanner, requestsRow, heroRequestStrip, liquidacionBanner, children }: Props) {
   const [forceMap, setForceMap] = useState(false);
 
   const handleToggleMap = useCallback(() => {
@@ -46,6 +49,9 @@ export default function HomeShell({ totalListings, hasFilters, featuredRow, test
       ) : (
         <h1 className="sr-only">Libros usados en Chile — tuslibros.cl</h1>
       )}
+
+      {/* Contador de confianza (prueba social) — arriba del fold */}
+      {!hasFilters && <StatsBar listings={totalListings} stores={stores} views={views} />}
 
       {/* Caluga liquidación 50% — arriba del fold, alto tráfico */}
       {!hasFilters && liquidacionBanner}
