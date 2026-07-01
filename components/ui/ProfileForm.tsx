@@ -17,6 +17,12 @@ interface Props {
   defaultLat?: number | null;
   defaultLng?: number | null;
   defaultAddress?: string | null;
+  initialPickupPoints?: PickupPoint[];
+}
+
+interface PickupPoint {
+  label: string;
+  comuna?: string | null;
 }
 
 const PHONE_REGEX = /^\+56[0-9]{9}$/;
@@ -61,6 +67,7 @@ export default function ProfileForm({
   defaultLat,
   defaultLng,
   defaultAddress,
+  initialPickupPoints,
 }: Props) {
   const supabase = createClient();
 
@@ -77,6 +84,15 @@ export default function ProfileForm({
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Puntos de entrega en persona (por tienda; idea de Carlos/CIMLibros)
+  const [pickupPoints, setPickupPoints] = useState<PickupPoint[]>(
+    (initialPickupPoints ?? []).map((p) => ({ label: p.label ?? "", comuna: p.comuna ?? "" }))
+  );
+  const addPickupPoint = () => setPickupPoints((prev) => [...prev, { label: "", comuna: "" }]);
+  const removePickupPoint = (i: number) => setPickupPoints((prev) => prev.filter((_, idx) => idx !== i));
+  const updatePickupPoint = (i: number, field: "label" | "comuna", value: string) =>
+    setPickupPoints((prev) => prev.map((p, idx) => (idx === i ? { ...p, [field]: value } : p)));
 
   // Ubicación
   const [savedAddress, setSavedAddress] = useState(defaultAddress ?? "");
@@ -156,6 +172,9 @@ export default function ProfileForm({
         bio: bio.trim() || null,
         public_email: publicEmail.trim() || null,
         instagram: instagram.trim().replace(/^@/, "") || null,
+        pickup_points: pickupPoints
+          .filter((p) => p.label.trim())
+          .map((p) => ({ label: p.label.trim(), comuna: (p.comuna ?? "").trim() || null })),
       })
       .eq("id", userId);
 
@@ -342,6 +361,52 @@ export default function ProfileForm({
                 Opcional — se mostrará en tus publicaciones y tu tienda.
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* ── Puntos de entrega en persona (por tienda) ── */}
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+            <h2 className="text-sm font-semibold text-gray-700">Dónde entregas en persona</h2>
+            <p className="text-xs text-gray-400 mt-1">
+              Si entregas en varios lugares, agrégalos acá. Se muestran en tus libros para
+              que el comprador sepa dónde retirar. (Opcional)
+            </p>
+          </div>
+          <div className="px-6 py-5 space-y-3">
+            {pickupPoints.map((p, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={p.label}
+                  onChange={(e) => updatePickupPoint(i, "label", e.target.value)}
+                  placeholder="Ej: Metro Los Leones"
+                  className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+                />
+                <input
+                  type="text"
+                  value={p.comuna ?? ""}
+                  onChange={(e) => updatePickupPoint(i, "comuna", e.target.value)}
+                  placeholder="Comuna"
+                  className="w-32 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => removePickupPoint(i)}
+                  aria-label="Quitar punto"
+                  className="flex-shrink-0 w-9 h-9 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addPickupPoint}
+              className="flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors"
+            >
+              <span className="text-base leading-none">+</span> Agregar un punto de entrega
+            </button>
           </div>
         </div>
 

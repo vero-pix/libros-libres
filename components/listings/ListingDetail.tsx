@@ -294,7 +294,18 @@ export default function ListingDetail({ listing, images = [] }: Props) {
                 <span className="text-base">🤝</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-ink">Encuentro en persona</p>
-                  <p className="text-[11px] text-ink-muted">Coordina lugar y hora con el vendedor</p>
+                  <p className="text-[11px] text-ink-muted">
+                    {(() => {
+                      const pts = ((listing.seller as any)?.pickup_points ?? []) as { label: string; comuna?: string | null }[];
+                      const valid = pts.filter((p) => p?.label?.trim());
+                      if (valid.length === 0) return "Coordina lugar y hora con el vendedor";
+                      return (
+                        <>
+                          Retira en: {valid.map((p) => p.label + (p.comuna ? ` (${p.comuna})` : "")).join(" · ")}
+                        </>
+                      );
+                    })()}
+                  </p>
                 </div>
                 <span className="text-xs font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Gratis</span>
               </div>
