@@ -304,7 +304,9 @@ export default function ListingDetail({ listing, images = [] }: Props) {
                   <p className="text-sm font-medium text-ink">Despacho courier</p>
                   <p className="text-[11px] text-ink-muted">Starken · Chilexpress · 24-48h</p>
                 </div>
-                <span className="text-[11px] font-mono text-ink-muted">cotiza al comprar</span>
+                {/* Antes decía "cotiza al comprar" → el costo aparecía recién en el checkout
+                    (shock de precio). Mostramos el piso real ($2.900 estándar) desde la ficha. */}
+                <span className="text-[11px] font-semibold text-ink whitespace-nowrap">desde $2.900</span>
               </div>
             </div>
           </div>
