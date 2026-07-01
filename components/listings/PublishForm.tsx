@@ -101,6 +101,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
   const [notes, setNotes] = useState("");
   const [phone, setPhone] = useState(existingPhone ?? "");
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [phoneWarn, setPhoneWarn] = useState(false); // aviso suave: publicar sin WhatsApp
   const [location, setLocation] = useState<LocationData | null>(
     defaultLocation ?? null
   );
@@ -295,6 +296,13 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
     if (modality !== "sale" && !rentalPrice) { setError("Ingresa el precio de arriendo."); return; }
     if (phone && !PHONE_REGEX.test(phone)) {
       setPhoneError("Formato inválido. Usa +56 seguido de 9 dígitos. Ej: +56912345678");
+      return;
+    }
+    // Aviso suave (no bloqueo): publicar sin WhatsApp. Al primer intento mostramos la
+    // advertencia; si insiste (segundo click) publica igual. Reemplaza al viejo muro.
+    if (!phone.trim() && !phoneWarn) {
+      setPhoneWarn(true);
+      setError(null);
       return;
     }
 
@@ -962,6 +970,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
             onChange={(e) => {
               setPhone(e.target.value.trim());
               setPhoneError(null);
+              if (e.target.value.trim()) setPhoneWarn(false);
             }}
             placeholder="+56912345678"
             className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 transition-colors ${
@@ -1017,13 +1026,29 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         </div>
       )}
 
+      {/* Aviso suave: publicar sin WhatsApp (no bloquea, pero advierte una vez) */}
+      {phoneWarn && !phone.trim() && (
+        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl">
+          <span className="mt-0.5">📱</span>
+          <span>
+            Vas a publicar <strong>sin WhatsApp</strong>. Los compradores no podrán escribirte
+            para coordinar la entrega. Agrega tu número arriba, o vuelve a tocar
+            <strong> Publicar</strong> para continuar sin él.
+          </span>
+        </div>
+      )}
+
       {/* Submit */}
       <button
         type="submit"
         disabled={loading}
         className="w-full bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-semibold py-3.5 rounded-xl transition-colors text-base shadow-sm"
       >
-        {loading ? "Publicando..." : "Publicar libro"}
+        {loading
+          ? "Publicando..."
+          : phoneWarn && !phone.trim()
+            ? "Publicar sin WhatsApp"
+            : "Publicar libro"}
       </button>
     </form>
   );
