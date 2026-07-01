@@ -158,7 +158,7 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 **Feedback CIMLibros / Carlos (1 jul 2026)** — su vendedor más activo
 - [x] **Contador de confianza en el home** — ✅ 1 jul. Prueba social arriba del fold: libros publicados (1.076) · tiendas activas (40) · visitas totales (~31k). Componente `components/home/StatsBar.tsx`, datos cacheados (`getPublicStats` en page.tsx). **Sin "vendidos" a propósito** (hoy ~0 / off-platform → delataría el problema). Incluye link "Mira lo nuevo →" a /novedades (Carlos dijo que las novedades quedan poco visibles).
 - [x] **Ranking de tiendas** — ✅ 1 jul. Página `/tiendas` (`app/(main)/tiendas/page.tsx`) rankea las 40 tiendas por publicaciones activas (dato honesto; ventas fuera mientras sea ~0), con medallas al top 3. Linkeada desde el contador ("tiendas activas" → /tiendas), footer y sitemap.
-- [ ] **Varios puntos de entrega por tienda** — Carlos entrega en varios lugares. Necesita modelo de datos (`pickup_points` o JSON en users/listings) + publish form + ficha + checkout + cercanía. Sesión propia.
+- [x] **Varios puntos de entrega por tienda** — ✅ 1 jul. Columna `users.pickup_points` JSONB. Editor "Dónde entregas en persona" en /perfil (ProfileForm), y se listan en la ficha bajo "Encuentro en persona". Por tienda, sin tocar el pago. (Migración 20260701_pickup_points.sql aplicada en prod por Vero.)
 - **Insight clave (Carlos):** "mucha gente me ubica por fuera y concreta fuera de la página" → confirma la fuga off-platform (ventas reales por WhatsApp que no dejan comisión). Su cuenta SÍ puede cobrar, así que es fuga por costumbre, no por MP roto. Evidencia directa para el trabajo de conversión ("Comprar manda"). Ver [[project_conversion_compra_jul2026]].
 
 **UX y features**
