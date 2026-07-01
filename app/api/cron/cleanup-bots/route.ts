@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { looksLikeBotName } from "@/lib/botDetection";
+import { looksLikeBotName, isLikelyBotEmail } from "@/lib/botDetection";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -71,6 +71,26 @@ export async function GET(request: Request) {
     }
   }
 
+  // ── Limpieza de newsletter_subscribers (bots) ──
+  // El formulario público de suscripción no tenía protección y se llenó de emails
+  // basura (dominios extranjeros al azar, SMS-gateways, role, desechables). Esta tabla
+  // no la tocaba el cron. Borramos los que isLikelyBotEmail marca como bot.
+  const subsDeleted: string[] = [];
+  const { data: subs, error: subsErr } = await supabase
+    .from("newsletter_subscribers")
+    .select("email");
+  if (subsErr) {
+    console.error("[cron/cleanup-bots] subs fetch error:", subsErr.message);
+  } else {
+    for (const row of subs ?? []) {
+      if (!isLikelyBotEmail(row.email)) continue;
+      if (dry) { subsDeleted.push(`[dry] ${row.email}`); continue; }
+      const { error: dErr } = await supabase
+        .from("newsletter_subscribers").delete().eq("email", row.email);
+      if (!dErr) subsDeleted.push(row.email);
+    }
+  }
+
   // ── Reactivación programada de modo vacaciones (one-off) ──
   // Felipe (Libros De La Buhardilla) vuelve del sur el lunes 8 jun 2026.
   // Este bloque se dispara en la primera corrida en/después de esa fecha y se
@@ -86,6 +106,14 @@ export async function GET(request: Request) {
     }
   }
 
-  console.log(`[cron/cleanup-bots] ${dry ? "DRY " : ""}borrados=${deleted.length} saltados=${skipped.length}`);
-  return NextResponse.json({ dry, deletedCount: deleted.length, deleted, skipped, reactivated });
+  console.log(`[cron/cleanup-bots] ${dry ? "DRY " : ""}users_borrados=${deleted.length} subs_borrados=${subsDeleted.length} saltados=${skipped.length}`);
+  return NextResponse.json({
+    dry,
+    deletedCount: deleted.length,
+    deleted,
+    subsDeletedCount: subsDeleted.length,
+    subsDeleted,
+    skipped,
+    reactivated,
+  });
 }
