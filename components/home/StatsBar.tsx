@@ -18,25 +18,36 @@ const fmtViews = (n: number) => (n >= 10000 ? `${Math.round(n / 1000)} mil` : fm
  */
 export default function StatsBar({ listings, stores, views }: Props) {
   const stats = [
-    { value: fmt(listings), label: "libros publicados" },
-    { value: fmt(stores), label: "tiendas activas" },
-    { value: fmtViews(views), label: "visitas al catálogo" },
+    { value: fmt(listings), label: "libros publicados", href: undefined as string | undefined },
+    { value: fmt(stores), label: "tiendas activas", href: "/tiendas" },
+    { value: fmtViews(views), label: "visitas al catálogo", href: undefined as string | undefined },
   ];
 
   return (
     <section className="bg-cream-warm/60 border-b border-cream-dark">
       <div className="max-w-6xl mx-auto px-6 py-5">
         <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 sm:gap-x-14">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center animate-fade-up">
-              <div className="font-display text-2xl sm:text-3xl font-bold text-ink leading-none tabular-nums">
-                {s.value}
+          {stats.map((s) => {
+            const inner = (
+              <>
+                <div className="font-display text-2xl sm:text-3xl font-bold text-ink leading-none tabular-nums">
+                  {s.value}
+                </div>
+                <div className="text-[11px] font-mono uppercase tracking-wider text-ink-muted mt-1.5">
+                  {s.label}
+                </div>
+              </>
+            );
+            return s.href ? (
+              <Link key={s.label} href={s.href} className="text-center animate-fade-up group">
+                <div className="group-hover:opacity-80 transition-opacity">{inner}</div>
+              </Link>
+            ) : (
+              <div key={s.label} className="text-center animate-fade-up">
+                {inner}
               </div>
-              <div className="text-[11px] font-mono uppercase tracking-wider text-ink-muted mt-1.5">
-                {s.label}
-              </div>
-            </div>
-          ))}
+            );
+          })}
           <Link
             href="/novedades"
             className="self-center text-xs font-semibold text-brand-600 hover:text-coral hover:underline transition-colors"

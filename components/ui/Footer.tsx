@@ -81,6 +81,7 @@ export default function Footer() {
               <li><Link href="/libros-usados-baratos" className="hover:text-coral transition-colors">Libros usados baratos</Link></li>
               <li><Link href="/vender" className="hover:text-coral transition-colors">Vende tu libro</Link></li>
               <li><Link href="/mapa" className="hover:text-coral transition-colors">Mapa de librerías</Link></li>
+              <li><Link href="/tiendas" className="hover:text-coral transition-colors">Tiendas y librerías</Link></li>
               <li><Link href="/novedades" className="hover:text-coral transition-colors">Novedades</Link></li>
               <li><Link href="/search" className="hover:text-coral transition-colors">Buscar</Link></li>
             </ul>
