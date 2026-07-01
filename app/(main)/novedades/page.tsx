@@ -39,6 +39,21 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "1 julio 2026",
+    title: "Saqué el trámite que había antes de publicar tu primer libro",
+    description:
+      "Me puse a mirar por qué entraba gente nueva pero pocos subían su primer libro, y me di cuenta de que yo misma les había puesto una tranca. Cuando te registrabas y apretabas \"publicar\", antes de dejarte ver el formulario te mandaba a otra página a \"completar tu perfil\": teléfono y dirección obligatorios, arrastrar un pin en un mapa… todo antes de haber subido nada. Un montón se bajaba ahí no más, y con razón: viniste a publicar un libro, no a llenar una ficha. Así que lo saqué. Ahora entras directo a subir el libro: le sacas una foto a la portada o escaneas el código, yo completo el resto y tú le pones precio. La ubicación te la sigo pidiendo —es lo que deja que el comprador calcule el envío o pase a buscarlo—, pero ahí mismo, en una sola pantalla, sin desvíos. Y el WhatsApp ahora es opcional: si publicas sin ponerlo te aviso que los compradores no van a poder escribirte, pero tú decides. Menos trámite, más libros. Si te habías quedado a medio camino, es buen momento para volver.",
+    tag: "Mejora",
+    link: "/publish",
+    linkText: "Publicar un libro",
+    visual: {
+      kind: "milestone",
+      icon: "📕",
+      metric: "Publicar en 1 pantalla",
+      detail: "sin completar perfil antes: entras directo a subir tu libro",
+    },
+  },
+  {
     date: "30 junio 2026",
     title: "Puse el sitio a volar de nuevo (y la búsqueda ahora se pagina)",
     description:
