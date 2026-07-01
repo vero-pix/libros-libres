@@ -157,7 +157,7 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 
 **Feedback CIMLibros / Carlos (1 jul 2026)** — su vendedor más activo
 - [x] **Contador de confianza en el home** — ✅ 1 jul. Prueba social arriba del fold: libros publicados (1.076) · tiendas activas (40) · visitas totales (~31k). Componente `components/home/StatsBar.tsx`, datos cacheados (`getPublicStats` en page.tsx). **Sin "vendidos" a propósito** (hoy ~0 / off-platform → delataría el problema). Incluye link "Mira lo nuevo →" a /novedades (Carlos dijo que las novedades quedan poco visibles).
-- [ ] **Ranking de tiendas** — por publicaciones/visitas (NO por ventas mientras sea ~0). Reusar lógica de `getFeaturedSellers`. Esfuerzo medio.
+- [x] **Ranking de tiendas** — ✅ 1 jul. Página `/tiendas` (`app/(main)/tiendas/page.tsx`) rankea las 40 tiendas por publicaciones activas (dato honesto; ventas fuera mientras sea ~0), con medallas al top 3. Linkeada desde el contador ("tiendas activas" → /tiendas), footer y sitemap.
 - [ ] **Varios puntos de entrega por tienda** — Carlos entrega en varios lugares. Necesita modelo de datos (`pickup_points` o JSON en users/listings) + publish form + ficha + checkout + cercanía. Sesión propia.
 - **Insight clave (Carlos):** "mucha gente me ubica por fuera y concreta fuera de la página" → confirma la fuga off-platform (ventas reales por WhatsApp que no dejan comisión). Su cuenta SÍ puede cobrar, así que es fuga por costumbre, no por MP roto. Evidencia directa para el trabajo de conversión ("Comprar manda"). Ver [[project_conversion_compra_jul2026]].
 
