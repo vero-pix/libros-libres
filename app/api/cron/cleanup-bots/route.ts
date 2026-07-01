@@ -76,6 +76,13 @@ export async function GET(request: Request) {
   // basura (dominios extranjeros al azar, SMS-gateways, role, desechables). Esta tabla
   // no la tocaba el cron. Borramos los que isLikelyBotEmail marca como bot.
   const subsDeleted: string[] = [];
+  // Nunca borrar un suscriptor cuyo email pertenece a un usuario registrado: los
+  // registrados son personas reales (aunque tengan un dominio poco común, p.ej.
+  // castrov@ticlibre.com). El cron de users los maneja aparte por nombre-bot.
+  const { data: allUserEmails } = await supabase.from("users").select("email");
+  const registeredEmails = new Set(
+    (allUserEmails ?? []).map((u) => (u.email ?? "").toLowerCase()).filter(Boolean)
+  );
   const { data: subs, error: subsErr } = await supabase
     .from("newsletter_subscribers")
     .select("email");
@@ -83,6 +90,7 @@ export async function GET(request: Request) {
     console.error("[cron/cleanup-bots] subs fetch error:", subsErr.message);
   } else {
     for (const row of subs ?? []) {
+      if (registeredEmails.has((row.email ?? "").toLowerCase())) continue;
       if (!isLikelyBotEmail(row.email)) continue;
       if (dry) { subsDeleted.push(`[dry] ${row.email}`); continue; }
       const { error: dErr } = await supabase

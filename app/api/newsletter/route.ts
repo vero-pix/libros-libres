@@ -3,10 +3,18 @@ import { createServerClient } from "@supabase/ssr";
 import { sendEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
-  const { email, full_name } = (await req.json()) as {
+  const { email, full_name, company } = (await req.json()) as {
     email?: string;
     full_name?: string;
+    company?: string;
   };
+
+  // Honeypot: los formularios traen un campo oculto `company` que los humanos dejan
+  // vacío. Si viene con algo, es un bot → respondemos 200 (para no darle pistas) pero
+  // NO guardamos nada. Esto es lo que llenaba newsletter_subscribers de basura.
+  if (company && company.trim() !== "") {
+    return NextResponse.json({ ok: true });
+  }
 
   if (!email || !email.includes("@")) {
     return NextResponse.json({ error: "Email inválido" }, { status: 400 });

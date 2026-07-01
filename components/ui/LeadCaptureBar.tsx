@@ -8,6 +8,7 @@ const DELAY_MS = 25_000;
 export default function LeadCaptureBar() {
   const [visible, setVisible] = useState(false);
   const [email, setEmail] = useState("");
+  const [company, setCompany] = useState(""); // honeypot
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "err">("idle");
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export default function LeadCaptureBar() {
       const res = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, company }),
       });
       if (!res.ok) throw new Error();
       setStatus("ok");
@@ -83,6 +84,17 @@ export default function LeadCaptureBar() {
             Déjame tu email y te aviso cuando lleguen libros que podrían gustarte.
           </p>
           <form onSubmit={handleSubmit} className="flex gap-2">
+            {/* Honeypot anti-bot: oculto para humanos */}
+            <input
+              type="text"
+              name="company"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="hidden"
+            />
             <input
               type="email"
               value={email}
