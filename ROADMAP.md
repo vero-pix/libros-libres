@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 25 junio 2026
+Última actualización: 2 julio 2026
 
 ---
 
@@ -9,8 +9,21 @@
 | Bug | Fix de raíz | Fecha |
 |---|---|---|
 | Vendedor nuevo sin username → URL UUID | Trigger DB `auto_username_on_insert` + endpoint `/api/users/generate-username` | 13 mayo 2026 |
+| Copy de pago que promete escrow ("pago retenido hasta que confirmes recepción") | NO existe escrow — la plata va al vendedor cuando MP aprueba. Solo decir "pago seguro con MercadoPago" (trazable, no efectivo a desconocido). Nunca prometer retención/devolución garantizada. | 2 jul 2026 |
 
 Cuando aparezca un bug de este tipo: **no solo backfillear — siempre tapar el origen**.
+
+---
+
+## 🎯 Plan de abordaje — próxima sesión (estado 2 jul 2026)
+
+**El $0 de revenue NO es el código — es la cuenta MP.** La máquina de compra funciona (MP crea preferencia, 26/30 vendedores pueden cobrar). Pero 4 cuentas están bloqueadas (`rejected_by_regulations`), incluida la de TusLibros (es la de la mamá de Vero, `margar@tuslibros.cl`) = 201 libros + Ruth 65 + Nicole 20 + Barbara 7 = ~293 libros (29%) que se ven pero no se pueden pagar. Detalle en memoria `project_conversion_compra_jul2026`.
+
+Orden por impacto:
+1. **[Vero, fuera de la app]** Arreglar cuenta MP de Margarita → desbloquea el revenue. #1 absoluto.
+2. **[Código, pendiente]** Blindaje: no mostrar "Comprar" en libros de vendedores con `sell.allow=false` (guardar en `users.mp_can_collect` vía cron; buybox → "pronto disponible/contacto"). Hace SEGURO traer tráfico.
+3. **[Distribución — Vero quiere meterle]** LinkedIn + otro Reddit CON FOCO (post #3 demanda ya en draft `docs/reddit_r_chile_post.md`) + bookfluencers (`docs/dm_bookfluencers_jun2026.md`). **NO disparar antes de #1 y #2** o se quema el tráfico en el pago roto.
+4. Avisar a Ruth/Nicole/Barbara del bloqueo MP.
 
 ---
 
