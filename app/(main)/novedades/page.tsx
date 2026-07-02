@@ -39,6 +39,36 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "2 julio 2026",
+    title: "Colecciones editoriales: Historia de Chile, Novela Negra, Clásicos y más",
+    description:
+      "Armé seis vitrinas temáticas con URL propia para que Google las encuentre mejor y para que puedas compartir una colección entera de un tirón. Historia de Chile, Literatura Chilena, Novela Negra, Clásicos, Tarde de Lluvia y Latinoamérica Contemporánea. Cada una tiene su propia dirección (tuslibros.cl/coleccion/...), muestra solo los libros disponibles hoy y tiene un texto editorial que explica por qué vale la pena ese tema. También agregué la landing de Marcela Paz y Papelucho — hay ejemplares de segunda mano en muy buen estado, ideal para armar la colección sin gastar de más.",
+    tag: "Lanzamiento",
+    link: "/coleccion/historia-de-chile",
+    linkText: "Ver Historia de Chile",
+    visual: {
+      kind: "milestone",
+      icon: "📚",
+      metric: "6 colecciones",
+      detail: "Historia de Chile · Novela Negra · Clásicos · Literatura Chilena · Tarde de Lluvia · Latinoamérica",
+    },
+  },
+  {
+    date: "2 julio 2026",
+    title: "Ahora puedes cambiar tu contraseña desde tu perfil",
+    description:
+      "Antes si querías cambiar tu contraseña tenías que esperar un link por correo y usarlo antes de que venciera — un proceso que más de alguien encontró engorroso. Ahora la opción está directo en tu perfil: entras a tuslibros.cl/perfil, vas al final de la página y cambias la contraseña en el momento, sin esperar nada.",
+    tag: "Mejora",
+    link: "/perfil",
+    linkText: "Ir a mi perfil",
+    visual: {
+      kind: "milestone",
+      icon: "🔐",
+      metric: "Contraseña",
+      detail: "cambia desde tu perfil, sin esperar link por correo",
+    },
+  },
+  {
     date: "1 julio 2026",
     title: "Comprar quedó más claro y seguro",
     description:
