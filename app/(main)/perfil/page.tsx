@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import ProfileForm from "@/components/ui/ProfileForm";
 import MercadoPagoConnect from "@/components/ui/MercadoPagoConnect";
 import ApiKeyManager from "@/components/ui/ApiKeyManager";
+import ChangePasswordForm from "@/components/ui/ChangePasswordForm";
 
 export const metadata = { title: "Mi Perfil — tuslibros.cl", robots: { index: false } };
 
@@ -71,6 +72,7 @@ export default async function PerfilPage() {
           />
         </div>
         <ApiKeyManager />
+        <ChangePasswordForm />
       </main>
     </div>
   );
