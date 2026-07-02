@@ -426,12 +426,14 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               >
                 Comprar con MercadoPago — ${listing.price.toLocaleString("es-CL")}
               </Link>
-              {/* Confianza: el pago protegido resuelve el "¿y si no me llega?" antes de que se vaya por WhatsApp */}
+              {/* Confianza (honesto — NO prometemos escrow, no existe en el flujo): pagar
+                  vía MercadoPago vs efectivo a un desconocido es el diferenciador real. */}
               <div className="flex items-start gap-2 bg-[#009EE3]/5 border border-[#009EE3]/20 rounded-xl px-3 py-2.5">
-                <span className="text-base leading-none mt-0.5" aria-hidden>🛡️</span>
+                <span className="text-base leading-none mt-0.5" aria-hidden>🔒</span>
                 <p className="text-xs text-ink leading-snug">
-                  <span className="font-semibold">Compra protegida.</span> Tu pago queda retenido en
-                  MercadoPago y el vendedor lo recibe recién cuando confirmas que el libro llegó bien.
+                  <span className="font-semibold">Pago seguro con MercadoPago.</span> Pagas con tu
+                  tarjeta a través de MercadoPago —no en efectivo a un desconocido— y queda registro
+                  de la compra.
                 </p>
               </div>
               <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
