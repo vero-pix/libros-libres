@@ -3,7 +3,7 @@
     {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "librolibre.cl" }],
-      "destination": "https://tuslibros.cl/:path*",
+      "destination": "https://tuslibros.cl/:path*?utm_source=librolibre&utm_medium=redirect",
       "permanent": true
     }
   ],
