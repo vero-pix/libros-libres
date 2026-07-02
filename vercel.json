@@ -1,4 +1,12 @@
 {
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "librolibre.cl" }],
+      "destination": "https://tuslibros.cl/:path*",
+      "permanent": true
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron/update-rankings",
