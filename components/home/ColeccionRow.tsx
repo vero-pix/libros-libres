@@ -5,13 +5,14 @@ import type { ListingWithBook } from "@/types";
 
 interface Props {
   tag: string;
+  collectionSlug?: string;
   title: string;
   subtitle: string;
   listings: ListingWithBook[];
 }
 
 // Presentacional: los listings (ya deduplicados entre colecciones y filas) llegan por prop.
-export default function ColeccionRow({ tag, title, subtitle, listings }: Props) {
+export default function ColeccionRow({ tag, collectionSlug, title, subtitle, listings }: Props) {
   if (!listings || listings.length < 3) return null;
 
   return (
@@ -22,7 +23,7 @@ export default function ColeccionRow({ tag, title, subtitle, listings }: Props) 
           <p className="text-[11px] font-mono text-ink-muted mt-0.5">{subtitle}</p>
         </div>
         <Link
-          href={`/?tag=${tag}`}
+          href={collectionSlug ? `/coleccion/${collectionSlug}` : `/?tag=${tag}`}
           className="text-xs font-medium text-brand-600 hover:underline flex-shrink-0"
         >
           Ver todos →
