@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { createServerClient } from "@supabase/ssr";
+import { COLLECTIONS } from "@/app/(main)/coleccion/[slug]/collections.config";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://tuslibros.cl";
@@ -76,6 +77,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
       };
     });
+
+    // Colecciones editoriales con URL canónica (jul 2026)
+    const collectionPages: MetadataRoute.Sitemap = Object.keys(COLLECTIONS).map((slug) => ({
+      url: `${baseUrl}/coleccion/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
+    listingPages = [...collectionPages, ...listingPages];
 
     // TODO: agregar /categoria/[slug] cuando existan las rutas reales (Fase 2)
   } catch {

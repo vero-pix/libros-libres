@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
+import CategoriesMobileDrawer from "@/components/ui/CategoriesMobileDrawer";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
 import ListingCardList from "@/components/listings/ListingCardList";
@@ -196,13 +197,14 @@ const getCollectibleListings = unstable_cache(
 const EXCLUDED_SUBCATEGORIES = ["no-ficcion-ensayo", "no-ficcion-humanidades"];
 
 // Colecciones editoriales curadas por Vero (orden = prioridad al deduplicar).
+// collectionSlug: URL canónica /coleccion/[slug] cuando existe la página dedicada.
 const COLLECTION_CONFIGS = [
-  { tag: "tarde-de-lluvia", title: "Para una tarde de lluvia", subtitle: "Curado por Vero · lectura lenta, sin apuro" },
-  { tag: "literatura-chilena", title: "Literatura chilena", subtitle: "Escritoras y escritores de acá" },
-  { tag: "latinoamerica-contemp", title: "Latinoamérica contemporánea", subtitle: "Lo que se está escribiendo ahora mismo" },
-  { tag: "historia-chile", title: "Historia de Chile", subtitle: "Memoria, política, identidad" },
-  { tag: "clasicos", title: "Clásicos que no caducan", subtitle: "Los que siempre vuelven" },
-  { tag: "novela-negra", title: "Novela negra y suspenso", subtitle: "Para no soltar el libro" },
+  { tag: "tarde-de-lluvia", collectionSlug: "tarde-de-lluvia", title: "Para una tarde de lluvia", subtitle: "Curado por Vero · lectura lenta, sin apuro" },
+  { tag: "literatura-chilena", collectionSlug: "literatura-chilena", title: "Literatura chilena", subtitle: "Escritoras y escritores de acá" },
+  { tag: "latinoamerica-contemp", collectionSlug: "latinoamerica-contemporanea", title: "Latinoamérica contemporánea", subtitle: "Lo que se está escribiendo ahora mismo" },
+  { tag: "historia-chile", collectionSlug: "historia-de-chile", title: "Historia de Chile", subtitle: "Memoria, política, identidad" },
+  { tag: "clasicos", collectionSlug: "clasicos", title: "Clásicos que no caducan", subtitle: "Los que siempre vuelven" },
+  { tag: "novela-negra", collectionSlug: "novela-negra", title: "Novela negra y suspenso", subtitle: "Para no soltar el libro" },
   { tag: "filosofia", title: "Filosofía accesible", subtitle: "Pensar sin sufrir" },
   { tag: "ensayo", title: "Ensayo y pensamiento", subtitle: "Ideas que cambian cómo ves las cosas" },
   { tag: "ciencia-divulgacion", title: "Ciencia y divulgación", subtitle: "Para entender el mundo sin título universitario" },
@@ -237,7 +239,7 @@ const getCollections = unstable_cache(
         used.add(l.id);
         listings.push(l);
       }
-      return { tag: c.tag, title: c.title, subtitle: c.subtitle, listings };
+      return { tag: c.tag, collectionSlug: c.collectionSlug, title: c.title, subtitle: c.subtitle, listings };
     });
   },
   ["home-collections-v1"],
@@ -375,7 +377,7 @@ export default async function HomePage({ searchParams }: Props) {
     getFeaturedSellers(),
     getCollectibleListings() as unknown as Promise<ListingWithBook[]>,
     getRecentListings() as unknown as Promise<ListingWithBook[]>,
-    getCollections() as unknown as Promise<{ tag: string; title: string; subtitle: string; listings: ListingWithBook[] }[]>,
+    getCollections() as unknown as Promise<{ tag: string; collectionSlug?: string; title: string; subtitle: string; listings: ListingWithBook[] }[]>,
     getTotalActiveCount(),
     getAvailableTags(),
     getPublicStats(),
@@ -482,6 +484,11 @@ export default async function HomePage({ searchParams }: Props) {
           ...(subcategory ? [{ label: categoryTree.flatMap((c) => c.children).find((c) => c.slug === subcategory)?.name ?? subcategory }] : []),
           ...(tag ? [{ label: `#${tag}` }] : []),
         ]} />
+        <CategoriesMobileDrawer
+          categories={categoryTree.flatMap((g) => g.children.map((c) => ({ category: c.slug, count: c.count })))}
+          activeCategory={subcategory ?? category}
+        />
+
         <div className="flex gap-10">
           <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalCount} availableTags={availableTags} />
 
@@ -493,7 +500,7 @@ export default async function HomePage({ searchParams }: Props) {
             {/* Colecciones editoriales curadas por Vero — deduplicadas entre sí y contra las filas */}
             {!hasFilters &&
               collections.map((c) => (
-                <ColeccionRow key={c.tag} tag={c.tag} title={c.title} subtitle={c.subtitle} listings={c.listings} />
+                <ColeccionRow key={c.tag} tag={c.tag} collectionSlug={c.collectionSlug} title={c.title} subtitle={c.subtitle} listings={c.listings} />
               ))}
 
             {!hasFilters && collectibleRowListings.length > 0 && (
