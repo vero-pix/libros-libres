@@ -98,6 +98,12 @@ interface ListingWithRentalFields extends ListingWithBook {
   rental_period_days?: number | null;
 }
 
+// Vendedores cuya cuenta MercadoPago temporalmente NO puede recibir pagos (en
+// recuperación, ej. rejected_by_regulations). En vez de mandar al comprador a la página
+// muerta de MP, mostramos un aviso suave + contacto. Quitar el username de acá cuando la
+// cuenta vuelva a operar. (Por ahora solo la cuenta de Vero, mientras la recupera.)
+const MP_NOT_RECEIVING = new Set<string>(["vero"]);
+
 interface Props {
   listing: ListingWithBook;
   images?: { id: string; image_url: string }[];
@@ -418,6 +424,21 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               </div>
               <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} />
             </div>
+          ) : MP_NOT_RECEIVING.has((listing.seller as any)?.username) ? (
+            <div className="space-y-3">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+                <span className="text-2xl leading-none mt-0.5" aria-hidden>🛠️</span>
+                <div>
+                  <p className="font-display text-base font-bold text-amber-900">Pago en línea en mantención</p>
+                  <p className="text-sm text-amber-800 mt-1 leading-relaxed">
+                    Por ahora MercadoPago no está 100% operativo para esta tienda. Escríbele al
+                    vendedor para coordinar la compra mientras lo dejamos al día.
+                  </p>
+                </div>
+              </div>
+              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} />
+              <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
+            </div>
           ) : (listing.seller as any)?.mercadopago_user_id ? (
             <>
               <Link
@@ -480,7 +501,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             <span className="text-xl font-bold text-black leading-none">${listing.price.toLocaleString("es-CL")}</span>
           </div>
           <div className="flex-1">
-            {listing.seller?.mercadopago_user_id ? (
+            {listing.seller?.mercadopago_user_id && !MP_NOT_RECEIVING.has((listing.seller as any)?.username) ? (
               <Link
                 href={`/checkout/${listing.id}`}
                 className="flex items-center justify-center w-full bg-coral active:bg-coral-deep text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-base"
