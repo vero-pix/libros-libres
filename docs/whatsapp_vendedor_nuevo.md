@@ -4,6 +4,10 @@ Plantilla para responder a alguien que escribe por WhatsApp queriendo publicar s
 Nace de la conversación real del 3 jul 2026 (persona preguntó "¿se hace un cuestionario?").
 Voz de Vero: cercana, directa, chilena. Sin sonar a folleto.
 
+**Versión visual (imagen para enviar):** `docs/guia_vender_vero.html` — pieza "Publicar es así de fácil"
+con los 4 pasos + Cien años de soledad de ejemplo. Abrir en el navegador y exportar como imagen
+(o screenshot) para mandar por WhatsApp cuando el texto no basta.
+
 ---
 
 ## Versión estándar (la que sirve el 90% de las veces)
