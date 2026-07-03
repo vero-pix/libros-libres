@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import CategoriesMobileDrawer from "@/components/ui/CategoriesMobileDrawer";
 import ListingToolbar from "@/components/listings/ListingToolbar";
@@ -118,14 +119,26 @@ const getTotalActiveCount = unstable_cache(
 const getPublicStats = unstable_cache(
   async () => {
     const supabase = createPublicClient();
+    const serviceClient = createServiceRoleClient();
     const [{ data: sellers }, { count: views }] = await Promise.all([
       supabase.from("listings").select("seller_id").eq("status", "active"),
-      supabase.from("page_views").select("*", { count: "exact", head: true }),
+      serviceClient.from("page_views").select("*", { count: "exact", head: true }),
     ]);
+    const { data: sold } = await serviceClient
+      .from("listings")
+      .select("updated_at")
+      .eq("status", "completed");
+
+    const soldByMonth: Record<string, number> = {};
+    for (const l of sold ?? []) {
+      const m = (l.updated_at as string).slice(0, 7);
+      soldByMonth[m] = (soldByMonth[m] ?? 0) + 1;
+    }
+
     const stores = new Set((sellers ?? []).map((l) => l.seller_id)).size;
-    return { stores, views: views ?? 0 };
+    return { stores, views: views ?? 0, soldByMonth, totalSold: (sold ?? []).length };
   },
-  ["home-public-stats-v1"],
+  ["home-public-stats-v2"],
   { revalidate: 300 }
 );
 
@@ -466,6 +479,8 @@ export default async function HomePage({ searchParams }: Props) {
         totalListings={totalActiveCount}
         stores={publicStats.stores}
         views={publicStats.views}
+        totalSold={publicStats.totalSold}
+        soldByMonth={publicStats.soldByMonth}
         hasFilters={hasFilters}
         featuredRow={
           !hasFilters && (featuredRowListings.length > 0 || featuredSellers.length > 0) ? (
