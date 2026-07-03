@@ -5,7 +5,7 @@ export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 const TO = "veronicavelasquez@mac.com";
-const REPLY_TO = "vero@economics.cl";
+const REPLY_TO = "vero@tuslibros.cl";
 
 /**
  * GET /api/cron/seo-report

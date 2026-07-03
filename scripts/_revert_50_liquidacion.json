@@ -1,0 +1,962 @@
+[
+  {
+    "id": "384eece0-8a52-4239-8c72-97bf4a9c346a",
+    "price": 12000,
+    "original_price": null
+  },
+  {
+    "id": "f5b104d1-e04e-41c3-acf9-61b28482e9f2",
+    "price": 8000,
+    "original_price": null
+  },
+  {
+    "id": "2ded4dec-3ce7-490c-9b65-8052af52f3f7",
+    "price": 4000,
+    "original_price": null
+  },
+  {
+    "id": "7378ca00-c621-49dc-aec5-cf32f947ecf0",
+    "price": 11990,
+    "original_price": 23490
+  },
+  {
+    "id": "ee60d2cf-8433-4ee8-8700-9cb507c03ade",
+    "price": 17000,
+    "original_price": null
+  },
+  {
+    "id": "935d9726-1457-40cc-a618-1571212711e0",
+    "price": 12000,
+    "original_price": null
+  },
+  {
+    "id": "126e9f6a-86ea-4f50-a655-cc7dae6eec73",
+    "price": 9990,
+    "original_price": null
+  },
+  {
+    "id": "4bbce47f-1dd9-4b10-88d7-ceddd36ff2e5",
+    "price": 10000,
+    "original_price": null
+  },
+  {
+    "id": "5b37599a-6757-47af-ba58-e96d53626806",
+    "price": 25000,
+    "original_price": null
+  },
+  {
+    "id": "6f86402f-539a-483f-836d-935cbfbab6b2",
+    "price": 25000,
+    "original_price": null
+  },
+  {
+    "id": "caec40ba-c7f6-4ebe-a288-7c85d84b8723",
+    "price": 8990,
+    "original_price": 6000
+  },
+  {
+    "id": "a248542e-2da2-4381-b746-caa7d29509cb",
+    "price": 10000,
+    "original_price": 12000
+  },
+  {
+    "id": "1ca01998-3a13-4845-b303-7b92dc784565",
+    "price": 6500,
+    "original_price": null
+  },
+  {
+    "id": "87ac3413-b8e5-4333-b998-f611a48b75ff",
+    "price": 8990,
+    "original_price": 6000
+  },
+  {
+    "id": "0594b158-5137-41a6-ad11-f00de594d912",
+    "price": 8990,
+    "original_price": 6000
+  },
+  {
+    "id": "370bb085-1bd3-4676-b2bf-7aca2cc96be6",
+    "price": 9990,
+    "original_price": null
+  },
+  {
+    "id": "f61e5113-6938-429b-a94b-fa26a989274c",
+    "price": 12000,
+    "original_price": null
+  },
+  {
+    "id": "19abd38b-fafd-4347-9fda-8253e06cdce3",
+    "price": 6500,
+    "original_price": null
+  },
+  {
+    "id": "8153e536-f136-4ded-90e6-c38d73f57727",
+    "price": 3000,
+    "original_price": null
+  },
+  {
+    "id": "60eb000b-5a57-416a-b978-025dc5d10a39",
+    "price": 7000,
+    "original_price": 8000
+  },
+  {
+    "id": "689393ed-6f12-4785-845d-690a73cb0189",
+    "price": 6000,
+    "original_price": null
+  },
+  {
+    "id": "3687d50c-441e-422f-bf1d-37b207a17e3e",
+    "price": 12000,
+    "original_price": null
+  },
+  {
+    "id": "918e1224-bc59-46e6-802d-841a0ffd9aab",
+    "price": 6500,
+    "original_price": null
+  },
+  {
+    "id": "80cbe77b-1071-4faf-93c0-c1dfd83a7429",
+    "price": 12000,
+    "original_price": null
+  },
+  {
+    "id": "27bfafef-b8f5-4bbc-9a82-db0a4943da36",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "91c697f4-aa68-4a44-9c2c-6d2ac5cd1786",
+    "price": 12000,
+    "original_price": null
+  },
+  {
+    "id": "e23348d2-ad23-4446-a7a2-15dff9a28a1d",
+    "price": 6600,
+    "original_price": 8000
+  },
+  {
+    "id": "4f4e3123-5f21-45d5-ae45-522551c863ad",
+    "price": 15000,
+    "original_price": null
+  },
+  {
+    "id": "cb9ef1c5-88d9-4da3-a718-84f8a5fbc024",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "ab7a7757-8fca-4f87-b478-3d37869533de",
+    "price": 5000,
+    "original_price": null
+  },
+  {
+    "id": "0d27fc01-2e62-49cb-8571-6b43652d97e2",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "7f31d3f8-ce93-41ec-b7be-9d6e0d29d816",
+    "price": 80000,
+    "original_price": null
+  },
+  {
+    "id": "3f5aeb9c-d877-45a5-b6f6-b356c406df5f",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "cc3fa26e-cabd-4418-8b09-737c2a0aa0ab",
+    "price": 7700,
+    "original_price": null
+  },
+  {
+    "id": "9317af59-2d0a-4dec-aa93-8c7af7608c21",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "fc479326-aa25-4272-a4f4-7a3f9616113e",
+    "price": 22000,
+    "original_price": 25000
+  },
+  {
+    "id": "19448795-ef3e-4283-b733-0efa6279a09a",
+    "price": 23990,
+    "original_price": 40000
+  },
+  {
+    "id": "fca4ba42-4b6f-496c-bd51-aa68ffd7be16",
+    "price": 8000,
+    "original_price": null
+  },
+  {
+    "id": "59f0bc85-9ef3-46cd-981f-ce4b54683949",
+    "price": 8000,
+    "original_price": null
+  },
+  {
+    "id": "eeab45c6-fbf5-486c-b171-bb2dfa1831b6",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "15f667d4-6ee8-4cfd-9312-375fb544ac24",
+    "price": 6500,
+    "original_price": null
+  },
+  {
+    "id": "c2001f64-7241-42dd-8ad3-a6d29c856a85",
+    "price": 11990,
+    "original_price": null
+  },
+  {
+    "id": "32fc78b5-2c38-448c-8d27-c19cfed50051",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "57116520-8ba5-4899-a0e6-8ec48465152c",
+    "price": 6500,
+    "original_price": null
+  },
+  {
+    "id": "3cbe4c6e-dce0-413a-8ee8-74a0c518583a",
+    "price": 6500,
+    "original_price": null
+  },
+  {
+    "id": "e22d3286-29b3-40e2-b3a7-910a1270896e",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "94aca585-7694-4bbe-9ab8-05d6204728e0",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "58e294e8-ed80-44da-af9b-7c32129be5e0",
+    "price": 12000,
+    "original_price": null
+  },
+  {
+    "id": "5e0d8281-ca0f-4fd5-8794-87f55d707b63",
+    "price": 6500,
+    "original_price": null
+  },
+  {
+    "id": "7fae07f8-6a03-4d24-9623-92052ef2bd0f",
+    "price": 12000,
+    "original_price": null
+  },
+  {
+    "id": "b88571b9-719d-48c5-a349-55768c8235b8",
+    "price": 9500,
+    "original_price": null
+  },
+  {
+    "id": "d94d31dc-6873-42af-9316-5de7323dca76",
+    "price": 6500,
+    "original_price": null
+  },
+  {
+    "id": "fd635d5c-8554-4bda-8714-e1a0d31eb877",
+    "price": 50000,
+    "original_price": null
+  },
+  {
+    "id": "eead580d-9318-427c-87fb-65d6dccfcf9b",
+    "price": 8000,
+    "original_price": null
+  },
+  {
+    "id": "1ba4414a-79b1-4e22-bd33-8fea0a5e7459",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "32e65178-f775-4d09-97dc-66c3529c4a46",
+    "price": 8000,
+    "original_price": null
+  },
+  {
+    "id": "3973af2c-c84d-411d-98e8-d7f8d4a941cc",
+    "price": 15000,
+    "original_price": null
+  },
+  {
+    "id": "620f6126-37b7-4815-a0b2-d17b1bd91a3c",
+    "price": 9000,
+    "original_price": null
+  },
+  {
+    "id": "07ecf174-d6f6-453e-95d7-9b6c81ad94fd",
+    "price": 10000,
+    "original_price": 12000
+  },
+  {
+    "id": "200aecf3-4e78-4ba8-a278-9279c69a9509",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "8c215a0c-f612-405e-9305-5e9cc1e91b63",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "3b68acfc-b4c2-436f-bbef-52f23352512c",
+    "price": 10000,
+    "original_price": 11200
+  },
+  {
+    "id": "8f11f4f4-022f-4001-9b4f-26215d8ca66c",
+    "price": 7000,
+    "original_price": null
+  },
+  {
+    "id": "6a6f655b-fd11-4742-982a-5ee5035e23ee",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "4cd7beb4-7dc8-4d53-a91b-3fad226ea4cf",
+    "price": 12990,
+    "original_price": 25000
+  },
+  {
+    "id": "c651c1e7-a445-4ab0-84ce-1b26087342ef",
+    "price": 4000,
+    "original_price": null
+  },
+  {
+    "id": "0b3d080c-b968-44a7-b122-db8e8ce52e0a",
+    "price": 4000,
+    "original_price": null
+  },
+  {
+    "id": "fbf3187b-dfd8-4540-8720-e7b9be0413da",
+    "price": 8990,
+    "original_price": 15000
+  },
+  {
+    "id": "efb54ba3-f0aa-4eba-b82f-6a5da4b27c85",
+    "price": 23990,
+    "original_price": 40000
+  },
+  {
+    "id": "4f465ea1-b196-4f7d-81ca-11a0c78fa554",
+    "price": 13000,
+    "original_price": null
+  },
+  {
+    "id": "e67188bb-a7a9-439b-9a90-c75ee468f13f",
+    "price": 15000,
+    "original_price": null
+  },
+  {
+    "id": "ee5ccee8-3347-4224-9d0a-72845197050c",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "b985ec8d-d972-4508-9528-7de5040dc082",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "b2759bf6-257b-47f4-8b27-f1f512abbfbc",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "d02e12dc-4cd6-403b-973d-14633cfde83d",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "6ef83927-5641-4a93-8bd7-08523c391a23",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "25d121da-449b-420b-a677-6d9b28d21968",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "047fcc59-9fca-452d-9efa-27e6033a5ec3",
+    "price": 9000,
+    "original_price": null
+  },
+  {
+    "id": "1edd8a60-6252-4b4a-b602-86c36f1f7216",
+    "price": 6990,
+    "original_price": null
+  },
+  {
+    "id": "9733cc1c-198f-4660-82bc-de5ac9e1fdac",
+    "price": 59000,
+    "original_price": 79000
+  },
+  {
+    "id": "81bf81af-c5d9-4bd0-939a-8037b5f27a8b",
+    "price": 9900,
+    "original_price": 12000
+  },
+  {
+    "id": "950ab038-5a2a-4c8b-adec-a839aafc69d1",
+    "price": 7994,
+    "original_price": null
+  },
+  {
+    "id": "e37bbb0e-cabe-42a1-83a1-f4c76cd8d8a6",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "c1f9c17a-67fb-4694-b992-09220cefa685",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "c60affe9-abb3-44a7-bfed-705f90d41271",
+    "price": 3500,
+    "original_price": null
+  },
+  {
+    "id": "59fa0351-8a8c-46ec-ab07-dbcb121cfe37",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "594cf096-6183-48e9-ba8f-8be14dc3bb88",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "ff15bd66-1b25-4cb3-9e4e-1b6c08740070",
+    "price": 7900,
+    "original_price": null
+  },
+  {
+    "id": "b3935f29-f3df-4f37-8c38-31d1c513e0ac",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "d7d91262-0dcf-430b-b87b-920f06e89e15",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "7ff60ca1-cb04-4502-bb72-a8505ec93da9",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "989fa7db-7274-4917-9710-3fc3e565617f",
+    "price": 13990,
+    "original_price": null
+  },
+  {
+    "id": "2d831032-a79c-43e7-bf52-dac30ae670db",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "27b41146-fd72-4ecf-a353-fdbb7dabd37f",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "745a0684-a5fe-4d76-8f36-e73852b400d4",
+    "price": 20000,
+    "original_price": null
+  },
+  {
+    "id": "a569c6c7-0c45-45f0-84b1-2f92bfc19624",
+    "price": 25000,
+    "original_price": 25000
+  },
+  {
+    "id": "ebe9163d-1efb-4d6c-8297-8888f8af18b6",
+    "price": 13000,
+    "original_price": null
+  },
+  {
+    "id": "4bcf7595-ae87-47a2-a593-24d657b41d91",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "c4f53377-b835-4309-934c-de6bef8e2048",
+    "price": 5000,
+    "original_price": null
+  },
+  {
+    "id": "e9c2c7bb-8db5-4c52-9b5b-7a22abf95590",
+    "price": 6500,
+    "original_price": null
+  },
+  {
+    "id": "50ab84fe-e27a-4f1f-b752-229f8f1e3113",
+    "price": 7000,
+    "original_price": null
+  },
+  {
+    "id": "edd83023-d21e-4c2f-8ed0-e36025985802",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "af4e4feb-54fe-4792-830f-fc7e71f246a6",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "294fcc1f-d43d-449d-8335-911c25169c35",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "19a1a6da-f11f-4216-8422-c4923a33bf6b",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "d3934e75-f4b6-47c3-b41b-11d1011fd7db",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "2324772a-f746-435d-9acf-1f28522155b2",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "d866c6b0-b5dc-4db4-a3e6-dd67657f4541",
+    "price": 9990,
+    "original_price": null
+  },
+  {
+    "id": "ec309589-a562-4e0a-b82c-ee689b903ab4",
+    "price": 6000,
+    "original_price": null
+  },
+  {
+    "id": "44d586d1-67ea-4d18-b2ec-eccb5d6fb0b4",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "aac99971-717e-4fcf-b362-ff0bf80446b0",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "7edc5003-8067-48d3-ae5b-5f32b315df39",
+    "price": 11800,
+    "original_price": 22000
+  },
+  {
+    "id": "f5a090dd-4b2a-4249-8760-9dbe91c13b36",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "318606ff-72a4-4e6d-bc49-bf0069008986",
+    "price": 19990,
+    "original_price": 24000
+  },
+  {
+    "id": "6ee88c00-953f-4c60-bee5-0459eeadc2ee",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "496195dc-9712-41a7-9ebb-9b39bbf62389",
+    "price": 15000,
+    "original_price": 20000
+  },
+  {
+    "id": "d96e0a98-6dd2-4a99-80fd-cebfbec066da",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "ad49f79f-6244-4c97-9fbc-08fa5a1881da",
+    "price": 9990,
+    "original_price": null
+  },
+  {
+    "id": "3b484512-0636-4fee-9919-b500c7f14edd",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "5b5863cc-72e7-418d-989a-2498207e4daf",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "529a12ff-c0ca-4436-aa91-39bb0a81a9a1",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "e0e5ae06-00bb-4f74-8ece-98caf2137255",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "8fa669f1-cd69-4281-9f92-7ee576f07741",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "e9e1967a-fa0d-4d7e-aa11-d4066225abb3",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "fc78733e-615b-4338-8993-12e8910ad2bd",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "04e56a5b-3162-4887-9d2e-8e51d421f530",
+    "price": 5500,
+    "original_price": 6000
+  },
+  {
+    "id": "953c7669-471b-4407-9e5c-7dbd3bda1a62",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "b509a17e-5e76-4f18-9183-37985ae476e8",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "1b504450-398e-4ab2-9f9b-31a378e1af9d",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "897c5ab2-a770-465c-b798-1be6bab09f59",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "1c64b962-6336-4032-9692-83dfc4181711",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "42dc9db6-2805-43a4-be4b-de96f3c2ae86",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "bc207a2c-7cd7-4b30-8ad4-85326c9e9c76",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "26a5b9d5-edfb-407c-831c-a19deb9232c1",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "f1430345-981c-497f-91c0-a923f0c1aff0",
+    "price": 7000,
+    "original_price": 8000
+  },
+  {
+    "id": "66623582-5a93-4610-9685-d49569889d53",
+    "price": 7990,
+    "original_price": 8990
+  },
+  {
+    "id": "ee0573a9-40bf-49fb-9c91-19abcc7fce99",
+    "price": 14000,
+    "original_price": null
+  },
+  {
+    "id": "6c5c177c-d47a-44a7-a08d-be3a83bca5f8",
+    "price": 10990,
+    "original_price": null
+  },
+  {
+    "id": "650ff29b-f652-4bac-b789-444cd3a60c0a",
+    "price": 20000,
+    "original_price": null
+  },
+  {
+    "id": "d76a7f0a-8121-48d5-9f68-69b664cc9342",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "301e872b-64ca-4388-87f1-f6abf090ff93",
+    "price": 11800,
+    "original_price": null
+  },
+  {
+    "id": "b649a9fc-2375-4a15-b1bb-0703c83fb295",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "fe66d4d2-8510-48ee-993e-8a5dc391a275",
+    "price": 13000,
+    "original_price": 14560
+  },
+  {
+    "id": "606759fa-614f-4047-b5ae-0af7648b3af3",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "990d5a89-6e0c-4254-82ca-38d0f87cdde0",
+    "price": 6990,
+    "original_price": null
+  },
+  {
+    "id": "f0654e34-c791-4c6c-a422-f9315adaf8cf",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "d9d72511-c4ab-4724-b19a-9d2726efd0ce",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "08cd6280-817e-4a5e-93a1-c380f9a56af1",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "277e1e79-aee9-4323-acf8-5c90f17ec125",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "15eb6240-b28d-4d92-a049-c064fd054cfc",
+    "price": 9990,
+    "original_price": null
+  },
+  {
+    "id": "67c1a6e7-af87-4654-b636-79b4e5eeee62",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "65956f59-47fa-4073-a45d-25f415c23ca8",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "4fe96972-5425-42b0-a029-eb7cd6d6365c",
+    "price": 35000,
+    "original_price": 45000
+  },
+  {
+    "id": "0f6c9d29-f5a8-45f6-a2e1-00973a9d160e",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "aa30cb3b-5495-4966-aee4-397195d40de5",
+    "price": 12000,
+    "original_price": 15000
+  },
+  {
+    "id": "f18957ba-0b9d-49bd-b2ec-16c5b2aa8ac1",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "7af28fbd-358e-41d1-ae1b-7a1e62a37b7b",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "148d9c51-59b1-4acf-98f6-7c15a76b54c2",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "b3adc45c-c9ff-400f-87d8-4350b421a270",
+    "price": 6000,
+    "original_price": null
+  },
+  {
+    "id": "f5466fa3-da91-4ffe-ab30-905d4b9006c5",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "5039f8df-dfe1-4119-bf4b-587ac7be2f9d",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "6ca99323-6b8c-4da6-802e-46f72c07b8d2",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "1a2948db-016e-4ff4-af3b-248625d0dc61",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "eaa2819b-383b-46e0-b0ea-57d9575060f8",
+    "price": 4000,
+    "original_price": null
+  },
+  {
+    "id": "178baf5a-ac04-4808-8bf1-799a9f3688f9",
+    "price": 5000,
+    "original_price": 6000
+  },
+  {
+    "id": "9ada19f4-ec21-4f49-99ce-e56a1448c424",
+    "price": 12000,
+    "original_price": 9700
+  },
+  {
+    "id": "20834307-c8ac-462c-87b5-903e7f071eab",
+    "price": 12000,
+    "original_price": 12000
+  },
+  {
+    "id": "e52cea3c-123c-40f2-affd-0ba355cdc9e1",
+    "price": 40000,
+    "original_price": 50000
+  },
+  {
+    "id": "eabc7db4-6a6c-4fa8-a1d3-14d3de7d85a1",
+    "price": 20000,
+    "original_price": null
+  },
+  {
+    "id": "08b467ca-5f2a-4428-9931-db721818ae38",
+    "price": 12000,
+    "original_price": null
+  },
+  {
+    "id": "3fb61c4b-a425-4e95-9005-af38339cde06",
+    "price": 6500,
+    "original_price": null
+  },
+  {
+    "id": "bf312101-779e-4c9d-886f-5773fb1da872",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "299a6fbe-fd1c-42f4-bbe6-aa9172cad70d",
+    "price": 9990,
+    "original_price": 12000
+  },
+  {
+    "id": "bf5a490c-cc64-47a0-b858-531f92b89461",
+    "price": 10990,
+    "original_price": null
+  },
+  {
+    "id": "0d4d9e35-19cf-48ce-8ca5-62af4ee981a8",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "0bca2647-3a0d-41c3-b6e2-6d5b2bc3d067",
+    "price": 9990,
+    "original_price": 15000
+  },
+  {
+    "id": "93ef91b5-61ef-4775-80d0-94c292e9592c",
+    "price": 12000,
+    "original_price": null
+  },
+  {
+    "id": "cefd92e1-93c7-43e6-b1a7-a7dd3bb8a6b6",
+    "price": 12000,
+    "original_price": null
+  },
+  {
+    "id": "2c159985-76c0-4ff6-a7f3-69c1e8997813",
+    "price": 6990,
+    "original_price": null
+  },
+  {
+    "id": "4d6ff005-21f3-4867-bae4-e68578e7ebc3",
+    "price": 26990,
+    "original_price": 45000
+  },
+  {
+    "id": "e82fd5f3-48a5-4673-b959-94b62c540fd5",
+    "price": 7990,
+    "original_price": null
+  },
+  {
+    "id": "c832c4a5-d782-4102-8b04-c9edfb64cc93",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "681a02b9-3322-4ec2-8779-faa0992f0a98",
+    "price": 12990,
+    "original_price": 25000
+  },
+  {
+    "id": "b3335ac0-84ab-4f46-9719-cf4ba793a91b",
+    "price": 14990,
+    "original_price": null
+  },
+  {
+    "id": "a3d2b63e-e493-4027-a45b-f2730e784d17",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "aa3e6619-64ea-4756-b9d5-bed9921a1836",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "1769ea94-6e98-465f-8815-6f4a3fea09a5",
+    "price": 5600,
+    "original_price": null
+  },
+  {
+    "id": "8de1dd83-b747-4222-9426-de93ae15e64c",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "340ce40b-90e9-43a5-a6b0-18da688561d2",
+    "price": 8990,
+    "original_price": null
+  },
+  {
+    "id": "503cdde7-7a7e-4b52-b17b-c465d1b2d9da",
+    "price": 12000,
+    "original_price": 15000
+  },
+  {
+    "id": "2094150a-bbe6-4d78-bb05-bfabd3e91c7e",
+    "price": 50000,
+    "original_price": null
+  },
+  {
+    "id": "b112fd2d-65d4-41c1-99ba-d1cf92a0832c",
+    "price": 14000,
+    "original_price": null
+  }
+]

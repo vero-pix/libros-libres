@@ -5,7 +5,7 @@ import { sendEmail } from "@/lib/email";
 /**
  * POST /api/contact
  * Saves contact form submissions to Supabase.
- * Invisible to user — messages go to vero@economics.cl via admin panel or future email integration.
+ * Invisible to user — messages go to vero@tuslibros.cl via admin panel or future email integration.
  */
 export async function POST(req: NextRequest) {
   const { name, email, message } = (await req.json()) as {
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   // Send notification email (don't fail the request if this errors)
   try {
     await sendEmail({
-      to: "vero@economics.cl",
+      to: "vero@tuslibros.cl",
       subject: "Nuevo mensaje de contacto — tuslibros.cl",
       html: `
         <h2>Nuevo mensaje de contacto</h2>

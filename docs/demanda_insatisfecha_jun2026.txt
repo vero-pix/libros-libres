@@ -1,0 +1,320 @@
+Búsquedas distintas (30d): 429 | con stock: 112 | SIN stock: 317
+
+══ DEMANDA INSATISFECHA (lo que buscaron y NO teníamos) ══
+  12× cine
+  10× Isaac asimov
+  10× de profesion fantasma
+   8× Python
+   8× Cantos para todos
+   8× laura gallego
+   8× roma antigua
+   8× Biblia Straubinger
+   8× Juego de tronos
+   6× Brandon sanderson
+   6× Terramar
+   6× Psicoanálisis
+   6× Fanatical Prospecting
+   6× adios al septimo de linea
+   6× Kiersten white
+   6× Un Testamento agrícola
+   4× la dama del lago
+   4× batman
+   4× dune
+   4× Ebola Holmes
+   4× everybody up
+   4× Rebeca Khamlichi
+   4× Forrest gump
+   4× fahrenheit 451 la copec
+   4× Cujo
+   4× Salvatore
+   4× Narnia
+   4× penguin
+   4× Andrés montero
+   4× julio cesar
+   4× perro con chaleco
+   4× Finanzas
+   4× Un monstruo viene a verme Patrick ness
+   4× Dietoterapia
+   4× Asimov
+   4× ciudad medialuna
+   4× Infantil
+   4× aguilar
+   4× Hidraulica
+   4× Beren y luthien
+   4× una vida con proposito
+   4× Son tantas cosas
+   4× Libros de odontología
+   4× Papeles inesperados
+   4× Diario para estoicos
+   4× Gredos
+   4× David parmutter
+   4× algebra de baldor
+   4× Vinyasa
+   4× arte moderno
+   4× Keiko
+   4× javiera carrera y la formacion del chile republicano soledad reyes del villar
+   2× ramón chao
+   2× Hijos de dune
+   2× Matenaticas
+   2× Nacidos de la bruma
+   2× Guayaba
+   2× a dead man in deptford
+   2× Haruhi suzumiya
+   2× Jaime San Martin
+   2× Villa grimaldi
+   2× dostoievsky
+   2× afgnaistan
+   2× star trek
+   2× Pulp
+   2× sanderson
+   2× Parrq
+   2× Zurita
+   2× Huidobro
+   2× Corregidor Zañartu
+   2× derecho
+   2× winnipeg
+   2× hugo correa
+   2× Emanuelle Carrere
+   2× ingeniería
+   2× Julio verne
+   2× dibujo tecnico
+   2× Heaven
+   2× farenheit
+   2× mcondo
+   2× Steven erikson
+   2× Abbas
+   2× salvador reyes
+   2× Novela negra
+   2× anita alvarado
+   2× Inmunidad diplomática
+   2× Paradice lost
+   2× Dazai
+   2× Hyperion
+   2× mistborn
+   2× lobo estepario
+   2× Language corporal
+   2× Orgullo y prejuicio
+   2× gen egoísta
+   2× haggard
+   2× ursula k. le guin
+   2× no tengo boca
+   2× merlin
+   2× Millionaire boy
+   2× ungar
+   2× poggi
+   2× Apoyo mutuo
+   2× piñen
+   2× Andrea Longarela
+   2× ya te vas Kollita
+   2× games of thrones
+   2× La cama magica de bartolo
+   2× ernesto castro
+   2× Persepolis
+   2× Bartolo y los cocodrilos mágicos
+   2× Chaplin está vivo
+   2× casas de campo
+   2× Noches blancas (Fiódor Dostoievski)
+   2× Un monstruo viene a verme
+   2× la esquizofrenia incipiente
+   2× La seleccion
+   2× marlon brando
+   2× actores y actrices
+   2× rick riordan
+   2× cuando chile dio la cara
+   2× Percy jackson y el ladron del rayo
+   2× Lisa kleypas
+   2× luca prodan
+   2× antologia juvencio valle
+   2× Siruela
+   2× Steimer
+   2× bridge
+   2× jaime hagel
+   2× A tavés del tiempo Brian Waiss
+   2× la voz ausente
+   2× Alas de sangre
+   2× Lorena cortes
+   2× Saga crepusculo
+   2× el maestro de los maestro
+   2× mientras yuboo
+   2× Hervé Guiber
+   2× libros en ingles
+   2× Nikolái Gógol
+   2× parasitos mentales
+   2× JULIO CABELLO Y LS AS SALCHIPAPAS MAGICAS EDITORIAL SM
+   2× JULIO CABELLO Y LS AS SALCHIPAPAS MAGICAS
+   2× Vendele a la mente, no a la gente
+   2× El nombre del viento
+   2× Montecristo
+   2× tibet
+   2× Cetogenico
+   2× Keto
+   2× pilares de la tierra
+   2× la edad del pavo carlos ruiz tagle
+   2× la llamada de la carne : apolonios, servidor del dios esculapio
+   2× arguedas
+   2× elena white
+   2× Digital control
+   2× diaz reguera
+   2× primero yo despues el resto
+   2× que se yo del universo
+   2× ballenas
+   2× 9788414041703
+   2× Las hadas
+   2× biografia institucional de carabineros de chile 1927 1988
+   2× Peterson
+   2× la casa de hojas
+   2× PEDRO JUAN GUTIERREZ
+   2× plotino
+   2× martes 11 luis alvarez francisco castillo abraham santibanez
+   2× lamaitre
+   2× wilelm flusser
+   2× El Libro Largo de los Andes de Chile
+   2× Victor jara
+   2× el abisinio
+   2× Como tratar con gente a la que no puedo soportar
+   2× Los juegos del hambre
+   2× descubrir la ciencia
+   2× Abducidos
+   2× Teresa Wilms montt
+   2× Me llamo Anita Alvarado
+   2× digital image processing
+   2× Los peligros de fumar en la cama
+   2× quimantu para todos
+   2× un velo escarlata
+   2× Pinel
+   2× El héroe de las mil caras
+   2× Phaidon
+   2× dropleta
+   2× mariana enriquez
+   2× 100 Palabras
+   2× Padre rico padre pobre
+   2× Prinzhorn
+   2× jorge inostroza
+   2× Marine Terminal Management and Self Assessment
+   2× morir con cero
+   2× Frege
+   2× El método gabriel
+   2× claudio naranjo
+   2× fundamentos de electricidad
+   2× catalamessa
+   2× tagore
+   2× CLEOPATRA
+   2× Coquimbo Las Amarantas
+   2× el paciente
+   2× geologia
+   2× Los orígenes del totalitarismo
+   2× Comentarios de la guerra de las galias
+   2× fuga al anochecer ana veronica pena
+   2× Siete reporteros y un periódico
+   2× LA FRONDA ARISTOCRATICA
+   2× la llamada de la carne: apolonios, servidor del dios esculapio, de frederik koning
+   2× lo se todo de america larousse
+   2× martin rivas
+   2× guitton
+   2× juegos de tronos
+   2× El diario de un estoico
+   2× adios al septimo de inea
+   2× Chico Javier
+   2× 978-970-32-2924-6
+   2× chimamanda
+   2× el mas poderoso
+   2× las ventajas de ser invisible
+   2× las brujas de roald dahl
+   2× La amortajada
+   2× CALCULO DE THOMAS
+   2× El enigma de blackthorn
+   2× gaviota
+   2× La fuga del gran elefante
+   2× Elemental
+   2× Sarah Maclean
+   2× Eli shabi Rehen
+   2× de todos nuestros
+   2× como matar
+   2× Coconut seller
+   2× En el corazón del mar
+   2× Zill
+   2× apaga te celular y enciende tu cerebro
+   2× Luz chuaqui
+   2× matematica-3-basico
+   2× Alas de hierro
+   2× Leonardo da vinci
+   2× Camilleri
+   2× La buena tierra
+   2× jujutsu kaisen
+   2× en la ruta de los parasitos
+   2× Jorge Marchant Lazcano
+   2× Interlineal
+   2× las siete hermanas
+   2× emma jane austen
+   2× emma jane austen usado
+   2× Los cretinos Ronald dable
+   2× Caballo de troya
+   2× China meiville
+   2× Caballo de troyq
+   2× Reality transurfing
+   2× romeo y julieta
+   2× El impostor
+   2× Grainger
+   2× El jefe: la vida de jorge gonzález von marées
+   2× EL VERANO EN QUE ME ENAMORÉ
+   2× fundamentos del diseño
+   2× Nicole Sepulveda
+   2× A historia Of Brightman and homr
+   2× Acotar
+   2× Kim Cattrall
+   2× Manual historia de chile francisco frías valenzuela
+   2× Enfermeria
+   2× Lo nuestro es nuestro
+   2× teresa audesirk biologia la vida en la tierra
+   2× calamity
+   2× era del vacio
+   2× no funciona la tele
+   2× labarca
+   2× La llamada de la carne: Apolonios, servidor del dios Esculapio
+   2× kiss me
+   2× Marcelo fayard
+   2× derecho penal
+   2× Polican2
+   2× el enigma cuantico
+   2× electrodinámica cuántica
+   2× pipes
+   2× De sangre y cenizas
+   2× cuentos de eva luna
+   2× roald-dahl
+   2× la muerte negra
+   2× delirio laura restrepo
+   2× la semana laboral de 4 hora
+   2× Andersen
+   2× clarise lispector
+   2× brian tracy
+   2× El hombre que susurraba a los ummitas
+   2× los huerfanos de la guerra del pacifico
+   2× historia de la filosofía julián marías
+   2× spider
+   2× Historia del arte
+   2× Guerra y paz
+   2× ushuaia
+   2× Sinzhiemer
+   2× sarah lark
+   2× El cuento de la criada
+   2× l-art-du-papier-vegetal-marie-jeanne-lorente
+   2× yukio mishima
+   2× yukio n
+   2× Practice of Everyday Life
+   2× 50 sombras
+   2× Sarah J Maas
+   2× La Escritura Creativa y Formal
+   2× walter scott
+   2× pack 2 libros tratado general de ajedrez roberto grau
+   2× maria la dura en no quiero ser ninja
+   2× para-leer-al-pato-donald-ariel-dorfman-armand-mattelart
+   2× ni-por-mar-ni-por-tierra-miguel-serrano
+   2× quieren-saber-por-que-les-cuento-cuentos-aonikenk-saul-schkolnik
+   2× enciclopedia-del-conocimiento-universal-historia-1
+   2× tu ruta
+   2× mindset
+   2× lilo
+   2× glosario filosofia técnica
+   1× clinica-psicopedagogica-jorge-visca-epistemologia-convergente
+   1× narraciones-extraordinarias-edgar-allan-poe
+   1× eres-mi-idolo-우상

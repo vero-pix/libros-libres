@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-const REPLY_TO = "vero@economics.cl";
+const REPLY_TO = "vero@tuslibros.cl";
 const FROM = "Vero de tuslibros.cl <noreply@tuslibros.cl>";
 const VERO = "veronicavelasquez@mac.com";
 
