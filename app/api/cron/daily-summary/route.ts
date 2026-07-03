@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-const ADMIN_EMAIL = "vero@economics.cl";
+const ADMIN_EMAIL = "vero@tuslibros.cl";
 const SITE = "https://tuslibros.cl";
 
 export async function POST() {

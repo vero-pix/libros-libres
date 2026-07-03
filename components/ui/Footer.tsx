@@ -123,7 +123,7 @@ export default function Footer() {
               </svg>
             </a>
           </div>
-          <a href="mailto:vero@economics.cl" className="hover:text-coral transition-colors">¿Dudas? vero@economics.cl</a>
+          <a href="mailto:vero@tuslibros.cl" className="hover:text-coral transition-colors">¿Dudas? vero@tuslibros.cl</a>
         </div>
       </div>
     </footer>

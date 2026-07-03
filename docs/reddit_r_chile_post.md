@@ -79,3 +79,37 @@ Antes/después del post revisar en `/admin → Negocio`:
 - Fuente de tráfico: `reddit.com` / `com.reddit.frontpage` — ya aparece con 5 hits, queremos verlo subir fuerte.
 - Registros nuevos
 - Carritos abandonados nuevos (intención que hay que recuperar)
+
+---
+
+## POST #2 PUBLICADO (jun 2026) — voz real de Vero
+
+> **Update honesto: se sumaron librerías de libros usados y ya hay casi 1.000 libros**
+>
+> Hace un mes les conté por acá que estaba obsesionada con que los libros usados de Chile no terminaran durmiendo (o en la basura). Vengo a contarles cómo va, porque me sorprendió.
+>
+> Lo que más me emocionó no fue el número de libros (que igual se duplicó), sino quiénes se sumaron: librerías de viejo de regiones, gente que tenía primeras ediciones guardadas, un caballero con pura novela negra. Y la sección "Se busca" —donde pides un libro que no encuentras— empezó a moverse: hay 26 personas buscando títulos agotados ahora mismo.
+>
+> Lo digo con un poco de pena: comprar todavía cuesta, recién estamos en eso. Pero ver el catálogo llenarse de rarezas me tiene contenta.
+>
+> ¿Cuál es ese libro agotado que llevan años buscando y no encuentran? Tengo curiosidad (y capaz que alguien acá lo tenga guardado).
+
+**Nota de voz**: corto, honesto, emocional. Update sobre lo anterior ("hace un mes les conté"). Reconoce lo que NO va bien (comprar cuesta) — eso da credibilidad. Cierra con pregunta de curiosidad, no con CTA. NO viñetas de marketing, NO lista de títulos. Datos verificados al publicar: ~1.000 libros, ~25-26 personas buscando.
+
+---
+
+## POST #3 DRAFT (jun 2026) — atraer DEMANDA (lectores/compradores)
+
+**Sub sugerido**: r/ClubdelecturaChile o r/chile (lectores chilenos = compradores potenciales).
+
+> **Título:** ¿Cuál es ese libro agotado que llevas años buscando? Armé un lugar para pedirlos (y capaz alguien en Chile lo tenga guardado)
+>
+> Hola. Tengo una obsesión: que los libros usados de Chile no terminen en la basura. Armé tuslibros.cl para que circulen, pero le puse una función que resultó ser mi favorita: la sección **"Se busca"**, donde pides un libro agotado que no encuentras en ningún lado.
+>
+> Pensé que nadie la usaría. Hoy hay 25 personas buscando títulos imposibles. Uno lleva un mes buscando el mismo libro rarísimo. Y a veces aparece: alguien lo tenía durmiendo en su casa.
+>
+> Así que les pregunto en serio, porque me da curiosidad y porque capaz lo resolvemos entre todos: **¿cuál es ese libro que buscaste por años y nunca encontraste?**
+>
+> (Si quieren dejarlo pedido formalmente está en tuslibros.cl/solicitudes, pero acá en los comentarios también vale — me encanta leerlos.)
+
+**Objetivo**: atraer demanda. La gente deja su libro buscado (registra intención en /solicitudes) y conoce el sitio sin sentir venta. Ángulo curiosidad, no CTA.

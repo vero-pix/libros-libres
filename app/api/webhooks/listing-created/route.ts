@@ -122,7 +122,7 @@ export async function POST(req: Request) {
 
     // Email a admin vía Resend (complementa al Telegram)
     const resendKey = process.env.RESEND_API_KEY;
-    const adminEmail = process.env.ADMIN_EMAIL || "vero@economics.cl";
+    const adminEmail = process.env.ADMIN_EMAIL || "vero@tuslibros.cl";
     if (resendKey) {
       try {
         const emailHtml = `

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
 import { sendGong, escapeHtml } from "@/lib/notifications";
 
-const ADMIN_EMAIL = "vero@economics.cl";
+const ADMIN_EMAIL = "vero@tuslibros.cl";
 const WEBHOOK_SECRET = process.env.SUPABASE_WEBHOOK_SECRET;
 
 /**

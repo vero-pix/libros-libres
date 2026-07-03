@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
   try {
     await sendEmail({
-      to: "vero@economics.cl",
+      to: "vero@tuslibros.cl",
       subject: `Amigo de la casa: ${name} — ${offer}`,
       html: `
         <h2>Nueva postulación a Gente de confianza</h2>

@@ -15,15 +15,22 @@ Cuando aparezca un bug de este tipo: **no solo backfillear — siempre tapar el 
 
 ---
 
-## 🎯 Plan de abordaje — próxima sesión (estado 2 jul 2026)
+## 🎯 Plan de abordaje — próxima sesión (estado 2 jul 2026, tarde)
 
 **El $0 de revenue NO es el código — es la cuenta MP.** La máquina de compra funciona (MP crea preferencia, 26/30 vendedores pueden cobrar). Pero 4 cuentas están bloqueadas (`rejected_by_regulations`), incluida la de TusLibros (es la de la mamá de Vero, `margar@tuslibros.cl`) = 201 libros + Ruth 65 + Nicole 20 + Barbara 7 = ~293 libros (29%) que se ven pero no se pueden pagar. Detalle en memoria `project_conversion_compra_jul2026`.
 
-Orden por impacto:
+**Hecho hoy (2 jul tarde):**
+- ✅ 6 páginas `/coleccion/[slug]` con URL canónica, schema CollectionPage, sitemap (commit 29f6650)
+- ✅ ColeccionRow links actualizados a `/coleccion/` (no `/?tag=`)
+- ✅ CategoriesMobileDrawer conectado a la home
+- ✅ librolibre.cl: decidir redirección (ver pendientes urgentes)
+
+Orden por impacto para próxima sesión:
 1. **[Vero, fuera de la app]** Arreglar cuenta MP de Margarita → desbloquea el revenue. #1 absoluto.
 2. **[Código, pendiente]** Blindaje: no mostrar "Comprar" en libros de vendedores con `sell.allow=false` (guardar en `users.mp_can_collect` vía cron; buybox → "pronto disponible/contacto"). Hace SEGURO traer tráfico.
-3. **[Distribución — Vero quiere meterle]** LinkedIn + otro Reddit CON FOCO (post #3 demanda ya en draft `docs/reddit_r_chile_post.md`) + bookfluencers (`docs/dm_bookfluencers_jun2026.md`). **NO disparar antes de #1 y #2** o se quema el tráfico en el pago roto.
-4. Avisar a Ruth/Nicole/Barbara del bloqueo MP.
+3. **[GSC — Vero]** Pedir indexación manual de las 6 URLs nuevas de colección en Google Search Console.
+4. **[Distribución — Vero quiere meterle]** LinkedIn + otro Reddit CON FOCO (post #3 demanda ya en draft `docs/reddit_r_chile_post.md`) + bookfluencers (`docs/dm_bookfluencers_jun2026.md`). **NO disparar antes de #1 y #2** o se quema el tráfico en el pago roto.
+5. Avisar a Ruth/Nicole/Barbara del bloqueo MP.
 
 ---
 
@@ -116,6 +123,7 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 | `/megan-maxwell-libros` | megan maxwell usados | — | — | comprador autora | ✅ 25 jun (29 libros) |
 | `/novela-negra-policial` | novela negra usada | — | — | comprador género | ✅ 25 jun (118 libros) |
 | `/libros-escolares-usados` | libros escolares usados | — | — | temporada escolar | ⬜ Pendiente |
+| `/coleccion/historia-de-chile` · `/literatura-chilena` · `/novela-negra` · `/clasicos` · `/tarde-de-lluvia` · `/latinoamerica-contemporanea` | colecciones editoriales curadas | — | — | comprador por género/mood | ✅ 2 jul (6 rutas, schema CollectionPage, sitemap) |
 
 > **Método validado (25 jun):** antes de crear una landing de ciudad/tema, verificar stock real con script (geolocalización o needles). Crear solo si ≥~15 libros para evitar thin content. De 9 ciudades candidatas, 6 tenían 0 stock → descartadas. Cruzar siempre con búsquedas reales (`page_views /search?q=`) para priorizar por demanda.
 
