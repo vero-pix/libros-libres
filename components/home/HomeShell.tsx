@@ -7,6 +7,7 @@ import StatsBar from "./StatsBar";
 import TiendaToggle from "./TiendaToggle";
 import CollectionBanners from "./CollectionBanners";
 import LeadCaptureBar from "@/components/ui/LeadCaptureBar";
+import SalesTrend from "./SalesTrend";
 
 const ShelfTransformation = dynamic(() => import("./ShelfTransformation"));
 
@@ -14,6 +15,8 @@ interface Props {
   totalListings: number;
   stores: number;
   views: number;
+  totalSold: number;
+  soldByMonth: Record<string, number>;
   hasFilters: boolean;
   featuredRow?: ReactNode;
   testimonialBanner?: ReactNode;
@@ -23,7 +26,7 @@ interface Props {
   children: ReactNode;
 }
 
-export default function HomeShell({ totalListings, stores, views, hasFilters, featuredRow, testimonialBanner, requestsRow, heroRequestStrip, liquidacionBanner, children }: Props) {
+export default function HomeShell({ totalListings, stores, views, totalSold, soldByMonth, hasFilters, featuredRow, testimonialBanner, requestsRow, heroRequestStrip, liquidacionBanner, children }: Props) {
   const [forceMap, setForceMap] = useState(false);
 
   const handleToggleMap = useCallback(() => {
@@ -110,6 +113,10 @@ export default function HomeShell({ totalListings, stores, views, hasFilters, fe
             </div>
           </div>
         </section>
+      )}
+
+      {!hasFilters && Object.keys(soldByMonth).length > 0 && (
+        <SalesTrend soldByMonth={soldByMonth} totalSold={totalSold} />
       )}
 
       {!hasFilters && <LeadCaptureBar />}

@@ -6,9 +6,9 @@ import { libroUrl } from "@/lib/urls";
 import type { ListingWithBook } from "@/types";
 
 export const metadata = {
-  title: "Diario de tuslibros.cl — Junio 2026",
+  title: "Diario de tuslibros.cl — Julio 2026",
   description:
-    "Lo que pasó esta semana en tuslibros.cl: bloqueo de bots por país, rate limiting, API para librerías, nueva taxonomía chilena y más.",
+    "Lo que pasó en tuslibros.cl: 6 colecciones editoriales, ficha de compra rediseñada, publicar sin fricción y 66 libros vendidos en 3 meses.",
   alternates: { canonical: "https://tuslibros.cl/novedades" },
 };
 
@@ -1265,23 +1265,22 @@ export default async function NovedadesPage() {
           <div className="flex items-center gap-3 mb-6 animate-fade-in-up">
             <span className="h-px w-10 bg-amber-300/70" />
             <p className="text-[11px] uppercase tracking-[0.32em] text-amber-300 font-semibold">
-              Diario de tuslibros.cl · Mayo 2026
+              Diario de tuslibros.cl · Julio 2026
             </p>
           </div>
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[1.05] text-cream mb-6 animate-fade-in-up" style={{ animationDelay: "60ms" }}>
-            Día 42 — <em className="text-amber-300 not-italic font-normal italic">infraestructura que cuida</em>.
+            Día 93 — <em className="text-amber-300 not-italic font-normal italic">colecciones, compra clara y menos fricción</em>.
           </h1>
           <p className="text-base md:text-lg text-cream/80 max-w-2xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "120ms" }}>
-            Bots bloqueados, API protegida, buscador rediseñado y más puertas de entrada en Google.
-            Un marketplace que crece también tiene que defenderse. Esto es lo que fue pasando, en orden de lo que más
-            importa. Lo escribo yo. — Vero
+            Seis vitrinas temáticas con URL propia, la ficha de compra que por fin dice lo que importa y el formulario de publicar sin trámite previo.
+            66 libros vendidos y el catálogo sigue creciendo. Lo escribo yo. — Vero
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 animate-fade-in-up" style={{ animationDelay: "180ms" }}>
             {[
-              { big: "4", small: "llegaron desde ChatGPT hoy" },
-              { big: "101", small: "sesiones únicas hoy" },
-              { big: "+2.19%", small: "SEO — único del sector subiendo" },
-              { big: "2", small: "librerías indie publicando" },
+              { big: "66", small: "libros que encontraron nuevo dueño" },
+              { big: "1.100", small: "libros publicados hoy" },
+              { big: "40", small: "tiendas activas" },
+              { big: "#1", small: "Google \"vender libros usados Chile\"" },
             ].map((s) => (
               <div key={s.small} className="border-l-2 border-amber-300/40 pl-4">
                 <p className="font-display text-3xl md:text-4xl text-cream leading-none">{s.big}</p>
@@ -1296,19 +1295,19 @@ export default async function NovedadesPage() {
         {/* SPOTLIGHT — tres momentos grandes */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 animate-fade-in-up" style={{ animationDelay: "240ms" }}>
           <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Nueva herramienta · 6 may</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">API para librerías externas</p>
-            <p className="text-xs text-ink-muted">Conecta tu sistema de inventario a tuslibros.cl y sincroniza stock en tiempo real.</p>
+            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Lanzamiento · 2 jul</p>
+            <p className="font-display text-lg text-ink leading-snug mb-2">6 colecciones editoriales con URL propia</p>
+            <p className="text-xs text-ink-muted">Historia de Chile, Novela Negra, Clásicos, Literatura Chilena, Tarde de Lluvia y Latinoamérica.</p>
           </div>
           <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Hito · 23 abr</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">Dos librerías indie publicando</p>
-            <p className="text-xs text-ink-muted">Buhardilla y cimlibros: primera señal de que librerías reales están eligiendo tuslibros.</p>
+            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Mejora · 1 jul</p>
+            <p className="font-display text-lg text-ink leading-snug mb-2">La ficha dice lo que importa</p>
+            <p className="text-xs text-ink-muted">Pago protegido visible junto al botón, envío desde $2.900 sin sorpresas, menos ruido.</p>
           </div>
           <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Señal · 22 abr</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">Único dominio del sector subiendo</p>
-            <p className="text-xs text-ink-muted">+2.19% en SEMrush mientras los 7 competidores bajan. De posición 9 a 5.</p>
+            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Mejora · 1 jul</p>
+            <p className="font-display text-lg text-ink leading-snug mb-2">Publicar sin trámite previo</p>
+            <p className="text-xs text-ink-muted">Antes te mandaba a completar el perfil primero. Ahora entras directo a subir tu libro.</p>
           </div>
         </section>
 
