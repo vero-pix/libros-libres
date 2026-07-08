@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { google } from "googleapis";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -7,13 +8,54 @@ export const dynamic = "force-dynamic";
 const TO = "vero@tuslibros.cl";
 const REPLY_TO = "vero@tuslibros.cl";
 
+type GscRow = { keys: string[]; clicks: number; impressions: number; ctr: number; position: number };
+
+/**
+ * Consulta Search Analytics de GSC para un rango y dimensión.
+ * Autentica con el service account inyectado como JSON en GSC_SERVICE_ACCOUNT_JSON
+ * (en Vercel no existe el archivo local que usan los scripts). Devuelve null si
+ * faltan credenciales o la API falla, para que el email no se caiga por esto.
+ */
+async function queryGsc(
+  dimension: "query" | "page",
+  startDate: string,
+  endDate: string
+): Promise<GscRow[] | null> {
+  const raw = process.env.GSC_SERVICE_ACCOUNT_JSON;
+  const site = process.env.GSC_SITE_URL || "sc-domain:tuslibros.cl";
+  if (!raw) return null;
+  try {
+    const credentials = JSON.parse(raw);
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ["https://www.googleapis.com/auth/webmasters.readonly"],
+    });
+    const sc = google.searchconsole({ version: "v1", auth });
+    const res = await sc.searchanalytics.query({
+      siteUrl: site,
+      requestBody: { startDate, endDate, dimensions: [dimension], rowLimit: 1000, dataState: "final" },
+    });
+    return (res.data.rows ?? []).map((r) => ({
+      keys: r.keys ?? [],
+      clicks: r.clicks ?? 0,
+      impressions: r.impressions ?? 0,
+      ctr: r.ctr ?? 0,
+      position: r.position ?? 0,
+    }));
+  } catch (err) {
+    console.error("[seo-report] GSC query falló:", (err as Error).message);
+    return null;
+  }
+}
+
 /**
  * GET /api/cron/seo-report
  *
  * Reporte SEO/tráfico diario a Vero. Calcula desde page_views (tracking propio):
  * pageviews/sesiones de hoy, 7d y 30d, bounce de 7d, top fuentes y top páginas.
- * Las posiciones de keywords NO se automatizan (Semrush no está conectado);
- * el correo incluye un recordatorio para revisarlas a mano.
+ * Las keywords vienen en vivo de Google Search Console (API, service account):
+ * top consultas por clics y las que más crecieron vs el periodo anterior. Si no
+ * hay credenciales GSC en el entorno, esa sección cae a un aviso, sin romper el email.
  *
  * Protegido por CRON_SECRET. Agendado diario en vercel.json.
  */
@@ -102,6 +144,60 @@ export async function GET(request: Request) {
   const list = (entries: [string, number][]) =>
     entries.map(([k, n]) => `<div style="padding:5px 0;border-bottom:1px solid #f0ebe0;font-size:13px"><strong>${n}</strong> &nbsp;${k}</div>`).join("");
 
+  // ── Keywords en vivo desde Google Search Console ──
+  // GSC tiene ~3 días de lag; comparamos los últimos 28 días vs los 28 previos.
+  const iso = (ms: number) => new Date(ms).toISOString().slice(0, 10);
+  const gscEnd = iso(now - 3 * dayMs);
+  const gscStart = iso(now - 31 * dayMs);
+  const gscPrevEnd = iso(now - 32 * dayMs);
+  const gscPrevStart = iso(now - 60 * dayMs);
+
+  const [qCur, qPrev] = await Promise.all([
+    queryGsc("query", gscStart, gscEnd),
+    queryGsc("query", gscPrevStart, gscPrevEnd),
+  ]);
+
+  let keywordsHtml: string;
+  if (qCur && qCur.length) {
+    const totClicks = qCur.reduce((s, r) => s + r.clicks, 0);
+    const totImpr = qCur.reduce((s, r) => s + r.impressions, 0);
+    const ctr = totImpr > 0 ? ((totClicks / totImpr) * 100).toFixed(1) : "0";
+    const avgPos = qCur.length
+      ? (qCur.reduce((s, r) => s + r.position * r.impressions, 0) / (totImpr || 1)).toFixed(1)
+      : "—";
+
+    const topByClicks = [...qCur].sort((a, b) => b.clicks - a.clicks).slice(0, 8);
+
+    // Crecimiento vs periodo anterior (por clics)
+    const prevMap = new Map<string, number>();
+    for (const r of qPrev ?? []) prevMap.set(r.keys[0] ?? "", r.clicks);
+    const growth = qCur
+      .map((r) => ({ q: r.keys[0] ?? "", delta: r.clicks - (prevMap.get(r.keys[0] ?? "") ?? 0) }))
+      .filter((g) => g.delta > 0)
+      .sort((a, b) => b.delta - a.delta)
+      .slice(0, 5);
+
+    const kwRow = (q: string, right: string) =>
+      `<div style="padding:5px 0;border-bottom:1px solid #f0ebe0;font-size:13px;display:flex;justify-content:space-between"><span>${q}</span><strong style="color:#1a3a6b">${right}</strong></div>`;
+
+    keywordsHtml = `
+  <div>${stat(totClicks, "clics 28d")}${stat(totImpr.toLocaleString("es-CL"), "impresiones 28d")}${stat(ctr + "%", "CTR")}${stat("#" + avgPos, "posición prom.")}</div>
+  <p style="font-size:13px;color:#837c70;margin:10px 0 4px">Top consultas por clics (28d)</p>
+  ${topByClicks.map((r) => kwRow(r.keys[0] ?? "", `${r.clicks} clics · #${r.position.toFixed(1)}`)).join("")}
+  ${
+    growth.length
+      ? `<p style="font-size:13px;color:#837c70;margin:14px 0 4px">Las que más crecieron vs mes anterior</p>${growth
+          .map((g) => kwRow(g.q, `+${g.delta} clics`))
+          .join("")}`
+      : ""
+  }
+  <p style="font-size:11px;color:#b0a898;margin-top:8px">Fuente: Google Search Console (API) · rango ${gscStart} → ${gscEnd} · lag ~3 días.</p>`;
+  } else {
+    keywordsHtml = `<p style="font-size:13px;color:#837c70">Sin datos de GSC en este envío${
+      process.env.GSC_SERVICE_ACCOUNT_JSON ? " (la API no respondió)" : " — falta configurar GSC_SERVICE_ACCOUNT_JSON en Vercel"
+    }. Referencia manual: #1 en «vender libros usados chile» y «libros usados providencia».</p>`;
+  }
+
   const html = `
 <div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.6;color:#1a1a2e;max-width:600px">
   <p style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#d4a017;margin:0">Reporte SEO diario</p>
@@ -118,8 +214,8 @@ export async function GET(request: Request) {
   <h3 style="color:#1a3a6b;border-bottom:2px solid #d4a017;padding-bottom:4px">📄 Páginas más vistas (7d)</h3>
   ${list(topPaths)}
 
-  <h3 style="color:#1a3a6b;border-bottom:2px solid #d4a017;padding-bottom:4px">🏆 Keywords</h3>
-  <p style="font-size:13px;color:#837c70">Los rankings de Google se revisan a mano en Semrush (no está conectado al sitio). Último snapshot: #1 en «vender libros usados chile» y «libros usados providencia»; «libros de segunda mano» (8) y «libros usados baratos» (11) al borde de la 1ª página.</p>
+  <h3 style="color:#1a3a6b;border-bottom:2px solid #d4a017;padding-bottom:4px">🏆 Keywords (Search Console)</h3>
+  ${keywordsHtml}
 
   <p style="color:#837c70;font-size:12px;margin-top:24px">Reporte automático diario · tuslibros.cl</p>
 </div>`;
