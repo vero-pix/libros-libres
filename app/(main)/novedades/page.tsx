@@ -39,6 +39,21 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "10 julio 2026",
+    title: "\"Se busca\" se duplicó: ya son 51 personas pidiendo libros agotados",
+    description:
+      "La sección /solicitudes —donde pides un libro que no encuentras en ningún lado— pasó de 26 a 51 solicitudes abiertas en menos de tres semanas. Si vendes libros usados, vale la pena revisarla seguido: cada pedido es una venta esperando a que alguien tenga ese libro guardado. Y si eres tú el que anda buscando algo agotado hace años, ahí puedes dejarlo pedido.",
+    tag: "Comunidad",
+    link: "/solicitudes",
+    linkText: "Ver todas las solicitudes",
+    visual: {
+      kind: "milestone",
+      icon: "🔎",
+      metric: "51 solicitudes",
+      detail: "se duplicaron en menos de 3 semanas · /solicitudes",
+    },
+  },
+  {
     date: "2 julio 2026",
     title: "Colecciones editoriales: Historia de Chile, Novela Negra, Clásicos y más",
     description:
