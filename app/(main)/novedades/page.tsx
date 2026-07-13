@@ -8,7 +8,7 @@ import type { ListingWithBook } from "@/types";
 export const metadata = {
   title: "Diario de tuslibros.cl — Julio 2026",
   description:
-    "Lo que pasó en tuslibros.cl: 6 colecciones editoriales, ficha de compra rediseñada, publicar sin fricción y 66 libros vendidos en 3 meses.",
+    "Lo que pasó en tuslibros.cl: el catálogo casi se dobló en un mes (ya son 1.380 libros), 178 títulos nuevos en una semana, colecciones editoriales, ficha de compra rediseñada y publicar sin fricción.",
   alternates: { canonical: "https://tuslibros.cl/novedades" },
 };
 
@@ -38,6 +38,23 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 };
 
 const novedades: Entry[] = [
+  {
+    date: "12 julio 2026",
+    title: "El catálogo casi se dobló en un mes — y esta semana entraron 178 libros de una",
+    description:
+      "Me senté a mirar los números de la semana y me sorprendí sola. Hace un mes había 755 libros en vitrina; hoy son más de 1.380, con 1.260 disponibles para comprar ahora mismo. Solo en los últimos 7 días se publicaron 178 títulos nuevos — la semana más movida desde que abrí. Y lo bonito es que no soy yo subiéndolos de a uno: están llegando vendedores por su cuenta, de todo Chile. Alguien subió 100 libros de arquitectura y cine de una sentada, otra persona 20 de infantiles (Papelucho, los cuentos de Perrault, Natacha), otro pura filosofía y ciencia, otra los clásicos de Kant y Aristóteles. Cada libro que entra es una puerta más para que justo tú encuentres el que andabas buscando hace años. Si tienes una ruma juntando polvo, es buen momento: nunca hubo tanta gente mirando.",
+    tag: "Señal",
+    link: "/libros-usados-chile",
+    linkText: "Ver el catálogo",
+    visual: {
+      kind: "stat",
+      stats: [
+        { big: "178", small: "libros nuevos en 7 días" },
+        { big: "755 → 1.380", small: "catálogo en un mes" },
+        { big: "1.260", small: "disponibles para comprar hoy" },
+      ],
+    },
+  },
   {
     date: "10 julio 2026",
     title: "\"Se busca\" se duplicó: ya son 51 personas pidiendo libros agotados",
