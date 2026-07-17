@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import Logo from "./Logo";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
@@ -13,6 +14,17 @@ export default async function Navbar() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Geolocalización por IP (headers de Vercel, sin pedir permiso al usuario).
+  // Cae a "Chile" si la IP es chilena pero sin ciudad; se oculta si no hay dato.
+  const h = headers();
+  const rawCity = h.get("x-vercel-ip-city");
+  const country = h.get("x-vercel-ip-country");
+  const cityLabel = rawCity
+    ? decodeURIComponent(rawCity).replace(/\+/g, " ")
+    : country === "CL"
+      ? "Chile"
+      : null;
 
   let displayName: string | null = null;
   let cartCount = 0;
@@ -106,14 +118,16 @@ export default async function Navbar() {
               </a>
             </nav>
 
-            {/* Ciudad (placeholder de geolocalización) */}
-            <span className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold tracking-[0.03em] text-ink px-3 py-1.5 rounded-full border border-line-strong whitespace-nowrap">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path d="M12 21s-7-5.5-7-11a7 7 0 0114 0c0 5.5-7 11-7 11z" />
-                <circle cx="12" cy="10" r="2.5" />
-              </svg>
-              Providencia
-            </span>
+            {/* Ciudad detectada por geo-IP (Vercel headers) */}
+            {cityLabel && (
+              <span className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold tracking-[0.03em] text-ink px-3 py-1.5 rounded-full border border-line-strong whitespace-nowrap">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path d="M12 21s-7-5.5-7-11a7 7 0 0114 0c0 5.5-7 11-7 11z" />
+                  <circle cx="12" cy="10" r="2.5" />
+                </svg>
+                {cityLabel}
+              </span>
+            )}
 
             <NavbarClient user={user} displayName={displayName} initialCartCount={cartCount} />
 
