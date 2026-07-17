@@ -87,6 +87,15 @@ export default function BookMap({ onListingsLoaded, onUserLocation, flyToListing
     });
 
     map.on("load", () => {
+      // Pedir ubicación al cargar para que el orden "Cercanía" funcione sin
+      // apretar el botón. Si el usuario deniega, el mapa queda en el centro
+      // por defecto (Santiago) — sin romper nada.
+      try {
+        geolocate.trigger();
+      } catch {
+        /* geolocalización no disponible: se ignora, queda el botón manual */
+      }
+
       // GeoJSON source con clustering habilitado
       map.addSource(SOURCE_ID, {
         type: "geojson",
