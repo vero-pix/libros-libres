@@ -60,6 +60,13 @@ const nextConfig = {
         hostname: "*.supabase.co",
       },
       {
+        // Custom domain de Supabase (api.tuslibros.cl) — sirve /storage/covers.
+        // Sin esto, next/image bloquea las portadas de libros subidos
+        // después de la migración al custom domain.
+        protocol: "https",
+        hostname: "api.tuslibros.cl",
+      },
+      {
         protocol: "https",
         hostname: "covers.openlibrary.org",
       },
