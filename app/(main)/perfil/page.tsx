@@ -4,6 +4,7 @@ import ProfileForm from "@/components/ui/ProfileForm";
 import MercadoPagoConnect from "@/components/ui/MercadoPagoConnect";
 import ApiKeyManager from "@/components/ui/ApiKeyManager";
 import ChangePasswordForm from "@/components/ui/ChangePasswordForm";
+import LinkedAccounts from "@/components/ui/LinkedAccounts";
 
 export const metadata = { title: "Mi Perfil — tuslibros.cl", robots: { index: false } };
 
@@ -71,6 +72,7 @@ export default async function PerfilPage() {
             connectedAt={profile?.mercadopago_connected_at ?? null}
           />
         </div>
+        <LinkedAccounts />
         <ApiKeyManager />
         <ChangePasswordForm />
       </main>
