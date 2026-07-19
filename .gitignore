@@ -64,3 +64,4 @@ supabase/.branches/
 
 # Llaves locales (service accounts, etc.)
 .secrets/
+social/
