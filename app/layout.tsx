@@ -108,7 +108,11 @@ export default function RootLayout({
               logo: "https://tuslibros.cl/og-image.png",
               description: "Marketplace chileno de libros usados. Compra, vende y arrienda libros cerca de ti, con mapa, despacho por courier o retiro en mano.",
               areaServed: { "@type": "Country", name: "Chile" },
-              sameAs: ["https://www.linkedin.com/in/economista-veronica-velasquez/"],
+              sameAs: [
+                "https://instagram.com/tuslibros.cl",
+                "https://facebook.com/vendetuslibros.cl",
+                "https://www.linkedin.com/company/tuslibros/",
+              ],
             }),
           }}
         />
