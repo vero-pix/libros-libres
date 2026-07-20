@@ -70,7 +70,7 @@ export default function SobreNosotrosPage() {
           </h2>
           <div className="bg-white rounded-xl shadow-sm border border-cream-dark p-6 space-y-4 text-ink-muted leading-relaxed">
             <p>
-              Hace unos 20 años armé una primera versión de tuslibros.cl. Era la misma idea — conectar lectores directo, sin las comisiones y los líos de las plataformas que ya existían. La mantuve a pulso, con plata mía, durante años. Crecía, pero el costo también crecía, y en algún momento tuve que soltarla. Dolió.
+              Hace un tiempo armé una primera versión de tuslibros.cl. Era la misma idea — conectar lectores directo, sin las comisiones y los líos de las plataformas que ya existían. La mantuve a pulso, con plata mía, durante años. Crecía, pero el costo también crecía, y en algún momento tuve que soltarla. Dolió.
             </p>
             <p>
               Pasaron quince meses. Un día estaba mirando la ciudad desde la ventana — toda esa extensión de edificios, departamentos, casas — y pensé: en cada una de esas ventanas hay una estantería. Y en cada estantería hay un libro que yo no sé que existe, que alguien ya leyó, que quizás me cambiaría algo si lo encontrara.
