@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createPublicClient } from "@/lib/supabase/public";
+import { foldAccents } from "@/lib/accentSearch";
 
 interface BookRequest {
   id: string;
@@ -7,6 +8,23 @@ interface BookRequest {
   author: string | null;
   requester_location: string | null;
   created_at: string;
+}
+
+// Clave normalizada para detectar el mismo libro escrito distinto:
+// tildes, mayúsculas, puntuación y colas tipo "Tomo 3, Ed. Taurus" colapsan.
+function demandKey(title: string): string {
+  return foldAccents(title)
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Dos títulos son "el mismo libro" si coinciden normalizados, o si uno es
+// prefijo del otro (con guarda de largo para no colapsar títulos muy cortos).
+function sameBook(a: string, b: string): boolean {
+  if (a === b) return true;
+  const min = Math.min(a.length, b.length);
+  return min >= 6 && (a.startsWith(b) || b.startsWith(a));
 }
 
 export default async function RequestsRow() {
@@ -18,7 +36,7 @@ export default async function RequestsRow() {
     .select("id, title, author, requester_location, created_at")
     .eq("fulfilled", false)
     .order("created_at", { ascending: false })
-    .limit(4);
+    .limit(24); // Traer de más para poder deduplicar y aún mostrar variedad.
 
   // Fetch raw search queries from the last 7 days (with OR without results).
   // A wider window + all results makes this section resilient — it won't
@@ -58,16 +76,39 @@ export default async function RequestsRow() {
     })
     .slice(0, 4);
 
-  const hasContent =
-    (requests && requests.length > 0) || topSearches.length > 0;
+  // Colapsar pedidos repetidos del mismo libro (misma persona que reenvía, o
+  // dos que piden lo mismo). Se conserva la versión más completa —con autor y
+  // comuna— y, a igualdad, la más reciente (ya vienen ordenados por fecha desc).
+  const uniqueRequests: BookRequest[] = [];
+  for (const r of requests ?? []) {
+    const key = demandKey(r.title);
+    const score = (r.author ? 2 : 0) + (r.requester_location ? 1 : 0);
+    const dupIdx = uniqueRequests.findIndex((u) => sameBook(demandKey(u.title), key));
+    if (dupIdx === -1) {
+      uniqueRequests.push(r);
+    } else {
+      const u = uniqueRequests[dupIdx];
+      const uScore = (u.author ? 2 : 0) + (u.requester_location ? 1 : 0);
+      if (score > uScore) uniqueRequests[dupIdx] = r; // Reemplazar por la más completa.
+    }
+  }
+  const topRequests = uniqueRequests.slice(0, 4);
+
+  // Quitar de las búsquedas las que ya están cubiertas por un pedido.
+  const requestKeys = topRequests.map((r) => demandKey(r.title));
+  const uniqueSearches = topSearches.filter(
+    (s) => !requestKeys.some((rk) => sameBook(rk, demandKey(s.original)))
+  );
+
+  const hasContent = topRequests.length > 0 || uniqueSearches.length > 0;
 
   // Nothing to show at all — hide section completely.
   if (!hasContent) return null;
 
   // Build unified demand items merging book_requests + top search queries.
   const demandItems = [
-    ...(requests ?? []).map((r) => ({ ...r, type: "request" as const })),
-    ...topSearches.map((s) => ({
+    ...topRequests.map((r) => ({ ...r, type: "request" as const })),
+    ...uniqueSearches.map((s) => ({
       id: `s-${s.original}`,
       title: s.original,
       author: null as string | null,
