@@ -4,11 +4,11 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Nuestra historia — tuslibros.cl",
   description:
-    "La historia larga de tuslibros.cl. Veinte años de una idea, una pausa obligada, y una segunda oportunidad. Por Verónica Velásquez.",
+    "La historia larga de tuslibros.cl. Una primera versión, una pausa obligada, y una segunda oportunidad. Por Verónica Velásquez.",
   openGraph: {
     title: "Nuestra historia — tuslibros.cl",
     description:
-      "Veinte años de una idea, una pausa obligada, y una segunda oportunidad.",
+      "Una primera versión, una pausa obligada, y una segunda oportunidad.",
     type: "article",
   },
 };
@@ -23,7 +23,7 @@ export default function HistoriaPage() {
             Nuestra historia
           </p>
           <h1 className="font-display text-4xl sm:text-5xl font-bold text-ink leading-tight mb-4">
-            Veinte años, una pausa,<br />
+            Una primera versión, una pausa,<br />
             <span className="italic text-brand-600">y una segunda oportunidad.</span>
           </h1>
           <p className="text-ink-muted">
@@ -34,7 +34,7 @@ export default function HistoriaPage() {
         {/* Body */}
         <div className="space-y-6 text-ink-muted leading-relaxed text-lg">
           <p>
-            Esta idea no es nueva. La primera versión la armé hace como veinte
+            Esta idea no es nueva. La primera versión la armé hace
             años. Era más rudimentaria, claro — otra internet, otro país, otro
             yo. Pero la intuición era la misma: conectar a quienes tienen
             libros con quienes los buscan, sin que una plataforma grande se
@@ -73,8 +73,8 @@ export default function HistoriaPage() {
           </p>
 
           <p>
-            Esa imagen no se me fue. Volví a pensar en la idea de hace veinte
-            años, pero distinta. Ya no era solo &ldquo;que los lectores se
+            Esa imagen no se me fue. Volví a pensar en esa idea de años
+            atrás, pero distinta. Ya no era solo &ldquo;que los lectores se
             conecten sin comisiones&rdquo;. Era algo más cercano, más físico,
             casi vecinal. Descubrir un libro que está literalmente al lado
             mío, sin algoritmo que me empuje otra cosa, sin tener que entrar
