@@ -177,7 +177,7 @@ export default function ListingToolbar() {
         <option value="poor">Con detalles</option>
       </select>
 
-      {/* Modality */}
+      {/* Modality — oculto 20 jul 2026: el arriendo está en pausa (revivir con bibliotecas).
       <select
         aria-label="Filtrar por modalidad"
         onChange={handleChange("modality")}
@@ -188,6 +188,7 @@ export default function ListingToolbar() {
         <option value="sale">Venta</option>
         <option value="loan">Arriendo</option>
       </select>
+      */}
 
       {/* Binding */}
       <select

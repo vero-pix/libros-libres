@@ -94,7 +94,7 @@ export default function HeroBar({}: Props) {
           {/* Texto */}
           <div className="max-w-2xl">
             <p className="inline-flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.22em] text-coral mb-5 before:content-[''] before:w-6 before:h-px before:bg-current">
-              Marketplace de libros usados · Chile
+              Libros libres · Chile
             </p>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-[64px] font-normal text-ink leading-[1.05] tracking-[-0.02em]">
               Cada estantería{" "}

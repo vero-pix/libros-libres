@@ -7,17 +7,20 @@ export default function Footer() {
       {/* Footer reforzado — tres destacados */}
       <div className="bg-cream border-t border-line">
         <div className="max-w-6xl mx-auto px-6 pt-12">
-          <div className="grid sm:grid-cols-3 rounded-2xl border border-line overflow-hidden bg-paper-card">
+          {/* Grilla a 2 columnas: "Gente de confianza" guardada por ahora (20 jul 2026). Volver a sm:grid-cols-3 al revivirla. */}
+          <div className="grid sm:grid-cols-2 rounded-2xl border border-line overflow-hidden bg-paper-card">
             <Link href="/solicitudes" className="group p-6 sm:p-7 border-b sm:border-b-0 sm:border-r border-line hover:bg-cream-warm/50 transition-colors">
               <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-coral font-semibold">Economía inversa</p>
               <h4 className="font-display text-xl text-ink mt-3 mb-2 tracking-[-0.01em]">Se busca</h4>
               <p className="text-[13px] text-ink-muted leading-relaxed">¿No está en el catálogo? Pídelo. Alguien cerca de ti puede tenerlo durmiendo en su estante.</p>
             </Link>
+            {/* Guardada por ahora — "Gente de confianza" (sección vacía, sin contactos aún):
             <Link href="/gente-de-confianza" className="group p-6 sm:p-7 border-b sm:border-b-0 sm:border-r border-line hover:bg-cream-warm/50 transition-colors">
               <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-coral font-semibold">Gente de confianza</p>
               <h4 className="font-display text-xl text-ink mt-3 mb-2 tracking-[-0.01em]">Vendedores reales</h4>
               <p className="text-[13px] text-ink-muted leading-relaxed">Personas y librerías de viejo con pago protegido por MercadoPago y reseñas. Sabes a quién le compras.</p>
             </Link>
+            */}
             <Link href="/?category=escolar" className="group p-6 sm:p-7 hover:bg-cream-warm/50 transition-colors">
               <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-coral font-semibold">De vuelta a clases</p>
               <h4 className="font-display text-xl text-ink mt-3 mb-2 tracking-[-0.01em]">Libros escolares</h4>
@@ -62,7 +65,7 @@ export default function Footer() {
               <li><Link href="/como-funciona" className="hover:text-coral transition-colors">Cómo funciona</Link></li>
               <li><Link href="/faq" className="hover:text-coral transition-colors">FAQ</Link></li>
               <li><Link href="/alianzas" className="hover:text-coral transition-colors">Alianzas</Link></li>
-              <li><Link href="/gente-de-confianza" className="hover:text-coral transition-colors">Gente de confianza</Link></li>
+              {/* <li><Link href="/gente-de-confianza" ...>Gente de confianza</Link></li> guardada por ahora (20 jul 2026) */}
             </ul>
           </div>
           <div>
