@@ -1,4 +1,4 @@
-import Image from "next/image";
+// import Image from "next/image"; // ya no se usa: encabezado sin foto stock (20 jul 2026)
 import Link from "next/link";
 
 export const metadata = {
@@ -251,19 +251,11 @@ export default function FAQPage() {
   return (
     <div className="min-h-screen bg-cream">
 
-      {/* Hero */}
-      <div className="relative h-64 overflow-hidden">
-        <Image
-          src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1200&q=80"
-          alt="Librería"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-cream/70" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-4xl font-bold text-ink mb-2">Preguntas frecuentes</h1>
-          <p className="text-ink-muted text-lg max-w-xl">Lo que me preguntan más seguido. Si te falta algo, escríbeme.</p>
+      {/* Hero — encabezado limpio de marca (sin foto stock, mejor contraste) */}
+      <div className="bg-cream-warm border-b border-cream-dark">
+        <div className="max-w-3xl mx-auto px-4 py-16 sm:py-20 text-center">
+          <h1 className="font-display text-4xl sm:text-5xl font-bold text-ink mb-3">Preguntas frecuentes</h1>
+          <p className="text-ink-muted text-lg max-w-xl mx-auto">Lo que me preguntan más seguido. Si te falta algo, escríbeme.</p>
         </div>
       </div>
 

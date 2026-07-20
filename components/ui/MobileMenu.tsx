@@ -62,13 +62,14 @@ export default function MobileMenu({ loggedIn }: Props) {
 
         {loggedIn ? (
           <Section>
+            {/* Ocultos 20 jul 2026 (nadie los usa): Mensajes, Mis arriendos, Invita y gana. Revivir cuando aplique.
             <Item href="/mensajes" label="Mensajes" />
+            <Item href="/mis-arriendos" label="Mis arriendos" />
+            <Item href="/referidos" label="Invita y gana" /> */}
             <Item href="/mis-libros" label="Mis libros" />
             <Item href="/mis-pedidos" label="Mis pedidos" />
             <Item href="/mis-ventas" label="Mis ventas" />
-            <Item href="/mis-arriendos" label="Mis arriendos" />
             <Item href="/carrito" label="Carrito" />
-            <Item href="/referidos" label="Invita y gana" />
             <Item href="/perfil" label="Perfil" />
           </Section>
         ) : (
