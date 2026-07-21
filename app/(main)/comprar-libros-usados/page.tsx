@@ -5,6 +5,27 @@ import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
+import { CIUDADES, ORDEN } from "../libros-usados/ciudades";
+
+// Landings de autor y tema para el hub de enlaces internos (SEO).
+const AUTORES = [
+  { href: "/pablo-neruda", label: "Pablo Neruda" },
+  { href: "/mario-vargas-llosa", label: "Mario Vargas Llosa" },
+  { href: "/marcela-paz-libros", label: "Marcela Paz" },
+  { href: "/megan-maxwell-libros", label: "Megan Maxwell" },
+  { href: "/georges-simenon", label: "Georges Simenon" },
+  { href: "/algebra-de-baldor", label: "Álgebra de Baldor" },
+];
+const TEMAS = [
+  { href: "/cien-anos-de-soledad", label: "Cien años de soledad" },
+  { href: "/rayuela", label: "Rayuela" },
+  { href: "/el-arte-de-amar", label: "El arte de amar" },
+  { href: "/distopias-clasicas", label: "Distopías clásicas" },
+  { href: "/novela-negra-policial", label: "Novela negra y policial" },
+  { href: "/novelas-romanticas-usadas", label: "Novelas románticas" },
+  { href: "/libros-antiguos", label: "Libros antiguos" },
+  { href: "/libros-de-historia-de-chile", label: "Historia de Chile" },
+];
 
 export const metadata: Metadata = {
   title: "Comprar libros usados en Chile — baratos, raros y cerca de ti | tuslibros.cl",
@@ -226,6 +247,51 @@ export default async function ComprarLibrosUsadosPage() {
             >
               Dejar mi pedido →
             </Link>
+          </section>
+
+          {/* Explora — hub de enlaces internos a landings de ciudad, autor y tema (SEO) */}
+          <section className="mb-16">
+            <h2 className="font-display text-3xl font-bold text-ink mb-8">
+              Explora por ciudad, autor o tema
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div>
+                <h3 className="font-display text-lg font-bold text-ink mb-3">Por ciudad</h3>
+                <ul className="space-y-2 text-sm">
+                  {ORDEN.map((slug) => (
+                    <li key={slug}>
+                      <Link href={`/libros-usados/${slug}`} className="text-ink-muted hover:text-brand-600 transition-colors">
+                        Libros usados en {CIUDADES[slug].label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-display text-lg font-bold text-ink mb-3">Por autor</h3>
+                <ul className="space-y-2 text-sm">
+                  {AUTORES.map((a) => (
+                    <li key={a.href}>
+                      <Link href={a.href} className="text-ink-muted hover:text-brand-600 transition-colors">
+                        Libros de {a.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-display text-lg font-bold text-ink mb-3">Por tema</h3>
+                <ul className="space-y-2 text-sm">
+                  {TEMAS.map((t) => (
+                    <li key={t.href}>
+                      <Link href={t.href} className="text-ink-muted hover:text-brand-600 transition-colors">
+                        {t.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </section>
 
           {/* FAQ */}
