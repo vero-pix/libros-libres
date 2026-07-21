@@ -16,6 +16,7 @@ export const COORDS: Record<string, { lat: number; lng: number; radiusKm: number
   providencia: { lat: -33.4263, lng: -70.6116, radiusKm: 6 },
   "las-condes": { lat: -33.4087, lng: -70.5709, radiusKm: 7 },
   nunoa: { lat: -33.4569, lng: -70.5985, radiusKm: 5 },
+  "la-florida": { lat: -33.5225, lng: -70.5817, radiusKm: 6 },
   valparaiso: { lat: -33.0458, lng: -71.6197, radiusKm: 12 },
   "vina-del-mar": { lat: -33.0245, lng: -71.5518, radiusKm: 10 },
   concepcion: { lat: -36.8201, lng: -73.0444, radiusKm: 20 },
@@ -116,6 +117,27 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿El pago es seguro?",
+        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
+      },
+    ],
+  },
+  "la-florida": {
+    label: "La Florida",
+    match: "La Florida",
+    heroSub: "Libros usados en el sur oriente de Santiago.",
+    intro:
+      "La Florida concentra una de las mayores ofertas de libros usados de tuslibros.cl, con libreros y lectores que venden a pocas cuadras. Coordina retiro cerca de Vicente Valdés, Bellavista de La Florida o Plaza Vespucio y ahórrate el despacho, o recibe el libro por courier si prefieres. Pago seguro con MercadoPago.",
+    faqs: [
+      {
+        q: "¿Dónde se coordinan los retiros en La Florida?",
+        a: "La mayoría de los vendedores de la comuna coordinan en estaciones de la Línea 5 (Vicente Valdés, Bellavista de La Florida, Mirador) o cerca de Plaza Vespucio. Lo acuerdas directamente con el vendedor al comprar, sin pagar despacho.",
+      },
+      {
+        q: "¿Puedo pedir envío en vez de retirar?",
+        a: "Sí. Al pagar eliges envío por courier y el libro llega a tu dirección, normalmente al día hábil siguiente, por un costo reducido.",
+      },
+      {
+        q: "¿Cómo protegen mi pago?",
         a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
       },
     ],
@@ -312,7 +334,7 @@ export const CIUDADES: Record<string, Ciudad> = {
 };
 
 export const ORDEN = [
-  "santiago", "providencia", "las-condes", "nunoa",
+  "santiago", "providencia", "las-condes", "nunoa", "la-florida",
   "valparaiso", "vina-del-mar", "concepcion", "temuco", "antofagasta", "la-serena",
   "talca", "puerto-montt", "coquimbo",
 ];

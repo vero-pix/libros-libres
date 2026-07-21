@@ -126,7 +126,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // existan landings dedicadas (/libros-de-historia, etc.).
 
   const ciudadPages: MetadataRoute.Sitemap = [
-    "santiago", "providencia", "las-condes", "nunoa",
+    "santiago", "providencia", "las-condes", "nunoa", "la-florida",
     "valparaiso", "vina-del-mar", "concepcion", "temuco", "antofagasta", "la-serena",
     "talca", "puerto-montt", "coquimbo",
   ].map((c) => ({
