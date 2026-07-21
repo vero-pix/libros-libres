@@ -15,6 +15,7 @@ import SellerOtherListings from "./SellerOtherListings";
 import { libroUrl } from "@/lib/urls";
 import { trackEvent } from "@/utils/analytics";
 import { translateGenre } from "@/lib/genres";
+import { authorLanding } from "@/lib/authorLandings";
 
 function WhatsAppButton({
   phone,
@@ -113,6 +114,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
   const { book } = listing;
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
+  const authorHub = authorLanding(book.author); // landing de autor (SEO: concentra autoridad en el hub)
   const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
@@ -200,6 +202,14 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             {(book as any).publisher && <span className="not-italic"> · {(book as any).publisher}</span>}
             {book.published_year && <span className="not-italic"> · {book.published_year}</span>}
           </Link>
+          {authorHub && (
+            <Link
+              href={authorHub.slug}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-700 transition-colors mt-1.5"
+            >
+              Ver todos los libros de {authorHub.label} →
+            </Link>
+          )}
 
           {/* Tags */}
           {((book as any).tags ?? []).length > 0 && (
