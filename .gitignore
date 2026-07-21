@@ -65,3 +65,14 @@ supabase/.branches/
 # Llaves locales (service accounts, etc.)
 .secrets/
 social/
+
+# Scripts de diagnóstico de un solo uso (_check_*, _audit_*, _find_*...). Sirven para
+# mirar la BD en el momento y no son parte del producto. Los ~200 que ya están
+# versionados quedan hasta que se purguen aparte; de acá en adelante no entran más.
+scripts/_*.mjs
+
+# Conversaciones y material con datos de usuarios reales — el repo es PÚBLICO
+docs/chat_*.md
+
+# Artefactos HTML generados por scripts (regenerables)
+docs/books_huerfanos_*.html
