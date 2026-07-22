@@ -2,11 +2,13 @@ import { createClient } from "@/lib/supabase/server";
 import { permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import ListingDetail from "@/components/listings/ListingDetail";
+import BookReviews from "@/components/listings/BookReviews";
 import ListingCard from "@/components/listings/ListingCard";
 import ListingViewTracker from "@/components/listings/ListingViewTracker";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import { buildCategoryTree } from "@/lib/categoryTree";
+import { resolveAuthorSlug } from "@/lib/authorLink";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 
@@ -128,6 +130,24 @@ export default async function LibroPage({ params }: Props) {
     .eq("listing_id", listing.id)
     .order("sort_order", { ascending: true });
 
+  // Reseñas de OBRA (books.id): se muestran en TODAS las copias del mismo libro.
+  // Editorial primero, luego las más recientes.
+  const { data: bookReviews } = await supabase
+    .from("book_reviews")
+    .select("id, rating, title, body, is_editorial, author_label, created_at, reviewer:users!book_reviews_reviewer_id_fkey(id, full_name)")
+    .eq("book_id", listing.book.id)
+    .eq("status", "published")
+    .order("is_editorial", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  const reviews = (bookReviews ?? []) as any[];
+  // Solo las reseñas con nota cuentan para el promedio (editorial puede no puntuar).
+  const ratedReviews = reviews.filter((r) => r.rating != null);
+  const reviewCount = ratedReviews.length;
+  const reviewAvg = reviewCount
+    ? ratedReviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+    : 0;
+
   const [authorResult, categoryResult, allActiveResult] = await Promise.all([
     listing.book?.author
       ? supabase
@@ -191,6 +211,33 @@ export default async function LibroPage({ params }: Props) {
       ? String(listing.book.published_year)
       : undefined,
     numberOfPages: (listing.book as any).pages || undefined,
+    // AggregateRating + Review: solo cuando hay reseñas con nota. No inventamos
+    // ratings. Google muestra estrellas con esto (validar en Rich Results Test).
+    ...(reviewCount > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: reviewAvg.toFixed(1),
+            reviewCount,
+          },
+          review: ratedReviews.slice(0, 5).map((r) => ({
+            "@type": "Review",
+            reviewRating: {
+              "@type": "Rating",
+              ratingValue: String(r.rating),
+              bestRating: "5",
+              worstRating: "1",
+            },
+            author: {
+              "@type": r.is_editorial ? "Organization" : "Person",
+              name: r.is_editorial
+                ? r.author_label || "Equipo tuslibros"
+                : r.reviewer?.full_name || "Lector",
+            },
+            reviewBody: r.body,
+          })),
+        }
+      : {}),
     offers: {
       "@type": "Offer",
       price: listing.price,
@@ -271,11 +318,17 @@ export default async function LibroPage({ params }: Props) {
           <div className="flex-1 min-w-0">
             <ListingDetail listing={listing} images={(images ?? []) as any} />
 
+            <BookReviews
+              bookId={listing.book.id}
+              bookTitle={listing.book.title}
+              initialReviews={reviews as any}
+            />
+
             {authorListings.length > 0 && (
               <section className="mt-12">
                 <div className="flex justify-between items-end mb-6">
                   <h2 className="font-display text-2xl font-bold text-ink">Más libros de {listing.book.author}</h2>
-                  <Link href={`/search?q=${encodeURIComponent(listing.book.author)}`} className="text-sm font-semibold text-brand-600 hover:text-brand-700">Ver todos →</Link>
+                  <Link href={resolveAuthorSlug(listing.book.author) ? `/autor/${resolveAuthorSlug(listing.book.author)}` : `/search?q=${encodeURIComponent(listing.book.author)}`} className="text-sm font-semibold text-brand-600 hover:text-brand-700">Ver todos →</Link>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {authorListings.map((l) => (

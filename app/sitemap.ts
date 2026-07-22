@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { createServerClient } from "@supabase/ssr";
 import { COLLECTIONS } from "@/app/(main)/coleccion/[slug]/collections.config";
+import { AUTHORS } from "@/app/(main)/autor/[slug]/authors.config";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://tuslibros.cl";
@@ -136,5 +137,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }));
 
-  return [...staticPages, ...ciudadPages, ...listingPages, ...sellerPages];
+  // Páginas de autor (config-driven en authors.config.ts) + su índice.
+  const authorPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/autor`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    },
+    ...Object.keys(AUTHORS).map((slug) => ({
+      url: `${baseUrl}/autor/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
+  ];
+
+  return [...staticPages, ...ciudadPages, ...authorPages, ...listingPages, ...sellerPages];
 }
