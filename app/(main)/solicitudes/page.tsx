@@ -5,7 +5,7 @@ import RequestForm from "./RequestForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Se busca · Pide un libro que no está en el catálogo — tuslibros.cl",
+  title: "Se busca · Pide un libro que no está en el catálogo",
   description:
     "¿Buscas un libro que no está en tuslibros.cl? Pídelo acá. Los vendedores ven la demanda y publican los libros que tienen. Economía inversa.",
   alternates: { canonical: "https://tuslibros.cl/solicitudes" },

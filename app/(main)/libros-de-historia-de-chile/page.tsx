@@ -9,7 +9,7 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Libros de Historia de Chile Usados | tuslibros.cl",
+  title: "Libros de Historia de Chile Usados",
   description:
     "Compra libros de historia de Chile usados: la Unidad Popular, la dictadura, la Guerra del Pacífico, los pueblos originarios, el salitre y más. Segunda mano, muchos agotados, envío a todo Chile.",
   alternates: { canonical: "https://tuslibros.cl/libros-de-historia-de-chile" },
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     "frias valenzuela historia de chile",
   ],
   openGraph: {
-    title: "Libros de Historia de Chile Usados | tuslibros.cl",
+    title: "Libros de Historia de Chile Usados",
     description:
       "Historia de Chile usada: Unidad Popular, dictadura, Guerra del Pacífico, pueblos originarios, salitre y más. Muchos títulos agotados. Envío a todo Chile.",
     url: "https://tuslibros.cl/libros-de-historia-de-chile",

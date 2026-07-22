@@ -8,7 +8,7 @@ import ListingViewTracker from "@/components/listings/ListingViewTracker";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import { buildCategoryTree } from "@/lib/categoryTree";
-import { resolveAuthorSlug } from "@/lib/authorLink";
+import { resolveAuthorUrl } from "@/lib/authorLink";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 
@@ -328,7 +328,7 @@ export default async function LibroPage({ params }: Props) {
               <section className="mt-12">
                 <div className="flex justify-between items-end mb-6">
                   <h2 className="font-display text-2xl font-bold text-ink">Más libros de {listing.book.author}</h2>
-                  <Link href={resolveAuthorSlug(listing.book.author) ? `/autor/${resolveAuthorSlug(listing.book.author)}` : `/search?q=${encodeURIComponent(listing.book.author)}`} className="text-sm font-semibold text-brand-600 hover:text-brand-700">Ver todos →</Link>
+                  <Link href={resolveAuthorUrl(listing.book.author) ?? `/search?q=${encodeURIComponent(listing.book.author)}`} className="text-sm font-semibold text-brand-600 hover:text-brand-700">Ver todos →</Link>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {authorListings.map((l) => (

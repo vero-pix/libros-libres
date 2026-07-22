@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Cómo despachar — tuslibros.cl",
+  title: "Cómo despachar",
   description: "Guía paso a paso para despachar un libro vendido por courier",
   alternates: { canonical: "https://tuslibros.cl/como-despachar" },
 };

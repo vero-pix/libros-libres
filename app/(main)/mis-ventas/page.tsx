@@ -6,7 +6,7 @@ import type { Order, OrderStatus } from "@/types";
 import BuyerCartsSection from "@/components/sales/BuyerCartsSection";
 
 export const metadata = {
-  title: "Mis Ventas — tuslibros.cl",
+  title: "Mis Ventas",
   description: "Dashboard de ventas y comisiones",
   robots: { index: false },
 };

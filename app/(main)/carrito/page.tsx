@@ -4,7 +4,7 @@ import CartView from "./CartView";
 import type { ListingWithBook } from "@/types";
 
 export const metadata = {
-  title: "Mi Carrito — tuslibros.cl",
+  title: "Mi Carrito",
   robots: { index: false },
 };
 
