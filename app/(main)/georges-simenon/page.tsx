@@ -9,7 +9,7 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Libros de Georges Simenon Usados en Chile | tuslibros.cl",
+  title: "Libros de Georges Simenon Usados en Chile",
   description:
     "Compra libros de Georges Simenon usados en Chile. Las novelas del comisario Maigret y sus novelas duras, en segunda mano. Envío a todo Chile, pago seguro.",
   alternates: { canonical: "https://tuslibros.cl/georges-simenon" },
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "novela policial usada",
   ],
   openGraph: {
-    title: "Libros de Georges Simenon Usados en Chile | tuslibros.cl",
+    title: "Libros de Georges Simenon Usados en Chile",
     description: "Maigret y las novelas duras de Simenon, usados en Chile. Envío a todo el país o retiro en mano.",
     url: "https://tuslibros.cl/georges-simenon",
     siteName: "tuslibros.cl",

@@ -6,7 +6,7 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Comprar libros usados baratos en Chile — desde $1.000 | tuslibros.cl",
+  title: "Comprar libros usados baratos en Chile — desde $1.000",
   description:
     "Compra libros usados baratos en Chile desde $1.000. Cientos de ofertas y libros de segunda mano hasta 60% bajo el precio nuevo. Pago protegido con MercadoPago, retiro en mano gratis o despacho a todo Chile.",
   alternates: { canonical: "https://tuslibros.cl/libros-usados-baratos" },
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "comprar libros baratos online",
   ],
   openGraph: {
-    title: "Comprar libros usados baratos en Chile — desde $1.000 | tuslibros.cl",
+    title: "Comprar libros usados baratos en Chile — desde $1.000",
     description:
       "Cientos de libros usados baratos y en oferta, hasta 60% bajo el precio nuevo. Pago protegido y despacho a todo Chile.",
     url: "https://tuslibros.cl/libros-usados-baratos",

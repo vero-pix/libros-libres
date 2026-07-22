@@ -3,12 +3,12 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Vender Libros Usados en Chile | tuslibros.cl",
+  title: "Vender Libros Usados en Chile",
   description:
     "Publica y vende libros usados fácilmente en Chile. Llega a miles de lectores en tuslibros.cl.",
   alternates: { canonical: "https://tuslibros.cl/vender-libros-usados" },
   openGraph: {
-    title: "Vender Libros Usados en Chile | tuslibros.cl",
+    title: "Vender Libros Usados en Chile",
     description:
       "Publica y vende libros usados fácilmente en Chile. Llega a miles de lectores en tuslibros.cl.",
     url: "https://tuslibros.cl/vender-libros-usados",

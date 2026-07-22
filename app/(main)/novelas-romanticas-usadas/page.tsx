@@ -9,7 +9,7 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Novelas Románticas Usadas en Chile | tuslibros.cl",
+  title: "Novelas Románticas Usadas en Chile",
   description:
     "Compra novelas románticas usadas en Chile: Danielle Steel, Megan Maxwell, Nicholas Sparks, Alice Kellen y más. Romance contemporáneo y clásico de segunda mano. Envío a todo Chile, pago seguro.",
   alternates: { canonical: "https://tuslibros.cl/novelas-romanticas-usadas" },
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "novela romantica segunda mano",
   ],
   openGraph: {
-    title: "Novelas Románticas Usadas en Chile | tuslibros.cl",
+    title: "Novelas Románticas Usadas en Chile",
     description: "Romance usado en Chile: Steel, Maxwell, Sparks, Kellen y más. Envío a todo el país o retiro en mano.",
     url: "https://tuslibros.cl/novelas-romanticas-usadas",
     siteName: "tuslibros.cl",

@@ -9,7 +9,7 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Cien Años de Soledad — Libro Usado en Chile | tuslibros.cl",
+  title: "Cien Años de Soledad — Libro Usado en Chile",
   description:
     "Compra Cien años de soledad de García Márquez usado en Chile. Envío a todo el país o retiro en mano. Pago seguro con MercadoPago desde $4.000.",
   alternates: { canonical: "https://tuslibros.cl/cien-anos-de-soledad" },
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     "gabriel garcia marquez libros",
   ],
   openGraph: {
-    title: "Cien Años de Soledad — Libro Usado en Chile | tuslibros.cl",
+    title: "Cien Años de Soledad — Libro Usado en Chile",
     description: "Cien años de soledad de García Márquez, usado en Chile. Envío a todo el país.",
     url: "https://tuslibros.cl/cien-anos-de-soledad",
     siteName: "tuslibros.cl",

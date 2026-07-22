@@ -6,12 +6,12 @@ import { AUTHORS } from "./[slug]/authors.config";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Autores — Libros Usados en Chile | tuslibros.cl",
+  title: "Autores — Libros Usados en Chile",
   description:
     "Explora autores destacados en tuslibros.cl: José Donoso, Gabriela Mistral, Nicanor Parra, Roberto Bolaño, Juan Emar, María Luisa Bombal y más. Libros usados con envío a todo Chile o retiro en mano.",
   alternates: { canonical: "https://tuslibros.cl/autor" },
   openGraph: {
-    title: "Autores — Libros Usados en Chile | tuslibros.cl",
+    title: "Autores — Libros Usados en Chile",
     description:
       "Explora autores destacados en tuslibros.cl. Libros usados con envío a todo Chile o retiro en mano.",
     url: "https://tuslibros.cl/autor",
