@@ -22,7 +22,7 @@ import { sortListingsForDisplay } from "@/lib/sortListings";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
-import { categoriaUrl } from "@/lib/urls";
+import { categoriaUrl, libroUrl } from "@/lib/urls";
 
 // Nombres legibles para slugs de categoría/subcategoría usados en metadata
 const CATEGORY_NAMES: Record<string, string> = {
@@ -401,7 +401,24 @@ export default async function HomePage({ searchParams }: Props) {
   const usedRowIds = new Set<string>();
   const dedupeRow = (arr: ListingWithBook[]) =>
     arr.filter((l) => (usedRowIds.has(l.id) ? false : (usedRowIds.add(l.id), true)));
-  const featuredRowListings = dedupeRow(featuredListings);
+  // Abanico del hero (solo desktop): 6 portadas REALES del catálogo destacado.
+  // Reemplaza los mockups CSS que antes se veían un poco fake. cover_image_url
+  // gana a book.cover_url (libros con foto propia tienen book.cover_url null).
+  // Reservo estos 6 y los EXCLUYO de la fila "Destacados" para no repetir el
+  // mismo libro en el abanico y justo debajo. Solo si hay margen (≥9 con portada:
+  // 6 para el hero + 3 para la fila); si no, cae a los mockups semanales.
+  const heroPool = featuredListings.filter((l) => l.book && (l.cover_image_url || l.book.cover_url));
+  const useHeroReal = heroPool.length >= 9;
+  const heroReserved = new Set(useHeroReal ? heroPool.slice(0, 6).map((l) => l.id) : []);
+  const heroBooks = useHeroReal
+    ? heroPool.slice(0, 6).map((l) => ({
+        cover: (l.cover_image_url || l.book.cover_url) as string,
+        title: l.book.title as string,
+        author: (l.book.author as string) || "",
+        href: libroUrl(l),
+      }))
+    : [];
+  const featuredRowListings = dedupeRow(featuredListings.filter((l) => !heroReserved.has(l.id)));
   const recentRowListings = dedupeRow(recentListings);
   const collectibleRowListings = dedupeRow(collectibleListings);
   // Las colecciones ya vienen deduplicadas entre sí; además les quitamos lo que ya
@@ -482,6 +499,7 @@ export default async function HomePage({ searchParams }: Props) {
         totalSold={publicStats.totalSold}
         soldByMonth={publicStats.soldByMonth}
         hasFilters={hasFilters}
+        heroBooks={heroBooks}
         featuredRow={
           !hasFilters && (featuredRowListings.length > 0 || featuredSellers.length > 0) ? (
             <FeaturedRow featuredListings={featuredRowListings} featuredSellers={featuredSellers} />

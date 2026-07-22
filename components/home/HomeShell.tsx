@@ -11,6 +11,13 @@ import SalesTrend from "./SalesTrend";
 
 const ShelfTransformation = dynamic(() => import("./ShelfTransformation"));
 
+export interface HeroBook {
+  cover: string;
+  title: string;
+  author: string;
+  href: string;
+}
+
 interface Props {
   totalListings: number;
   stores: number;
@@ -18,6 +25,7 @@ interface Props {
   totalSold: number;
   soldByMonth: Record<string, number>;
   hasFilters: boolean;
+  heroBooks?: HeroBook[];
   featuredRow?: ReactNode;
   testimonialBanner?: ReactNode;
   requestsRow?: ReactNode;
@@ -26,7 +34,7 @@ interface Props {
   children: ReactNode;
 }
 
-export default function HomeShell({ totalListings, stores, views, totalSold, soldByMonth, hasFilters, featuredRow, testimonialBanner, requestsRow, heroRequestStrip, liquidacionBanner, children }: Props) {
+export default function HomeShell({ totalListings, stores, views, totalSold, soldByMonth, hasFilters, heroBooks, featuredRow, testimonialBanner, requestsRow, heroRequestStrip, liquidacionBanner, children }: Props) {
   const [forceMap, setForceMap] = useState(false);
 
   const handleToggleMap = useCallback(() => {
@@ -39,7 +47,7 @@ export default function HomeShell({ totalListings, stores, views, totalSold, sol
 
       {!hasFilters ? (
         <>
-          <HeroBar totalListings={totalListings} onToggleMap={handleToggleMap} />
+          <HeroBar totalListings={totalListings} heroBooks={heroBooks} onToggleMap={handleToggleMap} />
           {/* SEO: keywords naturales del mercado, invisibles al usuario */}
           <p className="sr-only">
             tuslibros.cl es el marketplace chileno de libros usados.
