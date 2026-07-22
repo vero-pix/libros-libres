@@ -67,9 +67,9 @@ function byKey(rows: Row[]): Map<string, Row> {
 function movers(curRows: Row[], prevRows: Row[], metric: "clicks" | "impressions", topN = 12) {
   const cur = byKey(curRows);
   const prev = byKey(prevRows);
-  const keys = new Set([...cur.keys(), ...prev.keys()]);
+  const keys = new Set(Array.from(cur.keys()).concat(Array.from(prev.keys())));
   const out: Array<{ key: string; cur: number; prev: number; diff: number; pos: number; posPrev: number }> = [];
-  for (const k of keys) {
+  for (const k of Array.from(keys)) {
     const c = cur.get(k);
     const p = prev.get(k);
     const cv = c?.[metric] ?? 0;
