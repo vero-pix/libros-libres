@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import type { HeroBook } from "./HomeShell";
 
 interface Props {
   totalListings: number;
+  heroBooks?: HeroBook[];
   onToggleMap?: () => void;
 }
 
@@ -86,7 +88,24 @@ function FanBook({ b }: { b: ReturnType<typeof weeklyHeroBooks>[number] }) {
   );
 }
 
-export default function HeroBar({}: Props) {
+/* Portada real del catálogo, con las mismas posiciones/rotaciones del abanico.
+   Enlaza a la ficha del libro. object-cover para que cualquier proporción llene el slot. */
+function RealFanBook({ book, pos }: { book: HeroBook; pos: string }) {
+  return (
+    <Link
+      href={book.href}
+      title={book.title}
+      className={`group absolute aspect-[148/225] rounded-[2px_4px_4px_2px] shadow-book overflow-hidden bg-ink/5 ${pos} transition-transform duration-300 hover:!rotate-0 hover:z-[7] hover:scale-[1.04]`}
+    >
+      <span aria-hidden className="absolute inset-y-0 left-0 w-2 z-[2] bg-gradient-to-r from-black/30 via-white/10 to-black/10" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={book.cover} alt={book.title} loading="lazy" className="w-full h-full object-cover" />
+    </Link>
+  );
+}
+
+export default function HeroBar({ heroBooks }: Props) {
+  const useReal = (heroBooks?.length ?? 0) >= 6;
   return (
     <section className="bg-cream-warm border-b border-line overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 pt-12 pb-10 sm:pt-16 sm:pb-12">
@@ -138,11 +157,15 @@ export default function HeroBar({}: Props) {
             </div>
           </div>
 
-          {/* Abanico de libros (decorativo, solo desktop) — rota por semana */}
+          {/* Abanico de libros (decorativo, solo desktop). Portadas REALES del
+              catálogo cuando hay ≥6; si no (filtros/catálogo vacío), cae a los
+              mockups semanales para no dejar el espacio en blanco. */}
           <div className="relative h-[460px] hidden lg:block">
-            {weeklyHeroBooks().map((b) => (
-              <FanBook key={b.t} b={b} />
-            ))}
+            {useReal
+              ? heroBooks!.slice(0, 6).map((b, i) => (
+                  <RealFanBook key={b.href} book={b} pos={HERO_SLOTS[i].pos} />
+                ))
+              : weeklyHeroBooks().map((b) => <FanBook key={b.t} b={b} />)}
             <div className="absolute z-[6] left-[40%] top-[188px] rotate-[2deg] bg-white border border-line rounded-full px-3.5 py-2 shadow-card flex items-center gap-2.5 font-mono text-[11px] font-semibold text-ink whitespace-nowrap">
               <span className="w-2 h-2 rounded-full bg-coral shadow-[0_0_0_4px_rgba(223,82,57,0.18)]" />
               A 800 m · retiro en mano
