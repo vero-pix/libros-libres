@@ -9,7 +9,7 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Libros de Megan Maxwell Usados en Chile | tuslibros.cl",
+  title: "Libros de Megan Maxwell Usados en Chile",
   description:
     "Compra libros de Megan Maxwell usados en Chile: la saga Pídeme lo que quieras, Las ranas también se enamoran, Adivina quién soy y más romántica. Segunda mano, envío a todo Chile o retiro en mano.",
   alternates: { canonical: "https://tuslibros.cl/megan-maxwell-libros" },
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "megan maxwell segunda mano",
   ],
   openGraph: {
-    title: "Libros de Megan Maxwell Usados en Chile | tuslibros.cl",
+    title: "Libros de Megan Maxwell Usados en Chile",
     description:
       "Toda la romántica de Megan Maxwell usada y a buen precio. Pídeme lo que quieras, Adivina quién soy y más. Envío a todo Chile.",
     url: "https://tuslibros.cl/megan-maxwell-libros",

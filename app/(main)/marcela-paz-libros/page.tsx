@@ -9,7 +9,7 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Libros de Marcela Paz Usados en Chile — Papelucho | tuslibros.cl",
+  title: "Libros de Marcela Paz Usados en Chile — Papelucho",
   description:
     "Compra libros de Marcela Paz usados en Chile: Papelucho Misionero, Papelucho Perdido, ¿Soy Dix-leso? y más. Segunda mano, envío a todo Chile o retiro en persona.",
   alternates: { canonical: "https://tuslibros.cl/marcela-paz-libros" },
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "marcela paz usados",
   ],
   openGraph: {
-    title: "Libros de Marcela Paz Usados en Chile — Papelucho | tuslibros.cl",
+    title: "Libros de Marcela Paz Usados en Chile — Papelucho",
     description:
       "Papelucho y toda la obra de Marcela Paz de segunda mano. Buen estado, a buen precio, con envío a todo Chile.",
     url: "https://tuslibros.cl/marcela-paz-libros",

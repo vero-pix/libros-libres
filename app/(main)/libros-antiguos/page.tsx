@@ -7,7 +7,7 @@ import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Libros antiguos y de colección en Chile | tuslibros.cl",
+  title: "Libros antiguos y de colección en Chile",
   description:
     "Encuentra libros antiguos, primeras ediciones, ediciones descatalogadas y rarezas literarias en Chile. Compra segura con MercadoPago y envío a todo el país.",
   alternates: { canonical: "https://tuslibros.cl/libros-antiguos" },
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     "librería anticuaria online",
   ],
   openGraph: {
-    title: "Libros antiguos y de colección en Chile — tuslibros.cl",
+    title: "Libros antiguos y de colección en Chile",
     description:
       "Rescatamos primeras ediciones, rarezas y libros que creías perdidos. Encuentra esa edición especial en nuestro marketplace.",
     url: "https://tuslibros.cl/libros-antiguos",

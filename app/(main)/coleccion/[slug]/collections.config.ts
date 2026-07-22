@@ -10,7 +10,7 @@ export interface CollectionConfig {
 export const COLLECTIONS: Record<string, CollectionConfig> = {
   'historia-de-chile': {
     title: 'Libros de Historia de Chile',
-    seoTitle: 'Libros de Historia de Chile Usados — tuslibros.cl',
+    seoTitle: 'Libros de Historia de Chile Usados',
     seoDescription: 'Encuentra libros usados sobre historia de Chile: política, memoria, identidad. Despacho a todo Chile o retiro en persona.',
     tagFilter: 'historia-chile',
     subtitle: 'Memoria, política, identidad',
@@ -19,7 +19,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
 
   'literatura-chilena': {
     title: 'Literatura Chilena Usada',
-    seoTitle: 'Literatura Chilena Usada — tuslibros.cl',
+    seoTitle: 'Literatura Chilena Usada',
     seoDescription: 'Narrativa, poesía y ensayo de autores chilenos. Donoso, Edwards, Marta Brunet, Nicanor Parra y más. Libros usados con despacho a todo Chile.',
     tagFilter: 'literatura-chilena',
     subtitle: 'Escritoras y escritores de acá',
@@ -28,7 +28,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
 
   'novela-negra': {
     title: 'Novela Negra y Policial Usada',
-    seoTitle: 'Novela Negra y Policial Usada — tuslibros.cl',
+    seoTitle: 'Novela Negra y Policial Usada',
     seoDescription: 'Los mejores libros de novela negra y policial usados: Simenon, Camilleri, nordic noir y más. Despacho a todo Chile.',
     tagFilter: 'novela-negra',
     subtitle: 'Para no soltar el libro',
@@ -37,7 +37,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
 
   'clasicos': {
     title: 'Clásicos que No Caducan',
-    seoTitle: 'Clásicos de Literatura Universal Usados — tuslibros.cl',
+    seoTitle: 'Clásicos de Literatura Universal Usados',
     seoDescription: 'Clásicos de la literatura universal en ediciones usadas: Kafka, Orwell, Cortázar, Borges y más. Despacho a todo Chile.',
     tagFilter: 'clasicos',
     subtitle: 'Los que siempre vuelven',
@@ -55,7 +55,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
 
   'latinoamerica-contemporanea': {
     title: 'Literatura Latinoamericana Contemporánea',
-    seoTitle: 'Literatura Latinoamericana Contemporánea Usada — tuslibros.cl',
+    seoTitle: 'Literatura Latinoamericana Contemporánea Usada',
     seoDescription: 'Lo mejor de la narrativa latinoamericana contemporánea: Fuentes, Bolaño, Vargas Llosa y nuevas voces. Libros usados con despacho a Chile.',
     tagFilter: 'latinoamerica-contemp',
     subtitle: 'Lo que se está escribiendo ahora mismo',

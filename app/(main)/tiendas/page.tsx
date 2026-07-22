@@ -5,7 +5,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Tiendas y librerías — tuslibros.cl",
+  title: "Tiendas y librerías",
   description:
     "Las librerías y vendedores con más libros usados publicados en tuslibros.cl. Explora sus catálogos y compra directo con pago protegido.",
   alternates: { canonical: "https://tuslibros.cl/tiendas" },

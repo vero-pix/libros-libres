@@ -2,11 +2,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Nuestra historia — tuslibros.cl",
+  title: "Nuestra historia",
   description:
     "La historia larga de tuslibros.cl. Una primera versión, una pausa obligada, y una segunda oportunidad. Por Verónica Velásquez.",
   openGraph: {
-    title: "Nuestra historia — tuslibros.cl",
+    title: "Nuestra historia",
     description:
       "Una primera versión, una pausa obligada, y una segunda oportunidad.",
     type: "article",

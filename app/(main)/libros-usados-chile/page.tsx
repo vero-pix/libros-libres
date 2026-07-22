@@ -8,7 +8,7 @@ import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Libros usados en Chile — comprar, vender y arrendar | tuslibros.cl",
+  title: "Libros usados en Chile — comprar, vender y arrendar",
   description:
     "Marketplace chileno de libros usados con mapa, pago seguro y envío por courier o retiro en mano. Primeras ediciones, rarezas y clásicos desde $3.000. Publicar es gratis.",
   alternates: { canonical: "https://tuslibros.cl/libros-usados-chile" },
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "librería de viejo online",
   ],
   openGraph: {
-    title: "Libros usados en Chile — tuslibros.cl",
+    title: "Libros usados en Chile",
     description:
       "En Chile hay más libros usados de los que crees. Están en estantes de librerías de viejo, en bodegas de universitarios, en cajas guardadas en Providencia. Acá viven juntos.",
     url: "https://tuslibros.cl/libros-usados-chile",
