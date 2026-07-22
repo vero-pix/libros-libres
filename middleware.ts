@@ -61,7 +61,8 @@ export async function middleware(request: NextRequest) {
     "/tag",
     "/category",
     "/author",
-    "/autor",
+    // "/autor" — ya NO es legacy: es una ruta viva (páginas de autor dinámicas,
+    // app/(main)/autor/[slug]). Slugs no configurados caen en notFound() (404).
     "/producto-categoria",
     "/product-category",
     "/shop",
