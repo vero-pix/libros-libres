@@ -39,6 +39,31 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "22 julio 2026",
+    title: "Ahora cada autor tiene su propia página — partí por Neruda",
+    description:
+      "Hasta ayer, si hacías clic en el nombre de un autor caías en una búsqueda cualquiera. Ahora no: los autores más buscados tienen su propia página, con una nota corta de quién fue, sus libros más pedidos y todo lo que hay disponible de esa persona en un solo lugar. Empecé por Pablo Neruda —con sus poemas de memoria: el Poema 20, «me gustas cuando callas», los Cien sonetos de amor, el Canto General— y seguí con Donoso, Bolaño, Gabriela Mistral, Nicanor Parra, Marta Brunet y varios más. Haz clic en cualquier nombre de autor, en una ficha o en una tarjeta, y llegas directo. La idea es simple: que encontrar «todo lo de tal autor» sea un clic y no una cacería.",
+    tag: "Descubrir",
+    link: "/pablo-neruda",
+    linkText: "Ver la página de Neruda",
+    visual: {
+      kind: "covers",
+      match: (l) =>
+        titleMatches(l, [
+          "neruda",
+          "donoso",
+          "bolaño",
+          "bolano",
+          "mistral",
+          "nicanor parra",
+          "vargas llosa",
+          "marta brunet",
+        ]),
+      limit: 6,
+      caption: "Autores con página propia",
+    },
+  },
+  {
     date: "12 julio 2026",
     title: "El catálogo casi se dobló en un mes — y esta semana entraron 178 libros de una",
     description:
