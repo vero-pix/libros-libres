@@ -22,7 +22,7 @@ import { sortListingsForDisplay } from "@/lib/sortListings";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
-import { categoriaUrl, libroUrl } from "@/lib/urls";
+import { libroUrl } from "@/lib/urls";
 
 // Nombres legibles para slugs de categoría/subcategoría usados en metadata
 const CATEGORY_NAMES: Record<string, string> = {
@@ -69,25 +69,23 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
   if (subcategory) {
     const name = slugToName(subcategory);
-    title = `${name} — Libros Usados en Chile | tuslibros.cl`;
+    title = `${name} — Libros Usados en Chile`;        // sin "| tuslibros.cl" (el template lo agrega)
     description = `Encuentra libros usados de ${name}. Compra seguro con envío a todo Chile en tuslibros.cl.`;
-    canonical = category
-      ? `${base}${categoriaUrl(category, subcategory)}`
-      : `${base}/categoria/${subcategory}`;
+    canonical = base;                                   // antes: /categoria/${subcategory} → 404
   } else if (category) {
     const name = slugToName(category);
-    title = `${name} — Libros Usados en Chile | tuslibros.cl`;
+    title = `${name} — Libros Usados en Chile`;         // sin "| tuslibros.cl"
     description = `Encuentra la mejor selección de libros de ${name} usados. Compra seguro con envío a todo Chile.`;
-    canonical = `${base}${categoriaUrl(category)}`;
+    canonical = base;                                   // antes: categoriaUrl(category) → 404
   } else if (genre) {
-    title = `Libros de ${genre} Usados | tuslibros.cl`;
+    title = `Libros de ${genre} Usados`;
   } else if (author) {
-    title = `Libros de ${author} Usados | tuslibros.cl`;
+    title = `Libros de ${author} Usados`;
   } else if (collectible === "1") {
-    title = "Libros de Colección y Ediciones Raras | tuslibros.cl";
+    title = "Libros de Colección y Ediciones Raras";
     canonical = `${base}/?collectible=1`;
   } else if (tag) {
-    title = `Libros sobre ${tag} | tuslibros.cl`;
+    title = `Libros sobre ${tag}`;
   }
 
   return {
