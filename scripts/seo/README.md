@@ -32,6 +32,8 @@ Requiere consola de Google Cloud con login humano. Claude no lo ejecuta.
 npm run seo:gsc                                   # consultas + páginas, últimos 28d (hasta hace 3)
 npm run seo:gsc -- --start 2026-06-01 --end 2026-06-17
 npm run seo:gsc -- --dimension page               # solo tabla por página
+npm run seo:wow                                   # semana vs semana (7d): totales + movers por query/página
+npm run seo:wow -- --end 2026-07-19               # fija el fin de la ventana (default: hace 3 días)
 npm run seo:sitemaps                              # estado de los sitemaps enviados
 npm run seo:audit-404                             # clasifica los 404 de GSC (requiere input, ver abajo)
 ```
