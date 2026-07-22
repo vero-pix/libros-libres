@@ -9,23 +9,27 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Veinte Poemas de Amor y otros Libros de Pablo Neruda Usados | tuslibros.cl",
+  title: "Poemas de Pablo Neruda — Libros Usados en Chile | tuslibros.cl",
   description:
-    "Compra Veinte Poemas de Amor y una Canción Desesperada, Canto General, Odas Elementales y más libros de Pablo Neruda usados en Chile. Envío a todo el país o retiro en mano. Pago seguro con MercadoPago.",
+    "Poemas y libros de Pablo Neruda usados en Chile: Veinte Poemas de Amor, Canto General, Odas Elementales, Cien Sonetos de Amor y más. Conoce sus poemas más famosos y compra tu ejemplar. Envío a todo el país o retiro en mano.",
   alternates: { canonical: "https://tuslibros.cl/pablo-neruda" },
   keywords: [
     "pablo neruda",
+    "poemas de pablo neruda",
+    "pablo neruda poemas",
     "libros pablo neruda",
     "neruda libros usados",
     "comprar neruda chile",
     "poemas neruda",
     "veinte poemas de amor neruda",
+    "poema 20 neruda",
     "canto general neruda",
+    "cien sonetos de amor neruda",
   ],
   openGraph: {
-    title: "Veinte Poemas de Amor y otros Libros de Pablo Neruda Usados | tuslibros.cl",
+    title: "Poemas de Pablo Neruda — Libros Usados en Chile | tuslibros.cl",
     description:
-      "Libros de Pablo Neruda usados en Chile. Envío a todo el país o retiro en mano.",
+      "Poemas y libros de Pablo Neruda usados en Chile. Envío a todo el país o retiro en mano.",
     url: "https://tuslibros.cl/pablo-neruda",
     siteName: "tuslibros.cl",
     locale: "es_CL",
@@ -54,6 +58,19 @@ const faqs = [
     q: "¿Se pueden vender libros de Neruda en tuslibros.cl?",
     a: "Sí. Los libros de Neruda tienen demanda activa y constante. Publicar es gratis — subes una foto, ingresas los datos del libro y quedas visible para compradores en todo Chile. La comisión es 8% solo cuando el libro se vende.",
   },
+];
+
+/* Los poemas más buscados de Neruda, identificados por su verso de apertura
+   (así los busca la gente). Cada uno enlaza a la obra donde comprarlo. Objetivo
+   SEO: capturar "poemas de pablo neruda", "poema 20", "me gustas cuando callas",
+   que hoy caen en una ficha suelta en pos. 69. */
+const poemasFamosos = [
+  { verso: "Puedo escribir los versos más tristes esta noche…", nombre: "Poema 20", obra: "Veinte poemas de amor y una canción desesperada", q: "veinte poemas de amor" },
+  { verso: "Me gustas cuando callas porque estás como ausente…", nombre: "Poema 15", obra: "Veinte poemas de amor y una canción desesperada", q: "veinte poemas de amor" },
+  { verso: "Cuerpo de mujer, blancas colinas, muslos blancos…", nombre: "Poema 1", obra: "Veinte poemas de amor y una canción desesperada", q: "veinte poemas de amor" },
+  { verso: "No te amo como si fueras rosa de sal, topacio…", nombre: "Soneto XVII", obra: "Cien sonetos de amor", q: "cien sonetos de amor" },
+  { verso: "Sube a nacer conmigo, hermano…", nombre: "Alturas de Macchu Picchu", obra: "Canto General", q: "canto general" },
+  { verso: "Del aire al aire, como una red vacía…", nombre: "Canto General", obra: "Canto General", q: "canto general" },
 ];
 
 export default async function PabloNerudaPage() {
@@ -193,6 +210,30 @@ export default async function PabloNerudaPage() {
                   <h3 className="font-semibold text-ink mb-1 text-sm">{b.title}</h3>
                   <p className="text-xs text-ink-muted leading-relaxed">{b.desc}</p>
                 </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="mb-16">
+            <h2 className="font-display text-2xl font-bold text-ink mb-2">Los poemas más conocidos de Pablo Neruda</h2>
+            <p className="text-sm text-ink-muted leading-relaxed max-w-2xl mb-6">
+              Sus versos más recordados — los que se recitan de memoria y se buscan por su primera
+              línea. Cada uno vive en un libro que puedes conseguir usado acá.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {poemasFamosos.map((p) => (
+                <Link
+                  key={p.nombre + p.verso}
+                  href={`/search?q=${encodeURIComponent(p.q)}`}
+                  className="group block bg-white rounded-xl p-5 border border-cream-dark hover:border-brand-500 transition-colors"
+                >
+                  <p className="font-display italic text-ink text-[15px] leading-snug mb-2 group-hover:text-brand-600 transition-colors">
+                    «{p.verso}»
+                  </p>
+                  <p className="text-xs text-ink-muted">
+                    <span className="font-semibold text-ink">{p.nombre}</span> · {p.obra}
+                  </p>
+                </Link>
               ))}
             </div>
           </section>
