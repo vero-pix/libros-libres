@@ -29,7 +29,7 @@ export const AUTHORS: Record<string, AuthorConfig> = {
     slug: 'juan-emar',
     displayName: 'Juan Emar',
     dbAuthors: ['Juan Emar'],
-    seoTitle: 'Juan Emar — Libros Usados en Chile | tuslibros.cl',
+    seoTitle: 'Juan Emar — Libros Usados en Chile',
     seoDescription:
       'Libros de Juan Emar usados en Chile: Ayer, Un año, Miltín 1934, Diez. El vanguardista chileno que se adelantó a su tiempo. Envío a todo el país o retiro en mano.',
     keywords: ['juan emar', 'juan emar libros', 'ayer juan emar', 'miltin 1934', 'diez juan emar', 'emar libros usados'],
@@ -46,7 +46,7 @@ export const AUTHORS: Record<string, AuthorConfig> = {
     slug: 'jose-donoso',
     displayName: 'José Donoso',
     dbAuthors: ['José Donoso', 'José Donoso '],
-    seoTitle: 'José Donoso — Libros Usados en Chile | tuslibros.cl',
+    seoTitle: 'José Donoso — Libros Usados en Chile',
     seoDescription:
       'Libros de José Donoso usados en Chile: El obsceno pájaro de la noche, Casa de campo, Coronación y más. El gran novelista del boom chileno. Envío a todo Chile o retiro en mano.',
     keywords: ['jose donoso', 'josé donoso libros', 'el obsceno pajaro de la noche', 'casa de campo donoso', 'coronacion donoso', 'donoso libros usados'],
@@ -63,7 +63,7 @@ export const AUTHORS: Record<string, AuthorConfig> = {
     slug: 'maria-luisa-bombal',
     displayName: 'María Luisa Bombal',
     dbAuthors: ['María Luisa Bombal'],
-    seoTitle: 'María Luisa Bombal — Libros Usados en Chile | tuslibros.cl',
+    seoTitle: 'María Luisa Bombal — Libros Usados en Chile',
     seoDescription:
       'Libros de María Luisa Bombal usados en Chile: La última niebla, La amortajada. La escritora que renovó la narrativa chilena. Envío a todo el país o retiro en mano.',
     keywords: ['maria luisa bombal', 'la ultima niebla', 'la amortajada', 'bombal libros', 'bombal libros usados'],
@@ -80,7 +80,7 @@ export const AUTHORS: Record<string, AuthorConfig> = {
     slug: 'gabriela-mistral',
     displayName: 'Gabriela Mistral',
     dbAuthors: ['Gabriela Mistral'],
-    seoTitle: 'Gabriela Mistral — Libros Usados en Chile | tuslibros.cl',
+    seoTitle: 'Gabriela Mistral — Libros Usados en Chile',
     seoDescription:
       'Libros de Gabriela Mistral usados en Chile: Desolación, Tala, Ternura, Lagar. La primera Nobel latinoamericana. Envío a todo Chile o retiro en mano.',
     keywords: ['gabriela mistral', 'gabriela mistral libros', 'desolacion mistral', 'tala mistral', 'ternura gabriela mistral', 'mistral libros usados'],
@@ -97,7 +97,7 @@ export const AUTHORS: Record<string, AuthorConfig> = {
     slug: 'nicanor-parra',
     displayName: 'Nicanor Parra',
     dbAuthors: ['Nicanor Parra'],
-    seoTitle: 'Nicanor Parra — Libros Usados en Chile | tuslibros.cl',
+    seoTitle: 'Nicanor Parra — Libros Usados en Chile',
     seoDescription:
       'Libros de Nicanor Parra usados en Chile: Poemas y antipoemas, Artefactos, Sermones y prédicas del Cristo de Elqui. El creador de la antipoesía. Envío a todo Chile o retiro en mano.',
     keywords: ['nicanor parra', 'poemas y antipoemas', 'antipoesia', 'artefactos parra', 'nicanor parra libros usados'],
@@ -114,7 +114,7 @@ export const AUTHORS: Record<string, AuthorConfig> = {
     slug: 'roberto-bolano',
     displayName: 'Roberto Bolaño',
     dbAuthors: ['Roberto Bolaño'],
-    seoTitle: 'Roberto Bolaño — Libros Usados en Chile | tuslibros.cl',
+    seoTitle: 'Roberto Bolaño — Libros Usados en Chile',
     seoDescription:
       'Libros de Roberto Bolaño usados en Chile: Los detectives salvajes, 2666, Estrella distante, Nocturno de Chile. Envío a todo el país o retiro en mano.',
     keywords: ['roberto bolaño', 'los detectives salvajes', '2666 bolaño', 'estrella distante', 'nocturno de chile', 'bolaño libros usados'],
@@ -131,7 +131,7 @@ export const AUTHORS: Record<string, AuthorConfig> = {
     slug: 'pedro-prado',
     displayName: 'Pedro Prado',
     dbAuthors: ['Pedro Prado'],
-    seoTitle: 'Pedro Prado — Libros Usados en Chile | tuslibros.cl',
+    seoTitle: 'Pedro Prado — Libros Usados en Chile',
     seoDescription:
       'Libros de Pedro Prado usados en Chile: Alsino, Un juez rural. El primer Premio Nacional de Literatura. Envío a todo el país o retiro en mano.',
     keywords: ['pedro prado', 'alsino pedro prado', 'un juez rural', 'pedro prado libros'],
@@ -148,7 +148,7 @@ export const AUTHORS: Record<string, AuthorConfig> = {
     slug: 'marta-brunet',
     displayName: 'Marta Brunet',
     dbAuthors: ['Marta Brunet ', 'Marta Brunet'],
-    seoTitle: 'Marta Brunet — Libros Usados en Chile | tuslibros.cl',
+    seoTitle: 'Marta Brunet — Libros Usados en Chile',
     seoDescription:
       'Libros de Marta Brunet usados en Chile: Montaña adentro, María Nadie, Humo hacia el sur. Premio Nacional de Literatura. Envío a todo Chile o retiro en mano.',
     keywords: ['marta brunet', 'montaña adentro', 'maria nadie', 'humo hacia el sur', 'marta brunet libros usados'],
@@ -165,7 +165,7 @@ export const AUTHORS: Record<string, AuthorConfig> = {
     slug: 'jorge-teillier',
     displayName: 'Jorge Teillier',
     dbAuthors: ['Jorge Teillier'],
-    seoTitle: 'Jorge Teillier — Libros Usados en Chile | tuslibros.cl',
+    seoTitle: 'Jorge Teillier — Libros Usados en Chile',
     seoDescription:
       'Libros de Jorge Teillier usados en Chile: Para ángeles y gorriones, El árbol de la memoria, Muertes y maravillas. El poeta lárico. Envío a todo Chile o retiro en mano.',
     keywords: ['jorge teillier', 'poesia larica', 'para angeles y gorriones', 'muertes y maravillas', 'teillier libros usados'],

@@ -5,7 +5,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import Image from "next/image";
 
 export const metadata = {
-  title: "Términos y Condiciones — tuslibros.cl",
+  title: "Términos y Condiciones",
   alternates: { canonical: "https://tuslibros.cl/terminos" },
 };
 

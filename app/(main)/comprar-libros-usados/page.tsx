@@ -28,7 +28,7 @@ const TEMAS = [
 ];
 
 export const metadata: Metadata = {
-  title: "Comprar libros usados en Chile — baratos, raros y cerca de ti | tuslibros.cl",
+  title: "Comprar libros usados en Chile — baratos, raros y cerca de ti",
   description:
     "Compra libros usados en Chile: clásicos, rarezas y primeras ediciones desde $3.000, hasta 60% bajo el precio nuevo. Pago protegido con MercadoPago, retiro en mano o despacho por courier a todo Chile.",
   alternates: { canonical: "https://tuslibros.cl/comprar-libros-usados" },
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     "primeras ediciones Chile",
   ],
   openGraph: {
-    title: "Comprar libros usados en Chile — tuslibros.cl",
+    title: "Comprar libros usados en Chile",
     description:
       "El libro que buscas probablemente ya lo leyó alguien cerca de ti. Cómpralo usado: más barato, muchas veces agotado en librerías nuevas, y con pago protegido.",
     url: "https://tuslibros.cl/comprar-libros-usados",

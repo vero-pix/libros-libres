@@ -9,7 +9,7 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Álgebra de Baldor — Libro Usado en Chile | tuslibros.cl",
+  title: "Álgebra de Baldor — Libro Usado en Chile",
   description:
     "Compra Álgebra de Baldor usado en Chile. Ejemplares disponibles desde $3.000 con envío a todo el país o retiro en mano. Ediciones Patria, CECSA y más. Pago seguro con MercadoPago.",
   alternates: { canonical: "https://tuslibros.cl/algebra-de-baldor" },
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "libro de matematicas baldor",
   ],
   openGraph: {
-    title: "Álgebra de Baldor — Libro Usado en Chile | tuslibros.cl",
+    title: "Álgebra de Baldor — Libro Usado en Chile",
     description:
       "Compra Álgebra de Baldor usado en Chile. Envío a todo el país o retiro en mano. Pago seguro.",
     url: "https://tuslibros.cl/algebra-de-baldor",

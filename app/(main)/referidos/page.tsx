@@ -4,7 +4,7 @@ import ReferralDashboard from "@/components/referrals/ReferralDashboard";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Invita y gana — tuslibros.cl",
+  title: "Invita y gana",
   description: "Invita amigos a tuslibros.cl y gana descuentos en despacho.",
   alternates: { canonical: "https://tuslibros.cl/referidos" },
   robots: { index: false },

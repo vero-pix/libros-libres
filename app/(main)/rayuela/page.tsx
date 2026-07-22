@@ -9,7 +9,7 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Rayuela de Cortázar — Libro Usado en Chile | tuslibros.cl",
+  title: "Rayuela de Cortázar — Libro Usado en Chile",
   description:
     "Compra Rayuela de Julio Cortázar usado en Chile. Ejemplares disponibles con envío a todo el país o retiro en mano. Pago seguro con MercadoPago.",
   alternates: { canonical: "https://tuslibros.cl/rayuela" },
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     "rayuela libro usado",
   ],
   openGraph: {
-    title: "Rayuela de Cortázar — Libro Usado en Chile | tuslibros.cl",
+    title: "Rayuela de Cortázar — Libro Usado en Chile",
     description: "Compra Rayuela de Julio Cortázar usado en Chile. Envío a todo el país.",
     url: "https://tuslibros.cl/rayuela",
     siteName: "tuslibros.cl",

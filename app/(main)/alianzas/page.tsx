@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Alianzas — tuslibros.cl",
+  title: "Alianzas",
   description:
     "Estamos armando alianzas con universidades, bibliotecas, centros de alumnos y librerías de segunda mano. Si quieres ser parte, escríbeme.",
   alternates: { canonical: "https://tuslibros.cl/alianzas" },

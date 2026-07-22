@@ -9,7 +9,7 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Novela Negra y Policial Usada en Chile | tuslibros.cl",
+  title: "Novela Negra y Policial Usada en Chile",
   description:
     "Compra novela negra y policial usada en Chile: Simenon y el comisario Maigret, Camilleri, Mankell, Vázquez Montalbán, Agatha Christie y más. Segunda mano, envío a todo Chile o retiro en mano.",
   alternates: { canonical: "https://tuslibros.cl/novela-negra-policial" },
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     "novela negra nordica",
   ],
   openGraph: {
-    title: "Novela Negra y Policial Usada en Chile | tuslibros.cl",
+    title: "Novela Negra y Policial Usada en Chile",
     description:
       "Simenon, Camilleri, Mankell, Christie y toda la novela negra usada. Pago protegido y envío a todo Chile.",
     url: "https://tuslibros.cl/novela-negra-policial",

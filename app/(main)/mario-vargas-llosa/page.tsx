@@ -9,7 +9,7 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Libros de Vargas Llosa Usados en Chile | tuslibros.cl",
+  title: "Libros de Vargas Llosa Usados en Chile",
   description:
     "Compra libros de Mario Vargas Llosa usados en Chile. La ciudad y los perros, La fiesta del Chivo, Conversación en La Catedral y más. Envío a todo Chile. Pago seguro.",
   alternates: { canonical: "https://tuslibros.cl/mario-vargas-llosa" },
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "conversacion en la catedral",
   ],
   openGraph: {
-    title: "Libros de Vargas Llosa Usados en Chile | tuslibros.cl",
+    title: "Libros de Vargas Llosa Usados en Chile",
     description: "Libros de Mario Vargas Llosa usados en Chile. Envío a todo el país o retiro en mano.",
     url: "https://tuslibros.cl/mario-vargas-llosa",
     siteName: "tuslibros.cl",

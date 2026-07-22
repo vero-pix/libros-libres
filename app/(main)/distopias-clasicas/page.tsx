@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "novela distopica segunda mano",
   ],
   openGraph: {
-    title: "Distopías Clásicas Usadas en Chile | tuslibros.cl",
+    title: "Distopías Clásicas Usadas en Chile",
     description: "1984, Un mundo feliz, Fahrenheit 451 y más, usados en Chile. Envío a todo el país o retiro en mano.",
     url: "https://tuslibros.cl/distopias-clasicas",
     siteName: "tuslibros.cl",

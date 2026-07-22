@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Política de devoluciones — tuslibros.cl",
+  title: "Política de devoluciones",
   description: "Cómo funcionan las devoluciones en tuslibros.cl",
   alternates: { canonical: "https://tuslibros.cl/devoluciones" },
 };

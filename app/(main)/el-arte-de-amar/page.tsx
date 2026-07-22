@@ -9,7 +9,7 @@ import type { ListingWithBook } from "@/types";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "El Arte de Amar de Fromm — Libro Usado en Chile | tuslibros.cl",
+  title: "El Arte de Amar de Fromm — Libro Usado en Chile",
   description:
     "Compra El Arte de Amar de Erich Fromm usado en Chile. Ejemplares disponibles con envío a todo el país o retiro en mano. Pago seguro con MercadoPago desde $4.000.",
   alternates: { canonical: "https://tuslibros.cl/el-arte-de-amar" },
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     "el arte de amar libro usado",
   ],
   openGraph: {
-    title: "El Arte de Amar de Fromm — Libro Usado en Chile | tuslibros.cl",
+    title: "El Arte de Amar de Fromm — Libro Usado en Chile",
     description: "El Arte de Amar de Erich Fromm, usado en Chile. Envío a todo el país.",
     url: "https://tuslibros.cl/el-arte-de-amar",
     siteName: "tuslibros.cl",
