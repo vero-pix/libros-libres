@@ -6,6 +6,7 @@ import { memo, useState, useCallback, useTransition } from "react";
 import dynamic from "next/dynamic";
 import type { ListingWithBook } from "@/types";
 import { libroUrl } from "@/lib/urls";
+import { resolveAuthorUrl } from "@/lib/authorLink";
 
 const QuickViewModal = dynamic(() => import("./QuickViewModal"), {
   ssr: false,
@@ -322,9 +323,9 @@ const ListingCard = memo(function ListingCard({
 
           {book.author && (
             <Link
-              href={`/search?author=${encodeURIComponent(book.author)}`}
+              href={resolveAuthorUrl(book.author) ?? `/search?author=${encodeURIComponent(book.author)}`}
               className="block font-display italic text-[13px] text-ink-muted hover:text-ink mt-0.5 truncate transition-colors"
-              aria-label={`Buscar libros de ${book.author}`}
+              aria-label={`Ver libros de ${book.author}`}
             >
               {book.author}
             </Link>
