@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "bulk-upload": "npx tsx scripts/bulk-upload.ts",
+    "cards": "tsx scripts/content-cards/generate.mjs",
     "qa": "playwright test",
     "qa:prod": "QA_BASE_URL=https://tuslibros.cl playwright test",
     "qa:ui": "playwright test --ui",
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.19",
     "@types/mapbox-gl": "^3.4.1",
     "@types/node": "^20.17.30",

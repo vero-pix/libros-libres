@@ -76,3 +76,6 @@ docs/chat_*.md
 
 # Artefactos HTML generados por scripts (regenerables)
 docs/books_huerfanos_*.html
+
+# Salida del generador de tarjetas de contenido (PNGs + manifest)
+content-out/
