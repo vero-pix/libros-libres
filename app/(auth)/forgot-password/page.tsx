@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ForgotPasswordPage() {
   const supabase = createClient();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -16,17 +18,21 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setError(null);
 
-    const siteUrl = window.location.origin;
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${siteUrl}/reset-password`,
-    });
+    // Enviamos un código de 6 dígitos (OTP), no un link. Un link de un solo
+    // uso lo consume el escáner antivirus de Gmail antes de que la persona lo
+    // abra ("el link expiró"). Un código que se escribe a mano es inmune a eso.
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
 
     if (error) {
       setError("No pudimos enviar el correo. Revisa que el email sea correcto.");
+      setLoading(false);
     } else {
       setSent(true);
+      // Llevamos a la página donde escribe el código + la nueva contraseña.
+      setTimeout(() => {
+        router.push(`/reset-password?email=${encodeURIComponent(email)}`);
+      }, 1200);
     }
-    setLoading(false);
   }
 
   return (
@@ -45,7 +51,7 @@ export default function ForgotPasswordPage() {
             Recuperar contraseña
           </h1>
           <p className="text-ink-muted text-sm mt-2">
-            Te enviaremos un link para crear una nueva contraseña.
+            Te enviaremos un código para crear una nueva contraseña.
           </p>
         </div>
 
@@ -54,17 +60,11 @@ export default function ForgotPasswordPage() {
             <div className="text-center space-y-4">
               <div className="text-4xl">📧</div>
               <p className="text-sm text-gray-700">
-                Revisa tu correo <strong>{email}</strong>. Te enviamos un link para restablecer tu contraseña.
+                Revisa tu correo <strong>{email}</strong>. Te enviamos un código para restablecer tu contraseña.
               </p>
               <p className="text-xs text-gray-400">
-                Si no lo ves, revisa tu carpeta de spam.
+                Te llevamos al siguiente paso… Si no ves el correo, revisa spam.
               </p>
-              <Link
-                href="/login"
-                className="inline-block text-sm text-brand-600 hover:underline font-medium"
-              >
-                Volver al login
-              </Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">

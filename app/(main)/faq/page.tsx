@@ -224,10 +224,10 @@ const faqSections = [
         a: (
           <span>
             En la pantalla de inicio de sesión, haz clic en{" "}
-            <Link href="/reset-password" className={linkClass}>
+            <Link href="/forgot-password" className={linkClass}>
               <strong>¿Olvidaste tu contraseña?</strong>
             </Link>{" "}
-            para recibir un correo de recuperación.
+            para recibir un código de recuperación por correo.
           </span>
         ),
       },
