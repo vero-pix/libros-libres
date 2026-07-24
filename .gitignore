@@ -79,3 +79,6 @@ docs/books_huerfanos_*.html
 
 # Salida del generador de tarjetas de contenido (PNGs + manifest)
 content-out/
+
+# Docs de trabajo Claude (planes, cifras, borradores de venta) — nunca públicos
+docs_desde_claude/
