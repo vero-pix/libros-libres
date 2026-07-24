@@ -101,9 +101,12 @@ interface ListingWithRentalFields extends ListingWithBook {
 
 // Vendedores cuya cuenta MercadoPago temporalmente NO puede recibir pagos (en
 // recuperación, ej. rejected_by_regulations). En vez de mandar al comprador a la página
-// muerta de MP, mostramos un aviso suave + contacto. Quitar el username de acá cuando la
-// cuenta vuelva a operar. (Por ahora solo la cuenta de Vero, mientras la recupera.)
-const MP_NOT_RECEIVING = new Set<string>(["vero"]);
+// muerta de MP, mostramos un aviso suave + contacto. Agregar el username acá si a algún
+// vendedor se le cae MP.
+// 24 jul 2026: Vero reconectó su cuenta personal (vero@tuslibros.cl, mp_user_id 188221236,
+// distinta de la de su mamá); split verificado OK → se saca de la lista y sus fichas
+// vuelven a mostrar "Comprar".
+const MP_NOT_RECEIVING = new Set<string>([]);
 
 interface Props {
   listing: ListingWithBook;
