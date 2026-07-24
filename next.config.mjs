@@ -24,6 +24,11 @@ const nextConfig = {
       // Redirigen ANTES que el middleware para transferir link equity (308).
       { source: '/libro/algebra-de-baldor', destination: '/algebra-de-baldor', permanent: true },
       { source: '/libro/algebra-de-baldor/', destination: '/algebra-de-baldor', permanent: true },
+      // Neruda: la ficha original se vendió y su URL zombi quedaba indexada en pos ~70
+      // con 755 impr/semana y 0 clics (el middleware la mandaba 302 a /search, dead end).
+      // 301 permanente a la landing dedicada para consolidar esas impresiones donde toca.
+      { source: '/libro/veinte-poemas-de-amor-y-una-cancion-desesperada-pablo-neruda', destination: '/pablo-neruda', permanent: true },
+      { source: '/libro/veinte-poemas-de-amor-y-una-cancion-desesperada-pablo-neruda/', destination: '/pablo-neruda', permanent: true },
       // Consolidación geo SEO → patrón canónico único /libros-usados/[ciudad].
       // 301 desde rutas legacy y desde /ciudad/[slug] para eliminar canibalización.
       { source: '/libros-usados-santiago', destination: '/libros-usados/santiago', permanent: true },
