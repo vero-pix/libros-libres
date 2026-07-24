@@ -1,0 +1,54 @@
+{
+  "_nota": "Destacados de la semana — 5 libros caros/atractivos de vero. 5 fichas + 1 carrusel resumen. Editá captions a gusto. Correr: npm run cards -- content/cards/lote-destacados.json",
+  "pieces": [
+    {
+      "template": "ficha",
+      "slug": "vero/los-hechizados",
+      "kicker": "Gótica y rara",
+      "caption": "Los hechizados, la novela gótica que Gombrowicz publicó por entregas y casi en secreto. Un castillo, un misterio y una fuerza que nadie logra controlar.\n\n📚 tuslibros.cl",
+      "firstComment": "#gombrowicz #loshechizados #novelagotica #literatura #librosusados #tuslibros"
+    },
+    {
+      "template": "ficha",
+      "slug": "vero/las-vidas-paralelas-de-plutarco-tomo-i",
+      "kicker": "Edición de colección",
+      "caption": "Las Vidas Paralelas de Plutarco, Tomo I. Los grandes de Grecia y Roma, uno frente a otro. Edición antigua, de las que ya no se hacen.\n\n📚 tuslibros.cl",
+      "firstComment": "#plutarco #clasicos #vidasparalelas #librosantiguos #librosusados #tuslibros"
+    },
+    {
+      "template": "ficha",
+      "slug": "vero/conversacion-en-la-catedral",
+      "kicker": "Un clásico del boom",
+      "caption": "«¿En qué momento se había jodido el Perú?». Conversación en La Catedral, de Vargas Llosa — una de las cumbres del boom latinoamericano.\n\n📚 tuslibros.cl",
+      "firstComment": "#vargasllosa #conversacionenlacatedral #boomlatinoamericano #librosusados #tuslibros"
+    },
+    {
+      "template": "ficha",
+      "slug": "vero/bartleby-el-escribiente-biblioteca-de-babel",
+      "kicker": "Biblioteca de Babel",
+      "caption": "«Preferiría no hacerlo». Bartleby el escribiente, en la Biblioteca de Babel que armó Borges. Pieza de colección.\n\n📚 tuslibros.cl",
+      "firstComment": "#bartleby #melville #bibliotecadebabel #borges #librosdecoleccion #tuslibros"
+    },
+    {
+      "template": "ficha",
+      "slug": "vero/elogio-de-la-sombra",
+      "kicker": "Borges, de colección",
+      "caption": "Borges, Elogio de la sombra. Poemas de la vejez y la ceguera, escritos como quien mira hacia adentro.\n\n📚 tuslibros.cl",
+      "firstComment": "#borges #elogiodelasombra #poesia #librosdecoleccion #librosusados #tuslibros"
+    },
+    {
+      "template": "lista",
+      "kicker": "Tesoros de la semana",
+      "slugs": [
+        "vero/los-hechizados",
+        "vero/conversacion-en-la-catedral",
+        "vero/bartleby-el-escribiente-biblioteca-de-babel",
+        "vero/el-cardenal-napellus-biblioteca-de-babel",
+        "vero/homo-faber",
+        "vero/elogio-de-la-sombra"
+      ],
+      "caption": "Seis tesoros que puedes conseguir ahora en tuslibros.cl. Clásicos, colección y ediciones difíciles de encontrar — todos usados, con despacho a todo Chile.\n\n📚 tuslibros.cl",
+      "firstComment": "#librosusados #librosdecoleccion #clasicos #literatura #tuslibros"
+    }
+  ]
+}

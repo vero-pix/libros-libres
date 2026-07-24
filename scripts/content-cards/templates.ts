@@ -92,7 +92,19 @@ export function fichaTemplate(piece: Piece, listing: Listing): string {
     maxLines: 4,
   });
   const titleLH = 66;
-  const titleTop = 400;
+
+  // El bloque de la derecha (kicker + título + autor + precio + condición) se
+  // centra verticalmente respecto a la portada, así una ficha de título corto
+  // no queda flotando arriba con el tercio inferior vacío.
+  const kickerGap = 84; // del kicker al arranque del título
+  const authorGap = listing.author ? 74 : 0;
+  const priceGap = formatCLP(listing.price) ? 44 : 0;
+  const condGap = conditionLabel(listing.condition) ? 40 : 0;
+  const blockH =
+    kickerGap + titleLines.length * titleLH + authorGap + priceGap + condGap;
+  const coverMid = coverY + coverH / 2;
+  const kickerY = Math.max(300, Math.round(coverMid - blockH / 2));
+  const titleTop = kickerY + kickerGap;
 
   const titleSvg = titleLines
     .map(
@@ -122,7 +134,7 @@ export function fichaTemplate(piece: Piece, listing: Listing): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${CANVAS}" height="${CANVAS}" viewBox="0 0 ${CANVAS} ${CANVAS}">
     ${backgroundSvg(COLORS.cream)}
     ${coverBox(listing.coverDataUri, coverX, coverY, coverW, coverH)}
-    ${kickerSvg(piece.kicker || "Recién llegado", tx, 316)}
+    ${kickerSvg(piece.kicker || "Recién llegado", tx, kickerY)}
     ${titleSvg}
     ${authorSvg}
     ${priceSvg}
@@ -203,13 +215,13 @@ function renderLamina(piece: Piece, items: Listing[], index: number, total: numb
   const cols = 3;
   const gap = 40;
   const cellW = Math.floor((CANVAS - MARGIN * 2 - gap * (cols - 1)) / cols); // ~274
-  const coverW = 176;
-  const coverH = 264;
+  const coverW = 160;
+  const coverH = 240; // 2:3, un pelín más chica para dar aire a títulos de 2 líneas
   const cellPadX = Math.floor((cellW - coverW) / 2);
 
   // Grilla de 2 filas dentro del área útil, dejando ~80px abajo para el footer.
-  const gridTop = 240;
-  const rowH = 350; // portada (264) + título + precio + aire, sin invadir el footer
+  const gridTop = 210;
+  const rowH = 376; // portada (240) + título (hasta 2 líneas) + precio + aire, sin invadir el footer
 
   const cells = items
     .map((l, i) => {
@@ -222,17 +234,25 @@ function renderLamina(piece: Piece, items: Listing[], index: number, total: numb
 
       const cover = coverBox(l.coverDataUri, x, y, coverW, coverH, 12);
 
-      const titleLine = wrapText(l.title, {
+      const titleLineH = 28;
+      const titleLines = wrapText(l.title, {
         maxWidth: cellW,
         fontSize: 22,
         family: "sans",
-        maxLines: 1,
-      })[0];
-      const titleSvg = `<text x="${centerX}" y="${y + coverH + 38}" text-anchor="middle" font-family="${FONTS.sans}" font-size="22" fill="${COLORS.muted}">${escapeXml(titleLine)}</text>`;
+        maxLines: 2,
+      });
+      const titleSvg = titleLines
+        .map(
+          (ln, ti) =>
+            `<text x="${centerX}" y="${y + coverH + 38 + ti * titleLineH}" text-anchor="middle" font-family="${FONTS.sans}" font-size="22" fill="${COLORS.muted}">${escapeXml(ln)}</text>`
+        )
+        .join("\n");
 
+      // El precio va bajo la última línea del título (1 o 2 líneas).
+      const priceY = y + coverH + 38 + (titleLines.length - 1) * titleLineH + 34;
       const priceStr = formatCLP(l.price);
       const priceSvg = priceStr
-        ? `<text x="${centerX}" y="${y + coverH + 72}" text-anchor="middle" font-family="${FONTS.sansSemibold}" font-size="30" fill="${COLORS.amber}">${escapeXml(priceStr)}</text>`
+        ? `<text x="${centerX}" y="${priceY}" text-anchor="middle" font-family="${FONTS.sansSemibold}" font-size="30" fill="${COLORS.amber}">${escapeXml(priceStr)}</text>`
         : "";
 
       return `${cover}\n${titleSvg}\n${priceSvg}`;
