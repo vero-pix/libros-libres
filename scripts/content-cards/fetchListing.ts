@@ -45,15 +45,42 @@ export type Listing = {
   price: number | null;
   condition: string | null;
   coverUrl: string | null;
+  /** true si la portada es una foto real del ejemplar (Storage), no genérica. */
+  realPhoto: boolean;
   /** Portada ya descargada como data: URI, lista para el <image> del SVG. */
   coverDataUri: string | null;
 };
 
+/**
+ * FILTRO OBLIGATORIO: todas las piezas usan SOLO libros de Vero. Cualquier
+ * listing de otro vendedor se descarta con aviso. (username 'vero', Providencia)
+ */
+const VERO_SELLER_ID = "2201d163-4423-4971-91f0-f6cebd00d1bd";
+
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const SELECT = `id, slug, price, condition, cover_image_url, book:books(title, author, cover_url)`;
+const SELECT = `id, slug, seller_id, price, condition, cover_image_url, book:books(title, author, cover_url)`;
 
-/** Resuelve la referencia de pieza a un registro de listing (o null si no está). */
+/** URL genérica (no foto real del ejemplar): OpenLibrary y sin URL. */
+function isGenericCover(url?: string | null): boolean {
+  return !url || /covers\.openlibrary\.org/i.test(url);
+}
+
+/**
+ * Elige la FOTO REAL del ejemplar, en orden de preferencia:
+ *   1. listing_images (sort_order = 0) — la principal subida por el vendedor
+ *   2. listings.cover_image_url        — foto propia (bucket 'covers')
+ *   3. books.cover_url                 — solo si no es genérica
+ * Descarta siempre covers.openlibrary.org (son portadas genéricas).
+ */
+function pickRealCover(images0?: string | null, coverImageUrl?: string | null, bookCoverUrl?: string | null): string | null {
+  for (const u of [images0, coverImageUrl, bookCoverUrl]) {
+    if (u && !isGenericCover(u)) return u;
+  }
+  return null;
+}
+
+/** Resuelve la referencia de pieza a un listing DE VERO (o null si no aplica). */
 export async function fetchListing(ref: string): Promise<Listing | null> {
   const sb = client();
   let row: any = null;
@@ -61,31 +88,36 @@ export async function fetchListing(ref: string): Promise<Listing | null> {
   if (UUID_RE.test(ref)) {
     const { data } = await sb.from("listings").select(SELECT).eq("id", ref).maybeSingle();
     row = data;
-  } else if (ref.includes("/")) {
-    const [username, slug] = ref.split("/");
-    const { data: seller } = await sb
-      .from("users")
-      .select("id")
-      .eq("username", username)
-      .maybeSingle();
-    if (!seller) return null;
-    const { data } = await sb
-      .from("listings")
-      .select(SELECT)
-      .eq("slug", slug)
-      .eq("seller_id", seller.id)
-      .maybeSingle();
-    row = data;
   } else {
-    // slug suelto (sin username): último intento por slug único.
-    const { data } = await sb.from("listings").select(SELECT).eq("slug", ref).maybeSingle();
-    row = data;
+    // "username/slug" o slug suelto: tomamos el slug y filtramos por Vero.
+    const slug = ref.includes("/") ? ref.split("/").pop()! : ref;
+    const { data: rows } = await sb.from("listings").select(SELECT).eq("slug", slug);
+    row = (rows ?? []).find((r: any) => r.seller_id === VERO_SELLER_ID) ?? null;
+    if (!row && (rows ?? []).length > 0) {
+      console.warn(`  ⚠ "${ref}" existe pero es de otro vendedor (no Vero) — descartado.`);
+      return null;
+    }
   }
 
   if (!row) return null;
 
+  // Filtro obligatorio: solo Vero.
+  if (row.seller_id !== VERO_SELLER_ID) {
+    console.warn(`  ⚠ "${ref}" no es de Vero (seller ${row.seller_id}) — descartado.`);
+    return null;
+  }
+
   const book = Array.isArray(row.book) ? row.book[0] : row.book;
-  const coverUrl: string | null = row.cover_image_url ?? book?.cover_url ?? null;
+
+  // Foto principal desde listing_images (sort_order = 0), si existe.
+  const { data: imgs } = await sb
+    .from("listing_images")
+    .select("image_url, sort_order")
+    .eq("listing_id", row.id)
+    .order("sort_order", { ascending: true });
+  const main = (imgs ?? []).find((x: any) => x.sort_order === 0) ?? (imgs ?? [])[0];
+
+  const coverUrl = pickRealCover(main?.image_url, row.cover_image_url, book?.cover_url);
 
   return {
     ref,
@@ -94,6 +126,7 @@ export async function fetchListing(ref: string): Promise<Listing | null> {
     price: row.price ?? null,
     condition: row.condition ?? null,
     coverUrl,
+    realPhoto: coverUrl != null,
     coverDataUri: coverUrl ? await toDataUri(coverUrl) : null,
   };
 }

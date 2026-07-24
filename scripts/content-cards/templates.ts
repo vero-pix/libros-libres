@@ -12,6 +12,7 @@ import {
   FONTS,
   MARGIN,
   backgroundSvg,
+  cleanTitle,
   conditionLabel,
   escapeXml,
   footerSvg,
@@ -55,7 +56,8 @@ function coverBox(
 ): string {
   const id = `clip${CLIP_SEQ++}`;
   const shadow = `<rect x="${x + 10}" y="${y + 14}" width="${w}" height="${h}" rx="${radius}" fill="${COLORS.ink}" opacity="0.12"/>`;
-  const border = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${radius}" fill="none" stroke="${COLORS.line}" stroke-width="2"/>`;
+  // Marco fino en tinta (ink): enmarca la foto real como una lámina.
+  const border = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${radius}" fill="none" stroke="${COLORS.ink}" stroke-width="1.5" opacity="0.9"/>`;
 
   if (!dataUri) {
     return `
@@ -85,13 +87,18 @@ export function fichaTemplate(piece: Piece, listing: Listing): string {
   const tx = coverX + coverW + 64; // inicio columna de texto
   const tw = CANVAS - MARGIN - tx; // ancho de texto
 
-  const titleLines = wrapText(listing.title, {
+  // Auto-escala la fuente del título según su largo: los medianos entran en
+  // 2 líneas sin truncarse en la columna angosta, los cortos se ven grandes.
+  const cleaned = cleanTitle(listing.title);
+  const titleFont =
+    cleaned.length > 40 ? 38 : cleaned.length > 24 ? 44 : cleaned.length > 16 ? 52 : 58;
+  const titleLH = Math.round(titleFont * 1.14);
+  const titleLines = wrapText(cleaned, {
     maxWidth: tw,
-    fontSize: 58,
+    fontSize: titleFont,
     family: "serif",
-    maxLines: 4,
+    maxLines: 2,
   });
-  const titleLH = 66;
 
   // El bloque de la derecha (kicker + título + autor + precio + condición) se
   // centra verticalmente respecto a la portada, así una ficha de título corto
@@ -109,14 +116,18 @@ export function fichaTemplate(piece: Piece, listing: Listing): string {
   const titleSvg = titleLines
     .map(
       (ln, i) =>
-        `<text x="${tx}" y="${titleTop + i * titleLH}" font-family="${FONTS.serif}" font-weight="700" font-size="58" fill="${COLORS.ink}">${escapeXml(ln)}</text>`
+        `<text x="${tx}" y="${titleTop + i * titleLH}" font-family="${FONTS.serif}" font-weight="700" font-size="${titleFont}" fill="${COLORS.ink}">${escapeXml(ln)}</text>`
     )
     .join("\n");
   const titleBottom = titleTop + (titleLines.length - 1) * titleLH;
 
   let cursor = titleBottom + 62;
-  const authorSvg = listing.author
-    ? `<text x="${tx}" y="${cursor}" font-family="${FONTS.sans}" font-style="italic" font-size="30" fill="${COLORS.muted}">${escapeXml(listing.author)}</text>`
+  // Autor recortado a una línea al ancho de la columna (no se desborda del canvas).
+  const authorLine = listing.author
+    ? wrapText(listing.author, { maxWidth: tw, fontSize: 30, family: "sans", maxLines: 1 })[0]
+    : "";
+  const authorSvg = authorLine
+    ? `<text x="${tx}" y="${cursor}" font-family="${FONTS.sans}" font-style="italic" font-size="30" fill="${COLORS.muted}">${escapeXml(authorLine)}</text>`
     : "";
   if (listing.author) cursor += 74;
 
@@ -235,7 +246,7 @@ function renderLamina(piece: Piece, items: Listing[], index: number, total: numb
       const cover = coverBox(l.coverDataUri, x, y, coverW, coverH, 12);
 
       const titleLineH = 28;
-      const titleLines = wrapText(l.title, {
+      const titleLines = wrapText(cleanTitle(l.title), {
         maxWidth: cellW,
         fontSize: 22,
         family: "sans",

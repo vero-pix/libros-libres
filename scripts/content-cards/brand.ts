@@ -57,6 +57,27 @@ export function formatCLP(price?: number | null): string | null {
   return "$" + Math.round(price).toLocaleString("es-CL");
 }
 
+/**
+ * Limpia el título antes de pintarlo para que el recorte quede elegante:
+ * quita paréntesis de año, sufijos de tomo/volumen y separadores colgando.
+ * Ej.: "Œuvres Complètes (1866) - Pascal Tomo III" → "Œuvres Complètes - Pascal".
+ * Ej.: "Las Vidas Paralelas de Plutarco — Tomo I"  → "Las Vidas Paralelas de Plutarco".
+ */
+export function cleanTitle(raw?: string | null): string {
+  let t = String(raw ?? "").trim();
+  // Paréntesis de año: (1866), (2014)…
+  t = t.replace(/\s*\((?:1[5-9]\d\d|20\d\d)\)\s*/g, " ");
+  // Sufijo de tomo/volumen al final: "- Tomo III", "— Tomo I", "Vol. 2",
+  // "Volumen X", "Tomo I-II" (con o sin separador previo).
+  t = t.replace(
+    /\s*[-–—·|]?\s*(?:tomos?|vol\.?|volumen)\s+[ivxlcdm\d]+(?:\s*[-–y]\s*[ivxlcdm\d]+)?\.?\s*$/i,
+    ""
+  );
+  // Separadores o comas colgando al final + espacios dobles.
+  t = t.replace(/\s*[-–—·|:,]\s*$/, "").replace(/\s{2,}/g, " ").trim();
+  return t || String(raw ?? "").trim();
+}
+
 /** Escapa texto para insertarlo seguro en XML/SVG. */
 export function escapeXml(s: string): string {
   return String(s ?? "")
@@ -102,7 +123,8 @@ export function wrapText(
 
   if (lines.length <= maxLines) return lines;
   const kept = lines.slice(0, maxLines);
-  kept[maxLines - 1] = kept[maxLines - 1].replace(/[.,;:\s]*$/, "") + "…";
+  // Recorta puntuación/separadores colgando antes de la elipsis (evita "Complètes -…").
+  kept[maxLines - 1] = kept[maxLines - 1].replace(/[\s.,;:·|–—-]*$/, "") + "…";
   return kept;
 }
 

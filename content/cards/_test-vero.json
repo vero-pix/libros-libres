@@ -1,0 +1,33 @@
+{
+  "_nota": "Spec de PRUEBA de los ajustes (solo Vero, foto real, título limpio). El 4º es de otro vendedor a propósito, para verificar que el filtro lo descarta con aviso. Correr: npm run cards -- content/cards/_test-vero.json",
+  "pieces": [
+    {
+      "template": "ficha",
+      "slug": "vero/oeuvres-completes-1866-pascal",
+      "kicker": "Edición antigua",
+      "caption": "Œuvres Complètes de Pascal, edición de 1866. Prueba de limpieza de título y precio.",
+      "firstComment": "#pascal #librosantiguos #tuslibros"
+    },
+    {
+      "template": "ficha",
+      "slug": "vero/las-vidas-paralelas-de-plutarco-tomo-ii",
+      "kicker": "Clásico de colección",
+      "caption": "Las Vidas Paralelas de Plutarco, Tomo II.",
+      "firstComment": "#plutarco #clasicos #tuslibros"
+    },
+    {
+      "template": "ficha",
+      "slug": "vero/baudolino",
+      "kicker": "Umberto Eco",
+      "caption": "Baudolino, de Umberto Eco.",
+      "firstComment": "#umbertoeco #baudolino #tuslibros"
+    },
+    {
+      "template": "ficha",
+      "slug": "buhardilla/el-fin-de-la-sociedad-medieval-y-la-peste-negra",
+      "kicker": "NO debería salir",
+      "caption": "Este es de otro vendedor — debe descartarse con aviso.",
+      "firstComment": ""
+    }
+  ]
+}
