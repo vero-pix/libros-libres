@@ -131,6 +131,36 @@ export async function fetchListing(ref: string): Promise<Listing | null> {
   };
 }
 
+/**
+ * Autoselección para el destacado "Novedades": trae los listings MÁS RECIENTES
+ * de Vero que tengan FOTO REAL del ejemplar (descarta portadas genéricas y sin
+ * foto). Devuelve hasta `limit` piezas, ya con la portada como data: URI.
+ *
+ * Escanea un lote mayor (`scan`) porque no todos los recientes tienen foto real;
+ * se queda con los primeros `limit` que sí la tienen.
+ */
+export async function fetchRecentVero(
+  limit = 3,
+  scan = 40
+): Promise<Listing[]> {
+  const sb = client();
+  const { data: rows } = await sb
+    .from("listings")
+    .select("id, created_at")
+    .eq("seller_id", VERO_SELLER_ID)
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(scan);
+
+  const out: Listing[] = [];
+  for (const r of rows ?? []) {
+    if (out.length >= limit) break;
+    const l = await fetchListing(r.id);
+    if (l && l.realPhoto && l.coverDataUri) out.push(l);
+  }
+  return out;
+}
+
 /** Descarga una imagen remota y la devuelve como data: URI (o null si falla). */
 export async function toDataUri(url: string): Promise<string | null> {
   try {

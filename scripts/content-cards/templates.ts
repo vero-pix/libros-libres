@@ -24,7 +24,7 @@ import {
 import type { Listing } from "./fetchListing";
 
 export type Piece = {
-  template: "ficha" | "tipografica" | "lista";
+  template: "ficha" | "tipografica" | "lista" | "historia";
   slug?: string;
   listingId?: string;
   slugs?: string[];
@@ -205,6 +205,89 @@ export function tipograficaTemplate(piece: Piece, listing: Listing | null): stri
     ${subSvg}
     ${cornerCover}
     ${footerSvg(MARGIN, CANVAS - MARGIN + 8)}
+  </svg>`;
+}
+
+/* ─────────────────────────── HISTORIA ──────────────────────── */
+/**
+ * Formato HISTORIA vertical (1080×1920) para IG Stories / destacado "Novedades".
+ * La FOTO REAL del ejemplar es protagonista, centrada; debajo van título, autor
+ * y precio. Todo dentro de la zona segura de historias (evita el tercio inferior
+ * que tapa la UI de Instagram). Es la pieza dinámica con imagen (no solo texto).
+ */
+const STORY_W = 1080;
+const STORY_H = 1920;
+
+export function historiaFichaTemplate(piece: Piece, listing: Listing): string {
+  const cx = STORY_W / 2;
+
+  // Fondo crema con borde interior sutil (marco de la caja de seguridad).
+  const bg = `
+    <rect width="${STORY_W}" height="${STORY_H}" fill="${COLORS.cream}"/>
+    <rect x="24" y="24" width="${STORY_W - 48}" height="${STORY_H - 48}" rx="28"
+          fill="none" stroke="${COLORS.line}" stroke-width="2"/>`;
+
+  // Kicker centrado arriba, con regla fina bajo el texto.
+  const kicker = (piece.kicker || "Recién llegado").toUpperCase();
+  const kickerY = 300;
+  const kickerSvgC = `
+    <text x="${cx}" y="${kickerY}" text-anchor="middle" font-family="${FONTS.sansSemibold}"
+          font-size="30" letter-spacing="6" fill="${COLORS.amber}">${escapeXml(kicker)}</text>
+    <rect x="${cx - 40}" y="${kickerY + 20}" width="80" height="4" rx="2" fill="${COLORS.amber}"/>`;
+
+  // Portada real, centrada, proporción 2:3.
+  const coverW = 560;
+  const coverH = 840;
+  const coverX = cx - coverW / 2;
+  const coverY = 400;
+  const cover = coverBox(listing.coverDataUri, coverX, coverY, coverW, coverH, 18);
+
+  // Bloque de texto bajo la portada.
+  let y = coverY + coverH + 110; // ~1350
+
+  const cleaned = cleanTitle(listing.title);
+  const titleFont = cleaned.length > 40 ? 54 : cleaned.length > 22 ? 64 : 74;
+  const titleLH = Math.round(titleFont * 1.14);
+  const titleLines = wrapText(cleaned, {
+    maxWidth: STORY_W - MARGIN * 2,
+    fontSize: titleFont,
+    family: "serif",
+    maxLines: 2,
+  });
+  const titleSvg = titleLines
+    .map(
+      (ln, i) =>
+        `<text x="${cx}" y="${y + i * titleLH}" text-anchor="middle" font-family="${FONTS.serif}" font-weight="700" font-size="${titleFont}" fill="${COLORS.ink}">${escapeXml(ln)}</text>`
+    )
+    .join("\n");
+  y += (titleLines.length - 1) * titleLH + 70;
+
+  const authorLine = listing.author
+    ? wrapText(listing.author, { maxWidth: STORY_W - MARGIN * 2, fontSize: 34, family: "sans", maxLines: 1 })[0]
+    : "";
+  const authorSvg = authorLine
+    ? `<text x="${cx}" y="${y}" text-anchor="middle" font-family="${FONTS.sans}" font-style="italic" font-size="34" fill="${COLORS.muted}">${escapeXml(authorLine)}</text>`
+    : "";
+  if (authorLine) y += 74;
+
+  const priceStr = formatCLP(listing.price);
+  const priceSvg = priceStr
+    ? `<text x="${cx}" y="${y}" text-anchor="middle" font-family="${FONTS.sansSemibold}" font-size="60" fill="${COLORS.amber}">${escapeXml(priceStr)}</text>`
+    : "";
+
+  // Footer de marca, centrado, dentro de la zona segura.
+  const footer = `
+    <text x="${cx}" y="1600" text-anchor="middle" font-family="${FONTS.sansSemibold}" font-size="30"
+          letter-spacing="1" fill="${COLORS.ink}">tuslibros<tspan fill="${COLORS.amber}">.cl</tspan></text>`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${STORY_W}" height="${STORY_H}" viewBox="0 0 ${STORY_W} ${STORY_H}">
+    ${bg}
+    ${kickerSvgC}
+    ${cover}
+    ${titleSvg}
+    ${authorSvg}
+    ${priceSvg}
+    ${footer}
   </svg>`;
 }
 

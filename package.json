@@ -9,6 +9,7 @@
     "lint": "next lint",
     "bulk-upload": "npx tsx scripts/bulk-upload.ts",
     "cards": "tsx scripts/content-cards/generate.mjs",
+    "novedades": "tsx scripts/content-cards/novedades.mjs",
     "qa": "playwright test",
     "qa:prod": "QA_BASE_URL=https://tuslibros.cl playwright test",
     "qa:ui": "playwright test --ui",

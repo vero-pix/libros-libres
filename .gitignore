@@ -40,6 +40,7 @@ docs/IMG_*
 docs/crops/
 docs/maigrets/
 docs/*.jpeg
+docs/pascal/
 docs/*.jpg
 docs/*.pdf
 docs/maigret.jpg
