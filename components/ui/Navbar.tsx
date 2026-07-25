@@ -20,11 +20,15 @@ export default async function Navbar() {
   const h = headers();
   const rawCity = h.get("x-vercel-ip-city");
   const country = h.get("x-vercel-ip-country");
-  const cityLabel = rawCity
-    ? decodeURIComponent(rawCity).replace(/\+/g, " ")
-    : country === "CL"
-      ? "Chile"
-      : null;
+  // Solo mostramos la ciudad si la IP es chilena. Con VPN o iCloud Private Relay
+  // (activo por defecto en Mac/iPhone) Vercel entrega ciudades gringas —
+  // "Columbus" en un marketplace chileno se lee como error, no como cercanía.
+  const cityLabel =
+    country !== "CL"
+      ? null
+      : rawCity
+        ? decodeURIComponent(rawCity).replace(/\+/g, " ")
+        : "Chile";
 
   let displayName: string | null = null;
   let cartCount = 0;

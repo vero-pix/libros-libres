@@ -91,8 +91,10 @@ export default function CategoriesSidebar({
 
       {categoryTree
         .map((group, idx) => {
-        // Nota: mostramos TODAS las categorías de la taxonomía curada,
-        // independiente del conteo. El count es solo informativo.
+        // Antes se mostraban TODAS las categorías de la taxonomía curada aunque
+        // estuvieran vacías. Se ocultan las subcategorías con 0 (jul 2026): mandar a
+        // alguien a una categoría sin libros es una salida segura del sitio.
+        // Siguen en la BD y su URL resuelve igual — solo no se listan.
         const isOpen = openGroups.has(idx);
         return (
           <div key={group.slug} className="mt-3">
@@ -124,9 +126,9 @@ export default function CategoriesSidebar({
                 </svg>
               </span>
             </button>
-            {isOpen && group.children.length > 0 && (
+            {isOpen && group.children.some((sub) => sub.count > 0) && (
               <ul className="space-y-0.5 mt-0.5">
-                {group.children.map((sub) => (
+                {group.children.filter((sub) => sub.count > 0).map((sub) => (
                     <li key={sub.slug}>
                       <Link
                         href={`/?category=${group.slug}&subcategory=${sub.slug}`}

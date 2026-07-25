@@ -2,19 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { translateGenre, CATEGORY_GROUPS } from "@/lib/genres";
 
 interface CategoryCount {
+  /** slug — se usa tal cual en la URL, NO tocar (hay SEO indexado). */
   category: string;
+  /** nombre legible, viene de la tabla `categories` de Supabase. */
+  name: string;
   count: number;
+  /** nombre de la categoría padre, para agrupar. */
+  group: string;
 }
 
 interface Props {
   categories: CategoryCount[];
   activeCategory?: string;
+  activeCategoryName?: string;
 }
 
-export default function CategoriesMobileDrawer({ categories, activeCategory }: Props) {
+export default function CategoriesMobileDrawer({ categories, activeCategory, activeCategoryName }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -27,7 +32,7 @@ export default function CategoriesMobileDrawer({ categories, activeCategory }: P
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-ink-muted">
           <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
-        {activeCategory ? translateGenre(activeCategory) : "Categorías"}
+        {activeCategoryName ?? "Categorías"}
       </button>
 
       {/* Backdrop */}
@@ -77,40 +82,31 @@ export default function CategoriesMobileDrawer({ categories, activeCategory }: P
               </Link>
             </li>
             {(() => {
-              const countMap = new Map(categories.map((c) => [c.category, c.count]));
-              const groupedCategories = new Set(CATEGORY_GROUPS.flatMap((g) => g.genres));
-              const groups = CATEGORY_GROUPS
-                .map((group) => ({
-                  ...group,
-                  items: group.genres.filter((g) => countMap.has(g)).map((g) => ({ category: g, count: countMap.get(g)! })),
-                }))
-                .filter((g) => g.items.length > 0);
-              const ungrouped = categories.filter((c) => !groupedCategories.has(c.category));
+              // Agrupa por la categoría padre que viene del árbol de Supabase,
+              // preservando el orden en que llegan (sort_order de la tabla).
+              const groups: { label: string; items: CategoryCount[] }[] = [];
+              for (const cat of categories) {
+                const existing = groups.find((g) => g.label === cat.group);
+                if (existing) existing.items.push(cat);
+                else groups.push({ label: cat.group, items: [cat] });
+              }
 
-              return [...groups.map((group) => (
+              return groups.map((group) => (
                 <li key={group.label}>
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-muted/50 px-4 pt-3 pb-1">{group.label}</p>
                   <ul className="space-y-0.5">
                     {group.items.map((cat) => (
                       <li key={cat.category}>
                         <Link href={`/?category=${encodeURIComponent(cat.category)}`} onClick={() => setOpen(false)}
-                          className={`flex items-center justify-between text-sm py-2.5 px-4 rounded-xl transition-colors ${activeCategory === cat.category ? "bg-brand-50 text-brand-600 font-medium" : "text-ink-muted active:bg-cream-warm"}`}>
-                          <span>{translateGenre(cat.category)}</span>
-                          <span className="text-xs text-ink-light bg-cream-warm rounded-full px-2 py-0.5">{cat.count}</span>
+                          className={`flex items-center justify-between gap-3 text-sm py-2.5 px-4 rounded-xl transition-colors ${activeCategory === cat.category ? "bg-brand-50 text-brand-600 font-medium" : "text-ink-muted active:bg-cream-warm"}`}>
+                          <span>{cat.name}</span>
+                          <span className="shrink-0 text-xs text-ink-light bg-cream-warm rounded-full px-2 py-0.5">{cat.count}</span>
                         </Link>
                       </li>
                     ))}
                   </ul>
                 </li>
-              )), ...ungrouped.map((cat) => (
-                <li key={cat.category}>
-                  <Link href={`/?category=${encodeURIComponent(cat.category)}`} onClick={() => setOpen(false)}
-                    className={`flex items-center justify-between text-sm py-2.5 px-4 rounded-xl transition-colors ${activeCategory === cat.category ? "bg-brand-50 text-brand-600 font-medium" : "text-ink-muted active:bg-cream-warm"}`}>
-                    <span>{translateGenre(cat.category)}</span>
-                    <span className="text-xs text-ink-light bg-cream-warm rounded-full px-2 py-0.5">{cat.count}</span>
-                  </Link>
-                </li>
-              ))];
+              ));
             })()}
           </ul>
         </div>
