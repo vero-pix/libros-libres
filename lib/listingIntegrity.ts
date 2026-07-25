@@ -168,6 +168,56 @@ export function differentVolume(a: string, b: string): boolean {
   return distinto;
 }
 
+/**
+ * Bajo esta similitud entre el título que escribió el vendedor y el de la ficha
+ * encontrada por ISBN, NO se reutiliza la ficha: se crea una nueva.
+ */
+export const FICHA_MATCH_MIN = 0.6;
+
+/**
+ * ¿La ficha que encontramos por ISBN es realmente el libro que se está
+ * publicando?
+ *
+ * Existe porque el ISBN no es confiable como identidad: hay ediciones chilenas
+ * y colecciones por entregas donde varios tomos traen el MISMO código de barras
+ * impreso. Al escanearlos, todos caían en la primera ficha creada y el título
+ * escrito por el vendedor se descartaba en silencio. Así 4 novelas distintas de
+ * Isabel Allende terminaron publicadas como "El plan infinito".
+ *
+ * Ante la duda preferimos una ficha duplicada (se consolida después) antes que
+ * un enlace incorrecto (rompe búsqueda y SEO sin que nadie lo note).
+ */
+export function fichaCoincide(
+  tituloEscrito: string,
+  tituloFicha: string | null | undefined,
+  autorEscrito?: string | null,
+  autorFicha?: string | null
+): boolean {
+  if (!tituloFicha) return false;
+
+  // PRIMERO los tomos: "Séneca Tomo I" y "Tomo II" tienen similitud altísima
+  // (0.98) y son libros distintos. Si esto va después del umbral, nunca corre.
+  if (differentVolume(tituloEscrito, tituloFicha)) return false;
+
+  if (titleSimilarity(tituloEscrito, tituloFicha) >= FICHA_MATCH_MIN) return true;
+
+  // Título corto que es prefijo del de la ficha ("Conocer" → "Conocer — las
+  // ciencias cognitivas…"), con el mismo autor. El autor se compara por
+  // contención además de similitud: "Varela" y "Francisco J. Varela" son la
+  // misma persona pero su similitud de bigramas es baja.
+  const a = normalizeTitle(tituloEscrito);
+  const b = normalizeTitle(tituloFicha);
+  const prefijo = !!a && !!b && (a.startsWith(b.slice(0, 20)) || b.startsWith(a.slice(0, 20)));
+  if (!prefijo) return false;
+
+  const na = normalizeTitle(autorEscrito ?? "");
+  const nb = normalizeTitle(autorFicha ?? "");
+  if (!na || !nb) return false;
+  const mismoAutor =
+    titleSimilarity(na, nb) > 0.8 || na.includes(nb) || nb.includes(na);
+  return mismoAutor;
+}
+
 export interface DuplicateCandidate {
   id: string;
   slug: string | null;
