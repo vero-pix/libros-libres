@@ -25,10 +25,10 @@ import { trackEvent } from "@/utils/analytics";
 type Modality = "sale" | "loan" | "both";
 type Condition = "new" | "good" | "fair" | "poor";
 
+// El arriendo se descontinuó (jul 2026): solo venta. Se deja el arreglo por si
+// se reactiva; con un solo elemento, el selector de modalidad no se muestra.
 const MODALITY_OPTIONS: { value: Modality; label: string; icon: string; desc: string }[] = [
   { value: "sale",  label: "Venta",            icon: "🏷️", desc: "Quieres vender el libro" },
-  { value: "loan",  label: "Arriendo",           icon: "📖", desc: "Lo arriendas y te lo devuelven" },
-  { value: "both",  label: "Venta o arriendo",  icon: "📚", desc: "Cualquiera de las dos" },
 ];
 
 const CONDITION_OPTIONS: { value: Condition; label: string; color: string }[] = [
@@ -715,7 +715,8 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
           </h2>
         </div>
         <div className="px-6 py-5 space-y-4">
-          {/* Modalidad */}
+          {/* Modalidad — oculto si hay una sola opción (hoy solo Venta). */}
+          {MODALITY_OPTIONS.length > 1 && (
           <div className="grid grid-cols-3 gap-2">
             {MODALITY_OPTIONS.map((opt) => (
               <button
@@ -736,6 +737,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
               </button>
             ))}
           </div>
+          )}
 
           {/* Precio original + Precio */}
           {modality !== "loan" && (

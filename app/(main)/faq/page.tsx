@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata = {
   title: "Preguntas frecuentes",
   description:
-    "Resuelve tus dudas sobre comprar, vender y arrendar libros usados en tuslibros.cl. Cómo funciona el pago con MercadoPago, despachos a Chile, arriendos con garantía y más.",
+    "Resuelve tus dudas sobre comprar y vender libros usados en tuslibros.cl. Cómo funciona el pago con MercadoPago, despachos a Chile y más.",
   alternates: { canonical: "https://tuslibros.cl/faq" },
 };
 
@@ -159,46 +159,6 @@ const faqSections = [
             Desde tu{" "}
             <Link href="/perfil" className={linkClass}>perfil</Link>, en la sección{" "}
             <Link href="/mis-libros" className={linkClass}>Mis Libros</Link>, puedes pausar o eliminar cualquier publicación cuando quieras.
-          </span>
-        ),
-      },
-    ],
-  },
-  {
-    title: "Arriendos de libros",
-    questions: [
-      {
-        q: "¿Cómo funciona el arriendo?",
-        a: (
-          <span>
-            Algunos libros los lees una vez y ya — para esos armamos esto. Quien publica activa la opción al listar. Quien arrienda paga el arriendo (por 7, 14 o 30 días) más una{" "}
-            <Link href="/devoluciones" className={linkClass}>garantía</Link>. Devuelves el libro en buen estado y recuperas la garantía completa.
-          </span>
-        ),
-      },
-      {
-        q: "¿Cuánto cuesta arrendar un libro?",
-        a: "El precio lo pone cada vendedor. Normalmente es una fracción del precio de venta — un libro de $12.000 puede quedar en $3.000 de arriendo más garantía reembolsable. La garantía suele ser el precio del libro completo, para que nadie pierda si el libro no vuelve.",
-      },
-      {
-        q: "¿Qué pasa si no devuelvo el libro a tiempo?",
-        a: "Se retiene la garantía como compensación al vendedor. No es un castigo, es simplemente que el libro ya no vuelve y quien lo prestó no queda a cero.",
-      },
-      {
-        q: "¿La garantía es reembolsable?",
-        a: (
-          <span>
-            Sí, completa. Si devuelves dentro del plazo y en buen estado, la{" "}
-            <Link href="/devoluciones" className={linkClass}>garantía</Link> vuelve entera a tu cuenta de{" "}
-            <a
-              href="https://www.mercadopago.cl"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={linkClass}
-            >
-              MercadoPago
-            </a>
-            .
           </span>
         ),
       },

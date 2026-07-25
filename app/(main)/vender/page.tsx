@@ -28,7 +28,7 @@ const steps = [
     emoji: "💰",
     title: "Ponle precio",
     description:
-      "Elige cuánto cobrar y si lo vendes, arriendas o ambas. Puedes agregar fotos reales si quieres.",
+      "Elige cuánto cobrar por tu libro. Puedes agregar fotos reales si quieres.",
   },
   {
     emoji: "✅",

@@ -27,7 +27,7 @@ const steps = [
   {
     n: "2",
     title: "Fija el precio que tú quieras",
-    desc: "Hay un comparador integrado que muestra el precio del mismo libro en Buscalibre y MercadoLibre. Tú decides — lo vendemos o lo arriendamos, o las dos cosas.",
+    desc: "Hay un comparador integrado que muestra el precio del mismo libro en Buscalibre y MercadoLibre. Tú decides el precio de venta.",
   },
   {
     n: "3",

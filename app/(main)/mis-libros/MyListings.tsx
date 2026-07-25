@@ -672,8 +672,6 @@ function EditForm({
             <label className="block text-xs font-medium text-gray-500 mb-1">Modalidad</label>
             <select value={modality} onChange={(e) => setModality(e.target.value as typeof modality)} className={inputClass}>
               <option value="sale">Venta</option>
-              <option value="loan">Arriendo</option>
-              <option value="both">Venta y arriendo</option>
             </select>
           </div>
           {modality !== "loan" && (

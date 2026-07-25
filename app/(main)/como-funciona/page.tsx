@@ -2,9 +2,9 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Cómo funciona — comprar, vender y arrendar libros usados",
+  title: "Cómo funciona — comprar y vender libros usados",
   description:
-    "Guía paso a paso para usar tuslibros.cl: cómo comprar con MercadoPago, cómo publicar tus libros gratis, cómo funciona el arriendo con garantía, y cómo coordinamos el despacho por courier o retiro en mano.",
+    "Guía paso a paso para usar tuslibros.cl: cómo comprar con MercadoPago, cómo publicar tus libros gratis, y cómo coordinamos el despacho por courier o retiro en mano.",
   alternates: { canonical: "https://tuslibros.cl/como-funciona" },
 };
 
@@ -21,13 +21,6 @@ const mpSteps = [
   { number: 4, icon: "✅", title: "Recibe y confirma", description: "El vendedor recibe su pago automáticamente al confirmar la entrega." },
 ];
 
-const rentalSteps = [
-  { number: 1, icon: "📚", title: "Busca libros para arriendo", description: "Filtra por modalidad «Arriendo» en el catálogo." },
-  { number: 2, icon: "📅", title: "Elige plazo y paga", description: "7, 14 o 30 días. Pagas arriendo + garantía reembolsable con MercadoPago." },
-  { number: 3, icon: "📖", title: "Lee y disfruta", description: "Recibe el libro por courier o retíralo en persona." },
-  { number: 4, icon: "🔄", title: "Devuelve y recupera tu garantía", description: "Devuelves en buen estado, tu garantía vuelve completa a tu cuenta." },
-];
-
 const sellerSteps = [
   { number: 1, icon: "📱", title: "Escanea el código de barras", description: "Usa la cámara de tu celular para escanear el ISBN de tu libro." },
   { number: 2, icon: "✏️", title: "Completa precio y condición", description: "Agrega el precio que quieres y selecciona el estado del libro." },
@@ -39,7 +32,6 @@ const benefits = [
   { icon: "✅", text: "Cero comisión si coordinas por WhatsApp" },
   { icon: "✅", text: "Pago seguro con MercadoPago (opcional)" },
   { icon: "✅", text: "Despacho a todo Chile con Shipit" },
-  { icon: "✅", text: "Arriendo con garantía reembolsable" },
 ];
 
 function StepCard({ step }: { step: { number: number; icon: string; title: string; description: string } }) {
@@ -91,17 +83,6 @@ export default function ComoFuncionaPage() {
           <p className="text-ink-muted mb-6">Si prefieres no coordinar nada, pagas con <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a> desde la publicación y listo. Acá sí cobramos una comisión chica, porque la pasarela y el despacho cuestan. Si no quieres comisión, usa WhatsApp.</p>
           <div className="space-y-5">
             {mpSteps.map((step) => <StepCard key={step.number} step={step} />)}
-          </div>
-        </section>
-
-        {/* Arriendo */}
-        <section className="mb-14">
-          <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
-            Arriendo de libros
-          </h2>
-          <p className="text-ink-muted mb-6">Algunos libros los lees una vez y ya. Para esos, armamos el arriendo: pagas una fracción del precio más una garantía, lees tranquilo, y cuando devuelves el libro en buen estado recuperas la garantía completa.</p>
-          <div className="space-y-5">
-            {rentalSteps.map((step) => <StepCard key={step.number} step={step} />)}
           </div>
         </section>
 

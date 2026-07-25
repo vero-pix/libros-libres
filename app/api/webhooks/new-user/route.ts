@@ -89,8 +89,8 @@ export async function POST(req: NextRequest) {
                 <p style="margin:4px 0 0;color:#666;font-size:14px">Busca por título, autor o categoría. Filtra por cercanía para encontrar libros cerca de ti.</p>
               </div>
               <div style="background:#f5f0e8;padding:16px;border-radius:12px">
-                <p style="margin:0;font-weight:600;color:#1a1a1a">3. Compra o arrienda</p>
-                <p style="margin:4px 0 0;color:#666;font-size:14px">Coordina por WhatsApp (gratis) o paga seguro con MercadoPago.</p>
+                <p style="margin:0;font-weight:600;color:#1a1a1a">3. Compra</p>
+                <p style="margin:4px 0 0;color:#666;font-size:14px">Paga seguro con MercadoPago o coordina el retiro con el vendedor.</p>
               </div>
             </div>
 

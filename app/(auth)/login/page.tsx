@@ -37,7 +37,7 @@ export default function LoginPage({
               <span className="italic text-brand-600">nuevos lectores.</span>
             </h2>
             <p className="text-ink-muted mt-4 leading-relaxed">
-              Compra, vende y arrienda los libros que tienes cerca.
+              Compra y vende los libros que tienes cerca.
               Desde $3.000, con pago seguro y despacho puerta a puerta.
             </p>
             <AuthWantedList />

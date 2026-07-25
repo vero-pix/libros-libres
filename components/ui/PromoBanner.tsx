@@ -53,7 +53,7 @@ export default function PromoBanner({ variant }: PromoBannerProps) {
             Tus libros merecen circular
           </p>
           <p className="text-sm text-white/70 mt-1">
-            Compra, vende o arrienda cerca de ti. Pago seguro.
+            Compra y vende cerca de ti. Pago seguro.
           </p>
         </div>
 

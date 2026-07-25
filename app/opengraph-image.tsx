@@ -54,7 +54,7 @@ export default function OGImage() {
               marginTop: "6px",
             }}
           >
-            Compra, vende y arrienda libros en Chile. Pago seguro con MercadoPago.
+            Compra y vende libros usados en Chile. Pago seguro con MercadoPago.
             Despacho puerta a puerta con Shipit o retiro en mano.
           </div>
           <div

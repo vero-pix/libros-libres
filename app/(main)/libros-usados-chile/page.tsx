@@ -8,7 +8,7 @@ import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Libros usados en Chile — comprar, vender y arrendar",
+  title: "Libros usados en Chile — comprar y vender",
   description:
     "Marketplace chileno de libros usados con mapa, pago seguro y envío por courier o retiro en mano. Primeras ediciones, rarezas y clásicos desde $3.000. Publicar es gratis.",
   alternates: { canonical: "https://tuslibros.cl/libros-usados-chile" },
@@ -56,7 +56,7 @@ const faqs = [
   },
   {
     q: "¿Es gratis publicar mis libros?",
-    a: "Sí, publicar es 100% gratis. Solo cobramos una comisión pequeña cuando se vende (8%) o se arrienda (10%). Sin mensualidades ni cargos fijos. Conéctate con MercadoPago y listo.",
+    a: "Sí, publicar es 100% gratis. Solo cobramos una comisión pequeña cuando se vende (8%). Sin mensualidades ni cargos fijos. Conéctate con MercadoPago y listo.",
   },
 ];
 
@@ -96,7 +96,7 @@ export default async function LibrosUsadosChilePage() {
           <section className="mt-8 mb-16 max-w-3xl">
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-ink leading-[1.05] tracking-tight">
               Libros usados en Chile —<br />
-              <span className="italic text-brand-600">comprar, vender, arrendar.</span>
+              <span className="italic text-brand-600">comprar y vender.</span>
             </h1>
             <p className="mt-6 text-lg text-ink-muted leading-relaxed">
               En Chile hay más libros usados de los que crees. Están en estantes de
@@ -218,7 +218,7 @@ export default async function LibrosUsadosChilePage() {
               llega directo a tu cuenta.
             </p>
             <ul className="space-y-2 text-sm text-cream/90 mb-6">
-              <li>→ Comisión 8% por venta, 10% por arriendo. Sin mensualidades.</li>
+              <li>→ Comisión 8% por venta. Sin mensualidades.</li>
               <li>→ Tú fijas el precio. Nosotros no intervenimos en tus publicaciones.</li>
               <li>→ Shipit retira el libro en tu casa cuando alguien compra.</li>
             </ul>

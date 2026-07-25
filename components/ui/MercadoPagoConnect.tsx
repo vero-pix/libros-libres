@@ -19,7 +19,7 @@ export default function MercadoPagoConnect({ isConnected, connectedAt }: Props) 
       <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
         <h2 className="text-sm font-semibold text-gray-700">MercadoPago</h2>
         <p className="text-xs text-gray-400 mt-1">
-          Conecta tu cuenta para recibir pagos de ventas y arriendos.
+          Conecta tu cuenta para recibir los pagos de tus ventas.
         </p>
       </div>
       <div className="px-6 py-5 space-y-3">
@@ -56,7 +56,7 @@ export default function MercadoPagoConnect({ isConnected, connectedAt }: Props) 
         ) : (
           <>
             <p className="text-sm text-gray-500">
-              Para vender o arrendar libros necesitas conectar tu cuenta de MercadoPago.
+              Para vender libros necesitas conectar tu cuenta de MercadoPago.
               El dinero de tus ventas llegará directamente a tu cuenta.
             </p>
             <a

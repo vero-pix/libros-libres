@@ -106,7 +106,7 @@ export default function RootLayout({
               alternateName: "tuslibros",
               url: "https://tuslibros.cl",
               logo: "https://tuslibros.cl/og-image.png",
-              description: "Marketplace chileno de libros usados. Compra, vende y arrienda libros cerca de ti, con mapa, despacho por courier o retiro en mano.",
+              description: "Marketplace chileno de libros usados. Compra y vende libros cerca de ti, con mapa, despacho por courier o retiro en mano.",
               areaServed: { "@type": "Country", name: "Chile" },
               sameAs: [
                 "https://instagram.com/tuslibros.cl",

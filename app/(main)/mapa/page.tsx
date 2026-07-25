@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Mapa de libros usados en Chile",
   description:
-    "Explora en el mapa los libros usados disponibles cerca de ti en Chile. Compra, arrienda o retira en mano. Santiago, regiones y todo el país.",
+    "Explora en el mapa los libros usados disponibles cerca de ti en Chile. Compra o retira en mano. Santiago, regiones y todo el país.",
   openGraph: {
     title: "Mapa de libros usados en Chile",
     description:

@@ -190,7 +190,7 @@ export default function ImportForm() {
         <p className="text-xs text-ink-muted mt-3">
           <strong>condicion</strong>: como_nuevo, buen_estado, estado_regular, con_detalles
           <br />
-          <strong>tipo</strong>: venta, arriendo, ambos
+          <strong>tipo</strong>: venta
           <br />
           <strong>precio</strong>: en pesos sin puntos ni signos (ej: 8000)
           <br />
