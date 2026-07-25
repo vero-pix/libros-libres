@@ -23,6 +23,7 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
 import { libroUrl } from "@/lib/urls";
+import { CURATED_MIN_PRICE } from "@/lib/listingIntegrity";
 
 // Nombres legibles para slugs de categoría/subcategoría usados en metadata
 const CATEGORY_NAMES: Record<string, string> = {
@@ -152,6 +153,7 @@ const getFeaturedListings = unstable_cache(
       .select(SEL)
       .eq("status", "active")
       .eq("featured", true)
+      .gte("price", CURATED_MIN_PRICE)
       .order("featured_rank", { ascending: true, nullsFirst: false })
       .limit(10);
 
@@ -198,6 +200,7 @@ const getCollectibleListings = unstable_cache(
       .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
       .eq("status", "active")
       .eq("is_collectible", true)
+      .gte("price", CURATED_MIN_PRICE)
       .limit(12);
     return data ?? [];
   },
@@ -237,6 +240,9 @@ const getCollections = unstable_cache(
           .eq("status", "active")
           .neq("deprioritized", true)
           .contains("book.tags", [c.tag])
+          // Un dedazo de precio no puede llegar a un carrusel curado:
+          // "Historia de Mayta" a $100 salió destacado en "Para regalar".
+          .gte("price", CURATED_MIN_PRICE)
           .order("featured_rank", { ascending: true, nullsFirst: false })
           .limit(16)
           .then((r) => ({ ...c, items: (r.data ?? []).filter((l: any) => l.book) }))

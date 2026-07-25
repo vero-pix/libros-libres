@@ -16,6 +16,15 @@ const DraggableLocationPicker = dynamic(
 import type { BookData } from "@/types";
 import Image from "next/image";
 import CategoryPicker from "@/components/listings/CategoryPicker";
+import {
+  MIN_LISTING_PRICE,
+  checkPriceFloor,
+  checkPriceDeviation,
+  findDuplicates,
+  median,
+  normalizeIsbn,
+  type DuplicateCandidate,
+} from "@/lib/listingIntegrity";
 import CoverUpload from "@/components/books/CoverUpload";
 import ImageUploadMultiple from "@/components/listings/ImageUploadMultiple";
 import { compressImage, compressScanImage } from "@/lib/image-compress";
@@ -102,6 +111,11 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
   const [phone, setPhone] = useState(existingPhone ?? "");
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [phoneWarn, setPhoneWarn] = useState(false); // aviso suave: publicar sin WhatsApp
+  // Integridad de la publicación (ver lib/listingIntegrity.ts). Nada de esto
+  // bloquea salvo el mínimo duro: publicar sigue tomando 5 minutos.
+  const [priceWarn, setPriceWarn] = useState<string | null>(null);
+  const [dupes, setDupes] = useState<DuplicateCandidate[] | null>(null);
+  const [dupeAck, setDupeAck] = useState(false); // "es otro ejemplar"
   const [location, setLocation] = useState<LocationData | null>(
     defaultLocation ?? null
   );
@@ -287,6 +301,76 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
     }
   }
 
+  /**
+   * Avisos de integridad ANTES de publicar. Devuelve true si mostró algo y hay
+   * que esperar al usuario. Nunca impide publicar: el segundo click pasa igual.
+   * Si algo falla (red, permisos), deja publicar — no somos un portero.
+   */
+  async function revisarIntegridad(): Promise<boolean> {
+    try {
+      const isbn = (book as any)?.isbn ?? null;
+
+      // 1. ¿Este vendedor ya publicó este mismo libro?
+      const { data: mios } = await supabase
+        .from("listings")
+        .select("id, slug, price, book:books(title, author, isbn)")
+        .eq("seller_id", userId)
+        .eq("status", "active");
+
+      const encontrados = findDuplicates((mios ?? []) as any, {
+        title: bookTitle,
+        author: bookAuthor,
+        isbn,
+      });
+      if (encontrados.length) {
+        setDupes(encontrados);
+        setError(null);
+        return true;
+      }
+
+      // 2. ¿El precio se aleja mucho de lo que vale ese título acá?
+      if (modality !== "loan" && !priceWarn) {
+        const p = parseFloat(price);
+        let ref: number | null = null;
+
+        const normIsbn = normalizeIsbn(isbn);
+        if (normIsbn) {
+          const { data } = await supabase
+            .from("listings")
+            .select("price, book:books!inner(isbn)")
+            .eq("status", "active")
+            .eq("book.isbn", isbn)
+            .limit(50);
+          ref = median((data ?? []).map((l: any) => l.price));
+        }
+        if (!ref && bookTitle.trim()) {
+          const { data } = await supabase
+            .from("listings")
+            .select("price, book:books!inner(title)")
+            .eq("status", "active")
+            .ilike("book.title", bookTitle.trim())
+            .limit(50);
+          ref = median((data ?? []).map((l: any) => l.price));
+        }
+        // Fallback: el precio de referencia de la ficha (Buscalibre/MercadoLibre).
+        if (!ref) {
+          const refFicha = (book as any)?.reference_price ?? (book as any)?.list_price ?? null;
+          if (refFicha) ref = Number(refFicha);
+        }
+
+        const dev = checkPriceDeviation(p, ref);
+        if (dev.level === "warn") {
+          setPriceWarn(dev.message);
+          setError(null);
+          return true;
+        }
+      }
+      return false;
+    } catch {
+      return false; // ante la duda, dejar publicar
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!bookTitle.trim()) { setError("El libro necesita un título. Complétalo antes de publicar."); return; }
@@ -294,6 +378,12 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
     if (!location) { setError("Marca la ubicación del libro en el mapa."); return; }
     if (modality !== "loan" && !price) { setError("Ingresa el precio de venta."); return; }
     if (modality !== "sale" && !rentalPrice) { setError("Ingresa el precio de arriendo."); return; }
+
+    // ── Integridad: mínimo duro de precio (único bloqueo nuevo) ──
+    if (modality !== "loan") {
+      const floor = checkPriceFloor(parseFloat(price));
+      if (floor.level === "block") { setError(floor.message); return; }
+    }
     if (phone && !PHONE_REGEX.test(phone)) {
       setPhoneError("Formato inválido. Usa +56 seguido de 9 dígitos. Ej: +56912345678");
       return;
@@ -304,6 +394,13 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       setPhoneWarn(true);
       setError(null);
       return;
+    }
+
+    // ── Integridad: duplicados y precio fuera de rango (avisos, no bloqueos) ──
+    // Solo al publicar algo nuevo; editar una publicación existente no aplica.
+    if (!dupeAck) {
+      const alerta = await revisarIntegridad();
+      if (alerta) return; // ya quedó el aviso en pantalla
     }
 
     setLoading(true);
@@ -1025,6 +1122,57 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         <div className="flex items-start gap-2 bg-red-50 border border-red-100 text-red-700 text-sm px-4 py-3 rounded-xl">
           <span className="mt-0.5">⚠️</span>
           <span>{error}</span>
+        </div>
+      )}
+
+      {/* Ya tienes este libro publicado. No bloquea: dos caminos explícitos. */}
+      {dupes && dupes.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-900 text-sm px-4 py-3 rounded-xl">
+          <p className="flex items-start gap-2">
+            <span className="mt-0.5">📚</span>
+            <span>
+              Ya tienes {dupes.length === 1 ? "este libro publicado" : `${dupes.length} publicaciones de este libro`}
+              {dupes[0].reason === "isbn" ? " (mismo ISBN)" : ""}:
+            </span>
+          </p>
+          <ul className="mt-2 ml-7 space-y-1">
+            {dupes.map((d) => (
+              <li key={d.id}>
+                <a
+                  href={`/libro/${username}/${d.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 hover:text-amber-950"
+                >
+                  {d.title}
+                </a>
+                {d.price != null && <span className="text-amber-700"> · ${d.price.toLocaleString("es-CL")}</span>}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-3 ml-7 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => { setDupes(null); setDupeAck(true); }}
+              className="px-3 py-1.5 rounded-lg bg-amber-600 text-white text-xs font-medium hover:bg-amber-700 transition-colors"
+            >
+              Es otro ejemplar, publicar igual
+            </button>
+            <a
+              href={`/mis-libros`}
+              className="px-3 py-1.5 rounded-lg border border-amber-300 text-amber-800 text-xs font-medium hover:bg-amber-100 transition-colors"
+            >
+              Editar el que ya tengo
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* Precio muy bajo respecto de lo que vale ese título acá. No bloquea. */}
+      {priceWarn && (
+        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl">
+          <span className="mt-0.5">💰</span>
+          <span>{priceWarn}</span>
         </div>
       )}
 
