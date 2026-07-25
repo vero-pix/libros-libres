@@ -49,7 +49,16 @@ export type Listing = {
   realPhoto: boolean;
   /** Portada ya descargada como data: URI, lista para el <image> del SVG. */
   coverDataUri: string | null;
+  /** Slug del listing en el sitio (para armar la URL de compra). */
+  slug: string | null;
+  /** URL amigable de compra en tuslibros.cl (username de Vero = 'vero'). */
+  buyUrl: string | null;
 };
+
+/** URL de compra amigable. Vero tiene username 'vero' → /libro/vero/[slug]. */
+function buildBuyUrl(slug?: string | null): string | null {
+  return slug ? `https://tuslibros.cl/libro/vero/${slug}` : null;
+}
 
 /**
  * FILTRO OBLIGATORIO: todas las piezas usan SOLO libros de Vero. Cualquier
@@ -128,6 +137,8 @@ export async function fetchListing(ref: string): Promise<Listing | null> {
     coverUrl,
     realPhoto: coverUrl != null,
     coverDataUri: coverUrl ? await toDataUri(coverUrl) : null,
+    slug: row.slug ?? null,
+    buyUrl: buildBuyUrl(row.slug),
   };
 }
 
