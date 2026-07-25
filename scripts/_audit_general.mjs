@@ -31,10 +31,26 @@ const listings = await fetchAll('listings', 'id, status, price, seller_id, creat
 const byStatus = {};
 for (const l of listings) byStatus[l.status ?? 'null'] = (byStatus[l.status ?? 'null'] ?? 0) + 1;
 console.log(`  Total: ${listings.length} · por status: ${JSON.stringify(byStatus)}`);
-const sold = listings.filter(l => (l.status ?? '').toLowerCase() === 'sold');
-console.log(`  Marcados vendidos: ${sold.length} · valor listado ${clp(sold.reduce((s, l) => s + (l.price ?? 0), 0))}`);
+// OJO: los vendidos usan status `completed`, NO `sold` (que no existe en la BD).
+// Este script reportaba 0 ventas por buscar 'sold' — corregido 25 jul 2026.
+const sold = listings.filter(l => (l.status ?? '').toLowerCase() === 'completed');
+console.log(`  Vendidos (status completed): ${sold.length} · valor listado ${clp(sold.reduce((s, l) => s + (l.price ?? 0), 0))}`);
 const soldRecent = sold.filter(l => (l.updated_at ?? '') >= d(30)).sort((a, b) => (b.updated_at ?? '').localeCompare(a.updated_at ?? ''));
-console.log(`  Vendidos (updated_at 30d): ${soldRecent.length}`);
+console.log(`  Vendidos últimos 30d: ${soldRecent.length} · ${clp(soldRecent.reduce((s, l) => s + (l.price ?? 0), 0))}`);
+// Ritmo semanal (lunes a lunes) de los vendidos recientes.
+const byWeek = {};
+for (const l of sold) {
+  const iso = (l.updated_at ?? '').slice(0, 10);
+  if (!iso || iso < d(70).slice(0, 10)) continue;
+  const dt = new Date(iso);
+  const mon = new Date(dt);
+  mon.setUTCDate(dt.getUTCDate() - ((dt.getUTCDay() + 6) % 7));
+  const k = mon.toISOString().slice(0, 10);
+  byWeek[k] = byWeek[k] ?? { n: 0, v: 0 };
+  byWeek[k].n++; byWeek[k].v += l.price ?? 0;
+}
+console.log('  Por semana:');
+Object.entries(byWeek).sort().forEach(([k, v]) => console.log(`    semana del ${k} · ${v.n} libros · ${clp(v.v)}`));
 // títulos vía books
 const bookIds = [...new Set(soldRecent.map(l => l.book_id).filter(Boolean))].slice(0, 200);
 const books = bookIds.length ? await supa.from('books').select('id, title').in('id', bookIds) : { data: [] };
