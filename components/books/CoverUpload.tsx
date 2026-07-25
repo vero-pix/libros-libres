@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
 import { compressImage } from "@/lib/image-compress";
@@ -16,8 +16,17 @@ export default function CoverUpload({ currentUrl, onUploaded }: Props) {
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // object URL del preview local, para liberarlo (si no, se acumula en memoria).
+  const previewUrlRef = useRef<string | null>(null);
 
   const displayUrl = preview ?? currentUrl;
+
+  // Al desmontar, liberamos el último preview colgando.
+  useEffect(() => {
+    return () => {
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    };
+  }, []);
 
   async function handleFile(file: File) {
     if (!file.type.startsWith("image/") && !/\.heic$|\.heif$/i.test(file.name)) {
@@ -35,8 +44,10 @@ export default function CoverUpload({ currentUrl, onUploaded }: Props) {
     // Compress before upload
     const compressed = await compressImage(file);
 
-    // Preview local
+    // Preview local — liberamos el anterior antes de crear otro.
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
     const localUrl = URL.createObjectURL(compressed);
+    previewUrlRef.current = localUrl;
     setPreview(localUrl);
 
     try {
@@ -60,6 +71,10 @@ export default function CoverUpload({ currentUrl, onUploaded }: Props) {
       onUploaded(publicUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al subir imagen.");
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+        previewUrlRef.current = null;
+      }
       setPreview(null);
     } finally {
       setUploading(false);
