@@ -515,9 +515,21 @@ export default async function HomePage({ searchParams }: Props) {
           ...(subcategory ? [{ label: categoryTree.flatMap((c) => c.children).find((c) => c.slug === subcategory)?.name ?? subcategory }] : []),
           ...(tag ? [{ label: `#${tag}` }] : []),
         ]} />
+        {/* El nombre viene de la tabla `categories` (fuente de verdad). Antes solo se
+            pasaba el slug y el drawer lo traducía con el mapa viejo de lib/genres,
+            que quedó en la taxonomía anterior → mostraba el slug crudo.
+            Se ocultan las subcategorías sin inventario activo (count 0). */}
         <CategoriesMobileDrawer
-          categories={categoryTree.flatMap((g) => g.children.map((c) => ({ category: c.slug, count: c.count })))}
+          categories={categoryTree.flatMap((g) =>
+            g.children
+              .filter((c) => c.count > 0)
+              .map((c) => ({ category: c.slug, name: c.name, count: c.count, group: g.name }))
+          )}
           activeCategory={subcategory ?? category}
+          activeCategoryName={
+            categoryTree.flatMap((g) => g.children).find((c) => c.slug === (subcategory ?? category))?.name ??
+            categoryTree.find((c) => c.slug === (subcategory ?? category))?.name
+          }
         />
 
         <div className="flex gap-10">

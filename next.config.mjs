@@ -79,6 +79,13 @@ const nextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        // Avatares de quienes entran con Google (OAuth, vivo desde jul 2026).
+        // Sin esto next/image rechaza el avatar: en dev tumba la página entera
+        // con "Invalid src prop" y en producción el avatar queda roto.
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
     ],
   },
 }
