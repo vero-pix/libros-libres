@@ -19,6 +19,7 @@
  * las landings /categoria/[slug] y el filtro del home. NO los de lib/genres.ts,
  * que quedó en la taxonomía anterior.
  */
+import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "fs";
 
@@ -173,15 +174,55 @@ const SLUGS_VALIDOS = Object.entries(TAXONOMIA)
   .map(([p, h]) => `${p}: ${h.join(", ")}`)
   .join("\n");
 
+/**
+ * Esquema de salida forzado: la respuesta se valida contra esto, así que no hay
+ * que parsear texto libre ni rezar para que devuelva JSON bien formado.
+ */
+const ESQUEMA = {
+  type: "object",
+  properties: {
+    resultados: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          n: { type: "integer" },
+          category: { type: "string", enum: Object.keys(TAXONOMIA) },
+          subcategory: { type: "string", enum: Object.values(TAXONOMIA).flat() },
+          confidence: { type: "string", enum: ["alta", "media", "baja"] },
+        },
+        required: ["n", "category", "subcategory", "confidence"],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ["resultados"],
+  additionalProperties: false,
+};
+
+const anthropic = env.ANTHROPIC_API_KEY
+  ? new Anthropic({ apiKey: env.ANTHROPIC_API_KEY })
+  : null;
+
 async function clasificarConClaude(lote) {
-  const apiKey = env.ANTHROPIC_API_KEY;
-  if (!apiKey) return [];
+  if (!anthropic) return [];
 
   const listado = lote
     .map((b, i) => `${i + 1}. "${b.title ?? ""}" — ${b.author ?? "autor desconocido"}${b.publisher ? ` (${b.publisher})` : ""}`)
     .join("\n");
 
-  const prompt = `Clasifica cada libro de esta lista en la taxonomía de un marketplace chileno de libros usados.
+  try {
+    const res = await anthropic.messages.create({
+      model: "claude-opus-5",
+      max_tokens: 8000,
+      output_config: {
+        effort: "low", // clasificar por título y autor es tarea simple
+        format: { type: "json_schema", schema: ESQUEMA },
+      },
+      messages: [
+        {
+          role: "user",
+          content: `Clasifica cada libro en la taxonomía de un marketplace chileno de libros usados.
 
 Taxonomía válida (categoría padre: subcategorías):
 ${SLUGS_VALIDOS}
@@ -189,40 +230,21 @@ ${SLUGS_VALIDOS}
 Libros:
 ${listado}
 
-Responde SOLO un array JSON, un objeto por libro y en el mismo orden:
-[{"n":1,"category":"ficcion","subcategory":"ficcion-novela","confidence":"alta"}]
+Devuelve un objeto con "resultados": un elemento por libro, con "n" = el número de la lista.
+- "confidence": "alta" si reconoces el libro o al autor con seguridad; "media" si lo deduces del título; "baja" si estás adivinando.
+- La subcategoría debe pertenecer a la categoría que elijas.`,
+        },
+      ],
+    });
 
-Reglas:
-- "category" y "subcategory" deben salir EXACTAMENTE de la taxonomía de arriba.
-- "confidence": "alta" si reconoces el libro o el autor con seguridad; "media" si lo deduces del título; "baja" si estás adivinando.
-- Si no puedes clasificarlo, usa confidence "baja".
-- Sin texto fuera del JSON.`;
-
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-5",
-      max_tokens: 4000,
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
-
-  if (!res.ok) {
-    console.error(`  ⚠️ Claude respondió ${res.status}: ${(await res.text()).slice(0, 200)}`);
-    return [];
-  }
-  const data = await res.json();
-  const texto = data.content?.[0]?.text ?? "";
-  const match = texto.match(/\[[\s\S]*\]/);
-  if (!match) return [];
-  try {
-    return JSON.parse(match[0]);
-  } catch {
+    // OJO: con thinking adaptivo el primer bloque puede ser de razonamiento,
+    // no de texto. Buscar el bloque de texto en vez de asumir content[0].
+    const texto = res.content.find((b) => b.type === "text")?.text ?? "";
+    if (!texto) return [];
+    const datos = JSON.parse(texto);
+    return datos.resultados ?? [];
+  } catch (err) {
+    console.error(`  ⚠️ ${err?.status ?? ""} ${err?.message?.slice(0, 140) ?? err}`);
     return [];
   }
 }
@@ -320,6 +342,18 @@ console.log("por confianza:", JSON.stringify(porConf));
 console.log("\npor categoría destino:");
 Object.entries(porCat).sort((a, b) => b[1] - a[1]).forEach(([k, v]) => console.log(`  ${String(v).padStart(4)}  ${k}`));
 
+if (process.argv.includes("--ver-dificiles")) {
+  const claves = ["ciam", "vaticano", "cinema", "cinéma", "giedion", "frei montalva", "salgari", "lebret", "catalogo general", "catálogo general", "biblicas", "bíblicas"];
+  console.log("\n━━━━━━ LAS DIFÍCILES ━━━━━━");
+  for (const p of propuestas) {
+    const t = `${p.book.title ?? ""} ${p.book.author ?? ""}`.toLowerCase();
+    if (claves.some((k) => t.includes(k))) {
+      console.log(`  [${p.confidence}] "${(p.book.title ?? "").slice(0, 52)}" — ${(p.book.author ?? "").slice(0, 26)}`);
+      console.log(`       → ${p.category} / ${p.subcategory}`);
+    }
+  }
+}
+
 console.log("\n━━━━━━ MUESTRA AL AZAR (20) ━━━━━━");
 const mezcla = [...propuestas].sort(() => (propuestas.length % 2 ? 1 : -1));
 const paso = Math.max(1, Math.floor(propuestas.length / 20));
@@ -335,7 +369,7 @@ const CON_LANDING = new Set([
   "no-ficcion", "no-ficcion-historia", "no-ficcion-ensayo", "no-ficcion-humanidades",
   "no-ficcion-ciencia", "no-ficcion-biografia", "no-ficcion-arte",
   "infantil-juvenil", "academico-universitario", "academico-escolar",
-  "academico-manuales", "idiomas",
+  "academico-manuales", "idiomas", "otros", "academico",
 ]);
 const sinLanding = propuestas.filter((p) => !CON_LANDING.has(p.category) && !CON_LANDING.has(p.subcategory ?? ""));
 if (sinLanding.length) {

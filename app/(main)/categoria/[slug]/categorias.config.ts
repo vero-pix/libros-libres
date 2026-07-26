@@ -363,6 +363,42 @@ export const CATEGORIAS: Record<string, CategoriaConfig> = {
     relacionadas: ["no-ficcion-historia", "no-ficcion-ensayo", "no-ficcion-ciencia"],
     enlaces: [{ label: "Historia de Chile", href: "/coleccion/historia-de-chile" }],
   },
+
+  otros: {
+    slug: "otros",
+    displayName: "Otros",
+    dbCategory: "otros",
+    seoTitle: "Revistas, Enciclopedias y Libros Religiosos Usados",
+    seoDescription:
+      "Revistas antiguas, enciclopedias, diccionarios, cómics y libros religiosos usados en Chile. Lo que no cabe en ninguna estantería, de segunda mano y con envío a todo el país.",
+    keywords: ["revistas antiguas usadas", "enciclopedias usadas", "libros religiosos usados", "comics usados chile", "diccionarios usados"],
+    subtitle: "Lo que no cabe en ninguna estantería",
+    intro:
+      "Revistas de colección, enciclopedias completas, diccionarios, cómics y libros religiosos. Es la sección más impredecible del catálogo y por eso mismo donde aparecen las rarezas: colecciones de revistas que ya no existen, enciclopedias de tapa dura que nadie reedita, documentos y textos religiosos difíciles de encontrar.",
+    faqs: [
+      { q: "¿Se consiguen revistas antiguas?", a: "Sí, y suelen ser de lo más difícil de encontrar en otra parte: números sueltos y colecciones de revistas chilenas que dejaron de publicarse hace décadas." },
+      { q: "¿Vale la pena comprar una enciclopedia usada?", a: "Depende para qué. Como obra de consulta general internet la reemplazó, pero como objeto, como material de época o para una biblioteca, las ediciones antiguas de tapa dura siguen teniendo valor y cuestan una fracción de lo que costaron nuevas." },
+    ],
+    relacionadas: ["no-ficcion", "no-ficcion-historia", "academico"],
+  },
+
+  academico: {
+    slug: "academico",
+    displayName: "Académico",
+    dbCategory: "academico",
+    seoTitle: "Libros Académicos y de Estudio Usados en Chile",
+    seoDescription:
+      "Libros de estudio usados en Chile: universitarios, escolares, manuales y textos técnicos. Bibliografía de segunda mano a precio de estudiante, con envío a todo el país.",
+    keywords: ["libros academicos usados", "libros de estudio usados", "textos universitarios usados", "libros tecnicos usados"],
+    subtitle: "Universitario, escolar y técnico",
+    intro:
+      "Todo lo que se compra para estudiar: bibliografía universitaria, textos escolares, manuales de preparación y libros técnicos. Es la categoría donde más se ahorra comprando usado, porque son libros caros que se usan un semestre o un año y después quedan en la repisa.",
+    faqs: [
+      { q: "¿Cuánto se ahorra comprando libros de estudio usados?", a: "Es la diferencia más grande del catálogo. Los textos universitarios y escolares son caros nuevos y es común encontrarlos acá a la mitad de precio o menos." },
+      { q: "¿Importa la edición?", a: "En algunas carreras sí, sobre todo derecho y medicina, donde el contenido cambia. Revisa qué edición pide tu programa y confírmala con el vendedor si no está en la descripción." },
+    ],
+    relacionadas: ["academico-universitario", "academico-escolar", "academico-manuales"],
+  },
 };
 
 export const CATEGORIA_SLUGS = Object.keys(CATEGORIAS);
