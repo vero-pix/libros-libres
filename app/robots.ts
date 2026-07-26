@@ -33,7 +33,6 @@ export default function robots(): MetadataRoute.Robots {
     "/checkout/",
     "/mensajes/",
     "/referidos/",
-    "/pitch/",
     "/login",
     "/register",
     "/publish",
