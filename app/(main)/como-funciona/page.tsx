@@ -32,6 +32,7 @@ const benefits = [
   { icon: "✅", text: "Cero comisión si coordinas por WhatsApp" },
   { icon: "✅", text: "Pago seguro con MercadoPago (opcional)" },
   { icon: "✅", text: "Despacho a todo Chile con Shipit" },
+  { icon: "✅", text: "Devolución en 7 días en compras con MercadoPago" },
 ];
 
 function StepCard({ step }: { step: { number: number; icon: string; title: string; description: string } }) {
@@ -69,7 +70,7 @@ export default function ComoFuncionaPage() {
           <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
             Compra directa
           </h2>
-          <p className="text-ink-muted mb-6">El modo más simple, y mi favorito. Tú y quien vende se hablan directo por WhatsApp, se ponen de acuerdo, y yo no me meto en el medio. No cobro nada.</p>
+          <p className="text-ink-muted mb-6"><strong>Ideal si el libro está cerca tuyo.</strong> El modo más simple, y mi favorito. Tú y quien vende se hablan directo por WhatsApp, se ponen de acuerdo, y yo no me meto en el medio. No cobro nada.</p>
           <div className="space-y-5">
             {directSteps.map((step) => <StepCard key={step.number} step={step} />)}
           </div>
@@ -80,7 +81,7 @@ export default function ComoFuncionaPage() {
           <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
             Compra con pago seguro
           </h2>
-          <p className="text-ink-muted mb-6">Si prefieres no coordinar nada, pagas con <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a> desde la publicación y listo. Acá sí cobramos una comisión chica, porque la pasarela y el despacho cuestan. Si no quieres comisión, usa WhatsApp.</p>
+          <p className="text-ink-muted mb-6"><strong>Ideal si el libro está en otra ciudad, o si quieres respaldo.</strong> Pagas con <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a> desde la publicación y el libro te llega por courier — así puedes comprarle a alguien de otra región o de una comuna lejana, sin tener que ir a buscarlo. Tu dinero queda retenido hasta que confirmas que recibiste el libro, y tienes <Link href="/devoluciones" className="text-brand-600 font-semibold hover:underline">7 días para devolverlo</Link> si llega dañado, si es un libro distinto al publicado, o si viene en peor estado del que decía la ficha. Por esta vía cobro una comisión sobre el precio del libro — 8% si vende una persona, 5% un librero, 3% una librería — y con eso pago la pasarela y el despacho.</p>
           <div className="space-y-5">
             {mpSteps.map((step) => <StepCard key={step.number} step={step} />)}
           </div>
@@ -88,9 +89,10 @@ export default function ComoFuncionaPage() {
 
         {/* Vendedores */}
         <section className="mb-14">
-          <h2 className="text-2xl font-bold text-ink mb-6 border-b-2 border-brand-600 pb-2 inline-block">
+          <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
             Para vendedores
           </h2>
+          <p className="text-ink-muted mb-6">Publicar es gratis y no tiene vuelta. Y si la venta se paga con MercadoPago, no tienes que ir a ninguna parte: <strong>el courier pasa a buscar el paquete a tu casa</strong> y <strong>no le pagas nada</strong> — el envío se factura a tuslibros.cl a fin de mes. Solo necesitas tener el paquete listo dentro de los 2 días hábiles siguientes a la venta. <Link href="/como-despachar" className="text-brand-600 font-semibold hover:underline">Te explico el despacho paso a paso</Link>.</p>
           <div className="space-y-5">
             {sellerSteps.map((step) => <StepCard key={step.number} step={step} />)}
           </div>

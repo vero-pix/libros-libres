@@ -41,7 +41,21 @@ const faqSections = [
       },
       {
         q: "¿Cuánto cuesta comprar?",
-        a: "Pagas el precio publicado. Nada escondido, nada raro.",
+        a: (
+          <span>
+            Pagas el precio publicado. Nada escondido, nada raro. Si pagas con{" "}
+            <a
+              href="https://www.mercadopago.cl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+            >
+              MercadoPago
+            </a>
+            , además tienes <strong>7 días para devolver el libro</strong> si llega dañado, si es distinto al publicado o si viene en peor estado del que decía la ficha —{" "}
+            <Link href="/devoluciones" className={linkClass}>acá está la política completa</Link>.
+          </span>
+        ),
       },
       {
         q: "¿Puedo negociar el precio?",
@@ -94,7 +108,7 @@ const faqSections = [
             <strong>
               <Link href="/como-despachar" className={linkClass}>despacho por courier</Link>
             </strong>{" "}
-            (Shipit hoy, más integraciones en camino). Si coordinas todo por WhatsApp y entregas en persona, no pagas nada.
+            (Shipit hoy, más integraciones en camino). La comisión se calcula sobre el precio del libro: <strong>8%</strong> si vendes como persona, <strong>5%</strong> si eres librero y <strong>3%</strong> si eres librería. Si coordinas todo por WhatsApp y entregas en persona, no pagas nada.
           </span>
         ),
       },
@@ -256,10 +270,10 @@ export default function FAQPage() {
               Ir a Contacto
             </Link>
             <a
-              href="mailto:hola@tuslibros.cl"
+              href="mailto:vero@tuslibros.cl"
               className="inline-block border border-brand-600 text-brand-600 font-semibold px-6 py-3 rounded-xl hover:bg-brand-50 transition-colors"
             >
-              hola@tuslibros.cl
+              vero@tuslibros.cl
             </a>
           </div>
         </div>

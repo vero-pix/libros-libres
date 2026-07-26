@@ -49,8 +49,8 @@ export default function DevolucionesPage() {
           <ol className="text-sm text-ink-muted space-y-3 leading-relaxed list-decimal list-inside">
             <li>
               Escríbenos a{" "}
-              <a href="mailto:hola@tuslibros.cl" className="text-brand-600 underline">
-                hola@tuslibros.cl
+              <a href="mailto:vero@tuslibros.cl" className="text-brand-600 underline">
+                vero@tuslibros.cl
               </a>{" "}
               con el ID de tu orden y una foto del libro.
             </li>

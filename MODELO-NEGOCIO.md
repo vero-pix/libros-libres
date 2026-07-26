@@ -1,6 +1,21 @@
+> ## ⚠️ DOCUMENTO HISTÓRICO — NO ES FUENTE VIGENTE
+>
+> Congelado el **3 de abril de 2026**. Se conserva como registro de cómo se pensó el negocio al partir. **No usar para tomar decisiones ni para redactar copy.**
+>
+> Dos cosas que este archivo dice y que hoy son falsas:
+>
+> - **El arriendo y el préstamo se descontinuaron el 24 de julio de 2026.** Solo hay venta. Los 130 listings con arriendo se migraron a `modality='sale'`.
+> - **La comisión es sobre el precio del libro, no sobre la logística.** El `marketplace_fee` que aparece en los diagramas de split es el campo de la API de MercadoPago (comisión + despacho que la plataforma retiene para pagarle después al courier), no la comisión.
+>
+> **Fuentes vigentes:**
+>
+> - Comisiones y tramos: `lib/commissions.ts` (única fuente de verdad).
+> - Convenciones del proyecto: `CLAUDE.md`.
+> - Reglas cara al usuario: las páginas publicadas — `/como-funciona`, `/faq`, `/devoluciones`, `/como-despachar`.
+
 # tuslibros.cl — Modelo de Negocio & Flujos
 
-Última actualización: 3 abril 2026
+Última actualización: 3 abril 2026 (ver advertencia arriba)
 
 ---
 
