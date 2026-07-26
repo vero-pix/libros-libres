@@ -1,5 +1,6 @@
 // import Image from "next/image"; // ya no se usa: encabezado sin foto stock (20 jul 2026)
 import Link from "next/link";
+import { isValidElement, type ReactNode } from "react";
 
 export const metadata = {
   title: "Preguntas frecuentes",
@@ -9,6 +10,47 @@ export const metadata = {
 };
 
 const linkClass = "text-brand-600 font-semibold hover:underline";
+
+/**
+ * Serializa una respuesta del FAQ (string o JSX) a texto plano para el JSON-LD.
+ * Devuelve null si el nodo no se puede serializar con certeza — en ese caso la
+ * pregunta se omite del schema, que es preferible a publicar una respuesta falsa.
+ * Antes acá había un fallback a item.q que hacía que Google recibiera la pregunta
+ * repetida como respuesta en casi las 15 entradas.
+ */
+function answerToPlainText(node: ReactNode): string | null {
+  if (node === null || node === undefined || typeof node === "boolean") return "";
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+
+  if (Array.isArray(node)) {
+    const parts = node.map(answerToPlainText);
+    if (parts.some((p) => p === null)) return null;
+    return parts.join("");
+  }
+
+  if (isValidElement(node)) {
+    const { children } = node.props as { children?: ReactNode };
+    // Componentes propios: no podemos saber qué renderizan sin ejecutarlos.
+    if (typeof node.type !== "string" && children === undefined) return null;
+    // Elementos DOM sin hijos (<br />, <hr />) no aportan texto.
+    if (children === undefined) return "";
+    const inner = answerToPlainText(children);
+    if (inner === null) return null;
+    // Los <li> son frases independientes: separarlas para que no se peguen.
+    return node.type === "li" ? `${inner.trim()}. ` : inner;
+  }
+
+  return null;
+}
+
+function normalizeAnswer(text: string): string {
+  return text
+    .replace(/\s+/g, " ")
+    .replace(/\s+([.,;:])/g, "$1")
+    .replace(/\.\s*\./g, ".")
+    .trim();
+}
 
 const faqSections = [
   {
@@ -287,14 +329,20 @@ export default function FAQPage() {
             "@context": "https://schema.org",
             "@type": "FAQPage",
             mainEntity: faqSections.flatMap((s) =>
-              s.questions.map((item) => ({
-                "@type": "Question",
-                name: item.q,
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: typeof item.a === "string" ? item.a : item.q,
-                },
-              }))
+              s.questions.flatMap((item) => {
+                const raw = answerToPlainText(item.a);
+                if (raw === null) return [];
+                const text = normalizeAnswer(raw);
+                // Sin respuesta real, o una que solo repite la pregunta: fuera del schema.
+                if (!text || text === item.q) return [];
+                return [
+                  {
+                    "@type": "Question",
+                    name: item.q,
+                    acceptedAnswer: { "@type": "Answer", text },
+                  },
+                ];
+              })
             ),
           }),
         }}
