@@ -1,4 +1,5 @@
 import { fichaCoincide } from "@/lib/listingIntegrity";
+import { normalizeGenre } from "@/lib/genreNormalizer";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -224,6 +225,11 @@ export async function POST(req: NextRequest) {
     // Create book if needed
     if (!bookId) {
       const coverUrl = buildCoverUrl(isbn);
+      // La carga masiva daba default a `genre` pero dejaba category/subcategory
+      // en null. Así se acumularon 363 libros invisibles para las landings de
+      // categoría y para el filtro. Ahora se clasifica siempre; si no se puede
+      // deducir nada, cae en "otros" — nunca null.
+      const normalized = normalizeGenre(genre, title, null);
       const { data: newBook, error: bookErr } = await supabase
         .from("books")
         .insert({
@@ -232,6 +238,8 @@ export async function POST(req: NextRequest) {
           isbn: isbn || null,
           cover_url: coverUrl,
           genre,
+          category: normalized?.category ?? "otros",
+          subcategory: normalized?.subcategory ?? null,
           created_by: user.id,
         })
         .select("id")

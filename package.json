@@ -18,7 +18,8 @@
     "seo:gsc": "tsx scripts/seo/gsc-report.ts",
     "seo:wow": "tsx scripts/seo/week-over-week.ts",
     "seo:sitemaps": "tsx scripts/seo/sitemaps.ts",
-    "seo:audit-404": "tsx scripts/seo/audit-404.ts"
+    "seo:audit-404": "tsx scripts/seo/audit-404.ts",
+    "backfill-categorias": "node scripts/backfill-categorias.mjs"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
@@ -40,6 +41,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
     "@playwright/test": "^1.59.1",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.19",
