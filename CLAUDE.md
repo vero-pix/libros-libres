@@ -64,9 +64,38 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 
 La memoria persistente del asistente vive en `~/.claude/projects/-Users-veronicavelasquez-dev-libros-libres/memory/` (consolidada el 28 may 2026 desde las carpetas previas de iCloud/Desktop; las antiguas quedaron de respaldo). `MEMORY.md` es el índice — arranca por ahí para entender sesiones previas, feedback acumulado y pendientes. No duplicar en este archivo lo que ya está en memoria: este CLAUDE.md es para convenciones estables; la memoria es para contexto evolutivo.
 
-## Roadmap y decisiones
+## Dónde está cada cosa (fuentes canónicas)
 
-- `ROADMAP.md` — features pendientes y entregadas
-- `MODELO-NEGOCIO.md` — lógica de comisiones y arriendo
+Antes de afirmar cualquier dato de negocio, mirar acá. Si un documento contradice a estas fuentes, gana la fuente.
+
+| Tema | Fuente | Nota |
+|---|---|---|
+| Comisiones | `lib/commissions.ts` | Código, no documento. 8% particular / 5% librero / 3% librería, **sobre el precio del libro** |
+| Políticas, despacho, devoluciones, URLs | `docs/KB-TUSLIBROS.md` | Verificado contra el sitio publicado |
+| Plan de crecimiento vigente | `docs_desde_claude/SPRING_15_DAYS.md` | Sprint de 15 días |
+| Visión de largo plazo | `docs_desde_claude/MASTER_PLAN.md` | |
+| Features pendientes y entregadas | `ROADMAP.md` | |
+| Onboarding de vendedores | `docs/MENSAJES-ONBOARDING-VENDEDOR.md` · `docs/guia-vender-v2.html` | |
+
+**Documentos históricos — NO usar como fuente:**
+
+- `MODELO-NEGOCIO.md` — congelado en abril 2026. Describe el arriendo como vivo (descontinuado el 24-07-2026) y la comisión como si fuera sobre logística. Ya contaminó un plan completo.
+- `SESION-*.md`, `docs/*-2026-0[456]-*.md` — registros de sesiones pasadas, no estado actual.
+
+Otras carpetas:
+
 - `docs/` — material de trabajo, fotos, research (no commitear HEICs grandes)
 - `ideas/` — ignorado en git, material personal
+
+## Trabajo desde sesiones de chat
+
+Vero trabaja desde chats (Cowork/Claude) que producen prompts, documentos y piezas. **Ese material debe quedar en el repo, no en la carpeta temporal de la sesión** — si no, se pierde y el próximo agente parte a ciegas.
+
+Convención:
+
+- Documentos de estrategia y estado → `docs_desde_claude/`
+- Prompts ejecutables para Claude Code → `docs/prompts/`
+- Piezas y material de apoyo → `docs/`
+- Todo lo que se vuelva fuente de verdad → agregarlo a la tabla de arriba
+
+Regla: si un archivo importa la semana que viene, va en el repo.
