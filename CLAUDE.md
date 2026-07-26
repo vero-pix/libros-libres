@@ -70,7 +70,7 @@ Antes de afirmar cualquier dato de negocio, mirar acá. Si un documento contradi
 
 | Tema | Fuente | Nota |
 |---|---|---|
-| Comisiones | `lib/commissions.ts` | Código, no documento. 8% particular / 5% librero / 3% librería, **sobre el precio del libro** |
+| Comisiones | `lib/commissions.ts` | Código, no documento. **8% sobre el precio del libro, igual para todos.** Los tramos por plan (librero 5% / librería 3%) se eliminaron el 26-07-2026: nunca aplicaron a nadie. Solo se cobra si la venta pasa por MercadoPago o despacho por courier; por WhatsApp en persona, $0 |
 | Políticas, despacho, devoluciones, URLs | `docs/KB-TUSLIBROS.md` | Verificado contra el sitio publicado |
 | Plan de crecimiento vigente | `docs_desde_claude/SPRING_15_DAYS.md` | Sprint de 15 días |
 | Visión de largo plazo | `docs_desde_claude/MASTER_PLAN.md` | |

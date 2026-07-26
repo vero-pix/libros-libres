@@ -337,7 +337,7 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 - [x] Split Payment producción — verificado con venta real (6 abril 2026).
 - [x] Bundle checkout — orders con `bundle_id` compartido, una preferencia MP.
 - [x] Shipit integración completa — cotización, etiquetas, tracking. Validado para vendedores no-admin.
-- [x] Comisiones por plan (Libre 8%, Librero 5%, Librería 3%).
+- [x] ~~Comisiones por plan (Libre 8%, Librero 5%, Librería 3%)~~ → **revertido el 26-07-2026**: comisión única de 8% para todos. Los tramos nunca aplicaron (todos en `plan = free`).
 - [x] Economía inversa "Se busca" — tabla `book_requests`, API, página `/solicitudes`.
 - [x] Ranking por cercanía en /solicitudes.
 - [x] Activación post-registro — webhook welcome email con 3 CTAs.
