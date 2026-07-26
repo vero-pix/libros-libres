@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import {
   sellerPreferenceClient,
   preferenceClient,
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
   const { data: listing, error: listingError } = await supabase
     .from("listings")
     .select(
-      `*, book:books(title, author), seller:users(id, full_name, mercadopago_access_token, mercadopago_user_id)`
+      `*, book:books(title, author), seller:users(id, full_name, mercadopago_user_id)`
     )
     .eq("id", listing_id)
     .eq("status", "active")
@@ -62,7 +63,6 @@ export async function POST(req: NextRequest) {
   const seller = listing.seller as {
     id: string;
     full_name: string;
-    mercadopago_access_token: string | null;
     mercadopago_user_id: string | null;
   };
 
@@ -70,7 +70,8 @@ export async function POST(req: NextRequest) {
   const deposit = Number(listing.rental_deposit ?? 0);
 
   // Comisión
-  const useSplit = !!seller.mercadopago_access_token;
+  // Ver orders/route.ts: los tokens son credenciales y solo se leen con service role.
+  const useSplit = !!seller.mercadopago_user_id;
   const { rate: commissionRate, commission } = useSplit
     ? calculateCommission(rentalPrice)
     : { rate: 0, commission: 0 };
@@ -152,7 +153,21 @@ export async function POST(req: NextRequest) {
         await supabase.from("rentals").delete().eq("id", rental.id);
         return NextResponse.json({ error: "Configuración de marketplace incompleta" }, { status: 500 });
       }
-      let sellerToken = seller.mercadopago_access_token!;
+      const adminSbToken = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { persistSession: false } }
+      );
+      const { data: sellerCreds } = await adminSbToken
+        .from("users")
+        .select("mercadopago_access_token, mercadopago_refresh_token")
+        .eq("id", seller.id)
+        .single();
+      if (!sellerCreds?.mercadopago_access_token) {
+        await supabase.from("rentals").delete().eq("id", rental.id);
+        return NextResponse.json({ error: "El dueño no tiene MercadoPago conectado" }, { status: 409 });
+      }
+      let sellerToken = sellerCreds.mercadopago_access_token;
       const splitBody = {
         items,
         marketplace_fee: commission,
@@ -163,12 +178,7 @@ export async function POST(req: NextRequest) {
         notification_url: `${siteUrl}/api/webhooks/mercadopago`,
       };
 
-      const { data: sellerTokenData } = await supabase
-        .from("users")
-        .select("mercadopago_refresh_token")
-        .eq("id", seller.id)
-        .single();
-      const refreshToken = sellerTokenData?.mercadopago_refresh_token ?? "";
+      const refreshToken = sellerCreds.mercadopago_refresh_token ?? "";
 
       try {
         const sellerPref = sellerPreferenceClient(sellerToken);

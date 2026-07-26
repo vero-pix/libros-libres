@@ -18,7 +18,10 @@ export default async function MisLibrosPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("public_email, instagram, phone, mercadopago_access_token")
+    // mercadopago_user_id y NO el access_token: el token es una credencial y su
+    // lectura quedó revocada para anon/authenticated. user_id es además el campo
+    // que usa el botón de compra en la ficha, así que aviso y botón coinciden.
+    .select("public_email, instagram, phone, mercadopago_user_id")
     .eq("id", user.id)
     .single();
 
@@ -33,7 +36,7 @@ export default async function MisLibrosPage() {
 
   // Camino de vuelta para quien descartó el aviso en el éxito de publicación.
   const activas = listings.filter((l) => l.status === "active").length;
-  const mostrarNudgeMP = !profile?.mercadopago_access_token && activas > 0;
+  const mostrarNudgeMP = !profile?.mercadopago_user_id && activas > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">

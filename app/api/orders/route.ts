@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
   const { data: listings, error: listingsError } = await supabase
     .from("listings")
     .select(
-      `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_access_token, mercadopago_user_id, on_vacation)`
+      `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_user_id, on_vacation)`
     )
     .in("id", listingIds)
     .eq("status", "active");
@@ -171,7 +171,6 @@ export async function POST(req: NextRequest) {
     full_name: string;
     email: string;
     phone: string;
-    mercadopago_access_token: string | null;
     mercadopago_user_id: string | null;
   };
 
@@ -218,7 +217,10 @@ export async function POST(req: NextRequest) {
   const courier =
     shipping_service ?? COURIER_BY_SPEED[shipping_speed] ?? "Envío estándar";
 
-  const useSplit = !!seller.mercadopago_access_token;
+  // mercadopago_user_id y no el access_token: la lectura del token quedó
+  // revocada para anon/authenticated porque es una credencial. Es además el
+  // mismo campo que decide si la ficha muestra el botón de comprar.
+  const useSplit = !!seller.mercadopago_user_id;
   const isInPerson =
     shipping_service === "Entrega en persona" ||
     shipping_service === "Punto de retiro";
@@ -324,7 +326,27 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      let sellerToken = seller.mercadopago_access_token!;
+      // Los tokens del vendedor SOLO se leen con service role: son credenciales y
+      // anon/authenticated ya no tienen SELECT sobre esas columnas.
+      const adminSbToken = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { persistSession: false } }
+      );
+      const { data: sellerCreds } = await adminSbToken
+        .from("users")
+        .select("mercadopago_access_token, mercadopago_refresh_token")
+        .eq("id", seller.id)
+        .single();
+
+      if (!sellerCreds?.mercadopago_access_token) {
+        await supabase.from("orders").delete().eq("bundle_id", bundleId);
+        return NextResponse.json(
+          { error: "El vendedor no tiene MercadoPago conectado" },
+          { status: 409 }
+        );
+      }
+      let sellerToken = sellerCreds.mercadopago_access_token;
       const splitBody = {
         items,
         marketplace_fee: commission + shippingCost,
@@ -335,12 +357,7 @@ export async function POST(req: NextRequest) {
         notification_url: `${siteUrl}/api/webhooks/mercadopago`,
       };
 
-      const { data: sellerTokenData } = await supabase
-        .from("users")
-        .select("mercadopago_refresh_token")
-        .eq("id", seller.id)
-        .single();
-      const refreshToken = sellerTokenData?.mercadopago_refresh_token ?? "";
+      const refreshToken = sellerCreds.mercadopago_refresh_token ?? "";
 
       try {
         const sellerPref = sellerPreferenceClient(sellerToken);
