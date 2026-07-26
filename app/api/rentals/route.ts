@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   const { data: listing, error: listingError } = await supabase
     .from("listings")
     .select(
-      `*, book:books(title, author), seller:users(id, full_name, mercadopago_access_token, mercadopago_user_id, plan)`
+      `*, book:books(title, author), seller:users(id, full_name, mercadopago_access_token, mercadopago_user_id)`
     )
     .eq("id", listing_id)
     .eq("status", "active")
@@ -64,7 +64,6 @@ export async function POST(req: NextRequest) {
     full_name: string;
     mercadopago_access_token: string | null;
     mercadopago_user_id: string | null;
-    plan: "free" | "librero" | "libreria";
   };
 
   const rentalPrice = Number(listing.rental_price);
@@ -73,7 +72,7 @@ export async function POST(req: NextRequest) {
   // Comisión
   const useSplit = !!seller.mercadopago_access_token;
   const { rate: commissionRate, commission } = useSplit
-    ? calculateCommission(rentalPrice, seller.plan ?? "free", "rental")
+    ? calculateCommission(rentalPrice)
     : { rate: 0, commission: 0 };
 
   const total = rentalPrice + deposit + commission;
@@ -210,7 +209,9 @@ export async function POST(req: NextRequest) {
         gross_amount: rentalPrice,
         commission_rate: commissionRate,
         commission_amount: commission,
-        seller_plan: seller.plan ?? "free",
+        // Columna heredada de los tramos por plan: es NOT NULL en la BD, así que se
+        // escribe fija en "free" hasta aplicar la migración que la vuelve nullable.
+        seller_plan: "free",
       });
     }
 

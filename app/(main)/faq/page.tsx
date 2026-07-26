@@ -150,7 +150,7 @@ const faqSections = [
             <strong>
               <Link href="/como-despachar" className={linkClass}>despacho por courier</Link>
             </strong>{" "}
-            (Shipit hoy, más integraciones en camino). La comisión se calcula sobre el precio del libro: <strong>8%</strong> si vendes como persona, <strong>5%</strong> si eres librero y <strong>3%</strong> si eres librería. Si coordinas todo por WhatsApp y entregas en persona, no pagas nada.
+            (Shipit hoy, más integraciones en camino). Cobro un <strong>8% del precio del libro</strong>, igual para todos. Si coordinas todo por WhatsApp y entregas en persona, no pagas nada.
           </span>
         ),
       },

@@ -30,7 +30,6 @@ export type ParamsFicha = {
   precio: number | null;
   categoria: string;
   comuna: string;
-  tipo_vendedor: string;
 };
 
 // Nunca dejar que la analítica rompa la navegación: si gtag no existe o un
@@ -139,13 +138,6 @@ interface ListingWithRentalFields extends ListingWithBook {
 // vuelven a mostrar "Comprar".
 const MP_NOT_RECEIVING = new Set<string>([]);
 
-// users.plan → tramo de comisión (ver lib/commissions.ts: 8% / 5% / 3%).
-const TIPO_VENDEDOR: Record<string, string> = {
-  free: "particular",
-  librero: "librero",
-  libreria: "libreria",
-};
-
 interface Props {
   listing: ListingWithBook;
   images?: { id: string; image_url: string }[];
@@ -183,9 +175,8 @@ export default function ListingDetail({ listing, images = [] }: Props) {
       precio: listing.price ?? null,
       categoria: (book as any)?.category ?? "sin_categoria",
       comuna,
-      tipo_vendedor: TIPO_VENDEDOR[(listing.seller as any)?.plan ?? "free"] ?? "particular",
     }),
-    [listing.id, mpDisponible, listing.seller?.phone, listing.price, book, comuna, listing.seller]
+    [listing.id, mpDisponible, listing.seller?.phone, listing.price, book, comuna]
   );
 
   const vistaMedida = useRef(false);

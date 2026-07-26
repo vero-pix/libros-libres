@@ -19,11 +19,8 @@ const STATUS_LABELS: Record<OrderStatus, { label: string; class: string }> = {
   cancelled: { label: "Cancelado", class: "bg-red-50 text-red-700 border-red-200" },
 };
 
-const PLAN_LABELS: Record<string, string> = {
-  free: "Libre (8%)",
-  librero: "Librero (5%)",
-  libreria: "Librería (3%)",
-};
+// 26 jul 2026: se eliminaron los tramos por plan. Comisión única de 8% para todos
+// (ver lib/commissions.ts).
 
 export default async function MisVentasPage() {
   const supabase = await createClient();
@@ -33,14 +30,13 @@ export default async function MisVentasPage() {
 
   if (!user) redirect("/login?next=/mis-ventas");
 
-  // Profile with plan
+  // Profile
   const { data: profile } = await supabase
     .from("users")
-    .select("full_name, plan, mercadopago_user_id")
+    .select("full_name, mercadopago_user_id")
     .eq("id", user.id)
     .single();
 
-  const plan = profile?.plan ?? "free";
   const mpConnected = !!profile?.mercadopago_user_id;
 
   // Orders where I'm the seller
@@ -208,8 +204,8 @@ export default async function MisVentasPage() {
             </p>
           </div>
           <div className="text-right">
-            <span className="text-xs uppercase tracking-wider text-ink-muted">Plan</span>
-            <p className="text-sm font-semibold text-brand-600">{PLAN_LABELS[plan]}</p>
+            <span className="text-xs uppercase tracking-wider text-ink-muted">Comisión</span>
+            <p className="text-sm font-semibold text-brand-600">8% del precio del libro</p>
             <p className="text-[11px] text-ink-muted mt-1 bg-green-50 text-green-700 px-2 py-0.5 rounded-full inline-block">
               Comisión solo con MercadoPago · WhatsApp es gratis
             </p>

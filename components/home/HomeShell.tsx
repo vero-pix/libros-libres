@@ -112,9 +112,9 @@ export default function HomeShell({ totalListings, stores, views, totalSold, sol
                   libro viaja donde tiene que ir — sin intermediarios raros.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-6 text-xs font-mono text-ink-muted">
-                  <span>Plan Libre · <strong className="text-ink">8%</strong> por venta</span>
-                  <span>Librero · <strong className="text-ink">5%</strong></span>
-                  <span>Librería · <strong className="text-ink">3%</strong></span>
+                  <span>Publicar · <strong className="text-ink">gratis</strong></span>
+                  <span>Comisión · <strong className="text-ink">8%</strong> por venta</span>
+                  <span>Por WhatsApp · <strong className="text-ink">$0</strong></span>
                 </div>
               </div>
               <ShelfTransformation />

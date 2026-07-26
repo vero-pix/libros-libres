@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
   const { data: listings, error: listingsError } = await supabase
     .from("listings")
     .select(
-      `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_access_token, mercadopago_user_id, plan, on_vacation)`
+      `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_access_token, mercadopago_user_id, on_vacation)`
     )
     .in("id", listingIds)
     .eq("status", "active");
@@ -173,7 +173,6 @@ export async function POST(req: NextRequest) {
     phone: string;
     mercadopago_access_token: string | null;
     mercadopago_user_id: string | null;
-    plan: "free" | "librero" | "libreria";
   };
 
   // Validar y aplicar código de descuento
@@ -225,7 +224,7 @@ export async function POST(req: NextRequest) {
     shipping_service === "Punto de retiro";
 
   const { rate: commissionRate, commission } = useSplit
-    ? calculateCommission(totalBookPrice, seller.plan ?? "free", "sale")
+    ? calculateCommission(totalBookPrice)
     : { rate: 0, commission: 0 };
 
   const serviceFee = isInPerson ? 0 : useSplit ? commission : SERVICE_FEE;
@@ -381,7 +380,9 @@ export async function POST(req: NextRequest) {
         gross_amount: totalBookPrice,
         commission_rate: commissionRate,
         commission_amount: commission,
-        seller_plan: seller.plan ?? "free",
+        // Columna heredada de los tramos por plan: es NOT NULL en la BD, así que se
+        // escribe fija en "free" hasta aplicar la migración que la vuelve nullable.
+        seller_plan: "free",
       });
     }
 
