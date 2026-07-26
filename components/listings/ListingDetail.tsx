@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import type { ListingWithBook } from "@/types";
 import { addRecentlyViewed } from "./RecentlyViewed";
 import { createClient } from "@/lib/supabase/client";
@@ -17,16 +17,44 @@ import { trackEvent } from "@/utils/analytics";
 import { translateGenre } from "@/lib/genres";
 import { authorLanding } from "@/lib/authorLandings";
 
+/**
+ * Atributos de la ficha que viajan con los eventos de elección de vía.
+ * Sirven para responder la pregunta real: cuando AMBAS vías estaban disponibles,
+ * ¿cuál eligió el comprador? Sin mp_disponible, comparar clics no significa nada.
+ * Solo atributos de la publicación — ningún dato personal del vendedor.
+ */
+export type ParamsFicha = {
+  listing_id: string;
+  mp_disponible: boolean;
+  whatsapp_disponible: boolean;
+  precio: number | null;
+  categoria: string;
+  comuna: string;
+  tipo_vendedor: string;
+};
+
+// Nunca dejar que la analítica rompa la navegación: si gtag no existe o un
+// adblocker lo bloquea, el clic tiene que seguir su camino igual.
+function medir(evento: string, params: Record<string, unknown>) {
+  try {
+    trackEvent(evento, params);
+  } catch {
+    /* la analítica no manda acá */
+  }
+}
+
 function WhatsAppButton({
   phone,
   title,
   listingId,
   variant = "primary",
+  paramsFicha,
 }: {
   phone: string | null;
   title: string;
   listingId: string;
   variant?: "primary" | "secondary";
+  paramsFicha?: ParamsFicha;
 }) {
   if (!phone) {
     if (variant === "secondary") return null;
@@ -43,8 +71,11 @@ function WhatsAppButton({
     `Hola, vi tu libro "${title}" en tuslibros.cl y me interesa. ¿Está disponible?`
   );
   const waUrl = `https://wa.me/${cleanPhone}?text=${message}`;
-  const track = () =>
-    trackEvent("click_contact", { listing_id: listingId, book_title: title });
+  const track = () => {
+    // click_contact es el evento histórico: se mantiene para no cortar la serie.
+    medir("click_contact", { listing_id: listingId, book_title: title });
+    if (paramsFicha) medir("click_whatsapp_vendedor", paramsFicha);
+  };
 
   // Secundario: link chico y discreto — "Comprar" manda, WhatsApp es solo para dudas.
   if (variant === "secondary") {
@@ -108,6 +139,13 @@ interface ListingWithRentalFields extends ListingWithBook {
 // vuelven a mostrar "Comprar".
 const MP_NOT_RECEIVING = new Set<string>([]);
 
+// users.plan → tramo de comisión (ver lib/commissions.ts: 8% / 5% / 3%).
+const TIPO_VENDEDOR: Record<string, string> = {
+  free: "particular",
+  librero: "librero",
+  libreria: "libreria",
+};
+
 interface Props {
   listing: ListingWithBook;
   images?: { id: string; image_url: string }[];
@@ -119,6 +157,43 @@ export default function ListingDetail({ listing, images = [] }: Props) {
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
   const authorHub = authorLanding(book.author); // landing de autor (SEO: concentra autoridad en el hub)
   const [isOwner, setIsOwner] = useState(false);
+  const isSold = listing.status === "completed";
+
+  // La comuna se deriva igual que el dato que ya se muestra en la ficha (address
+  // partido por comas). No mandamos la dirección completa: solo la comuna.
+  const comuna = listing.address?.split(",")[1]?.trim() || "sin_comuna";
+
+  // mp_disponible tiene que significar "el botón de comprar se está renderizando",
+  // no "el vendedor tiene cuenta". Por eso replica la condición completa del buybox:
+  // sin precio, en arriendo, vendido, en vacaciones o con MP en mantención, el botón
+  // no aparece aunque la cuenta esté conectada.
+  const mpDisponible =
+    listing.price != null &&
+    listing.modality !== "loan" &&
+    !isSold &&
+    !(listing.seller as any)?.on_vacation &&
+    !MP_NOT_RECEIVING.has((listing.seller as any)?.username) &&
+    !!(listing.seller as any)?.mercadopago_user_id;
+
+  const paramsFicha: ParamsFicha = useMemo(
+    () => ({
+      listing_id: listing.id,
+      mp_disponible: mpDisponible,
+      whatsapp_disponible: !!listing.seller?.phone,
+      precio: listing.price ?? null,
+      categoria: (book as any)?.category ?? "sin_categoria",
+      comuna,
+      tipo_vendedor: TIPO_VENDEDOR[(listing.seller as any)?.plan ?? "free"] ?? "particular",
+    }),
+    [listing.id, mpDisponible, listing.seller?.phone, listing.price, book, comuna, listing.seller]
+  );
+
+  const vistaMedida = useRef(false);
+  useEffect(() => {
+    if (vistaMedida.current) return;
+    vistaMedida.current = true;
+    medir("ver_publicacion", paramsFicha);
+  }, [paramsFicha]);
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => {
@@ -144,8 +219,6 @@ export default function ListingDetail({ listing, images = [] }: Props) {
       seller_username: listing.seller?.username,
     });
   }, [listing.id, listing.slug, book.title, coverUrl, listing.price, book.genre, book.author, listing.seller?.username]);
-
-  const isSold = listing.status === "completed";
 
   return (
     <div className="bg-paper-card rounded-2xl border border-line overflow-hidden relative pb-24 sm:pb-0">
@@ -409,7 +482,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               El vendedor aún no le puso precio. Escríbele para acordarlo y comprarlo.
             </p>
           </div>
-          <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} />
+          <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} paramsFicha={paramsFicha} />
           <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
         </div>
       )}
@@ -435,7 +508,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
                   </p>
                 </div>
               </div>
-              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} />
+              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} paramsFicha={paramsFicha} />
             </div>
           ) : MP_NOT_RECEIVING.has((listing.seller as any)?.username) ? (
             <div className="space-y-3">
@@ -449,13 +522,14 @@ export default function ListingDetail({ listing, images = [] }: Props) {
                   </p>
                 </div>
               </div>
-              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} />
+              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} paramsFicha={paramsFicha} />
               <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
             </div>
           ) : (listing.seller as any)?.mercadopago_user_id ? (
             <>
               <Link
                 href={`/checkout/${listing.id}`}
+                onClick={() => medir("click_comprar_mercadopago", paramsFicha)}
                 className="flex items-center justify-center gap-2 w-full bg-coral hover:bg-coral-deep text-white font-bold py-4 rounded-xl transition-all text-base shadow-sm"
               >
                 Comprar con MercadoPago — ${listing.price.toLocaleString("es-CL")}
@@ -471,11 +545,11 @@ export default function ListingDetail({ listing, images = [] }: Props) {
                 </p>
               </div>
               <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
-              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} variant="secondary" />
+              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} variant="secondary" paramsFicha={paramsFicha} />
             </>
           ) : (
             <div className="space-y-2">
-              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} />
+              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} paramsFicha={paramsFicha} />
               <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
             </div>
           )}
@@ -517,6 +591,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
             {listing.seller?.mercadopago_user_id && !MP_NOT_RECEIVING.has((listing.seller as any)?.username) ? (
               <Link
                 href={`/checkout/${listing.id}`}
+                onClick={() => medir("click_comprar_mercadopago", paramsFicha)}
                 className="flex items-center justify-center w-full bg-coral active:bg-coral-deep text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-base"
               >
                 Comprar ahora
@@ -526,6 +601,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
                 phone={listing.seller?.phone ?? null}
                 title={book.title}
                 listingId={listing.id}
+                paramsFicha={paramsFicha}
               />
             )}
           </div>
