@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { createServerClient } from "@supabase/ssr";
 import { COLLECTIONS } from "@/app/(main)/coleccion/[slug]/collections.config";
 import { AUTHORS } from "@/app/(main)/autor/[slug]/authors.config";
+import { CATEGORIA_SLUGS } from "@/app/(main)/categoria/[slug]/categorias.config";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://tuslibros.cl";
@@ -89,7 +90,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
     listingPages = [...collectionPages, ...listingPages];
 
-    // TODO: agregar /categoria/[slug] cuando existan las rutas reales (Fase 2)
+    // Landings de categoría (config-driven en categorias.config.ts) + su índice.
+    const categoriaPages = [
+      {
+        url: `${baseUrl}/categoria`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      },
+      ...CATEGORIA_SLUGS.map((slug) => ({
+        url: `${baseUrl}/categoria/${slug}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      })),
+    ];
+    listingPages = [...categoriaPages, ...listingPages];
   } catch {
     // Sitemap still works without dynamic pages
   }

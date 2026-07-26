@@ -24,6 +24,7 @@ import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
 import { libroUrl } from "@/lib/urls";
 import { CURATED_MIN_PRICE } from "@/lib/listingIntegrity";
+import { CATEGORIAS } from "@/app/(main)/categoria/[slug]/categorias.config";
 
 // Nombres legibles para slugs de categoría/subcategoría usados en metadata
 const CATEGORY_NAMES: Record<string, string> = {
@@ -69,15 +70,18 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   let canonical = base;
 
   if (subcategory) {
-    const name = slugToName(subcategory);
+    const name = CATEGORIAS[subcategory]?.displayName ?? slugToName(subcategory);
     title = `${name} — Libros Usados en Chile`;        // sin "| tuslibros.cl" (el template lo agrega)
     description = `Encuentra libros usados de ${name}. Compra seguro con envío a todo Chile en tuslibros.cl.`;
-    canonical = base;                                   // antes: /categoria/${subcategory} → 404
+    // La landing /categoria/[slug] es el hogar canónico de esta vista filtrada.
+    // Si no existe página para el slug, la home sigue siendo el canonical
+    // (antes apuntaba a /categoria/... inexistente → 4XX en Ahrefs).
+    canonical = CATEGORIAS[subcategory] ? `${base}/categoria/${subcategory}` : base;
   } else if (category) {
-    const name = slugToName(category);
+    const name = CATEGORIAS[category]?.displayName ?? slugToName(category);
     title = `${name} — Libros Usados en Chile`;         // sin "| tuslibros.cl"
     description = `Encuentra la mejor selección de libros de ${name} usados. Compra seguro con envío a todo Chile.`;
-    canonical = base;                                   // antes: categoriaUrl(category) → 404
+    canonical = CATEGORIAS[category] ? `${base}/categoria/${category}` : base;
   } else if (genre) {
     title = `Libros de ${genre} Usados`;
   } else if (author) {
