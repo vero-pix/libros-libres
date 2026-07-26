@@ -229,6 +229,30 @@ Reglas:
 
 // ─────────────────────────── MAIN ───────────────────────────
 
+// ── Validación dura: la taxonomía del script debe calzar con la tabla real ──
+// Si alguien agrega/renombra una categoría en Supabase y el script queda
+// desfasado, preferimos abortar antes que escribir slugs malformados.
+{
+  const { data: reales, error } = await supa.from("categories").select("slug, parent_slug");
+  if (error) { console.error("No pude leer la tabla categories:", error.message); process.exit(1); }
+  const validos = new Set((reales ?? []).map((c) => c.slug));
+  const padreReal = Object.fromEntries((reales ?? []).map((c) => [c.slug, c.parent_slug]));
+  const problemas = [];
+  for (const [padre, hijos] of Object.entries(TAXONOMIA)) {
+    if (!validos.has(padre)) problemas.push(`padre "${padre}" no existe en categories`);
+    for (const h of hijos) {
+      if (!validos.has(h)) problemas.push(`subcategoría "${h}" no existe en categories`);
+      else if (padreReal[h] !== padre) problemas.push(`"${h}" cuelga de "${padreReal[h]}" en la BD, no de "${padre}"`);
+    }
+  }
+  if (problemas.length) {
+    console.error("✗ La taxonomía del script no calza con la BD:");
+    problemas.forEach((p) => console.error("   " + p));
+    process.exit(1);
+  }
+  console.log(`✓ Taxonomía validada contra la BD: ${validos.size} slugs reales\n`);
+}
+
 console.log(ESCRIBIR ? "MODO ESCRITURA — se van a modificar datos" : "DRY-RUN — no se escribe nada");
 console.log(`Umbral: ${SOLO_ALTA ? "solo confianza alta" : "alta y media"}${SIN_LLM ? " · sin capa Claude" : ""}\n`);
 
@@ -305,6 +329,23 @@ for (let i = 0; i < propuestas.length && i / paso < 20; i += paso) {
   console.log(`       → ${p.category} / ${p.subcategory}`);
 }
 
+// Cobertura: qué propuestas caen en una categoría SIN landing publicada.
+const CON_LANDING = new Set([
+  "ficcion", "ficcion-novela", "ficcion-poesia", "ficcion-policial",
+  "no-ficcion", "no-ficcion-historia", "no-ficcion-ensayo", "no-ficcion-humanidades",
+  "no-ficcion-ciencia", "no-ficcion-biografia", "no-ficcion-arte",
+  "infantil-juvenil", "academico-universitario", "academico-escolar",
+  "academico-manuales", "idiomas",
+]);
+const sinLanding = propuestas.filter((p) => !CON_LANDING.has(p.category) && !CON_LANDING.has(p.subcategory ?? ""));
+if (sinLanding.length) {
+  console.log(`\n⚠️  ${sinLanding.length} quedarán bien clasificadas pero SIN landing que las muestre:`);
+  const porCat2 = {};
+  for (const p of sinLanding) porCat2[p.subcategory ?? p.category] = (porCat2[p.subcategory ?? p.category] ?? 0) + 1;
+  Object.entries(porCat2).forEach(([k, v]) => console.log(`     ${String(v).padStart(3)}  ${k}`));
+  console.log("     (falta crear /categoria/otros — se puede agregar a categorias.config.ts)");
+}
+
 const noResueltas = fichas.size - propuestas.length;
 if (noResueltas > 0) {
   console.log(`\n━━━━━━ SIN CLASIFICAR: ${noResueltas} ━━━━━━`);
@@ -321,6 +362,15 @@ if (!ESCRIBIR) {
   console.log("\n✅ dry-run listo — no se modificó nada. Para escribir: npm run backfill-categorias -- --write");
   process.exit(0);
 }
+
+// Cada propuesta, una por una, contra el set válido. Nada malformado pasa.
+const malformadas = propuestas.filter((p) => !esValido(p.category, p.subcategory));
+if (malformadas.length) {
+  console.error(`\n✗ ${malformadas.length} propuestas malformadas — se abortó sin escribir:`);
+  malformadas.forEach((p) => console.error(`   ${p.category}/${p.subcategory} · "${p.book.title}"`));
+  process.exit(1);
+}
+console.log(`\n✓ Las ${propuestas.length} propuestas usan slugs válidos`);
 
 const aEscribir = propuestas.filter((p) => (SOLO_ALTA ? p.confidence === "alta" : p.confidence !== "baja"));
 console.log(`\n━━━━━━ ESCRIBIENDO ${aEscribir.length} fichas ━━━━━━`);
