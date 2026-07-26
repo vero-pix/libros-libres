@@ -112,9 +112,17 @@ export default async function PublishPage({ searchParams }: Props) {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("phone, username, default_latitude, default_longitude, default_address")
+    .select("phone, username, default_latitude, default_longitude, default_address, mercadopago_access_token")
     .eq("id", user.id)
     .single();
+
+  // Para invitar a conectar MercadoPago en el estado de éxito (ver MercadoPagoNudge).
+  const mpConnected = !!profile?.mercadopago_access_token;
+  const { count: publicacionesActivas } = await supabase
+    .from("listings")
+    .select("id", { count: "exact", head: true })
+    .eq("seller_id", user.id)
+    .eq("status", "active");
 
   // Pre-llenar el formulario si viene de "Publicar uno igual"
   let initialBook: BookData | null = null;
@@ -237,6 +245,8 @@ export default async function PublishPage({ searchParams }: Props) {
           existingPhone={profile?.phone ?? null}
           defaultLocation={defaultLocation}
           initialBook={initialBook}
+          mpConnected={mpConnected}
+          publicacionesActivas={publicacionesActivas ?? 0}
         />
       </main>
     </div>

@@ -1,11 +1,16 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { MP_ORIGEN_KEY } from "@/components/listings/MercadoPagoNudge";
+import { trackEvent } from "@/utils/analytics";
 
 interface Props {
   isConnected: boolean;
   connectedAt: string | null;
 }
+
+const FIRED_KEY = "tl_mp_conectado_medido";
 
 export default function MercadoPagoConnect({ isConnected, connectedAt }: Props) {
   const searchParams = useSearchParams();
@@ -13,6 +18,34 @@ export default function MercadoPagoConnect({ isConnected, connectedAt }: Props) 
   const mpError = searchParams.get("mp_error");
 
   const connected = isConnected || justConnected;
+
+  // El callback de MercadoPago siempre vuelve acá con ?mp_connected=true, así que
+  // este es el único punto donde se puede medir la conexión completada sin tocar
+  // el flujo OAuth. El origen lo dejó guardado quien disparó la invitación
+  // (MercadoPagoNudge) o el botón de esta misma tarjeta.
+  useEffect(() => {
+    if (!justConnected) return;
+    let origen = "desconocido";
+    try {
+      // El ?mp_connected=true queda en la URL: sin este flag, un refresh
+      // volvería a contar la misma conexión.
+      if (window.sessionStorage.getItem(FIRED_KEY) === "1") return;
+      window.sessionStorage.setItem(FIRED_KEY, "1");
+      origen = window.localStorage.getItem(MP_ORIGEN_KEY) ?? "perfil";
+      window.localStorage.removeItem(MP_ORIGEN_KEY);
+    } catch {
+      // Sin storage medimos igual, con el origen en "desconocido".
+    }
+    trackEvent("mp_conectado", { origen });
+  }, [justConnected]);
+
+  const marcarOrigenPerfil = () => {
+    try {
+      window.localStorage.setItem(MP_ORIGEN_KEY, "perfil");
+    } catch {
+      // Sin storage el origen queda en "perfil" por defecto de todas formas.
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -48,6 +81,7 @@ export default function MercadoPagoConnect({ isConnected, connectedAt }: Props) 
             </div>
             <a
               href="/api/auth/mercadopago"
+              onClick={marcarOrigenPerfil}
               className="block w-full text-center py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
             >
               Reconectar cuenta
@@ -61,6 +95,7 @@ export default function MercadoPagoConnect({ isConnected, connectedAt }: Props) 
             </p>
             <a
               href="/api/auth/mercadopago"
+              onClick={marcarOrigenPerfil}
               className="block w-full text-center py-3 bg-[#009ee3] hover:bg-[#007eb5] text-white font-semibold rounded-2xl transition-colors"
             >
               Conectar MercadoPago

@@ -28,6 +28,7 @@ import {
 } from "@/lib/listingIntegrity";
 import CoverUpload from "@/components/books/CoverUpload";
 import ImageUploadMultiple from "@/components/listings/ImageUploadMultiple";
+import MercadoPagoNudge from "@/components/listings/MercadoPagoNudge";
 import { compressImage, compressScanImage } from "@/lib/image-compress";
 import Link from "next/link";
 import { trackEvent } from "@/utils/analytics";
@@ -79,9 +80,13 @@ interface Props {
   existingPhone?: string | null;
   defaultLocation?: DefaultLocation | null;
   initialBook?: BookData | null;
+  /** Si el vendedor ya tiene MercadoPago conectado, el éxito no cambia. */
+  mpConnected?: boolean;
+  /** Publicaciones activas ANTES de esta; el éxito suma la recién creada. */
+  publicacionesActivas?: number;
 }
 
-export default function PublishForm({ userId, username, existingPhone, defaultLocation, initialBook }: Props) {
+export default function PublishForm({ userId, username, existingPhone, defaultLocation, initialBook, mpConnected = true, publicacionesActivas = 0 }: Props) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -563,6 +568,15 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         <p className="text-ink-muted text-sm">
           Tu libro ya está visible en la tienda y en el mapa.
         </p>
+
+        {/* Conectar MercadoPago: el momento de más motivación es justo acá, recién
+            publicado. No bloquea nada — publicar sin MP sigue siendo válido. */}
+        {!mpConnected && (
+          <MercadoPagoNudge
+            ubicacion="publish_exito"
+            nPublicaciones={publicacionesActivas + 1}
+          />
+        )}
 
         {/* Upload additional images */}
         {publishedListingId && (

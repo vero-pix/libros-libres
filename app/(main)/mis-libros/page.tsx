@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import MyListings from "./MyListings";
+import MercadoPagoNudge from "@/components/listings/MercadoPagoNudge";
 import WantedBounty from "@/components/listings/WantedBounty";
 import type { ListingWithBook } from "@/types";
 
@@ -17,7 +18,7 @@ export default async function MisLibrosPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("public_email, instagram, phone")
+    .select("public_email, instagram, phone, mercadopago_access_token")
     .eq("id", user.id)
     .single();
 
@@ -29,6 +30,10 @@ export default async function MisLibrosPage() {
 
   const listings = (data as unknown as ListingWithBook[]) ?? [];
   const missingContact = !profile?.public_email && !profile?.instagram && !profile?.phone;
+
+  // Camino de vuelta para quien descartó el aviso en el éxito de publicación.
+  const activas = listings.filter((l) => l.status === "active").length;
+  const mostrarNudgeMP = !profile?.mercadopago_access_token && activas > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -49,6 +54,9 @@ export default async function MisLibrosPage() {
               Ir al perfil &rarr;
             </span>
           </Link>
+        )}
+        {mostrarNudgeMP && (
+          <MercadoPagoNudge ubicacion="mis_libros" nPublicaciones={activas} />
         )}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Mis Libros</h1>
