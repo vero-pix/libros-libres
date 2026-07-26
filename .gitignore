@@ -83,3 +83,14 @@ content-out/
 
 # Docs de trabajo Claude (planes, cifras, borradores de venta) — nunca públicos
 docs_desde_claude/
+
+# Material de levantamiento de capital — EL REPO ES PÚBLICO, esto nunca se commitea
+docs/borrador_SAFE_chileno.md
+docs/data_room_checklist.md
+docs/deck_final_inversion.html
+docs/deck_tia.html
+docs/deck_valorizacion*.html
+docs/deck_valorizacion*.pptx
+docs/~$*
+scripts/_valuation_snapshot.mjs
+scripts/_generate_deck_pptx*.py
