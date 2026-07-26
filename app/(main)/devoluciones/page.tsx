@@ -20,10 +20,27 @@ export default function DevolucionesPage() {
         </header>
 
         <section className="bg-white border border-cream-dark/40 rounded-xl p-6 mb-6">
+          <h2 className="font-semibold text-ink text-lg mb-3">Qué compras cubre</h2>
+          <p className="text-sm text-ink-muted leading-relaxed mb-3">
+            Esta garantía cubre las compras que se pagan con{" "}
+            <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a>{" "}
+            dentro de tuslibros.cl. La razón es simple: devolver un libro significa devolverte la
+            plata, y eso solo lo puedo hacer si el pago pasó por acá.
+          </p>
+          <p className="text-sm text-ink-muted leading-relaxed">
+            Si te pusiste de acuerdo con quien vende por WhatsApp y le pagaste directo, ese trato es
+            entre ustedes dos y no pasa por este proceso. Sigue siendo una forma perfectamente
+            válida de comprar —{" "}
+            <Link href="/como-funciona" className="text-brand-600 font-semibold hover:underline">es la primera que ofrezco y no cobro nada por ella</Link>{" "}
+            — pero ahí la confianza la ponen ustedes, no yo. Si igual se complica algo, escríbeme y
+            te ayudo a conversarlo, aunque no pueda procesar un reembolso.
+          </p>
+        </section>
+
+        <section className="bg-white border border-cream-dark/40 rounded-xl p-6 mb-6">
           <h2 className="font-semibold text-ink text-lg mb-3">Cuándo puedes devolver</h2>
           <p className="text-sm text-ink-muted leading-relaxed mb-3">
-            Puedes solicitar la devolución de un libro comprado en tuslibros.cl en los siguientes
-            casos:
+            Dentro de esas compras, puedes solicitar la devolución en los siguientes casos:
           </p>
           <ul className="text-sm text-ink-muted space-y-2 leading-relaxed">
             <li>
