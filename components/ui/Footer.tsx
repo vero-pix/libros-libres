@@ -49,11 +49,14 @@ export default function Footer() {
           <div>
             <h4 className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink mb-4 font-semibold">Categorías</h4>
             <ul className="space-y-2.5 text-ink-muted">
-              <li><Link href="/?subcategory=ficcion-novela" className="hover:text-coral transition-colors">Novela y Ficción</Link></li>
-              <li><Link href="/?subcategory=ficcion-poesia" className="hover:text-coral transition-colors">Poesía</Link></li>
-              <li><Link href="/?subcategory=no-ficcion-ensayo" className="hover:text-coral transition-colors">Ensayo</Link></li>
-              <li><Link href="/?subcategory=no-ficcion-historia" className="hover:text-coral transition-colors">Historia</Link></li>
-              <li><Link href="/?category=escolar" className="hover:text-coral transition-colors">Libros escolares</Link></li>
+              <li><Link href="/categoria/ficcion-novela" className="hover:text-coral transition-colors">Novela y Ficción</Link></li>
+              <li><Link href="/categoria/ficcion-poesia" className="hover:text-coral transition-colors">Poesía</Link></li>
+              <li><Link href="/categoria/no-ficcion-ensayo" className="hover:text-coral transition-colors">Ensayo</Link></li>
+              <li><Link href="/categoria/no-ficcion-historia" className="hover:text-coral transition-colors">Historia</Link></li>
+              <li><Link href="/categoria/academico-escolar" className="hover:text-coral transition-colors">Libros escolares</Link></li>
+              <li><Link href="/categoria/academico-universitario" className="hover:text-coral transition-colors">Universitarios</Link></li>
+              <li><Link href="/categoria/infantil-juvenil" className="hover:text-coral transition-colors">Infantil y juvenil</Link></li>
+              <li><Link href="/categoria" className="hover:text-coral transition-colors">Todas las categorías</Link></li>
               <li><Link href="/?collectible=1" className="hover:text-coral transition-colors">Coleccionables</Link></li>
             </ul>
           </div>

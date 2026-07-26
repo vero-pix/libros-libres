@@ -39,6 +39,24 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "25 julio 2026",
+    title: "Cada categoría tiene su propia estantería",
+    description:
+      "Antes, si querías ver «solo novelas» o «solo historia», aplicabas un filtro y llegabas a una lista sin nombre ni contexto. Ahora cada categoría tiene su página de verdad: novela y ficción, historia, poesía, ensayo, policial, biografías, arte, ciencia, infantil y juvenil, universitario, escolar e idiomas. Cada una parte con una nota corta de qué vas a encontrar ahí y por qué esa sección se mueve distinto —los textos universitarios son los que más se ahorran comprando usados; la poesía es donde Chile juega de local; los libros de niños son los que más sentido hace pasar de mano en mano—, después la estantería completa con lo que hay hoy, y al final las preguntas que más me hacen sobre esa categoría. También limpié el menú de categorías, que estaba mostrando nombres en clave como «ficcion-novela» en vez de «Novela y ficción», y saqué las categorías que no tienen ni un libro: mandarte a una repisa vacía no le sirve a nadie.",
+    tag: "Descubrir",
+    link: "/categoria",
+    linkText: "Ver todas las categorías",
+    visual: {
+      kind: "covers",
+      match: (l) =>
+        ["ficcion-novela", "no-ficcion-historia", "ficcion-poesia"].includes(
+          (l.book as any).subcategory ?? ""
+        ),
+      limit: 6,
+      caption: "Una página por categoría",
+    },
+  },
+  {
     date: "22 julio 2026",
     title: "Ahora cada autor tiene su propia página — partí por Neruda",
     description:

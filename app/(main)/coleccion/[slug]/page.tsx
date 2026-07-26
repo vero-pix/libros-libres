@@ -1,7 +1,6 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import Script from 'next/script'
 import { createPublicClient } from '@/lib/supabase/public'
 import ListingCard from '@/components/listings/ListingCard'
 import { COLLECTIONS } from './collections.config'
@@ -77,7 +76,7 @@ export default async function ColeccionPage({ params }: Props) {
 
   return (
     <>
-      <Script
+      <script
         id="coleccion-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
