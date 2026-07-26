@@ -414,12 +414,18 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       // Si no, intentar inferir desde genre del libro (legacy path).
       let finalCategory: string | null = categorySlug;
       let finalSubcategory: string | null = subcategorySlug;
-      if (!finalCategory && book?.genre) {
-        const normalized = normalizeGenre(book.genre, book?.title ?? bookTitle, book?.description);
-        if (normalized) {
-          finalCategory = normalized.category;
-          finalSubcategory = normalized.subcategory;
-        }
+      if (!finalCategory) {
+        // Antes esto solo corría si la ficha traía `genre`, y sin genre la
+        // categoría quedaba en null: 23% del catálogo terminó invisible para las
+        // landings /categoria/[slug] y para el filtro. Ahora se infiere igual
+        // desde el título, y si ni así se puede, cae en "otros".
+        const normalized = normalizeGenre(
+          book?.genre ?? null,
+          book?.title ?? bookTitle,
+          book?.description
+        );
+        finalCategory = normalized?.category ?? "otros";
+        finalSubcategory = normalized?.subcategory ?? null;
       }
       const tags = suggestTags({
         title: bookTitle,

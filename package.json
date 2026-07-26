@@ -18,7 +18,8 @@
     "seo:gsc": "tsx scripts/seo/gsc-report.ts",
     "seo:wow": "tsx scripts/seo/week-over-week.ts",
     "seo:sitemaps": "tsx scripts/seo/sitemaps.ts",
-    "seo:audit-404": "tsx scripts/seo/audit-404.ts"
+    "seo:audit-404": "tsx scripts/seo/audit-404.ts",
+    "backfill-categorias": "node scripts/backfill-categorias.mjs"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
