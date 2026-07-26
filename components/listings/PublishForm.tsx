@@ -21,6 +21,7 @@ import {
   checkPriceFloor,
   checkPriceDeviation,
   findDuplicates,
+  fichaCoincide,
   median,
   normalizeIsbn,
   type DuplicateCandidate,
@@ -449,15 +450,23 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       let bookId: string;
 
       if (book?.isbn) {
+        // Traemos también título y autor: el ISBN NO basta como identidad.
+        // Hay ediciones y colecciones donde varios tomos comparten el código de
+        // barras impreso, y al escanearlos todos caían en la misma ficha
+        // descartando el título escrito. Ver fichaCoincide().
         const { data: existingBook, error: findBookErr } = await supabase
           .from("books")
-          .select("id")
+          .select("id, title, author")
           .eq("isbn", book.isbn)
           .maybeSingle();
         if (findBookErr) throw new Error(findBookErr.message);
 
-        if (existingBook?.id) {
-          bookId = existingBook.id;
+        const esElMismoLibro =
+          !!existingBook?.id &&
+          fichaCoincide(bookTitle, existingBook.title, bookAuthor, existingBook.author);
+
+        if (esElMismoLibro) {
+          bookId = existingBook!.id;
         } else {
           const { data: bookRow, error: bookErr } = await supabase
             .from("books")

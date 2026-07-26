@@ -1,3 +1,4 @@
+import { fichaCoincide } from "@/lib/listingIntegrity";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -192,11 +193,18 @@ export async function POST(req: NextRequest) {
     if (isbn) {
       const { data: existing } = await supabase
         .from("books")
-        .select("id")
+        .select("id, title, author")
         .eq("isbn", isbn)
         .maybeSingle();
 
-      if (existing) {
+      // El ISBN no basta como identidad: hay ediciones donde varios tomos traen
+      // el mismo código de barras. Si el título de la fila no calza con el de la
+      // ficha, creamos ficha nueva en vez de enlazar mal. Ver fichaCoincide().
+      // Si el título de la fila no calza con el de la ficha, dejamos bookId en
+      // null: más abajo se crea una ficha nueva. Preferimos ficha duplicada
+      // (se consolida después) antes que enlace incorrecto (rompe búsqueda y
+      // SEO en silencio).
+      if (existing && fichaCoincide(title, existing.title, author, existing.author)) {
         // Check duplicate listing
         const { data: existingListing } = await supabase
           .from("listings")
