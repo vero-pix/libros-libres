@@ -8,9 +8,9 @@ import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Libros usados en Chile — comprar y vender",
+  title: "Libros usados en Chile — rarezas, clásicos y escolares",
   description:
-    "Marketplace chileno de libros usados con mapa, pago seguro y envío por courier o retiro en mano. Primeras ediciones, rarezas y clásicos desde $3.000. Publicar es gratis.",
+    "Primeras ediciones, agotados y clásicos usados desde $3.000. Busca por cercanía en el mapa, retira en mano o recibe por courier, con pago protegido.",
   alternates: { canonical: "https://tuslibros.cl/libros-usados-chile" },
   keywords: [
     "libros usados Chile",

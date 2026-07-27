@@ -2,9 +2,12 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Cómo funciona — comprar y vender libros usados",
+  // Esta página ya rankea en posición 8 para "dónde vender libros usados" (151
+  // impresiones) pero con CTR 1.3%: el título decía "Cómo funciona", que no
+  // responde la pregunta que la persona escribió. Ahora la responde literal.
+  title: "Dónde vender libros usados en Chile — cómo funciona",
   description:
-    "Guía paso a paso para usar tuslibros.cl: cómo comprar con MercadoPago, cómo publicar tus libros gratis, y cómo coordinamos el despacho por courier o retiro en mano.",
+    "Dónde y cómo vender tus libros usados en Chile: publica gratis en 10 segundos, pon tu precio y cobra por MercadoPago. Courier o retiro en mano.",
   alternates: { canonical: "https://tuslibros.cl/como-funciona" },
 };
 

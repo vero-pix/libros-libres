@@ -3,9 +3,9 @@ import RequestsRow from "@/components/home/RequestsRow";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Venta de libros usados en Chile — vende los tuyos en minutos",
+  title: "Vender libros usados en Chile — publicar es gratis",
   description:
-    "La venta de libros usados más simple de Chile. ¿Quieres vender libros usados? Publica en 10 segundos: escanea el código de barras, ponle precio y listo. Pago seguro con MercadoPago y envío a todo el país.",
+    "Vende tus libros usados en Chile: publica gratis escaneando el código de barras, pon tu precio y cobra por MercadoPago. Comisión 8%, solo si vendes.",
   alternates: { canonical: "https://tuslibros.cl/vender" },
   keywords: [
     "venta de libros",

@@ -65,8 +65,20 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const { category, subcategory, genre, author, tag, collectible } = searchParams;
   const base = "https://tuslibros.cl";
 
-  let title = "Libros Usados en Chile | Compra y Venta";
-  let description = "Haz circular los libros que ya leíste y encuentra los que te faltan en el marketplace chileno tuslibros.cl.";
+  // El conteo va dinámico y REDONDEADO al centenar hacia abajo ("más de 1.500").
+  // La cifra exacta cambiaría con cada publicación: Google trata como inestable
+  // el título que se mueve seguido y termina reescribiéndolo por su cuenta.
+  // getTotalActiveCount ya está cacheado (revalidate 300) y lo usa el render de
+  // la página, así que llamarlo acá no agrega una query.
+  const totalActive = await getTotalActiveCount();
+  const totalRedondeado = Math.floor(totalActive / 100) * 100;
+  const cuantos = totalRedondeado >= 100 ? `Más de ${totalRedondeado.toLocaleString("es-CL")}` : "";
+
+  let title = cuantos
+    ? `${cuantos} libros usados en Chile, cerca de ti`
+    : "Libros usados en Chile — compra y vende cerca de ti";
+  let description =
+    "Compra y vende libros usados con personas reales: clásicos, rarezas y escolares. Retiro en mano o envío a todo Chile, con pago protegido.";
   let canonical = base;
 
   if (subcategory) {

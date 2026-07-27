@@ -6,9 +6,13 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Comprar libros usados baratos en Chile — desde $1.000",
+  // "desde $1.000" prometía algo que el catálogo no sostiene: solo 14 libros
+  // activos cuestan $2.000 o menos. Bajo $5.000 hay 327, así que "cientos bajo
+  // $5.000" es la promesa fuerte que sí se cumple al aterrizar. Prometer de más
+  // trae clics que rebotan y termina hundiendo el CTR.
+  title: "Libros usados baratos en Chile — cientos bajo $5.000",
   description:
-    "Compra libros usados baratos en Chile desde $1.000. Cientos de ofertas y libros de segunda mano hasta 60% bajo el precio nuevo. Pago protegido con MercadoPago, retiro en mano gratis o despacho a todo Chile.",
+    "Cientos de libros usados bajo $5.000: novela, historia, escolares y rarezas hasta 60% bajo el precio nuevo. Retiro en mano gratis o envío a todo Chile.",
   alternates: { canonical: "https://tuslibros.cl/libros-usados-baratos" },
   keywords: [
     "comprar libros usados baratos",

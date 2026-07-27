@@ -4,9 +4,9 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { CIUDADES, ORDEN } from "./ciudades";
 
 export const metadata: Metadata = {
-  title: "Libros usados en Chile por ciudad",
+  title: "Libros usados cerca de ti — elige tu ciudad",
   description:
-    "Encuentra libros usados cerca de ti. Elige tu ciudad —Santiago, Providencia, Valparaíso, Concepción y más— y compra con retiro en persona o envío a domicilio. Pago seguro con MercadoPago.",
+    "Libros usados en Santiago, Concepción, Valparaíso, Talca, Temuco y más. Elige tu ciudad, retira en mano gratis o recibe por courier. Pago protegido.",
   alternates: { canonical: "https://tuslibros.cl/libros-usados" },
   openGraph: {
     title: "Libros usados en Chile por ciudad",

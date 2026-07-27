@@ -5,9 +5,12 @@ import { createPublicClient } from "@/lib/supabase/public";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Tiendas y librerías",
+  // Estaba en posición 3.9 con CTR 0% (131 impresiones, 0 clics en 28 días): el
+  // título "Tiendas y librerías" no decía libros usados ni ciudad, y la query que
+  // la trae es "librerías de libros usados en santiago de chile".
+  title: "Librerías de libros usados en Chile — compra directo",
   description:
-    "Las librerías y vendedores con más libros usados publicados en tuslibros.cl. Explora sus catálogos y compra directo con pago protegido.",
+    "Las librerías y vendedores con más libros usados de Chile: Santiago, Concepción, Talca y más. Explora sus catálogos y compra con pago protegido.",
   alternates: { canonical: "https://tuslibros.cl/tiendas" },
 };
 

@@ -36,11 +36,11 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://tuslibros.cl"),
   title: {
-    default: "Libros Usados en Chile | Compra y Venta — tuslibros.cl",
+    default: "Libros usados en Chile — compra y vende cerca de ti | tuslibros.cl",
     template: "%s | tuslibros.cl",
   },
   description:
-    "Haz circular los libros que ya leíste y encuentra los que te faltan. El marketplace chileno para comprar y vender con pago seguro, envíos a todo Chile o retiro en mano. Publica gratis tu biblioteca.",
+    "Compra y vende libros usados con personas reales: clásicos, rarezas y escolares. Retiro en mano o envío a todo Chile, con pago protegido por MercadoPago.",
   // Sin canonical global: forzaba a TODA página sin canonical propio (ej. /mapa,
   // /historia) a apuntar a la home → "URL no canónica" en el sitemap. Cada página
   // define el suyo; las que no, quedan auto-canónicas (Google usa su propia URL).
