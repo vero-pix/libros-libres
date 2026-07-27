@@ -4,20 +4,10 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 
 ## Stack
 
-- **Next.js 14.2** (App Router) + TypeScript + React 18
-- **Tailwind v3** + shadcn/ui
-- **Supabase** (Postgres + Storage + Auth)
-- **MercadoPago** split payment (tokens de vendedor + marketplace_fee)
-- **Shipit** para etiquetas de courier
-- Deploy en **Vercel**
-
-> Nota: el global CLAUDE.md menciona Next 16 / Tailwind v4 / AI SDK v6 — eso aplica a otros proyectos de Vero. Este repo sigue en Next 14 y Tailwind 3.
+> Nota: el global CLAUDE.md menciona Next 16 / Tailwind v4 / AI SDK v6 — eso aplica a otros proyectos de Vero. Este repo sigue en **Next 14 y Tailwind 3** (el resto está en `package.json`).
 
 ## Comandos
 
-- `npm run dev` — local en :3000
-- `npm run build` — build de producción (verificar antes de decir "listo")
-- `npm run lint`
 - `npm run bulk-upload` — script de carga masiva
 
 ## Convenciones del código
@@ -29,6 +19,7 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 - **URLs amigables**: `/libro/[username]/[slug]`. Si el vendedor no tiene username, cae a `/listings/[uuid]`.
 - **Bundle checkout**: orders con `bundle_id` compartido, una preferencia MP, `external_reference = bundle_id`. Shipping/fee solo en la primera order del bundle.
 - **Eventos del carrito**: dispatch `window.dispatchEvent(new CustomEvent("cart-updated"))` al agregar/eliminar para que el badge del navbar se refresque.
+- **Migraciones**: `supabase/migrations/` es SQL versionado — aplicar manual en el SQL Editor si no hay CLI.
 
 ## Reglas de trabajo
 
@@ -36,7 +27,7 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 - **Voz en 1ª persona** (yo/nosotros/Vero) en copy orientado al cliente. No marca impersonal.
 - **Humor confesional** en marketing, no frases de agencia.
 - **Probar siempre en local primero** (rama + `npm run dev`) antes de push a main.
-- **No hacer `git push` ni deploy sin autorización explícita** de Vero.
+- **`git push` a main: autorizado, sin preguntar** (27-07-2026). El **deploy a producción sí** requiere autorización explícita de Vero. Esto reemplaza la regla del CLAUDE.md global, que sigue vigente para los otros proyectos.
 - **Nunca commitear con `--no-verify`** ni saltarse hooks.
 - Preferir editar archivos existentes sobre crear nuevos.
 
@@ -50,15 +41,6 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 2. Si es UI, probar el flujo en el navegador (golden path + edge case)
 3. Si toca BD, verificar que la migración se aplicó en Supabase
 4. Commit con mensaje descriptivo en español, sin `--no-verify`
-
-## Estructura relevante
-
-- `app/(main)/` — páginas públicas (home, search, listings, checkout, perfil, mis-pedidos, mis-ventas)
-- `app/api/` — endpoints (orders, cart, webhooks/mercadopago, listings)
-- `components/` — UI por dominio (checkout, listings, sales, home, ui)
-- `lib/` — clientes Supabase (server/browser), mercadopago, shipit, notifications, genreNormalizer
-- `scripts/` — carga masiva, enriquecimiento, utilidades de migración
-- `supabase/migrations/` — SQL versionado (aplicar manual en SQL Editor si no hay CLI)
 
 ## Memoria y contexto histórico
 
