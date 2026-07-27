@@ -11,10 +11,10 @@ interface Props {
 
 const CATEGORY_CHIPS = [
   { label: "Novela", href: "/?subcategory=ficcion-novela" },
-  { label: "Poesía", href: "/?subcategory=general-adulto-poesia" },
+  { label: "Poesía", href: "/?subcategory=ficcion-poesia" },
   { label: "Historia", href: "/?subcategory=no-ficcion-historia" },
   { label: "Policial", href: "/?subcategory=ficcion-policial" },
-  { label: "Escolares", href: "/?subcategory=academico-escolar" },
+  { label: "Ensayo", href: "/?subcategory=no-ficcion-ensayo" },
   { label: "Colección", href: "/?collectible=1" },
   { label: "Ofertas", href: "/?sort=price_asc" },
 ];
