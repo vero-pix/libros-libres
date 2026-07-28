@@ -118,9 +118,23 @@ export default async function LibroPage({ params }: Props) {
   const supabase = await createClient();
   const listing = await getListing(params.username, params.slug);
 
-  // Ver comentario en listings/[id]: listings eliminados → home con 308
-  // en vez de 404 seco. Mejor UX y mejor señal a Google.
   if (!listing) {
+    // El username del vendedor pudo cambiar (p.ej. al corregir uno mal generado).
+    // Antes de mandar al home, resolver el libro por su slug y redirigir a la URL
+    // canónica: así los enlaces ya publicados e indexados no pierden su destino.
+    const { data: porSlug } = await supabase
+      .from("listings")
+      .select("slug, seller:users(username)")
+      .eq("slug", params.slug)
+      .single();
+
+    const canonico = (porSlug?.seller as any)?.username;
+    if (canonico && canonico !== params.username) {
+      permanentRedirect(`/libro/${canonico}/${porSlug!.slug}`);
+    }
+
+    // Ver comentario en listings/[id]: listings eliminados → home con 308
+    // en vez de 404 seco. Mejor UX y mejor señal a Google.
     permanentRedirect("/");
   }
 
