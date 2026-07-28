@@ -36,8 +36,12 @@ export default async function AdminPage() {
       .select(`*, book:books(*), seller:users(id, full_name, email, phone)`)
       .order("created_at", { ascending: false }),
     supabase
+      // Columnas explícitas, NO select("*"): el permiso sobre users es por
+      // columna desde 20260727_fix_revoke_tokens_mp.sql. Ver /vendedor/[id].
       .from("users")
-      .select("*")
+      .select(
+        "id, email, full_name, avatar_url, created_at, updated_at, city, phone, default_address, role, mercadopago_user_id, mercadopago_connected_at, plan, bio, public_email, instagram, referral_code, referred_by, featured, username, on_vacation, vacation_message",
+      )
       .order("created_at", { ascending: false }),
     supabase
       .from("contact_messages")

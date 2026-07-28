@@ -16,7 +16,16 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
 async function resolveSeller(supabase: Awaited<ReturnType<typeof createClient>>, idOrUsername: string) {
   const col = UUID_RE.test(idOrUsername) ? "id" : "username";
-  return supabase.from("users").select("*").eq(col, idOrUsername).single();
+  // Columnas explícitas, NO select("*"): desde 20260727_fix_revoke_tokens_mp.sql
+  // el permiso sobre users es por columna, y "*" pide la tabla entera —incluidas
+  // las credenciales de MercadoPago— así que falla con "permission denied".
+  return supabase
+    .from("users")
+    .select(
+      "id, username, full_name, avatar_url, bio, city, phone, public_email, instagram, featured, plan, created_at, on_vacation, vacation_message, pickup_points, mercadopago_user_id",
+    )
+    .eq(col, idOrUsername)
+    .single();
 }
 
 export async function generateMetadata({ params }: Props) {
@@ -24,9 +33,14 @@ export async function generateMetadata({ params }: Props) {
   const { data: seller } = await resolveSeller(supabase, params.id);
 
   const name = seller?.full_name ?? "Vendedor";
-  const location = seller?.comuna ? ` en ${seller.comuna}` : "";
+  // `comuna` no existe en users: la columna es `city`. Con select("*") el tipo
+  // era laxo y esto quedaba siempre vacío — el título y la descripción del
+  // vendedor nunca mostraban la ubicación.
+  const location = seller?.city ? ` en ${seller.city}` : "";
   const bio = seller?.bio ? ` ${seller.bio.slice(0, 100)}` : "";
-  const title = `${name} — Libros usados${location} | tuslibros.cl`;
+  // Sin "| tuslibros.cl": el template de app/layout.tsx ya lo agrega ("%s | tuslibros.cl").
+  // Venía duplicado en la pestaña y en el resultado de Google.
+  const title = `${name} — Libros usados${location}`;
   const description = `Compra libros de ${name}${location}.${bio} Envío seguro con MercadoPago o coordinación por WhatsApp.`;
   const slug = seller?.username ?? params.id;
   const canonicalUrl = `https://tuslibros.cl/vendedor/${slug}`;
