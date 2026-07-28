@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import SocialLoginButtons from "./SocialLoginButtons";
+import { nombreSospechoso } from "@/lib/nombreSospechoso";
 
 export default function RegisterForm() {
   const supabase = createClient();
@@ -12,6 +13,9 @@ export default function RegisterForm() {
   const [refCode, setRefCode] = useState("");
   const [showRefCode, setShowRefCode] = useState(false);
   const [fullName, setFullName] = useState("");
+  // Honeypot anti-bot: oculto para humanos, los bots lo rellenan.
+  // Mismo patrón que NewsletterForm y LeadCaptureBar.
+  const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,6 +38,20 @@ export default function RegisterForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    // Honeypot relleno = bot. Fingimos éxito para no darle señal de qué falló.
+    if (company) {
+      setSuccess(true);
+      return;
+    }
+
+    // Nombres al azar del tipo "rTrOVifemKCJSUegA": 7 registros así hasta el
+    // 28 jul, ninguno publicó nunca, y ensucian el conteo de registros.
+    if (nombreSospechoso(fullName)) {
+      setError("Escribe tu nombre como lo usas normalmente, por ejemplo María García.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -135,6 +153,17 @@ export default function RegisterForm() {
   return (
     <div className="space-y-4">
       <form onSubmit={handleSubmit} className="space-y-3">
+        {/* Honeypot anti-bot: oculto para humanos, los bots lo rellenan */}
+        <input
+          type="text"
+          name="company"
+          value={company}
+          onChange={(e) => setCompany(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }}
+        />
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Tu nombre
