@@ -26,6 +26,10 @@ const { data: before } = await s
 
 console.log("ANTES:", JSON.stringify(before, null, 2));
 
+// Los tokens viven en mp_credentials: desconectar es borrar esa fila
+// y limpiar la bandera pública en users.
+await s.from("mp_credentials").delete().eq("user_id", VERO_ID);
+
 const { error } = await s
   .from("users")
   .update({

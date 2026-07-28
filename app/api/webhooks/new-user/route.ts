@@ -63,44 +63,54 @@ export async function POST(req: NextRequest) {
       `Email: ${escapeHtml(email)}`
     ).catch(() => {});
 
-    // Welcome email to user
+    // Welcome email to user.
+    // Voz de Vero, en 1ª persona, y girado a VENDEDOR: por GSC sabemos que el
+    // registro llega con intención de vender, no de comprar. Conectar MercadoPago
+    // es un paso propio y no una nota al pie — 24 de 50 vendedores activos
+    // publican sin MP. Las frases salen de docs/MENSAJES-ONBOARDING-VENDEDOR.md,
+    // que es cómo Vero ya le escribe a los vendedores por WhatsApp.
     if (email && email !== "Sin email") {
+      // "Sin nombre" es el fallback de arriba: saludar sin nombre antes que
+      // mandar un "Hola Sin,".
+      const primerNombre = name === "Sin nombre" ? "" : name.split(" ")[0];
+      const saludo = primerNombre ? `Hola ${primerNombre}, soy Vero` : "Hola, soy Vero";
+
       await sendEmail({
         to: email,
-        subject: "Bienvenido a tuslibros.cl — Tu estantería te espera",
+        subject: "Soy Vero, de tuslibros.cl — partamos por tu primer libro",
         html: `
           <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
             <h1 style="color:#1a1a1a;font-size:24px;margin-bottom:4px">tuslibros.cl</h1>
             <p style="color:#888;font-size:14px;margin-top:0">Cada estantería es una librería</p>
 
-            <h2 style="color:#1a1a1a;font-size:18px;margin-top:24px">Hola ${name.split(" ")[0]}, bienvenido/a</h2>
+            <h2 style="color:#1a1a1a;font-size:18px;margin-top:24px">${saludo}</h2>
 
             <p style="color:#333;font-size:15px;line-height:1.6">
-              Ya eres parte de la comunidad de lectores de tuslibros.cl. Esto es lo que puedes hacer ahora:
+              Qué bueno que te animaste. Te dejo los dos pasos que importan, en orden.
             </p>
 
             <div style="margin:20px 0">
               <div style="background:#f5f0e8;padding:16px;border-radius:12px;margin-bottom:12px">
                 <p style="margin:0;font-weight:600;color:#1a1a1a">1. Publica tu primer libro</p>
-                <p style="margin:4px 0 0;color:#666;font-size:14px">Escanea el ISBN o ingresa los datos manualmente. Es gratis y toma 1 minuto.</p>
-              </div>
-              <div style="background:#f5f0e8;padding:16px;border-radius:12px;margin-bottom:12px">
-                <p style="margin:0;font-weight:600;color:#1a1a1a">2. Explora el catálogo</p>
-                <p style="margin:4px 0 0;color:#666;font-size:14px">Busca por título, autor o categoría. Filtra por cercanía para encontrar libros cerca de ti.</p>
+                <p style="margin:4px 0 0;color:#666;font-size:14px">Escaneas el ISBN o escribes los datos a mano. Es gratis y toma menos de un minuto por libro.</p>
               </div>
               <div style="background:#f5f0e8;padding:16px;border-radius:12px">
-                <p style="margin:0;font-weight:600;color:#1a1a1a">3. Compra</p>
-                <p style="margin:4px 0 0;color:#666;font-size:14px">Paga seguro con MercadoPago o coordina el retiro con el vendedor.</p>
+                <p style="margin:0;font-weight:600;color:#1a1a1a">2. Conecta tu MercadoPago</p>
+                <p style="margin:4px 0 0;color:#666;font-size:14px">Es lo que falta para que te puedan pagar. Sin eso, solo te compra quien coordine contigo en persona. Con MercadoPago te compran desde cualquier región, y la plata te llega directa a ti.</p>
               </div>
             </div>
 
             <a href="https://tuslibros.cl/publish" style="display:inline-block;background:#d4a017;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Publicar mi primer libro</a>
 
-            <p style="color:#888;font-size:13px;margin-top:24px">
-              ¿Dudas? Visita nuestras <a href="https://tuslibros.cl/faq" style="color:#d4a017">Preguntas Frecuentes</a> o escríbenos por <a href="https://wa.me/56994583067" style="color:#d4a017">WhatsApp</a>.
+            <p style="color:#333;font-size:15px;line-height:1.6;margin-top:24px">
+              ¿Cuántos libros tienes en mente? Si son muchos, responde este correo y te paso el importador para que no los subas de a uno.
             </p>
 
-            <p style="color:#aaa;font-size:12px;margin-top:16px">— El equipo de tuslibros.cl</p>
+            <p style="color:#888;font-size:13px;margin-top:20px">
+              Si algo se traba, escríbeme por <a href="https://wa.me/56994583067" style="color:#d4a017">WhatsApp</a> o mira las <a href="https://tuslibros.cl/faq" style="color:#d4a017">preguntas frecuentes</a>. Dudas, reclamos, ideas — me llegan todas y las leo yo.
+            </p>
+
+            <p style="color:#aaa;font-size:12px;margin-top:16px">— Vero</p>
           </div>
         `,
       }).catch((err) => console.error("[new-user] Welcome email error:", err));
