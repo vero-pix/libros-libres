@@ -86,21 +86,32 @@ export async function POST(req: NextRequest) {
             <h2 style="color:#1a1a1a;font-size:18px;margin-top:24px">${saludo}</h2>
 
             <p style="color:#333;font-size:15px;line-height:1.6">
-              Qué bueno que te animaste. Te dejo los dos pasos que importan, en orden.
+              Qué bueno que te animaste. Son tres pasos, y cada uno tiene su link acá abajo.
             </p>
 
             <div style="margin:20px 0">
               <div style="background:#f5f0e8;padding:16px;border-radius:12px;margin-bottom:12px">
                 <p style="margin:0;font-weight:600;color:#1a1a1a">1. Publica tu primer libro</p>
-                <p style="margin:4px 0 0;color:#666;font-size:14px">Escaneas el ISBN o escribes los datos a mano. Es gratis y toma menos de un minuto por libro.</p>
+                <p style="margin:4px 0 8px;color:#666;font-size:14px">Escaneas el ISBN o escribes los datos a mano. Es gratis y toma menos de un minuto por libro.</p>
+                <a href="https://tuslibros.cl/publish" style="color:#d4a017;font-size:14px;font-weight:600;text-decoration:none">Publicar un libro →</a>
               </div>
-              <div style="background:#f5f0e8;padding:16px;border-radius:12px">
+
+              <div style="background:#f5f0e8;padding:16px;border-radius:12px;margin-bottom:12px">
                 <p style="margin:0;font-weight:600;color:#1a1a1a">2. Conecta tu MercadoPago</p>
-                <p style="margin:4px 0 0;color:#666;font-size:14px">Es lo que falta para que te puedan pagar. Sin eso, solo te compra quien coordine contigo en persona. Con MercadoPago te compran desde cualquier región, y la plata te llega directa a ti.</p>
+                <p style="margin:4px 0 8px;color:#666;font-size:14px">Es lo que falta para que te puedan pagar. Sin eso, solo te compra quien coordine contigo en persona. Con MercadoPago te compran desde cualquier región y la plata te llega directa a ti.<br><br>En la misma página puedes activar el despacho con Shipit: imprimes la etiqueta y un courier pasa a buscar el libro a tu casa. No tienes que ir a ninguna oficina.</p>
+                <a href="https://tuslibros.cl/perfil" style="color:#d4a017;font-size:14px;font-weight:600;text-decoration:none">Conectar MercadoPago y Shipit →</a>
+              </div>
+
+              <div style="background:#f5f0e8;padding:16px;border-radius:12px">
+                <p style="margin:0;font-weight:600;color:#1a1a1a">3. Cuenta quién eres</p>
+                <p style="margin:4px 0 8px;color:#666;font-size:14px">Tu foto y unas líneas tuyas. La gente le compra a personas, no a catálogos — y se nota en las ventas.<br><br>Mira cómo lo hizo Lorena: <i>&ldquo;libros varios, colección personal de mi madre, ella falleció&hellip;&rdquo;</i>. Eso vende más que cualquier lista de géneros.</p>
+                <a href="https://tuslibros.cl/perfil" style="color:#d4a017;font-size:14px;font-weight:600;text-decoration:none">Completar mi perfil →</a>
+                <span style="color:#bbb">&nbsp;·&nbsp;</span>
+                <a href="https://tuslibros.cl/vendedor/lorena.cortes" style="color:#d4a017;font-size:14px;text-decoration:none">ver el ejemplo</a>
               </div>
             </div>
 
-            <a href="https://tuslibros.cl/publish" style="display:inline-block;background:#d4a017;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Publicar mi primer libro</a>
+            <a href="https://tuslibros.cl/publish" style="display:inline-block;background:#d4a017;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Empezar por mi primer libro</a>
 
             <p style="color:#333;font-size:15px;line-height:1.6;margin-top:24px">
               ¿Cuántos libros tienes en mente? Si son muchos, responde este correo y te paso el importador para que no los subas de a uno.
