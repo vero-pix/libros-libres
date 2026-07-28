@@ -31,9 +31,9 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 - **Nunca commitear con `--no-verify`** ni saltarse hooks.
 - Preferir editar archivos existentes sobre crear nuevos.
 
-## Al cerrar cada sesión
+## `/novedades`
 
-- **Actualizar `/novedades`** con los features/mejoras del día visibles para usuarios. Sin esto, la página queda desactualizada y los usuarios no se enteran de lo nuevo.
+- **No tocarla salvo que Vero lo pida explícitamente** (27-07-2026). Reemplaza la regla anterior de actualizarla al cerrar cada sesión.
 
 ## Antes de terminar una tarea
 
