@@ -104,10 +104,10 @@ export async function POST(req: NextRequest) {
 
               <div style="background:#f5f0e8;padding:16px;border-radius:12px">
                 <p style="margin:0;font-weight:600;color:#1a1a1a">3. Cuenta quién eres</p>
-                <p style="margin:4px 0 8px;color:#666;font-size:14px">Tu foto y unas líneas tuyas. La gente le compra a personas, no a catálogos — y se nota en las ventas.<br><br>Mira cómo lo hizo Lorena: <i>&ldquo;libros varios, colección personal de mi madre, ella falleció&hellip;&rdquo;</i>. Eso vende más que cualquier lista de géneros.</p>
+                <p style="margin:4px 0 8px;color:#666;font-size:14px">Tu foto y unas líneas tuyas. La gente le compra a personas, no a catálogos — y se nota en las ventas.<br><br>Yo cuento por qué armé esto: en cada ventana de la ciudad hay una estantería, y en cada estantería un libro que no sé que existe. Una razón vende más que una lista de géneros.</p>
                 <a href="https://tuslibros.cl/perfil" style="color:#d4a017;font-size:14px;font-weight:600;text-decoration:none">Completar mi perfil →</a>
                 <span style="color:#bbb">&nbsp;·&nbsp;</span>
-                <a href="https://tuslibros.cl/vendedor/lorena.cortes" style="color:#d4a017;font-size:14px;text-decoration:none">ver el ejemplo</a>
+                <a href="https://tuslibros.cl/vendedor/vero" style="color:#d4a017;font-size:14px;text-decoration:none">ver el ejemplo</a>
               </div>
             </div>
 
