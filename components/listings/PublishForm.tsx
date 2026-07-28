@@ -377,8 +377,27 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
     }
   }
 
+  // Guardia síncrona contra el doble/triple clic al publicar.
+  // `setLoading(true)` recién ocurre DESPUÉS del await de revisarIntegridad(),
+  // así que durante ese viaje de red el botón sigue habilitado y cada clic
+  // arranca otro handleSubmit. El 28 jul un vendedor publicó el mismo libro 4
+  // veces, tres de ellas con 3 ms de diferencia, y cada clic creó además su
+  // propia fila en `books`. Un ref se actualiza al instante; el estado de React
+  // no llega a tiempo.
+  const enviando = useRef(false);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (enviando.current) return;
+    enviando.current = true;
+    try {
+      await publicarLibro();
+    } finally {
+      enviando.current = false;
+    }
+  }
+
+  async function publicarLibro() {
     if (!bookTitle.trim()) { setError("El libro necesita un título. Complétalo antes de publicar."); return; }
     if (!bookAuthor.trim()) { setError("El libro necesita un autor. Complétalo antes de publicar."); return; }
     if (!location) { setError("Marca la ubicación del libro en el mapa."); return; }
