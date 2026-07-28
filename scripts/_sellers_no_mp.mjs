@@ -8,10 +8,10 @@ const { data: ls } = await s.from("listings").select("seller_id").eq("status","a
 const cnt={}; for(const l of ls) cnt[l.seller_id]=(cnt[l.seller_id]??0)+1;
 const ids=Object.keys(cnt);
 
-const { data: users, error } = await s.from("users").select("id,full_name,username,mercadopago_access_token,mercadopago_connected_at").in("id",ids);
+const { data: users, error } = await s.from("users").select("id,full_name,username,mercadopago_user_id,mercadopago_connected_at").in("id",ids);
 if(error){console.log("ERROR:",error.message);process.exit(1);}
-const noMp = users.filter(u => !u.mercadopago_access_token);
-const withMp = users.filter(u => u.mercadopago_access_token);
+const noMp = users.filter(u => !u.mercadopago_user_id);
+const withMp = users.filter(u => u.mercadopago_user_id);
 
 console.log(`Vendedores con al menos 1 libro ACTIVO: ${users.length}`);
 console.log(`  Con MercadoPago:  ${withMp.length}`);

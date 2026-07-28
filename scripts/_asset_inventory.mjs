@@ -17,7 +17,7 @@ console.log("  vendedores con catálogo activo:", sellers.size);
 
 console.log("\nUSUARIOS");
 console.log("  registrados totales:", await c("users"));
-console.log("  con MercadoPago conectado:", await c("users",q=>q.not("mercadopago_access_token","is",null)));
+console.log("  con MercadoPago conectado:", await c("users",q=>q.not("mercadopago_user_id","is",null)));
 console.log("  destacados:", await c("users",q=>q.eq("featured",true)));
 
 console.log("\nDEMANDA / FEATURES");

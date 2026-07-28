@@ -15,7 +15,7 @@ console.log("\n══ USUARIOS / VENDEDORES ══");
 console.log("usuarios totales:", await c("users"));
 console.log("nuevos 7d:", await c("users",q=>q.gte("created_at",dISO(7))));
 console.log("nuevos 30d:", await c("users",q=>q.gte("created_at",dISO(30))));
-console.log("con MercadoPago:", await c("users",q=>q.not("mercadopago_access_token","is",null)));
+console.log("con MercadoPago:", await c("users",q=>q.not("mercadopago_user_id","is",null)));
 let ls=[],from=0;
 while(true){const {data}=await s.from("listings").select("seller_id").eq("status","active").range(from,from+999);if(!data||!data.length)break;ls.push(...data);if(data.length<1000)break;from+=1000;}
 console.log("vendedores con catálogo activo:", new Set(ls.map(l=>l.seller_id)).size);

@@ -10,7 +10,7 @@ const cnt={}; for(const l of ls) cnt[l.seller_id]=(cnt[l.seller_id]??0)+1;
 const ids=Object.keys(cnt);
 
 const { data: users, error } = await s.from("users")
-  .select("id,full_name,username,city,created_at,mercadopago_access_token,mercadopago_connected_at,on_vacation")
+  .select("id,full_name,username,city,created_at,mercadopago_user_id,mercadopago_connected_at,on_vacation")
   .in("id",ids);
 if(error){console.log("ERROR:",error.message);process.exit(1);}
 
@@ -18,9 +18,9 @@ const now = Date.now();
 const DAYS = 30;
 const isNew = (u)=> u.created_at && (now - new Date(u.created_at).getTime()) < DAYS*86400000;
 
-const withMp = users.filter(u => u.mercadopago_access_token);
+const withMp = users.filter(u => u.mercadopago_user_id);
 const newSellers = users.filter(isNew);
-const newWithMp = newSellers.filter(u => u.mercadopago_access_token);
+const newWithMp = newSellers.filter(u => u.mercadopago_user_id);
 
 console.log(`━━━ VENDEDORES ACTIVOS (≥1 libro activo) ━━━`);
 console.log(`Total activos:        ${users.length}`);
@@ -35,5 +35,5 @@ console.log(`  Sin MercadoPago:    ${newSellers.length - newWithMp.length}\n`);
 console.log("Detalle nuevos (más reciente primero):");
 for(const u of newSellers.sort((a,b)=> new Date(b.created_at)-new Date(a.created_at))){
   const d = new Date(u.created_at).toLocaleDateString("es-CL");
-  console.log(`  ${cnt[u.id]?String(cnt[u.id]).padStart(3):"  ?"} libros · ${d} · ${u.mercadopago_access_token?"✅ MP":"❌ MP"}${u.on_vacation?" 🌴":""} — ${u.full_name} (@${u.username??"—"}, ${u.city??"—"})`);
+  console.log(`  ${cnt[u.id]?String(cnt[u.id]).padStart(3):"  ?"} libros · ${d} · ${u.mercadopago_user_id?"✅ MP":"❌ MP"}${u.on_vacation?" 🌴":""} — ${u.full_name} (@${u.username??"—"}, ${u.city??"—"})`);
 }

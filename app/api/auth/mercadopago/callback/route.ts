@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 /**
  * GET /api/auth/mercadopago/callback
@@ -51,20 +51,35 @@ export async function GET(request: NextRequest) {
     user_id: number;
   };
 
-  // Guardar en Supabase
-  const supabase = await createClient();
-  const { error } = await supabase
+  // Guardar en Supabase. Los tokens van a mp_credentials, que no tiene grants
+  // para el cliente, así que la escritura necesita service role. En `users`
+  // queda solo lo no secreto: el id público del vendedor en MP y la fecha.
+  const admin = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  );
+
+  const { error: credError } = await admin.from("mp_credentials").upsert(
+    {
+      user_id: state,
+      access_token,
+      refresh_token,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id" }
+  );
+
+  const { error } = await admin
     .from("users")
     .update({
       mercadopago_user_id: String(mpUserId),
-      mercadopago_access_token: access_token,
-      mercadopago_refresh_token: refresh_token,
       mercadopago_connected_at: new Date().toISOString(),
     })
     .eq("id", state);
 
-  if (error) {
-    console.error("Error guardando tokens MP:", error);
+  if (credError || error) {
+    console.error("Error guardando tokens MP:", credError ?? error);
     return NextResponse.redirect(
       `${siteUrl}/perfil?mp_error=save_failed`
     );

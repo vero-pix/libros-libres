@@ -14,7 +14,7 @@ const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABAS
 // Buscar TODAS las cuentas relacionadas a Vero / TusLibros
 const { data: users } = await s
   .from("users")
-  .select("id, full_name, email, username, mercadopago_user_id, mercadopago_connected_at, mercadopago_access_token, mercadopago_refresh_token, plan, role")
+  .select("id, full_name, email, username, mercadopago_user_id, mercadopago_connected_at, plan, role")
   .or("email.ilike.%tuslibros%,email.ilike.%vero%,email.ilike.%veronicavelasquez%,full_name.ilike.%vero%,full_name.ilike.%tuslibros%");
 
 console.log(`Cuentas relacionadas a Vero / TusLibros: ${users?.length ?? 0}\n`);
@@ -28,6 +28,8 @@ for (const u of users ?? []) {
   console.log(`  role:          ${u.role}  |  plan: ${u.plan}`);
   console.log(`  MP user_id:    ${u.mercadopago_user_id ?? "— NO conectado"}`);
   console.log(`  MP connected:  ${u.mercadopago_connected_at ?? "—"}`);
-  console.log(`  access_token:  ${u.mercadopago_access_token ? `${u.mercadopago_access_token.slice(0, 12)}...(${u.mercadopago_access_token.length} chars)` : "—"}`);
-  console.log(`  refresh_token: ${u.mercadopago_refresh_token ? "✅ presente" : "❌ no"}`);
+  // Los tokens viven en mp_credentials, no en users
+  const { data: cred } = await s.from("mp_credentials").select("access_token, refresh_token").eq("user_id", u.id).maybeSingle();
+  console.log(`  access_token:  ${cred?.access_token ? `${cred.access_token.slice(0, 12)}...(${cred.access_token.length} chars)` : "—"}`);
+  console.log(`  refresh_token: ${cred?.refresh_token ? "✅ presente" : "❌ no"}`);
 }

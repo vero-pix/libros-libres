@@ -13,21 +13,21 @@ const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABAS
 
 const { data: user } = await s
   .from("users")
-  .select("mercadopago_access_token, mercadopago_user_id")
+  .select("mercadopago_user_id")
   .eq("id", "2201d163-7020-41d8-ba9a-ebb0ed1f0059")
   .maybeSingle();
 
 // intentamos por id exacto — si no, por email
-let accessToken = user?.mercadopago_access_token;
+let accessToken = (await s.from("mp_credentials").select("access_token").eq("user_id", user?.id ?? id).maybeSingle()).data?.access_token;
 let mpUserId = user?.mercadopago_user_id;
 
 if (!accessToken) {
   const { data: u } = await s
     .from("users")
-    .select("mercadopago_access_token, mercadopago_user_id")
+    .select("mercadopago_user_id")
     .eq("email", "vero@tuslibros.cl")
     .maybeSingle();
-  accessToken = u?.mercadopago_access_token;
+  accessToken = (await s.from("mp_credentials").select("access_token").eq("user_id", u?.id).maybeSingle()).data?.access_token;
   mpUserId = u?.mercadopago_user_id;
 }
 

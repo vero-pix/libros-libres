@@ -37,13 +37,20 @@ export async function refreshSellerToken(
     { cookies: { getAll: () => [], setAll: () => {} } }
   );
 
+  // Los tokens viven en mp_credentials (sin grants para el cliente); en `users`
+  // solo se refresca la fecha, que no es secreta.
+  await supabase
+    .from("mp_credentials")
+    .update({
+      access_token,
+      refresh_token: newRefresh,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", sellerId);
+
   await supabase
     .from("users")
-    .update({
-      mercadopago_access_token: access_token,
-      mercadopago_refresh_token: newRefresh,
-      mercadopago_connected_at: new Date().toISOString(),
-    })
+    .update({ mercadopago_connected_at: new Date().toISOString() })
     .eq("id", sellerId);
 
   return access_token;

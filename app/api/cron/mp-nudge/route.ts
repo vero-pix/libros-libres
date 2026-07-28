@@ -48,10 +48,12 @@ export async function GET(request: Request) {
   // Candidatos del cohorte 48-72h, sin MP, no en vacaciones
   const { data: users, error } = await supabase
     .from("users")
-    .select("id, email, full_name, mercadopago_access_token, mercadopago_user_id, on_vacation, created_at")
+    // La bandera de "tiene MP conectado" es mercadopago_user_id, no el token:
+    // los tokens se movieron a mp_credentials. Verificado el 27 jul, los dos
+    // campos calzaban exacto en los 41 vendedores conectados.
+    .select("id, email, full_name, mercadopago_user_id, on_vacation, created_at")
     .gte("created_at", olderThan)
     .lt("created_at", newerThan)
-    .is("mercadopago_access_token", null)
     .is("mercadopago_user_id", null)
     .or("on_vacation.is.null,on_vacation.eq.false");
 

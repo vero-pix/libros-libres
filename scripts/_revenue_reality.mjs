@@ -36,6 +36,6 @@ const recent=(carts??[]).filter(c=>Date.now()-new Date(c.added_at).getTime()<7*8
 console.log(`  agregados últimos 7d: ${recent}`);
 
 // MP conectados
-const {count:mpYes}=await s.from("users").select("*",{count:"exact",head:true}).not("mercadopago_access_token","is",null);
+const {count:mpYes}=await s.from("users").select("*",{count:"exact",head:true}).not("mercadopago_user_id","is",null);
 const {count:sellers}=await s.from("listings").select("seller_id",{count:"exact",head:true}).eq("status","active");
 console.log(`\nVendedores con MP conectado: ${mpYes}`);

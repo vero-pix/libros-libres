@@ -6,7 +6,7 @@ const s=createClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.SUPABASE_S
 const {data:u}=await s.from("users").select("*").eq("email","poletteatenas@gmail.com").single();
 console.log("=== POLETTE ===");
 console.log("id:",u.id,"| @",u.username,"| ciudad:",u.city,"| comuna(default):",u.default_address);
-console.log("MP token:",u.mercadopago_access_token?"SÍ ✅":"NO ❌","| featured:",u.featured,"| plan:",u.plan,"| phone:",u.phone??"—","| instagram:",u.instagram??"—");
+console.log("MP token:",u.mercadopago_user_id?"SÍ ✅":"NO ❌","| featured:",u.featured,"| plan:",u.plan,"| phone:",u.phone??"—","| instagram:",u.instagram??"—");
 const {data:ls}=await s.from("listings").select("id,price,original_price,status,cover_image_url,city_id,book:books(title,author,category,subcategory,tags,cover_url)").eq("seller_id",u.id).order("created_at",{ascending:false});
 console.log(`\n=== ${ls.length} LIBROS ===`);
 for(const l of ls){

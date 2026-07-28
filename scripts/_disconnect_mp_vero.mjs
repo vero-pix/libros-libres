@@ -30,8 +30,6 @@ const { error } = await s
   .from("users")
   .update({
     mercadopago_user_id: null,
-    mercadopago_access_token: null,
-    mercadopago_refresh_token: null,
     mercadopago_connected_at: null,
   })
   .eq("id", VERO_ID);

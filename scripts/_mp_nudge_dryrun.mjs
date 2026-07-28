@@ -6,9 +6,9 @@ const s=createClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.SUPABASE_S
 const day=864e5, now=Date.now();
 const older=new Date(now-3*day).toISOString(), newer=new Date(now-2*day).toISOString();
 const {data:users}=await s.from("users")
-  .select("id,email,full_name,created_at,mercadopago_access_token,mercadopago_user_id,on_vacation")
+  .select("id,email,full_name,created_at,mercadopago_user_id,on_vacation")
   .gte("created_at",older).lt("created_at",newer)
-  .is("mercadopago_access_token",null).is("mercadopago_user_id",null)
+  .is("mercadopago_user_id",null)
   .or("on_vacation.is.null,on_vacation.eq.false");
 console.log(`Ventana 48-72h (${older.slice(0,16)} → ${newer.slice(0,16)} UTC)`);
 console.log(`Candidatos sin MP: ${users?.length??0}`);

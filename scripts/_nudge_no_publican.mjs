@@ -17,7 +17,7 @@ const H = (ms) => (now - new Date(ms).getTime()) / 3600000;
 
 // Registrados últimos 14 días
 const { data: users } = await s.from("users")
-  .select("id, full_name, email, username, created_at, mercadopago_access_token")
+  .select("id, full_name, email, username, created_at, mercadopago_user_id")
   .gte("created_at", new Date(now - 14 * 86400000).toISOString())
   .order("created_at", { ascending: false });
 
@@ -29,7 +29,7 @@ for (const u of users ?? []) {
   if (h < 36) continue; // recién registrado: ya recibió bienvenida auto, darle tiempo
   const { count } = await s.from("listings").select("id", { count: "exact", head: true }).eq("seller_id", u.id);
   if ((count ?? 0) > 0) continue; // ya publicó
-  targets.push({ ...u, hasMP: !!u.mercadopago_access_token, days: (h / 24).toFixed(0) });
+  targets.push({ ...u, hasMP: !!u.mercadopago_user_id, days: (h / 24).toFixed(0) });
 }
 
 const wrap = (body) => `

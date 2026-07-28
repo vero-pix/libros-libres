@@ -107,8 +107,8 @@ const subs = await fetchAll('newsletter_subscribers', 'email, subscribed_at, uns
 const active = subs.filter(s => !s.unsubscribed_at);
 const botLike = active.filter(s => /(\+|sms|otp|@qq\.|\.ru$|\.cn$|xn--|mailinator|guerrilla)/i.test(s.email ?? ''));
 console.log(`  newsletter_subscribers: ${subs.length} (activos ${active.length}) · sospechosos bot: ${botLike.length}`);
-const users = await fetchAll('users', 'id, username, mercadopago_access_token, city, created_at');
-console.log(`  users: ${users.length} · con MP: ${users.filter(u => u.mercadopago_access_token).length} · sin username: ${users.filter(u => !u.username).length}`);
+const users = await fetchAll('users', 'id, username, mercadopago_user_id, city, created_at');
+console.log(`  users: ${users.length} · con MP: ${users.filter(u => u.mercadopago_user_id).length} · sin username: ${users.filter(u => !u.username).length}`);
 
 // ── SELLERS ACTIVOS ──
 P('VENDEDORES');
