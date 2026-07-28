@@ -3,10 +3,13 @@ import { createServerClient } from "@supabase/ssr";
 import { sendEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
-  const { email, full_name, company } = (await req.json()) as {
+  const { email, full_name, company, origen } = (await req.json()) as {
     email?: string;
     full_name?: string;
     company?: string;
+    // "registro" cuando viene de RegisterForm: ahí el webhook new-user ya manda
+    // su propia bienvenida, y dos correos a la vez se leen como spam.
+    origen?: string;
   };
 
   // Honeypot: los formularios traen un campo oculto `company` que los humanos dejan
@@ -36,9 +39,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Error al suscribir" }, { status: 500 });
   }
 
+  // El registro ya recibe la bienvenida del webhook new-user. Acá solo se
+  // suscribe, sin segundo correo.
+  if (origen === "registro") {
+    return NextResponse.json({ ok: true });
+  }
+
   // Send welcome email (don't fail the request if this errors)
   const firstName = (full_name ?? "").trim().split(/\s+/)[0];
   const greeting = firstName ? `Hola ${firstName}` : "Hola";
+
+  // Cifras EN VIVO. Antes decían "3 compradores reales, 11 libros vendidos",
+  // escritos a mano en abril: en julio ya eran 146 vendidos. Un número viejo y
+  // chico desanima justo cuando la persona está decidiendo si vale la pena.
+  const [{ count: activos }, { count: vendidos }] = await Promise.all([
+    supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "active"),
+    supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "completed"),
+  ]);
+  const { data: conStock } = await supabase
+    .from("listings").select("seller_id").eq("status", "active").limit(2000);
+  const vendedores = new Set((conStock ?? []).map((l) => l.seller_id)).size;
+  const miles = (x: number | null) => (x ?? 0).toLocaleString("es-CL");
 
   try {
     await sendEmail({
@@ -59,8 +80,16 @@ export async function POST(req: NextRequest) {
   <p style="font-size:15px;line-height:1.65;color:#3a2f24;margin:0 0 16px;">
     tuslibros.cl es un marketplace de libros usados chilenos con pago seguro por
     MercadoPago y despacho puerta a puerta con Shipit: imprimes la etiqueta y el
-    courier pasa a buscarlo a tu casa. Ya hay 3 compradores reales, 11 libros vendidos,
-    y el primer envío llegó a Concepción esta semana.
+    courier pasa a buscarlo a tu casa. Hoy hay <strong>${miles(activos)} libros
+    publicados por ${vendedores} vendedores</strong>, y van ${miles(vendidos)} vendidos.
+  </p>
+
+  <p style="font-size:15px;line-height:1.65;color:#3a2f24;margin:0 0 16px;">
+    Quiero que esto crezca sobre bases que le convengan a los dos lados. Publicar es
+    gratis, siempre. Cobro 8% de comisión <strong>solo si la venta pasa por
+    MercadoPago</strong> — si la cierras en persona, no cobro nada. El pago va
+    protegido y la plata le llega directa al vendedor. Sin versión premium escondida
+    ni letra chica.
   </p>
 
   <p style="font-size:15px;line-height:1.65;color:#3a2f24;margin:0 0 20px;">

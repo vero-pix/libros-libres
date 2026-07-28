@@ -99,7 +99,7 @@ export default function RegisterForm() {
         await fetch("/api/newsletter", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, full_name: fullName }),
+          body: JSON.stringify({ email, full_name: fullName, origen: "registro" }),
         });
       } catch {}
 
