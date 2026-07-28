@@ -155,7 +155,7 @@ export default async function PublishPage({ searchParams }: Props) {
 
       {/* Hero de publicación */}
       <section className="bg-cream-warm border-b border-cream-dark">
-        <div className="max-w-2xl mx-auto px-4 py-10 text-center">
+        <div className="max-w-2xl mx-auto px-4 py-6 text-center">
           <div className="inline-flex items-center gap-2 bg-brand-50 border border-brand-200 px-4 py-1.5 rounded-full mb-4">
             <svg className="w-4 h-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
@@ -170,7 +170,7 @@ export default async function PublishPage({ searchParams }: Props) {
           </p>
 
           {/* Mini steps */}
-          <div className="flex items-center justify-center gap-6 mt-8">
+          <div className="flex items-center justify-center gap-6 mt-5">
             {[
               { num: "1", text: "Busca el libro (o ingreso manual)" },
               { num: "2", text: "Ponle precio" },
@@ -192,7 +192,21 @@ export default async function PublishPage({ searchParams }: Props) {
         </div>
       </section>
 
-      {/* Explicación del despacho puerta a puerta */}
+      <main className="max-w-2xl mx-auto px-4 py-8">
+        <PublishForm
+          userId={user.id}
+          username={profile?.username ?? null}
+          existingPhone={profile?.phone ?? null}
+          defaultLocation={defaultLocation}
+          initialBook={initialBook}
+          mpConnected={mpConnected}
+          publicacionesActivas={publicacionesActivas ?? 0}
+        />
+      </main>
+      {/* Explicación del despacho + carga masiva. Van DEBAJO del formulario:
+          arriba eran dos pantallas de scroll en móvil antes de ver un solo
+          campo, y el 46% de las sesiones logueadas que no publican se iban en
+          menos de 30 segundos. Quien llega a /publish viene a publicar. */}
       <section className="bg-white border-b border-cream-dark">
         <div className="max-w-2xl mx-auto px-4 py-6">
           <p className="text-[10px] uppercase tracking-[0.25em] text-brand-600 font-semibold mb-3 text-center">
@@ -238,17 +252,6 @@ export default async function PublishPage({ searchParams }: Props) {
         </div>
       </section>
 
-      <main className="max-w-2xl mx-auto px-4 py-8">
-        <PublishForm
-          userId={user.id}
-          username={profile?.username ?? null}
-          existingPhone={profile?.phone ?? null}
-          defaultLocation={defaultLocation}
-          initialBook={initialBook}
-          mpConnected={mpConnected}
-          publicacionesActivas={publicacionesActivas ?? 0}
-        />
-      </main>
     </div>
   );
 }
