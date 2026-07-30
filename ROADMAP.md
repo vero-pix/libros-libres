@@ -170,7 +170,16 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 - [x] **Rotación automática FeaturedRow** — ✅ 30 jun. Con 1.058 listings, 776 sin una sola visita. Destacados ahora = 10 curados + 6 "descubrimientos" rotativos por día (enterrados con portada, excluye deprioritized). HeroBar rota 24 clásicos por semana. Además se eliminaron TODOS los repetidos de la portada (colecciones multi-tag + grilla vs recientes) — ver memoria `feedback_portada_sin_repetidos`. Simulador `scripts/_sim_full_home.mjs`.
 
 **Reputación**
-- [ ] **Sistema de reputación por vendedor** — tabla `reviews` existe pero vacía. UI básica en perfil existe sin datos. Álvaro y otros lo piden: historial independiente por librería, estilo ML.
+- [ ] **Sistema de reputación por vendedor** — tabla `reviews` existe pero vacía. UI básica en perfil existe sin datos. Álvaro y otros lo piden: historial independiente por librería, estilo ML. **Reforzado por la encuesta (29 jul):** un vendedor lo pidió textual — sin estrellas, comprar con despacho "es a fe".
+
+**Caluga de destacados + respuesta a la encuesta** (idea de Vero, 29 jul)
+- [ ] **Caluga con destacados del día / del mes** — pieza en el home que rote una selección: destacado del día, del mes, joyas, etc. Nace de dos pedidos de la encuesta: *"los libros que llevan días subidos se pierden"* (todo ordena por lo más reciente) y el hallazgo de que las funciones existentes son invisibles (modo vacaciones lo conocía 1 de 9).
+  - **Por qué importa más de lo que parece:** es la infraestructura para pagar la **deuda de los 6 destacados prometidos** en la encuesta (una semana destacado a quien dejó su correo: buhardilla, cimlibros, pribernalb, ahenriquez0909, martinacamus, pobleteruht). Hoy eso se cumpliría a mano.
+  - Se apoya en lo ya construido: `featured` / `featured_rank` y la rotación de `FeaturedRow` (30 jun).
+- [ ] **Respuesta pública a la encuesta** — contar qué pidió la gente y qué se va a hacer, encuadrado en la etapa actual: *"vamos a X libros, la meta es 5.000; mientras tanto esto es lo que viene"*. Cierra el ciclo con quien respondió y hace visible el criterio.
+  - **Esperar el Grupo B**: con 9 respuestas la muestra se ve flaca. Publicar cuando haya masa.
+  - Aprovechar para responder la pregunta de moderación que hizo un vendedor (¿qué está prohibido publicar?) con un deslinde corto.
+  - Contexto de etapa: sigue vigente volumen primero (ver memoria `project_estrategia_volumen_primero`), meta 5.000 libros.
 
 ---
 
