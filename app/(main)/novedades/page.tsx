@@ -39,6 +39,21 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "30 julio 2026",
+    title: "Les pregunté qué les falta — y la respuesta fue una sola, repetida",
+    description:
+      "Llevo meses decidiendo qué construir mirando números: qué páginas se visitan, dónde se cae la gente, qué se busca y no se encuentra. Sirve, pero tiene un límite: los números te dicen qué pasó, no qué querías que pasara. Así que hice algo más simple: mandé un correo preguntando directamente. Van 71 enviados y las primeras 9 respuestas ya dejaron algo clarísimo: 8 de esas 9 personas marcaron lo mismo. No quieren más funciones ni un panel más bonito. Quieren que lleguen más compradores. Eso es todo, y es justo. Lo segundo más pedido me gustó porque no me lo esperaba tan arriba: 7 de 9 quieren que les avise cuando alguien esté buscando un libro que ellos tienen guardado. O sea, al revés de como funciona todo: que la demanda salga a buscar la oferta. Y lo tercero fue el golpe a mi ego: pregunté cuáles de las funciones que ya existen conocían, y el modo vacaciones —que sirve para pausar tus libros si te vas de viaje, y que me costó bastante hacer— lo conocía 1 de 9. Los puntos de entrega en tu perfil, 2 de 9. No están rotos: están escondidos. Eso no se arregla programando más, se arregla mostrando lo que ya hay. En el texto libre apareció lo mejor: que falta un sistema de estrellas porque sin reputación comprar con despacho «es a fe» (textual, y tiene toda la razón), que se necesitan más fotos porque a veces el índice de un libro tiene tres páginas, que se debería poder vender lotes y no solo libros sueltos, y que los libros que llevan días publicados se pierden porque la portada siempre muestra lo más reciente. Esa última la empecé a arreglar hoy mismo. Si te llegó el correo y no lo has contestado, son dos minutos y de verdad los leo todos.",
+    tag: "Señal",
+    visual: {
+      kind: "stat",
+      stats: [
+        { big: "8 de 9", small: "quieren más compradores" },
+        { big: "7 de 9", small: "quieren saber quién busca su libro" },
+        { big: "1 de 9", small: "sabía que existe el modo vacaciones" },
+      ],
+    },
+  },
+  {
     date: "25 julio 2026",
     title: "Cada categoría tiene su propia estantería",
     description:
