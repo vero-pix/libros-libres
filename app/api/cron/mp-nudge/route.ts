@@ -88,7 +88,11 @@ export async function GET(request: Request) {
         from: FROM,
         to: [u.email],
         reply_to: REPLY_TO,
-        subject: firstName ? `${firstName}, te falta un paso para vender 📚` : "Te falta un paso para vender en tuslibros.cl 📚",
+        // El asunto anterior ("te falta un paso para vender") leía como que sin
+        // MercadoPago no se puede vender, y no es así. Un vendedor dejó de subir
+        // libros por eso (31-07-2026): "quiero agregar otra cuenta que no sea
+        // mercado pago, por eso no he subido libros".
+        subject: firstName ? `${firstName}, así te pueden comprar de todo Chile 📚` : "Así te pueden comprar de todo Chile 📚",
         html,
       }),
     });
@@ -126,12 +130,13 @@ function nudgeEmail(firstName: string, listings: number) {
   <h2 style="font-family:Georgia,serif;color:#1a3a6b;margin:0 0 4px">tuslibros.cl</h2>
   <div style="height:3px;width:54px;background:#d4a017;border-radius:2px;margin-bottom:18px"></div>
   <p>${hi}</p>
-  <p>Soy Vero, de tuslibros.cl. Vi que ya tienes ${listings === 1 ? "tu primer libro publicado" : `${listings} libros publicados`} — ¡gracias por sumarte! Te escribo porque te falta <strong>un solo paso</strong> para poder vender de verdad.</p>
+  <p>Soy Vero, de tuslibros.cl. Vi que ya tienes ${listings === 1 ? "tu primer libro publicado" : `${listings} libros publicados`} — ¡gracias por sumarte! Tus libros ya están a la vista y te pueden escribir cuando quieran.</p>
   <div style="background:#fff8e8;border:1px solid #f0d98a;border-radius:10px;padding:14px 16px;margin:18px 0">
-    <p style="margin:0 0 8px"><strong>Conectar tu MercadoPago.</strong></p>
-    <p style="margin:0 0 12px">Mientras no lo conectes, los compradores no pueden pagarte directo y tus libros no se pueden comprar. Se hace en 1 minuto desde tu perfil — tú recibes la plata al toque (split payment) y yo me encargo del resto.</p>
+    <p style="margin:0 0 8px"><strong>Si quieres, conecta tu MercadoPago.</strong></p>
+    <p style="margin:0 0 12px">Sin conectarlo solo te puede comprar alguien que coordine contigo en persona. Con MercadoPago te compran desde cualquier región y la plata te llega directa a ti. Se hace en 1 minuto desde tu perfil.</p>
     <a href="https://tuslibros.cl/perfil" style="display:inline-block;background:#1a3a6b;color:#fff;text-decoration:none;padding:9px 18px;border-radius:8px;font-weight:600">Conectar MercadoPago</a>
   </div>
+  <p>Y si prefieres partir sin conectarlo, no hay drama: tus libros siguen publicados igual y lo puedes hacer cuando quieras.</p>
   <p>Si tienes cualquier duda con el proceso, me respondes este correo directo y te ayudo yo misma.</p>
   <p>— Vero</p>
   <p style="color:#837c70;font-size:12px;margin-top:26px">tuslibros.cl · marketplace de libros usados en Chile</p>
