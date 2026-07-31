@@ -34,6 +34,12 @@ const nextConfig = {
       { source: '/libros-usados-santiago', destination: '/libros-usados/santiago', permanent: true },
       { source: '/libros-usados-providencia', destination: '/libros-usados/providencia', permanent: true },
       { source: '/ciudad/:slug', destination: '/libros-usados/:slug', permanent: true },
+      // Consolidación de "vender" (31 jul 2026). /vender-libros-usados era un
+      // duplicado casi calcado de /vender: 0 clics, 0 impresiones y 0 consultas
+      // en GSC durante 90 días, mientras /vender aparecía en posición ~46 para
+      // "vender libros usados" y la home se llevaba el tráfico (posición 7,5).
+      // Tres páginas peleando la misma intención; se deja una sola.
+      { source: '/vender-libros-usados', destination: '/vender', permanent: true },
       // WordPress legacy URLs → new routes
       // NOTA: /libro/:slug ya NO se redirige acá — el middleware lo resuelve a /libro/[username]/[slug]
       // Recuperación de tráfico: el slug legacy se traduce a búsqueda (hay intent recuperable)

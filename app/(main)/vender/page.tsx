@@ -95,6 +95,13 @@ const faqItems = [
     a: "Los libros raros, descatalogados y de autores chilenos tienen alta demanda. También las series completas y libros escolares en temporada. El precio es clave: entre 40% y 60% menos que en librerías nuevas convierte muy bien.",
   },
   {
+    // Traída de /vender-libros-usados al consolidar las dos páginas (31 jul 2026).
+    // La cifra de vendedores está verificada contra la BD (listings en status
+    // completed): el más activo supera los 70 libros vendidos.
+    q: "¿Cuánto puedo ganar vendiendo libros usados?",
+    a: "Depende del libro y del precio que le pongas. Una novela bien conservada entre $6.000 y $12.000 se mueve rápido; un libro raro o técnico puede valer entre $20.000 y $80.000. La receta que funciona es precio 40% a 60% bajo el valor nuevo y fotos reales del ejemplar. Hay vendedores en tuslibros.cl que ya superaron los 70 libros vendidos.",
+  },
+  {
     q: "¿Puedo publicar muchos libros a la vez?",
     a: "Sí, todos los que quieras. Si tienes una biblioteca grande, también tenemos un importador por CSV para subir todo de una sola vez.",
   },

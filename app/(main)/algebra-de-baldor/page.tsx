@@ -309,7 +309,7 @@ export default async function AlgebraDeBaldorPage() {
               </Link>
               <span className="text-ink-muted">·</span>
               <Link
-                href="/vender-libros-usados"
+                href="/vender"
                 className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors"
               >
                 Vender libros usados
