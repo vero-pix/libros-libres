@@ -75,9 +75,18 @@ Vero trabaja desde chats (Cowork/Claude) que producen prompts, documentos y piez
 
 Convención:
 
-- Documentos de estrategia y estado → `docs_desde_claude/`
+- Documentos de estrategia y estado → `docs_desde_claude/` — **carpeta PRIVADA**
 - Prompts ejecutables para Claude Code → `docs/prompts/`
 - Piezas y material de apoyo → `docs/`
 - Todo lo que se vuelva fuente de verdad → agregarlo a la tabla de arriba
 
-Regla: si un archivo importa la semana que viene, va en el repo.
+Regla: si un archivo importa la semana que viene, va en el disco del repo. Pero
+ojo con la diferencia entre *estar en la carpeta* y *estar versionado*:
+
+> ⚠️ **`docs_desde_claude/` está en `.gitignore` a propósito y NO se commitea.**
+> Este repo es **público** ([[reference_repo_publico]]) y esa carpeta guarda
+> material que no puede serlo: el borrador de venta del sitio
+> (`forobeta-venta-tuslibros.md`), el teléfono personal de Vero, cifras internas.
+> **Nunca forzar con `git add -f`** para meter algo ahí — si un documento tiene
+> que quedar versionado, va en `docs/` después de revisar que no exponga nada.
+> (El 30-07-2026 se forzó el informe del lote de joyas y hubo que revertirlo.)
