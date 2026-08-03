@@ -23,6 +23,21 @@ export function foldAccents(input: string): string {
   return input.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
+/**
+ * Palabras vacías del español. La búsqueda parte la consulta en términos y los
+ * une con OR, así que un "de" suelto hace match por substring contra casi todo
+ * el catálogo y entierra el resultado relevante. Se descartan al tokenizar.
+ *
+ * Ojo: solo para tokenizar. La frase completa se sigue buscando tal cual, así
+ * que un título que de verdad se llame "El amor en los tiempos del cólera"
+ * sigue calzando entero.
+ */
+export const SEARCH_STOPWORDS = new Set([
+  "de", "del", "la", "las", "el", "los", "un", "una", "unos", "unas",
+  "y", "e", "o", "u", "en", "con", "por", "para", "al", "a",
+  "su", "sus", "lo", "que", "se", "es",
+]);
+
 export function accentInsensitiveRegex(input: string): string {
   // Quitar diacríticos del término y pasar a minúscula → base "plana".
   // (ñ y vocales acentuadas quedan en su letra base; abajo se re-expanden.)

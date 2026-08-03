@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createPublicClient } from "@/lib/supabase/public";
-import { accentInsensitiveRegex } from "@/lib/accentSearch";
+import { accentInsensitiveRegex, foldAccents, SEARCH_STOPWORDS } from "@/lib/accentSearch";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import { getCachedCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -104,7 +104,17 @@ export default async function SearchPage({ searchParams }: Props) {
   if (q) {
     // Normalizar guiones a espacios
     const clean = q.replace(/[-_]+/g, " ").replace(/[()]/g, "").replace(/\s+/g, " ").trim();
-    const words = clean.split(" ").filter(w => w.length > 1);
+    // Las palabras vacías se descartan: como cada término se busca por separado
+    // y con OR, un "de" hacía imatch contra medio catálogo y sepultaba el
+    // resultado bueno. "algebra de baldor" devolvía Gargantúa y Pantagruel.
+    // Si la consulta es SOLO stopwords ("el", "la de"), se cae a los términos
+    // originales para no dejar la búsqueda sin filtro. (3 ago 2026)
+    const meaningful = clean.split(" ").filter(
+      (w) => w.length > 1 && !SEARCH_STOPWORDS.has(foldAccents(w))
+    );
+    const words = meaningful.length > 0
+      ? meaningful
+      : clean.split(" ").filter((w) => w.length > 1);
 
     const rx = accentInsensitiveRegex(clean);
     const filters = [
@@ -127,6 +137,24 @@ export default async function SearchPage({ searchParams }: Props) {
       .or(filters);
 
     matchingBookIds = Array.from(new Set(matchedBooks?.map((b) => b.id) ?? []));
+
+    // Con varios términos, el OR de arriba trae todo lo que calce con UNO solo,
+    // y el libro que calza con todos queda perdido entre los demás. Así que
+    // primero se intenta la versión estricta: los que calcen con CADA término
+    // (en título o autor, indistinto — la gente escribe "algebra de baldor",
+    // que cruza los dos campos). Si eso da resultados, mandan ellos; si no,
+    // se mantiene el OR amplio para no dejar al usuario con la nada.
+    if (words.length > 1 && matchingBookIds.length > 1) {
+      let strict = supabase.from("books").select("id");
+      for (const word of words) {
+        const wr = accentInsensitiveRegex(word);
+        strict = strict.or(`title.imatch.${wr},author.imatch.${wr}`);
+      }
+      const { data: strictBooks } = await strict;
+      if (strictBooks && strictBooks.length > 0) {
+        matchingBookIds = Array.from(new Set(strictBooks.map((b) => b.id)));
+      }
+    }
   }
 
   // Si el texto de búsqueda no calzó con ningún libro, forzamos resultado vacío.

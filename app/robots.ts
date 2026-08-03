@@ -1,14 +1,27 @@
 import { MetadataRoute } from "next";
 
-// Crawlers que scrapean masivamente para entrenar LLMs sin devolver tráfico.
-// Los bloqueamos por completo. Mantenemos Googlebot/Bingbot (search) y
-// ChatGPT-User/PerplexityBot (citation con clicks reales al sitio).
-const AI_TRAINING_CRAWLERS = [
+// Asistentes de IA que SÍ nos mandan gente. Abiertos a propósito desde el
+// 3 ago 2026: la encuesta de julio mostró que ChatGPT es la 2ª fuente de
+// tráfico del sitio, así que aparecer en sus respuestas vale más que
+// proteger un catálogo que ya es público. Van explícitos para no depender
+// de la regla "*".
+const AI_ASSISTANTS_ALLOWED = [
   "GPTBot",
-  "CCBot",
+  "OAI-SearchBot",
+  "ChatGPT-User",
   "ClaudeBot",
+  "Claude-User",
+  "Claude-SearchBot",
   "anthropic-ai",
   "Google-Extended",
+  "PerplexityBot",
+  "Perplexity-User",
+  "cohere-ai",
+];
+
+// Scrapers que extraen en masa sin devolver una sola visita. Bloqueo total.
+const SCRAPERS_BLOCKED = [
+  "CCBot",
   "Bytespider",
   "FacebookBot",
   "Amazonbot",
@@ -17,7 +30,6 @@ const AI_TRAINING_CRAWLERS = [
   "Diffbot",
   "DataForSeoBot",
   "ImagesiftBot",
-  "cohere-ai",
 ];
 
 export default function robots(): MetadataRoute.Robots {
@@ -45,9 +57,10 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: [
           ...privateSections,
-          // Búsquedas con parámetros — sin valor SEO, gastan crawl budget
-          "/search",
-          "/search?",
+          // Ojo: /search NO va acá. Las páginas de búsqueda ya llevan
+          // `noindex, follow` en el <head>, y bloquearlas por robots impedía
+          // que Google lo leyera — así seguían indexadas para siempre.
+          // Para desindexar hay que dejarlas rastreables. (3 ago 2026)
           // Block filtered/sorted URLs to prevent crawl of thousands of param combos
           "/*?*sort=",
           "/*?*page=",
@@ -60,8 +73,14 @@ export default function robots(): MetadataRoute.Robots {
           "/*?*view=",
         ],
       },
-      // Crawlers de training de LLM — bloqueo total.
-      ...AI_TRAINING_CRAWLERS.map((ua) => ({
+      // Asistentes de IA — mismo trato que un buscador normal.
+      ...AI_ASSISTANTS_ALLOWED.map((ua) => ({
+        userAgent: ua,
+        allow: "/",
+        disallow: privateSections,
+      })),
+      // Scrapers sin retorno — bloqueo total.
+      ...SCRAPERS_BLOCKED.map((ua) => ({
         userAgent: ua,
         disallow: "/",
       })),
