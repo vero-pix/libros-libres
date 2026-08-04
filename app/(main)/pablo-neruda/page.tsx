@@ -5,6 +5,7 @@ import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import { authorItemListJsonLd, AUTHOR_LANDING_LIMIT } from "@/lib/authorLandings";
+import AuthorProfile from "@/components/landings/AuthorProfile";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -84,6 +85,23 @@ const poemasFamosos = [
   { verso: "No te amo como si fueras rosa de sal, topacio…", nombre: "Soneto XVII", obra: "Cien sonetos de amor", q: "cien sonetos de amor" },
   { verso: "Sube a nacer conmigo, hermano…", nombre: "Alturas de Macchu Picchu", obra: "Canto General", q: "canto general" },
   { verso: "Del aire al aire, como una red vacía…", nombre: "Canto General", obra: "Canto General", q: "canto general" },
+];
+
+const BIO = [
+  "Ricardo Eliécer Neftalí Reyes Basoalto nació en Parral en 1904 y creció en Temuco, entre la lluvia y los bosques del sur que después no dejaría de nombrar. Su madre murió al mes de nacer él. A los dieciséis se fue a Santiago a estudiar pedagogía en francés y a los diecinueve ya había publicado Crepusculario. Firmaba Pablo Neruda para que su padre, ferroviario, no supiera que escribía.",
+  "En 1924, con veinte años, publicó Veinte poemas de amor y una canción desesperada. Es probablemente el libro de poesía en español más vendido del siglo XX y el que más gente ha regalado sin haber leído entero. Neruda lo escribió siendo un estudiante pobre en una pieza de Santiago y pasó el resto de su vida a la sombra de esos poemas.",
+  "Después vino todo lo demás: el consulado en Rangún y la soledad de Residencia en la tierra, la guerra civil española y la muerte de García Lorca que lo volvieron político, el Canto general escrito en la clandestinidad mientras huía a caballo por Lilpela, las Odas elementales dedicadas a la cebolla y al calcetín, y los Cien sonetos de amor para Matilde.",
+  "Ganó el Nobel en 1971. Murió en Santiago el 23 de septiembre de 1973, doce días después del golpe, con su casa de Valparaíso allanada. Su funeral fue la primera manifestación pública contra la dictadura. En Chile Neruda no es solo un autor: es un objeto doméstico, está en todas las casas, y por eso es de lo que más circula en libros usados.",
+];
+
+const FOR_WHOM = [
+  "Quien busca su primer libro de poesía y no sabe por dónde partir: los Veinte poemas siguen siendo la puerta.",
+  "Estudiantes con Neruda en la lista de lectura obligatoria, que en Chile son varias generaciones seguidas.",
+  "Lectores de poesía amorosa que quieren algo más que una frase de Instagram.",
+  "Quien viene por lo político: Canto general, España en el corazón, Incitación al nixonicidio.",
+  "Coleccionistas de ediciones antiguas — de Neruda circulan ediciones Losada y Nascimento que valen la pena.",
+  "Quien quiere regalar poesía sin equivocarse.",
+  "Lectores del sur que reconocen los paisajes: Temuco, la lluvia, la madera mojada.",
 ];
 
 export default async function PabloNerudaPage() {
@@ -203,6 +221,13 @@ export default async function PabloNerudaPage() {
               </Link>
             </section>
           )}
+
+          <AuthorProfile
+            name="Pablo Neruda"
+            bio={BIO}
+            forWhom={FOR_WHOM}
+            note="De Neruda hay siempre, pero no todo es igual. Las ediciones viejas de Losada y Nascimento aparecen de vez en cuando y valen bastante más que una reimpresión reciente; si te topas con una en buen estado a precio de libro común, llévatela."
+          />
 
           <section className="mb-16 bg-white border border-cream-dark rounded-2xl p-6 md:p-8">
             <h2 className="font-display text-2xl font-bold text-ink mb-3">

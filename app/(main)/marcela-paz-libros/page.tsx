@@ -5,6 +5,7 @@ import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import { authorItemListJsonLd, AUTHOR_LANDING_LIMIT } from "@/lib/authorLandings";
+import AuthorProfile from "@/components/landings/AuthorProfile";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -55,6 +56,23 @@ const faqs = [
     q: "¿Puedo vender mis Papelucho acá?",
     a: "Sí. Publicar es gratis y cobramos una comisión pequeña solo cuando el libro se vende. Los Papelucho tienen buena salida, especialmente en época escolar.",
   },
+];
+
+const BIO = [
+  "Marcela Paz era el seudónimo de Ester Huneeus Salas, nacida en Santiago en 1902 en una familia acomodada donde a las mujeres no se les pedía que trabajaran. Empezó a escribir a escondidas y usó nombre falso durante décadas: recién en 1963 se supo públicamente quién era la autora de Papelucho.",
+  "Papelucho apareció en 1947. Es un niño de ocho o nueve años que escribe su diario de vida, y ahí está todo el truco: no hay un adulto contando cómo son los niños, hay un niño contando cómo son los adultos. Papelucho se mete en problemas, razona con una lógica impecable y equivocada, y le pasan cosas que van del colegio a un viaje en globo.",
+  "Escribió doce libros de la serie a lo largo de treinta años, además de otros títulos y de fundar la primera biblioteca para ciegos de Chile. Ganó el Premio Nacional de Literatura en 1982.",
+  "En Chile Papelucho es lo más parecido que hay a una lectura común entre generaciones. Hay abuelos, padres e hijos que leyeron los mismos libros, muchas veces los mismos ejemplares. Por eso circula tanto de segunda mano: casi nadie los bota, se pasan.",
+];
+
+const FOR_WHOM = [
+  "Papás y mamás buscando el libro que ellos mismos leyeron, para pasárselo a sus hijos.",
+  "Niños de siete a doce que recién agarran el gusto de leer solos.",
+  "Colegios y profesores: Papelucho es lectura complementaria en medio Chile.",
+  "Quien quiere completar la colección — son doce y casi nadie los tiene todos.",
+  "Adultos con nostalgia, que es un motivo tan válido como cualquier otro.",
+  "Coleccionistas de las ediciones antiguas ilustradas por la propia autora.",
+  "Quien busca literatura infantil chilena que no sea condescendiente con los niños.",
 ];
 
 export default async function MarcelaPazPage() {
@@ -163,6 +181,13 @@ export default async function MarcelaPazPage() {
               </Link>
             </section>
           )}
+
+          <AuthorProfile
+            name="Marcela Paz"
+            bio={BIO}
+            forWhom={FOR_WHOM}
+            note="Ojo con el estado: los Papelucho usados suelen venir rayados, con nombre de dueño y esquinas dobladas, porque fueron leídos por niños de verdad. Para regalar conviene mirar bien las fotos; para leer, esas marcas son parte de la gracia."
+          />
 
           <section className="mb-16 bg-ink text-cream rounded-2xl p-8 md:p-10">
             <h2 className="font-display text-2xl font-bold mb-3">¿Tienes Papelucho que ya leyeron en casa?</h2>

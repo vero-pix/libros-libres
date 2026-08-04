@@ -5,6 +5,7 @@ import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import { authorItemListJsonLd, AUTHOR_LANDING_LIMIT } from "@/lib/authorLandings";
+import AuthorProfile from "@/components/landings/AuthorProfile";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -50,6 +51,23 @@ const faqs = [
     q: "¿Puedo vender mis libros de Simenon en tuslibros.cl?",
     a: "Sí. Los lectores de novela negra buscan completar colecciones, así que hay demanda. Publicar es gratis y la comisión es 8% solo cuando el libro se vende con pago por MercadoPago.",
   },
+];
+
+const BIO = [
+  "Georges Simenon nació en Lieja, Bélgica, en 1903, y a los dieciséis años ya escribía en la Gaceta de Lieja: crónica policial, tribunales, la ciudad de noche. Esa fue toda su escuela. A los diecinueve se fue a París y durante casi una década publicó novelas populares por encargo bajo más de una docena de seudónimos, a un ritmo que hoy parece inventado — llegó a escribir un libro en pocos días, cientos en total.",
+  "En 1931 apareció Maigret y le cambió la vida. El comisario no era un genio deductivo al estilo inglés: era un hombre pesado, con pipa y estufa, que resolvía casos quedándose en el lugar el tiempo suficiente para entender a la gente. No buscaba al culpable, buscaba por qué. Simenon escribió setenta y cinco novelas y veintiocho cuentos con él, y aun así pasó buena parte de su vida intentando que no lo redujeran a eso.",
+  "Porque en paralelo escribió lo que él llamaba sus romans durs, las novelas duras: historias sin detective donde una persona común cruza una línea y ya no puede volver. Ahí está el Simenon que admiraban André Gide y Faulkner, el que se interesaba menos por el crimen que por el minuto anterior al crimen.",
+  "Dejó de escribir en 1972, de un día para otro, después de más de cuatrocientos libros. Murió en Lausana en 1989. Es de los autores más traducidos del mundo y, en Chile, uno de los que mejor circula de mano en mano: sus novelas son cortas, baratas y adictivas, y por eso aparecen una y otra vez en librerías de viejo.",
+];
+
+const FOR_WHOM = [
+  "Quien recién entra a la novela negra y quiere empezar por algo breve: casi ningún Maigret pasa de las doscientas páginas.",
+  "Lectores a los que les importa más el porqué que el quién — acá el misterio es la persona, no el truco.",
+  "Coleccionistas de Maigret, que son legión y siempre andan cazando el tomo que les falta.",
+  "Quien busca atmósfera: París lluvioso, canales, bares de provincia, gente cansada.",
+  "Los que vienen de Chandler o Highsmith y quieren la versión europea, más callada y más triste.",
+  "Amantes de la novela psicológica breve, aunque no lean policial: para eso están las novelas duras.",
+  "Quien quiere leer en francés con un vocabulario abordable — Simenon escribía con unas dos mil palabras a propósito.",
 ];
 
 export default async function SimenonPage() {
@@ -158,6 +176,13 @@ export default async function SimenonPage() {
               </Link>
             </section>
           )}
+
+          <AuthorProfile
+            name="Georges Simenon"
+            bio={BIO}
+            forWhom={FOR_WHOM}
+            note="En tuslibros.cl los Simenon aparecen seguido y se van rápido. Si andas completando la colección de Maigret, conviene mirar la página cada cierto rato o dejar una solicitud: casi siempre hay alguien vaciando una biblioteca con veinte tomos adentro."
+          />
 
           <section className="mb-16">
             <h2 className="font-display text-2xl font-bold text-ink mb-4">Lo más buscado de Simenon</h2>

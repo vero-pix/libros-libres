@@ -5,6 +5,7 @@ import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import { authorItemListJsonLd, AUTHOR_LANDING_LIMIT } from "@/lib/authorLandings";
+import AuthorProfile from "@/components/landings/AuthorProfile";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -54,6 +55,23 @@ const faqs = [
     q: "¿Puedo vender mis libros de Vargas Llosa en tuslibros.cl?",
     a: "Sí, y hay demanda activa. Publicar es gratis. Fotografías la portada, ingresas los datos y quedas visible para compradores en todo Chile. La comisión es 8% solo cuando el libro se vende con pago por MercadoPago.",
   },
+];
+
+const BIO = [
+  "Nació en Arequipa en 1936 y creció creyendo que su padre estaba muerto. Cuando reapareció, a los diez años, lo mandó a un colegio militar en Lima para quitarle lo de escritor. De esa experiencia salió La ciudad y los perros, que publicó a los veintiséis y que el Colegio Leoncio Prado quemó públicamente en su patio.",
+  "Fue el más joven del boom latinoamericano y el más metódico. Mientras García Márquez inventaba Macondo, Vargas Llosa construía novelas como arquitecto: estructuras de cajas chinas, líneas temporales cruzadas, diálogos que saltan de una escena a otra en la mitad de la frase. La casa verde, Conversación en La Catedral, La guerra del fin del mundo.",
+  "También se metió en política de frente. Fue candidato a la presidencia del Perú en 1990 y perdió contra Fujimori. Su giro desde la izquierda de juventud hacia el liberalismo le costó amistades — la más famosa, la de García Márquez, que terminó de un combo en un cine de México en 1976 por razones que ninguno de los dos explicó nunca.",
+  "Ganó el Nobel en 2010. Sigue siendo de los autores latinoamericanos que más se lee y se estudia, y en Chile sus novelas circulan mucho en las carreras de literatura, periodismo e historia.",
+];
+
+const FOR_WHOM = [
+  "Quien quiere entrar al boom latinoamericano por algo distinto a Cien años de soledad.",
+  "Lectores a los que les gusta que una novela los haga trabajar: acá la estructura es parte del asunto.",
+  "Estudiantes de literatura, periodismo o ciencia política — La fiesta del Chivo y Conversación en La Catedral son lectura de programa.",
+  "Quien busca novela histórica en serio: La guerra del fin del mundo, El sueño del celta.",
+  "Los que llegan por el escándalo o la polémica y se quedan por la prosa.",
+  "Quien quiere leer sobre dictaduras latinoamericanas desde adentro de la cabeza del poder.",
+  "Lectores que ya leyeron a Bolaño y quieren ir hacia atrás.",
 ];
 
 export default async function MarioVargasLlosaPage() {
@@ -161,6 +179,13 @@ export default async function MarioVargasLlosaPage() {
               </Link>
             </section>
           )}
+
+          <AuthorProfile
+            name="Mario Vargas Llosa"
+            bio={BIO}
+            forWhom={FOR_WHOM}
+            note="Las ediciones de Seix Barral y Alfaguara son las que más circulan usadas, y suelen estar en buen estado porque son libros que se leen una vez y se guardan. Si buscas Conversación en La Catedral, revisa que esté completo: es largo y algunas ediciones vienen en dos tomos."
+          />
 
           <section className="mb-16">
             <h2 className="font-display text-2xl font-bold text-ink mb-4">Sus novelas más buscadas</h2>

@@ -5,6 +5,7 @@ import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import { authorItemListJsonLd, AUTHOR_LANDING_LIMIT } from "@/lib/authorLandings";
+import AuthorProfile from "@/components/landings/AuthorProfile";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -51,6 +52,23 @@ const faqs = [
     q: "¿No está el título que busco?",
     a: "Déjalo en la sección Se busca: publicas el libro de Megan Maxwell que andas persiguiendo y te avisamos por correo cuando alguien lo suba.",
   },
+];
+
+const BIO = [
+  "Megan Maxwell es el seudónimo de Ana Rosa Bustos, nacida en Nuremberg de padre español y madre irlandesa, y radicada en Madrid. Empezó publicando en internet y por su cuenta, construyendo lectoras antes que editoriales, hasta que Esencia la fichó y se convirtió en una de las autoras de romántica más vendidas en español.",
+  "Su serie más conocida es Pídeme lo que quieras, que arrancó en 2012 y se estiró a varios volúmenes. Romance erótico, protagonistas con dinero y con carácter, y un tono que se ríe de sí mismo: sus lectoras dicen que lo que la distingue del resto del género es el humor.",
+  "Ha publicado más de cuarenta títulos entre romántica contemporánea, histórica y navideña. Escribe rápido y publica seguido, lo que arma colecciones largas.",
+  "En el mercado de segunda mano chileno es de lo que más se mueve: son libros que se leen de corrido, se prestan entre amigas y se sueltan después, así que aparecen en muy buen estado y a precios bajos.",
+];
+
+const FOR_WHOM = [
+  "Lectoras de romántica que quieren serie larga y no un libro suelto.",
+  "Quien busca romance erótico con humor, no solemne.",
+  "Las que quieren completar Pídeme lo que quieras sin pagar precio de librería — la serie completa nueva sale carísima.",
+  "Lectoras de Colleen Hoover o E. L. James buscando algo en español y del mismo pulso.",
+  "Quien lee rápido y necesita volumen: acá hay cuarenta y tantos títulos.",
+  "Clubes de lectura de romántica, que en Chile son más y más activos.",
+  "Quien recién entra al género y quiere partir por algo liviano.",
 ];
 
 export default async function MeganMaxwellPage() {
@@ -149,6 +167,13 @@ export default async function MeganMaxwellPage() {
               </Link>
             </section>
           )}
+
+          <AuthorProfile
+            name="Megan Maxwell"
+            bio={BIO}
+            forWhom={FOR_WHOM}
+            note="Es de lo que llega más nuevo al catálogo: son libros que se leen una vez y circulan, así que es fácil encontrarlos casi impecables por una fracción del precio. Si vas por la serie completa, revisa que los tomos sean de la misma edición para que calcen en la repisa."
+          />
 
           <section className="mb-16 bg-ink text-cream rounded-2xl p-8 md:p-10">
             <h2 className="font-display text-2xl font-bold mb-3">¿Tienes Megan Maxwell que ya leíste?</h2>
