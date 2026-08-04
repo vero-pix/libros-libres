@@ -210,7 +210,14 @@ const ListingCard = memo(function ListingCard({
               {coverUrl && !imgError ? (
                 <Image
                   src={coverUrl}
-                  alt={book.title}
+                  // Con autor y "libro usado": es el texto que Google Imágenes
+                  // usa para entender la portada, y la gente busca ediciones
+                  // por imagen. Julio cerró con 0 clics desde ese canal.
+                  alt={
+                    book.author
+                      ? `${book.title} — ${book.author}, libro usado`
+                      : `${book.title}, libro usado`
+                  }
                   fill
                   className="object-cover"
                   sizes="(max-width: 640px) 32vw, (max-width: 1024px) 22vw, 13vw"

@@ -85,6 +85,11 @@ export default function robots(): MetadataRoute.Robots {
         disallow: "/",
       })),
     ],
-    sitemap: "https://tuslibros.cl/sitemap.xml",
+    sitemap: [
+      "https://tuslibros.cl/sitemap.xml",
+      // Portadas del catálogo. Sin declararlo, la búsqueda de imágenes no
+      // entrega nada: julio cerró en 0 clics con 1.671 libros con portada.
+      "https://tuslibros.cl/sitemap-imagenes.xml",
+    ],
   };
 }

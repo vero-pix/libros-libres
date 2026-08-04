@@ -59,19 +59,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { cookies: { getAll: () => [], setAll: () => {} } }
     );
 
-    const { data: listings } = await supabase
-      .from("listings")
-      .select("id, slug, updated_at, seller:users(username)")
-      .eq("status", "active")
-      .order("updated_at", { ascending: false })
-      .limit(1000);
+    // Paginado: Supabase corta en 1.000 filas y el catálogo ya pasó de eso, así
+    // que con un `.limit()` a secas el sitemap dejaba fuera las fichas más
+    // antiguas sin avisar. (4 ago 2026)
+    const listings: any[] = [];
+    for (let from = 0; from < 5000; from += 1000) {
+      const { data } = await supabase
+        .from("listings")
+        .select(
+          "id, slug, updated_at, cover_image_url, seller:users(username), book:books(title, author, cover_url)"
+        )
+        .eq("status", "active")
+        .order("updated_at", { ascending: false })
+        .range(from, from + 999);
+      if (!data?.length) break;
+      listings.push(...data);
+      if (data.length < 1000) break;
+    }
 
-    listingPages = (listings ?? []).map((l: any) => {
+    listingPages = listings.map((l: any) => {
       const username = l.seller?.username;
       const url =
         username && l.slug
           ? `${baseUrl}/libro/${username}/${l.slug}`
           : `${baseUrl}/listings/${l.id}`;
+
+      // Las portadas NO van acá: `images` en MetadataRoute.Sitemap recién
+      // existe en Next 15 y este repo va en 14.2 — el campo se ignora en
+      // silencio al serializar. Van en /sitemap-imagenes.xml, generado a mano.
       return {
         url,
         lastModified: new Date(l.updated_at),
