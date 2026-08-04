@@ -30,6 +30,7 @@ import { createClient } from "@supabase/supabase-js";
 import { readFileSync, existsSync, readdirSync } from "fs";
 import { resolve, join, basename, extname } from "path";
 import { normalizeGenre } from "../lib/genreNormalizer";
+import { slugify } from "../lib/slugify";
 
 // Load .env.local manually
 const envPath = resolve(process.cwd(), ".env.local");
@@ -287,16 +288,24 @@ async function main() {
   loadPhotoDir();
 
   // Resolver ubicación del vendedor desde su perfil
-  const { data: seller } = await supabase
+  // Ojo: pedía la columna `comuna`, que no existe en `users`. PostgREST falla
+  // el select entero, `seller` queda null y TODOS los libros se publicaban en
+  // Santiago aunque el vendedor tuviera sus coordenadas guardadas. La columna
+  // de comuna es `city`. (3 ago 2026)
+  const { data: seller, error: sellerErr } = await supabase
     .from("users")
-    .select("default_latitude, default_longitude, default_address, comuna")
+    .select("default_latitude, default_longitude, default_address, city")
     .eq("id", SELLER_ID)
     .single();
+
+  if (sellerErr) {
+    console.warn(`⚠️  No se pudo leer el perfil del vendedor: ${sellerErr.message}`);
+  }
 
   if (seller?.default_latitude && seller?.default_longitude) {
     SELLER_LAT = seller.default_latitude;
     SELLER_LNG = seller.default_longitude;
-    SELLER_ADDRESS = seller.default_address || seller.comuna || "Santiago, Chile";
+    SELLER_ADDRESS = seller.default_address || seller.city || "Santiago, Chile";
     console.log(`📍 Ubicación del vendedor: ${SELLER_ADDRESS} (${SELLER_LAT}, ${SELLER_LNG})`);
   } else {
     console.warn(`⚠️  Vendedor sin ubicación guardada. Usando Santiago centro como fallback.`);
@@ -463,6 +472,19 @@ async function main() {
       bookId = newBook.id;
     }
 
+    // Slug para la URL amigable /libro/[username]/[slug]. El script no lo
+    // generaba y los listings quedaban con slug null, así que la ficha caía a
+    // /listings/[uuid] y se perdía el SEO del título. (3 ago 2026)
+    const baseSlug = slugify(title || "libro");
+    let slug = baseSlug;
+    const { count: slugTaken } = await supabase
+      .from("listings")
+      .select("id", { count: "exact", head: true })
+      .eq("slug", baseSlug);
+    if (slugTaken && slugTaken > 0) {
+      slug = `${baseSlug}-${Math.random().toString(36).slice(-4)}`;
+    }
+
     // Create listing
     const { data: newListing, error: listErr } = await supabase
       .from("listings")
@@ -478,6 +500,7 @@ async function main() {
         latitude: SELLER_LAT,
         longitude: SELLER_LNG,
         address: SELLER_ADDRESS,
+        slug,
         status: "active",
       })
       .select("id")
