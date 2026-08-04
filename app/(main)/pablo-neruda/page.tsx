@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { sortListingsForDisplay } from "@/lib/sortListings";
+import { authorItemListJsonLd, AUTHOR_LANDING_LIMIT } from "@/lib/authorLandings";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -90,15 +91,15 @@ export default async function PabloNerudaPage() {
 
   const { data: raw } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
+    .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
     .eq("status", "active")
     .ilike("book.author", "%neruda%")
     .order("created_at", { ascending: false })
-    .limit(20);
+    .limit(AUTHOR_LANDING_LIMIT);
 
   const listings = sortListingsForDisplay(
     ((raw ?? []).filter((item: any) => item.book !== null) as unknown as ListingWithBook[])
-  ).slice(0, 8);
+  ).slice(0, AUTHOR_LANDING_LIMIT);
 
   const personJsonLd = {
     "@context": "https://schema.org",
@@ -134,10 +135,17 @@ export default async function PabloNerudaPage() {
     })),
   };
 
+  const itemListJsonLd = authorItemListJsonLd(
+    listings,
+    "https://tuslibros.cl/pablo-neruda",
+    "Pablo Neruda"
+  );
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <div className="min-h-screen bg-cream">

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { sortListingsForDisplay } from "@/lib/sortListings";
+import { authorItemListJsonLd, AUTHOR_LANDING_LIMIT } from "@/lib/authorLandings";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -67,18 +68,20 @@ const faqs = [
 export default async function AlgebraDeBaldorPage() {
   const supabase = await createClient();
 
-  // Buscar listings de Álgebra de Baldor por título
+  // Título O autor: el ejemplar de catálogo se llama "Álgebra" a secas y
+  // "Baldor" solo aparece en el autor ("Aurelio Baldor"), así que filtrar por
+  // título dejaba la landing vacía teniendo el libro publicado. (4 ago 2026)
   const { data: baldorRaw } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
+    .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
     .eq("status", "active")
-    .ilike("book.title", "%baldor%")
+    .or("title.ilike.%baldor%,author.ilike.%baldor%", { referencedTable: "book" })
     .order("created_at", { ascending: false })
-    .limit(20);
+    .limit(AUTHOR_LANDING_LIMIT);
 
   const baldorListings = sortListingsForDisplay(
     ((baldorRaw ?? []).filter((item: any) => item.book !== null) as unknown as ListingWithBook[])
-  ).slice(0, 8);
+  ).slice(0, AUTHOR_LANDING_LIMIT);
 
   // Schema del libro (Book + Offer agregado)
   const bookJsonLd = {
@@ -120,10 +123,17 @@ export default async function AlgebraDeBaldorPage() {
     })),
   };
 
+  const itemListJsonLd = authorItemListJsonLd(
+    baldorListings,
+    "https://tuslibros.cl/algebra-de-baldor",
+    "Baldor"
+  );
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(bookJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <div className="min-h-screen bg-cream">

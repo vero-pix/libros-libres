@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { sortListingsForDisplay } from "@/lib/sortListings";
+import { authorItemListJsonLd, AUTHOR_LANDING_LIMIT } from "@/lib/authorLandings";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -55,18 +56,18 @@ const faqs = [
 export default async function MeganMaxwellPage() {
   const supabase = await createClient();
 
+  // Filtro por autor en la BD, no en JS: traer 1.000 listings y filtrar acá
+  // dejaba fuera parte del catálogo por el techo de filas de Supabase.
   const { data: raw } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
+    .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
     .eq("status", "active")
-    .limit(1000);
+    .ilike("book.author", "%maxwell%")
+    .limit(AUTHOR_LANDING_LIMIT);
 
-  const matched = ((raw ?? []) as any[]).filter((item) => {
-    if (!item.book) return false;
-    return (item.book.author ?? "").toLowerCase().includes("maxwell");
-  }) as unknown as ListingWithBook[];
+  const matched = ((raw ?? []) as any[]).filter((item) => item.book) as unknown as ListingWithBook[];
 
-  const listings = sortListingsForDisplay(matched).slice(0, 8);
+  const listings = sortListingsForDisplay(matched).slice(0, AUTHOR_LANDING_LIMIT);
 
   const collectionJsonLd = {
     "@context": "https://schema.org",
@@ -89,10 +90,17 @@ export default async function MeganMaxwellPage() {
     mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
   };
 
+  const itemListJsonLd = authorItemListJsonLd(
+    listings,
+    "https://tuslibros.cl/megan-maxwell-libros",
+    "Megan Maxwell"
+  );
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <div className="min-h-screen bg-cream">

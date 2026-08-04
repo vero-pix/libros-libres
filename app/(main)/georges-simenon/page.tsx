@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { sortListingsForDisplay } from "@/lib/sortListings";
+import { authorItemListJsonLd, AUTHOR_LANDING_LIMIT } from "@/lib/authorLandings";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -54,18 +55,19 @@ const faqs = [
 export default async function SimenonPage() {
   const supabase = await createClient();
 
+  // El filtro por autor va en la BD, no en JS. Antes traía 1.000 listings
+  // cualesquiera y filtraba acá: con 1.671 activos, Supabase cortaba en 1.000
+  // y se perdían 10 de los 27 Simenon publicados. (4 ago 2026)
   const { data: raw } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
+    .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
     .eq("status", "active")
-    .limit(1000);
+    .ilike("book.author", "%simenon%")
+    .limit(AUTHOR_LANDING_LIMIT);
 
-  const matched = ((raw ?? []) as any[]).filter((item) => {
-    if (!item.book) return false;
-    return `${item.book.author ?? ""}`.toLowerCase().includes("simenon");
-  }) as unknown as ListingWithBook[];
+  const matched = ((raw ?? []) as any[]).filter((item) => item.book) as unknown as ListingWithBook[];
 
-  const listings = sortListingsForDisplay(matched).slice(0, 8);
+  const listings = sortListingsForDisplay(matched).slice(0, AUTHOR_LANDING_LIMIT);
 
   const personJsonLd = {
     "@context": "https://schema.org",
@@ -99,10 +101,17 @@ export default async function SimenonPage() {
     })),
   };
 
+  const itemListJsonLd = authorItemListJsonLd(
+    listings,
+    "https://tuslibros.cl/georges-simenon",
+    "Georges Simenon"
+  );
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <div className="min-h-screen bg-cream">
