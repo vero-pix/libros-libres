@@ -77,7 +77,9 @@ async function getListings(slug: string, label: string): Promise<ListingWithBook
     .gte("longitude", lng - dLng)
     .lte("longitude", lng + dLng)
     .order("created_at", { ascending: false })
-    .limit(200);
+    // El bounding box de Santiago ya devuelve más de 500 candidatos; con 200 se
+    // descartaban fichas de la comuna exacta antes siquiera de medir distancia.
+    .limit(600);
 
   const near = ((data as unknown as ListingWithBook[]) ?? []).filter((l) => {
     const lLat = (l as any).latitude;
@@ -94,7 +96,10 @@ async function getListings(slug: string, label: string): Promise<ListingWithBook
   });
   const resto = near.filter((l) => !exactas.includes(l));
 
-  return [...sortListingsForDisplay(exactas), ...sortListingsForDisplay(resto)].slice(0, 18);
+  // 18 dejaba fuera casi todo: La Florida tiene 193 libros dentro del radio y
+  // mostraba 18. El tope alto es justamente el argumento de la página — que
+  // haya catálogo real de esa comuna, no una muestra. (4 ago 2026)
+  return [...sortListingsForDisplay(exactas), ...sortListingsForDisplay(resto)].slice(0, 48);
 }
 
 export default async function LibrosUsadosCiudadPage({ params }: { params: { ciudad: string } }) {
