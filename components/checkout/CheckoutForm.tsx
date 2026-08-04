@@ -90,19 +90,22 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
 
         const data = await res.json();
 
-        if (!res.ok) {
+        const q = (data.quotes ?? []) as ShippingQuote[];
+
+        // Mismo caso que en BundleCheckoutForm: el endpoint responde 200 con
+        // `quotes: []` cuando no hay opciones, así que el fallback no puede
+        // colgar solo de `!res.ok` o el comprador queda sin poder pagar y sin
+        // explicación. (4 ago 2026)
+        if (!res.ok || q.length === 0) {
           setQuoteError(data.error ?? "Error al cotizar envío");
           setQuotes(FALLBACK_OPTIONS);
           setSelectedService(FALLBACK_OPTIONS[0].serviceCode);
           return;
         }
 
-        const q = data.quotes as ShippingQuote[];
         setQuotes(q);
-        if (q.length > 0) {
-          const cheapest = q.reduce((a, b) => (a.price < b.price ? a : b));
-          setSelectedService(cheapest.serviceCode);
-        }
+        const cheapest = q.reduce((a, b) => (a.price < b.price ? a : b));
+        setSelectedService(cheapest.serviceCode);
       } catch {
         setQuoteError("Error de conexión al cotizar");
         setQuotes(FALLBACK_OPTIONS);

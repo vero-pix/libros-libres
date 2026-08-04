@@ -95,19 +95,24 @@ export default function BundleCheckoutForm({
 
         const data = await res.json();
 
-        if (!res.ok) {
+        const q = (data.quotes ?? []) as ShippingQuote[];
+
+        // Sin opciones se cae a las tarifas de referencia, VENGA COMO VENGA la
+        // respuesta. El endpoint devuelve 200 con `quotes: []` a propósito
+        // ("so fallback works"), pero el fallback vivía detrás de `!res.ok` y
+        // por lo tanto nunca corría: el comprador quedaba con el botón muerto
+        // en "Ingresa dirección" habiendo escrito su dirección, y sin ver el
+        // motivo. Una compradora lo reportó por correo. (4 ago 2026)
+        if (!res.ok || q.length === 0) {
           setQuoteError(data.error ?? "Error al cotizar envío");
           setQuotes(FALLBACK_OPTIONS);
           setSelectedService(FALLBACK_OPTIONS[0].serviceCode);
           return;
         }
 
-        const q = data.quotes as ShippingQuote[];
         setQuotes(q);
-        if (q.length > 0) {
-          const cheapest = q.reduce((a, b) => (a.price < b.price ? a : b));
-          setSelectedService(cheapest.serviceCode);
-        }
+        const cheapest = q.reduce((a, b) => (a.price < b.price ? a : b));
+        setSelectedService(cheapest.serviceCode);
       } catch {
         setQuoteError("Error de conexión al cotizar");
         setQuotes(FALLBACK_OPTIONS);

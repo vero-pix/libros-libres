@@ -1,3 +1,5 @@
+import { foldAccents } from "./accentSearch";
+
 const SHIPIT_EMAIL = process.env.SHIPIT_EMAIL ?? "";
 const SHIPIT_TOKEN = process.env.SHIPIT_TOKEN ?? "";
 const BASE_URL = "https://api.shipit.cl/v";
@@ -38,17 +40,31 @@ async function loadCommunes(): Promise<{ id: number; name: string }[]> {
   }
 }
 
-/** Find commune ID by name (fuzzy match) */
+/**
+ * Find commune ID by name (fuzzy match).
+ *
+ * Shipit devuelve sus 727 comunas SIN tildes ni ñ (`CONCEPCION`, `NUNOA`,
+ * `VALPARAISO`, `PENALOLEN`). Comparar contra el nombre real con tilde no
+ * calzaba ni exacto ni parcial, así que cotizar despacho fallaba en silencio
+ * para toda comuna acentuada: 287 de 1.671 libros activos, 116 solo de
+ * Concepción. Por eso se compara sobre texto plegado. (4 ago 2026)
+ */
 async function findCommuneId(communeName: string): Promise<number | null> {
   const communes = await loadCommunes();
-  const upper = communeName.toUpperCase().trim();
+  const wanted = foldAccents(communeName).trim();
+  if (!wanted) return null;
 
   // Exact match
-  const exact = communes.find((c) => c.name === upper);
+  const exact = communes.find((c) => foldAccents(c.name) === wanted);
   if (exact) return exact.id;
 
-  // Partial match
-  const partial = communes.find((c) => c.name.includes(upper) || upper.includes(c.name));
+  // Partial match. Se exige un mínimo de largo porque un `includes` con
+  // términos cortos empareja cualquier cosa.
+  if (wanted.length < 4) return null;
+  const partial = communes.find((c) => {
+    const name = foldAccents(c.name);
+    return name.includes(wanted) || wanted.includes(name);
+  });
   if (partial) return partial.id;
 
   return null;
