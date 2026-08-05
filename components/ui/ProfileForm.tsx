@@ -79,6 +79,10 @@ export default function ProfileForm({
   const [publicEmail, setPublicEmail] = useState(initialPublicEmail ?? "");
   const [instagram, setInstagram] = useState(initialInstagram ?? "");
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  // El error de la foto se muestra: antes se tragaba con un console.error y el
+  // usuario veía que "no pasaba nada". Un vendedor lo intentó cinco veces sin
+  // saber que estaba fallando. (5 ago 2026)
+  const [avatarError, setAvatarError] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -223,6 +227,32 @@ export default function ProfileForm({
           <div className="text-xs text-gray-400">
             <p>JPG o PNG, máximo 2MB</p>
             <p>Recomendado: cuadrado, mínimo 200x200px</p>
+            {avatarUrl && (
+              <button
+                type="button"
+                onClick={async () => {
+                  setAvatarError(null);
+                  setUploadingAvatar(true);
+                  // Basta con soltar la referencia en el perfil: el archivo
+                  // huérfano en el bucket no se muestra en ninguna parte y
+                  // borrarlo depende de una política que no siempre aplica.
+                  const { error: delErr } = await supabase
+                    .from("users")
+                    .update({ avatar_url: null })
+                    .eq("id", userId);
+                  if (delErr) {
+                    setAvatarError("No pudimos quitar la foto. Inténtalo de nuevo.");
+                  } else {
+                    setAvatarUrl("");
+                  }
+                  setUploadingAvatar(false);
+                }}
+                disabled={uploadingAvatar}
+                className="mt-1.5 text-gray-500 underline underline-offset-2 hover:text-gray-700 disabled:opacity-50"
+              >
+                Quitar foto
+              </button>
+            )}
           </div>
           <input
             ref={avatarInputRef}
@@ -232,8 +262,13 @@ export default function ProfileForm({
             onChange={async (e) => {
               const file = e.target.files?.[0];
               if (!file) return;
-              if (file.size > 2 * 1024 * 1024) return;
+              if (file.size > 2 * 1024 * 1024) {
+                setAvatarError("La imagen pesa más de 2 MB. Prueba con una más liviana.");
+                e.target.value = "";
+                return;
+              }
               setUploadingAvatar(true);
+              setAvatarError(null);
               try {
                 const compressed = await compressImage(file, 400, 400, 0.85);
                 const ext = "jpg";
@@ -248,11 +283,20 @@ export default function ProfileForm({
                 setAvatarUrl(`${publicUrl}?t=${Date.now()}`);
               } catch (err) {
                 console.error("Avatar upload error:", err);
+                setAvatarError(
+                  "No pudimos guardar la foto. Vuelve a intentarlo y si sigue fallando escríbenos: es problema nuestro, no tuyo."
+                );
               }
               setUploadingAvatar(false);
+              // Sin esto, elegir el MISMO archivo dos veces seguidas no dispara
+              // el onChange y parece que el botón no hace nada.
+              e.target.value = "";
             }}
           />
         </div>
+        {avatarError && (
+          <p className="px-6 pb-5 -mt-2 text-xs text-red-600">{avatarError}</p>
+        )}
       </div>
 
       {/* ── Datos personales ── */}
