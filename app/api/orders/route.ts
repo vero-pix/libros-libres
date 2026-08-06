@@ -396,9 +396,23 @@ export async function POST(req: NextRequest) {
       .update({ mercadopago_preference_id: preference.id })
       .eq("bundle_id", bundleId);
 
-    // Una comisión por bundle
+    // Una comisión por bundle.
+    //
+    // Va con service role a propósito: `commissions` tiene RLS habilitada desde
+    // 20260404 con SOLO dos policies, ambas de SELECT ("Admin ve comisiones" y
+    // "Vendedor ve sus comisiones"). Sin policy de INSERT, este insert hecho con
+    // el cliente del comprador venía siendo rechazado en silencio desde abril —
+    // y como el error nunca se miraba, la tabla quedó vacía cuatro meses. El
+    // dinero sí se cobraba (llega como `marketplace_fee` de MercadoPago), pero
+    // no quedaba registrado en ninguna parte, así que /mis-ventas mostraba
+    // "Comisión $0" incluso en ventas cobradas. (6 ago 2026)
     if (useSplit) {
-      await supabase.from("commissions").insert({
+      const adminSbCommission = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { persistSession: false } }
+      );
+      const { error: commissionError } = await adminSbCommission.from("commissions").insert({
         order_id: firstOrderId,
         seller_id: sellerId,
         transaction_type: "sale",
@@ -409,6 +423,14 @@ export async function POST(req: NextRequest) {
         // escribe fija en "free" hasta aplicar la migración que la vuelve nullable.
         seller_plan: "free",
       });
+      // No revienta la compra —la venta vale más que su registro— pero deja de
+      // ser invisible: fue el silencio, no el fallo, lo que costó cuatro meses.
+      if (commissionError) {
+        console.error(
+          `[orders] No se registró la comisión del bundle ${bundleId}:`,
+          commissionError.message
+        );
+      }
     }
 
     // Limpiar carrito: quitar los listings recién comprados
