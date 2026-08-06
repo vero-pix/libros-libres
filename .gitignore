@@ -94,3 +94,9 @@ docs/deck_valorizacion*.pptx
 docs/~$*
 scripts/_valuation_snapshot.mjs
 scripts/_generate_deck_pptx*.py
+
+# registro local de envíos de la encuesta
+scripts/.encuesta_*.json
+
+# logs de tareas programadas
+logs/
