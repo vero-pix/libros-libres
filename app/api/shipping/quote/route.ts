@@ -52,22 +52,32 @@ export async function POST(req: NextRequest) {
   const destCommune = extractCommune(buyer_address);
 
   // Get quotes from Shipit
-  const quotes = await getShipitQuotes(originCommune, destCommune);
+  const { quotes, unavailable, reason } = await getShipitQuotes(
+    originCommune,
+    destCommune
+  );
 
   if (!quotes.length) {
     return NextResponse.json(
       {
-        error: `No se encontraron opciones de envío de ${originCommune} a ${destCommune}`,
+        error:
+          reason ??
+          `No se encontraron opciones de envío de ${originCommune} a ${destCommune}`,
         quotes: [],
+        // `unavailable: true` ⇒ Shipit dijo que no hay servicio para este par de
+        // comunas. El checkout NO debe ofrecer la tarifa de referencia: se
+        // vendería un despacho que nadie puede hacer (Melipeuco, 5 ago 2026).
+        unavailable,
         origin: { commune: originCommune },
         destination: { commune: destCommune },
       },
-      { status: 200 } // Return 200 with empty quotes so fallback works
+      { status: 200 } // 200 con quotes vacío para que el checkout decida
     );
   }
 
   return NextResponse.json({
     quotes,
+    unavailable: false,
     origin: { commune: originCommune },
     destination: { commune: destCommune },
   });

@@ -366,9 +366,27 @@ export default async function MisVentasPage() {
                                 </a>
                               ) : labelStuck ? (
                                 <div className="space-y-1">
-                                  <span className="text-[11px] text-ink-muted block">
-                                    Sin etiqueta para imprimir — el courier Shipit trae el manifiesto al retiro.
+                                  {/* Antes decía "el courier trae el manifiesto al
+                                      retiro", que en el caso de Melipeuco era falso:
+                                      no había courier asignado ni retiro agendado, y
+                                      el vendedor esperaba a alguien que nunca iba a
+                                      llegar. Mejor decir que está trabado. (5 ago 2026) */}
+                                  <span className="text-[11px] text-amber-700 block font-medium">
+                                    Este envío no logró emitir etiqueta.
                                   </span>
+                                  <span className="text-[11px] text-ink-muted block">
+                                    A veces el courier igual retira con su propio
+                                    manifiesto, pero no lo des por hecho: escríbenos y
+                                    lo resolvemos contigo.
+                                  </span>
+                                  <a
+                                    href={`mailto:vero@economics.cl?subject=${encodeURIComponent(
+                                      `Envío trabado — orden ${order.id.slice(0, 8)}`
+                                    )}`}
+                                    className="inline-block text-[11px] bg-ink text-cream px-2 py-1 rounded-md hover:bg-ink/90"
+                                  >
+                                    Avisarle a Vero
+                                  </a>
                                   <a
                                     href={supportMailto!}
                                     className="inline-block text-[11px] bg-cream-warm text-ink px-2 py-1 rounded-md border border-cream-dark/40 hover:bg-cream-dark/20"

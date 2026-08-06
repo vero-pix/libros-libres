@@ -60,6 +60,8 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [quoting, setQuoting] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
+  /** Shipit confirmó que no hay despacho posible entre estas comunas. */
+  const [shippingUnavailable, setShippingUnavailable] = useState(false);
 
   const { book } = listing;
   const bookPrice = listing.price ?? 0;
@@ -67,6 +69,10 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   const discountedBookPrice = bookPrice - discountAmount;
 
   const isCourier = deliveryMethod === "courier";
+  // Calle Y número: sin el número Shipit recibe `number: 0` y no hay entrega
+  // posible aunque la etiqueta se emita. (5 ago 2026)
+  const addressHasNumber = /\d{1,6}(\s|,|$)/.test(address);
+  const addressIncomplete = isCourier && address.trim().length >= 5 && !addressHasNumber;
   const selectedQuote = isCourier ? quotes.find((q) => q.serviceCode === selectedService) : null;
   const shippingCost = selectedQuote?.price ?? 0;
   const total = discountedBookPrice + shippingCost;
@@ -77,6 +83,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
 
       setQuoting(true);
       setQuoteError(null);
+      setShippingUnavailable(false);
 
       try {
         const res = await fetch("/api/shipping/quote", {
@@ -91,6 +98,19 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
         const data = await res.json();
 
         const q = (data.quotes ?? []) as ShippingQuote[];
+
+        // Shipit respondió que no hay servicio para este par de comunas. No se
+        // estima nada: vender el despacho igual deja al vendedor sin forma de
+        // despachar (caso Melipeuco, 5 ago 2026).
+        if (res.ok && data.unavailable) {
+          setQuoteError(
+            "No hay courier que despache este libro a tu dirección. Puedes coordinar un encuentro en persona con el vendedor."
+          );
+          setShippingUnavailable(true);
+          setQuotes([]);
+          setSelectedService(null);
+          return;
+        }
 
         // Mismo caso que en BundleCheckoutForm: el endpoint responde 200 con
         // `quotes: []` cuando no hay opciones, así que el fallback no puede
@@ -108,6 +128,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
         setSelectedService(cheapest.serviceCode);
       } catch {
         setQuoteError("Error de conexión al cotizar");
+        setShippingUnavailable(false);
         setQuotes(FALLBACK_OPTIONS);
         setSelectedService(FALLBACK_OPTIONS[0].serviceCode);
       } finally {
@@ -153,7 +174,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (isCourier && !selectedQuote) return;
+    if (isCourier && (!selectedQuote || shippingUnavailable || !addressHasNumber)) return;
     if (!phone.trim()) { setError("Necesitamos un teléfono de contacto para el vendedor."); return; }
     
     setLoading(true);
@@ -313,7 +334,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                 <button
                   type="button"
                   onClick={() => fetchQuotes(address)}
-                  disabled={quoting || address.trim().length < 5}
+                  disabled={quoting || address.trim().length < 5 || !addressHasNumber}
                   className="px-6 py-2.5 bg-ink hover:bg-black disabled:bg-gray-300 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all"
                 >
                   {quoting ? "Calculando..." : "Calcular envío"}
@@ -323,6 +344,23 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                 <div className="mt-3 flex items-center gap-2 text-[10px] text-ink-muted font-bold uppercase tracking-widest animate-pulse">
                   <span className="w-2 h-2 bg-brand-500 rounded-full" />
                   Cotizando con couriers...
+                </div>
+              )}
+              {addressIncomplete && (
+                <p className="mt-3 text-xs text-amber-700">
+                  Falta el número de la calle. Sin él el courier no puede entregar.
+                </p>
+              )}
+              {shippingUnavailable && (
+                <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 animate-fade-in">
+                  <p className="text-xs font-bold text-amber-900 mb-1">
+                    No hay despacho disponible para este libro
+                  </p>
+                  <p className="text-xs text-amber-800">
+                    Ningún courier cubre la ruta entre la comuna del vendedor y tu
+                    dirección. Puedes cambiar a <strong>encuentro en persona</strong>{" "}
+                    y coordinar con el vendedor, o probar con otra dirección.
+                  </p>
                 </div>
               )}
             </div>
@@ -486,7 +524,12 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
             {(listing.seller as any)?.mercadopago_user_id ? (
               <button
                 onClick={handleSubmit}
-                disabled={loading || (isCourier && (!address || !selectedQuote)) || !phone}
+                disabled={
+                  loading ||
+                  (isCourier &&
+                    (!address || !selectedQuote || shippingUnavailable || !addressHasNumber)) ||
+                  !phone
+                }
                 className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white font-bold py-4 rounded-xl text-sm transition-all shadow-lg shadow-brand-500/20 active:scale-95"
               >
                 {loading ? (

@@ -214,8 +214,16 @@ export async function POST(req: NextRequest) {
     shipping_cost_override ??
     SHIPPING_COSTS[shipping_speed] ??
     SHIPPING_COSTS.standard;
+  // `shipping_courier` es el client real de Shipit ("starken", "chilexpress");
+  // `shipping_service` es solo el nombre visible. Esta columna termina viajando
+  // al webhook como `courier.client`, así que el client manda. Guardar el
+  // nombre visible dejaba a Shipit con `courier.client: ""` y la orden atascada
+  // en draft, sin etiqueta ni retiro. (5 ago 2026)
   const courier =
-    shipping_service ?? COURIER_BY_SPEED[shipping_speed] ?? "Envío estándar";
+    shipping_courier ??
+    shipping_service ??
+    COURIER_BY_SPEED[shipping_speed] ??
+    "Envío estándar";
 
   // mercadopago_user_id y no el access_token: la lectura del token quedó
   // revocada para anon/authenticated porque es una credencial. Es además el

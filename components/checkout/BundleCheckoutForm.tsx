@@ -60,6 +60,8 @@ export default function BundleCheckoutForm({
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [quoting, setQuoting] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
+  /** Shipit confirmó que no hay despacho posible entre estas comunas. */
+  const [shippingUnavailable, setShippingUnavailable] = useState(false);
 
   const seller = listings[0].seller;
   const totalBookPrice = listings.reduce(
@@ -68,6 +70,12 @@ export default function BundleCheckoutForm({
   );
 
   const isCourier = deliveryMethod === "courier";
+  // El courier necesita calle Y número. Rodrigo Cumsille compró con su
+  // `default_address` guardado, que era solo "San Fernando, Región de
+  // O'Higgins": la orden llegó a Shipit con `number: 0` y no había cómo
+  // entregar aunque la etiqueta se hubiera emitido. (5 ago 2026)
+  const addressHasNumber = /\d{1,6}(\s|,|$)/.test(address);
+  const addressIncomplete = isCourier && address.trim().length >= 5 && !addressHasNumber;
   const selectedQuote = isCourier
     ? quotes.find((q) => q.serviceCode === selectedService)
     : null;
@@ -82,6 +90,7 @@ export default function BundleCheckoutForm({
 
       setQuoting(true);
       setQuoteError(null);
+      setShippingUnavailable(false);
 
       try {
         const res = await fetch("/api/shipping/quote", {
@@ -96,6 +105,22 @@ export default function BundleCheckoutForm({
         const data = await res.json();
 
         const q = (data.quotes ?? []) as ShippingQuote[];
+
+        // Shipit dijo explícitamente que no hay servicio entre estas dos
+        // comunas (típico: ningún courier retira en el origen). No hay tarifa
+        // que estimar — ofrecer el fallback vende un despacho que nadie puede
+        // hacer. Pasó con la primera venta de Libros del Bardo: Melipeuco no
+        // tiene retiro, se cobró $2.900 y la etiqueta nunca se pudo emitir.
+        // (5 ago 2026)
+        if (res.ok && data.unavailable) {
+          setQuoteError(
+            "No hay courier que despache este pedido a tu dirección. Puedes coordinar un encuentro en persona con el vendedor."
+          );
+          setShippingUnavailable(true);
+          setQuotes([]);
+          setSelectedService(null);
+          return;
+        }
 
         // Sin opciones se cae a las tarifas de referencia, VENGA COMO VENGA la
         // respuesta. El endpoint devuelve 200 con `quotes: []` a propósito
@@ -115,6 +140,7 @@ export default function BundleCheckoutForm({
         setSelectedService(cheapest.serviceCode);
       } catch {
         setQuoteError("Error de conexión al cotizar");
+        setShippingUnavailable(false);
         setQuotes(FALLBACK_OPTIONS);
         setSelectedService(FALLBACK_OPTIONS[0].serviceCode);
       } finally {
@@ -132,7 +158,7 @@ export default function BundleCheckoutForm({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (isCourier && !selectedQuote) return;
+    if (isCourier && (!selectedQuote || shippingUnavailable || !addressHasNumber)) return;
     setLoading(true);
     setError(null);
 
@@ -273,12 +299,30 @@ export default function BundleCheckoutForm({
             <button
               type="button"
               onClick={() => fetchQuotes(address)}
-              disabled={quoting || address.trim().length < 5}
+              disabled={quoting || address.trim().length < 5 || !addressHasNumber}
               className="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white text-sm font-medium rounded-md transition-colors whitespace-nowrap"
             >
               {quoting ? "Cotizando..." : "Cotizar"}
             </button>
           </div>
+          {addressIncomplete && (
+            <p className="mt-2 text-xs text-amber-700">
+              Falta el número de la calle. Sin él el courier no puede entregar.
+            </p>
+          )}
+        </div>
+      )}
+
+      {isCourier && shippingUnavailable && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-5">
+          <h2 className="font-semibold text-amber-900 mb-1 text-sm">
+            No hay despacho disponible para este pedido
+          </h2>
+          <p className="text-xs text-amber-800">
+            Ningún courier cubre la ruta entre la comuna del vendedor y tu
+            dirección. Puedes cambiar a <strong>encuentro en persona</strong> y
+            coordinar con el vendedor, o probar con otra dirección.
+          </p>
         </div>
       )}
 
@@ -375,7 +419,11 @@ export default function BundleCheckoutForm({
         <>
           <button
             type="submit"
-            disabled={loading || (isCourier && (!address || !selectedQuote))}
+            disabled={
+              loading ||
+              (isCourier &&
+                (!address || !selectedQuote || shippingUnavailable || !addressHasNumber))
+            }
             className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white font-semibold py-3 rounded-lg text-sm transition-colors"
           >
             {loading
