@@ -86,14 +86,23 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
       setShippingUnavailable(false);
 
       try {
-        const res = await fetch("/api/shipping/quote", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            listing_id: listing.id,
-            buyer_address: addr,
-          }),
-        });
+        // Un reintento antes de caer al fallback de $2.900, que casi siempre
+        // queda bajo el costo real. Ver comentario en BundleCheckoutForm.
+        const pedirCotizacion = () =>
+          fetch("/api/shipping/quote", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              listing_id: listing.id,
+              buyer_address: addr,
+            }),
+          });
+
+        let res = await pedirCotizacion();
+        if (!res.ok && res.status >= 500) {
+          await new Promise((r) => setTimeout(r, 1200));
+          res = await pedirCotizacion();
+        }
 
         const data = await res.json();
 

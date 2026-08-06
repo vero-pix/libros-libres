@@ -58,6 +58,15 @@ export async function POST(req: NextRequest) {
   );
 
   if (!quotes.length) {
+    // Se registra aparte el caso "no cotizamos pero SÍ hay servicio", porque
+    // ahí el checkout cobra la tarifa de referencia de $2.900 y la diferencia
+    // con el costo real la paga la casa. Buscar esta línea en los logs de
+    // Vercel dice cuánto está costando el fallback.
+    if (!unavailable) {
+      console.error(
+        `[quote] FALLBACK $2.900 aplicado — ${originCommune} → ${destCommune} (${reason ?? "sin razón"})`
+      );
+    }
     return NextResponse.json(
       {
         error:

@@ -93,14 +93,26 @@ export default function BundleCheckoutForm({
       setShippingUnavailable(false);
 
       try {
-        const res = await fetch("/api/shipping/quote", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            listing_id: firstListingId,
-            buyer_address: addr,
-          }),
-        });
+        // Un reintento antes de rendirse. El fallback de $2.900 es una tarifa
+        // de referencia que casi siempre queda por debajo del costo real (el
+        // piso observado en Shipit ronda los $4.400), así que cada vez que
+        // entra por un fallo pasajero de red le cuesta plata a la casa. Que
+        // sea la excepción de verdad, no el camino fácil.
+        const pedirCotizacion = () =>
+          fetch("/api/shipping/quote", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              listing_id: firstListingId,
+              buyer_address: addr,
+            }),
+          });
+
+        let res = await pedirCotizacion();
+        if (!res.ok && res.status >= 500) {
+          await new Promise((r) => setTimeout(r, 1200));
+          res = await pedirCotizacion();
+        }
 
         const data = await res.json();
 
