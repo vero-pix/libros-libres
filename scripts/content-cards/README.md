@@ -1,12 +1,21 @@
 # Generador de tarjetas de contenido
 
-Convierte una lista de piezas en **PNGs 1080×1080 con la identidad de tuslibros**,
+Convierte una lista de piezas en **PNGs 1080×1350 (4:5) con la identidad de tuslibros**,
 compositando la **portada real** de cada libro desde el catálogo. Es para el
 volumen diario de redes (5–10 piezas), no para historias especiales (esas se
 diseñan a mano). Deja además un `manifest.json` con la caption por pieza, listo
 para el futuro auto-posteo con la Graph API de Meta.
 
 No es código de la app: no toca runtime, home ni checkout. Vive bajo `scripts/`.
+
+> ⚠️ **Hay dos pipelines de redes y hacen cosas distintas.** Este genera
+> tarjetas. `scripts/generar-post-social.mjs` genera `social/metricool-batch.csv`,
+> cuya columna `Image` apunta a la **portada cruda** en Supabase Storage — las
+> tarjetas HTML que deja en `social/cards/` son una alternativa que hay que
+> capturar a mano. O sea: **cargar ese CSV a Metricool publica portadas crudas,
+> no estas tarjetas.** Lo publicado en el feed hasta el 6-08-2026 salió de acá
+> (el wordmark cortado a la izquierda es el `footerSvg` de este generador; el de
+> la tarjeta HTML va centrado y no se cortaría).
 
 ## Uso
 
@@ -24,12 +33,30 @@ Salida en `content-out/` (gitignored): `NN_template_slug.png` + `manifest.json`.
 
 | template      | qué es                                                            | campos del spec |
 |---------------|------------------------------------------------------------------|-----------------|
-| `ficha`       | portada real protagonista + título/autor/precio. La de más enganche | `slug` o `listingId`, `kicker` |
+| `ficha`       | portada real arriba a todo el ancho + título/autor abajo. La de más enganche | `slug` o `listingId`, `kicker` |
 | `tipografica` | frase/dato grande en Playfair sobre crema. Portada chica opcional | `headline`, `sub`, `kicker`, `slug` (opcional) |
-| `lista`       | grilla de 3–6 portadas con precio (carruseles). Varias láminas si hay >6 | `slugs[]`, `kicker` |
+| `lista`       | grilla de 3–6 portadas (carruseles). Varias láminas si hay >6 | `slugs[]`, `kicker` |
 
-Todas: márgenes ≥88, dos pesos tipográficos (Playfair 700 + Inter 400/600),
-crema/tinta/ámbar, sin neón. En `headline` los saltos de línea se escriben `\\n`.
+Todas: dos pesos tipográficos (Playfair 700 + Inter 400/600), crema/tinta/ámbar,
+sin neón. En `headline` los saltos de línea se escriben `\\n`.
+
+### Formato y zona segura
+
+El lienzo es **4:5 (1080×1350)**. Antes era cuadrado y la grilla del perfil de
+Instagram —vertical desde enero de 2026— lo recortaba por los lados: el wordmark
+se leía **"ibros.cl"** en todas las miniaturas.
+
+Nada crítico (wordmark, título, kicker) puede entrar en el **12% de cada borde
+lateral**: es la constante `SAFE_X` de `brand.ts` y las plantillas del feed la
+usan como margen, no `MARGIN`. Para verificar un lote nuevo, recorta una tarjeta
+a `820x1350` centrado y confirma que todo sobrevive.
+
+### El precio no va en la imagen
+
+Una tarjeta con el precio encima se lee como aviso, y nadie guarda ni comparte un
+aviso — que es justo lo que Instagram premia. El precio va en el **caption del
+post**; `generate.mjs` avisa por consola si el caption de una pieza no lo trae.
+Las historias (1080×1920) sí lo llevan: son efímeras y no entran a la grilla.
 
 ## Spec de entrada
 

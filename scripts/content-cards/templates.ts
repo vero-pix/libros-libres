@@ -1,16 +1,23 @@
 /**
- * Plantillas SVG (1080×1080) para las tarjetas de contenido. Cada función
- * devuelve el/los SVG listos para pasar a resvg. Tres plantillas cubren casi
- * todo: `ficha`, `tipografica` y `lista`.
+ * Plantillas SVG para las tarjetas de contenido. Cada función devuelve el/los
+ * SVG listos para pasar a resvg. Tres plantillas cubren casi todo: `ficha`,
+ * `tipografica` y `lista`, todas en el lienzo del feed (1080×1350, 4:5).
+ * `historia` es aparte y sigue en 1080×1920.
  *
- * Reglas de composición: margen ≥88, nada se corta ni se solapa, dos pesos
+ * Reglas de composición: nada crítico dentro de SAFE_X (la grilla del perfil
+ * recorta los bordes laterales), nada se corta ni se solapa, dos pesos
  * tipográficos (Playfair 700 + Inter 400/600), portadas con recorte tipo cover.
+ *
+ * El precio NO va en la imagen: una tarjeta con precio se lee como aviso y no
+ * se guarda ni se comparte. Va en el caption del post (ver README).
  */
 import {
-  CANVAS,
+  CANVAS_H,
+  CANVAS_W,
   COLORS,
   FONTS,
   MARGIN,
+  SAFE_X,
   backgroundSvg,
   cleanTitle,
   conditionLabel,
@@ -52,7 +59,10 @@ function coverBox(
   y: number,
   w: number,
   h: number,
-  radius = 18
+  radius = 18,
+  /** Anclaje del recorte. "xMidYMin" conserva la parte alta de la portada
+   *  (donde suelen ir título y autor) cuando la caja es más ancha que la foto. */
+  align: "xMidYMid" | "xMidYMin" = "xMidYMid"
 ): string {
   const id = `clip${CLIP_SEQ++}`;
   const shadow = `<rect x="${x + 10}" y="${y + 14}" width="${w}" height="${h}" rx="${radius}" fill="${COLORS.ink}" opacity="0.12"/>`;
@@ -72,26 +82,29 @@ function coverBox(
     ${shadow}
     <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${radius}"/></clipPath>
     <image href="${dataUri}" x="${x}" y="${y}" width="${w}" height="${h}"
-           preserveAspectRatio="xMidYMid slice" clip-path="url(#${id})"/>
+           preserveAspectRatio="${align} slice" clip-path="url(#${id})"/>
     ${border}`;
 }
 
 /* ─────────────────────────── FICHA ─────────────────────────── */
-/** Portada protagonista a la izquierda; a la derecha, texto y precio. */
+/**
+ * Vertical: portada protagonista arriba ocupando todo el ancho útil, texto
+ * abajo. La versión cuadrada ponía la portada como miniatura al costado de una
+ * columna de texto y dejaba media tarjeta en blanco — en la grilla del perfil
+ * eso se leía como un post vacío.
+ */
 export function fichaTemplate(piece: Piece, listing: Listing): string {
-  const coverX = MARGIN;
-  const coverW = 380;
-  const coverH = 560;
-  const coverY = 250;
+  const coverX = SAFE_X;
+  const coverW = CANVAS_W - SAFE_X * 2; // 820
+  const coverY = 190;
+  const coverH = 760; // ~56% del alto: la portada manda
+  const tw = coverW; // el texto usa el mismo ancho útil
 
-  const tx = coverX + coverW + 64; // inicio columna de texto
-  const tw = CANVAS - MARGIN - tx; // ancho de texto
-
-  // Auto-escala la fuente del título según su largo: los medianos entran en
-  // 2 líneas sin truncarse en la columna angosta, los cortos se ven grandes.
+  // Auto-escala la fuente del título según su largo. La columna ahora es ancha
+  // (820 y no 568), así que los tamaños suben respecto de la versión cuadrada.
   const cleaned = cleanTitle(listing.title);
   const titleFont =
-    cleaned.length > 40 ? 38 : cleaned.length > 24 ? 44 : cleaned.length > 16 ? 52 : 58;
+    cleaned.length > 60 ? 46 : cleaned.length > 40 ? 52 : cleaned.length > 24 ? 58 : 64;
   const titleLH = Math.round(titleFont * 1.14);
   const titleLines = wrapText(cleaned, {
     maxWidth: tw,
@@ -100,57 +113,40 @@ export function fichaTemplate(piece: Piece, listing: Listing): string {
     maxLines: 2,
   });
 
-  // El bloque de la derecha (kicker + título + autor + precio + condición) se
-  // centra verticalmente respecto a la portada, así una ficha de título corto
-  // no queda flotando arriba con el tercio inferior vacío.
-  const kickerGap = 84; // del kicker al arranque del título
-  const authorGap = listing.author ? 74 : 0;
-  const priceGap = formatCLP(listing.price) ? 44 : 0;
-  const condGap = conditionLabel(listing.condition) ? 40 : 0;
-  const blockH =
-    kickerGap + titleLines.length * titleLH + authorGap + priceGap + condGap;
-  const coverMid = coverY + coverH / 2;
-  const kickerY = Math.max(300, Math.round(coverMid - blockH / 2));
-  const titleTop = kickerY + kickerGap;
+  const kickerY = 128;
+  const titleTop = coverY + coverH + 78;
 
   const titleSvg = titleLines
     .map(
       (ln, i) =>
-        `<text x="${tx}" y="${titleTop + i * titleLH}" font-family="${FONTS.serif}" font-weight="700" font-size="${titleFont}" fill="${COLORS.ink}">${escapeXml(ln)}</text>`
+        `<text x="${SAFE_X}" y="${titleTop + i * titleLH}" font-family="${FONTS.serif}" font-weight="700" font-size="${titleFont}" fill="${COLORS.ink}">${escapeXml(ln)}</text>`
     )
     .join("\n");
-  const titleBottom = titleTop + (titleLines.length - 1) * titleLH;
 
-  let cursor = titleBottom + 62;
-  // Autor recortado a una línea al ancho de la columna (no se desborda del canvas).
+  let cursor = titleTop + (titleLines.length - 1) * titleLH + 56;
+
+  // Autor recortado a una línea al ancho útil (no se desborda del canvas).
   const authorLine = listing.author
-    ? wrapText(listing.author, { maxWidth: tw, fontSize: 30, family: "sans", maxLines: 1 })[0]
+    ? wrapText(listing.author, { maxWidth: tw, fontSize: 32, family: "sans", maxLines: 1 })[0]
     : "";
   const authorSvg = authorLine
-    ? `<text x="${tx}" y="${cursor}" font-family="${FONTS.sans}" font-style="italic" font-size="30" fill="${COLORS.muted}">${escapeXml(authorLine)}</text>`
+    ? `<text x="${SAFE_X}" y="${cursor}" font-family="${FONTS.sans}" font-style="italic" font-size="32" fill="${COLORS.muted}">${escapeXml(authorLine)}</text>`
     : "";
-  if (listing.author) cursor += 74;
-
-  const priceStr = formatCLP(listing.price);
-  const priceSvg = priceStr
-    ? `<text x="${tx}" y="${cursor}" font-family="${FONTS.sansSemibold}" font-size="52" fill="${COLORS.amber}">${escapeXml(priceStr)}</text>`
-    : "";
-  if (priceStr) cursor += 44;
+  if (authorLine) cursor += 54;
 
   const cond = conditionLabel(listing.condition);
   const condSvg = cond
-    ? `<text x="${tx}" y="${cursor}" font-family="${FONTS.sans}" font-size="26" fill="${COLORS.muted}">${escapeXml(cond)}</text>`
+    ? `<text x="${SAFE_X}" y="${cursor}" font-family="${FONTS.sans}" font-size="26" fill="${COLORS.muted}">${escapeXml(cond)}</text>`
     : "";
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${CANVAS}" height="${CANVAS}" viewBox="0 0 ${CANVAS} ${CANVAS}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}">
     ${backgroundSvg(COLORS.cream)}
-    ${coverBox(listing.coverDataUri, coverX, coverY, coverW, coverH)}
-    ${kickerSvg(piece.kicker || "Recién llegado", tx, kickerY)}
+    ${kickerSvg(piece.kicker || "Recién llegado", SAFE_X, kickerY)}
+    ${coverBox(listing.coverDataUri, coverX, coverY, coverW, coverH, 18, "xMidYMin")}
     ${titleSvg}
     ${authorSvg}
-    ${priceSvg}
     ${condSvg}
-    ${footerSvg(coverX, 936)}
+    ${footerSvg(SAFE_X, CANVAS_H - 80)}
   </svg>`;
 }
 
@@ -165,46 +161,47 @@ export function tipograficaTemplate(piece: Piece, listing: Listing | null): stri
   const fontSize = longest > 34 ? 66 : longest > 22 ? 80 : 94;
   const lh = Math.round(fontSize * 1.16);
 
+  const textW = CANVAS_W - SAFE_X * 2;
   const lines = wrapText(headline, {
-    maxWidth: CANVAS - MARGIN * 2,
+    maxWidth: textW,
     fontSize,
     family: "serif",
     maxLines: 6,
   });
 
   const blockH = lines.length * lh + (sub ? 70 : 0);
-  let y = Math.max(340, Math.round((CANVAS - blockH) / 2) + fontSize); // centrado vertical
+  let y = Math.max(400, Math.round((CANVAS_H - blockH) / 2) + fontSize); // centrado vertical
 
   const headlineSvg = lines
     .map((ln, i) => {
       const yy = y + i * lh;
-      return `<text x="${MARGIN}" y="${yy}" font-family="${FONTS.serif}" font-weight="700" font-size="${fontSize}" fill="${COLORS.ink}">${escapeXml(ln)}</text>`;
+      return `<text x="${SAFE_X}" y="${yy}" font-family="${FONTS.serif}" font-weight="700" font-size="${fontSize}" fill="${COLORS.ink}">${escapeXml(ln)}</text>`;
     })
     .join("\n");
 
   const subY = y + (lines.length - 1) * lh + 66;
   const subSvg = sub
-    ? wrapText(sub, { maxWidth: CANVAS - MARGIN * 2, fontSize: 34, family: "sans", maxLines: 3 })
+    ? wrapText(sub, { maxWidth: textW, fontSize: 34, family: "sans", maxLines: 3 })
         .map(
           (ln, i) =>
-            `<text x="${MARGIN}" y="${subY + i * 46}" font-family="${FONTS.sans}" font-size="34" fill="${COLORS.muted}">${escapeXml(ln)}</text>`
+            `<text x="${SAFE_X}" y="${subY + i * 46}" font-family="${FONTS.sans}" font-size="34" fill="${COLORS.muted}">${escapeXml(ln)}</text>`
         )
         .join("\n")
     : "";
 
-  // Portada chica opcional en la esquina inferior derecha.
+  // Portada chica opcional en la esquina inferior derecha, dentro de la zona segura.
   const cornerCover =
     listing && listing.coverDataUri
-      ? coverBox(listing.coverDataUri, CANVAS - MARGIN - 150, CANVAS - MARGIN - 222 - 40, 150, 222, 12)
+      ? coverBox(listing.coverDataUri, CANVAS_W - SAFE_X - 150, CANVAS_H - 190 - 222, 150, 222, 12)
       : "";
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${CANVAS}" height="${CANVAS}" viewBox="0 0 ${CANVAS} ${CANVAS}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}">
     ${backgroundSvg(COLORS.cream)}
-    ${kickerSvg(piece.kicker || "¿Sabías que…?", MARGIN, 210)}
+    ${kickerSvg(piece.kicker || "¿Sabías que…?", SAFE_X, 240)}
     ${headlineSvg}
     ${subSvg}
     ${cornerCover}
-    ${footerSvg(MARGIN, CANVAS - MARGIN + 8)}
+    ${footerSvg(SAFE_X, CANVAS_H - 80)}
   </svg>`;
 }
 
@@ -307,21 +304,21 @@ export function listaTemplate(piece: Piece, listings: Listing[]): string[] {
 
 function renderLamina(piece: Piece, items: Listing[], index: number, total: number): string {
   const cols = 3;
-  const gap = 40;
-  const cellW = Math.floor((CANVAS - MARGIN * 2 - gap * (cols - 1)) / cols); // ~274
-  const coverW = 160;
-  const coverH = 240; // 2:3, un pelín más chica para dar aire a títulos de 2 líneas
+  const gap = 36;
+  const cellW = Math.floor((CANVAS_W - SAFE_X * 2 - gap * (cols - 1)) / cols); // ~249
+  const coverW = 200;
+  const coverH = 300; // 2:3; el lienzo vertical da espacio para portadas más grandes
   const cellPadX = Math.floor((cellW - coverW) / 2);
 
-  // Grilla de 2 filas dentro del área útil, dejando ~80px abajo para el footer.
-  const gridTop = 210;
-  const rowH = 376; // portada (240) + título (hasta 2 líneas) + precio + aire, sin invadir el footer
+  // Grilla de 2 filas centrada entre el kicker y el footer.
+  const gridTop = 320;
+  const rowH = 416; // portada (300) + título (hasta 2 líneas) + aire, sin invadir el footer
 
   const cells = items
     .map((l, i) => {
       const r = Math.floor(i / cols);
       const c = i % cols;
-      const cellX = MARGIN + c * (cellW + gap);
+      const cellX = SAFE_X + c * (cellW + gap);
       const x = cellX + cellPadX;
       const y = gridTop + r * rowH;
       const centerX = cellX + Math.floor(cellW / 2);
@@ -342,22 +339,17 @@ function renderLamina(piece: Piece, items: Listing[], index: number, total: numb
         )
         .join("\n");
 
-      // El precio va bajo la última línea del título (1 o 2 líneas).
-      const priceY = y + coverH + 38 + (titleLines.length - 1) * titleLineH + 34;
-      const priceStr = formatCLP(l.price);
-      const priceSvg = priceStr
-        ? `<text x="${centerX}" y="${priceY}" text-anchor="middle" font-family="${FONTS.sansSemibold}" font-size="30" fill="${COLORS.amber}">${escapeXml(priceStr)}</text>`
-        : "";
-
-      return `${cover}\n${titleSvg}\n${priceSvg}`;
+      // Sin precio: la grilla es una selección para mirar, no un catálogo de
+      // ofertas. Los precios van en el caption.
+      return `${cover}\n${titleSvg}`;
     })
     .join("\n");
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${CANVAS}" height="${CANVAS}" viewBox="0 0 ${CANVAS} ${CANVAS}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}">
     ${backgroundSvg(COLORS.cream)}
-    ${kickerSvg(piece.kicker || "Selección", MARGIN, 190)}
+    ${kickerSvg(piece.kicker || "Selección", SAFE_X, 200)}
     ${cells}
-    ${footerSvg(MARGIN, CANVAS - MARGIN + 8)}
-    ${pagerSvg(index, total, CANVAS - MARGIN, CANVAS - MARGIN + 8)}
+    ${footerSvg(SAFE_X, CANVAS_H - 80)}
+    ${pagerSvg(index, total, CANVAS_W - SAFE_X, CANVAS_H - 80)}
   </svg>`;
 }

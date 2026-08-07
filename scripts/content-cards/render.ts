@@ -3,11 +3,14 @@
  * sistema, para que el render sea idéntico en cualquier máquina/CI).
  */
 import { Resvg } from "@resvg/resvg-js";
-import { CANVAS, FONTS } from "./brand";
+import { FONTS } from "./brand";
 
 export function svgToPng(svg: string): Buffer {
   const resvg = new Resvg(svg, {
-    fitTo: { mode: "width", value: CANVAS },
+    // "original" respeta el width/height que declara cada SVG. Con `width` fijo
+    // las historias (1080×1920) y el feed (1080×1350) compartían un solo valor
+    // y cualquier lienzo nuevo salía escalado sin querer.
+    fitTo: { mode: "original" },
     background: "#faf7f2",
     font: {
       fontFiles: [...FONTS.files],

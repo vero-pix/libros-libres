@@ -34,10 +34,27 @@ export const FONTS = {
   ],
 } as const;
 
-/** Lienzo Instagram cuadrado. */
-export const CANVAS = 1080;
-/** Margen de seguridad (el encargo pide ≥80). */
+/**
+ * Lienzo del feed de Instagram: vertical 4:5 (1080×1350).
+ *
+ * Antes era cuadrado (1080×1080) y la grilla del perfil —que desde enero de 2026
+ * es vertical— lo recortaba por los lados: el wordmark se leía "ibros.cl" en
+ * todas las miniaturas. Las historias siguen en 1080×1920 y viven aparte
+ * (`novedades.standalone.mjs`).
+ */
+export const CANVAS_W = 1080;
+export const CANVAS_H = 1350;
+
+/** Margen de composición general (el encargo original pedía ≥80). */
 export const MARGIN = 88;
+
+/**
+ * Zona segura lateral: la grilla del perfil recorta hasta un 12% de cada borde.
+ * Nada crítico —wordmark, título, kicker— puede quedar dentro de esa franja.
+ * Las plantillas del feed usan SAFE_X como margen lateral, no MARGIN.
+ */
+export const SAFE_RATIO = 0.12;
+export const SAFE_X = Math.round(CANVAS_W * SAFE_RATIO); // 130
 
 const CONDITION_LABELS: Record<string, string> = {
   new: "Como nuevo",
@@ -157,7 +174,7 @@ export function pagerSvg(index: number, total: number, xRight: number, y: number
 /** Fondo base crema con un borde interior sutil (marca la caja de seguridad). */
 export function backgroundSvg(color: string = COLORS.cream): string {
   return `
-    <rect width="${CANVAS}" height="${CANVAS}" fill="${color}"/>
-    <rect x="24" y="24" width="${CANVAS - 48}" height="${CANVAS - 48}" rx="28"
+    <rect width="${CANVAS_W}" height="${CANVAS_H}" fill="${color}"/>
+    <rect x="24" y="24" width="${CANVAS_W - 48}" height="${CANVAS_H - 48}" rx="28"
           fill="none" stroke="${COLORS.line}" stroke-width="2"/>`;
 }

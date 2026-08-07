@@ -99,6 +99,12 @@ async function main() {
       continue;
     }
 
+    // El precio salió de la imagen (una tarjeta con precio se lee como aviso),
+    // así que ahora tiene que estar sí o sí en el texto del post.
+    if (tpl !== "tipografica" && !/\$\s?\d/.test(piece.caption ?? "")) {
+      console.warn(`  ⚠ [${n}] el caption no menciona precio — agrégalo antes de programar el post.`);
+    }
+
     manifest.push({
       archivo: archivos[0],
       archivos, // todas las imágenes de la pieza (carrusel = un post)
