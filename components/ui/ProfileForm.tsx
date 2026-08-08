@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { compressImage } from "@/lib/image-compress";
 import Image from "next/image";
@@ -100,11 +100,38 @@ export default function ProfileForm({
 
   // Ubicación
   const [savedAddress, setSavedAddress] = useState(defaultAddress ?? "");
+  const [savedCoords, setSavedCoords] = useState<{ lat: number; lng: number } | null>(
+    defaultLat != null && defaultLng != null ? { lat: defaultLat, lng: defaultLng } : null
+  );
   const [addressQuery, setAddressQuery] = useState("");
   const [geolocating, setGeolocating] = useState(false);
   const [searching, setSearching] = useState(false);
   const [locationSaved, setLocationSaved] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+
+  // Propagación a las publicaciones ya hechas. Sin esto, cambiar la ubicación
+  // del perfil no arregla nada de lo publicado y el vendedor queda sin salida:
+  // hasta el 7-08-2026 había que corregirlo a mano en la base de datos.
+  const [publishedCount, setPublishedCount] = useState<number | null>(null);
+  const [confirmingApply, setConfirmingApply] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [appliedCount, setAppliedCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase
+      .from("listings")
+      .select("id", { count: "exact", head: true })
+      .eq("seller_id", userId)
+      .in("status", ["active", "paused"])
+      .then(({ count }) => {
+        if (!cancelled) setPublishedCount(count ?? 0);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   async function saveLocation(lat: number, lng: number, address: string) {
     const { error: err } = await supabase
@@ -115,10 +142,39 @@ export default function ProfileForm({
       setLocationError("No se pudo guardar la ubicación.");
     } else {
       setSavedAddress(address);
+      setSavedCoords({ lat, lng });
       setLocationSaved(true);
       setLocationError(null);
+      setAppliedCount(null);
+      setConfirmingApply(false);
       setTimeout(() => setLocationSaved(false), 3000);
     }
+  }
+
+  /** Copia la ubicación del perfil a todas las publicaciones vivas del vendedor. */
+  async function applyLocationToListings() {
+    if (!savedCoords || !savedAddress) return;
+    setApplying(true);
+    setLocationError(null);
+    // `listings.location` es columna generada desde latitude/longitude: no se
+    // escribe, se recalcula sola.
+    const { data, error: err } = await supabase
+      .from("listings")
+      .update({
+        latitude: savedCoords.lat,
+        longitude: savedCoords.lng,
+        address: savedAddress,
+      })
+      .eq("seller_id", userId)
+      .in("status", ["active", "paused"])
+      .select("id");
+    setApplying(false);
+    setConfirmingApply(false);
+    if (err) {
+      setLocationError("No se pudieron actualizar las publicaciones. Intenta de nuevo.");
+      return;
+    }
+    setAppliedCount(data?.length ?? 0);
   }
 
   async function handleGeolocate() {
@@ -470,7 +526,8 @@ export default function ProfileForm({
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
           <h2 className="text-sm font-semibold text-gray-700">Ubicación por defecto</h2>
           <p className="text-xs text-gray-400 mt-1">
-            Se usa para pre-rellenar el mapa al publicar un libro.
+            Pre-rellena el mapa al publicar y, si quieres, corrige de una vez la dirección de
+            los libros que ya tienes publicados.
           </p>
         </div>
         <div className="px-6 py-5 space-y-3">
@@ -539,6 +596,60 @@ export default function ProfileForm({
           )}
           {locationSaved && (
             <p className="text-xs text-green-600">✓ Ubicación guardada correctamente.</p>
+          )}
+
+          {/* Aplicar a lo ya publicado */}
+          {savedAddress && savedCoords && publishedCount != null && publishedCount > 0 && (
+            <div className="pt-3 mt-1 border-t border-gray-100 space-y-2">
+              {appliedCount != null ? (
+                <p className="text-xs text-green-600">
+                  ✓ Listo: {appliedCount}{" "}
+                  {appliedCount === 1 ? "publicación quedó" : "publicaciones quedaron"} con esta
+                  dirección.
+                </p>
+              ) : confirmingApply ? (
+                <>
+                  <p className="text-xs text-gray-600">
+                    Se le va a poner esta dirección a tus {publishedCount}{" "}
+                    {publishedCount === 1 ? "publicación" : "publicaciones"} activas y en pausa.
+                    Afecta desde dónde se cotiza el despacho.
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={applyLocationToListings}
+                      disabled={applying}
+                      className="px-4 py-2 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white text-xs font-medium rounded-xl transition-colors"
+                    >
+                      {applying ? "Actualizando..." : "Sí, aplicar a todas"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmingApply(false)}
+                      disabled={applying}
+                      className="px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmingApply(true)}
+                    className="w-full py-2.5 border border-brand-200 text-brand-700 hover:bg-brand-50 rounded-xl text-sm font-medium transition-colors"
+                  >
+                    Aplicar esta dirección a mis {publishedCount}{" "}
+                    {publishedCount === 1 ? "publicación" : "publicaciones"}
+                  </button>
+                  <p className="text-xs text-gray-400">
+                    Cambiar tu ubicación acá no mueve los libros que ya publicaste. Usa este botón
+                    si todos están donde tú estás.
+                  </p>
+                </>
+              )}
+            </div>
           )}
         </div>
       </div>
