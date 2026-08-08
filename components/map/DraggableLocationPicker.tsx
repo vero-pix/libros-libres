@@ -167,9 +167,14 @@ export default function DraggableLocationPicker({
           lng: initialLng!,
           address: initialAddress,
         });
-      } else {
+      } else if (hasInitial) {
         updateLocation(center.lng, center.lat);
       }
+      // Sin ubicación inicial NO se auto-asigna nada: el mapa arranca centrado
+      // en Santiago y antes eso quedaba guardado como la dirección del libro sin
+      // que el vendedor tocara el pin. Vendedores de regiones publicaban con
+      // "Virginia Opazo 23, Santiago" encima. Ahora el pin es solo un punto de
+      // partida y hay que moverlo (o usar GPS/búsqueda) para que cuente.
     });
 
     mapRef.current = map;
@@ -240,8 +245,13 @@ export default function DraggableLocationPicker({
             <span>{address}</span>
           </p>
         ) : (
-          <p className="text-xs text-gray-400">
-            Arrastra el pin, haz clic en el mapa o usa &quot;Mi ubicación&quot;.
+          <p className="text-xs text-amber-700 flex items-start gap-1">
+            <span className="mt-0.5 flex-shrink-0">⚠️</span>
+            <span>
+              Falta marcar dónde está el libro: arrastra el pin, haz clic en el
+              mapa o usa &quot;Mi ubicación&quot;. El mapa parte en Santiago, pero
+              eso <strong>no</strong> es tu ubicación hasta que lo muevas.
+            </span>
           </p>
         )}
       </div>
