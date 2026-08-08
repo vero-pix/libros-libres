@@ -63,14 +63,25 @@
   display: none !important;
 }
 
-/* Marquee libros destacados */
+/* Marquee libros destacados.
+   La duración va por variable: con 28s fijos, una tira de 12 pedidos pasaba a
+   ~2,3s por ítem y no se alcanzaba a leer, mientras una de 3 se arrastraba.
+   Cada componente calcula su duración según cuántos elementos tiene. */
 @keyframes marquee {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 .marquee-track {
-  animation: marquee 28s linear infinite;
+  animation: marquee var(--marquee-duration, 28s) linear infinite;
 }
-.marquee-track:hover {
+.marquee-track:hover,
+.marquee-track:focus-within {
   animation-play-state: paused;
+}
+/* Quien pidió menos movimiento no ve nada moviéndose: la tira queda quieta y
+   se puede recorrer a mano. */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
 }

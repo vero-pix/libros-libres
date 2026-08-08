@@ -40,7 +40,10 @@ export default function FeaturedRow({ featuredListings, featuredSellers }: Props
             </div>
           </div>
           <div className="overflow-hidden -mx-2 px-2">
-            <div className="marquee-track flex gap-4 w-max pb-2">
+            <div
+              className="marquee-track flex gap-4 w-max pb-2"
+              style={{ ["--marquee-duration" as string]: `${featuredListings.length * 7}s` }}
+            >
               {[...featuredListings, ...featuredListings].map((listing, i) => {
                 const book = listing.book;
                 const coverUrl = listing.cover_image_url || book.cover_url;
@@ -94,7 +97,10 @@ export default function FeaturedRow({ featuredListings, featuredSellers }: Props
             <span className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">· {featuredSellers.length} tiendas</span>
           </div>
           <div className="overflow-hidden -mx-2 px-2">
-            <div className="marquee-track flex gap-4 w-max pb-2">
+            <div
+              className="marquee-track flex gap-4 w-max pb-2"
+              style={{ ["--marquee-duration" as string]: `${shuffledSellers.length * 7}s` }}
+            >
             {[...shuffledSellers, ...shuffledSellers].map((seller, i) => (
               <Link
                 key={`${seller.id}-${i}`}

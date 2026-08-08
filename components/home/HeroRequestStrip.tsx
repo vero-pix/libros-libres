@@ -38,9 +38,13 @@ export default async function HeroRequestStrip() {
           Se busca
         </span>
 
-        {/* Marquee */}
+        {/* Marquee — ~7s por pedido para que se alcance a leer. Con la duración
+            fija de antes, 12 pedidos pasaban a 2,3s cada uno. */}
         <div className="overflow-hidden flex-1">
-          <div className="marquee-track flex items-center gap-7 w-max">
+          <div
+            className="marquee-track flex items-center gap-7 w-max"
+            style={{ ["--marquee-duration" as string]: `${reqs.length * 7}s` }}
+          >
             {loop.map((r, i) => {
               const loc = r.requester_location?.trim();
               return (
