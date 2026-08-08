@@ -24,7 +24,7 @@ import {
   outputPath,
   csvCell,
 } from "./_shared";
-import { BASELINE_2026_05_26 } from "./baseline";
+import { BASELINE_2026_05_26, VOLUMEN_MENSUAL } from "./baseline";
 
 loadEnv();
 
@@ -117,6 +117,8 @@ function compareBaseline(queryRows: Row[], endDate: string): void {
     estado: string;
     clicks: number;
     impressions: number;
+    /** Búsquedas/mes estimadas (SEMrush). Ordena por oportunidad, no por posición. */
+    volumen: number | null;
   };
   const comp: CompRow[] = [];
   const baselineKeys = new Set<string>();
@@ -138,6 +140,7 @@ function compareBaseline(queryRows: Row[], endDate: string): void {
         estado: "fuera del top 1000 (vol. bajo — verificar con filtro)",
         clicks: 0,
         impressions: 0,
+        volumen: VOLUMEN_MENSUAL[norm] ?? null,
       });
       continue;
     }
@@ -151,6 +154,7 @@ function compareBaseline(queryRows: Row[], endDate: string): void {
       estado: delta > 0 ? "MEJORÓ" : delta < 0 ? "EMPEORÓ" : "IGUAL",
       clicks: row.clicks,
       impressions: row.impressions,
+      volumen: VOLUMEN_MENSUAL[norm] ?? null,
     });
   }
 
@@ -164,6 +168,7 @@ function compareBaseline(queryRows: Row[], endDate: string): void {
   console.log("\n━━━ COMPARATIVA vs línea base 26-may-2026 ━━━");
   console.log(
     "keyword".padEnd(48) +
+      "vol/mes".padStart(8) +
       "base".padStart(6) +
       "actual".padStart(8) +
       "delta".padStart(7) +
@@ -172,12 +177,28 @@ function compareBaseline(queryRows: Row[], endDate: string): void {
   for (const c of comp.sort((a, b) => (b.delta ?? -999) - (a.delta ?? -999))) {
     console.log(
       c.keyword.slice(0, 47).padEnd(48) +
+        String(c.volumen ?? "—").padStart(8) +
         String(c.posBase ?? "—").padStart(6) +
         (c.posActual != null ? c.posActual.toFixed(1) : "—").padStart(8) +
         (c.delta != null ? (c.delta > 0 ? "+" : "") + c.delta.toFixed(1) : "—").padStart(7) +
         "  " +
         c.estado
     );
+  }
+
+  // Dónde conviene empujar: mucho volumen y posición todavía mala. Es la
+  // pregunta que la posición sola no responde.
+  const oportunidades = comp
+    .filter((c) => c.volumen != null && c.posActual != null && c.posActual > 5)
+    .sort((a, b) => (b.volumen ?? 0) - (a.volumen ?? 0))
+    .slice(0, 8);
+  if (oportunidades.length) {
+    console.log("\n━━━ OPORTUNIDADES (más buscadas donde aún no estás arriba) ━━━");
+    for (const o of oportunidades) {
+      console.log(
+        `  ${String(o.volumen).padStart(5)} búsq/mes · pos ${o.posActual!.toFixed(1).padStart(5)} · ${o.keyword}`
+      );
+    }
   }
 
   const mejoraron = comp.filter((c) => c.estado === "MEJORÓ").length;
@@ -198,10 +219,11 @@ function compareBaseline(queryRows: Row[], endDate: string): void {
 
   // CSV
   const csvLines = [
-    "keyword,pos_26may,pos_actual,delta,estado,clicks,impresiones",
+    "keyword,volumen_mensual,pos_26may,pos_actual,delta,estado,clicks,impresiones",
     ...comp.map((c) =>
       [
         csvCell(c.keyword),
+        c.volumen ?? "",
         c.posBase ?? "",
         c.posActual != null ? c.posActual.toFixed(1) : "",
         c.delta != null ? c.delta.toFixed(1) : "",
