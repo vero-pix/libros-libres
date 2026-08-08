@@ -8,6 +8,7 @@ import Image from "next/image";
 interface Props {
   userId: string;
   initialFullName: string;
+  initialUsername?: string;
   initialPhone: string;
   initialBio?: string;
   initialAvatarUrl?: string | null;
@@ -26,6 +27,8 @@ interface PickupPoint {
 }
 
 const PHONE_REGEX = /^\+56[0-9]{9}$/;
+/** Lo que puede ir en /libro/[username]/… sin romper la URL. */
+const USERNAME_REGEX = /^[a-z0-9](?:[a-z0-9.-]{1,38})[a-z0-9]$/;
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 
 async function reverseGeocode(lng: number, lat: number): Promise<string> {
@@ -58,6 +61,7 @@ async function forwardGeocode(query: string): Promise<{ lng: number; lat: number
 export default function ProfileForm({
   userId,
   initialFullName,
+  initialUsername,
   initialPhone,
   initialBio,
   initialAvatarUrl,
@@ -73,6 +77,12 @@ export default function ProfileForm({
 
   // Datos personales
   const [fullName, setFullName] = useState(initialFullName);
+  // El nombre de usuario se generaba solo desde el nombre al registrarse y no
+  // había forma de cambiarlo, aunque es lo que sale en la URL pública de cada
+  // libro. Un vendedor quedó con uno impresentable y tuvo que pedirlo por
+  // correo. (8 ago 2026)
+  const [username, setUsername] = useState(initialUsername ?? "");
+  const [usernameError, setUsernameError] = useState<string | null>(null);
   const [phone, setPhone] = useState(initialPhone);
   const [bio, setBio] = useState(initialBio ?? "");
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl ?? "");
@@ -220,27 +230,44 @@ export default function ProfileForm({
       setPhoneError("Formato inválido. Usa +56 seguido de 9 dígitos. Ej: +56912345678");
       return;
     }
+    const nuevoUsername = username.trim().toLowerCase();
+    const cambioUsername = nuevoUsername !== (initialUsername ?? "").toLowerCase();
+    if (cambioUsername && nuevoUsername && !USERNAME_REGEX.test(nuevoUsername)) {
+      setUsernameError(
+        "Usa entre 3 y 40 caracteres: letras sin tilde, números, puntos o guiones."
+      );
+      return;
+    }
+    setUsernameError(null);
     setLoading(true);
     setSaved(false);
     setError(null);
 
-    const { error: updateError } = await supabase
-      .from("users")
-      .update({
-        full_name: fullName.trim() || null,
-        phone: phone.trim() || null,
-        bio: bio.trim() || null,
-        public_email: publicEmail.trim() || null,
-        instagram: instagram.trim().replace(/^@/, "") || null,
-        pickup_points: pickupPoints
-          .filter((p) => p.label.trim())
-          .map((p) => ({ label: p.label.trim(), comuna: (p.comuna ?? "").trim() || null })),
-      })
-      .eq("id", userId);
+    const cambios: Record<string, unknown> = {
+      full_name: fullName.trim() || null,
+      phone: phone.trim() || null,
+      bio: bio.trim() || null,
+      public_email: publicEmail.trim() || null,
+      instagram: instagram.trim().replace(/^@/, "") || null,
+      pickup_points: pickupPoints
+        .filter((p) => p.label.trim())
+        .map((p) => ({ label: p.label.trim(), comuna: (p.comuna ?? "").trim() || null })),
+    };
+    // Solo se manda si cambió: mandarlo igual chocaría contra el índice único
+    // consigo mismo en algunas configuraciones.
+    if (cambioUsername && nuevoUsername) cambios.username = nuevoUsername;
+
+    const { error: updateError } = await supabase.from("users").update(cambios).eq("id", userId);
 
     setLoading(false);
     if (updateError) {
-      setError("No se pudieron guardar los cambios: " + updateError.message);
+      // 23505 = violación de unicidad. El mensaje crudo de Postgres no le dice
+      // nada a nadie.
+      if (updateError.code === "23505" || /duplicate|unique/i.test(updateError.message)) {
+        setUsernameError(`"${nuevoUsername}" ya está tomado. Prueba con otro.`);
+      } else {
+        setError("No se pudieron guardar los cambios: " + updateError.message);
+      }
     } else {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
@@ -386,6 +413,36 @@ export default function ProfileForm({
                 placeholder="Tu nombre"
                 className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 transition-colors"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Nombre de usuario
+              </label>
+              <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-brand-400 transition-colors">
+                <span className="pl-3 pr-1 py-2.5 text-sm text-gray-400 select-none whitespace-nowrap">
+                  tuslibros.cl/libro/
+                </span>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => {
+                    setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9.-]/g, ""));
+                    setUsernameError(null);
+                  }}
+                  placeholder="tu.nombre"
+                  className="flex-1 min-w-0 pr-3 py-2.5 text-sm focus:outline-none"
+                />
+              </div>
+              {usernameError ? (
+                <p className="text-xs text-red-600 mt-1.5">⚠ {usernameError}</p>
+              ) : (
+                <p className="text-xs text-gray-400 mt-1.5">
+                  Es la dirección pública de tus libros. Si la cambias, los enlaces
+                  antiguos siguen funcionando, pero conviene actualizar los que tengas
+                  compartidos.
+                </p>
+              )}
             </div>
 
             <div>
