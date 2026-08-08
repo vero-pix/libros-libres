@@ -257,7 +257,7 @@ export default function RegisterForm() {
             Inicia sesión
           </Link>
         </p>
-        <SocialLoginButtons />
+        <SocialLoginButtons next={safeNext} />
       </form>
     </div>
   );

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import PublishForm from "@/components/listings/PublishForm";
+import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
 import type { BookData } from "@/types";
 
 interface Props {
@@ -60,20 +61,24 @@ export default async function PublishPage({ searchParams }: Props) {
         </section>
 
         <main className="max-w-md mx-auto px-4 py-10">
-          {/* CTA card — crear cuenta / iniciar sesión, ambos vuelven a /publish */}
+          {/* CTA card — entrar con Google en un clic, o el formulario de siempre.
+              En julio 222 sesiones humanas llegaron acá sin sesión y ninguna
+              llegó al formulario: el registro por correo era la única puerta. */}
           <div className="bg-white rounded-xl border border-brand-200 p-7 text-center shadow-sm">
             <h2 className="font-display text-xl font-bold text-ink mb-2">
-              Crea tu cuenta gratis para publicar
+              Entra y publica tu libro
             </h2>
             <p className="text-sm text-ink-muted mb-6 leading-relaxed">
-              Te toma menos de un minuto. Apenas la creas, vuelves directo acá a subir tu
-              libro.
+              Con tu cuenta de Google es un clic y vuelves directo acá. Publicar es gratis.
             </p>
+
+            <SocialLoginButtons next="/publish" compact />
+
             <Link
               href="/register?next=/publish"
-              className="block w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-lg transition-colors shadow-sm"
+              className="mt-4 block w-full border border-brand-200 text-brand-700 hover:bg-brand-50 font-semibold py-3 rounded-lg transition-colors"
             >
-              Crear cuenta y publicar
+              Prefiero usar mi correo
             </Link>
             <p className="text-sm text-ink-muted mt-4">
               ¿Ya tienes cuenta?{" "}

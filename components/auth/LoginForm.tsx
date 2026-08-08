@@ -94,7 +94,7 @@ export default function LoginForm() {
           Regístrate gratis
         </Link>
       </p>
-      <SocialLoginButtons />
+      <SocialLoginButtons next={safeNext} />
     </form>
   );
 }

@@ -4,32 +4,53 @@ import { createClient } from "@/lib/supabase/client";
 
 type Provider = "google" | "linkedin_oidc";
 
-export default function SocialLoginButtons() {
+interface Props {
+  /** A dónde volver después del OAuth. Se sanea igual que en el resto de la
+   *  cadena de auth para evitar open redirects. */
+  next?: string;
+  /** Solo Google y sin el separador "o continúa con": para usarlo como entrada
+   *  principal (ej. /publish sin sesión), no como alternativa a un formulario. */
+  compact?: boolean;
+}
+
+export default function SocialLoginButtons({ next, compact = false }: Props) {
   const supabase = createClient();
 
   async function handleOAuth(provider: Provider) {
+    // Sin esto el callback caía siempre en "/" y quien entraba con Google para
+    // publicar aterrizaba en la home, lejos del formulario. El destino ya lo
+    // soportaba /api/auth/callback; nadie se lo estaba pasando. (7 ago 2026)
+    const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback`,
+        redirectTo: safeNext
+          ? `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(safeNext)}`
+          : `${window.location.origin}/api/auth/callback`,
       },
     });
   }
 
   return (
     <div className="space-y-2.5">
-      <div className="relative flex items-center gap-3 my-5">
-        <div className="flex-1 border-t border-cream-dark/40" />
-        <span className="text-xs text-ink-muted">o continúa con</span>
-        <div className="flex-1 border-t border-cream-dark/40" />
-      </div>
+      {!compact && (
+        <div className="relative flex items-center gap-3 my-5">
+          <div className="flex-1 border-t border-cream-dark/40" />
+          <span className="text-xs text-ink-muted">o continúa con</span>
+          <div className="flex-1 border-t border-cream-dark/40" />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-2.5">
         {/* Google */}
         <button
           type="button"
           onClick={() => handleOAuth("google")}
-          className="w-full flex items-center justify-center gap-3 py-2.5 border border-cream-dark/40 rounded-xl text-sm font-medium text-ink bg-white hover:bg-cream-light/50 transition-colors"
+          className={
+            compact
+              ? "w-full flex items-center justify-center gap-3 py-3 border border-cream-dark/40 rounded-lg text-sm font-semibold text-ink bg-white hover:bg-cream-light/50 transition-colors shadow-sm"
+              : "w-full flex items-center justify-center gap-3 py-2.5 border border-cream-dark/40 rounded-xl text-sm font-medium text-ink bg-white hover:bg-cream-light/50 transition-colors"
+          }
         >
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
@@ -40,7 +61,8 @@ export default function SocialLoginButtons() {
           Continuar con Google
         </button>
 
-        {/* LinkedIn */}
+        {/* LinkedIn — fuera del modo compacto: en /publish solo estorba. */}
+        {!compact && (
         <button
           type="button"
           onClick={() => handleOAuth("linkedin_oidc")}
@@ -51,6 +73,7 @@ export default function SocialLoginButtons() {
           </svg>
           Continuar con LinkedIn
         </button>
+        )}
       </div>
     </div>
   );
