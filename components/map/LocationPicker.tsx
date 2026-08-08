@@ -24,16 +24,26 @@ export default function LocationPicker({ onLocationChange }: Props) {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerRef = useRef<mapboxgl.Marker | null>(null);
   const [address, setAddress] = useState("");
+  const [mapaRoto, setMapaRoto] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    const map = new mapboxgl.Map({
-      container: containerRef.current,
-      style: "mapbox://styles/mapbox/light-v11",
-      center: DEFAULT_CENTER,
-      zoom: 12,
-    });
+    // Sin WebGL, instanciar el mapa lanza y tumba la página entera. Acá no hay
+    // alternativa de búsqueda por texto (sí la hay en /publish), así que al
+    // menos no se cae: se avisa y se manda al formulario que sí funciona.
+    let map: mapboxgl.Map;
+    try {
+      map = new mapboxgl.Map({
+        container: containerRef.current,
+        style: "mapbox://styles/mapbox/light-v11",
+        center: DEFAULT_CENTER,
+        zoom: 12,
+      });
+    } catch {
+      setMapaRoto(true);
+      return;
+    }
 
     map.addControl(new mapboxgl.NavigationControl(), "top-right");
 
@@ -76,8 +86,17 @@ export default function LocationPicker({ onLocationChange }: Props) {
 
   return (
     <div className="space-y-2">
-      <div ref={containerRef} className="w-full h-48 rounded-xl overflow-hidden border border-gray-200" />
-      {address ? (
+      <div
+        ref={containerRef}
+        className={mapaRoto ? "hidden" : "w-full h-48 rounded-xl overflow-hidden border border-gray-200"}
+      />
+      {mapaRoto ? (
+        <p className="text-xs text-amber-700">
+          Tu navegador no puede mostrar el mapa. Publica desde{" "}
+          <a href="/publish" className="underline font-medium">/publish</a>, donde puedes
+          escribir la dirección a mano.
+        </p>
+      ) : address ? (
         <p className="text-xs text-gray-600 flex items-center gap-1">
           <span>📍</span> {address}
         </p>

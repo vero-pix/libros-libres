@@ -9,6 +9,28 @@ mapboxgl.accessToken = TOKEN;
 
 const DEFAULT_CENTER: [number, number] = [-70.6693, -33.4489]; // Santiago
 
+/**
+ * Mapbox GL necesita WebGL y revienta sin él, tumbando toda la página de
+ * /publish: sin navegador con WebGL no se podía publicar nada. Lo reportó un
+ * vendedor el 8-08-2026, y también afecta a quien navega con lector de pantalla,
+ * para quien un pin arrastrable no sirve de nada.
+ *
+ * mapbox-gl 3.x ya no expone `supported()`, así que se prueba a mano.
+ */
+function hayWebGL(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(
+      canvas.getContext("webgl2") ||
+      canvas.getContext("webgl") ||
+      canvas.getContext("experimental-webgl")
+    );
+  } catch {
+    return false;
+  }
+}
+
 export interface LocationData {
   lat: number;
   lng: number;
@@ -77,6 +99,8 @@ export default function DraggableLocationPicker({
   const [searching, setSearching] = useState(false);
   const [geolocating, setGeolocating] = useState(false);
   const [geoError, setGeoError] = useState(false);
+  // null = todavía no se comprueba (SSR). Sin WebGL se cae al modo solo texto.
+  const [mapaDisponible, setMapaDisponible] = useState<boolean | null>(null);
 
   const updateLocation = useCallback(async (lng: number, lat: number, knownAddress?: string) => {
     setGeocoding(!knownAddress);
@@ -130,13 +154,33 @@ export default function DraggableLocationPicker({
   }
 
   useEffect(() => {
+    // Sin WebGL no se instancia el mapa: instanciarlo lanza y se lleva la
+    // página entera por delante. Se sigue pudiendo publicar buscando la
+    // dirección o con GPS.
+    if (!hayWebGL()) {
+      setMapaDisponible(false);
+      return;
+    }
     if (!containerRef.current || mapRef.current) return;
 
-    const map = new mapboxgl.Map({
-      container: containerRef.current,
-      style: "mapbox://styles/mapbox/light-v11",
-      center: initialCenter,
-      zoom: hasInitial ? 15 : 12,
+    let map: mapboxgl.Map;
+    try {
+      map = new mapboxgl.Map({
+        container: containerRef.current,
+        style: "mapbox://styles/mapbox/light-v11",
+        center: initialCenter,
+        zoom: hasInitial ? 15 : 12,
+      });
+    } catch {
+      // WebGL presente pero el contexto falla igual (drivers, memoria, GPU
+      // bloqueada por el sistema). Mismo camino de respaldo.
+      setMapaDisponible(false);
+      return;
+    }
+    setMapaDisponible(true);
+
+    map.on("error", (e) => {
+      console.error("[mapa] error de Mapbox:", e?.error?.message ?? e);
     });
 
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
@@ -190,7 +234,11 @@ export default function DraggableLocationPicker({
     <div className="space-y-2">
       {/* Búsqueda de dirección */}
       <div className="relative">
+        <label htmlFor="buscar-direccion" className="sr-only">
+          Dirección donde está el libro
+        </label>
         <input
+          id="buscar-direccion"
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -203,8 +251,26 @@ export default function DraggableLocationPicker({
         )}
       </div>
 
+      {/* Sin WebGL: el mapa no existe, pero buscar dirección y GPS sí sirven. */}
+      {mapaDisponible === false && (
+        <div className="bg-cream-warm border border-cream-dark rounded-xl px-3 py-2.5 space-y-2">
+          <p className="text-xs text-ink-muted">
+            Tu navegador no puede mostrar el mapa, así que ubica el libro escribiendo la
+            dirección arriba o con el botón de acá abajo. Funciona igual.
+          </p>
+          <button
+            type="button"
+            onClick={handleGeolocate}
+            disabled={geolocating}
+            className="w-full flex items-center justify-center gap-2 py-2 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60 transition-colors"
+          >
+            {geolocating ? "Obteniendo ubicación..." : "Usar mi ubicación actual"}
+          </button>
+        </div>
+      )}
+
       {/* Mapa con botón GPS superpuesto */}
-      <div className="relative">
+      <div className={mapaDisponible === false ? "hidden" : "relative"}>
         <div
           ref={containerRef}
           className="w-full h-56 rounded-xl overflow-hidden border border-gray-200"
@@ -243,6 +309,11 @@ export default function DraggableLocationPicker({
           <p className="text-xs text-gray-600 flex items-start gap-1">
             <span className="mt-0.5 flex-shrink-0">📍</span>
             <span>{address}</span>
+          </p>
+        ) : mapaDisponible === false ? (
+          <p className="text-xs text-amber-700 flex items-start gap-1">
+            <span className="mt-0.5 flex-shrink-0">⚠️</span>
+            <span>Falta indicar dónde está el libro: escribe la dirección o usa tu ubicación.</span>
           </p>
         ) : (
           <p className="text-xs text-amber-700 flex items-start gap-1">
