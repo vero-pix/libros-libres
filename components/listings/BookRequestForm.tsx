@@ -15,6 +15,9 @@ export default function BookRequestForm({ initialTitle = "" }: BookRequestFormPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDone, setIsDone] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [matches, setMatches] = useState<
+    { id: string; title: string; author: string | null; price: number | null; url: string }[]
+  >([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,11 +43,12 @@ export default function BookRequestForm({ initialTitle = "" }: BookRequestFormPr
         }),
       });
 
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error || "Error al guardar el pedido");
       }
 
+      setMatches(Array.isArray(data.matches) ? data.matches : []);
       setIsDone(true);
     } catch (err: any) {
       console.error("Error creating book request:", err.message);
@@ -60,13 +64,44 @@ export default function BookRequestForm({ initialTitle = "" }: BookRequestFormPr
         <div className="text-4xl mb-4">✨</div>
         <h3 className="text-xl font-bold text-ink">¡Pedido guardado!</h3>
         <p className="text-ink-muted mt-2">
-          Hemos anotado que buscas <strong>&ldquo;{title}&rdquo;</strong>. 
+          Hemos anotado que buscas <strong>&ldquo;{title}&rdquo;</strong>.
           Recibirás un correo apenas alguien lo publique.
         </p>
-        <button 
+
+        {/* Si ya está a la venta, mostrarlo acá mismo en vez de mandarlo a esperar. */}
+        {matches.length > 0 && (
+          <div className="mt-6 text-left">
+            <p className="text-xs uppercase tracking-wider font-semibold text-brand-700 mb-2">
+              Aunque quizás no tengas que esperar:
+            </p>
+            <ul className="space-y-2">
+              {matches.map((m) => (
+                <li key={m.id}>
+                  <a
+                    href={m.url}
+                    className="flex items-baseline justify-between gap-3 bg-white border border-brand-100 rounded-xl px-4 py-3 hover:border-brand-300 transition-colors"
+                  >
+                    <span className="min-w-0">
+                      <span className="block font-semibold text-ink truncate">{m.title}</span>
+                      {m.author && (
+                        <span className="block text-xs italic text-ink-muted truncate">{m.author}</span>
+                      )}
+                    </span>
+                    <span className="shrink-0 text-sm font-semibold text-brand-700">
+                      {m.price ? `$${m.price.toLocaleString("es-CL")}` : "Ver"} →
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <button
           className="mt-6 border border-brand-200 hover:bg-brand-100 text-brand-700 px-6 py-2 rounded-xl transition-colors"
           onClick={() => {
             setIsDone(false);
+            setMatches([]);
             setTitle("");
             setEmail("");
             setWhatsapp("");

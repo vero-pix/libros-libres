@@ -2,7 +2,18 @@
 
 import { useState } from "react";
 
+interface CatalogoMatch {
+  id: string;
+  title: string;
+  author: string | null;
+  price: number | null;
+  url: string;
+  sellerName: string | null;
+  nivel: "exacto" | "probable";
+}
+
 export default function RequestForm() {
+  const [matches, setMatches] = useState<CatalogoMatch[]>([]);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [notes, setNotes] = useState("");
@@ -40,6 +51,8 @@ export default function RequestForm() {
         setStatus("error");
         return;
       }
+      const data = await res.json().catch(() => ({}));
+      setMatches(Array.isArray(data.matches) ? data.matches : []);
       setStatus("ok");
       setTitle("");
       setAuthor("");
@@ -53,6 +66,66 @@ export default function RequestForm() {
   };
 
   if (status === "ok") {
+    // Si el libro ya está a la venta, eso es lo primero que tiene que ver: no
+    // sirve de nada avisarle que espere algo que puede comprar ahora mismo.
+    if (matches.length > 0) {
+      const hayExacto = matches.some((m) => m.nivel === "exacto");
+      return (
+        <div className="bg-amber-50 border border-amber-300 rounded-xl p-6 animate-fade-in-up">
+          <p className="text-[11px] uppercase tracking-[0.3em] font-semibold text-amber-700 mb-1">
+            No tienes que esperar
+          </p>
+          <p className="font-display text-xl text-ink mb-1">
+            {hayExacto ? "Este libro ya está en tuslibros" : "Puede que ya lo tengamos"}
+          </p>
+          <p className="text-sm text-ink-muted mb-4">
+            Guardamos tu solicitud igual. Pero mira, esto está publicado ahora:
+          </p>
+
+          <ul className="space-y-2 mb-5">
+            {matches.map((m) => (
+              <li key={m.id}>
+                <a
+                  href={m.url}
+                  className="flex items-baseline justify-between gap-3 bg-white border border-cream-dark rounded-lg px-4 py-3 hover:border-amber-500 transition-colors"
+                >
+                  <span className="min-w-0">
+                    <span className="block font-display text-base text-ink truncate">{m.title}</span>
+                    {m.author && (
+                      <span className="block text-xs italic text-ink-muted truncate">{m.author}</span>
+                    )}
+                    {m.sellerName && (
+                      <span className="block text-[11px] text-ink-muted mt-0.5">
+                        Vende {m.sellerName}
+                      </span>
+                    )}
+                  </span>
+                  <span className="shrink-0 text-sm font-semibold text-amber-800">
+                    {m.price ? `$${m.price.toLocaleString("es-CL")}` : "Ver"} →
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          <p className="text-xs text-ink-muted mb-3">
+            ¿No es ninguno de estos? No pasa nada — tu solicitud quedó en la lista
+            y te avisamos si alguien publica el que buscas.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setMatches([]);
+              setStatus("idle");
+            }}
+            className="text-xs uppercase tracking-wider font-semibold text-amber-800 underline"
+          >
+            Pedir otro libro
+          </button>
+        </div>
+      );
+    }
+
     return (
       <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
         <p className="font-display text-lg text-green-900 mb-2">¡Solicitud recibida!</p>

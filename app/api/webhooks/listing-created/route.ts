@@ -1,70 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { foldAccents } from "@/lib/accentSearch";
+import { compararLibro, normalizar } from "@/lib/bookRequestMatch";
 
 export const runtime = "nodejs";
-
-/** Minúsculas, sin tildes, sin puntuación y con los espacios colapsados. */
-function normalizar(s: string | null | undefined): string {
-  if (!s) return "";
-  // foldAccents ya dejó todo en minúscula y sin diacríticos (la ñ cae en n), así
-  // que basta con letras a-z y dígitos. Sin \p{L} a propósito: el target de TS
-  // del proyecto no admite la flag unicode del regex.
-  return foldAccents(s)
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-/** Palabras "de contenido": ignora artículos y preposiciones. */
-const VACIAS = new Set(["el","la","los","las","un","una","unos","unas","de","del","y","o","a","en","the","of","and"]);
-const tokens = (s: string) => s.split(" ").filter((t) => t.length >= 4 && !VACIAS.has(t));
-
-/**
- * ¿La publicación satisface la solicitud del "Se busca"?
- *
- * El match anterior era `includes` en cualquier sentido con umbral de 3 letras:
- * pedir "Ana" calzaba con "La ventana", y pedir "Chile" con cualquier libro que
- * tuviera "Chile" en el título. Eso cerraba solicitudes que nadie había cumplido.
- *
- * Devuelve además `fuerte`, que es lo único que autoriza a cerrar la solicitud.
- */
-function compararLibro(
-  reqTitle: string,
-  pubTitle: string,
-  reqAuthor: string,
-  pubAuthor: string
-): { hay: boolean; fuerte: boolean } {
-  if (!reqTitle || !pubTitle) return { hay: false, fuerte: false };
-
-  const igual = reqTitle === pubTitle;
-
-  // Contención, pero respetando palabras completas: un libro titulado "Q" cerró
-  // 6 solicitudes en producción porque `includes` matcheaba la letra q suelta
-  // dentro de "La músi-q-ue...". Con límites de palabra eso no vuelve a pasar,
-  // y "del amor" deja de calzar con quien pidió "El amor".
-  const corto = reqTitle.length <= pubTitle.length ? reqTitle : pubTitle;
-  const largo = reqTitle.length <= pubTitle.length ? pubTitle : reqTitle;
-  const contiene =
-    corto.length >= 4 &&
-    new RegExp(`\\b${corto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(largo);
-
-  // Autor: si ambos lo declaran, tienen que compartir al menos un apellido.
-  const ra = tokens(reqAuthor);
-  const pa = tokens(pubAuthor);
-  const hayAutores = ra.length > 0 && pa.length > 0;
-  const autorCalza = hayAutores && ra.some((t) => pa.includes(t));
-
-  // Si ambos declaran autor y no coincide, no es el mismo libro por más que el
-  // título se parezca (hay muchas "Antología poética").
-  if (hayAutores && !autorCalza) return { hay: false, fuerte: false };
-
-  const hay = igual || contiene;
-  // Avisar es barato; cerrar la solicitud no. Solo cierra el título calcado (con
-  // autor coincidente o sin autores declarados) o la contención con autor que calza.
-  const fuerte = igual ? autorCalza || !hayAutores : contiene && autorCalza;
-  return { hay, fuerte };
-}
 
 /**
  * Notificador "gong" para Vero vía Telegram.

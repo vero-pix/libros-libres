@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@/lib/supabase/server";
-import { notifyRequestSellers } from "@/lib/notifyRequestSellers";
+import { buscarEnCatalogo, type CatalogoMatch } from "@/lib/bookRequestMatch";
 
 /**
  * GET /api/requests
@@ -113,15 +113,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Notificar a sellers activos por email (side effect, sin bloquear la
-  // respuesta al usuario que pide el libro). Si algo falla, se logea.
-  notifyRequestSellers({
-    id: data.id,
-    title: data.title,
-    author: data.author ?? null,
-    notes: notes?.trim() || null,
-    requester_location: requester_location?.trim() || null,
-  }).catch((e) => console.error("[notifyRequestSellers] error:", e));
+  // ¿El libro ya está a la venta? El webhook de listing-created solo matchea
+  // hacia adelante, así que quien pedía algo publicado desde antes quedaba
+  // esperando un aviso que no iba a llegar nunca. Acá se le muestra al tiro.
+  let matches: CatalogoMatch[] = [];
+  try {
+    matches = await buscarEnCatalogo(admin, { title: resolvedTitle, author: resolvedAuthor });
+  } catch (e) {
+    // Que no se caiga la solicitud por fallar la búsqueda: sin matches se
+    // comporta como antes.
+    console.error("[requests] buscarEnCatalogo falló:", e);
+  }
+
+  // Antes acá salía un correo a TODOS los vendedores activos por cada solicitud.
+  // Con 87 destinatarios eso consumía casi la cuota diaria completa de Resend
+  // (100 en el plan gratis) con una sola solicitud, y entran ~2,3 al día. Ahora
+  // las junta el cron /api/cron/requests-digest y sale un resumen diario.
 
   // GONG: Avisar por Telegram
   import("@/lib/notifications").then(({ sendGong, escapeHtml }) => {
@@ -131,9 +138,10 @@ export async function POST(req: NextRequest) {
       (requester_email ? `Email: ${escapeHtml(requester_email)}\n` : "") +
       (requester_whatsapp ? `WA: ${escapeHtml(requester_whatsapp)}\n` : "") +
       (notes ? `Notas: <i>${escapeHtml(notes)}</i>\n` : "") +
+      (matches.length ? `\n⚡ Ya está en catálogo (${matches.length}) — se le mostró al pedir\n` : "") +
       `\n<a href="https://tuslibros.cl/admin?tab=requests">Ver solicitudes →</a>`
     ).catch(() => {});
   });
 
-  return NextResponse.json({ request: data }, { status: 201 });
+  return NextResponse.json({ request: data, matches }, { status: 201 });
 }
