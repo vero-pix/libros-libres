@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>tuslibros.cl — WhatsApp libreros de antiguo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&display=swap');
+
+  /* Paleta de scripts/content-cards/brand.ts. Nada de negro puro ni neón. */
+  :root {
+    --cream: #faf7f2;
+    --cream-warm: #f3e9d8;
+    --ink: #2a1f14;
+    --amber: #c08a12;
+    --muted: #8a7a63;
+    --line: #e7ddcd;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #2a2a35; padding: 40px;
+    display: flex; flex-direction: column; gap: 40px; align-items: center;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .card {
+    width: 1080px; height: 1350px;
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
+    background: var(--cream);
+    padding: 88px;
+  }
+
+  .brand {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700; font-style: italic;
+    font-size: 34px; color: var(--ink); letter-spacing: -0.5px;
+  }
+  .brand span { color: var(--amber); }
+
+  .kicker {
+    font-size: 15px; letter-spacing: 4.5px; text-transform: uppercase;
+    color: var(--amber); font-weight: 600;
+  }
+
+  .headline {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700; color: var(--ink); letter-spacing: -2px;
+  }
+  .headline em { font-style: italic; color: var(--amber); }
+
+  .rule { width: 78px; height: 4px; background: var(--amber); border-radius: 2px; }
+
+  .foot {
+    margin-top: auto; display: flex; justify-content: space-between;
+    align-items: flex-end; gap: 30px;
+  }
+  .url {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 40px; color: var(--ink); letter-spacing: -0.5px;
+  }
+  .foot-note { font-size: 21px; color: var(--muted); line-height: 1.45; text-align: right; }
+
+  /* ─── PIEZA A — el gancho ─── */
+  #card-a .headline { font-size: 88px; line-height: 1.04; margin-top: 30px; }
+  #card-a .sub {
+    font-size: 27px; line-height: 1.5; color: #4a3d2e;
+    margin-top: 38px; max-width: 850px;
+  }
+  #card-a .proof {
+    margin-top: 50px; display: flex; flex-direction: column; gap: 18px;
+  }
+  #card-a .row {
+    display: flex; align-items: baseline; gap: 20px;
+    padding: 22px 28px; background: var(--cream-warm);
+    border-left: 4px solid var(--amber); border-radius: 4px;
+  }
+  #card-a .row .price {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 40px; color: var(--ink); white-space: nowrap; min-width: 192px;
+  }
+  #card-a .row .what { font-size: 24px; color: #4a3d2e; line-height: 1.35; }
+  #card-a .row .what b { font-weight: 600; }
+
+  /* ─── PIEZA B — cómo funciona ─── */
+  #card-b { background: var(--cream-warm); }
+  #card-b .headline { font-size: 70px; line-height: 1.07; margin-top: 26px; }
+  #card-b .steps { margin-top: 46px; display: flex; flex-direction: column; gap: 30px; }
+  #card-b .step { display: flex; gap: 22px; align-items: flex-start; }
+  #card-b .num {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 44px; color: var(--amber); line-height: 1.1; min-width: 60px;
+  }
+  #card-b .step-body h3 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 34px; color: var(--ink); margin-bottom: 8px; letter-spacing: -0.5px;
+  }
+  #card-b .step-body p { font-size: 24px; line-height: 1.45; color: #4a3d2e; max-width: 760px; }
+  #card-b .stamp {
+    margin-top: 42px; padding: 26px 30px; background: var(--cream);
+    border: 2px solid var(--line); border-radius: 6px;
+    font-size: 24px; line-height: 1.45; color: #4a3d2e;
+  }
+  #card-b .stamp b { color: var(--ink); font-weight: 600; }
+
+  /* ─── PIEZAS C y D ─── */
+  #card-c { background: var(--cream); }
+  #card-c .row {
+    display: block; padding: 20px 26px; background: var(--cream-warm);
+    border-left: 4px solid var(--amber); border-radius: 4px;
+  }
+  #card-c .row .what { display: block; }
+  #card-d { background: var(--cream-warm); }
+  .stampline {
+    margin-top: 46px; padding: 26px 30px; background: var(--cream-warm);
+    border: 2px solid var(--line); border-radius: 6px;
+    font-size: 25px; line-height: 1.45; color: #4a3d2e;
+  }
+  #card-d .stampline { background: var(--cream); }
+  .stampline b { color: var(--ink); font-weight: 600; }
+  .bigsteps { margin-top: 58px; display: flex; flex-direction: column; gap: 38px; }
+  .bigstep { display: flex; gap: 24px; align-items: baseline; }
+  .bigstep .num {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 48px; color: var(--amber); line-height: 1; min-width: 64px;
+  }
+  .bigstep p { font-size: 30px; line-height: 1.38; color: #4a3d2e; max-width: 780px; }
+</style>
+</head>
+<body>
+
+<!-- ════════ PIEZA A — el gancho ════════ -->
+<div class="card" id="card-a">
+  <div class="brand">tuslibros<span>.cl</span></div>
+
+  <div style="margin-top:46px" class="kicker">Para quien vende libros antiguos</div>
+  <h1 class="headline">El libro raro<br>no se vende<br><em>en cualquier parte.</em></h1>
+
+  <p class="sub">
+    En un marketplace general, una primera edición compite con un bestseller de $3.000
+    y pierde. Acá no: la mitad de lo que se vende pasa los $15.000.
+  </p>
+
+  <div class="proof">
+    <div class="row">
+      <span class="price">$100.000</span>
+      <span class="what"><b>El Tesoro de la Juventud</b> — 20 tomos</span>
+    </div>
+    <div class="row">
+      <span class="price">$80.000</span>
+      <span class="what"><b>La Araucana</b> — edición de 1967, dos tomos</span>
+    </div>
+    <div class="row">
+      <span class="price">$35.000</span>
+      <span class="what"><b>ABC y XYZ de la apicultura</b></span>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span class="url">tuslibros.cl</span>
+    <span class="foot-note">Ventas reales,<br>no precios de vitrina</span>
+  </div>
+</div>
+
+<!-- ════════ PIEZA B — cómo funciona ════════ -->
+<div class="card" id="card-b">
+  <div class="brand">tuslibros<span>.cl</span></div>
+
+  <div style="margin-top:44px" class="kicker">Cómo funciona</div>
+  <h1 class="headline">Publicar es gratis.<br>Cobro <em>solo si vendes.</em></h1>
+  <div class="rule" style="margin-top:26px"></div>
+
+  <div class="steps">
+    <div class="step">
+      <span class="num">1</span>
+      <div class="step-body">
+        <h3>Subes tus libros</h3>
+        <p>Sin tope de títulos ni mensualidad. Si tienes muchos, mándame las fotos y los datos por WhatsApp: los subo yo.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="num">2</span>
+      <div class="step-body">
+        <h3>Pones tu precio</h3>
+        <p>Tú decides cuánto vale. Nadie te lo ajusta ni te obliga a competir hacia abajo.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="num">3</span>
+      <div class="step-body">
+        <h3>Cobras por MercadoPago</h3>
+        <p>La plata llega a tu cuenta. Comisión de 8% sobre el libro, y solo cuando la venta pasa por acá.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="stamp">
+    Hay <b>118 personas</b> buscando títulos que todavía nadie tiene publicados.
+    Si el tuyo aparece, les llega el aviso.
+  </div>
+
+  <div class="foot">
+    <span class="url">tuslibros.cl</span>
+    <span class="foot-note">Soy Vero,<br>yo llevo esto</span>
+  </div>
+</div>
+
+
+<!-- ════════ PIEZA C — demanda insatisfecha ════════ -->
+<div class="card" id="card-c">
+  <div class="brand">tuslibros<span>.cl</span></div>
+
+  <div style="margin-top:46px" class="kicker">Pedidos que nadie ha podido cumplir</div>
+  <h1 class="headline" style="font-size:80px;line-height:1.05;margin-top:26px">Esto lo están<br>buscando <em>ahora.</em></h1>
+
+  <p class="sub" style="font-size:26px;margin-top:34px;max-width:860px">
+    Cuando alguien no encuentra un libro acá, lo deja pedido. Estos siguen sin
+    aparecer — y a varios les queda poca gente en Chile que los tenga.
+  </p>
+
+  <div class="proof" style="margin-top:44px;gap:16px">
+    <div class="row"><span class="what" style="font-size:25px"><b>Los orígenes de la guerra de 1914</b> — Luigi Albertini</span></div>
+    <div class="row"><span class="what" style="font-size:25px"><b>La Viena de fin de siglo</b> — Carl E. Schorske</span></div>
+    <div class="row"><span class="what" style="font-size:25px"><b>La cábala y su simbolismo</b> — Gershom Scholem</span></div>
+    <div class="row"><span class="what" style="font-size:25px"><b>Vacas, cerdos, guerras y brujas</b> — Marvin Harris</span></div>
+    <div class="row"><span class="what" style="font-size:25px"><b>Cómo escuchamos la música</b> — Aaron Copland</span></div>
+  </div>
+
+  <div class="stampline" style="margin-top:40px;font-size:24px">
+    Si tienes alguno, lo publicas y <b>le llega el aviso a quien lo pidió</b>.
+    Sin buscar comprador.
+  </div>
+
+  <div class="foot">
+    <span class="url">tuslibros.cl</span>
+    <span class="foot-note">118 pedidos abiertos,<br>solo 3 cumplidos</span>
+  </div>
+</div>
+
+<!-- ════════ PIEZA D — mata la objeción del catálogo grande ════════ -->
+<div class="card" id="card-d">
+  <div class="brand">tuslibros<span>.cl</span></div>
+
+  <div style="margin-top:52px" class="kicker">Para catálogos grandes</div>
+  <h1 class="headline" style="font-size:84px;line-height:1.04;margin-top:30px">¿Tienes 200 libros?<br><em>Los subo yo.</em></h1>
+
+  <p class="sub" style="font-size:29px;margin-top:42px;max-width:860px">
+    Sé que ese es el problema: nadie tiene una tarde libre para cargar el
+    catálogo ficha por ficha.
+  </p>
+
+  <div class="bigsteps">
+    <div class="bigstep"><span class="num">1</span><p>Me mandas las fotos y los datos por WhatsApp, como los tengas</p></div>
+    <div class="bigstep"><span class="num">2</span><p>Los subo yo, con tus fotos y tus precios</p></div>
+    <div class="bigstep"><span class="num">3</span><p>Te aviso cuando estén arriba y los revisas</p></div>
+  </div>
+
+  <div class="stampline">
+    Ya lo hice con varios libreros. Lo último fueron <b>23 libros en un día</b>.
+  </div>
+
+  <div class="foot">
+    <span class="url">tuslibros.cl</span>
+    <span class="foot-note">Escríbeme y<br>lo coordinamos</span>
+  </div>
+</div>
+
+</body>
+</html>
