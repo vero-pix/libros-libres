@@ -59,7 +59,12 @@ export default async function RayuelaPage() {
 
   const { data: raw } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
+    // books!inner es obligatorio: sin él, PostgREST no filtra la fila padre por
+    // book.title — trae las 20 listings más recientes cualesquiera y deja
+    // book=null en las que no calzan. El .filter() de abajo las descarta y la
+    // página termina vacía aunque haya stock del título. Es el mismo error que
+    // dejó en cero las landings de autor el 4 ago 2026. (12 ago 2026)
+    .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
     .eq("status", "active")
     .ilike("book.title", "%rayuela%")
     .order("created_at", { ascending: false })

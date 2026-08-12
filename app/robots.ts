@@ -24,6 +24,15 @@ const SCRAPERS_BLOCKED = [
   "CCBot",
   "Bytespider",
   "FacebookBot",
+  // Crawler de entrenamiento de Meta AI. El 12 ago 2026 disparó una alerta de
+  // Vercel: 28K invocaciones en 2 horas contra 65K de uso diario normal,
+  // pegándole sobre todo a la optimización de imágenes —que se factura—. No
+  // manda una sola visita de vuelta: el tráfico de Meta que sí llega viene de
+  // links compartidos (l.instagram.com), no del crawler.
+  "meta-externalagent",
+  // OJO: "meta-externalfetcher" NO va acá. Ese es el que arma la
+  // previsualización cuando alguien comparte un link por WhatsApp o Instagram.
+  // Bloquearlo dejaría los links del sitio sin foto ni título.
   "Amazonbot",
   "Applebot-Extended",
   "Omgilibot",

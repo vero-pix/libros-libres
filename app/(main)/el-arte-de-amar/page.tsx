@@ -59,7 +59,9 @@ export default async function ElArteDeAmarPage() {
 
   const { data: raw } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
+    // books!inner: sin él, el filtro por book.title no descarta la fila padre y
+    // la landing queda vacía aunque haya stock. Ver nota en /rayuela. (12 ago 2026)
+    .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
     .eq("status", "active")
     .ilike("book.title", "%arte de amar%")
     .order("created_at", { ascending: false })

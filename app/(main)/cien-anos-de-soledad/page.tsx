@@ -59,7 +59,10 @@ export default async function CienAnosDeSoledadPage() {
 
   const { data: raw } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
+    // books!inner: sin él, el filtro por book.title no descarta la fila padre y
+    // la landing queda vacía aunque haya stock. Ver nota en /rayuela. Acá el
+    // costo era concreto: ocultaba el único ejemplar publicado. (12 ago 2026)
+    .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
     .eq("status", "active")
     .ilike("book.title", "%cien a%os de soledad%")
     .order("created_at", { ascending: false })
@@ -68,7 +71,7 @@ export default async function CienAnosDeSoledadPage() {
   // Fallback: si no encuentra por título exacto, busca por autor
   const { data: rawByAuthor } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
+    .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
     .eq("status", "active")
     .ilike("book.author", "%garc%a m%rquez%")
     .order("created_at", { ascending: false })

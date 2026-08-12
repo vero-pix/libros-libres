@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     "comprar libros baratos online",
   ],
   openGraph: {
-    title: "Comprar libros usados baratos en Chile — desde $1.000",
+    title: "Comprar libros usados baratos en Chile — cientos bajo $5.000",
     description:
       "Cientos de libros usados baratos y en oferta, hasta 60% bajo el precio nuevo. Pago protegido y despacho a todo Chile.",
     url: "https://tuslibros.cl/libros-usados-baratos",
@@ -38,11 +38,11 @@ export const metadata: Metadata = {
 const faqs = [
   {
     q: "¿Dónde comprar libros usados baratos en Chile?",
-    a: "En tuslibros.cl. Es un marketplace chileno donde personas y librerías de viejo publican libros usados desde $1.000. Filtras por precio de menor a mayor, pagas protegido con MercadoPago y eliges retiro en mano gratis o despacho por courier a todo Chile.",
+    a: "En tuslibros.cl. Es un marketplace chileno donde personas y librerías de viejo publican libros usados, con cientos de títulos bajo $5.000. Filtras por precio de menor a mayor, pagas protegido con MercadoPago y eliges retiro en mano gratis o despacho por courier a todo Chile.",
   },
   {
     q: "¿Cuán baratos pueden ser los libros usados?",
-    a: "Tenemos libros desde $1.000 y cientos bajo los $5.000. Lo normal es pagar entre 30% y 60% menos que el libro nuevo, y en títulos agotados la diferencia es aún mayor. En cada ficha mostramos el precio de referencia en Buscalibre y MercadoLibre para que compares.",
+    a: "Hay cientos de libros bajo los $5.000 y decenas bajo los $3.000. Lo normal es pagar entre 30% y 60% menos que el libro nuevo, y en títulos agotados la diferencia es aún mayor. En cada ficha mostramos el precio de referencia en Buscalibre y MercadoLibre para que compares.",
   },
   {
     q: "¿Cómo encuentro los libros más baratos?",
@@ -65,12 +65,21 @@ const faqs = [
 export default async function LibrosUsadosBaratosPage() {
   const supabase = await createClient();
 
-  // Los libros más baratos disponibles hoy (precio ascendente)
+  // Los libros más baratos disponibles hoy (precio ascendente).
+  //
+  // Piso de $1.000: ordenar por precio a secas ponía de primeros dos libros
+  // cargados con $10 y $20 —error de tipeo del vendedor, no una oferta—, y era
+  // lo primero que veía alguien que llegó buscando libros baratos. No es un
+  // dato de negocio configurable sino un saneamiento: bajo $1.000 no hay
+  // precio real en el catálogo. (12 ago 2026)
+  const PRECIO_MINIMO_CREIBLE = 1000;
+
   const { data: baratosRaw } = await supabase
     .from("listings")
     .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username)`)
     .eq("status", "active")
     .neq("deprioritized", true)
+    .gte("price", PRECIO_MINIMO_CREIBLE)
     .order("price", { ascending: true })
     .limit(12);
 
@@ -101,9 +110,14 @@ export default async function LibrosUsadosBaratosPage() {
 
           {/* Hero */}
           <section className="mt-8 mb-16 max-w-3xl">
+            {/* El title del <head> se corrigió el 27 jul a "cientos bajo $5.000"
+                porque "desde $1.000" prometía lo que el catálogo no sostiene,
+                pero el H1 se quedó atrás y seguía prometiendo $1.000 al
+                aterrizar. Hoy hay 3 libros bajo $1.000 (dos con precio mal
+                cargado) contra 357 bajo $5.000. Alineado el 12 ago 2026. */}
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-ink leading-[1.05] tracking-tight">
               Compra libros usados baratos en Chile —<br />
-              <span className="italic text-brand-600">desde $1.000.</span>
+              <span className="italic text-brand-600">cientos bajo $5.000.</span>
             </h1>
             <p className="mt-6 text-lg text-ink-muted leading-relaxed">
               No tienes que gastar una fortuna para leer. En{" "}
