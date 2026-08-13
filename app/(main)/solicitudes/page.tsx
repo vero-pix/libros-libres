@@ -90,7 +90,7 @@ export default async function SolicitudesPage() {
             Déjanos el título. Si un vendedor lo tiene, lo va a publicar y te
             avisamos. Tus datos de contacto son privados.
           </p>
-          <RequestForm />
+          <RequestForm hasSession={!!user} />
         </section>
 
         {/* OPEN LIST */}

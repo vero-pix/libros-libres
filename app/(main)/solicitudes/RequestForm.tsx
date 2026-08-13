@@ -12,7 +12,7 @@ interface CatalogoMatch {
   nivel: "exacto" | "probable";
 }
 
-export default function RequestForm() {
+export default function RequestForm({ hasSession = false }: { hasSession?: boolean }) {
   const [matches, setMatches] = useState<CatalogoMatch[]>([]);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -206,17 +206,20 @@ export default function RequestForm() {
 
       <label className="block">
         <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-          Tu email o WhatsApp (opcional)
+          {hasSession ? "Tu email o WhatsApp (opcional)" : "Tu email o WhatsApp"}
         </span>
         <input
           type="text"
           value={contact}
           onChange={(e) => setContact(e.target.value)}
+          required={!hasSession}
           placeholder="+56912345678 o tu@correo.cl"
           className="mt-1.5 w-full px-3 py-2.5 border border-cream-dark rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
         />
         <span className="text-[11px] text-ink-muted mt-1 block">
-          Solo para avisarte cuando alguien lo publique. No se muestra público.
+          {hasSession
+            ? "Ya tenemos tu correo de la cuenta. Déjalo en blanco si te sirve ese."
+            : "Sin esto no hay cómo avisarte cuando el libro aparezca. No se muestra público."}
         </span>
       </label>
 

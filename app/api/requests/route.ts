@@ -87,6 +87,15 @@ export async function POST(req: NextRequest) {
     data: { user },
   } = await ssrClient.auth.getUser();
 
+  // Sin correo, sin WhatsApp y sin sesión, el pedido entra al vacío: si el libro
+  // aparece, no hay a quién avisarle. Pasaron 17 así antes de este chequeo.
+  if (!user && !requester_email?.trim() && !requester_whatsapp?.trim()) {
+    return NextResponse.json(
+      { error: "Déjanos tu correo o WhatsApp, si no no tenemos cómo avisarte cuando aparezca." },
+      { status: 400 }
+    );
+  }
+
   const admin = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
