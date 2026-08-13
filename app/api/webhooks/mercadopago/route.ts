@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { paymentClient } from "@/lib/mercadopago";
-import { notifySeller } from "@/lib/notifications";
+import { notifySeller, notifyPaymentFailed } from "@/lib/notifications";
 import { sendEmail } from "@/lib/email";
 import { createShipitOrder, estimateBookPackageSize } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
@@ -313,6 +313,14 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      if (status === "cancelled") {
+        notifyPaymentFailed(
+          bundleOrders.map((o: any) => o.id),
+          supabase,
+          payment.status_detail
+        ).catch((err) => console.error("[webhook] notifyPaymentFailed error:", err));
+      }
+
       return NextResponse.json({ received: true, status, bundle: true });
     }
 
@@ -415,6 +423,12 @@ export async function POST(req: NextRequest) {
         } catch (shipitErr) {
           console.error("[webhook] Shipit creation error:", shipitErr);
         }
+      }
+
+      if (status === "cancelled") {
+        notifyPaymentFailed([order.id], supabase, payment.status_detail).catch((err) =>
+          console.error("[webhook] notifyPaymentFailed error:", err)
+        );
       }
 
       return NextResponse.json({ received: true, status });

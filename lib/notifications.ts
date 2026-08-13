@@ -149,3 +149,77 @@ export async function notifySeller(
 
   return notification;
 }
+
+/**
+ * Pago rechazado o cancelado: hasta ahora nadie se enteraba. El comprador
+ * quedaba mirando una pantalla de error y el libro seguía disponible sin que
+ * él lo supiera. Le avisamos a él y nos avisamos a nosotros.
+ */
+export async function notifyPaymentFailed(
+  orderIds: string[],
+  supabase: SupabaseClient,
+  statusDetail?: string
+): Promise<void> {
+  if (!orderIds.length) return;
+
+  const { data: orders } = await supabase
+    .from("orders")
+    .select("id, total, book_price, listing_id, buyer_id")
+    .in("id", orderIds);
+
+  if (!orders?.length) return;
+
+  const first = orders[0] as any;
+
+  const [{ data: buyer }, { data: listing }] = await Promise.all([
+    supabase.from("users").select("full_name, email").eq("id", first.buyer_id).maybeSingle(),
+    supabase.from("listings").select("slug, seller_id").eq("id", first.listing_id).maybeSingle(),
+  ]);
+
+  const { data: seller } = listing?.seller_id
+    ? await supabase.from("users").select("username").eq("id", listing.seller_id).maybeSingle()
+    : { data: null };
+
+  const buyerEmail = buyer?.email;
+  const buyerName = buyer?.full_name ?? "";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tuslibros.cl";
+  const count = orders.length;
+
+  // El banco rechazó vs. la persona se arrepintió: solo el primero merece
+  // explicación, el segundo ya sabe lo que hizo.
+  const rechazado = statusDetail !== "by_payer";
+
+  if (buyerEmail && rechazado) {
+    const link =
+      listing?.slug && seller?.username
+        ? `${siteUrl}/libro/${seller.username}/${listing.slug}`
+        : `${siteUrl}/carrito`;
+
+    const { sendEmail } = await import("./email");
+    await sendEmail({
+      to: buyerEmail,
+      from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+      subject:
+        count > 1
+          ? "Tu pago no pasó — los libros siguen disponibles"
+          : "Tu pago no pasó — el libro sigue disponible",
+      html: `
+        <div style="font-family:Georgia,serif;font-size:16px;line-height:1.6;color:#2b2b2b;max-width:520px">
+          <p>Hola${buyerName ? ` ${escapeHtml(buyerName.split(" ")[0])}` : ""}:</p>
+          <p>Soy Vero, de tuslibros.cl. Intentaste pagar reci&eacute;n y el pago no pas&oacute; &mdash; lo rechaz&oacute; el banco, no fue nada de tu cuenta.</p>
+          <p>${count > 1 ? "Los libros siguen" : "El libro sigue"} disponible${count > 1 ? "s" : ""}. Si quieres intentarlo de nuevo, en el checkout tambi&eacute;n puedes pagar con tarjeta de d&eacute;bito o cr&eacute;dito.</p>
+          <p><a href="${link}" style="color:#8a5a2b">Retomar la compra &rarr;</a></p>
+          <p>Y si algo no te calz&oacute; &mdash; el precio del despacho, por ejemplo &mdash; resp&oacute;ndeme este correo y lo vemos.</p>
+          <p>Vero<br><span style="color:#777;font-size:14px">tuslibros.cl</span></p>
+        </div>
+      `,
+    });
+  }
+
+  await sendGong(
+    `⚠️ <b>Pago fallido</b>\n${escapeHtml(buyerName || buyerEmail || "?")}\n` +
+      `${count} libro(s) · $${Number(first.total ?? 0).toLocaleString("es-CL")}\n` +
+      `Motivo: ${escapeHtml(statusDetail ?? "desconocido")}` +
+      (rechazado ? "\nLe avisé por correo." : "\nCanceló él mismo, no le escribí.")
+  );
+}

@@ -29,7 +29,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, username: null });
     }
 
+    // Si ya tiene username, no lo tocamos: reasignarlo rompe su URL pública.
+    const { data: actual } = await supabase
+      .from("users")
+      .select("username")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (actual?.username) {
+      return NextResponse.json({ ok: true, username: actual.username });
+    }
+
     // Find first available username: base, base2, base3...
+    // Ojo con el .neq: sin él, un segundo llamado para el mismo usuario ve el
+    // username que él mismo acaba de tomar, lo cree ocupado y salta a "base2".
     let candidate = base;
     let suffix = 2;
     while (true) {
@@ -37,6 +50,7 @@ export async function POST(req: NextRequest) {
         .from("users")
         .select("id")
         .eq("username", candidate)
+        .neq("id", userId)
         .maybeSingle();
 
       if (!data) break;
