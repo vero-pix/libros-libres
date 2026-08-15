@@ -23,11 +23,24 @@ interface BookRequest {
 
 export default async function SolicitudesPage() {
   const supabase = createPublicClient();
-  const { data: requests } = await supabase
-    .from("book_requests")
-    .select("id, title, author, notes, requester_location, fulfilled, created_at")
-    .order("created_at", { ascending: false })
-    .limit(100);
+  // Dos queries separadas: una sola con .limit(100) traía las 100 más recientes
+  // mezclando abiertas y cumplidas, así que las abiertas más viejas se caían de
+  // la lista y el contador no coincidía con el del home. (15 ago 2026)
+  const COLS = "id, title, author, notes, requester_location, fulfilled, created_at";
+  const [{ data: openRaw }, { data: fulfilledRaw }] = await Promise.all([
+    supabase
+      .from("book_requests")
+      .select(COLS)
+      .eq("fulfilled", false)
+      .order("created_at", { ascending: false })
+      .limit(300),
+    supabase
+      .from("book_requests")
+      .select(COLS)
+      .eq("fulfilled", true)
+      .order("created_at", { ascending: false })
+      .limit(20),
+  ]);
 
   // Si hay usuario logueado con ciudad, ordenar primero las solicitudes
   // cuyo requester_location matchee (proximidad = venta probable).
@@ -45,7 +58,6 @@ export default async function SolicitudesPage() {
     viewerCity = (profile?.city ?? "").trim().toLowerCase() || null;
   }
 
-  const all = (requests ?? []) as BookRequest[];
   const rankByProximity = (list: BookRequest[]) => {
     if (!viewerCity) return list;
     const tokens = viewerCity.split(/[\s,]+/).filter((t) => t.length >= 3);
@@ -59,8 +71,8 @@ export default async function SolicitudesPage() {
     return [...list].sort((a, b) => score(b) - score(a));
   };
 
-  const open = rankByProximity(all.filter((r) => !r.fulfilled));
-  const fulfilled = all.filter((r) => r.fulfilled);
+  const open = rankByProximity((openRaw ?? []) as BookRequest[]);
+  const fulfilled = (fulfilledRaw ?? []) as BookRequest[];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-cream-warm to-cream">

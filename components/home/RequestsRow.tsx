@@ -41,6 +41,13 @@ export default async function RequestsRow() {
   // Fetch raw search queries from the last 7 days (with OR without results).
   // A wider window + all results makes this section resilient — it won't
   // vanish just because no one searched with 0 results in the last 48h.
+  // Total de pedidos abiertos, para que el "ver todos" diga cuántos hay de
+  // verdad y no solo los 4-8 que caben en la grilla.
+  const { count: openRequestsCount } = await supabase
+    .from("book_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("fulfilled", false);
+
   const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const { data: rawSearches } = await supabase
     .from("search_queries")
@@ -155,6 +162,7 @@ export default async function RequestsRow() {
           </div>
 
           {/* Right — list */}
+          <div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {demandItems.map((r) => (
               <Link
@@ -189,6 +197,20 @@ export default async function RequestsRow() {
                 </div>
               </Link>
             ))}
+          </div>
+            {topRequests.length > 0 && (
+              <div className="mt-4 text-right">
+                <Link
+                  href="/solicitudes"
+                  className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-amber-800 hover:text-amber-900 hover:gap-2 transition-all"
+                >
+                  {openRequestsCount && openRequestsCount > demandItems.length
+                    ? `Ver los ${openRequestsCount} pedidos`
+                    : "Ver todos los pedidos"}
+                  <span aria-hidden>→</span>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
