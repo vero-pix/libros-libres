@@ -169,6 +169,20 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 - [x] **Search empty state review** — 80% bounce en /search. Rediseñado con CTA de economía inversa (Se busca) y sugerencias dinámicas de libros destacados.
 - [x] **Rotación automática FeaturedRow** — ✅ 30 jun. Con 1.058 listings, 776 sin una sola visita. Destacados ahora = 10 curados + 6 "descubrimientos" rotativos por día (enterrados con portada, excluye deprioritized). HeroBar rota 24 clásicos por semana. Además se eliminaron TODOS los repetidos de la portada (colecciones multi-tag + grilla vs recientes) — ver memoria `feedback_portada_sin_repetidos`. Simulador `scripts/_sim_full_home.mjs`.
 
+**Estado "Nuevo" real, separado de "Como nuevo"** (idea de Vero, 15 ago 2026 — *planificado, no implementado*)
+
+- [ ] **Agregar un 5º estado: `sealed` = "Nuevo · sin uso"**, distinto de `new` = "Como nuevo". Hoy los dos casos comparten etiqueta y el comprador no puede distinguir un libro sellado de uno leído una vez.
+  - **La evidencia ya está en la base:** de los 317 activos marcados "Como nuevo", los vendedores usan las *notas* para desempatar lo que la UI no distingue — *"aún con su plástico original"*, *"nuevo y sellado"* conviven con *"como nuevo, un solo lector"* y *"lo leí una sola vez"*. Están pidiendo el estado a mano.
+  - **Lo detonó un vendedor real:** Leonardo Auriol (memoria `project_leonardo_auriol`) preguntó por WhatsApp si podía publicar libros **nuevos** de un remate de Feria del Disco *"para no incumplir la norma"*, porque el sitio dice "libros usados". Dudó antes de publicar — mismo patrón de `feedback_copy_automatico_frena_publicacion`. Un estado explícito es la respuesta estructural a esa duda.
+  - **Por qué conviene comercialmente:** un libro nuevo a mitad de precio es un argumento de venta más fuerte que "usado como nuevo", y abre el ángulo de saldos/liquidaciones sin desviar el posicionamiento SEO ("libros usados" sigue siendo la keyword).
+
+  **Cómo se implementa (el orden importa):**
+  1. **Migración primero — `condition` es un enum de Postgres, no un `text` con CHECK.** Verificado el 15 ago: un update a un valor nuevo devuelve `invalid input value for enum book_condition`. Hay que hacer `ALTER TYPE book_condition ADD VALUE 'sealed'` en `supabase/migrations/`. Ojo: el valor nuevo **no se puede usar en la misma transacción** en que se agrega — migración y backfill van separados.
+  2. **Un solo diccionario de estados.** Hoy el mapa `new → "Como nuevo"` está **duplicado en 10 archivos** (`PublishForm.tsx`, `ListingDetail.tsx`, `ListingCardList.tsx`, `QuickViewModal.tsx`, `MyListings.tsx`, `NewListingForm.tsx`, `ListingToolbar.tsx`, `CategoriesSidebar.tsx`, `faq/page.tsx`, `scripts/bulk-upload-csv.ts`). Antes de agregar un 5º valor, **extraer a `lib/conditions.ts`** con label, color y orden — si no, el estado nuevo se va a olvidar en la mitad de las pantallas. Esta refactorización sola ya vale la pena.
+  3. **Nada de migrar los 317 existentes automáticamente.** Un libro marcado "Como nuevo" hoy puede ser cualquiera de los dos casos; adivinar por las notas produciría fichas que mienten. Se deja `new` como está y el vendedor reclasifica desde `/mis-libros` si quiere. Sí conviene un aviso puntual a los que ya escribieron "sellado/plástico original" en las notas.
+  4. **Copy y filtros:** sumar el estado al filtro de `ListingToolbar` + `CategoriesSidebar`, a la FAQ (que hoy enumera los 4), y revisar el copy "libros usados" para que diga explícitamente que se aceptan nuevos — es la mitad del problema que reportó Leonardo.
+  5. **`bulk-upload-csv.ts`**: agregar `nuevo_sellado` al `CONDITION_MAP` para poder cargar lotes como el de Leonardo.
+
 **Reputación**
 - [ ] **Sistema de reputación por vendedor** — tabla `reviews` existe pero vacía. UI básica en perfil existe sin datos. Álvaro y otros lo piden: historial independiente por librería, estilo ML. **Reforzado por la encuesta (29 jul):** un vendedor lo pidió textual — sin estrellas, comprar con despacho "es a fe".
 
