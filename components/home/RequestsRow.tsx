@@ -158,6 +158,18 @@ export default async function RequestsRow() {
               >
                 Publicar el mío
               </Link>
+              {/* Tercer CTA, no solo el link chico al pie de la grilla: la lista
+                  completa es el gancho para el vendedor —hay 127 pedidos abiertos
+                  y en el home solo caben 8. */}
+              {openRequestsCount != null && openRequestsCount > 0 && (
+                <Link
+                  href="/solicitudes"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-amber-700/40 text-amber-800 text-xs font-semibold uppercase tracking-wider rounded-md hover:border-amber-800 hover:bg-amber-50 transition-colors"
+                >
+                  Ver los {openRequestsCount} pedidos
+                  <span aria-hidden>→</span>
+                </Link>
+              )}
             </div>
           </div>
 
@@ -204,9 +216,7 @@ export default async function RequestsRow() {
                   href="/solicitudes"
                   className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-amber-800 hover:text-amber-900 hover:gap-2 transition-all"
                 >
-                  {openRequestsCount && openRequestsCount > demandItems.length
-                    ? `Ver los ${openRequestsCount} pedidos`
-                    : "Ver todos los pedidos"}
+                  Ver todos los pedidos
                   <span aria-hidden>→</span>
                 </Link>
               </div>
