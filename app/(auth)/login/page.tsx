@@ -13,16 +13,24 @@ import { createPublicClient } from "@/lib/supabase/public";
 const getAuthStats = unstable_cache(
   async () => {
     const supabase = createPublicClient();
-    const { data, count } = await supabase
-      .from("listings")
-      .select("seller_id, city_id", { count: "exact" })
-      .eq("status", "active")
-      .range(0, 4999);
-    const vendedores = new Set((data ?? []).map((l) => l.seller_id)).size;
-    const comunas = new Set(
-      (data ?? []).map((l) => l.city_id).filter(Boolean)
-    ).size;
-    return { libros: count ?? 0, vendedores, comunas };
+    // Hay que paginar: Supabase corta en 1.000 filas aunque el range pida más,
+    // y con ~1.950 activos eso daba 71 vendedores en vez de ~100 y 41 comunas
+    // en vez de las reales. Justo el error que esta pantalla venía a corregir.
+    const filas: Array<{ seller_id: string; city_id: string | null }> = [];
+    let total = 0;
+    for (let desde = 0; ; desde += 1000) {
+      const { data, count } = await supabase
+        .from("listings")
+        .select("seller_id, city_id", { count: "exact" })
+        .eq("status", "active")
+        .range(desde, desde + 999);
+      if (count != null) total = count;
+      filas.push(...((data ?? []) as typeof filas));
+      if (!data || data.length < 1000) break;
+    }
+    const vendedores = new Set(filas.map((l) => l.seller_id)).size;
+    const comunas = new Set(filas.map((l) => l.city_id).filter(Boolean)).size;
+    return { libros: total, vendedores, comunas };
   },
   ["auth-stats"],
   { revalidate: 3600 }
