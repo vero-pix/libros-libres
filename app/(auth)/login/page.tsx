@@ -1,13 +1,39 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { unstable_cache } from "next/cache";
 import LoginForm from "@/components/auth/LoginForm";
 import AuthWantedList from "@/components/auth/AuthWantedList";
+import { createPublicClient } from "@/lib/supabase/public";
 
-export default function LoginPage({
+// Los números de esta pantalla estaban hardcodeados en "500+ libros" y
+// "150+ vendedores". El primero se quedaba corto (hay ~1.900) y el segundo
+// era falso al revés: vendedores con libros activos hay ~100. Prometer de
+// más justo antes de pagar es lo peor que puede hacer esta página.
+// createPublicClient porque unstable_cache no admite cookies().
+const getAuthStats = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data, count } = await supabase
+      .from("listings")
+      .select("seller_id, city_id", { count: "exact" })
+      .eq("status", "active")
+      .range(0, 4999);
+    const vendedores = new Set((data ?? []).map((l) => l.seller_id)).size;
+    const comunas = new Set(
+      (data ?? []).map((l) => l.city_id).filter(Boolean)
+    ).size;
+    return { libros: count ?? 0, vendedores, comunas };
+  },
+  ["auth-stats"],
+  { revalidate: 3600 }
+);
+
+export default async function LoginPage({
   searchParams,
 }: {
   searchParams: { next?: string };
 }) {
+  const { libros, vendedores, comunas } = await getAuthStats();
   const wantsToPublish = (searchParams.next ?? "").includes("publish");
   const heading = wantsToPublish
     ? "Inicia sesión para publicar"
@@ -45,16 +71,21 @@ export default function LoginPage({
 
           <div className="flex gap-8 text-ink-muted text-sm">
             <div>
-              <p className="text-2xl font-bold text-brand-600">500+</p>
-              <p>libros</p>
+              <p className="text-2xl font-bold text-brand-600">
+                {libros.toLocaleString("es-CL")}
+              </p>
+              <p>libros publicados</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-brand-600">150+</p>
+              <p className="text-2xl font-bold text-brand-600">{vendedores}</p>
               <p>vendedores</p>
             </div>
+            {/* Antes decía "100% seguro", que promete algo que el flujo no
+                tiene: no hay escrow, la plata va al vendedor cuando MP aprueba.
+                Las comunas sí son verificables y refuerzan el "cerca de ti". */}
             <div>
-              <p className="text-2xl font-bold text-brand-600">100%</p>
-              <p>seguro</p>
+              <p className="text-2xl font-bold text-brand-600">{comunas}</p>
+              <p>comunas</p>
             </div>
           </div>
         </div>
