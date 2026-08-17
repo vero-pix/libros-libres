@@ -41,8 +41,16 @@ export async function updateSession(request: NextRequest) {
 
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
+    // El `next` tiene que llevar TAMBIÉN el query string. Guardaba solo el
+    // pathname, así que quien iba a /checkout/bundle?listings=A,B volvía del
+    // login a /checkout/bundle pelado — un checkout sin libros, justo en el
+    // paso de pagar. (17 ago 2026)
+    const destino = request.nextUrl.pathname + request.nextUrl.search;
+    // Limpiar los params heredados del clone antes de escribir el nuestro: si
+    // no, /login queda con los del destino colgando al lado del next.
+    for (const k of Array.from(url.searchParams.keys())) url.searchParams.delete(k);
     url.pathname = "/login";
-    url.searchParams.set("next", request.nextUrl.pathname);
+    url.searchParams.set("next", destino);
     return NextResponse.redirect(url);
   }
 
@@ -50,8 +58,13 @@ export async function updateSession(request: NextRequest) {
   if (user && (request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/register")) {
     const next = request.nextUrl.searchParams.get("next") || "/";
     const url = request.nextUrl.clone();
-    url.pathname = next;
-    url.searchParams.delete("next");
+    // `next` ahora puede traer query string ("/checkout/bundle?listings=A,B").
+    // Asignarlo entero a `pathname` codificaba el "?" como %3F y mandaba a una
+    // ruta inexistente, así que hay que separarlo.
+    const [destPath, destQuery] = next.split("?");
+    const seguro = destPath.startsWith("/") && !destPath.startsWith("//");
+    url.pathname = seguro ? destPath : "/";
+    url.search = seguro && destQuery ? `?${destQuery}` : "";
     return NextResponse.redirect(url);
   }
 
