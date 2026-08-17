@@ -31,6 +31,7 @@ import { readFileSync, existsSync, readdirSync } from "fs";
 import { resolve, join, basename, extname } from "path";
 import { normalizeGenre } from "../lib/genreNormalizer";
 import { slugify } from "../lib/slugify";
+import { comunaDesdeAddress, resolverCityId } from "../lib/cities";
 
 // Load .env.local manually
 const envPath = resolve(process.cwd(), ".env.local");
@@ -85,6 +86,7 @@ const MODALITY_MAP: Record<string, string> = {
 let SELLER_LAT = -33.4489;
 let SELLER_LNG = -70.6693;
 let SELLER_ADDRESS = "Santiago, Chile";
+let SELLER_CITY_ID: string | null = null;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env.local");
@@ -305,8 +307,23 @@ async function main() {
   if (seller?.default_latitude && seller?.default_longitude) {
     SELLER_LAT = seller.default_latitude;
     SELLER_LNG = seller.default_longitude;
-    SELLER_ADDRESS = seller.default_address || seller.city || "Santiago, Chile";
+    // NUNCA copiar el default_address tal cual: suele traer calle y número de la
+    // casa del vendedor, y la ficha publica address.split(",")[1] — a Rodrigo
+    // Cumsille le mostraba "casa 4" en vez de la comuna (6 ago 2026). Se guarda
+    // solo "Comuna, Región", que es lo único que la ficha necesita mostrar.
+    const rawAddress: string = seller.default_address || seller.city || "Santiago, Chile";
+    const comuna = comunaDesdeAddress(rawAddress);
+    const region = rawAddress
+      .split(",")
+      .map((p: string) => p.trim())
+      .find((p: string) => /Regi[oó]n/i.test(p));
+    SELLER_ADDRESS = comuna
+      ? [comuna, region?.replace(/\s+\d{4,}$/, "")].filter(Boolean).join(", ")
+      : seller.city || rawAddress;
+    SELLER_CITY_ID = await resolverCityId(supabase, rawAddress, { lat: SELLER_LAT, lng: SELLER_LNG });
     console.log(`📍 Ubicación del vendedor: ${SELLER_ADDRESS} (${SELLER_LAT}, ${SELLER_LNG})`);
+    if (rawAddress !== SELLER_ADDRESS) console.log(`   (perfil dice "${rawAddress}" — se guarda solo la comuna)`);
+    console.log(`   city_id: ${SELLER_CITY_ID ?? "⚠️  no resuelto (el libro no aparecerá al filtrar por comuna)"}`);
   } else {
     console.warn(`⚠️  Vendedor sin ubicación guardada. Usando Santiago centro como fallback.`);
     console.warn(`   Para corregir: actualiza default_latitude/longitude en el perfil del vendedor.`);
@@ -455,6 +472,12 @@ async function main() {
           description,
           cover_url: coverUrl,
           genre,
+          // Sin ISBN esta rama no guardaba category/subcategory: los 23 libros de
+          // Rodrigo Cumsille quedaron con category NULL e invisibles en los
+          // filtros y landings de categoría, y hubo que clasificarlos a mano
+          // (6 ago 2026). Se calculan igual que en la rama con ISBN.
+          category,
+          subcategory,
           published_year: year,
           publisher,
           pages,
@@ -500,6 +523,7 @@ async function main() {
         latitude: SELLER_LAT,
         longitude: SELLER_LNG,
         address: SELLER_ADDRESS,
+        city_id: SELLER_CITY_ID,
         slug,
         status: "active",
       })

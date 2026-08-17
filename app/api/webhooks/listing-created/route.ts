@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { compararLibro, normalizar } from "@/lib/bookRequestMatch";
+import { resolverCityId } from "@/lib/cities";
 
 export const runtime = "nodejs";
 
@@ -16,13 +17,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "missing listingId" }, { status: 400 });
     }
 
-    const token = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
-    if (!token || !chatId) {
-      console.warn("Telegram env vars missing — skipping notification");
-      return NextResponse.json({ ok: true, skipped: true });
-    }
-
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -32,13 +26,39 @@ export async function POST(req: Request) {
     const { data: listing } = await supabase
       .from("listings")
       .select(
-        "id, slug, price, modality, address, deprioritized, book:books(title, author), seller:users(full_name, username)"
+        "id, slug, price, modality, address, latitude, longitude, city_id, deprioritized, book:books(title, author), seller:users(full_name, username)"
       )
       .eq("id", listingId)
       .single();
 
     if (!listing) {
       return NextResponse.json({ error: "listing not found" }, { status: 404 });
+    }
+
+    // Completar city_id — el formulario de publicación no lo escribe, así que
+    // sin esto el libro no aparece al filtrar por comuna en /search. Va antes
+    // que Telegram a propósito: si faltan las credenciales del bot, el listing
+    // igual tiene que quedar bien clasificado. (17 ago 2026)
+    if (!(listing as any).city_id) {
+      try {
+        const cityId = await resolverCityId(supabase, (listing as any).address, {
+          lat: (listing as any).latitude,
+          lng: (listing as any).longitude,
+        });
+        if (cityId) {
+          await supabase.from("listings").update({ city_id: cityId }).eq("id", listingId);
+          console.log(`[listing-created] city_id asignado: ${cityId}`);
+        }
+      } catch (cityErr) {
+        console.error("Resolución de city_id falló:", cityErr);
+      }
+    }
+
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
+    if (!token || !chatId) {
+      console.warn("Telegram env vars missing — skipping notification");
+      return NextResponse.json({ ok: true, skipped: true });
     }
 
     // Auto-deprioritización por contenido político/controversial.
