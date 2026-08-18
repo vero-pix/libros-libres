@@ -61,6 +61,25 @@ const nextConfig = {
     ];
   },
   images: {
+    // ─── Control de costo de Vercel (17 ago 2026) ───────────────────────────
+    // La optimización de imágenes es lo que más factura del plan, y venía con
+    // los valores por defecto de Next 14: caché de 60 SEGUNDOS (cada visita
+    // después de ese minuto vuelve a transformar la misma portada y se vuelve a
+    // cobrar) y 16 anchos distintos por imagen, cada variante facturada aparte.
+    // Con ~1.950 portadas eso multiplica la cuenta sin que se note en pantalla.
+    //
+    // minimumCacheTTL: 30 días. Las portadas no cambian; si una se reemplaza,
+    // el listing recibe una URL nueva igual.
+    minimumCacheTTL: 2592000,
+    // Solo los anchos que el diseño realmente usa. Cada ancho de más es otra
+    // transformación facturada. Los `sizes` del código son 32/48/56/64/112/
+    // 144/160/220px, así que estos cuatro los cubren a 1x y a 2x (retina):
+    // 32@2x→64, 144@2x→288→384, 220@2x→440→640.
+    deviceSizes: [640, 828, 1200, 1920],
+    imageSizes: [64, 128, 256, 384],
+    // Solo WebP: AVIF comprime algo mejor pero es bastante más caro de generar
+    // y duplica las variantes de cada imagen.
+    formats: ["image/webp"],
     remotePatterns: [
       {
         protocol: "https",
