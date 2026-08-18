@@ -63,6 +63,16 @@ export async function GET() {
     "no-ficcion-tecnica": "Técnicos y universitarios",
     "ficcion-fantasia": "Fantasía y ciencia ficción",
     "ficcion-policial": "Policial y novela negra",
+    "academico-universitario": "Académicos y universitarios",
+    "otros-religion": "Religión y espiritualidad",
+    "no-ficcion-economia": "Economía y negocios",
+    "idiomas-aleman": "Libros en alemán",
+    "idiomas-ingles": "Libros en inglés",
+    "idiomas-frances": "Libros en francés",
+    "no-ficcion-psicologia": "Psicología",
+    "no-ficcion-cocina": "Cocina",
+    "no-ficcion-salud": "Salud y bienestar",
+    "otros-comics": "Cómics y novela gráfica",
   };
   const porCat: Record<string, number> = {};
   for (const f of filas) {
