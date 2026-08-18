@@ -36,7 +36,12 @@ export async function GET() {
     .sort((a, b) => a.localeCompare(b, "es"));
 
   const vendedores = new Set(filas.map((f) => f.seller_id)).size;
-  const precios = filas.map((f) => f.price).filter((p): p is number => typeof p === "number").sort((a, b) => a - b);
+  // Bajo $1.000 solo hay dedazos de precio (un "$10" en vez de "$10.000"), y
+  // publicar "desde $10" en el resumen que leen los asistentes queda pésimo.
+  const precios = filas
+    .map((f) => f.price)
+    .filter((p): p is number => typeof p === "number" && p >= 1000)
+    .sort((a, b) => a - b);
   const mediana = precios.length ? precios[Math.floor(precios.length / 2)] : 0;
   const min = precios[0] ?? 0;
 
@@ -51,6 +56,13 @@ export async function GET() {
     "ficcion-poesia": "Poesía",
     "ficcion-cuento": "Cuento",
     "infantil-juvenil": "Infantil y juvenil",
+    "infantil-juvenil-juvenil": "Juvenil",
+    "infantil-juvenil-infantil": "Infantil",
+    "no-ficcion-autoayuda": "Autoayuda y desarrollo personal",
+    "no-ficcion-arte": "Arte",
+    "no-ficcion-tecnica": "Técnicos y universitarios",
+    "ficcion-fantasia": "Fantasía y ciencia ficción",
+    "ficcion-policial": "Policial y novela negra",
   };
   const porCat: Record<string, number> = {};
   for (const f of filas) {
