@@ -171,7 +171,10 @@ const getFeaturedListings = unstable_cache(
       .eq("featured", true)
       .gte("price", CURATED_MIN_PRICE)
       .order("featured_rank", { ascending: true, nullsFirst: false })
-      .limit(10);
+      // 12 y no 10: la colección Ken Wilber ocupa 5 lugares y con el tope
+      // anterior empujaba fuera del velador justo a los vendedores que tenían
+      // una semana de destacado prometida desde la encuesta de julio.
+      .limit(12);
 
     // 2. Descubrimientos rotativos: libros NO destacados (mayoría sin una sola visita).
     //    Ventana diaria sobre el catálogo ordenado por antigüedad → cada día expone otros.
