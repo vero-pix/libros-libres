@@ -1,0 +1,14 @@
+# Vercel sube el directorio local, y macOS tiene bloqueadas estas imágenes de
+# WhatsApp que quedaron sueltas en la raíz: el deploy fallaba con
+# "EPERM: operation not permitted" al intentar leerlas. No hacen falta para el
+# build. (20 ago 2026)
+WhatsApp Image*.jpeg
+WhatsApp Image*.jpg
+
+# Lo de siempre
+node_modules
+.next
+.git
+.env*.local
+ideas
+docs_desde_claude
