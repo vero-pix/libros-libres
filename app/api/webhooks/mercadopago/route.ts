@@ -6,6 +6,7 @@ import { sendEmail } from "@/lib/email";
 import { createShipitOrder, estimateBookPackageSize } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
 import crypto from "crypto";
+import { registrarComisionVenta } from "@/lib/commissions";
 
 function verifySignature(req: NextRequest, body: Record<string, unknown>): boolean {
   const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest) {
     // Intentar primero como bundle_id
     const { data: bundleOrders } = await supabase
       .from("orders")
-      .select("id, listing_id, bundle_id, seller_id, buyer_id, buyer_address, courier, shipping_cost")
+      .select("id, listing_id, bundle_id, seller_id, buyer_id, buyer_address, courier, shipping_cost, book_price")
       .eq("bundle_id", externalRef);
 
     if (bundleOrders && bundleOrders.length > 0) {
@@ -113,6 +114,34 @@ export async function POST(req: NextRequest) {
         notifySeller(firstOrderId, supabase).catch((err) =>
           console.error("[webhook] notifySeller error:", err)
         );
+
+        // Comisión: acá y no al crear la orden. Este es el único punto donde
+        // consta que la plata efectivamente entró. (25 ago 2026)
+        try {
+          const sellerId = bundleOrders[0].seller_id;
+          const { data: vendedor } = await supabase
+            .from("users")
+            .select("mercadopago_user_id")
+            .eq("id", sellerId)
+            .maybeSingle();
+
+          // Sin cuenta conectada no hubo split: el cobro fue por la cuenta de
+          // tuslibros con SERVICE_FEE y no corresponde comisión del 8%.
+          if (vendedor?.mercadopago_user_id) {
+            const totalLibros = bundleOrders.reduce(
+              (t: number, o: any) => t + Number(o.book_price ?? 0),
+              0
+            );
+            await registrarComisionVenta({
+              admin: supabase,
+              orderId: firstOrderId,
+              sellerId,
+              grossAmount: totalLibros,
+            });
+          }
+        } catch (err) {
+          console.error(`[webhook] Error al registrar comisión del bundle ${externalRef}:`, err);
+        }
 
         // Shipit: un solo envío para el bundle, en la "primera" order (la que tiene shipping_cost > 0)
         try {
