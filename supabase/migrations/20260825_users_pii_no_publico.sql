@@ -1,0 +1,74 @@
+-- Cortar la fuga de datos personales de `users` al rol anónimo.
+--
+-- 25 ago 2026 — Supabase avisó por correo ("Table publicly accessible") y al
+-- auditar con la anon key —que va incrustada en el JavaScript público del
+-- sitio, o sea la tiene cualquiera— se pudo descargar:
+--
+--     299 correos electrónicos
+--     148 teléfonos
+--     118 direcciones particulares
+--
+-- La RLS de `users` está habilitada, pero RLS filtra FILAS, no COLUMNAS: la
+-- policy de lectura pública deja ver la fila entera. El corte correcto son
+-- privilegios por columna.
+--
+-- ⚠️ APLICAR EN EL SQL EDITOR DE SUPABASE (no hay CLI en este proyecto).
+--
+-- Verificación previa — debe devolver la lista de columnas actuales:
+--   SELECT column_name FROM information_schema.column_privileges
+--   WHERE table_name = 'users' AND grantee = 'anon';
+--
+-- Verificación posterior — con la anon key, esto debe fallar:
+--   curl "$URL/rest/v1/users?select=email&limit=1" -H "apikey: $ANON"
+
+BEGIN;
+
+-- 1. Cortar el acceso amplio del rol anónimo.
+REVOKE SELECT ON public.users FROM anon;
+
+-- 2. Devolver SOLO las columnas que el sitio usa sin sesión. La lista sale de
+--    auditar todos los `users(...)` que pasan por `createPublicClient()` y por
+--    el cliente de servidor cuando el visitante no tiene cuenta: home, search,
+--    categoría, colección, autor, ciudad, novedades, tiendas y la ficha.
+GRANT SELECT (
+  id,
+  full_name,
+  avatar_url,
+  username,
+  bio,
+  city,
+  public_email,
+  instagram,
+  plan,
+  featured,
+  on_vacation,
+  vacation_message,
+  pickup_points,
+  mercadopago_user_id,
+  mercadopago_connected_at,
+  created_at,
+  -- El teléfono queda porque el botón "Contactar por WhatsApp" tiene que
+  -- funcionar para un visitante sin cuenta (vendedores sin MercadoPago, ver
+  -- lib/whatsapp-policy.ts). ⚠️ Esto todavía permite scrapear los 148
+  -- teléfonos publicados. El arreglo de fondo es servirlo por una función que
+  -- devuelva el teléfono de UN vendedor a la vez, no la columna entera.
+  phone
+) ON public.users TO anon;
+
+-- 3. Lo que queda FUERA a propósito, y por qué:
+--      email              → PII. Para mostrar contacto existe `public_email`.
+--      default_address    → dirección particular de la persona.
+--      default_latitude   → ídem, permite ubicar la casa.
+--      default_longitude  → ídem.
+--      role               → deja identificar quién es admin.
+--      referral_code      → permite atribuirse referidos ajenos.
+--      referred_by        → grafo social de quién invitó a quién.
+--      updated_at         → no lo usa nadie sin sesión.
+
+-- 4. `spatial_ref_sys` es de PostGIS y viene sin RLS: es la que probablemente
+--    disparó el aviso de Supabase. No se puede activar RLS sobre una tabla de
+--    extensión sin ser owner, pero sí se le puede quitar el acceso: no la
+--    consulta nadie desde el cliente.
+REVOKE ALL ON public.spatial_ref_sys FROM anon, authenticated;
+
+COMMIT;
