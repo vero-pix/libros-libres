@@ -6,6 +6,7 @@ import SellerListingsGrid from "@/components/listings/SellerListingsGrid";
 import Avatar from "@/components/ui/Avatar";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
+import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
 
 interface Props {
   params: { id: string };
@@ -237,7 +238,9 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
 
         {/* Contact channels */}
         <div className="mb-8 flex flex-wrap gap-3">
-            {seller.phone && (() => {
+            {/* El WhatsApp de la tienda solo aparece si el vendedor NO puede
+                cobrar por la plataforma. Ver lib/whatsapp-policy.ts (25 ago 2026) */}
+            {seller.phone && mostrarWhatsAppVendedor(!!seller.mercadopago_user_id) && (() => {
               const cleanPhone = seller.phone.replace(/\D/g, "");
               return (
                 <a

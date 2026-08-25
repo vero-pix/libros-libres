@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import type { ListingWithBook } from "@/types";
+import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
 
 interface ShippingQuote {
   service: string;
@@ -69,11 +70,11 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   const discountedBookPrice = bookPrice - discountAmount;
 
   const isCourier = deliveryMethod === "courier";
-  // Sin MercadoPago no hay pago en el sitio: el WhatsApp deja de ser un extra y
-  // pasa a ser la única salida, venga o no con despacho. (25 ago 2026)
+  // Con MercadoPago el WhatsApp no compite con el botón de pagar; sin él es la
+  // única salida y se muestra siempre. Ver lib/whatsapp-policy.ts (25 ago 2026)
   const sellerHasMP = !!(listing.seller as any)?.mercadopago_user_id;
   const sellerPhone = listing.seller?.phone ?? null;
-  const showWhatsApp = !!sellerPhone && (!isCourier || !sellerHasMP);
+  const showWhatsApp = !!sellerPhone && mostrarWhatsAppVendedor(sellerHasMP);
   // Calle Y número: sin el número Shipit recibe `number: 0` y no hay entrega
   // posible aunque la etiqueta se emita. (5 ago 2026)
   const addressHasNumber = /\d{1,6}(\s|,|$)/.test(address);

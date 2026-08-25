@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import type { ListingWithBook } from "@/types";
+import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
 
 interface ShippingQuote {
   service: string;
@@ -452,7 +453,7 @@ export default function BundleCheckoutForm({
         </>
       )}
 
-      {!isCourier && sellerPhone && (
+      {sellerPhone && mostrarWhatsAppVendedor(sellerHasMP) && (
         <>
           {sellerHasMP && (
             <div className="flex items-center gap-3 text-xs text-gray-400">

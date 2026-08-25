@@ -536,7 +536,11 @@ export default function ListingDetail({ listing, images = [] }: Props) {
                 </p>
               </div>
               <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
-              <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} variant="secondary" paramsFicha={paramsFicha} />
+              {/* Antes había un WhatsApp secundario acá. Con MercadoPago conectado
+                  competía con el botón de comprar y la venta se cerraba fuera del
+                  sitio. Las dudas van por la mensajería interna, que le avisa al
+                  vendedor por correo. Ver lib/whatsapp-policy.ts (25 ago 2026) */}
+              <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
             </>
           ) : (
             <div className="space-y-2">

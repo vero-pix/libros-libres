@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { libroUrl } from "@/lib/urls";
 import { trackEvent } from "@/utils/analytics";
+import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
 
 interface CartItem {
   id: string;
@@ -342,7 +343,7 @@ export default function CartView({
                   {group.subtotal.toLocaleString("es-CL")}
                 </Link>
               )}
-              {group.sellerPhone && (
+              {group.sellerPhone && mostrarWhatsAppVendedor(group.sellerHasMP) && (
                 <a
                   href={`https://wa.me/${group.sellerPhone.replace(/\D/g, "")}?text=${waMessage()}`}
                   target="_blank"
