@@ -69,6 +69,11 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   const discountedBookPrice = bookPrice - discountAmount;
 
   const isCourier = deliveryMethod === "courier";
+  // Sin MercadoPago no hay pago en el sitio: el WhatsApp deja de ser un extra y
+  // pasa a ser la única salida, venga o no con despacho. (25 ago 2026)
+  const sellerHasMP = !!(listing.seller as any)?.mercadopago_user_id;
+  const sellerPhone = listing.seller?.phone ?? null;
+  const showWhatsApp = !!sellerPhone && (!isCourier || !sellerHasMP);
   // Calle Y número: sin el número Shipit recibe `number: 0` y no hay entrega
   // posible aunque la etiqueta se emita. (5 ago 2026)
   const addressHasNumber = /\d{1,6}(\s|,|$)/.test(address);
@@ -530,7 +535,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
               </div>
             )}
 
-            {(listing.seller as any)?.mercadopago_user_id ? (
+            {sellerHasMP ? (
               <button
                 onClick={handleSubmit}
                 disabled={
@@ -550,16 +555,31 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                   `Pagar con MercadoPago`
                 )}
               </button>
+            ) : sellerPhone ? (
+              <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                <p className="text-xs text-amber-900 font-bold mb-1">Este libro se coordina por WhatsApp</p>
+                <p className="text-[11px] text-amber-800 leading-relaxed">
+                  {listing.seller?.full_name ?? "El vendedor"} todavía no tiene pago online, así que recibe la plata
+                  directo. Escríbele y acuerdan cómo pagar y cómo te llega el libro.
+                </p>
+              </div>
             ) : (
-              <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl text-center">
-                <p className="text-[11px] text-amber-800 font-medium">Este vendedor no tiene pago online configurado.</p>
+              <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                <p className="text-xs text-amber-900 font-bold mb-1">Todavía no puedo cerrar esta compra</p>
+                <p className="text-[11px] text-amber-800 leading-relaxed">
+                  Este vendedor no tiene pago online ni WhatsApp publicado. Pide el libro en{" "}
+                  <a href="/solicitudes" className="underline font-bold">Se busca</a> y te aviso apenas
+                  alguien más lo tenga.
+                </p>
               </div>
             )}
 
-            {!isCourier && listing.seller?.phone && (
+            {showWhatsApp && sellerPhone && (
               <a
-                href={`https://wa.me/${listing.seller.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
-                  `Hola! Me interesa "${book.title}" a $${bookPrice.toLocaleString("es-CL")} en tuslibros.cl. ¿Podemos coordinar la entrega?`
+                href={`https://wa.me/${sellerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                  isCourier
+                    ? `Hola! Me interesa "${book.title}" a $${bookPrice.toLocaleString("es-CL")} en tuslibros.cl. ¿Me lo puedes despachar? Coordinemos el pago y el envío.`
+                    : `Hola! Me interesa "${book.title}" a $${bookPrice.toLocaleString("es-CL")} en tuslibros.cl. ¿Podemos coordinar la entrega?`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -572,15 +592,19 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
           </div>
         </div>
 
-        <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6">
-          <div className="flex gap-3">
-            <span className="text-xl">🛡️</span>
-            <div>
-              <p className="text-xs font-bold text-amber-900 uppercase tracking-widest mb-1">Compra protegida</p>
-              <p className="text-[11px] text-amber-800 leading-relaxed">Si pagas por la plataforma, retenemos el dinero hasta que confirmes la recepción. Si hay algún problema, te devolvemos el 100%.</p>
+        {/* Sin MercadoPago el pago no pasa por acá: no prometer una protección
+            que no puedo cumplir. (25 ago 2026) */}
+        {sellerHasMP && (
+          <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6">
+            <div className="flex gap-3">
+              <span className="text-xl">🛡️</span>
+              <div>
+                <p className="text-xs font-bold text-amber-900 uppercase tracking-widest mb-1">Compra protegida</p>
+                <p className="text-[11px] text-amber-800 leading-relaxed">Si pagas por la plataforma, retenemos el dinero hasta que confirmes la recepción. Si hay algún problema, te devolvemos el 100%.</p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </aside>
     </div>
   );
