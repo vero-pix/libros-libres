@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 2 julio 2026
+Última actualización: 25 agosto 2026
 
 ---
 
@@ -15,7 +15,52 @@ Cuando aparezca un bug de este tipo: **no solo backfillear — siempre tapar el 
 
 ---
 
-## 🎯 Plan de abordaje — próxima sesión (estado 2 jul 2026, tarde)
+## 🎯 Estado y plan — 25 agosto 2026
+
+**El cuello ya NO es que los vendedores no puedan cobrar. Es que la venta se
+cierra fuera del sitio aunque puedan.**
+
+De los **128 libros vendidos en agosto** ($1.720.981), **122 eran de vendedores
+con MercadoPago ya conectado** — y 119 se cerraron por fuera. Comisión del mes:
+**$1.440**. Comisión perdida: **$129.678**.
+
+Esto **invalida el diagnóstico de julio** que está más abajo ("el $0 de revenue
+es la cuenta MP"). Las cuentas MP se destrabaron; el dinero se sigue yendo igual.
+
+**Experimento en curso (25 ago → leer ~8 sept):** `lib/whatsapp-policy.ts` — el
+WhatsApp del vendedor deja de mostrarse cuando tiene MercadoPago conectado, para
+que no compita con el botón de comprar. Sin MP no cambia nada. Se mide con
+`node scripts/_captura.mjs`. Revertir = que la función devuelva siempre `true`.
+
+**Baseline de captura (lo que hay que superar):**
+
+| Mes | Libros | Volumen | Comisión | Captura |
+|---|---:|---:|---:|---:|
+| Junio | 32 | $522.499 | $0 | 0% |
+| Julio | 84 | $1.416.998 | $0 | 0% |
+| Agosto (al 25) | 128 | $1.720.981 | $1.440 | 1,9% |
+
+**Si el 8 de septiembre la captura no sube:** el modelo de comisión transaccional
+no se sostiene y toca cobrarle al vendedor (cuota mensual o por publicación).
+Con 112 vendedores activos, $3.000/mes = $336.000/mes.
+
+**Decidido y descartado el 25 ago: "MercadoPago obligatorio para publicar."**
+Resolvería 6 libros de 128 y afectaría al 53% de los vendedores activos (59 de
+112). Si se retoma, **solo para vendedores nuevos, nunca retroactivo.**
+
+**Otros pendientes vivos:**
+- El checkout **exige cuenta** (`lib/supabase/middleware.ts`). Decisión de producto sin tomar.
+- 458 de 2.020 listings activos (23%) son de vendedores sin MP.
+- Inconsistencia conocida: la ficha esconde "agregar al carrito" sin MP, la tarjeta de la grilla no (`ListingCard.tsx`). No se tocó porque 5 grillas no traen `mercadopago_user_id` en el select.
+- Comisiones fantasma: se registran al crear la orden, no al pagarse. Sin arreglar.
+
+---
+
+## 📉 Plan de abordaje — 2 julio 2026 (HISTÓRICO — diagnóstico superado)
+
+> ⚠️ Lo de abajo quedó obsoleto el 25 ago 2026. Las cuentas MP bloqueadas ya no
+> son el cuello: hoy el 95% de la fuga es de vendedores que **sí** pueden cobrar.
+> Se conserva por contexto, no como plan vigente.
 
 **El $0 de revenue NO es el código — es la cuenta MP.** La máquina de compra funciona (MP crea preferencia, 26/30 vendedores pueden cobrar). Pero 4 cuentas están bloqueadas (`rejected_by_regulations`), incluida la de TusLibros (es la de la mamá de Vero, `margar@tuslibros.cl`) = 201 libros + Ruth 65 + Nicole 20 + Barbara 7 = ~293 libros (29%) que se ven pero no se pueden pagar. Detalle en memoria `project_conversion_compra_jul2026`.
 

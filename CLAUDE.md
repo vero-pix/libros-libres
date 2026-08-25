@@ -20,6 +20,8 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 - **Bundle checkout**: orders con `bundle_id` compartido, una preferencia MP, `external_reference = bundle_id`. Shipping/fee solo en la primera order del bundle.
 - **Eventos del carrito**: dispatch `window.dispatchEvent(new CustomEvent("cart-updated"))` al agregar/eliminar para que el badge del navbar se refresque.
 - **Migraciones**: `supabase/migrations/` es SQL versionado — aplicar manual en el SQL Editor si no hay CLI.
+- **WhatsApp del vendedor**: pasar SIEMPRE por `mostrarWhatsAppVendedor()` de `lib/whatsapp-policy.ts`. No agregar botones de `wa.me` con el teléfono del vendedor sin esa guarda — es lo que hacía que la venta se cerrara fuera del sitio. El WhatsApp de soporte de Vero (`56994583067`) no tiene esta restricción.
+- **Nunca dejar una pantalla de compra sin salida.** Si el vendedor no puede cobrar, tiene que haber WhatsApp, mensajería interna o `/solicitudes` — nunca solo un cartel que informe el bloqueo. Pasó en el checkout con despacho por courier hasta el 25-08-2026.
 
 ## Reglas de trabajo
 
@@ -56,8 +58,10 @@ Antes de afirmar cualquier dato de negocio, mirar acá. Si un documento contradi
 | Políticas, despacho, devoluciones, URLs | `docs/KB-TUSLIBROS.md` | Verificado contra el sitio publicado |
 | Plan de crecimiento vigente | `docs_desde_claude/SPRING_15_DAYS.md` | Sprint de 15 días |
 | Visión de largo plazo | `docs_desde_claude/MASTER_PLAN.md` | |
-| Features pendientes y entregadas | `ROADMAP.md` | |
+| Features pendientes y entregadas | `ROADMAP.md` | Actualizado el 25-08-2026. El plan de julio que sigue más abajo en ese archivo está marcado como histórico: su diagnóstico quedó superado |
 | Onboarding de vendedores | `docs/MENSAJES-ONBOARDING-VENDEDOR.md` · `docs/guia-vender-v2.html` | |
+| Cuándo se muestra el WhatsApp del vendedor | `lib/whatsapp-policy.ts` | Código, no documento. **Con MercadoPago conectado NO se muestra** (competía con el botón de comprar); sin MP se muestra siempre, incluso con courier. Experimento abierto el 25-08-2026 — no revertirlo sin mirar la métrica de abajo |
+| Tasa de captura (la métrica del negocio) | `scripts/_captura.mjs` | Cuánto del volumen vendido pasa por la plataforma y deja comisión. Baseline agosto 2026: 1,9%. **Leer ~8 sept 2026** |
 
 **Documentos históricos — NO usar como fuente:**
 
