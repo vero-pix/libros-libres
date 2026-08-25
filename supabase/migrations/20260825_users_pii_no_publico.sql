@@ -14,6 +14,26 @@
 --
 -- ⚠️ APLICAR EN EL SQL EDITOR DE SUPABASE (no hay CLI en este proyecto).
 --
+-- ⚠️⚠️ ESTO YA TUMBÓ PRODUCCIÓN UNA VEZ (28 jul 2026). Al pasar `users` a
+-- permisos por columna, todo `select("*")` sobre la tabla empieza a fallar y se
+-- cayeron las páginas /vendedor/*. Verificado antes de escribir esta migración:
+-- HOY NO QUEDA NINGÚN `select("*")` ni `users(*)` en el repo — todas las
+-- lecturas nombran sus columnas. Si esto se aplica meses después, volver a
+-- correr la verificación:
+--
+--   grep -rn 'from("users")' --include="*.ts" --include="*.tsx" app/ components/ lib/ \
+--     | grep -E 'select\("\*"\)|users\(\*\)'
+--
+-- ⚠️ CONSECUENCIA PERMANENTE: con permisos por columna, toda columna que se
+-- agregue a `users` de aquí en adelante nace SIN permiso para `anon`. Si una
+-- página pública la pide, falla. Al agregar una columna pública, sumarla al
+-- GRANT de abajo.
+--
+-- NO se revoca nada al rol `authenticated` a propósito: el checkout, el perfil y
+-- las rutas de admin leen email/teléfono/dirección con la sesión del usuario y
+-- tienen que seguir funcionando. Se verificó que ninguna lectura anónima toca
+-- las columnas que quedan fuera.
+--
 -- Verificación previa — debe devolver la lista de columnas actuales:
 --   SELECT column_name FROM information_schema.column_privileges
 --   WHERE table_name = 'users' AND grantee = 'anon';
