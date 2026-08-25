@@ -21,8 +21,8 @@ Cuando aparezca un bug de este tipo: **no solo backfillear — siempre tapar el 
 cierra fuera del sitio aunque puedan.**
 
 De los **128 libros vendidos en agosto** ($1.720.981), **122 eran de vendedores
-con MercadoPago ya conectado** — y 119 se cerraron por fuera. Comisión del mes:
-**$1.440**. Comisión perdida: **$129.678**.
+con MercadoPago ya conectado** — y 119 se cerraron por fuera. Comisión del mes: **$800**
+(una sola venta, la del 6 de agosto). Comisión perdida: **$129.678**.
 
 Esto **invalida el diagnóstico de julio** que está más abajo ("el $0 de revenue
 es la cuenta MP"). Las cuentas MP se destrabaron; el dinero se sigue yendo igual.
@@ -38,7 +38,7 @@ que no compita con el botón de comprar. Sin MP no cambia nada. Se mide con
 |---|---:|---:|---:|---:|
 | Junio | 32 | $522.499 | $0 | 0% |
 | Julio | 84 | $1.416.998 | $0 | 0% |
-| Agosto (al 25) | 128 | $1.720.981 | $1.440 | 1,9% |
+| Agosto (al 25) | 128 | $1.720.981 | **$800** | **0,8%** |
 
 **Si el 8 de septiembre la captura no sube:** el modelo de comisión transaccional
 no se sostiene y toca cobrarle al vendedor (cuota mensual o por publicación).

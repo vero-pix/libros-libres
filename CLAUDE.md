@@ -61,7 +61,7 @@ Antes de afirmar cualquier dato de negocio, mirar acá. Si un documento contradi
 | Features pendientes y entregadas | `ROADMAP.md` | Actualizado el 25-08-2026. El plan de julio que sigue más abajo en ese archivo está marcado como histórico: su diagnóstico quedó superado |
 | Onboarding de vendedores | `docs/MENSAJES-ONBOARDING-VENDEDOR.md` · `docs/guia-vender-v2.html` | |
 | Cuándo se muestra el WhatsApp del vendedor | `lib/whatsapp-policy.ts` | Código, no documento. **Con MercadoPago conectado NO se muestra** (competía con el botón de comprar); sin MP se muestra siempre, incluso con courier. Experimento abierto el 25-08-2026 — no revertirlo sin mirar la métrica de abajo |
-| Tasa de captura (la métrica del negocio) | `scripts/_captura.mjs` | Cuánto del volumen vendido pasa por la plataforma y deja comisión. Baseline agosto 2026: 1,9%. **Leer ~8 sept 2026** |
+| Tasa de captura (la métrica del negocio) | `scripts/_captura.mjs` | Cuánto del volumen vendido pasa por la plataforma y deja comisión. Baseline agosto 2026: 0,8% ($800 en el mes). **Leer ~8 sept 2026** |
 
 **Documentos históricos — NO usar como fuente:**
 
