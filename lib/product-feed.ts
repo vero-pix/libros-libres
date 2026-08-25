@@ -181,8 +181,12 @@ export function limpiarDescripcion(texto: string): string {
     // Mínimos de compra propios del vendedor: no son los del checkout y en el
     // feed leen como una condición de la tienda que después no se cumple.
     .replace(/^.*\b(compras?\s+desde|pedido\s+m[ií]nimo|m[ií]nimo\s+de\s+compra)\b.*$/gim, " ")
-    // Emojis y símbolos decorativos
-    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, " ")
+    // Emojis y símbolos decorativos. Se escriben como pares suplentes en vez de
+    // `\u{...}` con flag `u` porque el tsconfig no apunta a ES6 y el build
+    // falla: "This regular expression flag is only available when targeting
+    // 'es6' or later".
+    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, " ")
+    .replace(/[←-⇿☀-➿⬀-⯿️•]/g, " ")
     .replace(/[ \t]+/g, " ")
     .replace(/\s*\n\s*/g, "\n")
     .replace(/\n{2,}/g, "\n")
