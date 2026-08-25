@@ -11,6 +11,7 @@ import { buildCategoryTree } from "@/lib/categoryTree";
 import { resolveAuthorUrl } from "@/lib/authorLink";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
+import { FEED_SHIPPING_CLP } from "@/lib/product-feed";
 
 export const revalidate = 60;
 
@@ -267,7 +268,11 @@ export default async function LibroPage({ params }: Props) {
         "@type": "OfferShippingDetails",
         shippingRate: {
           "@type": "MonetaryAmount",
-          value: "3500",
+          // Tiene que coincidir con lo que declara el feed de producto o
+          // Merchant Center marca discrepancia entre feed y landing. El $3.500
+          // fijo que había acá nunca fue cierto: la mediana real de las órdenes
+          // con despacho es $5.433. Ver lib/product-feed.ts (25 ago 2026).
+          value: String(FEED_SHIPPING_CLP),
           currency: "CLP",
         },
         shippingDestination: {
