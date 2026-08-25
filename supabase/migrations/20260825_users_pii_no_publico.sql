@@ -86,9 +86,20 @@ GRANT SELECT (
 --      updated_at         → no lo usa nadie sin sesión.
 
 -- 4. `spatial_ref_sys` es de PostGIS y viene sin RLS: es la que probablemente
---    disparó el aviso de Supabase. No se puede activar RLS sobre una tabla de
---    extensión sin ser owner, pero sí se le puede quitar el acceso: no la
---    consulta nadie desde el cliente.
+--    disparó el aviso de Supabase.
+--
+--    APLICADO EL 25 AGO Y NO SURTIÓ EFECTO: sigue siendo legible con la anon
+--    key. PostGIS otorga la tabla a PUBLIC, y revocarle a `anon` no toca ese
+--    grant. Lo que sí funcionaría es `REVOKE ALL ON public.spatial_ref_sys
+--    FROM PUBLIC`, pero eso puede romper funciones de PostGIS que la consultan
+--    con los permisos de quien invoca (ST_Transform y compañía), y este sitio
+--    hace búsquedas por distancia.
+--
+--    DECISIÓN: se deja como está. Es el catálogo estándar de sistemas de
+--    referencia geodésica —los mismos 8.500 SRIDs que trae cualquier
+--    instalación de PostGIS—, no hay un solo dato de tuslibros ahí. El aviso de
+--    Supabase se puede marcar como aceptado en el panel. No vale arriesgar el
+--    buscador por una tabla de referencia pública.
 REVOKE ALL ON public.spatial_ref_sys FROM anon, authenticated;
 
 COMMIT;
