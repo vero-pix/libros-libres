@@ -57,7 +57,7 @@ const faqs = [
   },
   {
     q: "¿Cómo sé que el libro llegará en buen estado?",
-    a: "Cada publicación tiene fotos reales, descripción del vendedor y condición declarada. El pago con MercadoPago queda retenido hasta que confirmas que recibiste el libro como esperabas. Si hay un problema, tienes 7 días para reclamar.",
+    a: "Cada publicación tiene fotos reales, descripción del vendedor y condición declarada. Pagas con tu tarjeta a través de MercadoPago —no en efectivo a un desconocido— y queda registro de la compra. Si hay un problema, tienes 7 días para reclamar.",
   },
   {
     q: "Tengo un Álgebra de Baldor en buen estado. ¿Puedo venderlo aquí?",

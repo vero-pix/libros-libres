@@ -88,7 +88,7 @@ const faqItems = [
   },
   {
     q: "¿Cuándo se aplican comisiones?",
-    a: "Las comisiones solo aplican cuando usas las herramientas integradas: pago con MercadoPago o despacho por courier (Starken, Chilexpress, Blue Express). Si coordinas todo por WhatsApp y entregas en persona, no pagas nada.",
+    a: "Publicar es gratis y no hay mensualidad. Cobro 8% del precio del libro cuando la venta se cierra acá, con el pago por MercadoPago y el despacho resuelto (Starken, Chilexpress, Blue Express). Con eso pago la pasarela, el servidor y las horas.",
   },
   {
     q: "¿Qué libros se venden mejor?",

@@ -46,7 +46,7 @@ const faqs = [
   },
   {
     q: "¿Cómo compro y recibo el libro?",
-    a: "Pagas protegido con MercadoPago: tu dinero queda retenido hasta que confirmas que recibiste el libro. Eliges retiro en mano gratis con la vendedora o despacho por courier a todo Chile.",
+    a: "Pagas con tu tarjeta a través de MercadoPago, así queda registro de la compra y tienes 7 días para reclamar si algo sale mal. Eliges retiro en mano gratis con la vendedora o despacho por courier a todo Chile.",
   },
   {
     q: "¿No está el título que busco?",

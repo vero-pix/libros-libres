@@ -7,9 +7,17 @@
  * a nadie — ni a CIM ni a Buhardilla — y el copy del sitio prometía algo falso.
  * Se eliminaron del producto, no solo del copy.
  *
- * La comisión se cobra SOLO cuando la venta pasa por las herramientas integradas
- * (pago con MercadoPago o despacho por courier). Si comprador y vendedor coordinan
- * por WhatsApp y entregan en persona, no se cobra nada.
+ * La comisión se cobra cuando el pago pasa por MercadoPago. Ojo con el matiz, que
+ * se prestó para copy equivocado: una entrega en persona pagada por MercadoPago SÍ
+ * paga comisión —el `marketplace_fee` que se le manda a MP es `commission +
+ * shippingCost` sin mirar la modalidad de entrega, aunque la orden quede con
+ * `service_fee: 0`—. Lo que no se cobra es la venta coordinada por fuera que nunca
+ * pasa por la plataforma, sencillamente porque no hay cómo.
+ *
+ * 25 ago 2026: se retiró de todo el copy cara al usuario la frase "si entregas en
+ * persona no pagas nada". Era cierta y funcionaba como instructivo para saltarse la
+ * caja: en agosto se vendieron $1.720.981 y la comisión del mes fue $800. No cambió
+ * lo que se cobra, cambió que dejamos de enseñarlo como atajo.
  *
  * Si algún día vuelven los tramos, este es el único archivo que hay que tocar.
  */

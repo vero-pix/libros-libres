@@ -85,11 +85,11 @@ export async function POST(req: NextRequest) {
   </p>
 
   <p style="font-size:15px;line-height:1.65;color:#3a2f24;margin:0 0 16px;">
-    Quiero que esto crezca sobre bases que le convengan a los dos lados. Publicar es
-    gratis, siempre. Cobro 8% de comisión <strong>solo si la venta pasa por
-    MercadoPago</strong> — si la cierras en persona, no cobro nada. El pago va
-    protegido y la plata le llega directa al vendedor. Sin versión premium escondida
-    ni letra chica.
+    Quiero que esto crezca sobre bases que le convengan a los dos lados.
+    <strong>Publicar es gratis, siempre.</strong> Cobro 8% cuando la venta se cierra
+    acá, con el pago por MercadoPago: la plata le llega directa al vendedor y queda
+    registro de la compra para los dos. Eso es lo que paga la pasarela, el servidor y
+    las horas. Sin versión premium escondida ni letra chica.
   </p>
 
   <p style="font-size:15px;line-height:1.65;color:#3a2f24;margin:0 0 20px;">
@@ -107,9 +107,12 @@ export async function POST(req: NextRequest) {
 
   <p style="font-size:14px;line-height:1.65;color:#3a2f24;margin:0 0 16px;">
     <strong>Si tienes varios libros</strong> y quieres ahorrarte la pega de subirlos
-    de a uno, mándame una foto de la ruma o un Excel con los títulos por
-    <a href="https://wa.me/56994583067" style="color:#a8581e;font-weight:600;">WhatsApp</a>
-    y yo los subo por ti.
+    de a uno, no lo hagas a mano: sube una foto de la ruma o un Excel con los títulos
+    en el
+    <a href="https://tuslibros.cl/mis-libros/importar" style="color:#a8581e;font-weight:600;">importador</a>
+    y quedan publicados de una. Si se te enreda, escríbeme desde
+    <a href="https://tuslibros.cl/mensajes" style="color:#a8581e;font-weight:600;">mensajes</a>
+    y lo vemos.
   </p>
 
   <p style="font-size:14px;line-height:1.65;color:#3a2f24;margin:0 0 22px;">

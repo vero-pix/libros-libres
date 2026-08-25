@@ -22,7 +22,11 @@ Se puede navegar sin cuenta. Se requiere cuenta para publicar o para escribirle 
 | **Pago con MercadoPago** | Compra desde la publicación, dinero protegido, vendedor cobra al confirmar entrega | Sí |
 | **Despacho por courier (Shipit)** | Retiro a domicilio, envío a todo Chile | Sí |
 
-**Regla de comisión (textual del FAQ):** *"Las comisiones solo aplican cuando usas nuestras herramientas integradas: pago con MercadoPago o despacho por courier. Si coordinas todo por WhatsApp y entregas en persona, no pagas nada."*
+**Regla de comisión (textual del FAQ, actualizada el 25-08-2026):** *"Cobro un 8% del precio del libro, igual para todos, y solo cuando la venta se cierra acá. Publicar no cuesta nada y no hay mensualidad."*
+
+> ⚠️ La formulación anterior —*"si coordinas todo por WhatsApp y entregas en persona, no pagas nada"*— se retiró de todo el copy el 25-08-2026. Era cierta, pero funcionaba como instructivo para saltarse la caja: en agosto se vendieron 128 libros por $1.720.981 y la comisión del mes fue $800. **No volver a escribirla.** Lo que se cobra sigue siendo lo mismo; lo que cambió es que ya no lo enseñamos como atajo.
+>
+> Precisión técnica, por si se redacta copy nuevo: la comisión se cobra cuando **el pago pasa por MercadoPago**, con o sin despacho — el `marketplace_fee` que se le envía a MP es `commission + shippingCost` sin mirar la modalidad de entrega, así que una entrega en persona pagada por MercadoPago **sí** paga comisión. Lo que no se cobra es la venta que nunca pasa por la plataforma, sencillamente porque no hay cómo.
 
 Las dos vías pagadas son combinables e independientes entre sí.
 

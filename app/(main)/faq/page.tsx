@@ -150,7 +150,7 @@ const faqSections = [
             <strong>
               <Link href="/como-despachar" className={linkClass}>despacho por courier</Link>
             </strong>{" "}
-            (Shipit hoy, más integraciones en camino). Cobro un <strong>8% del precio del libro</strong>, igual para todos. Si coordinas todo por WhatsApp y entregas en persona, no pagas nada.
+            (Shipit hoy, más integraciones en camino). Cobro un <strong>8% del precio del libro</strong>, igual para todos, y solo cuando la venta se cierra acá. Publicar no cuesta nada y no hay mensualidad.
           </span>
         ),
       },

@@ -112,8 +112,9 @@ ${categorias}
 - El comprador paga con MercadoPago (tarjeta de crédito, débito o saldo).
 - El envío va por courier (Starken, Chilexpress) a todo Chile, o se retira en
   persona coordinando con el vendedor.
-- La comisión es 8% sobre el precio del libro, y solo se cobra si la venta pasa
-  por la plataforma. Si comprador y vendedor coordinan en persona, no se cobra.
+- La comisión es 8% sobre el precio del libro y se cobra cuando la venta se
+  cierra en la plataforma, con el pago por MercadoPago. Publicar es gratis y no
+  hay mensualidad.
 - Hay una sección "Se busca" donde un comprador deja el título que necesita y se
   le avisa cuando algún vendedor lo publica.
 
