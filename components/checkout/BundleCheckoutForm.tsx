@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import type { ListingWithBook } from "@/types";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
+import { calcularEnvioPromo } from "@/lib/shipping-promo";
 
 interface ShippingQuote {
   service: string;
@@ -80,7 +81,17 @@ export default function BundleCheckoutForm({
   const selectedQuote = isCourier
     ? quotes.find((q) => q.serviceCode === selectedService)
     : null;
-  const shippingCost = selectedQuote?.price ?? 0;
+  /** Lo que cobra el courier de verdad. Es lo que se manda al servidor. */
+  const fleteCotizado = selectedQuote?.price ?? 0;
+  // Envío gratis sobre el umbral. El servidor lo recalcula al crear la orden:
+  // acá es solo para mostrar. Ver lib/shipping-promo.ts (25 ago 2026).
+  const promo = calcularEnvioPromo({
+    sellerId: seller?.id,
+    totalBookPrice,
+    fleteCotizado,
+    esCourier: isCourier,
+  });
+  const shippingCost = promo.cobrarAlComprador;
   const total = totalBookPrice + shippingCost;
 
   const firstListingId = listings[0].id;
@@ -402,11 +413,22 @@ export default function BundleCheckoutForm({
                 : "Entrega"}
             </span>
             <span className="text-gray-900">
-              {isCourier
-                ? selectedQuote
-                  ? `$${shippingCost.toLocaleString("es-CL")}`
-                  : "Ingresa dirección"
-                : "Gratis"}
+              {!isCourier ? (
+                "Gratis"
+              ) : !selectedQuote ? (
+                "Ingresa dirección"
+              ) : promo.aplica ? (
+                <>
+                  <span className="text-gray-400 line-through mr-1.5">
+                    ${fleteCotizado.toLocaleString("es-CL")}
+                  </span>
+                  <span className="text-green-700 font-semibold">
+                    {shippingCost > 0 ? `$${shippingCost.toLocaleString("es-CL")}` : "Gratis"}
+                  </span>
+                </>
+              ) : (
+                `$${shippingCost.toLocaleString("es-CL")}`
+              )}
             </span>
           </div>
           <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between font-bold">

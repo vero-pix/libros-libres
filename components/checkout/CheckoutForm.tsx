@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import type { ListingWithBook } from "@/types";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
+import { calcularEnvioPromo } from "@/lib/shipping-promo";
 
 interface ShippingQuote {
   service: string;
@@ -80,7 +81,17 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   const addressHasNumber = /\d{1,6}(\s|,|$)/.test(address);
   const addressIncomplete = isCourier && address.trim().length >= 5 && !addressHasNumber;
   const selectedQuote = isCourier ? quotes.find((q) => q.serviceCode === selectedService) : null;
-  const shippingCost = selectedQuote?.price ?? 0;
+  /** Lo que cobra el courier de verdad. Es lo que se manda al servidor. */
+  const fleteCotizado = selectedQuote?.price ?? 0;
+  // Envío gratis sobre el umbral. El servidor vuelve a calcular esto mismo al
+  // crear la orden: acá es solo para mostrar. Ver lib/shipping-promo.ts.
+  const promo = calcularEnvioPromo({
+    sellerId: listing.seller_id,
+    totalBookPrice: discountedBookPrice,
+    fleteCotizado,
+    esCourier: isCourier,
+  });
+  const shippingCost = promo.cobrarAlComprador;
   const total = discountedBookPrice + shippingCost;
 
   const fetchQuotes = useCallback(
@@ -511,11 +522,22 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                 {isCourier ? "Envío" : "Entrega"}
               </span>
               <span className="text-ink font-bold">
-                {isCourier
-                  ? selectedQuote
-                    ? `$${shippingCost.toLocaleString("es-CL")}`
-                    : "—"
-                  : "Gratis"}
+                {!isCourier ? (
+                  "Gratis"
+                ) : !selectedQuote ? (
+                  "—"
+                ) : promo.aplica ? (
+                  <>
+                    <span className="text-ink-muted font-medium line-through mr-1.5">
+                      ${fleteCotizado.toLocaleString("es-CL")}
+                    </span>
+                    <span className="text-green-700">
+                      {shippingCost > 0 ? `$${shippingCost.toLocaleString("es-CL")}` : "Gratis"}
+                    </span>
+                  </>
+                ) : (
+                  `$${shippingCost.toLocaleString("es-CL")}`
+                )}
               </span>
             </div>
             <div className="pt-3 border-t border-cream-dark flex justify-between items-baseline">

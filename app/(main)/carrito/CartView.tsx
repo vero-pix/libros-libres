@@ -6,6 +6,7 @@ import Link from "next/link";
 import { libroUrl } from "@/lib/urls";
 import { trackEvent } from "@/utils/analytics";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
+import { PROMO_UMBRAL, promoVigente, sellerParticipa } from "@/lib/shipping-promo";
 
 interface CartItem {
   id: string;
@@ -327,6 +328,38 @@ export default function CartView({
 
             {/* Checkout del grupo */}
             <div className="p-5 bg-cream-warm/20 border-t border-cream-dark/20 space-y-2">
+              {/* Envío gratis sobre el umbral — solo para vendedores que participan.
+                  Ver lib/shipping-promo.ts (25 ago 2026). */}
+              {sellerParticipa(group.sellerId) && promoVigente() && (() => {
+                const falta = PROMO_UMBRAL - group.subtotal;
+                const pct = Math.min(100, Math.round((group.subtotal / PROMO_UMBRAL) * 100));
+                return (
+                  <div className="mb-3">
+                    <p className="text-xs font-medium text-ink mb-1.5">
+                      {falta > 0 ? (
+                        <>
+                          Te faltan{" "}
+                          <strong className="text-coral">${falta.toLocaleString("es-CL")}</strong>{" "}
+                          para el envío gratis
+                        </>
+                      ) : (
+                        <span className="text-green-700 font-bold">
+                          🎉 Tienes envío gratis en este pedido
+                        </span>
+                      )}
+                    </p>
+                    <div className="h-2 w-full bg-cream-dark/40 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          falta > 0 ? "bg-coral" : "bg-green-600"
+                        }`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
+
               {group.sellerHasMP && (
                 <Link
                   href={checkoutHref}

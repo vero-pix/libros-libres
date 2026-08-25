@@ -12,6 +12,7 @@ import { calculateCommission } from "@/lib/commissions";
 import { refreshSellerToken } from "@/lib/mercadopago-oauth";
 import { sendGong, escapeHtml } from "@/lib/notifications";
 import crypto from "crypto";
+import { calcularEnvioPromo } from "@/lib/shipping-promo";
 
 /**
  * POST /api/orders
@@ -210,7 +211,11 @@ export async function POST(req: NextRequest) {
   );
   discountAmount = Math.round(rawBookPrice * discountPct / 100);
   const totalBookPrice = rawBookPrice - discountAmount;
-  const shippingCost =
+  // `shipping_cost_override` es la cotización REAL de Shipit que eligió el
+  // comprador. Ojo: viene del cliente. Más abajo se valida contra un piso y la
+  // promo de envío gratis se resuelve acá, en el servidor — si viviera solo en
+  // el navegador, cualquiera podría pedir envío gratis con un curl.
+  const fleteCotizado =
     shipping_cost_override ??
     SHIPPING_COSTS[shipping_speed] ??
     SHIPPING_COSTS.standard;
@@ -232,6 +237,27 @@ export async function POST(req: NextRequest) {
   const isInPerson =
     shipping_service === "Entrega en persona" ||
     shipping_service === "Punto de retiro";
+
+  // Piso de flete: si es despacho por courier, nadie puede mandar un costo
+  // menor al fallback. Sin esto, `shipping_cost_override: 0` en un curl daba
+  // envío gratis en cualquier compra, de cualquier vendedor.
+  if (!isInPerson && fleteCotizado < SHIPPING_COSTS.standard) {
+    return NextResponse.json(
+      { error: "El costo de despacho no es válido. Vuelve a cotizar el envío." },
+      { status: 400 }
+    );
+  }
+
+  // Envío gratis sobre el umbral: se decide acá, no en el navegador.
+  // Ver lib/shipping-promo.ts (25 ago 2026).
+  const promo = calcularEnvioPromo({
+    sellerId,
+    totalBookPrice,
+    fleteCotizado,
+    esCourier: !isInPerson,
+  });
+  const shippingCost = isInPerson ? 0 : promo.cobrarAlComprador;
+  const shippingSubsidy = promo.subsidio;
 
   const { rate: commissionRate, commission } = useSplit
     ? calculateCommission(totalBookPrice)
@@ -258,6 +284,10 @@ export async function POST(req: NextRequest) {
       seller_id: sellerId,
       book_price: discountedItemPrice,
       shipping_cost: itemShipping,
+      // Lo que Vero puso de su bolsillo por el envío gratis. `shipping_cost` es
+      // lo que pagó el comprador; sin esta columna no hay forma de saber cuánto
+      // costó la promo. Ver lib/shipping-promo.ts (25 ago 2026).
+      shipping_subsidy: isFirst ? shippingSubsidy : 0,
       service_fee: itemFee,
       total: itemTotal,
       status: "pending",

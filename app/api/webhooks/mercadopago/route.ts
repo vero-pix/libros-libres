@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     // Intentar primero como bundle_id
     const { data: bundleOrders } = await supabase
       .from("orders")
-      .select("id, listing_id, bundle_id, seller_id, buyer_id, buyer_address, courier, shipping_cost, book_price")
+      .select("id, listing_id, bundle_id, seller_id, buyer_id, buyer_address, courier, shipping_cost, shipping_subsidy, book_price")
       .eq("bundle_id", externalRef);
 
     if (bundleOrders && bundleOrders.length > 0) {
@@ -145,7 +145,14 @@ export async function POST(req: NextRequest) {
 
         // Shipit: un solo envío para el bundle, en la "primera" order (la que tiene shipping_cost > 0)
         try {
-          const headOrder = bundleOrders.find((o: any) => o.shipping_cost > 0) ?? bundleOrders[0];
+          // La "cabeza" del bundle es donde se cargaron shipping y fee. Con la
+          // promo de envío gratis, `shipping_cost` puede ser 0 en todas las
+          // órdenes, así que buscar por `> 0` ya no la identifica: se mira
+          // también el subsidio, y el fallback al primero sigue siendo válido
+          // porque todas las órdenes llevan el mismo `buyer_address`.
+          const headOrder =
+            bundleOrders.find((o: any) => o.shipping_cost > 0 || o.shipping_subsidy > 0) ??
+            bundleOrders[0];
           const isInPerson =
             headOrder.courier === "Entrega en persona" ||
             headOrder.courier === "Punto de retiro";
