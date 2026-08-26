@@ -144,11 +144,15 @@ export default function ProfileForm({
   }, [userId]);
 
   async function saveLocation(lat: number, lng: number, address: string) {
-    const { error: err } = await supabase
-      .from("users")
-      .update({ default_latitude: lat, default_longitude: lng, default_address: address })
-      .eq("id", userId);
-    if (err) {
+    // Vía endpoint y no directo a la tabla: guardar la ubicación también tiene
+    // que resolver la comuna (`users.city` y `listings.city_id`), y crear una
+    // comuna nueva en `cities` pide service role. Ver /api/perfil/ubicacion.
+    const res = await fetch("/api/perfil/ubicacion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lat, lng, address }),
+    });
+    if (!res.ok) {
       setLocationError("No se pudo guardar la ubicación.");
     } else {
       setSavedAddress(address);
@@ -166,25 +170,26 @@ export default function ProfileForm({
     if (!savedCoords || !savedAddress) return;
     setApplying(true);
     setLocationError(null);
-    // `listings.location` es columna generada desde latitude/longitude: no se
-    // escribe, se recalcula sola.
-    const { data, error: err } = await supabase
-      .from("listings")
-      .update({
-        latitude: savedCoords.lat,
-        longitude: savedCoords.lng,
+    // El endpoint escribe también `city_id`: sin eso la dirección decía Viña
+    // del Mar y el filtro de comuna seguía mostrando el libro en Santiago.
+    const res = await fetch("/api/perfil/ubicacion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        lat: savedCoords.lat,
+        lng: savedCoords.lng,
         address: savedAddress,
-      })
-      .eq("seller_id", userId)
-      .in("status", ["active", "paused"])
-      .select("id");
+        aplicarAPublicaciones: true,
+      }),
+    });
     setApplying(false);
     setConfirmingApply(false);
-    if (err) {
+    if (!res.ok) {
       setLocationError("No se pudieron actualizar las publicaciones. Intenta de nuevo.");
       return;
     }
-    setAppliedCount(data?.length ?? 0);
+    const { actualizados } = await res.json();
+    setAppliedCount(actualizados ?? 0);
   }
 
   async function handleGeolocate() {
