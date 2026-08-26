@@ -21,6 +21,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { authenticateApiKey, unauthorized } from "@/lib/apiAuth";
+import { slugListing, slugUnicoParaVendedor } from "@/lib/slugify";
 import { suggestTags } from "@/lib/tagSuggester";
 import { normalizeGenre } from "@/lib/genreNormalizer";
 
@@ -122,6 +123,14 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Slug para la URL amigable. La API lo dejaba en null y esas publicaciones
+  // caían a /listings/[uuid], que no rankea por nada.
+  const slug = await slugUnicoParaVendedor(
+    supabase,
+    caller.sellerId,
+    slugListing(title, author)
+  );
+
   // Crear el listing
   const { data: listing, error: listingErr } = await supabase
     .from("listings")
@@ -132,6 +141,7 @@ export async function POST(req: NextRequest) {
       condition,
       modality,
       city_id: city_id ?? null,
+      slug,
       status: "active",
     })
     .select("id, price, condition, modality, status, created_at")

@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { slugify } from "@/lib/slugify";
+import { slugListing, slugUnicoParaVendedor } from "@/lib/slugify";
 import { normalizeGenre } from "@/lib/genreNormalizer";
 import { suggestTags } from "@/lib/tagSuggester";
 import ISBNSearch from "@/components/books/ISBNSearch";
@@ -517,11 +517,14 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       }
 
       // Insertar publicación
-      // Generate unique slug
-      const baseSlug = slugify(bookTitle || "libro");
-      let slug = baseSlug;
-      const { count } = await supabase.from("listings").select("id", { count: "exact", head: true }).eq("slug", baseSlug);
-      if (count && count > 0) slug = `${baseSlug}-${Date.now().toString(36).slice(-4)}`;
+      // Slug con título y autor, único dentro del vendedor. Antes era solo el
+      // título y se chequeaba contra todo el sitio: el segundo Drácula del
+      // catálogo terminó en `dracula-l4b2`.
+      const slug = await slugUnicoParaVendedor(
+        supabase,
+        userId,
+        slugListing(bookTitle || "libro", bookAuthor)
+      );
 
       const { data: newListing, error: listingErr } = await supabase.from("listings").insert({
         book_id: bookId,

@@ -30,7 +30,7 @@ import { createClient } from "@supabase/supabase-js";
 import { readFileSync, existsSync, readdirSync } from "fs";
 import { resolve, join, basename, extname } from "path";
 import { normalizeGenre } from "../lib/genreNormalizer";
-import { slugify } from "../lib/slugify";
+import { slugListing, slugUnicoParaVendedor } from "../lib/slugify";
 import { comunaDesdeAddress, resolverCityId } from "../lib/cities";
 
 // Load .env.local manually
@@ -498,15 +498,11 @@ async function main() {
     // Slug para la URL amigable /libro/[username]/[slug]. El script no lo
     // generaba y los listings quedaban con slug null, así que la ficha caía a
     // /listings/[uuid] y se perdía el SEO del título. (3 ago 2026)
-    const baseSlug = slugify(title || "libro");
-    let slug = baseSlug;
-    const { count: slugTaken } = await supabase
-      .from("listings")
-      .select("id", { count: "exact", head: true })
-      .eq("slug", baseSlug);
-    if (slugTaken && slugTaken > 0) {
-      slug = `${baseSlug}-${Math.random().toString(36).slice(-4)}`;
-    }
+    const slug = await slugUnicoParaVendedor(
+      supabase,
+      SELLER_ID,
+      slugListing(title || "libro", author)
+    );
 
     // Create listing
     const { data: newListing, error: listErr } = await supabase

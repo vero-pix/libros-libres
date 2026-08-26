@@ -105,20 +105,12 @@ export async function PATCH(
 
   // Asegurar que tenga slug si no existe (retrocompatibilidad)
   if (!listing.slug) {
-    const { slugify } = await import("@/lib/slugify");
-    const baseSlug = slugify(bookUpdates.title || "libro");
-    let slug = baseSlug;
-    
-    // Verificar unicidad básica
-    const { count } = await admin
-      .from("listings")
-      .select("id", { count: "exact", head: true })
-      .eq("slug", baseSlug);
-      
-    if (count && count > 0) {
-      slug = `${baseSlug}-${Math.random().toString(36).slice(-4)}`;
-    }
-    listingUpdates.slug = slug;
+    const { slugListing, slugUnicoParaVendedor } = await import("@/lib/slugify");
+    listingUpdates.slug = await slugUnicoParaVendedor(
+      admin,
+      listing.seller_id,
+      slugListing(bookUpdates.title || "libro", bookUpdates.author)
+    );
   }
 
   const { error: updateListingError } = await admin
