@@ -361,7 +361,25 @@ export default async function LibroPage({ params }: Props) {
               <section className="mt-12">
                 <div className="flex justify-between items-end mb-6">
                   <h2 className="font-display text-2xl font-bold text-ink">Otros libros de {listing.book.genre}</h2>
-                  <Link href={`/search?q=${encodeURIComponent(listing.book.genre)}`} className="text-sm font-semibold text-brand-600 hover:text-brand-700">Ver todos →</Link>
+                  {/* Filtro real, no búsqueda de texto. Este "Ver todos" mandaba
+                      a /search?q=<género>, que busca el término en título y autor
+                      — ningún libro se llama "Juvenil". La gente hacía clic y
+                      caía en una pantalla vacía: 19 búsquedas de "FICTION" en un
+                      día, 11 de "Juvenil", 10 de "Espiritualidad", todas en cero.
+                      Los géneros en inglés vienen del enriquecimiento con Google
+                      Books y hacen el efecto todavía más raro. (26-08-2026) */}
+                  <Link
+                    href={
+                      (listing.book as any).subcategory
+                        ? `/?subcategory=${encodeURIComponent((listing.book as any).subcategory)}`
+                        : (listing.book as any).category
+                          ? `/?category=${encodeURIComponent((listing.book as any).category)}`
+                          : `/search?q=${encodeURIComponent(listing.book.genre)}`
+                    }
+                    className="text-sm font-semibold text-brand-600 hover:text-brand-700"
+                  >
+                    Ver todos →
+                  </Link>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {categoryListings.map((l) => (
