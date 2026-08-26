@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const listing = await getListing(params.username, params.slug);
 
   if (!listing) {
-    return { title: "Libro no encontrado — tuslibros.cl" };
+    return { title: "Libro no encontrado" };
   }
 
   const priceStr = listing.price ? `$${listing.price.toLocaleString("es-CL")}` : "";

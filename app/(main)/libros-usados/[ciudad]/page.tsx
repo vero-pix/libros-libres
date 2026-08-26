@@ -36,9 +36,12 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: { ciudad: string } }): Promise<Metadata> {
   const city = CIUDADES[params.ciudad];
-  if (!city) return { title: "Ciudad no encontrada — tuslibros.cl" };
+  if (!city) return { title: "Ciudad no encontrada" };
 
-  const title = `Libros usados en ${city.label} | Compra y venta | tuslibros.cl`;
+  // Sin el sufijo de marca: lo agrega el template del layout ("%s | tuslibros.cl").
+  // Ponerlo acá lo dejaba dos veces — Ahrefs lo pescó como "title too long" el
+  // 25-08-2026: "Libros usados en Santiago | Compra y venta | tuslibros.cl | tuslibros.cl".
+  const title = `Libros usados en ${city.label} | Compra y venta`;
   const url = `https://tuslibros.cl/libros-usados/${params.ciudad}`;
 
   return {

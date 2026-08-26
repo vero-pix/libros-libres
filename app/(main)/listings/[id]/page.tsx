@@ -24,7 +24,7 @@ async function getListing(id: string) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const listing = await getListing(params.id);
-  if (!listing) return { title: "Libro no encontrado — tuslibros.cl" };
+  if (!listing) return { title: "Libro no encontrado" };
 
   const priceStr = listing.price ? `$${listing.price.toLocaleString("es-CL")}` : "";
   const bookTitle = listing.book.title || "";
