@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { paginar } from "@/lib/supabase/paginar";
 
 /** GET /api/admin/analytics?days=7 */
 export async function GET(req: NextRequest) {
@@ -25,14 +26,26 @@ export async function GET(req: NextRequest) {
   const since = new Date();
   since.setDate(since.getDate() - days);
 
-  const { data: views } = await supabase
-    .from("page_views")
-    .select("path, browser, os, device, user_id, listing_id, session_id, created_at")
-    .gte("created_at", since.toISOString())
-    .order("created_at", { ascending: false })
-    .limit(5000);
-
-  const rows = views ?? [];
+  // Paginado en vez de `.limit(5000)`: con days=30 hay ~21.000 filas y el
+  // límite truncaba en silencio, así que todos los porcentajes del panel salían
+  // del 24% más reciente del período. (25 ago 2026)
+  const rows = await paginar<{
+    path: string;
+    browser: string;
+    os: string;
+    device: string;
+    user_id: string | null;
+    listing_id: string | null;
+    session_id: string | null;
+    created_at: string;
+  }>((desde, hasta) =>
+    supabase
+      .from("page_views")
+      .select("path, browser, os, device, user_id, listing_id, session_id, created_at")
+      .gte("created_at", since.toISOString())
+      .order("created_at", { ascending: false })
+      .range(desde, hasta)
+  );
 
   // Aggregate
   const totalViews = rows.length;

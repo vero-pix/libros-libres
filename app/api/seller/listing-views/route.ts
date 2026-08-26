@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { paginar } from "@/lib/supabase/paginar";
 
 /**
  * GET /api/seller/listing-views
@@ -57,24 +58,17 @@ export async function GET() {
    * Mismo error que el commit b306871 en el contador del login.
    * Ver [[reference_supabase_techo_1000_filas]].
    */
-  async function traerTodo(desdeFecha?: Date) {
-    const filas: { listing_id: string | null; created_at: string }[] = [];
-    for (let desde = 0; ; desde += 1000) {
+  const traerTodo = (desdeFecha?: Date) =>
+    paginar<{ listing_id: string | null; created_at: string }>((desde, hasta) => {
       let q = serviceClient
         .from("page_views")
         .select("listing_id, created_at")
         .in("listing_id", listingIds)
         .order("created_at", { ascending: false })
-        .range(desde, desde + 999);
+        .range(desde, hasta);
       if (desdeFecha) q = q.gte("created_at", desdeFecha.toISOString());
-
-      const { data, error } = await q;
-      if (error) throw new Error(error.message);
-      filas.push(...(data ?? []));
-      if (!data || data.length < 1000) break;
-    }
-    return filas;
-  }
+      return q;
+    });
 
   let historico: { listing_id: string | null; created_at: string }[];
   let semana: { listing_id: string | null; created_at: string }[];

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { paginar } from "@/lib/supabase/paginar";
 
 // Cache in-memory del resultado. El tab Negocio es admin, baja frecuencia,
 // no necesita datos al segundo. Evita quemar CPU con 5 queries pesadas.
@@ -21,20 +22,25 @@ export async function GET() {
   const since30 = new Date(Date.now() - 30 * 864e5).toISOString();
 
   const [
-    { data: views30 },
+    views30,
     { count: registered },
     { data: ordersAll },
     { data: carts },
     { data: allListings },
   ] = await Promise.all([
-    supabase.from("page_views").select("session_id").gte("created_at", since30),
+    // Paginado: sin esto llegaban 1.000 filas de 20.989 y el panel mostraba
+    // 467 sesiones en 30 días cuando eran 8.107 — el tráfico subestimado en un
+    // 94%. Supabase corta en mil y no avisa. (25 ago 2026)
+    paginar<{ session_id: string | null }>((desde, hasta) =>
+      supabase.from("page_views").select("session_id").gte("created_at", since30).range(desde, hasta)
+    ),
     supabase.from("users").select("id", { count: "exact", head: true }),
     supabase.from("orders").select("id, status, total, buyer_id, created_at, buyer:users!buyer_id(full_name, email)").order("created_at", { ascending: false }),
     supabase.from("cart_items").select("id, added_at, listing:listings(price, book:books(title)), user:users(full_name, email)").order("added_at", { ascending: false }),
     supabase.from("listings").select("seller_id, status, seller:users(full_name, username)"),
   ]);
 
-  const uniqueSessions30d = new Set((views30 ?? []).map((v: any) => v.session_id).filter(Boolean)).size;
+  const uniqueSessions30d = new Set(views30.map((v) => v.session_id).filter(Boolean)).size;
   const allOrders = ordersAll ?? [];
   const paidStatuses = ["paid", "shipped", "delivered", "completed"];
   const paidOrders = allOrders.filter((o: any) => paidStatuses.includes(o.status));
