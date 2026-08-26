@@ -43,32 +43,61 @@ export async function GET() {
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-  const { data: views, error: viewError } = await serviceClient
-    .from("page_views")
-    .select("listing_id, created_at")
-    .in("listing_id", listingIds);
+  /**
+   * Trae TODAS las filas paginando.
+   *
+   * Acá vivía el bug: la consulta pedía `page_views` sin `.range()` y filtraba
+   * los últimos 7 días en memoria. Supabase corta en 1.000 filas por defecto, y
+   * las 215 publicaciones de vero acumulan 1.263 desde abril — así que llegaban
+   * solo las 1.000 más antiguas, todas anteriores a la semana, y el contador
+   * mostraba "0 visitas en tus libros los últimos 7 días" mientras los números
+   * por libro seguían apareciendo. El vendedor con más catálogo era el que veía
+   * la plataforma más muerta. (25 ago 2026)
+   *
+   * Mismo error que el commit b306871 en el contador del login.
+   * Ver [[reference_supabase_techo_1000_filas]].
+   */
+  async function traerTodo(desdeFecha?: Date) {
+    const filas: { listing_id: string | null; created_at: string }[] = [];
+    for (let desde = 0; ; desde += 1000) {
+      let q = serviceClient
+        .from("page_views")
+        .select("listing_id, created_at")
+        .in("listing_id", listingIds)
+        .order("created_at", { ascending: false })
+        .range(desde, desde + 999);
+      if (desdeFecha) q = q.gte("created_at", desdeFecha.toISOString());
 
-  if (viewError) {
-    return NextResponse.json({ error: viewError.message }, { status: 500 });
+      const { data, error } = await q;
+      if (error) throw new Error(error.message);
+      filas.push(...(data ?? []));
+      if (!data || data.length < 1000) break;
+    }
+    return filas;
+  }
+
+  let historico: { listing_id: string | null; created_at: string }[];
+  let semana: { listing_id: string | null; created_at: string }[];
+  try {
+    // La ventana semanal se filtra EN LA CONSULTA, no en memoria.
+    [historico, semana] = await Promise.all([traerTodo(), traerTodo(sevenDaysAgo)]);
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
   }
 
   // Aggregate: { listingId -> count } and calculate weekly total
   const viewMap: Record<string, number> = {};
   const weeklyMap: Record<string, number> = {};
-  let totalWeeklyViews = 0;
 
-  for (const row of views ?? []) {
+  for (const row of historico) {
     if (!row.listing_id) continue;
-    
-    // Total count
     viewMap[row.listing_id] = (viewMap[row.listing_id] ?? 0) + 1;
-    
-    // Weekly count
-    if (new Date(row.created_at) >= sevenDaysAgo) {
-      weeklyMap[row.listing_id] = (weeklyMap[row.listing_id] ?? 0) + 1;
-      totalWeeklyViews++;
-    }
   }
+  for (const row of semana) {
+    if (!row.listing_id) continue;
+    weeklyMap[row.listing_id] = (weeklyMap[row.listing_id] ?? 0) + 1;
+  }
+  const totalWeeklyViews = semana.filter((r) => r.listing_id).length;
 
   return NextResponse.json({ 
     views: viewMap, 
