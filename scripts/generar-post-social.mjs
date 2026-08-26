@@ -35,6 +35,12 @@ const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABAS
 });
 
 const SITE = "https://tuslibros.cl";
+// Los links salen etiquetados: sin UTM no hay forma de atribuir el tráfico y
+// eso fue lo que dejó ciego al batch de julio. Ver lib/utm.ts (26 ago 2026).
+import { conUtm, slugCampana } from "../lib/utm.ts";
+
+/** Todos los posts de una corrida comparten campaña, para poder agruparlos. */
+const CAMPANA = slugCampana(`lote-${new Date().toISOString().slice(0, 10)}`);
 const clp = (n) => "$" + Math.round(Number(n) || 0).toLocaleString("es-CL");
 const fold = (x) => (x || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 const SEL = "*, book:books(*), seller:users(id, full_name, username, city)";
@@ -112,7 +118,7 @@ function caption(l, i) {
   const a = l.book?.author?.trim();
   const off = tieneOferta(l) ? ` (antes ${clp(l.original_price)})` : "";
   const gtag = fold(l.book?.genre || l.book?.category).replace(/[^a-z0-9]/g, "");
-  const url = SITE + libroUrl(l);
+  const url = conUtm(SITE + libroUrl(l), "instagram", CAMPANA);
   return (
     `${t}${a ? ` — ${a}` : ""}\n` +
     `${hookDe(l, i)}\n` +
@@ -224,7 +230,7 @@ md += `Generado para cargar en Metricool. Cadencia: 1 post cada ${EVERY} día(s)
 ranked.forEach((r, i) => {
   const l = r.l;
   const cap = caption(l, i);
-  const url = SITE + libroUrl(l);
+  const url = conUtm(SITE + libroUrl(l), "instagram", CAMPANA);
   const img = cover(l);
   const nn = String(i + 1).padStart(2, "0");
   const cardFile = `cards/card-${nn}.html`;

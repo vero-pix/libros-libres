@@ -13,6 +13,7 @@
  */
 
 import { calcularEnvioPromo } from "@/lib/shipping-promo";
+import { conUtm } from "@/lib/utm";
 
 export const SITE = "https://tuslibros.cl";
 
@@ -87,7 +88,7 @@ export function construirItems(
 ): { items: ItemFeed[]; excluidos: MotivoExclusion[] } {
   const items: ItemFeed[] = [];
   const excluidos: MotivoExclusion[] = [];
-  const utm = canal === "merchant" ? "merchant" : "meta";
+  const utm: "merchant" | "meta" = canal === "merchant" ? "merchant" : "meta";
 
   for (const l of filas) {
     const titulo = l.book?.title?.trim() ?? "";
@@ -134,7 +135,7 @@ export function construirItems(
         limpiarDescripcion(l.book?.description ?? "") ||
         `${titulo}, de ${autor}. Libro usado publicado por un vendedor de tuslibros.cl. Despacho a todo Chile o retiro en persona.`
       ).slice(0, 5000),
-      link: `${SITE}/libro/${l.seller.username}/${l.slug}?utm_source=${utm}&utm_medium=shopping&utm_campaign=feed-catalogo`,
+      link: conUtm(`${SITE}/libro/${l.seller.username}/${l.slug}`, utm, "feed-catalogo"),
       imageLink: imagen,
       price: l.price,
       availability: "in_stock",

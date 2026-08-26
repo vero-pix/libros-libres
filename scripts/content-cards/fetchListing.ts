@@ -10,6 +10,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { conUtm, slugCampana } from "../../lib/utm";
+
+/** Campaña de la corrida: agrupa todas las piezas generadas el mismo día. */
+const CAMPANA_CARDS = slugCampana(`cards-${new Date().toISOString().slice(0, 10)}`);
 
 /** Carga .env.local sin pisar el entorno (mismo patrón que el resto del repo). */
 function loadEnv(): void {
@@ -57,7 +61,9 @@ export type Listing = {
 
 /** URL de compra amigable. Vero tiene username 'vero' → /libro/vero/[slug]. */
 function buildBuyUrl(slug?: string | null): string | null {
-  return slug ? `https://tuslibros.cl/libro/vero/${slug}` : null;
+  // Con UTM: es el link que termina en una caption de Instagram, y sin
+  // parámetros no se puede atribuir nada. Ver lib/utm.ts (26 ago 2026).
+  return slug ? conUtm(`https://tuslibros.cl/libro/vero/${slug}`, "instagram", CAMPANA_CARDS) : null;
 }
 
 /**
