@@ -389,6 +389,7 @@ interface Props {
     publisher?: string;
     pages_min?: string;
     pages_max?: string;
+    city_id?: string;
     page?: string;
     view?: string;
     lat?: string;
@@ -398,14 +399,14 @@ interface Props {
 }
 
 export default async function HomePage({ searchParams }: Props) {
-  const { genre, category, subcategory, tag, sort, price_min, price_max, condition, modality, author, binding, publisher, pages_min, pages_max, page, view, lat, lng, collectible } = searchParams;
+  const { genre, category, subcategory, tag, sort, price_min, price_max, condition, modality, author, binding, publisher, pages_min, pages_max, city_id, page, view, lat, lng, collectible } = searchParams;
   const currentPage = Math.max(1, parseInt(page ?? "1", 10) || 1);
   const viewMode = view === "list" ? "list" : "grid";
   const userLat = lat ? parseFloat(lat) : null;
   const userLng = lng ? parseFloat(lng) : null;
   const collectibleOnly = collectible === "1";
 
-  const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || collectibleOnly);
+  const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || city_id || collectibleOnly);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
   const [featuredListings, featuredSellers, collectibleListings, recentListings, collectionsRaw, totalActiveCount, availableTags, publicStats] = await Promise.all([
@@ -482,6 +483,12 @@ export default async function HomePage({ searchParams }: Props) {
     if (price_min) query = query.gte("price", Number(price_min));
     if (price_max) query = query.lte("price", Number(price_max));
     if (collectibleOnly) query = query.eq("is_collectible", true);
+    // El selector de comuna del ListingToolbar se muestra también en el home,
+    // pero el home no leía `city_id`: se elegía Valparaíso, la URL cambiaba y la
+    // grilla seguía mostrando lo último publicado. Un vendedor lo reportó por
+    // WhatsApp el 26-08-2026 con la captura: filtro en Valparaíso, resultados en
+    // La Florida.
+    if (city_id) query = query.eq("city_id", city_id);
 
     if (sort === "price_asc") query = query.order("price", { ascending: true });
     else if (sort === "price_desc") query = query.order("price", { ascending: false });
