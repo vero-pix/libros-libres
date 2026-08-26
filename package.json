@@ -22,7 +22,8 @@
     "backfill-categorias": "node scripts/backfill-categorias.mjs",
     "seo:export": "tsx scripts/seo/export-csv.ts",
     "seo:paises": "tsx scripts/seo/paises.ts",
-    "feed:validar": "node scripts/feed-validar.mjs"
+    "feed:validar": "node scripts/feed-validar.mjs",
+    "demanda": "npx tsx scripts/demanda-no-servida.mjs"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
