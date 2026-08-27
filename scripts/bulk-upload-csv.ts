@@ -1,4 +1,5 @@
 import { fichaCoincide } from "../lib/listingIntegrity";
+import { detectarDelimitador, parseCsvLine, parseCsvLineTolerante, quitarBom } from "../lib/csv";
 /**
  * Carga masiva desde CSV con formato:
  * num,titulo,autor,isbn,condicion,tipo,descripcion,cover_openlibrary,cover_google,year,pages,categoria
@@ -154,24 +155,6 @@ async function fetchBookMeta(isbn: string, title: string, author: string): Promi
   }
 
   return { description: null, cover_url: null, genre: null, published_year: null, publisher: null, pages: null };
-}
-
-function parseCsvLine(line: string): string[] {
-  const fields: string[] = [];
-  let current = "";
-  let inQuotes = false;
-  for (const ch of line) {
-    if (ch === '"') {
-      inQuotes = !inQuotes;
-    } else if (ch === "," && !inQuotes) {
-      fields.push(current.trim());
-      current = "";
-    } else {
-      current += ch;
-    }
-  }
-  fields.push(current.trim());
-  return fields;
 }
 
 // Listado de la carpeta de fotos, cacheado una vez
@@ -351,9 +334,11 @@ async function main() {
     console.warn(`   Para corregir: actualiza default_latitude/longitude en el perfil del vendedor.`);
   }
 
-  const csv = readFileSync(filePath, "utf-8");
-  const lines = csv.split("\n").filter((l) => l.trim());
-  const header = parseCsvLine(lines[0]);
+  const csv = quitarBom(readFileSync(filePath, "utf-8"));
+  const lines = csv.split(/\r?\n/).filter((l) => l.trim());
+  const delimitador = detectarDelimitador(lines[0]);
+  const header = parseCsvLine(lines[0], delimitador);
+  if (delimitador !== ",") console.log(`📄 Separador detectado: "${delimitador === "\t" ? "tab" : delimitador}"`);
 
   let created = 0;
   let skipped = 0;
@@ -362,7 +347,7 @@ async function main() {
   let noPhoto = 0;
 
   for (let i = 1; i < lines.length; i++) {
-    const vals = parseCsvLine(lines[i]);
+    const vals = parseCsvLineTolerante(lines[i], delimitador, header.length);
     const row: Record<string, string> = {};
     header.forEach((h, idx) => { row[h] = vals[idx] ?? ""; });
 

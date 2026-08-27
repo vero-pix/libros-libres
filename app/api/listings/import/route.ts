@@ -1,4 +1,5 @@
 import { fichaCoincide } from "@/lib/listingIntegrity";
+import { detectarDelimitador, parseCsvLine, parseCsvLineTolerante, quitarBom } from "@/lib/csv";
 import { normalizeGenre } from "@/lib/genreNormalizer";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -22,24 +23,6 @@ const MODALITY_MAP: Record<string, string> = {
   loan: "loan",
   both: "both",
 };
-
-function parseCsvLine(line: string): string[] {
-  const fields: string[] = [];
-  let current = "";
-  let inQuotes = false;
-  for (const ch of line) {
-    if (ch === '"') {
-      inQuotes = !inQuotes;
-    } else if (ch === "," && !inQuotes) {
-      fields.push(current.trim());
-      current = "";
-    } else {
-      current += ch;
-    }
-  }
-  fields.push(current.trim());
-  return fields;
-}
 
 function buildCoverUrl(isbn: string): string | null {
   if (!isbn) return null;
@@ -149,14 +132,27 @@ export async function POST(req: NextRequest) {
     return { cover: null, gallery: [] };
   }
 
-  const text = await file.text();
-  const lines = text.split("\n").filter((l) => l.trim());
+  const text = quitarBom(await file.text());
+  const lines = text.split(/\r?\n/).filter((l) => l.trim());
 
   if (lines.length < 2) {
     return NextResponse.json({ error: "El archivo está vacío o solo tiene encabezados" }, { status: 400 });
   }
 
-  const header = parseCsvLine(lines[0]).map((h) => h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+  // Cada fila hace varias consultas y puede pegarle a Google Books. Un lote muy
+  // grande se corta por timeout a media carga y deja al vendedor sin saber qué
+  // libros entraron y cuáles no — peor que rechazarlo de entrada.
+  const MAX_FILAS = 500;
+  if (lines.length - 1 > MAX_FILAS) {
+    return NextResponse.json({
+      error: `Tu archivo trae ${lines.length - 1} libros y por acá puedo subir hasta ${MAX_FILAS} de una vez. Pártelo en tandas de ${MAX_FILAS}, o escríbenos y lo subimos nosotros de una sola vez.`,
+    }, { status: 400 });
+  }
+
+  // Excel en español guarda con ";" — sin detectarlo, la fila entera se lee
+  // como un solo campo y TODAS salen como "Falta título o autor".
+  const delimitador = detectarDelimitador(lines[0]);
+  const header = parseCsvLine(lines[0], delimitador).map((h) => h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
 
   const results: { title: string; status: "ok" | "error" | "skip"; message?: string }[] = [];
 
@@ -165,9 +161,10 @@ export async function POST(req: NextRequest) {
   let coversFromOwnPhotos = 0;
   let galleryImagesAdded = 0;
   const unmatchedRefs = new Set<string>();
+  const condicionesNoReconocidas = new Set<string>();
 
   for (let i = 1; i < lines.length; i++) {
-    const vals = parseCsvLine(lines[i]);
+    const vals = parseCsvLineTolerante(lines[i], delimitador, header.length);
     const row: Record<string, string> = {};
     header.forEach((h, idx) => { row[h] = vals[idx] ?? ""; });
 
@@ -175,7 +172,8 @@ export async function POST(req: NextRequest) {
     const author = row.autor || row.author || "";
     const isbn = row.isbn || "";
     const price = parseInt(row.precio || row.price || "0", 10);
-    const condition = CONDITION_MAP[row.condicion || row.condition || "good"] || "good";
+    const condRaw = (row.condicion || row.condition || "").trim().toLowerCase();
+    const condition = CONDITION_MAP[condRaw || "good"] || "good";
     const modality = MODALITY_MAP[row.tipo || row.type || row.modalidad || "sale"] || "sale";
     const genre = row.categoria || row.category || "Literatura";
 
@@ -187,6 +185,12 @@ export async function POST(req: NextRequest) {
     if (price <= 0) {
       results.push({ title, status: "skip", message: "Precio inválido" });
       continue;
+    }
+
+    // "nuevo" en vez de "como_nuevo" degradaba el libro a "buen estado" sin
+    // decir nada: con un lote grande son cientos de fichas mal marcadas.
+    if (condRaw && !CONDITION_MAP[condRaw]) {
+      condicionesNoReconocidas.add(condRaw);
     }
 
     // Check if book exists by ISBN
@@ -318,6 +322,8 @@ export async function POST(req: NextRequest) {
     skipped,
     failed,
     results,
+    // Valores de condición que no existen: los libros quedaron en "buen estado".
+    condicionesNoReconocidas: Array.from(condicionesNoReconocidas),
     photos: {
       provided: photosProvided,
       coversFromOwnPhotos,

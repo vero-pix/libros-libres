@@ -1,0 +1,55 @@
+COMO LLENAR LA PLANTILLA DE tuslibros.cl
+========================================
+
+Una fila = un libro = una publicacion. Si tienes 3 ejemplares del mismo titulo,
+NO pongas 3 filas: pon una sola y avisanos cuantos tienes.
+
+
+COLUMNAS OBLIGATORIAS
+---------------------
+titulo      El titulo del libro.
+autor       Nombre del autor. Si son varios: "Autor 1 - Autor 2".
+precio      Solo numeros, sin puntos ni signo peso. Ej: 8000 (no $8.000).
+            El minimo son $1.000.
+
+condicion   Tiene que ser EXACTAMENTE una de estas cuatro:
+                como_nuevo       sin marcas de uso
+                buen_estado      leido, pero cuidado
+                estado_regular   con desgaste visible
+                con_detalles     subrayados, manchas, lomo suelto
+            OJO: escribir "nuevo" o "usado" NO sirve, el libro queda
+            marcado como "buen estado" sin avisar.
+
+tipo        venta
+
+
+COLUMNAS OPCIONALES
+-------------------
+isbn        Si lo tienes, mejor: se completa portada y sinopsis solas.
+            Dejalo vacio si no lo tienes, no inventes.
+categoria   Ficcion, Historia, Poesia, Ensayo, Infantil, etc.
+editorial   Ej: Alfaguara
+ano         Ej: 1998
+paginas     Ej: 320
+
+
+FOTOS
+-----
+foto_portada    El nombre del archivo, tal cual, con extension.
+                Ej: cien-anos.jpg
+resto_fotos     Las demas fotos del MISMO libro, separadas por punto y coma.
+                Ej: tunel-lomo.jpg;tunel-contra.jpg
+                Hasta 5 por libro.
+
+Las fotos van aparte, en una carpeta o un Drive. El nombre en el Excel tiene
+que ser identico al del archivo. Formatos: jpg, png, webp. HEIC no sirve
+(el iPhone las guarda asi, hay que exportarlas a JPEG antes).
+
+
+AL GUARDAR
+----------
+Guarda como CSV UTF-8. Si Excel te lo guarda con punto y coma en vez de
+comas, no importa: el sistema lo entiende igual.
+
+Si algo no calza, mandanos el archivo como esta y lo acomodamos nosotros.
+No te compliques rellenando todo: con titulo, autor, precio y condicion basta.

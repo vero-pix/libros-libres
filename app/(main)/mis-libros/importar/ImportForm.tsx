@@ -27,6 +27,7 @@ export default function ImportForm() {
     failed: number;
     results: ImportResult[];
     photos?: { provided: number; coversFromOwnPhotos: number; galleryImagesAdded: number; unmatched: string[] };
+    condicionesNoReconocidas?: string[];
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -208,6 +209,14 @@ export default function ImportForm() {
           </svg>
           Descargar plantilla de ejemplo
         </a>
+        <a
+          href="/plantilla_carga_masiva_INSTRUCCIONES.txt"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 mt-4 ml-4 text-sm text-ink-muted hover:underline"
+        >
+          Cómo llenarla
+        </a>
       </div>
 
       {/* Upload CSV */}
@@ -336,6 +345,11 @@ export default function ImportForm() {
             )}
           </div>
           {/* Feedback de fotos: clave para saber si las imágenes se asociaron */}
+          {!!results.condicionesNoReconocidas?.length && (
+            <div className="mb-4 text-sm bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2.5 text-yellow-800">
+              ⚠️ No reconocí la condición <strong>{results.condicionesNoReconocidas.join(", ")}</strong>, así que esos libros quedaron como <strong>buen estado</strong>. Los valores válidos son <strong>como_nuevo</strong>, <strong>buen_estado</strong>, <strong>estado_regular</strong> y <strong>con_detalles</strong>. Puedes corregirlo en cada publicación o volver a importar con el valor correcto.
+            </div>
+          )}
           {results.photos && (
             results.photos.provided > 0 ? (
               <div className="mb-4 text-sm bg-cream-warm/60 border border-cream-dark/30 rounded-lg px-3 py-2.5 space-y-1">
