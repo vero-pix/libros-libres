@@ -62,6 +62,19 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [quoting, setQuoting] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
+  // El botón de pagar se apagaba por seis condiciones distintas sin decir
+  // ninguna: el comprador le daba, no pasaba nada y se iba. Esto nombra la que
+  // falta, en el orden en que se llena la página.
+  const motivoBloqueo = (): string | null => {
+    if (!phone) return "Escribe tu teléfono de WhatsApp para coordinar la entrega.";
+    if (!isCourier) return null;
+    if (!address) return "Escribe la dirección donde quieres recibir el libro.";
+    if (!addressHasNumber) return "Falta el número de la calle en tu dirección.";
+    if (shippingUnavailable) return "No hay courier que llegue a tu dirección. Cambia a encuentro en persona.";
+    if (!selectedQuote) return "Aprieta \u201cCalcular envío\u201d y elige una opción de despacho.";
+    return null;
+  };
+
   /** Shipit confirmó que no hay despacho posible entre estas comunas. */
   const [shippingUnavailable, setShippingUnavailable] = useState(false);
 
@@ -143,7 +156,15 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
         // colgar solo de `!res.ok` o el comprador queda sin poder pagar y sin
         // explicación. (4 ago 2026)
         if (!res.ok || q.length === 0) {
-          setQuoteError(data.error ?? "Error al cotizar envío");
+          // Shipit responde "no reconoce la comuna de destino: vitacur" cuando
+          // la dirección viene sin comuna o cortada. Mostrárselo tal cual al
+          // comprador no le dice qué hacer: se traduce a una instrucción.
+          const crudo = data.error ?? "Error al cotizar envío";
+          setQuoteError(
+            /no reconoce la comuna de destino/i.test(crudo)
+              ? "No reconocimos la comuna de tu dirección. Escríbela completa y sepárala con coma — por ejemplo: Av. Apoquindo 3000, Las Condes."
+              : crudo
+          );
           setQuotes(FALLBACK_OPTIONS);
           setSelectedService(FALLBACK_OPTIONS[0].serviceCode);
           return;
@@ -366,6 +387,9 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                   {quoting ? "Calculando..." : "Calcular envío"}
                 </button>
               </div>
+              <p className="mt-2 text-[11px] text-ink-muted">
+                Incluye la <strong>comuna</strong>: es lo que usan los couriers para cotizar el despacho.
+              </p>
               {quoting && (
                 <div className="mt-3 flex items-center gap-2 text-[10px] text-ink-muted font-bold uppercase tracking-widest animate-pulse">
                   <span className="w-2 h-2 bg-brand-500 rounded-full" />
@@ -375,6 +399,11 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
               {addressIncomplete && (
                 <p className="mt-3 text-xs text-amber-700">
                   Falta el número de la calle. Sin él el courier no puede entregar.
+                </p>
+              )}
+              {quoteError && !shippingUnavailable && (
+                <p className="mt-3 text-xs text-amber-700">
+                  {quoteError}
                 </p>
               )}
               {shippingUnavailable && (
@@ -556,6 +585,12 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
               <div className="p-3 bg-red-50 border border-red-100 text-red-700 text-xs font-medium rounded-xl animate-shake">
                 ⚠️ {error}
               </div>
+            )}
+
+            {sellerHasMP && !loading && motivoBloqueo() && (
+              <p className="text-xs text-amber-700 text-center">
+                {motivoBloqueo()}
+              </p>
             )}
 
             {sellerHasMP ? (

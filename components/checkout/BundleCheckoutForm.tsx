@@ -62,6 +62,16 @@ export default function BundleCheckoutForm({
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [quoting, setQuoting] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
+  // Mismo problema que en CheckoutForm: el botón se apagaba sin decir qué falta.
+  const motivoBloqueo = (): string | null => {
+    if (!isCourier) return null;
+    if (!address) return "Escribe la dirección donde quieres recibir los libros.";
+    if (!addressHasNumber) return "Falta el número de la calle en tu dirección.";
+    if (shippingUnavailable) return "No hay courier que llegue a tu dirección. Cambia a encuentro en persona.";
+    if (!selectedQuote) return "Aprieta \u201cCalcular envío\u201d y elige una opción de despacho.";
+    return null;
+  };
+
   /** Shipit confirmó que no hay despacho posible entre estas comunas. */
   const [shippingUnavailable, setShippingUnavailable] = useState(false);
 
@@ -153,7 +163,14 @@ export default function BundleCheckoutForm({
         // en "Ingresa dirección" habiendo escrito su dirección, y sin ver el
         // motivo. Una compradora lo reportó por correo. (4 ago 2026)
         if (!res.ok || q.length === 0) {
-          setQuoteError(data.error ?? "Error al cotizar envío");
+          {
+            const crudo = data.error ?? "Error al cotizar envío";
+            setQuoteError(
+              /no reconoce la comuna de destino/i.test(crudo)
+                ? "No reconocimos la comuna de tu dirección. Escríbela completa y sepárala con coma — por ejemplo: Av. Apoquindo 3000, Las Condes."
+                : crudo
+            );
+          }
           setQuotes(FALLBACK_OPTIONS);
           setSelectedService(FALLBACK_OPTIONS[0].serviceCode);
           return;
@@ -329,6 +346,10 @@ export default function BundleCheckoutForm({
               {quoting ? "Cotizando..." : "Cotizar"}
             </button>
           </div>
+              <p className="mt-2 text-[11px] text-gray-500">
+                Incluye la <strong>comuna</strong>: es lo que usan los couriers para cotizar el despacho.
+              </p>
+
           {addressIncomplete && (
             <p className="mt-2 text-xs text-amber-700">
               Falta el número de la calle. Sin él el courier no puede entregar.
@@ -448,6 +469,10 @@ export default function BundleCheckoutForm({
         <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-4">
           {error}
         </div>
+      )}
+
+      {sellerHasMP && !loading && motivoBloqueo() && (
+        <p className="text-xs text-amber-700 text-center">{motivoBloqueo()}</p>
       )}
 
       {sellerHasMP && (
