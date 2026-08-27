@@ -1,4 +1,5 @@
 "use client";
+import { comunaDesdeAddress } from "@/lib/comuna";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -164,7 +165,7 @@ const ListingCard = memo(function ListingCard({
 
   // Extraer comuna del address: "Calle 123, Providencia, Región..." → "Providencia"
   const address = (listing as unknown as Record<string, unknown>).address as string | undefined;
-  const displayLocation = address ? address.split(",")[1]?.trim() || null : null;
+  const displayLocation = comunaDesdeAddress(address);
 
   const badge = pickPrimaryBadge(listing);
 

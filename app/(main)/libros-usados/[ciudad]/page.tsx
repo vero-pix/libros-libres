@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { comunaDesdeAddress } from "@/lib/comuna";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createPublicClient } from "@/lib/supabase/public";
@@ -27,7 +28,7 @@ const norm = (s: string) =>
 // Comparamos contra el label de la ciudad para priorizar el match exacto.
 function comunaDeFicha(listing: ListingWithBook): string | null {
   const address = (listing as unknown as Record<string, unknown>).address as string | undefined;
-  return address ? address.split(",")[1]?.trim() ?? null : null;
+  return comunaDesdeAddress(address);
 }
 
 export function generateStaticParams() {

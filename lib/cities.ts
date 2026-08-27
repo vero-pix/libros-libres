@@ -1,5 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createPublicClient } from "@/lib/supabase/public";
+import { comunaDesdeAddress } from "@/lib/comuna";
+
+export { comunaDesdeAddress };
 
 let citiesCache: Array<{ id: string; name: string; region: string; lat: number; lng: number }> | null = null;
 let cacheTime = 0;
@@ -62,18 +65,6 @@ function claveComuna(s: string | null | undefined): string {
   return ALIAS[n] ?? n;
 }
 
-/**
- * La comuna es el componente inmediatamente anterior al que dice "Región".
- * Ej: "Colombia 8857, La Florida, Región Metropolitana de Santiago 8240000, Chile"
- *      → "La Florida"
- * Devuelve null si la dirección no trae región (ej: cimlibros tenía "Chile" a secas).
- */
-export function comunaDesdeAddress(address: string | null | undefined): string | null {
-  if (!address) return null;
-  const parts = address.split(",").map((p) => p.trim()).filter(Boolean);
-  const ri = parts.findIndex((p) => /Regi[oó]n/i.test(p));
-  return ri > 0 ? parts[ri - 1] : null;
-}
 
 /** Nombre de región legible desde el componente "Región de X" de la dirección. */
 function regionDesdeAddress(address: string | null | undefined): string | null {

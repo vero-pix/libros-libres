@@ -1,4 +1,5 @@
 "use client";
+import { comunaDesdeAddress } from "@/lib/comuna";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -153,7 +154,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
 
   // La comuna se deriva igual que el dato que ya se muestra en la ficha (address
   // partido por comas). No mandamos la dirección completa: solo la comuna.
-  const comuna = listing.address?.split(",")[1]?.trim() || "sin_comuna";
+  const comuna = comunaDesdeAddress(listing.address) || "sin_comuna";
 
   // mp_disponible tiene que significar "el botón de comprar se está renderizando",
   // no "el vendedor tiene cuenta". Por eso replica la condición completa del buybox:
@@ -432,7 +433,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               <p className="text-sm font-semibold text-ink truncate">{listing.seller?.full_name ?? sellerName}</p>
               <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                 {listing.address && (
-                  <span className="text-[11px] text-ink-muted">{listing.address.split(",")[1]?.trim()}</span>
+                  <span className="text-[11px] text-ink-muted">{comunaDesdeAddress(listing.address)}</span>
                 )}
                 {listing.seller?.mercadopago_user_id && (
                   <span className="text-[10px] font-semibold text-[#009EE3]">· Pago seguro</span>

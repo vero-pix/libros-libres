@@ -1,3 +1,4 @@
+import { fichaCoincide } from "../lib/listingIntegrity";
 /**
  * Carga masiva desde CSV con formato:
  * num,titulo,autor,isbn,condicion,tipo,descripcion,cover_openlibrary,cover_google,year,pages,categoria
@@ -61,6 +62,16 @@ const DEFAULT_NOTES = notesIdx > -1 ? process.argv[notesIdx + 1] : null;
 // Carpeta de fotos propias del vendedor (opcional)
 const photosIdx = process.argv.indexOf("--photos");
 const PHOTOS_DIR = photosIdx > -1 ? resolve(process.argv[photosIdx + 1]) : null;
+// Ubicación explícita para este lote: --lat -33.42 --lng -70.58 --address "Las Condes, Región Metropolitana de Santiago"
+// Sirve cuando el vendedor aún no guardó coordenadas en su perfil: sin esto los
+// libros caen en Santiago centro y con city_id null, o sea no aparecen al
+// filtrar por comuna. NO toca el perfil del vendedor, solo estas publicaciones.
+const latIdx = process.argv.indexOf("--lat");
+const OVERRIDE_LAT = latIdx > -1 ? parseFloat(process.argv[latIdx + 1]) : null;
+const lngIdx = process.argv.indexOf("--lng");
+const OVERRIDE_LNG = lngIdx > -1 ? parseFloat(process.argv[lngIdx + 1]) : null;
+const addressIdx = process.argv.indexOf("--address");
+const OVERRIDE_ADDRESS = addressIdx > -1 ? process.argv[addressIdx + 1] : null;
 // Dry-run: no escribe nada en la BD ni en Storage, solo reporta qué haría
 const DRY_RUN = process.argv.includes("--dry-run");
 const PHOTO_EXTS = [".jpg", ".jpeg", ".png", ".webp"];
@@ -108,8 +119,12 @@ async function fetchBookMeta(isbn: string, title: string, author: string): Promi
   const clean = isbn.replace(/[-\s]/g, "");
   const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
 
-  // Try by ISBN first
-  for (const query of [`isbn:${clean}`, `${title} ${author}`]) {
+  // ISBN primero cuando lo hay; si no, se busca por título + autor. Un CSV sin
+  // ISBN es lo normal en lotes cargados a mano (el vendedor no lo transcribe),
+  // así que esa segunda pasada no es un fallback raro: es el caso habitual.
+  const queries = clean ? [`isbn:${clean}`, `${title} ${author}`] : [`${title} ${author}`];
+  for (const query of queries) {
+    const porTitulo = !query.startsWith("isbn:");
     try {
       const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1${apiKey ? `&key=${apiKey}` : ""}`;
       const res = await fetch(url);
@@ -118,6 +133,10 @@ async function fetchBookMeta(isbn: string, title: string, author: string): Promi
       if (!data.items?.length) continue;
 
       const v = data.items[0].volumeInfo;
+      // Buscar por texto trae vecinos: "El límite del deseo" devuelve cualquier
+      // otro "El límite de…". Sin esta guarda le pegamos al libro la portada y
+      // la sinopsis de otro, que es peor que dejarlo sin portada.
+      if (porTitulo && !fichaCoincide(title, v.title, author, v.authors?.join(", "))) continue;
       const cover = v.imageLinks?.thumbnail?.replace("http://", "https://") ?? null;
       const desc = v.description ?? null;
 
@@ -304,14 +323,17 @@ async function main() {
     console.warn(`⚠️  No se pudo leer el perfil del vendedor: ${sellerErr.message}`);
   }
 
-  if (seller?.default_latitude && seller?.default_longitude) {
-    SELLER_LAT = seller.default_latitude;
-    SELLER_LNG = seller.default_longitude;
+  const lat = OVERRIDE_LAT ?? seller?.default_latitude;
+  const lng = OVERRIDE_LNG ?? seller?.default_longitude;
+  if (lat && lng) {
+    SELLER_LAT = lat;
+    SELLER_LNG = lng;
     // NUNCA copiar el default_address tal cual: suele traer calle y número de la
     // casa del vendedor, y la ficha publica address.split(",")[1] — a Rodrigo
     // Cumsille le mostraba "casa 4" en vez de la comuna (6 ago 2026). Se guarda
     // solo "Comuna, Región", que es lo único que la ficha necesita mostrar.
-    const rawAddress: string = seller.default_address || seller.city || "Santiago, Chile";
+    const rawAddress: string =
+      OVERRIDE_ADDRESS || seller?.default_address || seller?.city || "Santiago, Chile";
     const comuna = comunaDesdeAddress(rawAddress);
     const region = rawAddress
       .split(",")
@@ -319,7 +341,7 @@ async function main() {
       .find((p: string) => /Regi[oó]n/i.test(p));
     SELLER_ADDRESS = comuna
       ? [comuna, region?.replace(/\s+\d{4,}$/, "")].filter(Boolean).join(", ")
-      : seller.city || rawAddress;
+      : seller?.city || rawAddress;
     SELLER_CITY_ID = await resolverCityId(supabase, rawAddress, { lat: SELLER_LAT, lng: SELLER_LNG });
     console.log(`📍 Ubicación del vendedor: ${SELLER_ADDRESS} (${SELLER_LAT}, ${SELLER_LNG})`);
     if (rawAddress !== SELLER_ADDRESS) console.log(`   (perfil dice "${rawAddress}" — se guarda solo la comuna)`);
@@ -399,7 +421,7 @@ async function main() {
     }
 
     // Auto-complete missing data from Google Books
-    if (isbn && (!description || !coverUrl || !genre || !year)) {
+    if (!description || !coverUrl || !genre || !year) {
       console.log(`  Buscando datos de "${title}"...`);
       const meta = await fetchBookMeta(isbn, title, author);
       if (!description && meta.description) description = meta.description;
