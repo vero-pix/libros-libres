@@ -420,11 +420,30 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Guardar preference_id en todas las orders del bundle
-    await supabase
+    // Guardar preference_id en todas las orders del bundle.
+    //
+    // Va con service role a propósito: `orders` no tiene policy de UPDATE para
+    // authenticated (ver 20260402_create_orders.sql, "webhook uses service_role
+    // key"), así que con el cliente del usuario RLS descartaba la escritura,
+    // PostgREST respondía 0 filas y ningún error, y nadie se enteraba. Las 24
+    // órdenes de la BD tenían mercadopago_preference_id en null, incluidas las
+    // pagadas. Sin ese dato no se puede distinguir "no llegó a MercadoPago" de
+    // "abandonó en la pantalla de pago", que es justo lo que hay que saber para
+    // diagnosticar la fuga del checkout. (27 ago 2026)
+    const adminSbPref = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } }
+    );
+    const { error: prefErr } = await adminSbPref
       .from("orders")
       .update({ mercadopago_preference_id: preference.id })
       .eq("bundle_id", bundleId);
+    if (prefErr) {
+      // No se aborta la compra por esto: el comprador ya puede pagar. Pero
+      // queda en los logs, porque sin el id la orden es huérfana para conciliar.
+      console.error(`[orders] no se guardó preference_id del bundle ${bundleId}: ${prefErr.message}`);
+    }
 
     // La comisión NO se registra acá.
     //

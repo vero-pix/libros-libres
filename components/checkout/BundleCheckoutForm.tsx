@@ -230,6 +230,13 @@ export default function BundleCheckoutForm({
 
       if (data.init_point) {
         window.location.href = data.init_point;
+      } else {
+        // Mismo caso que en CheckoutForm: las órdenes quedan creadas y el
+        // comprador se queda mirando la pantalla. El 26 de agosto alguien
+        // reintentó cinco veces en ocho minutos y dejó 10 órdenes pendientes.
+        setError(
+          "Tu pedido quedó registrado, pero no pudimos abrir MercadoPago. Escríbenos por WhatsApp al +56 9 9458 3067 y lo resolvemos."
+        );
       }
     } catch {
       setError("Error de conexión. Intenta de nuevo.");
