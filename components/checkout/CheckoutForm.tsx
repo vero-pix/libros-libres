@@ -264,6 +264,13 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
 
       if (data.init_point) {
         window.location.href = data.init_point;
+      } else {
+        // La orden quedó creada pero MercadoPago no devolvió el link de pago:
+        // sin este aviso el comprador aprieta pagar, no pasa nada, y se va
+        // creyendo que el sitio está roto.
+        setError(
+          "Tu pedido quedó registrado, pero no pudimos abrir MercadoPago. Escríbenos por WhatsApp al +56 9 9458 3067 y lo resolvemos."
+        );
       }
     } catch {
       setError("Error de conexión. Intenta de nuevo.");

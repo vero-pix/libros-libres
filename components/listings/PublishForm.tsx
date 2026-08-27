@@ -131,6 +131,8 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [publishSuccess, setPublishSuccess] = useState(false);
+  // Fotos que no se pudieron subir: el libro se publica igual, pero hay que decirlo.
+  const [fotosFallidas, setFotosFallidas] = useState(0);
   const [scanLoading, setScanLoading] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const scanInputRef = useRef<HTMLInputElement>(null);
@@ -259,8 +261,10 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
   }
 
   async function uploadPendingImages(listingId: string) {
+    // Cuántas fotos no se pudieron subir, para decírselo al vendedor.
+    let fotosFallidas = 0;
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user || pendingImages.length === 0) return;
+    if (!user || pendingImages.length === 0) return 0;
 
     let firstUploadedUrl: string | null = null;
 
@@ -287,6 +291,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         if (!firstUploadedUrl) firstUploadedUrl = publicUrl;
       } catch {
         console.error("Failed to upload pending image", i);
+        fotosFallidas++;
       }
     }
 
@@ -305,6 +310,8 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
           .eq("id", listingId);
       }
     }
+
+    return fotosFallidas;
   }
 
   /**
@@ -562,9 +569,11 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       }
 
       // Upload pending additional images
+      let fotosQueFallaron = 0;
       if (newListing?.id && pendingImages.length > 0) {
-        await uploadPendingImages(newListing.id);
+        fotosQueFallaron = (await uploadPendingImages(newListing.id)) ?? 0;
       }
+      setFotosFallidas(fotosQueFallaron);
 
       if (newListing?.id) {
         trackEvent("listing_created", {
@@ -587,6 +596,14 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
       <div className="max-w-md mx-auto text-center py-8 space-y-6">
         <div className="text-5xl">🎉</div>
         <h2 className="font-display text-2xl font-bold text-ink">¡Libro publicado!</h2>
+        {fotosFallidas > 0 && (
+          <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+            {fotosFallidas === 1
+              ? "Una de tus fotos no se pudo subir"
+              : `${fotosFallidas} de tus fotos no se pudieron subir`}
+            {" "}y el libro quedó publicado sin ella{fotosFallidas === 1 ? "" : "s"}. Puedes agregarla{fotosFallidas === 1 ? "" : "s"} editando la publicación.
+          </div>
+        )}
         <p className="text-ink-muted text-sm">
           Tu libro ya está visible en la tienda y en el mapa.
         </p>

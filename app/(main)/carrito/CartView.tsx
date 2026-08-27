@@ -57,6 +57,7 @@ export default function CartView({
 }) {
   const [items, setItems] = useState(initialItems);
   const [removing, setRemoving] = useState<string | null>(null);
+  const [removeError, setRemoveError] = useState<string | null>(null);
   const [clearing, setClearing] = useState(false);
 
   const activeItems = items.filter((i) => i.listing.status === "active");
@@ -89,14 +90,26 @@ export default function CartView({
 
   async function handleRemove(listingId: string) {
     setRemoving(listingId);
-    await fetch("/api/cart", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ listing_id: listingId }),
-    });
-    setItems((prev) => prev.filter((i) => i.listing_id !== listingId));
-    setRemoving(null);
-    window.dispatchEvent(new CustomEvent("cart-updated"));
+    try {
+      const res = await fetch("/api/cart", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: listingId }),
+      });
+      // Sin esta comprobación el libro se borraba de la pantalla aunque el
+      // servidor fallara, y reaparecía al recargar sin ninguna explicación.
+      if (!res.ok) {
+        setRemoveError("No pudimos sacar el libro del carrito. Intenta de nuevo.");
+        return;
+      }
+      setItems((prev) => prev.filter((i) => i.listing_id !== listingId));
+      setRemoveError(null);
+      window.dispatchEvent(new CustomEvent("cart-updated"));
+    } catch {
+      setRemoveError("Sin conexión. No pudimos sacar el libro del carrito.");
+    } finally {
+      setRemoving(null);
+    }
   }
 
   async function handleClearCart() {
@@ -215,6 +228,12 @@ export default function CartView({
             </div>
           </div>
         ))}
+
+      {removeError && (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+          {removeError}
+        </div>
+      )}
 
       {/* Bloques por vendedor */}
       {sellerGroups.map((group) => {

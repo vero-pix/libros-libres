@@ -31,15 +31,22 @@ const PHONE_REGEX = /^\+56[0-9]{9}$/;
 const USERNAME_REGEX = /^[a-z0-9](?:[a-z0-9.-]{1,38})[a-z0-9]$/;
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 
-async function reverseGeocode(lng: number, lat: number): Promise<string> {
+/**
+ * Devuelve null cuando no se pudo resolver la dirección. Antes caía a
+ * "-33.42, -70.58", que se guardaba como default_address: sin comuna adentro,
+ * `comunaDesdeAddress` devuelve null, el city_id queda vacío y el vendedor
+ * desaparece de los filtros por comuna sin que nadie se entere.
+ */
+async function reverseGeocode(lng: number, lat: number): Promise<string | null> {
   try {
     const res = await fetch(
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${TOKEN}&language=es&types=address,neighborhood,locality`
     );
+    if (!res.ok) return null;
     const data = await res.json();
-    return data.features?.[0]?.place_name ?? `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    return data.features?.[0]?.place_name ?? null;
   } catch {
-    return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    return null;
   }
 }
 
@@ -203,6 +210,16 @@ export default function ProfileForm({
       async (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords;
         const address = await reverseGeocode(lng, lat);
+        if (!address) {
+          // Se guarda igual el punto (sirve para el mapa), pero hay que pedir la
+          // comuna: sin ella los libros no salen al filtrar por comuna.
+          await saveLocation(lat, lng, `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+          setLocationError(
+            "Ubicamos tu punto en el mapa, pero no pudimos obtener la dirección. Escribe tu comuna abajo para que tus libros aparezcan en las búsquedas de tu sector."
+          );
+          setGeolocating(false);
+          return;
+        }
         await saveLocation(lat, lng, address);
         setGeolocating(false);
       },
