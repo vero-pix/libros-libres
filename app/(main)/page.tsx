@@ -74,11 +74,16 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const totalRedondeado = Math.floor(totalActive / 100) * 100;
   const cuantos = totalRedondeado >= 100 ? `Más de ${totalRedondeado.toLocaleString("es-CL")}` : "";
 
+  // "compra y vende" va en las DOS variantes. La home es la que Google muestra
+  // para las búsquedas de intención vendedora ("donde vender libros usados",
+  // posición 6,1) — /vender queda en la 27 — pero el título solo hablaba de
+  // comprar y sacaba 2,9% de CTR donde la posición da para 6-8%. El que busca
+  // dónde vender no se reconocía en el snippet. (27 ago 2026)
   let title = cuantos
-    ? `${cuantos} libros usados en Chile, cerca de ti`
+    ? `${cuantos} libros usados en Chile — compra y vende`
     : "Libros usados en Chile — compra y vende cerca de ti";
   let description =
-    "Compra y vende libros usados con personas reales: clásicos, rarezas y escolares. Retiro en mano o envío a todo Chile, con pago protegido.";
+    "Vende los libros que ya leíste y encuentra los que te faltan, entre personas reales: clásicos, rarezas y escolares. Retiro en mano o envío a todo Chile, con pago protegido.";
   let canonical = base;
 
   if (subcategory) {
