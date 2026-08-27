@@ -8,9 +8,11 @@ interface SendEmailParams {
   from?: string;
   subject: string;
   html: string;
+  /** A dónde contesta el vendedor. Sin esto la respuesta muere en noreply@. */
+  replyTo?: string;
 }
 
-export async function sendEmail({ to, from = "noreply@tuslibros.cl", subject, html }: SendEmailParams) {
+export async function sendEmail({ to, from = "noreply@tuslibros.cl", subject, html, replyTo }: SendEmailParams) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.warn("[email] RESEND_API_KEY not set — skipping email");
@@ -23,7 +25,7 @@ export async function sendEmail({ to, from = "noreply@tuslibros.cl", subject, ht
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ from, to, subject, html }),
+    body: JSON.stringify({ from, to, subject, html, ...(replyTo ? { reply_to: replyTo } : {}) }),
   });
 
   if (!res.ok) {
