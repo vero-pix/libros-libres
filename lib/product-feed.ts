@@ -239,6 +239,11 @@ export function serializarXml(items: ItemFeed[], canal: CanalFeed): string {
     <title>tuslibros.cl — libros usados en Chile</title>
     <link>${SITE}</link>
     <description>Catálogo de libros usados con pago por MercadoPago y despacho a todo Chile. Feed: ${canal}.</description>
+    <!-- El feed no declaraba idioma y Merchant Center quedó tratando los 1.540
+         productos como si estuvieran en inglés (28-08-2026). Varias fichas
+         mencionan "inglés" en su descripción, así que la detección automática
+         tenía de dónde equivocarse. Declararlo explícito evita la ambigüedad. -->
+    <language>es-CL</language>
 ${cuerpo}
   </channel>
 </rss>
