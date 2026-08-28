@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "fs";
 import { createInterface } from "readline";
+import { comunaDesdeAddress, fijarComunaVendedorSiFalta, resolverCityId } from "../lib/cities";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -8,6 +9,10 @@ const SELLER_ID = process.env.SELLER_ID!;
 const SELLER_LATITUDE = parseFloat(process.env.SELLER_LATITUDE ?? "-33.4489");
 const SELLER_LONGITUDE = parseFloat(process.env.SELLER_LONGITUDE ?? "-70.6693");
 const SELLER_CITY = process.env.SELLER_CITY ?? "Santiago";
+// Dirección del lote. Se resuelve una vez en main() desde el perfil del vendedor;
+// SELLER_ADDRESS la fuerza cuando el lote va a otra comuna que la del perfil.
+let SELLER_ADDRESS: string = process.env.SELLER_ADDRESS ?? "";
+let SELLER_CITY_ID: string | null = null;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !SELLER_ID) {
   console.error(
@@ -80,13 +85,20 @@ async function processRow(row: CsvRow): Promise<boolean> {
       seller_id: SELLER_ID,
       price,
       condition: row.condition || "good",
-      modality: row.modality || "sell",
+      // El enum de la BD es `sale`, no `sell`: con "sell" PostgREST rechazaba la
+      // fila entera ("invalid input value for enum modality"). Se acepta igual
+      // en el CSV porque es el error natural de escribirlo en inglés.
+      modality: (row.modality || "sale") === "sell" ? "sale" : row.modality || "sale",
       notes: row.notes || null,
       rental_price: rentalPrice,
       rental_deposit: rentalDeposit,
       latitude: SELLER_LATITUDE,
       longitude: SELLER_LONGITUDE,
-      city: SELLER_CITY,
+      // `listings` NO tiene columna `city`: guardaba `city: SELLER_CITY` y
+      // PostgREST rechazaba CADA fila con "Could not find the 'city' column".
+      // La comuna se guarda como `address` (texto) + `city_id` (el que filtra).
+      address: SELLER_ADDRESS,
+      city_id: SELLER_CITY_ID,
       status: "active",
     });
 
@@ -104,6 +116,31 @@ async function processRow(row: CsvRow): Promise<boolean> {
 }
 
 async function main() {
+  // Ubicación del lote, resuelta una sola vez. Sin esto los libros quedan sin
+  // comuna y no aparecen al filtrar por ciudad en /search.
+  if (!SELLER_ADDRESS) {
+    const { data: seller } = await supabase
+      .from("users")
+      .select("default_address, city")
+      .eq("id", SELLER_ID)
+      .maybeSingle();
+    // Nunca copiar el default_address tal cual: trae calle y número de la casa
+    // del vendedor. Se guarda solo la comuna. (mismo criterio que bulk-upload-csv)
+    const rawAddress = seller?.default_address || seller?.city || SELLER_CITY;
+    const comuna = comunaDesdeAddress(rawAddress) ?? rawAddress;
+    SELLER_ADDRESS = comunaDesdeAddress(rawAddress)
+      ? rawAddress.slice(rawAddress.indexOf(comuna))
+      : `${comuna}, Chile`;
+  }
+  SELLER_CITY_ID = await resolverCityId(supabase, SELLER_ADDRESS, {
+    lat: SELLER_LATITUDE,
+    lng: SELLER_LONGITUDE,
+  });
+  console.log(`Ubicación del lote: ${SELLER_ADDRESS}`);
+  console.log(
+    `city_id: ${SELLER_CITY_ID ?? "⚠️  no resuelto (los libros no aparecerán al filtrar por comuna)"}`
+  );
+
   const filePath = process.argv[2];
   let csvContent: string;
 
@@ -152,6 +189,14 @@ async function main() {
     const success = await processRow(row as unknown as CsvRow);
     if (success) created++;
     else failed++;
+  }
+
+  // Publicar dice dónde está el vendedor: si no tiene comuna en el perfil, se
+  // le fija acá. El webhook de listing-created hace lo mismo, pero la carga
+  // masiva no pasa por él.
+  if (created > 0) {
+    const comuna = await fijarComunaVendedorSiFalta(supabase, SELLER_ID, SELLER_ADDRESS);
+    if (comuna) console.log(`Comuna del vendedor fijada: ${comuna}`);
   }
 
   console.log(`\nSummary: ${created} created, ${failed} failed`);

@@ -21,7 +21,7 @@ export default function Footer() {
               <p className="text-[13px] text-ink-muted leading-relaxed">Personas y librerías de viejo con pago protegido por MercadoPago y reseñas. Sabes a quién le compras.</p>
             </Link>
             */}
-            <Link href="/?category=escolar" className="group p-6 sm:p-7 hover:bg-cream-warm/50 transition-colors">
+            <Link href="/categoria/academico-escolar" className="group p-6 sm:p-7 hover:bg-cream-warm/50 transition-colors">
               <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-coral font-semibold">De vuelta a clases</p>
               <h4 className="font-display text-xl text-ink mt-3 mb-2 tracking-[-0.01em]">Libros escolares</h4>
               <p className="text-[13px] text-ink-muted leading-relaxed">Listas del MINEDUC, textos de estudio y lectura complementaria — usados, a precio honesto.</p>

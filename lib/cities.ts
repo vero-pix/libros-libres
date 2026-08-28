@@ -124,3 +124,56 @@ export async function resolverCityId(
     return null;
   }
 }
+
+/**
+ * Fija `users.city` cuando el vendedor todavía no la tiene, deduciéndola de la
+ * dirección de una publicación suya.
+ *
+ * El registro solo pide correo y nombre, y `city` se llenaba únicamente entrando
+ * a /perfil a mover el mapa: el 27-08-2026 había 53 de 118 vendedores con libros
+ * publicados y sin ciudad. Sin ella no salen en /tiendas, el perfil público
+ * pierde la ubicación y el digest del "Se busca" les arma un perfil peor.
+ *
+ * Vive acá y no en el webhook porque la usan también los scripts de carga
+ * masiva, que no pasan por él. Una sola copia: dos que se separan terminan
+ * comportándose distinto.
+ *
+ * Nunca pisa una ciudad ya puesta y nunca lanza — perder la comuna no puede
+ * costar la publicación. Devuelve la comuna si la escribió, si no null.
+ */
+export async function fijarComunaVendedorSiFalta(
+  supabase: SupabaseClient,
+  sellerId: string | null | undefined,
+  address: string | null | undefined
+): Promise<string | null> {
+  try {
+    if (!sellerId || !address) return null;
+
+    const comuna = comunaDesdeAddress(address);
+    if (!comuna) return null;
+
+    const { data: usuario } = await supabase
+      .from("users")
+      .select("city")
+      .eq("id", sellerId)
+      .maybeSingle();
+    if ((usuario?.city ?? "").trim()) return null;
+
+    // El mapa de /publish parte centrado en un punto fijo, y quien nunca lo movió
+    // quedó con la MISMA dirección exacta que otros vendedores (14 compartían una
+    // sola). Esa dirección no dice dónde vive nadie: si otro vendedor ya publicó
+    // desde ese punto, no se deduce nada.
+    const { data: otros } = await supabase
+      .from("listings")
+      .select("seller_id")
+      .eq("address", address)
+      .neq("seller_id", sellerId)
+      .limit(1);
+    if (otros && otros.length > 0) return null;
+
+    const { error } = await supabase.from("users").update({ city: comuna }).eq("id", sellerId);
+    return error ? null : comuna;
+  } catch {
+    return null;
+  }
+}

@@ -33,7 +33,7 @@ import { readFileSync, existsSync, readdirSync } from "fs";
 import { resolve, join, basename, extname } from "path";
 import { normalizeGenre } from "../lib/genreNormalizer";
 import { slugListing, slugUnicoParaVendedor } from "../lib/slugify";
-import { comunaDesdeAddress, resolverCityId } from "../lib/cities";
+import { comunaDesdeAddress, fijarComunaVendedorSiFalta, resolverCityId } from "../lib/cities";
 
 // Load .env.local manually
 const envPath = resolve(process.cwd(), ".env.local");
@@ -565,6 +565,14 @@ async function main() {
 
     created++;
     console.log(`  ✓ ${title} — ${author}${photoPaths.length ? ` (${photoPaths.length} foto/s)` : ""}`);
+  }
+
+  // Publicar dice dónde está el vendedor: si no tiene comuna en el perfil, se le
+  // fija acá. El webhook de listing-created hace lo mismo, pero esta carga no
+  // pasa por él. En dry-run no se escribe nada.
+  if (created > 0 && !DRY_RUN) {
+    const comuna = await fijarComunaVendedorSiFalta(supabase, SELLER_ID, SELLER_ADDRESS);
+    if (comuna) console.log(`Comuna del vendedor fijada: ${comuna}`);
   }
 
   console.log(`\nResultado: ${created} ${DRY_RUN ? "a crear" : "creados"}, ${skipped} omitidos, ${failed} fallidos`);

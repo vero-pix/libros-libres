@@ -312,7 +312,7 @@ export default async function AlgebraDeBaldorPage() {
               </Link>
               <span className="text-ink-muted">·</span>
               <Link
-                href="/search?category=universitario"
+                href="/categoria/academico-universitario"
                 className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors"
               >
                 Libros universitarios
