@@ -8,7 +8,7 @@ import NavDropdown from "./NavDropdown";
 import HeaderSearchBar from "./HeaderSearchBar";
 import WhatsAppSoporteLink from "./WhatsAppSoporteLink";
 import MobileMenu from "./MobileMenu";
-// import UnreadBadge from "@/components/messages/UnreadBadge"; // oculto con Mensajes (20 jul 2026)
+import UnreadBadge from "@/components/messages/UnreadBadge";
 
 export default async function Navbar() {
   const supabase = await createClient();
@@ -75,7 +75,8 @@ export default async function Navbar() {
 
               {user && (
                 <>
-                  {/* Mensajería interna oculta (nadie la usa, 20 jul 2026). Revivir si vuelve como notificaciones.
+                  {/* Repuesto el 27-08-2026: sí la usan. Compradores escribieron y nadie
+                      tenía bandeja donde leerlos (ver conversaciones sin leer de jul-ago). */}
                   <Link
                     href="/mensajes"
                     className="relative text-[14px] font-medium text-black-soft px-3 py-2 rounded-full hover:bg-black/[0.05] transition-colors whitespace-nowrap flex items-center gap-1"
@@ -83,7 +84,6 @@ export default async function Navbar() {
                     Mensajes
                     <UnreadBadge />
                   </Link>
-                  */}
                   <NavDropdown
                     label="Mi cuenta"
                     items={[
