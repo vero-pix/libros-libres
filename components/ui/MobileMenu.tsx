@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import UnreadBadge from "@/components/messages/UnreadBadge";
 
 interface Props {
   loggedIn: boolean;
@@ -24,13 +25,14 @@ export default function MobileMenu({ loggedIn }: Props) {
   const Section = ({ children }: { children: React.ReactNode }) => (
     <div className="py-1.5 border-t border-line first:border-t-0">{children}</div>
   );
-  const Item = ({ href, label }: { href: string; label: string }) => (
+  const Item = ({ href, label, badge }: { href: string; label: string; badge?: React.ReactNode }) => (
     <Link
       href={href}
       onClick={() => setOpen(false)}
-      className="block px-4 py-2.5 text-sm text-ink hover:bg-cream-warm/50 hover:text-coral transition-colors"
+      className="flex items-center px-4 py-2.5 text-sm text-ink hover:bg-cream-warm/50 hover:text-coral transition-colors"
     >
       {label}
+      {badge}
     </Link>
   );
 
@@ -62,7 +64,9 @@ export default function MobileMenu({ loggedIn }: Props) {
 
         {loggedIn ? (
           <Section>
-            <Item href="/mensajes" label="Mensajes" />
+            {/* El badge también acá: este menú es el único nav bajo lg, así que sin
+                él en el celular nadie se entera de que le escribieron. */}
+            <Item href="/mensajes" label="Mensajes" badge={<UnreadBadge />} />
             {/* Ocultos 20 jul 2026 (nadie los usa): Mis arriendos, Invita y gana. Revivir cuando aplique.
             <Item href="/mis-arriendos" label="Mis arriendos" />
             <Item href="/referidos" label="Invita y gana" /> */}
