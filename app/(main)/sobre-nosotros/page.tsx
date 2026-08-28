@@ -98,6 +98,17 @@ export default function SobreNosotrosPage() {
                 Cuando no estoy acá entre libros, trabajo en{" "}
                 <a href="https://economics.cl" target="_blank" rel="noopener" className="text-brand-600 hover:text-brand-700 underline">economics.cl</a>, asesorando empresas con la misma cabeza con que armé esto: mirar los números sin perder lo humano.
               </p>
+              <p>
+                Si quieres saber más de esa otra parte, estoy en{" "}
+                <a
+                  href="https://www.linkedin.com/in/economista-veronica-velasquez/"
+                  target="_blank"
+                  rel="noopener"
+                  className="text-brand-600 hover:text-brand-700 underline"
+                >
+                  LinkedIn
+                </a>.
+              </p>
               <p className="text-right text-sm italic text-ink">— Vero</p>
             </div>
           </div>
