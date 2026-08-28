@@ -4,6 +4,9 @@
 ofreciendo stock mayorista de manga ($6.600 el tomo sin IVA, mínimo 20 unidades).
 No les compramos: la contrapropuesta es que publiquen gratis en tuslibros.cl.
 
+**Enviado el 27-08-2026** desde la casilla de economics (la cuenta conectada al
+asistente), con copia a vero@tuslibros.cl. Thread `1a045fa1a8ac97da`.
+
 **Para:** ventas@komadistribuciones.cl
 **Asunto:** Re: Tu próximo gran éxito en Chile — les propongo algo al revés
 
@@ -44,6 +47,9 @@ funcionamos con despacho por courier a todo Chile y también con entrega en pers
 
 Verónica Velásquez
 tuslibros.cl
+
+PD: les escribo desde mi otra casilla, así que si prefieren, para tuslibros
+escríbanme directo a vero@tuslibros.cl (va en copia).
 
 ---
 
