@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { compararLibro, normalizar } from "@/lib/bookRequestMatch";
-import { resolverCityId } from "@/lib/cities";
+import { comunaDesdeAddress, resolverCityId } from "@/lib/cities";
 
 export const runtime = "nodejs";
 
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     const { data: listing } = await supabase
       .from("listings")
       .select(
-        "id, slug, price, modality, address, latitude, longitude, city_id, deprioritized, book:books(title, author), seller:users(full_name, username)"
+        "id, slug, price, modality, address, latitude, longitude, city_id, deprioritized, seller_id, book:books(title, author), seller:users(full_name, username, city)"
       )
       .eq("id", listingId)
       .single();
@@ -52,6 +52,52 @@ export async function POST(req: Request) {
       } catch (cityErr) {
         console.error("Resolución de city_id falló:", cityErr);
       }
+    }
+
+    // Fijar la comuna del vendedor si todavía no la tiene. El registro solo pide
+    // correo y nombre, y `users.city` se llenaba únicamente entrando a /perfil a
+    // mover el mapa: el 27-08-2026 había 53 de 118 vendedores con libros
+    // publicados y sin ciudad. Sin ella no salen en /tiendas, su perfil público
+    // pierde la ubicación y el digest del "Se busca" les arma un perfil peor.
+    //
+    // Publicar ya dice dónde está el vendedor, así que se aprovecha ese dato.
+    // La excepción es la dirección que nadie movió: el mapa de /publish parte
+    // centrado en un punto fijo, y 14 vendedores distintos compartían la misma
+    // dirección exacta. Esa dirección no dice dónde vive nadie — si otro
+    // vendedor ya publicó desde ese mismo punto, no se deduce nada.
+    try {
+      const sellerId = (listing as any).seller_id;
+      const ciudadActual = ((listing as any).seller?.city ?? "").trim();
+      const direccion = (listing as any).address as string | null;
+      const comuna = comunaDesdeAddress(direccion);
+
+      if (sellerId && !ciudadActual && comuna && direccion) {
+        const { data: otros } = await supabase
+          .from("listings")
+          .select("seller_id")
+          .eq("address", direccion)
+          .neq("seller_id", sellerId)
+          .limit(1);
+
+        if (otros && otros.length > 0) {
+          console.log(
+            `[listing-created] comuna no deducida: "${direccion}" la comparte otro vendedor (mapa sin mover)`
+          );
+        } else {
+          const { error: cityErr } = await supabase
+            .from("users")
+            .update({ city: comuna })
+            .eq("id", sellerId);
+          if (cityErr) {
+            console.error("No se pudo fijar users.city:", cityErr.message);
+          } else {
+            console.log(`[listing-created] comuna del vendedor fijada: ${comuna}`);
+          }
+        }
+      }
+    } catch (comunaErr) {
+      // Igual que con city_id: perder la comuna no puede costar la publicación.
+      console.error("Fijar la comuna del vendedor falló:", comunaErr);
     }
 
     const token = process.env.TELEGRAM_BOT_TOKEN;
