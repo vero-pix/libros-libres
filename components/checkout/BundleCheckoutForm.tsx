@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { ListingWithBook } from "@/types";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
 import { calcularEnvioPromo } from "@/lib/shipping-promo";
+import { comunaDesdeAddress } from "@/lib/comuna";
 
 interface ShippingQuote {
   service: string;
@@ -53,6 +54,22 @@ export default function BundleCheckoutForm({
   buyerAddress,
   buyerName,
 }: Props) {
+  // Dónde están los libros. Sin esto el comprador toma la opción gratis que viene
+  // marcada por defecto sin saber que el vendedor está en otra región: el
+  // 28-08-2026 se pagó un libro de Concepción para retirar "en persona" desde Ñuñoa.
+  const comunasVendedor = Array.from(
+    new Set(
+      listings
+        .map((l) => comunaDesdeAddress((l as any).address))
+        .filter((c): c is string => !!c)
+    )
+  );
+  const opcionesEntrega = DELIVERY_OPTIONS.map((o) =>
+    o.value === "in_person" && comunasVendedor.length
+      ? { ...o, desc: `Gratis — coordinas con el vendedor en ${comunasVendedor.join(" y ")}` }
+      : o
+  );
+
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("in_person");
   const [address, setAddress] = useState(buyerAddress);
   const [loading, setLoading] = useState(false);
@@ -304,7 +321,7 @@ export default function BundleCheckoutForm({
       <div className="bg-white rounded-lg border border-gray-200 p-5">
         <h2 className="font-semibold text-gray-900 mb-4">Forma de entrega</h2>
         <div className="space-y-2">
-          {DELIVERY_OPTIONS.map((opt) => (
+          {opcionesEntrega.map((opt) => (
             <label
               key={opt.value}
               className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${

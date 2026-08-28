@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { ListingWithBook } from "@/types";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
 import { calcularEnvioPromo } from "@/lib/shipping-promo";
+import { comunaDesdeAddress } from "@/lib/comuna";
 
 interface ShippingQuote {
   service: string;
@@ -33,6 +34,11 @@ interface Props {
 
 type DeliveryMethod = "courier" | "in_person" | "pickup_point";
 
+// La descripción de "en persona" se arma con la comuna del vendedor: sin ella el
+// comprador elige la opción gratis que viene marcada por defecto sin saber que el
+// libro está a 500 km. El 28-08-2026 alguien en Ñuñoa compró y pagó un libro que
+// estaba en Concepción creyendo que lo iba a buscar. (Ver también la venta de
+// Melipeuco del 5 ago: pagada y sin retiro posible.)
 const DELIVERY_OPTIONS = [
   { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis — coordina lugar y hora con el vendedor", icon: "🤝", enabled: true },
   // Punto de retiro: reactivar cuando haya convenios con lugares específicos
@@ -56,6 +62,14 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   const [validatingCode, setValidatingCode] = useState(false);
 
   const isGuest = !buyerName;
+
+  // Dónde está el libro. Se muestra en la opción de encuentro en persona.
+  const comunaVendedor = comunaDesdeAddress((listing as any).address);
+  const opcionesEntrega = DELIVERY_OPTIONS.map((o) =>
+    o.value === "in_person" && comunaVendedor
+      ? { ...o, desc: `Gratis — coordinas con el vendedor en ${comunaVendedor}` }
+      : o
+  );
 
   // Shipping quotes
   const [quotes, setQuotes] = useState<ShippingQuote[]>([]);
@@ -335,7 +349,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
             <h2 className="text-sm font-bold text-ink uppercase tracking-wider">Forma de entrega</h2>
           </div>
           <div className="px-6 py-5 space-y-3">
-            {DELIVERY_OPTIONS.map((opt) => (
+            {opcionesEntrega.map((opt) => (
               <label
                 key={opt.value}
                 className={`flex items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer ${
