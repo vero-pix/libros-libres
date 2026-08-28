@@ -3,6 +3,7 @@ import Image from "next/image";
 import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
 import type { Metadata } from "next";
+import StoreFinder, { type StoreRow } from "@/components/tiendas/StoreFinder";
 
 export const metadata: Metadata = {
   // Estaba en posición 3.9 con CTR 0% (131 impresiones, 0 clics en 28 días): el
@@ -16,26 +17,27 @@ export const metadata: Metadata = {
 
 export const revalidate = 300;
 
-interface Store {
-  id: string;
-  full_name: string | null;
-  username: string | null;
-  city: string | null;
-  avatar_url: string | null;
-  _count: number;
-}
+
 
 // Ranking de tiendas por publicaciones activas (dato honesto hoy; ventas quedan fuera
 // mientras sean ~0). Cacheado. Idea de Carlos (CIMLibros).
 const getStoreRanking = unstable_cache(
-  async (): Promise<Store[]> => {
+  async (): Promise<StoreRow[]> => {
     const supabase = createPublicClient();
-    const { data: listings } = await supabase
-      .from("listings")
-      .select("seller_id")
-      .eq("status", "active");
+    // Paginado: Supabase corta en 1.000 filas y el ranking salía calculado sobre
+    // media biblioteca. Ver [[reference_supabase_techo_1000_filas]]. (28-08-2026)
+    const listings: { seller_id: string }[] = [];
+    for (let desde = 0; ; desde += 1000) {
+      const { data } = await supabase
+        .from("listings")
+        .select("seller_id")
+        .eq("status", "active")
+        .range(desde, desde + 999);
+      listings.push(...(data ?? []));
+      if (!data || data.length < 1000) break;
+    }
     const counts = new Map<string, number>();
-    for (const l of listings ?? []) counts.set(l.seller_id, (counts.get(l.seller_id) ?? 0) + 1);
+    for (const l of listings) counts.set(l.seller_id, (counts.get(l.seller_id) ?? 0) + 1);
     const ranked = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
     const ids = ranked.map(([id]) => id);
     if (ids.length === 0) return [];
@@ -44,20 +46,33 @@ const getStoreRanking = unstable_cache(
       .select("id, full_name, username, city, avatar_url")
       .in("id", ids);
     const byId = new Map((users ?? []).map((u) => [u.id, u]));
+
+    // La región no vive en `users` (city es la comuna): se resuelve con la tabla
+    // `cities`, que es la fuente de verdad de la taxonomía geográfica.
+    const { data: cities } = await supabase.from("cities").select("name, region");
+    const regionPorComuna = new Map(
+      (cities ?? []).map((c) => [(c.name ?? "").toLowerCase(), c.region as string | null])
+    );
+
     return ranked
-      .map(([id, count]) => {
+      .map(([id, count], i) => {
         const u = byId.get(id);
-        return u ? { ...u, _count: count } : null;
+        if (!u) return null;
+        return {
+          ...u,
+          _count: count,
+          rank: i,
+          region: regionPorComuna.get((u.city ?? "").toLowerCase()) ?? null,
+        };
       })
-      .filter((s): s is Store => s !== null);
+      .filter((s): s is StoreRow => s !== null);
   },
-  ["store-ranking-v1"],
+  ["store-ranking-v2"],
   { revalidate: 300 }
 );
 
 export default async function TiendasPage() {
   const stores = await getStoreRanking();
-  const medal = (i: number) => (i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null);
 
   return (
     <div className="min-h-screen bg-cream">
@@ -77,42 +92,7 @@ export default async function TiendasPage() {
       </section>
 
       <main className="max-w-3xl mx-auto px-6 py-8">
-        <ol className="space-y-3">
-          {stores.map((s, i) => (
-            <li key={s.id}>
-              <Link
-                href={`/vendedor/${s.username ?? s.id}`}
-                className="group flex items-center gap-4 bg-white rounded-2xl border border-cream-dark p-4 hover:border-coral/40 hover:shadow-sm transition-all"
-              >
-                <div className="w-7 text-center flex-shrink-0">
-                  {medal(i) ? (
-                    <span className="text-xl">{medal(i)}</span>
-                  ) : (
-                    <span className="font-display text-lg font-bold text-ink-muted">{i + 1}</span>
-                  )}
-                </div>
-                <div className="w-12 h-12 rounded-full bg-ink text-white flex items-center justify-center text-base font-bold flex-shrink-0 overflow-hidden">
-                  {s.avatar_url ? (
-                    <Image src={s.avatar_url} alt={s.full_name ?? "Tienda"} width={48} height={48} className="object-cover w-full h-full" />
-                  ) : (
-                    (s.full_name ?? "?")[0]?.toUpperCase()
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-ink truncate">{s.full_name ?? "Tienda"}</p>
-                  {s.city && <p className="text-xs text-ink-muted mt-0.5">{s.city}</p>}
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="font-display text-lg font-bold text-ink tabular-nums leading-none">{s._count}</p>
-                  <p className="text-[10px] font-mono uppercase tracking-wider text-ink-muted mt-1">libros</p>
-                </div>
-                <span className="text-sm font-semibold text-brand-600 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 hidden sm:block">
-                  Ver →
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ol>
+        <StoreFinder stores={stores} />
 
         <div className="text-center mt-10">
           <p className="text-sm text-ink-muted mb-3">¿Tienes libros que ya leíste? Abre tu propia tienda.</p>
