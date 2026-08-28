@@ -560,7 +560,17 @@ export default async function HomePage({ searchParams }: Props) {
           categories={categoryTree.flatMap((g) =>
             g.children
               .filter((c) => c.count > 0)
-              .map((c) => ({ category: c.slug, name: c.name, count: c.count, group: g.name }))
+              // Estos son HIJOS del árbol, o sea SUBcategorías: enlazarlas como
+              // ?category=<slug> filtraba por books.category, que nunca vale
+              // "academico-escolar" ni similares — el drawer de móvil mandaba a
+              // listas vacías. Va la misma URL que usa el sidebar de escritorio.
+              .map((c) => ({
+                category: c.slug,
+                href: `/?category=${encodeURIComponent(g.slug)}&subcategory=${encodeURIComponent(c.slug)}`,
+                name: c.name,
+                count: c.count,
+                group: g.name,
+              }))
           )}
           activeCategory={subcategory ?? category}
           activeCategoryName={

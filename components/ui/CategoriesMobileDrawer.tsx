@@ -6,6 +6,8 @@ import Link from "next/link";
 interface CategoryCount {
   /** slug — se usa tal cual en la URL, NO tocar (hay SEO indexado). */
   category: string;
+  /** URL ya armada por el servidor, que es quien sabe la categoría padre. */
+  href: string;
   /** nombre legible, viene de la tabla `categories` de Supabase. */
   name: string;
   count: number;
@@ -97,7 +99,7 @@ export default function CategoriesMobileDrawer({ categories, activeCategory, act
                   <ul className="space-y-0.5">
                     {group.items.map((cat) => (
                       <li key={cat.category}>
-                        <Link href={`/?category=${encodeURIComponent(cat.category)}`} onClick={() => setOpen(false)}
+                        <Link href={cat.href} onClick={() => setOpen(false)}
                           className={`flex items-center justify-between gap-3 text-sm py-2.5 px-4 rounded-xl transition-colors ${activeCategory === cat.category ? "bg-brand-50 text-brand-600 font-medium" : "text-ink-muted active:bg-cream-warm"}`}>
                           <span>{cat.name}</span>
                           <span className="shrink-0 text-xs text-ink-light bg-cream-warm rounded-full px-2 py-0.5">{cat.count}</span>
