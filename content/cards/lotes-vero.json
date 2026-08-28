@@ -1,0 +1,476 @@
+[
+  {
+    "nombre": "Carvalho completo",
+    "gancho": "Cinco de la serie del detective Pepe Carvalho, de Vázquez Montalbán. Comida, Barcelona y desencanto.",
+    "precio": 23760,
+    "suelto": 38960,
+    "slugs": [
+      "vero/quinteto-de-buenos-aires",
+      "vero/los-pajaros-de-bangkok",
+      "vero/los-mares-del-sur",
+      "vero/el-hombre-de-mi-vida",
+      "vero/el-balneario"
+    ],
+    "libros": [
+      {
+        "titulo": "Quinteto de Buenos Aires",
+        "autor": "Manuel Vazquez Montalban",
+        "precio": 8990
+      },
+      {
+        "titulo": "Los pajaros de Bangkok",
+        "autor": "Manuel Vazquez Montalban",
+        "precio": 5000
+      },
+      {
+        "titulo": "Los mares del Sur",
+        "autor": "Manuel Vazquez Montalban",
+        "precio": 8990
+      },
+      {
+        "titulo": "El hombre de mi vida",
+        "autor": "Manuel Vázquez Montalbán",
+        "precio": 6990
+      },
+      {
+        "titulo": "El Balneario",
+        "autor": "Manuel Vazquez Montalban",
+        "precio": 8990
+      }
+    ]
+  },
+  {
+    "nombre": "Negra americana",
+    "gancho": "Ellroy y Benjamin Black: Los Ángeles corrupto y Dublín de posguerra.",
+    "precio": 25740,
+    "suelto": 40970,
+    "slugs": [
+      "vero/sangre-en-la-luna",
+      "vero/america-ellroy",
+      "vero/a-causa-de-la-noche",
+      "vero/muerte-en-verano",
+      "vero/el-secreto-de-christine"
+    ],
+    "libros": [
+      {
+        "titulo": "Sangre en la luna",
+        "autor": "James Ellroy",
+        "precio": 8990
+      },
+      {
+        "titulo": "América",
+        "autor": "James Ellroy",
+        "precio": 9990
+      },
+      {
+        "titulo": "A causa de la noche",
+        "autor": "James Ellroy",
+        "precio": 8990
+      },
+      {
+        "titulo": "Muerte en verano",
+        "autor": "Benjamin Black",
+        "precio": 6500
+      },
+      {
+        "titulo": "El secreto de Christine",
+        "autor": "Benjamin Black",
+        "precio": 6500
+      }
+    ]
+  },
+  {
+    "nombre": "Nórdicos",
+    "gancho": "Mankell, Läckberg, Jungstedt. Crímenes con frío y burocracia.",
+    "precio": 22770,
+    "suelto": 36990,
+    "slugs": [
+      "vero/la-falsa-pista",
+      "vero/huellas-imborrables",
+      "vero/nadie-lo-ha-oido",
+      "vero/la-quinta-mujer"
+    ],
+    "libros": [
+      {
+        "titulo": "La falsa Pista",
+        "autor": "Henning Mankell",
+        "precio": 6000
+      },
+      {
+        "titulo": "Huellas Imborrables",
+        "autor": "Camilla Läckberg",
+        "precio": 8990
+      },
+      {
+        "titulo": "Nadie lo ha Oído",
+        "autor": "Mari Jungstedt",
+        "precio": 10000
+      },
+      {
+        "titulo": "LA Quinta Mujer",
+        "autor": "Henning Mankell",
+        "precio": 12000
+      }
+    ]
+  },
+  {
+    "nombre": "Vila-Matas y la literatura sobre literatura",
+    "gancho": "Escritores escribiendo sobre escribir. Vila-Matas y compañía.",
+    "precio": 24750,
+    "suelto": 39970,
+    "slugs": [
+      "vero/hijos-sin-hijos",
+      "vero/lecciones-para-una-liebre-muerta",
+      "vero/el-mal-de-montano",
+      "vero/la-maleta",
+      "vero/el-desfile-del-amor"
+    ],
+    "libros": [
+      {
+        "titulo": "Hijos Sin Hijos",
+        "autor": "Enrique Vila-Matas",
+        "precio": 8990
+      },
+      {
+        "titulo": "Lecciones Para Una Liebre Muerta",
+        "autor": "Mario Bellatín",
+        "precio": 6500
+      },
+      {
+        "titulo": "El Mal De Montano",
+        "autor": "Enrique Vila-Matas",
+        "precio": 8990
+      },
+      {
+        "titulo": "La maleta",
+        "autor": "Sergei Dovlatov",
+        "precio": 6500
+      },
+      {
+        "titulo": "El desfile del amor",
+        "autor": "Sergio Pitol",
+        "precio": 8990
+      }
+    ]
+  },
+  {
+    "nombre": "Wilber y la conciencia",
+    "gancho": "Ken Wilber y compañía. Los que compré cuando quería entenderlo todo.",
+    "precio": 37620,
+    "suelto": 60990,
+    "slugs": [
+      "vero/la-ciencia-oculta",
+      "vero/los-tres-ojos-del-conocimiento",
+      "vero/ojo-del-espiritu-el",
+      "vero/en-defensa-de-la-felicidad-in-defense-of-happiness",
+      "vero/nietzsche"
+    ],
+    "libros": [
+      {
+        "titulo": "La Ciencia Oculta",
+        "autor": "Rudolf Steiner",
+        "precio": 10000
+      },
+      {
+        "titulo": "Los Tres Ojos del Conocimiento",
+        "autor": "Ken Wilber",
+        "precio": 13000
+      },
+      {
+        "titulo": "Ojo del Espiritu, El",
+        "autor": "Ken Wilber",
+        "precio": 13990
+      },
+      {
+        "titulo": "En defensa de la felicidad / In Defense of Happiness",
+        "autor": "Matthieu Ricard",
+        "precio": 12000
+      },
+      {
+        "titulo": "Nietzsche",
+        "autor": "Rüdiger Safranski",
+        "precio": 12000
+      }
+    ]
+  },
+  {
+    "nombre": "Espionaje",
+    "gancho": "Le Carré y los que se le parecen. Guerra Fría en tapa blanda.",
+    "precio": 24750,
+    "suelto": 40470,
+    "slugs": [
+      "vero/la-casa-rusia",
+      "vero/el-sastre-de-panama-359279",
+      "vero/un-espia-perfecto",
+      "vero/una-pequena-ciudad-de-alemania",
+      "vero/camel-club"
+    ],
+    "libros": [
+      {
+        "titulo": "La Casa Rusia",
+        "autor": "John le Carre",
+        "precio": 8990
+      },
+      {
+        "titulo": "El sastre de Panama",
+        "autor": "John le Carre",
+        "precio": 7000
+      },
+      {
+        "titulo": "Un espía perfecto",
+        "autor": "John Le Carré",
+        "precio": 8990
+      },
+      {
+        "titulo": "Una pequeña ciudad de Alemania",
+        "autor": "John Le Carré",
+        "precio": 6500
+      },
+      {
+        "titulo": "Camel Club",
+        "autor": "David Baldacci",
+        "precio": 8990
+      }
+    ]
+  },
+  {
+    "nombre": "Latinoamericanos",
+    "gancho": "Padura, Fonseca, Tomás Eloy Martínez, Pitol. El continente contándose solo.",
+    "precio": 25740,
+    "suelto": 41970,
+    "slugs": [
+      "vero/la-region-mas-transparente",
+      "vero/los-anos-con-laura-diaz",
+      "vero/diana-o-la-cazadora-solitaria",
+      "vero/el-sobre-negro",
+      "vero/la-transparencia-del-tiempo"
+    ],
+    "libros": [
+      {
+        "titulo": "LA REGIÓN MÁS TRANSPARENTE",
+        "autor": "Carlos Fuentes",
+        "precio": 7000
+      },
+      {
+        "titulo": "Los años con Laura Díaz",
+        "autor": "Carlos Fuentes",
+        "precio": 8990
+      },
+      {
+        "titulo": "Diana o la cazadora solitaria",
+        "autor": "Carlos Fuentes",
+        "precio": 8000
+      },
+      {
+        "titulo": "El sobre negro",
+        "autor": "Norman Manea",
+        "precio": 8990
+      },
+      {
+        "titulo": "La Transparencia Del Tiempo",
+        "autor": "Leonardo Padura",
+        "precio": 8990
+      }
+    ]
+  },
+  {
+    "nombre": "Marías y los españoles",
+    "gancho": "Javier Marías, Baroja, Pombo. Prosa larga y española.",
+    "precio": 29700,
+    "suelto": 48570,
+    "slugs": [
+      "vero/negra-espalda-del-tiempo",
+      "vero/manana-en-la-batalla-piensa-en-mi",
+      "vero/cuentos-reciclados",
+      "vero/camino-de-perfeccion-baroja",
+      "vero/breviario-de-podredumbre"
+    ],
+    "libros": [
+      {
+        "titulo": "Negra espalda del tiempo",
+        "autor": "Javier Marías",
+        "precio": 11800
+      },
+      {
+        "titulo": "Mañana en la batalla piensa en mí",
+        "autor": "Javier Marías",
+        "precio": 11800
+      },
+      {
+        "titulo": "Cuentos reciclados",
+        "autor": "Álvaro Pombo",
+        "precio": 8990
+      },
+      {
+        "titulo": "Camino de Perfección",
+        "autor": "Pío Baroja",
+        "precio": 6990
+      },
+      {
+        "titulo": "Breviario de podredumbre",
+        "autor": "E. M. Cioran",
+        "precio": 8990
+      }
+    ]
+  },
+  {
+    "nombre": "Chilenos",
+    "gancho": "Donoso, Edwards, Lafourcade. Los de acá.",
+    "precio": 29700,
+    "suelto": 48590,
+    "slugs": [
+      "vero/donde-van-a-morir-los-elefantes",
+      "vero/los-convidados-de-piedra",
+      "vero/animales-literarios-de-chile-gb2k",
+      "vero/el-principe-y-las-ovejas",
+      "vero/la-fiesta-del-rey-acab"
+    ],
+    "libros": [
+      {
+        "titulo": "Donde van a morir los elefantes",
+        "autor": "José Donoso",
+        "precio": 6600
+      },
+      {
+        "titulo": "Los convidados de piedra",
+        "autor": "Jorge Edwards",
+        "precio": 8000
+      },
+      {
+        "titulo": "Animales Literarios de Chile",
+        "autor": "Enrique Lafourcade",
+        "precio": 12000
+      },
+      {
+        "titulo": "El Príncipe y las Ovejas",
+        "autor": "Enrique Lafourcade",
+        "precio": 9990
+      },
+      {
+        "titulo": "La fiesta del rey Acab",
+        "autor": "Enrique Lafourcade",
+        "precio": 12000
+      }
+    ]
+  },
+  {
+    "nombre": "Caja sorpresa #1",
+    "gancho": "Cinco que elijo yo. No sabes cuáles hasta que llegan. Todas leídas, todas en buen estado.",
+    "precio": 20000,
+    "suelto": 39960,
+    "slugs": [
+      "vero/la-montana-magica",
+      "vero/el-gran-libro-de-los-habitos-zen",
+      "vero/existe-la-suerte",
+      "vero/steve-jobs",
+      "vero/la-deshumanizacion-del-arte-y-otros-ensayos-de-estetica"
+    ],
+    "libros": [
+      {
+        "titulo": "La montaña mágica",
+        "autor": "",
+        "precio": 8990
+      },
+      {
+        "titulo": "El gran libro de los hábitos zen",
+        "autor": "Leo Babauta",
+        "precio": 8990
+      },
+      {
+        "titulo": "¿Existe La Suerte?",
+        "autor": "Nassim Nicholas Taleb",
+        "precio": 8990
+      },
+      {
+        "titulo": "Steve Jobs",
+        "autor": "Walter Isaacson",
+        "precio": 8990
+      },
+      {
+        "titulo": "La deshumanización del arte y otros ensayos de estética",
+        "autor": "José Ortega y Gasset",
+        "precio": 4000
+      }
+    ]
+  },
+  {
+    "nombre": "Caja sorpresa #2",
+    "gancho": "Cinco que elijo yo. No sabes cuáles hasta que llegan. Todas leídas, todas en buen estado.",
+    "precio": 20000,
+    "suelto": 44950,
+    "slugs": [
+      "vero/los-romanticos",
+      "vero/oscuro-como-la-tumba-en-la-que-yace-mi-amigo",
+      "vero/el-encargo",
+      "vero/la-presencia-ignorada-de-dios",
+      "vero/griego-busca-griega"
+    ],
+    "libros": [
+      {
+        "titulo": "Los románticos",
+        "autor": "Pankaj Mishra",
+        "precio": 8990
+      },
+      {
+        "titulo": "Oscuro como la tumba en la que yace mi amigo",
+        "autor": "Malcolm Lowry",
+        "precio": 8990
+      },
+      {
+        "titulo": "El Encargo",
+        "autor": "Friedrich Dürrenmatt",
+        "precio": 8990
+      },
+      {
+        "titulo": "La presencia ignorada de Dios",
+        "autor": "Viktor E. Frankl",
+        "precio": 8990
+      },
+      {
+        "titulo": "Griego busca griega",
+        "autor": "Friedrich Dürrenmatt",
+        "precio": 8990
+      }
+    ]
+  },
+  {
+    "nombre": "Caja sorpresa #3",
+    "gancho": "Cinco que elijo yo. No sabes cuáles hasta que llegan. Todas leídas, todas en buen estado.",
+    "precio": 20000,
+    "suelto": 43960,
+    "slugs": [
+      "vero/un-siglo-de-economia-politica-chilena-1890-1990",
+      "vero/la-armonia-de-las-celulas",
+      "vero/la-conjura-de-los-necios",
+      "vero/los-fantasmas-de-kraven",
+      "vero/libertad"
+    ],
+    "libros": [
+      {
+        "titulo": "Un siglo de economía política chilena 1890-1990",
+        "autor": "Patricio Meller",
+        "precio": 8990
+      },
+      {
+        "titulo": "La armonía de las células",
+        "autor": "Siddhartha Mukherjee",
+        "precio": 8000
+      },
+      {
+        "titulo": "La conjura de los necios",
+        "autor": "John Kennedy Toole",
+        "precio": 8990
+      },
+      {
+        "titulo": "Los fantasmas de Kraven",
+        "autor": "Alan Isler",
+        "precio": 8990
+      },
+      {
+        "titulo": "Libertad",
+        "autor": "Jonathan Franzen",
+        "precio": 8990
+      }
+    ]
+  }
+]
