@@ -70,19 +70,27 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
 
   if (!seller) notFound();
 
-  // Seller's active listings
-  const { data } = await supabase
-    .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram, username, mercadopago_user_id)`)
-    .eq("seller_id", seller.id)
-    .eq("status", "active")
-    // Por defecto: más vistos primero (trending_score = proxy de visitas),
-    // con created_at como desempate. sortListingsForDisplay luego respeta este
-    // orden dentro de cada tier (mantiene político al final, destacados arriba).
-    .order("trending_score", { ascending: false, nullsFirst: false })
-    .order("created_at", { ascending: false });
+  // Seller's active listings. Paginado: Supabase corta en 1.000 filas y una
+  // librería con 1.729 libros mostraba "1000 libros publicados" en su vitrina.
+  // Ver [[reference_supabase_techo_1000_filas]]. (29-08-2026)
+  const filas: unknown[] = [];
+  for (let desde = 0; ; desde += 1000) {
+    const { data: pagina } = await supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram, username, mercadopago_user_id)`)
+      .eq("seller_id", seller.id)
+      .eq("status", "active")
+      // Por defecto: más vistos primero (trending_score = proxy de visitas),
+      // con created_at como desempate. sortListingsForDisplay luego respeta este
+      // orden dentro de cada tier (mantiene político al final, destacados arriba).
+      .order("trending_score", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false })
+      .range(desde, desde + 999);
+    filas.push(...(pagina ?? []));
+    if (!pagina || pagina.length < 1000) break;
+  }
 
-  let listings = (data as unknown as ListingWithBook[]) ?? [];
+  let listings = (filas as unknown as ListingWithBook[]) ?? [];
 
   // Sort
   if (sort === "price_asc") listings = [...listings].sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
@@ -126,7 +134,20 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
             listings.filter((l) => l.price != null).length
         )
       : null;
-  const genres = Array.from(new Set(listings.map((l) => l.book.genre).filter(Boolean)));
+  // Solo las etiquetas más usadas por el vendedor. El género es texto libre que
+  // viene del CSV de cada uno: la librería que subió 1.729 libros traía casi 400
+  // valores distintos ("crónica periodística-política", "historia del arte danés")
+  // y la vitrina se volvía una muralla de etiquetas que tapaba el catálogo.
+  const MAX_ETIQUETAS = 12;
+  const frecuencia = new Map<string, number>();
+  for (const l of listings) {
+    const g = l.book.genre?.trim();
+    if (g) frecuencia.set(g, (frecuencia.get(g) ?? 0) + 1);
+  }
+  const genres = Array.from(frecuencia.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, MAX_ETIQUETAS)
+    .map(([g]) => g);
   const memberSince = new Date(seller.created_at).toLocaleDateString("es-CL", {
     month: "long",
     year: "numeric",
