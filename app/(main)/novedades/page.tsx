@@ -39,6 +39,21 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "29 agosto 2026",
+    title: "Una librería subió 1.729 libros y el catálogo casi se duplicó",
+    description:
+      "Libro de Ocasión es una librería de Santiago que vende su biblioteca personal, y hoy entró completa: 1.729 libros de una sola vez. El catálogo del sitio pasó de 2.142 a 3.869 libros en un día. Casi todos vienen con su foto real —la del ejemplar que te va a llegar, no la portada genérica de internet— y 250 tienen varias fotos, así que puedes mirar el lomo y las páginas antes de decidir. Hay historia, crónica, ensayo, poesía, filosofía y bastante literatura chilena y latinoamericana, con ediciones de los cuarenta y cincuenta que no se encuentran en librería nueva. Los precios van de $3.000 a $100.000, con la mitad del catálogo bajo $12.000. Para que se entienda el tamaño: si antes entrabas a buscar un título específico y no estaba, ahora hay casi el doble de posibilidades de que sí.",
+    tag: "Catálogo",
+    visual: {
+      kind: "stat",
+      stats: [
+        { big: "1.729", small: "libros nuevos en el catálogo" },
+        { big: "3.869", small: "libros publicados en total" },
+        { big: "1.689", small: "con foto del ejemplar real" },
+      ],
+    },
+  },
+  {
     date: "30 julio 2026",
     title: "Les pregunté qué les falta — y la respuesta fue una sola, repetida",
     description:
@@ -1149,6 +1164,43 @@ const novedades: Entry[] = [
   },
 ];
 
+/**
+ * Las cifras del masthead. Salen de la base a propósito: estuvieron escritas a
+ * mano desde julio y para el 29-08-2026 decían "66 vendidos / 1.100 publicados"
+ * cuando iban 279 y 3.869. Un diario con los números congelados envejece peor
+ * que uno sin números.
+ */
+const DIA_UNO = new Date("2026-04-01T00:00:00-04:00");
+
+async function fetchCifrasDiario() {
+  const supabase = createPublicClient();
+
+  // Supabase corta en 1.000 filas, así que se piden CONTEOS, no las filas.
+  const [activos, vendidos, tiendas] = await Promise.all([
+    supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "active"),
+    supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "completed"),
+    supabase.from("listings").select("seller_id").eq("status", "active").limit(1000),
+  ]);
+
+  // Para las tiendas no basta un count: hay que contar vendedores distintos.
+  const { data: todosLosSellers } = await supabase
+    .from("listings")
+    .select("seller_id")
+    .eq("status", "active");
+  const distintos = new Set((todosLosSellers ?? []).map((l) => l.seller_id)).size;
+
+  const dia = Math.max(1, Math.round((Date.now() - DIA_UNO.getTime()) / 86400000));
+  const mes = new Date().toLocaleDateString("es-CL", { month: "long", year: "numeric", timeZone: "America/Santiago" });
+
+  return {
+    dia,
+    mes: mes.charAt(0).toUpperCase() + mes.slice(1),
+    activos: activos.count ?? 0,
+    vendidos: vendidos.count ?? 0,
+    tiendas: distintos || (tiendas.data ? new Set(tiendas.data.map((l) => l.seller_id)).size : 0),
+  };
+}
+
 async function fetchListingPool(): Promise<PoolListing[]> {
   const supabase = createPublicClient();
   const [featured, collectible, maigret, marina, emar, rokha] = await Promise.all([
@@ -1322,6 +1374,8 @@ function parseSpanishDate(s: string): number {
 export default async function NovedadesPage() {
   const pool = await fetchListingPool();
   const fulfilled = await fetchFulfilledRequests();
+  const cifras = await fetchCifrasDiario();
+  const miles = (n: number) => n.toLocaleString("es-CL");
 
   // Mezclar novedades hardcoded + cumplimientos dinámicos, ordenar desc por fecha
   const allEntries = [...fulfilled, ...novedades].sort(
@@ -1355,21 +1409,21 @@ export default async function NovedadesPage() {
           <div className="flex items-center gap-3 mb-6 animate-fade-in-up">
             <span className="h-px w-10 bg-amber-300/70" />
             <p className="text-[11px] uppercase tracking-[0.32em] text-amber-300 font-semibold">
-              Diario de tuslibros.cl · Julio 2026
+              Diario de tuslibros.cl · {cifras.mes}
             </p>
           </div>
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[1.05] text-cream mb-6 animate-fade-in-up" style={{ animationDelay: "60ms" }}>
-            Día 93 — <em className="text-amber-300 not-italic font-normal italic">colecciones, compra clara y menos fricción</em>.
+            Día {cifras.dia} — <em className="text-amber-300 not-italic font-normal italic">el catálogo se duplicó en un día</em>.
           </h1>
           <p className="text-base md:text-lg text-cream/80 max-w-2xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "120ms" }}>
-            Seis vitrinas temáticas con URL propia, la ficha de compra que por fin dice lo que importa y el formulario de publicar sin trámite previo.
-            66 libros vendidos y el catálogo sigue creciendo. Lo escribo yo. — Vero
+            Una librería de Santiago subió 1.729 libros de una vez y el catálogo pasó de 2.142 a {miles(cifras.activos)}.
+            {miles(cifras.vendidos)} libros ya encontraron nuevo dueño. Lo escribo yo. — Vero
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 animate-fade-in-up" style={{ animationDelay: "180ms" }}>
             {[
-              { big: "66", small: "libros que encontraron nuevo dueño" },
-              { big: "1.100", small: "libros publicados hoy" },
-              { big: "40", small: "tiendas activas" },
+              { big: miles(cifras.vendidos), small: "libros que encontraron nuevo dueño" },
+              { big: miles(cifras.activos), small: "libros publicados hoy" },
+              { big: String(cifras.tiendas), small: "tiendas activas" },
               { big: "#1", small: "Google \"vender libros usados Chile\"" },
             ].map((s) => (
               <div key={s.small} className="border-l-2 border-amber-300/40 pl-4">
