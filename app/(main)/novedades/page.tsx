@@ -40,6 +40,20 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 const novedades: Entry[] = [
   {
     date: "29 agosto 2026",
+    title: "Ahora puedes buscar una tienda por región",
+    description:
+      "En tuslibros no compras a una marca: cada libro lo vende una persona o una librería, y hasta ahora la lista de tiendas era eso, una lista. Con más de cien tiendas activas, encontrar una era imposible sin recorrerlas todas. Me pasó a mí buscando la tienda de una vendedora mía. Ahora /tiendas tiene un buscador por nombre o comuna —tolera acentos, así que \"Concepcion\" encuentra Concepción— y botones por región con la cantidad de tiendas que hay en cada una. Solo aparecen las regiones donde efectivamente hay alguien vendiendo: mandarte a una región vacía no le sirve a nadie. De paso arreglé el ranking, que estaba calculado sobre los primeros mil libros del catálogo en vez de sobre todos.",
+    tag: "Mejora",
+  },
+  {
+    date: "29 agosto 2026",
+    title: "El filtro de categorías del celular llevaba a listas vacías",
+    description:
+      "Esta la cuento porque es de las que dan rabia. Si entrabas desde el celular y abrías el menú de categorías para filtrar por, digamos, textos escolares, llegabas a una lista sin ni un libro. No era que no hubiera: el menú armaba mal el enlace y el filtro buscaba una categoría que no existe. En el computador funcionaba bien, así que era invisible para mí, que reviso todo en pantalla grande. Comprobado antes y después: el enlace viejo devolvía cero libros, el nuevo devuelve nueve. También estaba roto el enlace de \"Libros escolares\" del pie de página, que llevaba al mismo lugar vacío. Los dos arreglados.",
+    tag: "Arreglo",
+  },
+  {
+    date: "29 agosto 2026",
     title: "Una librería subió 1.729 libros y el catálogo casi se duplicó",
     description:
       "Libro de Ocasión es una librería de Santiago que vende su biblioteca personal, y hoy entró completa: 1.729 libros de una sola vez. El catálogo del sitio pasó de 2.142 a 3.869 libros en un día. Casi todos vienen con su foto real —la del ejemplar que te va a llegar, no la portada genérica de internet— y 250 tienen varias fotos, así que puedes mirar el lomo y las páginas antes de decidir. Hay historia, crónica, ensayo, poesía, filosofía y bastante literatura chilena y latinoamericana, con ediciones de los cuarenta y cincuenta que no se encuentran en librería nueva. Los precios van de $3.000 a $100.000, con la mitad del catálogo bajo $12.000. Para que se entienda el tamaño: si antes entrabas a buscar un título específico y no estaba, ahora hay casi el doble de posibilidades de que sí.",
