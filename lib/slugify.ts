@@ -51,13 +51,20 @@ export function slugListing(title: string, author?: string | null): string {
  */
 export async function slugUnicoParaVendedor(
   supabase: { from: (t: string) => any },
-  sellerId: string,
+  /** Ya no se usa para filtrar (ver comentario abajo). Se mantiene en la firma
+   *  porque lo pasan los dos cargadores y la ficha; el día que el índice pase a
+   *  ser único por vendedor, vuelve a servir. */
+  _sellerId: string,
   base: string
 ): Promise<string> {
+  // OJO: se busca la colisión en TODO el catálogo, no solo en los libros de este
+  // vendedor. El índice `listings_slug_key` es único global, así que filtrar por
+  // seller_id dejaba pasar slugs que la base después rechazaba: en la carga de
+  // 1.729 libros de Libro de Ocasión, "Pueblos y Estados en la Historia Moderna"
+  // reventó porque otro vendedor ya lo tenía publicado. (29-08-2026)
   const { data } = await supabase
     .from("listings")
     .select("slug")
-    .eq("seller_id", sellerId)
     .like("slug", `${base}%`);
 
   const tomados = new Set<string>((data ?? []).map((l: { slug: string | null }) => l.slug ?? ""));
