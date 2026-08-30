@@ -105,7 +105,7 @@ const all = [];
 for (let from = 0; ; from += 1000) {
   const { data, error } = await supa
     .from("listings")
-    .select("id, slug, price, seller_id, created_at, status, book:books(id, title, author, isbn, tags)")
+    .select("id, slug, price, seller_id, created_at, status, cover_image_url, book:books(id, title, author, isbn, tags)")
     .eq("status", "active")
     .range(from, from + 999);
   if (error) {
@@ -171,6 +171,7 @@ for (const l of withBook) {
 }
 let grupos = 0;
 let dupTotal = 0;
+let dupSospechosos = 0;
 for (const [sellerId, items] of bySeller) {
   const seen = new Set();
   for (let i = 0; i < items.length; i++) {
@@ -183,8 +184,13 @@ for (const [sellerId, items] of bySeller) {
       const sameIsbn =
         normalizeIsbn(a.isbn) && normalizeIsbn(a.isbn) === normalizeIsbn(b.isbn);
       const sim = titleSimilarity(a.title, b.title);
-      const sameAuthor =
-        !a.author || !b.author ? true : titleSimilarity(a.author, b.author) > 0.7;
+      // Un autor ausente NO es prueba de que sea el mismo libro. Antes lo era, y
+      // por eso el lote de agosto reportó "Obras selectas" de Hahn y de
+      // Shakespeare como la misma publicación repetida.
+      const autorConocido = Boolean(a.author && b.author);
+      const sameAuthor = autorConocido
+        ? titleSimilarity(a.author, b.author) > 0.7
+        : false;
       const otroTomo = differentVolume(a.title, b.title);
       if (!otroTomo && (sameIsbn || (sim >= SIMILARITY && sameAuthor))) {
         group.push(items[j]);
@@ -195,9 +201,18 @@ for (const [sellerId, items] of bySeller) {
       grupos++;
       dupTotal += group.length - 1;
       const mismaFicha = new Set(group.map((g) => g.book.id)).size === 1;
+      // Una librería puede tener dos ejemplares del mismo título. Si las fotos
+      // son distintas, casi siempre son dos ejemplares y no un error de carga;
+      // si comparten portada (o ninguno tiene), sí conviene mirarlo.
+      const portadas = new Set(group.map((g) => g.cover_image_url || "SIN"));
+      const mismaPortada = portadas.size === 1;
+      dupSospechosos += mismaPortada ? 1 : 0;
       console.log(
         `\n  @${U[sellerId]} — ${group.length} publicaciones del mismo libro` +
-          (mismaFicha ? "  ⚠️ TODAS apuntan a la MISMA ficha de libro" : "")
+          (mismaFicha ? "  ⚠️ TODAS apuntan a la MISMA ficha de libro" : "") +
+          (mismaPortada
+            ? "  ⚠️ MISMA portada — duplicado probable"
+            : "  · fotos distintas, probablemente dos ejemplares")
       );
       for (const g of group) {
         console.log(`     ${clp(g.price)} · ${(g.created_at ?? "").slice(0, 10)} · "${(g.book.title ?? "").slice(0, 44)}"`);
@@ -207,7 +222,10 @@ for (const [sellerId, items] of bySeller) {
   }
 }
 if (!grupos) console.log("  Ninguno.");
-else console.log(`\n  ${grupos} grupos · ${dupTotal} publicaciones sobrantes`);
+else
+  console.log(
+    `\n  ${grupos} grupos · ${dupTotal} publicaciones sobrantes · ${dupSospechosos} con la misma portada (revisar primero)`
+  );
 
 // ── 4. Sospechosas que además están en colecciones curadas ──
 P("SOSPECHOSAS QUE ESTÁN EN CARRUSELES CURADOS");
