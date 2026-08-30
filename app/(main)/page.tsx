@@ -140,10 +140,22 @@ const getPublicStats = unstable_cache(
   async () => {
     const supabase = createPublicClient();
     const serviceClient = createServiceRoleClient();
-    const [{ data: sellers }, { count: views }] = await Promise.all([
-      supabase.from("listings").select("seller_id").eq("status", "active"),
-      serviceClient.from("page_views").select("*", { count: "exact", head: true }),
-    ]);
+    // Supabase corta en 1.000 filas: sin paginar, el contador leía solo el primer
+    // millar del catálogo y mostraba 74 tiendas cuando eran 118. Se subestimaba
+    // solo, y peor mientras más crecía. Ver [[reference_supabase_techo_1000_filas]].
+    const sellers: { seller_id: string }[] = [];
+    for (let desde = 0; ; desde += 1000) {
+      const { data } = await supabase
+        .from("listings")
+        .select("seller_id")
+        .eq("status", "active")
+        .range(desde, desde + 999);
+      sellers.push(...((data ?? []) as { seller_id: string }[]));
+      if (!data || data.length < 1000) break;
+    }
+    const { count: views } = await serviceClient
+      .from("page_views")
+      .select("*", { count: "exact", head: true });
     const { data: sold } = await serviceClient
       .from("listings")
       .select("updated_at")
@@ -155,7 +167,7 @@ const getPublicStats = unstable_cache(
       soldByMonth[m] = (soldByMonth[m] ?? 0) + 1;
     }
 
-    const stores = new Set((sellers ?? []).map((l) => l.seller_id)).size;
+    const stores = new Set(sellers.map((l) => l.seller_id)).size;
     return { stores, views: views ?? 0, soldByMonth, totalSold: (sold ?? []).length };
   },
   ["home-public-stats-v2"],

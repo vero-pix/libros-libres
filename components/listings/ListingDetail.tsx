@@ -514,6 +514,7 @@ export default function ListingDetail({ listing, images = [] }: Props) {
                   </p>
                 </div>
               </div>
+              <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
               <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} paramsFicha={paramsFicha} />
               <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
             </div>
@@ -544,7 +545,14 @@ export default function ListingDetail({ listing, images = [] }: Props) {
               <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
             </>
           ) : (
+            /* Vendedor sin MercadoPago. El carrito va PRIMERO y siempre: es el único
+               gesto de "me lo llevo" que el comprador puede dejar acá, y el carrito
+               ya sabe agrupar por vendedor y ofrecer coordinación cuando no hay pago
+               en línea (CartView.tsx). Hasta el 29-08-2026 este botón vivía dentro de
+               la rama con MercadoPago y 528 libros quedaban sin ninguna acción de
+               compra: solo WhatsApp, que se lleva la venta fuera del sitio. */
             <div className="space-y-2">
+              <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
               <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} paramsFicha={paramsFicha} />
               <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
             </div>

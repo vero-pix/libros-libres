@@ -6,6 +6,7 @@ import Link from "next/link";
 import { libroUrl } from "@/lib/urls";
 import { trackEvent } from "@/utils/analytics";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
+import ContactSellerButton from "@/components/messages/ContactSellerButton";
 import { PROMO_UMBRAL, promoVigente, sellerParticipa } from "@/lib/shipping-promo";
 
 interface CartItem {
@@ -411,10 +412,22 @@ export default function CartView({
                   Coordinar por WhatsApp
                 </a>
               )}
+              {/* Sin pago en línea NI teléfono, la mensajería interna es la única
+                  salida: un carrito que solo informa el bloqueo es una pantalla de
+                  compra sin salida. Le llega correo al vendedor. */}
               {!group.sellerHasMP && !group.sellerPhone && (
-                <p className="text-xs text-ink-muted text-center">
-                  Este vendedor aún no tiene métodos de pago configurados.
-                </p>
+                <div className="space-y-2">
+                  <ContactSellerButton
+                    sellerId={group.sellerId}
+                    listingId={group.items[0].listing.id}
+                    sellerName={group.sellerName}
+                    bookTitle={group.items[0].listing.book.title}
+                  />
+                  <p className="text-xs text-ink-muted text-center">
+                    Este vendedor todavía no cobra en línea. Escríbele y coordinan
+                    la entrega y el pago directo.
+                  </p>
+                </div>
               )}
             </div>
           </div>
