@@ -39,6 +39,20 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "30 agosto 2026",
+    title: "530 libros del catálogo no se podían comprar y yo no lo sabía",
+    description:
+      "Esta me dolió. Cuando un vendedor no ha conectado MercadoPago, su ficha mostraba WhatsApp y nada más: ni botón de agregar al carrito, ni forma de avanzar dentro del sitio. Sin querer había armado dos catálogos, uno donde se compra y otro donde solo se conversa, y en el segundo hay 530 libros —el 14% de todo— incluidos los 117 de José y los 116 de Juan Adrián, que son de los mejores que tengo. El carrito siempre supo manejar este caso: agrupa por vendedor y ofrece coordinar la entrega cuando no hay pago en línea. El botón estaba puesto en el lugar equivocado del código, dentro de la parte que solo corre si hay MercadoPago. Ahora está siempre. Y si el vendedor no tiene ni MercadoPago ni teléfono, el carrito ofrece escribirle por la mensajería del sitio en vez de dejarte mirando un cartel que te informa que no se puede. Esa era mi regla y yo misma la estaba rompiendo: ninguna pantalla de compra puede quedarse sin salida.",
+    tag: "Arreglo",
+  },
+  {
+    date: "30 agosto 2026",
+    title: "El sitio se estaba contando de menos: decía 74 tiendas y son 118",
+    description:
+      "Un detalle chico con una moraleja grande. La portada leía el catálogo para contar cuántas tiendas hay activas, pero solo alcanzaba a leer los primeros mil libros de 3.870, así que contaba las tiendas que aparecían en esos mil y se olvidaba del resto. Resultado: mostraba 74 cuando son 118. Lo peor es que el error crecía solo: mientras más libros se suman, más grande es el pedazo que no alcanzaba a mirar. Arreglado, y de paso quedó anotado como cosa que revisar cada vez que el catálogo dé un salto.",
+    tag: "Arreglo",
+  },
+  {
     date: "29 agosto 2026",
     title: "Ahora puedes buscar una tienda por región",
     description:
