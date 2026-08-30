@@ -1,6 +1,6 @@
 # tuslibros.cl — Roadmap
 
-Última actualización: 25 agosto 2026
+Última actualización: 30 agosto 2026
 
 ---
 
@@ -15,7 +15,59 @@ Cuando aparezca un bug de este tipo: **no solo backfillear — siempre tapar el 
 
 ---
 
-## 🎯 Estado y plan — 25 agosto 2026
+## 🎯 Estado — 30 agosto 2026
+
+**La captura se movió por primera vez desde mayo.**
+
+| Mes | Libros | Volumen | Comisión | Captura |
+|---|---:|---:|---:|---:|
+| Junio | 32 | $522.499 | $0 | 0% |
+| Julio | 84 | $1.416.998 | $0 | 0% |
+| Ago (al 25) | 128 | $1.720.981 | $800 | 0,8% |
+| **Ago (al 30)** | **142** | **$1.911.469** | **$1.120** | **2,1%** |
+
+4 ventas pagadas contra 1 el día 25. Es poco volumen para cantar victoria; la
+medición oficial del experimento sigue siendo el **8 de septiembre**.
+
+**El bug de `preference_id` está confirmado muerto.** Las 20 órdenes de los
+últimos 45 días se parten limpio en dos: todas las del 28 de agosto en adelante
+tienen `mercadopago_preference_id` y 3 de 4 se pagaron; ninguna anterior lo
+tenía. Las 14 `pending` no son fuga viva, son cadáveres del bug.
+
+**Rodrigo Castillo es el costo documentado de ese bug:** 10 órdenes el 26 de
+agosto entre las 17:33 y las 17:41, los mismos 2 libros de
+@marta.olivia.yllades.iglesias (que sí tiene MP), ninguna con preferencia. Diez
+intentos en ocho minutos. Sus 2 libros siguen activos y hoy el checkout
+funciona: es un comprador con intención probada al que se le puede escribir.
+
+**Arreglado hoy (desplegado y verificado en producción):**
+- 530 libros (13,7% del catálogo) no tenían ninguna acción de compra en la
+  ficha: el botón de carrito vivía dentro de la rama "el vendedor tiene MP".
+  Los más afectados: @jose.santis (117), @juan.adrian (116), @ruty (35),
+  @fabian (31), @leonardo (28), @daniela.pizarro (22).
+- La portada contaba 74 tiendas activas leyendo solo los primeros 1.000 libros
+  de 3.875. Ahora muestra 120.
+- La auditoría de integridad reportaba 39 duplicados que eran 2: ignoraba el
+  autor cuando faltaba en un lado y no distinguía dos ejemplares de un error
+  de carga.
+
+**Lo que sigue sin decidir:**
+- El checkout **exige cuenta** (`lib/supabase/middleware.ts`). Decisión de
+  producto sin tomar. En 7 días: 984 fichas vistas → 26 carritos → 23 checkout.
+- Comisiones fantasma: se registran al crear la orden, no al pagarse.
+- 2 precios que son errores de tipeo: "Rubik" a $10 (@nicole.adriana.garay.rivas,
+  y está en el carrusel curado de Historia) y "Vigilar y castigar" a $20 (@leslie).
+- 2 duplicados probables de @libro.de.ocasion (misma portada, mismo precio):
+  "El nombre de la rosa" y "El gran arte". No se tocaron: es catálogo de un
+  vendedor tercero y borrar stock real es peor que dejar un duplicado.
+
+**Vencimientos:** Google Workspace corta el 5 sept · medir indexación del lote
+el 6 sept · medición del experimento de captura el 8 sept · el envío gratis
+sobre $20.000 termina el 15 sept (apagar o renovar).
+
+---
+
+## 🎯 Estado y plan — 25 agosto 2026 (superado por lo de arriba)
 
 **El cuello ya NO es que los vendedores no puedan cobrar. Es que la venta se
 cierra fuera del sitio aunque puedan.**
