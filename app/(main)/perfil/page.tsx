@@ -5,6 +5,7 @@ import MercadoPagoConnect from "@/components/ui/MercadoPagoConnect";
 import ApiKeyManager from "@/components/ui/ApiKeyManager";
 import ChangePasswordForm from "@/components/ui/ChangePasswordForm";
 import LinkedAccounts from "@/components/ui/LinkedAccounts";
+import DeleteAccount from "@/components/ui/DeleteAccount";
 
 export const metadata = { title: "Mi Perfil — tuslibros.cl", robots: { index: false } };
 
@@ -23,6 +24,11 @@ export default async function PerfilPage() {
     .select("full_name, username, email, phone, bio, avatar_url, public_email, instagram, default_latitude, default_longitude, default_address, pickup_points, mercadopago_user_id, mercadopago_connected_at")
     .eq("id", user.id)
     .single();
+
+  const { count: listingsCount } = await supabase
+    .from("listings")
+    .select("id", { count: "exact", head: true })
+    .eq("seller_id", user.id);
 
   const missingPhone = !profile?.phone;
   const missingAddress = profile?.default_latitude == null || profile?.default_longitude == null;
@@ -76,6 +82,7 @@ export default async function PerfilPage() {
         <LinkedAccounts />
         <ApiKeyManager />
         <ChangePasswordForm />
+        <DeleteAccount listingsCount={listingsCount ?? 0} />
       </main>
     </div>
   );
