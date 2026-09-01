@@ -4,11 +4,30 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 
 ## Stack
 
+- **Next.js 14.2** (App Router) + TypeScript + React 18
+- **Tailwind v3** + shadcn/ui
+- **Supabase** (Postgres + Storage + Auth)
+- **MercadoPago** split payment (tokens de vendedor + marketplace_fee)
+- **Shipit** para etiquetas de courier
+- Deploy en **Vercel**
+
 > Nota: el global CLAUDE.md menciona Next 16 / Tailwind v4 / AI SDK v6 — eso aplica a otros proyectos de Vero. Este repo sigue en **Next 14 y Tailwind 3** (el resto está en `package.json`).
 
 ## Comandos
 
+- `npm run dev` — local en :3000
+- `npm run build` — build de producción (verificar antes de decir "listo")
+- `npm run lint`
 - `npm run bulk-upload` — script de carga masiva
+
+## Estructura relevante
+
+- `app/(main)/` — páginas públicas (home, search, listings, checkout, perfil, mis-pedidos, mis-ventas)
+- `app/api/` — endpoints (orders, cart, webhooks/mercadopago, listings)
+- `components/` — UI por dominio (checkout, listings, sales, home, ui)
+- `lib/` — clientes Supabase (server/browser), mercadopago, shipit, notifications, genreNormalizer
+- `scripts/` — carga masiva, enriquecimiento, utilidades de migración
+- `supabase/migrations/` — SQL versionado (aplicar manual en SQL Editor si no hay CLI)
 
 ## Convenciones del código
 
