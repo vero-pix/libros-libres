@@ -7,7 +7,9 @@ import { createClient } from "@/lib/supabase/client";
 import SocialLoginButtons from "./SocialLoginButtons";
 import { nombreSospechoso } from "@/lib/nombreSospechoso";
 
-export default function RegisterForm() {
+type Ciudad = { id: string; name: string; region: string };
+
+export default function RegisterForm({ ciudades = [] }: { ciudades?: Ciudad[] }) {
   const supabase = createClient();
   const searchParams = useSearchParams();
   const [refCode, setRefCode] = useState("");
@@ -18,6 +20,7 @@ export default function RegisterForm() {
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [ciudad, setCiudad] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -81,10 +84,16 @@ export default function RegisterForm() {
     }
 
     if (data.user) {
+      // La comuna se pregunta acá porque el registro nunca la pedía: al 2 de
+      // septiembre de 2026, 205 de 357 usuarios no tenían ciudad. Sin ella el
+      // mapa los ubica en el centro de Santiago por defecto y el comprador no
+      // sabe si el libro está a diez cuadras o en Punta Arenas. Va OPCIONAL:
+      // el registro ya pierde gente y un campo obligatorio más pesa.
       await supabase.from("users").upsert({
         id: data.user.id,
         email,
         full_name: fullName,
+        ...(ciudad ? { city: ciudad } : {}),
       });
 
       try {
@@ -208,6 +217,36 @@ export default function RegisterForm() {
             autoComplete="new-password"
             className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            ¿De qué comuna eres? <span className="text-gray-400 font-normal">(opcional)</span>
+          </label>
+          <select
+            value={ciudad}
+            onChange={(e) => setCiudad(e.target.value)}
+            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
+          >
+            <option value="">Prefiero no decirlo</option>
+            {Object.entries(
+              ciudades.reduce<Record<string, Ciudad[]>>((acc, c) => {
+                (acc[c.region] ??= []).push(c);
+                return acc;
+              }, {})
+            ).map(([region, lista]) => (
+              <optgroup key={region} label={region}>
+                {lista.map((c) => (
+                  <option key={c.id} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-gray-500">
+            Sirve para que quien busca cerca te encuentre. Lo puedes cambiar después.
+          </p>
         </div>
 
         {showRefCode ? (

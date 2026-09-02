@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import RegisterForm from "@/components/auth/RegisterForm";
+import { getCities } from "@/lib/cities";
 import AuthWantedList from "@/components/auth/AuthWantedList";
 
-export default function RegisterPage({
+export default async function RegisterPage({
   searchParams,
 }: {
   searchParams: { next?: string };
 }) {
+  const ciudades = await getCities();
   const wantsToPublish = (searchParams.next ?? "").includes("publish");
   const heading = wantsToPublish ? "Crea tu cuenta y publica" : "Crea tu cuenta";
   const subheading = wantsToPublish
@@ -84,7 +86,7 @@ export default function RegisterPage({
 
             <div className="bg-white rounded-2xl border border-cream-dark/30 p-7">
               <Suspense>
-                <RegisterForm />
+                <RegisterForm ciudades={ciudades} />
               </Suspense>
             </div>
 
