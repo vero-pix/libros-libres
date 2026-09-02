@@ -1,4 +1,5 @@
 import Navbar from "@/components/ui/Navbar";
+import AvisoCierre from "@/components/ui/AvisoCierre";
 
 // Ojo: acá NO va <PageTracker />. Ya está montado en el layout raíz
 // (app/layout.tsx), que envuelve a este. Tenerlo en los dos hacía que cada
@@ -12,6 +13,7 @@ export default function MainLayout({
 }) {
   return (
     <>
+      <AvisoCierre />
       <Navbar />
       {children}
     </>

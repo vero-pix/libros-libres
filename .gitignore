@@ -100,3 +100,6 @@ scripts/.encuesta_*.json
 
 # logs de tareas programadas
 logs/
+
+# Exportaciones de cierre: traen correos de usuarios reales. Repo público.
+exports/
