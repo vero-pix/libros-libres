@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
 import { sendGong, escapeHtml } from "@/lib/notifications";
+import { createPublicClient } from "@/lib/supabase/public";
 
 const ADMIN_EMAIL = "vero@tuslibros.cl";
 const WEBHOOK_SECRET = process.env.SUPABASE_WEBHOOK_SECRET;
@@ -75,6 +76,23 @@ export async function POST(req: NextRequest) {
       const primerNombre = name === "Sin nombre" ? "" : name.split(" ")[0];
       const saludo = primerNombre ? `Hola ${primerNombre}, soy Vero` : "Hola, soy Vero";
 
+      // El bloque de comprador menciona cuántos libros hay. Se lee de la BD:
+      // hardcodearlo ya pasó en /login, donde decía "500+" con 1.900 publicados.
+      // Si la consulta falla, la frase se arma sin número en vez de mentir.
+      let librosActivos: number | null = null;
+      try {
+        const { count } = await createPublicClient()
+          .from("listings")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "active");
+        librosActivos = count ?? null;
+      } catch {
+        librosActivos = null;
+      }
+      const cuantos = librosActivos
+        ? `${librosActivos.toLocaleString("es-CL")} libros usados publicados`
+        : "libros usados publicados";
+
       await sendEmail({
         to: email,
         subject: "Soy Vero, de tuslibros.cl — partamos por tu primer libro",
@@ -116,6 +134,19 @@ export async function POST(req: NextRequest) {
             <p style="color:#333;font-size:15px;line-height:1.6;margin-top:24px">
               ¿Cuántos libros tienes en mente? Si son muchos, responde este correo y te paso el importador para que no los subas de a uno.
             </p>
+
+            <div style="border-top:1px solid #e8e0d4;margin-top:28px;padding-top:22px">
+              <p style="margin:0 0 6px;font-weight:600;color:#1a1a1a;font-size:16px">¿Y si en realidad viniste a comprar?</p>
+              <p style="margin:0 0 14px;color:#333;font-size:15px;line-height:1.6">
+                También sirve. Acá hay ${cuantos} por gente en todo Chile, y se busca por autor, título o género.
+              </p>
+              <a href="https://tuslibros.cl/search" style="display:inline-block;background:#f5f0e8;color:#1a1a1a;padding:10px 18px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">Buscar un libro →</a>
+
+              <p style="margin:18px 0 12px;color:#333;font-size:15px;line-height:1.6">
+                Y si no está el que andas buscando, déjalo pedido. Le llega a los vendedores y yo te aviso cuando aparezca.
+              </p>
+              <a href="https://tuslibros.cl/solicitudes" style="display:inline-block;background:#f5f0e8;color:#1a1a1a;padding:10px 18px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">Pedir un libro →</a>
+            </div>
 
             <p style="color:#888;font-size:13px;margin-top:20px">
               Si algo se traba, escríbeme por <a href="https://wa.me/56994583067" style="color:#d4a017">WhatsApp</a> o mira las <a href="https://tuslibros.cl/faq" style="color:#d4a017">preguntas frecuentes</a>. Dudas, reclamos, ideas — me llegan todas y las leo yo.
