@@ -34,20 +34,75 @@ function verifySignature(req: NextRequest, body: Record<string, unknown>): boole
   return hmac === v1;
 }
 
+
+/**
+ * Deja rastro de TODO webhook recibido, se haya aplicado o descartado.
+ *
+ * Sin esto el único indicio de que MercadoPago respondió es
+ * `orders.mercadopago_payment_id`; cuando está vacía no hay forma de saber si
+ * la persona no pagó o si pagó y el webhook no actualizó nada. Al diagnosticar
+ * las 14 órdenes pendientes del 2 de septiembre de 2026 hubo que deducirlo
+ * mirando la navegación posterior del comprador, que es adivinar.
+ *
+ * Nunca lanza: un fallo del log no puede tumbar el procesamiento de un pago,
+ * y la tabla puede no existir todavía (migración 20260902_mp_webhook_log.sql).
+ */
+async function logWebhook(datos: {
+  payment_id?: string | null;
+  external_ref?: string | null;
+  mp_status?: string | null;
+  mp_status_detail?: string | null;
+  amount?: number | null;
+  resultado: string;
+  orders_afectadas?: number;
+  detalle?: string | null;
+  payload?: unknown;
+}): Promise<void> {
+  try {
+    const admin = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { cookies: { getAll: () => [], setAll: () => {} } }
+    );
+    const { error } = await admin.from("mp_webhook_log").insert({
+      payment_id: datos.payment_id ? String(datos.payment_id) : null,
+      external_ref: datos.external_ref ?? null,
+      mp_status: datos.mp_status ?? null,
+      mp_status_detail: datos.mp_status_detail ?? null,
+      amount: datos.amount ?? null,
+      resultado: datos.resultado,
+      orders_afectadas: datos.orders_afectadas ?? 0,
+      detalle: datos.detalle ?? null,
+      payload: datos.payload ?? null,
+    });
+    if (error) console.error("[webhook] no se pudo registrar el log:", error.message);
+  } catch (e) {
+    console.error("[webhook] log falló:", e);
+  }
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
   if (!verifySignature(req, body)) {
     console.error("[webhook] Invalid signature");
+    await logWebhook({ payment_id: body?.data?.id, resultado: "firma_invalida", payload: body });
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
   if (body.type !== "payment" && body.action !== "payment.created") {
+    await logWebhook({
+      payment_id: body?.data?.id,
+      resultado: "ignorado",
+      detalle: `type=${body.type} action=${body.action}`,
+      payload: body,
+    });
     return NextResponse.json({ received: true });
   }
 
   const paymentId = body.data?.id;
   if (!paymentId) {
+    await logWebhook({ resultado: "error", detalle: "sin data.id", payload: body });
     return NextResponse.json({ error: "No payment ID" }, { status: 400 });
   }
 
@@ -62,6 +117,14 @@ export async function POST(req: NextRequest) {
 
     const externalRef = payment.external_reference;
     if (!externalRef) {
+      await logWebhook({
+        payment_id: String(paymentId),
+        mp_status: payment.status ?? null,
+        amount: payment.transaction_amount ?? null,
+        resultado: "sin_orden",
+        detalle: "el pago no trae external_reference",
+        payload: body,
+      });
       return NextResponse.json({ error: "No external_reference" }, { status: 400 });
     }
 
@@ -357,6 +420,13 @@ export async function POST(req: NextRequest) {
         ).catch((err) => console.error("[webhook] notifyPaymentFailed error:", err));
       }
 
+      await logWebhook({
+        payment_id: String(paymentId), external_ref: externalRef,
+        mp_status: payment.status ?? null, mp_status_detail: payment.status_detail ?? null,
+        amount: payment.transaction_amount ?? null,
+        resultado: "aplicado", orders_afectadas: bundleOrders?.length ?? 0,
+        detalle: `bundle → ${status}`, payload: body,
+      });
       return NextResponse.json({ received: true, status, bundle: true });
     }
 
@@ -467,6 +537,13 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      await logWebhook({
+        payment_id: String(paymentId), external_ref: externalRef,
+        mp_status: payment.status ?? null, mp_status_detail: payment.status_detail ?? null,
+        amount: payment.transaction_amount ?? null,
+        resultado: "aplicado", orders_afectadas: 1,
+        detalle: "order → " + status, payload: body,
+      });
       return NextResponse.json({ received: true, status });
     }
 
@@ -531,14 +608,27 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      await logWebhook({
+        payment_id: String(paymentId), external_ref: externalRef,
+        mp_status: payment.status ?? null, mp_status_detail: payment.status_detail ?? null,
+        amount: payment.transaction_amount ?? null,
+        resultado: "aplicado", orders_afectadas: 1,
+        detalle: "rental → " + status, payload: body,
+      });
       return NextResponse.json({ received: true, status });
     }
 
     console.error("[webhook] No order, bundle or rental found for ref:", externalRef);
+    await logWebhook({
+      payment_id: String(paymentId), external_ref: externalRef,
+      mp_status: payment.status ?? null, amount: payment.transaction_amount ?? null,
+      resultado: "sin_orden", detalle: "ninguna order/bundle/rental calza con la referencia", payload: body,
+    });
     return NextResponse.json({ error: "Reference not found" }, { status: 404 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Webhook error";
     console.error("MercadoPago webhook error:", message);
+    await logWebhook({ payment_id: String(paymentId), resultado: "error", detalle: message, payload: body });
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
