@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Newsreader, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
@@ -6,6 +7,7 @@ import { Analytics } from "@vercel/analytics/next";
 import Footer from "@/components/ui/Footer";
 import BackToTop from "@/components/ui/BackToTop";
 import PageTracker from "@/components/ui/PageTracker";
+import AuthErrorNotice from "@/components/auth/AuthErrorNotice";
 
 const newsreader = Newsreader({
   variable: "--font-newsreader",
@@ -143,6 +145,9 @@ export default function RootLayout({
         <BackToTop />
         <Analytics />
         <PageTracker />
+        <Suspense fallback={null}>
+          <AuthErrorNotice />
+        </Suspense>
       </body>
     </html>
   );
