@@ -10,6 +10,7 @@
 |---|---|---|
 | Vendedor nuevo sin username → URL UUID | Trigger DB `auto_username_on_insert` + endpoint `/api/users/generate-username` | 13 mayo 2026 |
 | Copy de pago que promete escrow ("pago retenido hasta que confirmes recepción") | NO existe escrow — la plata va al vendedor cuando MP aprueba. Solo decir "pago seguro con MercadoPago" (trazable, no efectivo a desconocido). Nunca prometer retención/devolución garantizada. | 2 jul 2026 |
+| **El precio exhibido tiene que ser idéntico al cobrado** | Los `items` de la preferencia de MercadoPago usaban `l.price` sin restar el descuento, mientras la orden guardaba el precio rebajado: el cupón MIDESCUENTO (20%) mostró $12.314 y MP cobró $13.514 — el comprador pagó los $1.200 que creía ahorrarse. Se aplica el descuento al primer item, igual que en `orderRows`, y una guarda en `/api/orders` corta la compra si la suma de los items no cuadra con el total de la orden. Ningún cobro puede diferir de lo que la persona vio en pantalla. | 2 sept 2026 |
 
 Cuando aparezca un bug de este tipo: **no solo backfillear — siempre tapar el origen**.
 

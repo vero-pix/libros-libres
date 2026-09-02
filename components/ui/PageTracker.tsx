@@ -19,16 +19,22 @@ function getSessionId(): string {
   return sid;
 }
 
-// Rutas que NO queremos trackear (paneles privados, auth, rutas técnicas).
+// Rutas que NO queremos trackear (paneles privados, rutas técnicas).
 // Todo lo demás va al analytics.
+//
+// /login y /register salieron de esta lista el 2 sept 2026. Son páginas
+// PÚBLICAS y lo único que llevan en la URL es ?next=, que es justamente el
+// dato que hacía falta: sin ellas no había forma de saber cuánta gente choca
+// con el muro del login yendo a una ficha, ni si vuelve. Mismo caso que
+// /carrito y /checkout, que estuvieron excluidos hasta el 12 ago por la misma
+// razón equivocada. Los paneles privados de verdad —/perfil, /mis-*,
+// /mensajes— siguen fuera.
 const EXCLUDE_PATTERNS = [
   /^\/api\//,
   /^\/admin/,
   /^\/mis-/,
   /^\/perfil/,
   /^\/mensajes/,
-  /^\/login/,
-  /^\/register/,
   /^\/forgot-password/,
   /^\/reset-password/,
   /^\/orders\//,

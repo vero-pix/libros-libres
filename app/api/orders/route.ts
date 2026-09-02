@@ -323,11 +323,21 @@ export async function POST(req: NextRequest) {
 
   try {
     const items = [
-      ...listings.map((l: any) => ({
+      // El descuento se aplica al PRIMER item, igual que en `orderRows` de más
+      // arriba: los dos números salen del mismo request y tienen que cuadrar.
+      //
+      // Hasta el 2 sept 2026 acá iba `l.price` pelado, sin restar el descuento.
+      // Resultado: la orden se guardaba con el precio rebajado y MercadoPago
+      // cobraba el precio lleno. En la venta del 1 de septiembre (Álgebra de
+      // Baldor, cupón MIDESCUENTO del 20%) la orden decía $12.314 y MP cobró
+      // $13.514: el comprador pagó los $1.200 del descuento que creía tener.
+      // No lo absorbía la plataforma ni salía del marketplace_fee — el
+      // descuento sencillamente no llegaba nunca al cobro.
+      ...listings.map((l: any, idx: number) => ({
         id: l.id,
         title: `${l.book.title} — ${l.book.author}`,
         quantity: 1,
-        unit_price: Math.round(l.price ?? 0),
+        unit_price: Math.round((l.price ?? 0) - (idx === 0 ? discountAmount : 0)),
         currency_id: "CLP",
       })),
       {
@@ -345,6 +355,23 @@ export async function POST(req: NextRequest) {
         currency_id: "CLP",
       },
     ];
+
+    // El precio exhibido tiene que ser idéntico al cobrado. Si la suma de lo que
+    // se le manda a MercadoPago no cuadra con el total de la orden, se corta acá
+    // antes de generar la preferencia: es preferible que la compra falle a que
+    // alguien pague un monto distinto al que vio en pantalla.
+    const sumaItems = items.reduce((a, it) => a + it.unit_price * it.quantity, 0);
+    if (sumaItems !== bundleGrandTotal) {
+      console.error(
+        `[orders] Descuadre precio exhibido vs cobrado en bundle ${bundleId}: ` +
+          `items=${sumaItems} orden=${bundleGrandTotal} (descuento ${discountAmount}, código ${discount_code ?? "—"})`
+      );
+      await supabase.from("orders").delete().eq("bundle_id", bundleId);
+      return NextResponse.json(
+        { error: "No pudimos generar el cobro con el precio correcto. Escríbenos y lo resolvemos." },
+        { status: 500 }
+      );
+    }
 
     const backUrls = {
       success: `${siteUrl}/orders/${firstOrderId}?status=success`,
