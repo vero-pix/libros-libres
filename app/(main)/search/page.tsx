@@ -229,16 +229,44 @@ export default async function SearchPage({ searchParams }: Props) {
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
-  // Trackear la búsqueda (fire-and-forget, no bloquea render)
+  // Trackear la búsqueda (fire-and-forget, no bloquea render).
+  //
+  // `results_count` guarda los resultados DEL TÉRMINO, no los de la pantalla.
+  // Antes se escribía `totalCount`, que ya venía con categoría, precio, ciudad
+  // y condición aplicados: una búsqueda de "isabel allende" con un filtro de
+  // precio que no calzaba quedaba registrada igual que un término inexistente.
+  // Al analizar las búsquedas sin resultado (2 sept 2026) eso hacía imposible
+  // distinguir "no lo tenemos" de "el filtro lo escondió". Si no hay filtros
+  // activos los dos números coinciden y no se paga ninguna consulta extra.
   if (q) {
     const normalized = q.toLowerCase().trim();
-    supabase
-      .from("search_queries")
-      .insert({
-        query: q,
-        normalized_query: normalized,
-        results_count: totalCount,
-      })
+    const hayFiltros = Boolean(
+      category || subcategory || tag || author || binding || publisher ||
+      pages_min || pages_max || condition || modality || city_id ||
+      price_min || price_max
+    );
+    const contarTermino = async () => {
+      if (!hayFiltros) return totalCount;
+      if (matchingBookIds === null) return totalCount;
+      // Con muchos ids la URL de PostgREST se vuelve inmanejable; en ese caso
+      // el término claramente tiene resultados y no hace falta el número exacto.
+      if (matchingBookIds.length > 300) return matchingBookIds.length;
+      const { count } = await supabase
+        .from("listings")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["active", "completed"])
+        .neq("deprioritized", true)
+        .in("book_id", matchingBookIds);
+      return count ?? 0;
+    };
+    contarTermino()
+      .then((sinFiltros) =>
+        supabase.from("search_queries").insert({
+          query: q,
+          normalized_query: normalized,
+          results_count: sinFiltros,
+        })
+      )
       .then(() => {});
   }
 
