@@ -196,9 +196,11 @@ export async function notifyPaymentFailed(
         : `${siteUrl}/carrito`;
 
     const { sendEmail } = await import("./email");
+    const { VERO_INBOX } = await import("./veroInbox");
     await sendEmail({
       to: buyerEmail,
       from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+      replyTo: VERO_INBOX,
       subject:
         count > 1
           ? "Tu pago no pasó — los libros siguen disponibles"
@@ -209,7 +211,7 @@ export async function notifyPaymentFailed(
           <p>Soy Vero, de tuslibros.cl. Intentaste pagar reci&eacute;n y el pago no pas&oacute; &mdash; lo rechaz&oacute; el banco, no fue nada de tu cuenta.</p>
           <p>${count > 1 ? "Los libros siguen" : "El libro sigue"} disponible${count > 1 ? "s" : ""}. Si quieres intentarlo de nuevo, en el checkout tambi&eacute;n puedes pagar con tarjeta de d&eacute;bito o cr&eacute;dito.</p>
           <p><a href="${link}" style="color:#8a5a2b">Retomar la compra &rarr;</a></p>
-          <p>Y si algo no te calz&oacute; &mdash; el precio del despacho, por ejemplo &mdash; resp&oacute;ndeme este correo y lo vemos.</p>
+          <p>Y si algo no te calz&oacute; &mdash; el precio del despacho, por ejemplo &mdash; resp&oacute;ndeme este correo o escr&iacute;beme al WhatsApp +56 9 9458 3067 y lo vemos.</p>
           <p>Vero<br><span style="color:#777;font-size:14px">tuslibros.cl</span></p>
         </div>
       `,

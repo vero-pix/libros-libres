@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import PurchaseTracker from "@/components/analytics/PurchaseTracker";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 interface Props {
   params: { id: string };
@@ -19,8 +20,8 @@ const STATUS_CONFIG: Record<
     color: "text-green-600",
   },
   failure: {
-    title: "Pago rechazado",
-    description: "El pago no pudo ser procesado. Puedes intentar nuevamente.",
+    title: "El pago no pasó",
+    description: "El libro sigue disponible y reservado para ti un rato. Abajo hay tres formas de retomarlo.",
     color: "text-red-600",
   },
   pending: {
@@ -50,7 +51,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
   const { data: order } = await supabase
     .from("orders")
     .select(
-      `*, listing:listings(*, book:books(title, author, cover_url))`
+      `*, listing:listings(*, book:books(title, author, cover_url)), seller:users!orders_seller_id_fkey(id, username, full_name)`
     )
     .eq("id", params.id)
     .single();
@@ -78,6 +79,32 @@ export default async function OrderPage({ params, searchParams }: Props) {
 
   const rawStatus = searchParams.status ?? order.status;
   const paymentStatus = STATUS_ALIAS[rawStatus] ?? rawStatus;
+
+  // Por qué no pasó el pago. MercadoPago lo manda al webhook y queda en
+  // mp_webhook_log (external_ref = bundle_id). Hasta el 04-09-2026 esta
+  // pantalla decía "puedes intentar nuevamente" y mandaba a un carrito que
+  // ya estaba vacío: el comprador quedaba sin salida.
+  let rejectReason: string | null = null;
+  if (paymentStatus === "failure") {
+    try {
+      const admin = createServiceRoleClient();
+      const { data: log } = await admin
+        .from("mp_webhook_log")
+        .select("mp_status_detail")
+        .eq("external_ref", order.bundle_id ?? order.id)
+        .in("mp_status", ["rejected", "cancelled"])
+        .order("received_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      rejectReason = log?.mp_status_detail ?? null;
+    } catch {
+      rejectReason = null;
+    }
+  }
+  const rejectText = explicarRechazo(rejectReason);
+  const seller = order.seller as { id: string; username: string | null; full_name: string | null } | null;
+  const sellerFirstName = seller?.full_name?.split(" ")[0] ?? "el vendedor";
+  const isBuyer = order.buyer_id === user.id;
   const config = STATUS_CONFIG[paymentStatus] ?? STATUS_CONFIG.pending;
   const isBundle = bundleOrders.length > 1;
 
@@ -164,17 +191,80 @@ export default async function OrderPage({ params, searchParams }: Props) {
             >
               Volver al inicio
             </Link>
-            {paymentStatus === "failure" && (
-              <Link
-                href="/carrito"
-                className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-2.5 rounded-md text-sm transition-colors"
-              >
-                Reintentar desde el carrito
-              </Link>
-            )}
           </div>
+
+          {paymentStatus === "failure" && isBuyer && (
+            <div className="mt-8 border-t border-gray-100 pt-6">
+              <p className="text-sm text-gray-700 leading-relaxed mb-5">{rejectText}</p>
+              <div className="space-y-2">
+                {bundleOrders.map((o: any) => {
+                  const book = o.listing?.book;
+                  const url =
+                    o.listing?.slug && seller?.username
+                      ? `/libro/${seller.username}/${o.listing.slug}`
+                      : `/listings/${o.listing_id}`;
+                  return (
+                    <Link
+                      key={o.id}
+                      href={url}
+                      className="flex items-center justify-between gap-3 bg-brand-500 hover:bg-brand-600 text-white font-medium px-5 py-3 rounded-md text-sm transition-colors"
+                    >
+                      <span className="truncate">Volver a intentar: {book?.title ?? "el libro"}</span>
+                      <span aria-hidden>→</span>
+                    </Link>
+                  );
+                })}
+                {seller?.id && (
+                  <Link
+                    href={`/mensajes?to=${seller.id}`}
+                    className="flex items-center justify-between gap-3 border border-gray-300 text-gray-800 hover:bg-gray-50 font-medium px-5 py-3 rounded-md text-sm transition-colors"
+                  >
+                    <span>Escribirle a {sellerFirstName} para coordinar otra forma de pago</span>
+                    <span aria-hidden>→</span>
+                  </Link>
+                )}
+                <a
+                  href={`https://wa.me/56994583067?text=${encodeURIComponent(
+                    `Hola Vero, intenté pagar "${bundleOrders[0]?.listing?.book?.title ?? "un libro"}" en tuslibros.cl y el pago no pasó. ¿Me ayudas?`
+                  )}`}
+                  target="_blank"
+                  rel="noopener"
+                  className="flex items-center justify-between gap-3 border border-gray-300 text-gray-800 hover:bg-gray-50 font-medium px-5 py-3 rounded-md text-sm transition-colors"
+                >
+                  <span>Pedir ayuda a Vero por WhatsApp</span>
+                  <span aria-hidden>→</span>
+                </a>
+              </div>
+              <p className="mt-4 text-xs text-gray-500 leading-relaxed">
+                En la ficha puedes pagar con otra tarjeta, con débito o con saldo de MercadoPago. Si el vendedor entrega en persona, también puedes coordinar transferencia con él.
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </div>
   );
+}
+
+/**
+ * Traduce el status_detail de MercadoPago a algo que un comprador entienda,
+ * sin culparlo. Códigos: https://www.mercadopago.cl/developers/es/docs/checkout-api/response-handling/collection-results
+ */
+function explicarRechazo(detail: string | null): string {
+  if (!detail) return "MercadoPago no aceptó el pago. Suele ser un tema del banco o de la tarjeta, no algo que hiciste mal.";
+  if (detail === "cc_rejected_high_risk" || detail === "rejected_high_risk")
+    return "MercadoPago frenó el pago por seguridad. Pasa seguido con cuentas nuevas o con tarjetas que no se han usado antes en línea. No es culpa tuya: con otra tarjeta, con débito o coordinando directo con el vendedor, sale.";
+  if (detail === "cc_rejected_insufficient_amount")
+    return "La tarjeta no tenía cupo o saldo suficiente para el total. Puedes intentar con otra tarjeta o con débito.";
+  if (detail.startsWith("cc_rejected_bad_filled"))
+    return "Algún dato de la tarjeta quedó mal escrito (número, vencimiento o código de seguridad). Vuelve a intentarlo con calma.";
+  if (detail === "cc_rejected_call_for_authorize")
+    return "Tu banco pide que autorices el pago por teléfono antes de volver a intentar. Después de llamar, vuelve a la ficha.";
+  if (detail === "cc_rejected_card_disabled")
+    return "La tarjeta está deshabilitada para compras en línea. Puedes habilitarla con tu banco o pagar con otra.";
+  if (detail === "cc_rejected_max_attempts")
+    return "Se superó el número de intentos permitidos con esa tarjeta. Espera un rato o usa otra.";
+  if (detail === "by_payer" || detail === "cc_rejected_by_payer")
+    return "Cancelaste el pago antes de terminar. Si fue sin querer, acá puedes retomarlo.";
+  return "MercadoPago no aceptó el pago. Suele ser un tema del banco o de la tarjeta, no algo que hiciste mal.";
 }
