@@ -40,6 +40,9 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 - **Eventos del carrito**: dispatch `window.dispatchEvent(new CustomEvent("cart-updated"))` al agregar/eliminar para que el badge del navbar se refresque.
 - **Migraciones**: `supabase/migrations/` es SQL versionado — aplicar manual en el SQL Editor si no hay CLI.
 - **WhatsApp del vendedor**: pasar SIEMPRE por `mostrarWhatsAppVendedor()` de `lib/whatsapp-policy.ts`. No agregar botones de `wa.me` con el teléfono del vendedor sin esa guarda — es lo que hacía que la venta se cerrara fuera del sitio. El WhatsApp de soporte de Vero (`56994583067`) no tiene esta restricción.
+- **Buzón de Vero = `VERO_INBOX` de `lib/veroInbox.ts`**, nunca `"vero@tuslibros.cl"` a mano en `to`/`reply_to`. Lo controla `VERO_INBOX_EMAIL` en Vercel (desde el 04-09-2026 apunta al correo personal porque Google Workspace está caído por impago: los correos SALEN por Resend, pero nada ENTRA a @tuslibros.cl). Los `from` siguen siendo @tuslibros.cl. Cuando Workspace vuelva, borrar la variable.
+- **Contacto público = WhatsApp de soporte (`56994583067`)**, no `mailto:vero@tuslibros.cl`. Footer, FAQ, devoluciones y alianzas ya lo usan (04-09-2026).
+- **Landings antes que fichas.** Las fichas de libro casi no rankean solas (795 fichas = 285 clics/90d; 79 landings = 2.327). Para posicionar un autor: entrada en `app/(main)/autor/[slug]/authors.config.ts` + match en `lib/authorLandings.ts`. Para un tema: copiar `app/(main)/antroposofia/page.tsx` y agregarla a `app/sitemap.ts` y `app/llms.txt/route.ts`. Para raros/caros: marcar `is_collectible`, que `/libros-antiguos` los muestra. Y que las fichas enlazadas tengan sinopsis real: la plantilla "Descubre X de Y. Este libro usado…" en `books.description` deja la meta description vacía.
 - **Nunca dejar una pantalla de compra sin salida.** Si el vendedor no puede cobrar, tiene que haber WhatsApp, mensajería interna o `/solicitudes` — nunca solo un cartel que informe el bloqueo. Pasó en el checkout con despacho por courier hasta el 25-08-2026.
 
 ## Reglas de trabajo
@@ -81,6 +84,7 @@ Antes de afirmar cualquier dato de negocio, mirar acá. Si un documento contradi
 | Onboarding de vendedores | `docs/MENSAJES-ONBOARDING-VENDEDOR.md` · `docs/guia-vender-v2.html` | |
 | Cuándo se muestra el WhatsApp del vendedor | `lib/whatsapp-policy.ts` | Código, no documento. **Con MercadoPago conectado NO se muestra** (competía con el botón de comprar); sin MP se muestra siempre, incluso con courier. Experimento abierto el 25-08-2026 — no revertirlo sin mirar la métrica de abajo |
 | Tasa de captura (la métrica del negocio) | `scripts/_captura.mjs` | Cuánto del volumen vendido pasa por la plataforma y deja comisión. Baseline agosto 2026: 0,8% ($800 en el mes). **Leer ~8 sept 2026** |
+| Estado de las landings de Vero (Wilber, Steiner, antroposofía, antiguos) y del correo con Workspace caído | `docs_desde_claude/ESTADO_2026-09-04.md` | Medir el **18-09-2026** con `npm run seo:gsc`. Pendiente: 2ª tanda de sinopsis (~145 fichas de vero con plantilla) |
 | Lectura del experimento del WhatsApp | `scripts/_captura_experimento.mjs` | Parte agosto-septiembre en antes/después del 25-08 y muestra el detalle diario. Diagnóstico vigente: `docs_desde_claude/DIAGNOSTICO_2026-09-02.md` |
 
 **Documentos históricos — NO usar como fuente:**
