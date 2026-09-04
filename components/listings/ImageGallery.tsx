@@ -91,6 +91,9 @@ export default function ImageGallery({ mainImage, images, alt, author }: Props) 
             fill
             className="object-cover"
             sizes="220px"
+            // La portada es el LCP de la ficha. Sin `priority` next/image le
+            // pone loading="lazy" y Lighthouse la medía en 6,8 s (4 sept 2026).
+            priority={safeIdx === 0}
             onError={() => {
               setErrorIds((prev) => new Set(prev).add(current.id));
               setActiveIdx(0);
