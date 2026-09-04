@@ -11,6 +11,10 @@ const AUTHOR_LANDINGS: { match: string; slug: string; label: string }[] = [
   { match: "megan maxwell", slug: "/megan-maxwell-libros", label: "Megan Maxwell" },
   { match: "simenon", slug: "/georges-simenon", label: "Georges Simenon" },
   { match: "baldor", slug: "/algebra-de-baldor", label: "Baldor" },
+  // Config-driven (/autor/[slug]). Van acá y no vía authorLink para no meter
+  // authors.config entero al bundle cliente de ListingDetail.
+  { match: "wilber", slug: "/autor/ken-wilber", label: "Ken Wilber" },
+  { match: "rudolf steiner", slug: "/autor/rudolf-steiner", label: "Rudolf Steiner" },
 ];
 
 export function authorLanding(author?: string | null): { slug: string; label: string } | null {

@@ -147,6 +147,16 @@ Por ejemplo: /libros-usados/santiago, /libros-usados/concepcion,
 - https://tuslibros.cl/cien-anos-de-soledad
 - https://tuslibros.cl/el-arte-de-amar
 - https://tuslibros.cl/libros-usados-chile
+- https://tuslibros.cl/georges-simenon
+- https://tuslibros.cl/marcela-paz-libros
+- https://tuslibros.cl/megan-maxwell-libros
+- https://tuslibros.cl/distopias-clasicas
+- https://tuslibros.cl/novela-negra-policial
+- https://tuslibros.cl/libros-de-historia-de-chile
+- https://tuslibros.cl/libros-antiguos (libros antiguos, primeras ediciones y de colección)
+- https://tuslibros.cl/antroposofia (Rudolf Steiner y antroposofía)
+- https://tuslibros.cl/autor/[slug] — páginas de autor, por ejemplo /autor/ken-wilber, /autor/rudolf-steiner, /autor/pedro-prado
+- https://tuslibros.cl/categoria/[slug] — páginas por categoría, por ejemplo /categoria/no-ficcion-ensayo
 
 ## Operación
 

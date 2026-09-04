@@ -1,0 +1,71 @@
+{
+  "_nota": "Sinopsis reales para reemplazar la plantilla 'Descubre X de Y…' en books.description. Solo book_ids usados exclusivamente por vero (verificado 4 sept 2026). Aplicar con: node scripts/_fix_descripciones_vero.mjs --apply",
+  "1af213b1-46bd-407a-9d48-028bfdd09ac4": {
+    "title": "Breve historia de todas las cosas",
+    "description": "Ken Wilber resume aquí, en forma de conversación, el modelo que desarrolló en El espectro de la conciencia y Sexo, ecología, espiritualidad: los cuatro cuadrantes (interior y exterior, individual y colectivo), los niveles y las líneas de desarrollo, y la idea de que la conciencia evoluciona desde la materia hasta lo que las tradiciones contemplativas llaman espíritu. Es el libro de entrada a la teoría integral: no exige haber leído nada antes y deja claro por qué Wilber cruza ciencia, psicología, budismo y filosofía occidental en un mismo mapa. Edición Kairós, tapa blanda."
+  },
+  "450fcd56-33b6-406d-bc07-ebc1efa0a688": {
+    "title": "Los Tres Ojos del Conocimiento",
+    "description": "Wilber toma una distinción de San Buenaventura, los tres ojos del conocimiento (el de la carne, el de la razón y el de la contemplación), y la usa para ordenar qué puede saber la ciencia, qué la filosofía y qué la experiencia mística, sin que ninguna invada el terreno de las otras. Es su libro más claro sobre epistemología y el que responde a la pregunta de si la espiritualidad puede tener un método verificable. Incluye los ensayos sobre el paradigma holográfico, la psicología transpersonal y la crítica a la nueva era. Edición Kairós."
+  },
+  "6895faa8-8e23-471f-b516-9c2d13abac20": {
+    "title": "Cuestiones Cuanticas",
+    "description": "Antología compilada por Ken Wilber con los escritos místicos de los grandes físicos del siglo XX: Heisenberg, Schrödinger, Einstein, De Broglie, Jeans, Planck, Pauli y Eddington. La tesis de Wilber, en el prólogo, es incómoda para todos: los físicos que fundaron la mecánica cuántica sí fueron místicos, pero ninguno creyó que la física demostrara el misticismo. Los textos están ahí para que el lector lo compruebe. Es el libro para quien quiere separar lo que dice la ciencia de lo que dicen quienes la citan. Edición Kairós."
+  },
+  "a32b4072-4e98-4294-8776-6136c8f9cc25": {
+    "title": "Después del Edén",
+    "description": "La historia de la evolución humana contada como evolución de la conciencia. Wilber recorre desde las culturas de cazadores hasta la modernidad y muestra cómo cada etapa (mágica, mítica, mental) trajo una forma nueva de identidad y un miedo nuevo a la muerte, con la religión y el poder como respuestas. Es el libro donde Wilber discute con Freud, Marx, Campbell y Eliade a la vez, y el que explica por qué para él la caída del Edén no fue una caída sino un despertar. Edición Kairós, tapa blanda."
+  },
+  "ad87fd1e-a6ae-4a35-8702-dfd45b46bbf5": {
+    "title": "Ojo del Espiritu, El",
+    "description": "Wilber aplica la visión integral a campos concretos: arte y crítica literaria, antropología, psicoterapia, ecología, feminismo, ciencia y religión. Cada capítulo toma una disciplina y muestra qué ve y qué se le escapa cuando ignora alguno de los cuadrantes. Es el libro donde el modelo deja de ser teoría y se convierte en método de lectura del mundo, y donde aparecen sus críticas más duras a la posmodernidad y al reduccionismo científico. Para quien ya leyó Breve historia de todas las cosas y quiere ver el modelo en uso. Edición Kairós."
+  },
+  "e2c7d116-0029-4392-987f-3c5c16873134": {
+    "title": "Bartleby el escribiente (Biblioteca de Babel)",
+    "description": "El relato de Melville sobre el copista que responde a todo con «preferiría no hacerlo», en la edición de la Biblioteca de Babel, la colección de literatura fantástica que Jorge Luis Borges seleccionó y prologó para Franco Maria Ricci y que Siruela publicó en español en los años ochenta. Cada volumen lleva el prólogo de Borges y el diseño de la colección, hoy cerrada y buscada por coleccionistas. Ejemplar antiguo en buen estado."
+  },
+  "24c25f0d-82e1-4d49-beb9-0cce44d1aab2": {
+    "title": "El cardenal Napellus (Biblioteca de Babel)",
+    "description": "Tres relatos de Gustav Meyrink, el autor de El Golem, elegidos y prologados por Jorge Luis Borges para la Biblioteca de Babel, su colección de literatura fantástica publicada en español por Siruela en los años ochenta. Meyrink escribe desde el ocultismo y la Praga de principios del siglo XX; Borges lo leyó de joven en alemán y lo recordó toda la vida. Colección cerrada, volumen buscado. Ejemplar antiguo en buen estado."
+  },
+  "22925cac-a5a2-4bc7-8071-94546c6fce68": {
+    "title": "La puerta en el muro (Biblioteca de Babel)",
+    "description": "Relatos de H. G. Wells seleccionados y prologados por Jorge Luis Borges para la Biblioteca de Babel, la colección de literatura fantástica que Siruela publicó en español en los años ochenta. Borges consideraba a Wells uno de los grandes narradores del siglo y este volumen reúne los cuentos que más admiraba, empezando por el que da título al libro: un hombre que de niño cruzó una puerta verde hacia un jardín y pasó la vida buscándola. Colección cerrada. Ejemplar antiguo en buen estado."
+  },
+  "7bc98f68-33f4-4769-869c-ce3f77278b0c": {
+    "title": "Obras Escogidas de Séneca — Tomo I",
+    "description": "Tomo primero de las Obras escogidas de Séneca en la traducción de Nicolás Estévanez, publicado en París por Casa Editorial Garnier Hermanos en 1895. Reúne tratados morales del filósofo estoico (sobre la ira, la brevedad de la vida, la tranquilidad del ánimo y la providencia) en la tipografía y encuadernación clásicas de Garnier, la editorial francesa que abasteció de clásicos en español a toda Hispanoamérica en el siglo XIX. Ejemplar de 130 años con la encuadernación original. Se vende junto o por separado con el Tomo II."
+  },
+  "eb6a3311-2e74-4070-8616-edbf1d443291": {
+    "title": "Obras Escogidas de Séneca — Tomo II",
+    "description": "Tomo segundo de las Obras escogidas de Séneca traducidas por Nicolás Estévanez, edición de Casa Editorial Garnier Hermanos, París, 1895. Contiene la continuación de los tratados morales y las cartas a Lucilio, el texto estoico más leído de la historia. Misma encuadernación Garnier que el Tomo I, con la firma manuscrita del propietario original en la portadilla. Pieza del siglo XIX para biblioteca de filosofía o bibliófilo. Se vende junto o por separado con el Tomo I."
+  },
+  "df2785bd-d8b9-403c-81e0-fde3ce91bffd": {
+    "title": "Las Vidas Paralelas de Plutarco — Tomo I",
+    "description": "Tomo primero de Las vidas paralelas de Plutarco en la traducción de Antonio Ranz Romanillos, la versión española clásica que se imprimió en Madrid a partir de 1821 y que siguió reeditándose durante dos siglos. Las biografías comparadas de griegos y romanos (Teseo y Rómulo, Licurgo y Numa, Solón y Publícola) en el texto que leyeron Bello, Sarmiento y toda la generación fundadora de las repúblicas americanas. Ejemplar de 1821 en rústica original, papel amarillento y texto íntegro. Se vende con el Tomo II o por separado."
+  },
+  "7ebb1bf1-6b93-4d75-91f7-d36484a36316": {
+    "title": "Las Vidas Paralelas de Plutarco — Tomo II",
+    "description": "Tomo segundo de Las vidas paralelas de Plutarco traducidas por Antonio Ranz Romanillos, edición madrileña de 1821. Continúa las biografías comparadas de griegos y romanos en la traducción que fue referencia en español durante doscientos años. Rústica original, papel amarillento propio de las impresiones españolas del siglo XIX, lomo con desgaste y texto íntegro. Ejemplar para bibliófilo o estudioso de los clásicos. Se vende con el Tomo I o por separado."
+  },
+  "54843dc8-a242-4653-a7d7-86da5768e6a0": {
+    "title": "Oeuvres Complètes (1866) - Pascal Tomo III",
+    "description": "Tomo tercero de las Oeuvres complètes de Blaise Pascal, edición original de 1866 de la Librairie de L. Hachette et Cie, París, en francés. Pascal (1623-1662) fue matemático, físico y filósofo: inventó la primera calculadora mecánica, fundó con Fermat la teoría de la probabilidad y escribió los Pensées, uno de los textos centrales de la filosofía occidental. Encuadernación de época en cuero rojo con letras doradas en el lomo. Ejemplar de 160 años para coleccionista o lector en francés."
+  },
+  "45a4b564-41ce-43b4-821f-98f8efcfd98e": {
+    "title": "Paideia. Los ideales de la cultura griega",
+    "description": "La obra mayor de Werner Jaeger sobre cómo los griegos entendieron la formación del ser humano: de Homero a Platón, la paideia como el ideal que hizo posible la filosofía, la tragedia, la democracia y la medicina. Es el libro de referencia sobre educación y cultura en la Antigüedad y una de las traducciones más importantes que publicó el Fondo de Cultura Económica. Edición antigua de FCE en tapa dura, interior limpio sin subrayados. Pieza de biblioteca para historia, filosofía o pedagogía."
+  },
+  "a974a0d1-9e61-4438-b590-f6e63209feea": {
+    "title": "Evangelio del Buda, El",
+    "description": "Paul Carus reunió en 1894 los textos centrales del canon budista y los ordenó como un relato continuo de la vida y la enseñanza de Buda, en un lenguaje que pudiera leer un occidental sin preparación. El libro fue la puerta de entrada al budismo para varias generaciones en Europa y América, y D. T. Suzuki lo tradujo al japonés. Sigue siendo una de las introducciones más claras a las cuatro nobles verdades, el óctuple sendero y las parábolas del Buda. Edición Biblok de 2014."
+  },
+  "a680b39a-31a6-4f2b-9013-cfed3d3e80a4": {
+    "title": "La Historia de Los Paises del Este",
+    "description": "Henry Bogdan recorre la historia de Europa central y oriental (Polonia, Hungría, Checoslovaquia, los Balcanes, los Bálticos) desde la Edad Media hasta la caída del muro, y explica por qué esa franja entre Alemania y Rusia fue durante siglos el territorio que las potencias se disputaron. Es la obra de referencia en español sobre la región, escrita justo cuando el bloque soviético se desarmaba. Edición Vergara de 1991. Para quien quiera entender Ucrania, Polonia o los Balcanes de hoy con la historia larga a la vista."
+  },
+  "de84d35c-5a4a-465f-9db7-daff7380c212": {
+    "title": "H2o Una Biografa Del Agua",
+    "description": "Philip Ball, editor de Nature durante veinte años, cuenta la historia del agua como si fuera una biografía: de dónde vino la del planeta, por qué su molécula se comporta de una manera que la física todavía no explica del todo, cómo hizo posible la vida y por qué es el recurso que definirá el siglo. Divulgación científica de primer nivel, sin fórmulas y con historia de la ciencia. Edición del Fondo de Cultura Económica en la colección Noema, 2010."
+  }
+}

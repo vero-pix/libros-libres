@@ -57,7 +57,8 @@ export default function Footer() {
               <li><Link href="/categoria/academico-universitario" className="hover:text-coral transition-colors">Universitarios</Link></li>
               <li><Link href="/categoria/infantil-juvenil" className="hover:text-coral transition-colors">Infantil y juvenil</Link></li>
               <li><Link href="/categoria" className="hover:text-coral transition-colors">Todas las categorías</Link></li>
-              <li><Link href="/?collectible=1" className="hover:text-coral transition-colors">Coleccionables</Link></li>
+              <li><Link href="/libros-antiguos" className="hover:text-coral transition-colors">Libros antiguos y de colección</Link></li>
+              <li><Link href="/autor" className="hover:text-coral transition-colors">Autores</Link></li>
             </ul>
           </div>
           <div>

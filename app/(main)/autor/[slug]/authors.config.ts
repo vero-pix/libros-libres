@@ -177,4 +177,39 @@ export const AUTHORS: Record<string, AuthorConfig> = {
       { q: '¿Hay antologías de Teillier disponibles?', a: 'Sí, circulan varias antologías que reúnen lo esencial de su obra. Crea una solicitud si buscas un título específico y te avisamos cuando ingrese.' },
     ],
   },
+
+  'ken-wilber': {
+    slug: 'ken-wilber',
+    displayName: 'Ken Wilber',
+    dbAuthors: ['Ken Wilber', 'Ken Wilber (ed.), David Bohm, Karl Pribram, Marilyn Ferguson, Fritjof Capra, Renée Weber'],
+    seoTitle: 'Ken Wilber — Libros Usados en Chile',
+    seoDescription:
+      'Libros de Ken Wilber usados en Chile: Breve historia de todas las cosas, Los tres ojos del conocimiento, Cuestiones cuánticas, Después del Edén, El ojo del espíritu. Ediciones Kairós. Envío a todo Chile o retiro en mano.',
+    keywords: ['ken wilber', 'ken wilber libros', 'breve historia de todas las cosas', 'los tres ojos del conocimiento', 'cuestiones cuanticas wilber', 'despues del eden wilber', 'el ojo del espiritu', 'psicologia transpersonal libros', 'teoria integral wilber', 'espectro de la conciencia', 'ken wilber chile'],
+    subtitle: 'El mapa más ambicioso de la conciencia',
+    bio: 'Ken Wilber es el autor que intentó juntar en un solo mapa lo que la ciencia, la psicología y las tradiciones contemplativas dicen sobre la conciencia. De ese intento salieron la psicología transpersonal y la teoría integral: los cuatro cuadrantes, los niveles y las líneas de desarrollo, el espectro que va del ego a lo que las tradiciones llaman espíritu. Breve historia de todas las cosas es la puerta de entrada; Los tres ojos del conocimiento y Cuestiones cuánticas son los libros donde discute con los científicos; Después del Edén es su historia de la evolución humana. En Chile sus libros llegaron casi siempre por Editorial Kairós y hoy varios están descatalogados, por eso los ejemplares usados se buscan. Los que están acá son de mi biblioteca personal: los leí, los subrayé y ahora busco a quién los siga leyendo.',
+    faqs: [
+      { q: '¿Por dónde empezar a leer a Ken Wilber?', a: 'Breve historia de todas las cosas: está escrito como una conversación y resume su modelo entero sin tecnicismos. Si te interesa el cruce con la ciencia, sigue con Los tres ojos del conocimiento o Cuestiones cuánticas. Después del Edén es para quien quiera su lectura de la historia humana.' },
+      { q: '¿Qué ediciones de Wilber circulan en Chile?', a: 'Casi todas son de Editorial Kairós (Barcelona), en tapa blanda, de los años 90 y 2000. Varias ya no se reimprimen, así que los ejemplares usados en buen estado son la forma más realista de conseguirlos sin importar.' },
+      { q: '¿Qué es la teoría integral?', a: 'Es el modelo con el que Wilber ordena el desarrollo humano en cuatro cuadrantes (interior y exterior, individual y colectivo), con niveles y líneas de desarrollo. Aparece completa en Breve historia de todas las cosas y se aplica en El ojo del espíritu.' },
+      { q: '¿Y si el libro que busco no está?', a: 'Crea una solicitud en tuslibros.cl con el título y te aviso cuando alguien lo publique. Los de Wilber se mueven rápido porque hay poca oferta.' },
+    ],
+  },
+
+  'rudolf-steiner': {
+    slug: 'rudolf-steiner',
+    displayName: 'Rudolf Steiner',
+    dbAuthors: ['Rudolf Steiner'],
+    seoTitle: 'Rudolf Steiner — Libros de Antroposofía Usados en Chile',
+    seoDescription:
+      'Libros de Rudolf Steiner usados en Chile: La ciencia oculta, La filosofía de la libertad, Curso de astronomía, Relaciones kármicas. Ediciones Antroposófica. Envío a todo Chile o retiro en mano.',
+    keywords: ['rudolf steiner', 'rudolf steiner libros', 'antroposofia libros', 'la ciencia oculta steiner', 'la filosofia de la libertad steiner', 'relaciones karmicas steiner', 'editorial antroposofica', 'pedagogia waldorf libros', 'steiner libros usados chile'],
+    subtitle: 'El fundador de la antroposofía',
+    bio: 'Rudolf Steiner (1861-1925) fundó la antroposofía y de ahí salieron cosas que hoy existen sin que mucha gente sepa de dónde vienen: las escuelas Waldorf, la agricultura biodinámica, la medicina antroposófica, la euritmia. Su obra escrita es enorme y en español circula sobre todo por Editorial Antroposófica (Buenos Aires), en tiradas chicas que se agotan y no siempre vuelven. La filosofía de la libertad es el libro que él mismo consideraba la base de todo; La ciencia oculta es la exposición más completa de su cosmovisión; los ciclos de conferencias, como Relaciones kármicas o el Curso de astronomía, son para quien ya entró. Estos ejemplares son de mi biblioteca personal.',
+    faqs: [
+      { q: '¿Qué libros de Rudolf Steiner se consiguen usados en Chile?', a: 'Los que más aparecen son La filosofía de la libertad, La ciencia oculta, Teosofía, Cómo se alcanza el conocimiento de los mundos superiores y ciclos de conferencias como Relaciones kármicas. Casi todos de Editorial Antroposófica.' },
+      { q: '¿Por dónde empezar con Steiner?', a: 'Si vienes de la filosofía, La filosofía de la libertad. Si te interesa la cosmovisión completa, La ciencia oculta. Si llegaste por la pedagogía Waldorf, los ciclos de conferencias sobre educación son más directos que los libros de base.' },
+      { q: '¿Son difíciles de encontrar?', a: 'Sí. Las ediciones en español son de tiradas pequeñas y en Chile hay poca oferta usada. Crea una solicitud para que te avise cuando entre un título específico.' },
+    ],
+  },
 };

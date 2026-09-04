@@ -146,6 +146,12 @@ export default function VenderPage() {
               ¿Cómo funciona? →
             </Link>
           </div>
+          <p className="mt-6 text-sm text-white/60 animate-fade-in-up" style={{ animationDelay: "0.45s" }}>
+            ¿Tienes libros antiguos, primeras ediciones o de colección?{" "}
+            <Link href="/libros-antiguos" className="underline underline-offset-2 hover:text-white transition-colors">
+              Acá se venden mejor →
+            </Link>
+          </p>
         </div>
       </section>
 
