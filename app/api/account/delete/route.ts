@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createAdminClient } from "@supabase/supabase-js";
+import { VERO_INBOX } from "@/lib/veroInbox";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export const dynamic = "force-dynamic";
  * el detalle de qué lo bloquea y a quién escribirle.
  */
 
-const SOPORTE = "vero@tuslibros.cl";
+const SOPORTE = VERO_INBOX;
 
 export async function POST(request: Request) {
   const supabase = await createClient();

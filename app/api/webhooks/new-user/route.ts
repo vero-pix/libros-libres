@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
 import { sendGong, escapeHtml } from "@/lib/notifications";
 import { createPublicClient } from "@/lib/supabase/public";
+import { VERO_INBOX } from "@/lib/veroInbox";
 
-const ADMIN_EMAIL = "vero@tuslibros.cl";
+const ADMIN_EMAIL = VERO_INBOX;
 const WEBHOOK_SECRET = process.env.SUPABASE_WEBHOOK_SECRET;
 
 /**

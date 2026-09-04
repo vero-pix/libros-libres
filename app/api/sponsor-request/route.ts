@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { sendEmail } from "@/lib/email";
+import { VERO_INBOX } from "@/lib/veroInbox";
 
 /**
  * POST /api/sponsor-request
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
 
   try {
     await sendEmail({
-      to: "vero@tuslibros.cl",
+      to: VERO_INBOX,
       subject: `Amigo de la casa: ${name} — ${offer}`,
       html: `
         <h2>Nueva postulación a Gente de confianza</h2>

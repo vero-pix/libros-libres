@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { VERO_INBOX } from "@/lib/veroInbox";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-const REPLY_TO = "vero@tuslibros.cl";
+const REPLY_TO = VERO_INBOX;
 const FROM = "Vero de tuslibros.cl <noreply@tuslibros.cl>";
 const VERO = "veronicavelasquez@mac.com";
 

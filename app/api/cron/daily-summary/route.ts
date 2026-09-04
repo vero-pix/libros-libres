@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { VERO_INBOX } from "@/lib/veroInbox";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-const ADMIN_EMAIL = "vero@tuslibros.cl";
+const ADMIN_EMAIL = VERO_INBOX;
 const SITE = "https://tuslibros.cl";
 
 export async function POST() {

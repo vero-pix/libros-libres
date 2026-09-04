@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { compararLibro, normalizar } from "@/lib/bookRequestMatch";
 import { fijarComunaVendedorSiFalta, resolverCityId } from "@/lib/cities";
+import { VERO_INBOX } from "@/lib/veroInbox";
 
 export const runtime = "nodejs";
 
@@ -155,7 +156,7 @@ export async function POST(req: Request) {
 
     // Email a admin vía Resend (complementa al Telegram)
     const resendKey = process.env.RESEND_API_KEY;
-    const adminEmail = process.env.ADMIN_EMAIL || "vero@tuslibros.cl";
+    const adminEmail = process.env.ADMIN_EMAIL || VERO_INBOX;
     if (resendKey) {
       try {
         const emailHtml = `

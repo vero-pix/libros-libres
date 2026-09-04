@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { google } from "googleapis";
+import { VERO_INBOX } from "@/lib/veroInbox";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-const TO = "vero@tuslibros.cl";
-const REPLY_TO = "vero@tuslibros.cl";
+const TO = VERO_INBOX;
+const REPLY_TO = VERO_INBOX;
 
 type GscRow = { keys: string[]; clicks: number; impressions: number; ctr: number; position: number };
 

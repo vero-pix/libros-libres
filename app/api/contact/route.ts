@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { sendEmail } from "@/lib/email";
+import { VERO_INBOX } from "@/lib/veroInbox";
 
 /**
  * POST /api/contact
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
   // Send notification email (don't fail the request if this errors)
   try {
     await sendEmail({
-      to: "vero@tuslibros.cl",
+      to: VERO_INBOX,
       subject: "Nuevo mensaje de contacto — tuslibros.cl",
       html: `
         <h2>Nuevo mensaje de contacto</h2>
