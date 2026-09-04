@@ -68,6 +68,8 @@ export default function ShelfTransformation() {
         {/* Background photo */}
         <img
           src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=75&auto=format"
+          loading="lazy"
+          decoding="async"
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
         />
