@@ -312,10 +312,12 @@ export default function FAQPage() {
               Ir a Contacto
             </Link>
             <a
-              href="mailto:vero@tuslibros.cl"
+              href="https://wa.me/56994583067?text=Hola%20Vero%2C%20tengo%20una%20pregunta%20sobre%20tuslibros.cl"
+              target="_blank"
+              rel="noopener"
               className="inline-block border border-brand-600 text-brand-600 font-semibold px-6 py-3 rounded-xl hover:bg-brand-50 transition-colors"
             >
-              vero@tuslibros.cl
+              Escribirme por WhatsApp
             </a>
           </div>
         </div>

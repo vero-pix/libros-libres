@@ -96,10 +96,12 @@ export default function AlianzasPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="mailto:vero@tuslibros.cl?subject=Alianza%20con%20tuslibros.cl"
+              href="https://wa.me/56994583067?text=Hola%20Vero%2C%20quiero%20proponer%20una%20alianza%20con%20tuslibros.cl"
+              target="_blank"
+              rel="noopener"
               className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
             >
-              Escribirme a vero@tuslibros.cl
+              Escribirme por WhatsApp
             </a>
             <Link
               href="/sobre-nosotros#contacto"

@@ -66,8 +66,8 @@ export default function DevolucionesPage() {
           <ol className="text-sm text-ink-muted space-y-3 leading-relaxed list-decimal list-inside">
             <li>
               Escríbenos a{" "}
-              <a href="mailto:vero@tuslibros.cl" className="text-brand-600 underline">
-                vero@tuslibros.cl
+              <a href="https://wa.me/56994583067?text=Hola%20Vero%2C%20necesito%20ayuda%20con%20una%20devoluci%C3%B3n" target="_blank" rel="noopener" className="text-brand-600 underline">
+                mi WhatsApp
               </a>{" "}
               con el ID de tu orden y una foto del libro.
             </li>

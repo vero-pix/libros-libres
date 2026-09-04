@@ -154,7 +154,7 @@ export default function Footer() {
               </svg>
             </a>
           </div>
-          <a href="mailto:vero@tuslibros.cl" className="hover:text-coral transition-colors">¿Dudas? vero@tuslibros.cl</a>
+          <a href="https://wa.me/56994583067?text=Hola%20Vero%2C%20tengo%20una%20duda%20sobre%20tuslibros.cl" target="_blank" rel="noopener" className="hover:text-coral transition-colors">¿Dudas? Escríbeme por WhatsApp</a>
         </div>
       </div>
     </footer>
