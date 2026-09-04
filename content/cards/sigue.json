@@ -1,0 +1,21 @@
+{
+  "_nota": "Anuncio de que tuslibros NO cierra (2 sept 2026). Correr: npm run cards -- content/cards/sigue.json",
+  "pieces": [
+    {
+      "template": "tipografica",
+      "kicker": "2 de septiembre de 2026",
+      "headline": "Ayer dije que\\ncerraba.\\nHoy no cierro.",
+      "sub": "tuslibros.cl sigue en pie.",
+      "slug": "vero/maximas-y-aforismos",
+      "caption": "Ayer dije que cerraba tuslibros.cl. Hoy no cierro."
+    },
+    {
+      "template": "tipografica",
+      "kicker": "Sigue todo",
+      "headline": "3.900 libros.\\n121 vendedores.\\nDonde estaban.",
+      "sub": "No se apaga nada el 15 ni el 30.",
+      "slug": "vero/maximas-y-aforismos",
+      "caption": "No se apaga nada. Los 3.900 libros y los 121 vendedores siguen donde estaban."
+    }
+  ]
+}

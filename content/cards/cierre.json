@@ -1,0 +1,37 @@
+{
+  "_nota": "Carteles de cierre (1 sept 2026). Para estado de WhatsApp e Instagram. Correr: npm run cards -- content/cards/cierre.json",
+  "pieces": [
+    {
+      "template": "tipografica",
+      "kicker": "1 de septiembre de 2026",
+      "headline": "Cierro\\ntuslibros.cl",
+      "sub": "Después de un año y medio.",
+      "slug": "vero/maximas-y-aforismos",
+      "caption": "Cierro tuslibros.cl. No por falta de libros: por los costos, que este mes ya no pude pagar."
+    },
+    {
+      "template": "tipografica",
+      "kicker": "Las fechas",
+      "headline": "Hasta el 15 de\\nseptiembre se\\npuede comprar.",
+      "sub": "El 30 el sitio se apaga.",
+      "slug": "vero/maximas-y-aforismos",
+      "caption": "Hasta el 15 de septiembre se puede comprar. El 30 el sitio se apaga."
+    },
+    {
+      "template": "tipografica",
+      "kicker": "A los vendedores",
+      "headline": "Llévate\\ntus libros.",
+      "sub": "Te mandé tu catálogo por correo.",
+      "slug": "vero/maximas-y-aforismos",
+      "caption": "A los que vendieron acá: les mandé su catálogo completo en un archivo para que se lo lleven donde quieran."
+    },
+    {
+      "template": "tipografica",
+      "kicker": "Gracias",
+      "headline": "3.900 libros.\\n121 personas.",
+      "sub": "Gracias por comprarle libros a personas.",
+      "slug": "vero/maximas-y-aforismos",
+      "caption": "3.900 libros publicados por 121 personas. Gracias por haberle comprado libros a personas y no a una bodega."
+    }
+  ]
+}
