@@ -8,29 +8,32 @@ import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
 
-const URL = "https://tuslibros.cl/antroposofia";
+const URL = "https://tuslibros.cl/espiritualidad";
 
 export const metadata: Metadata = {
-  title: "Antroposofía: libros de Rudolf Steiner usados en Chile",
+  title: "Libros de espiritualidad y esoterismo usados en Chile",
   description:
-    "Libros de antroposofía usados en Chile: Rudolf Steiner (La ciencia oculta, La filosofía de la libertad, Relaciones kármicas), pedagogía Waldorf, biodinámica. Ediciones Antroposófica. Envío a todo Chile.",
+    "Libros de espiritualidad usados en Chile: budismo, meditación, Krishnamurti, Ken Wilber, Steiner, Schuré, teosofía, tarot, astrología, tradición hermética. Ediciones agotadas. Envío a todo Chile.",
   alternates: { canonical: URL },
   keywords: [
-    "antroposofia libros",
-    "antroposofia chile",
-    "rudolf steiner libros",
-    "libros de rudolf steiner usados",
-    "la ciencia oculta steiner",
-    "la filosofia de la libertad",
-    "pedagogia waldorf libros",
-    "agricultura biodinamica libros",
-    "editorial antroposofica",
+    "libros de espiritualidad",
+    "libros espirituales usados",
+    "libros esotericos",
     "libros esotericos usados chile",
+    "libros de budismo",
+    "libros de meditacion",
+    "krishnamurti libros",
+    "los grandes iniciados schure",
+    "teosofia libros",
+    "libros de tarot usados",
+    "libros de astrologia usados",
+    "psicologia transpersonal",
+    "libros ocultismo chile",
   ],
   openGraph: {
-    title: "Antroposofía: libros de Rudolf Steiner usados en Chile",
+    title: "Libros de espiritualidad y esoterismo usados en Chile",
     description:
-      "Steiner, pedagogía Waldorf, biodinámica. Ediciones que ya no se reimprimen, usadas y con envío a todo Chile.",
+      "Budismo, meditación, Krishnamurti, Wilber, Steiner, Schuré, tarot, tradición hermética. Ediciones agotadas, usadas y con envío a todo Chile.",
     url: URL,
     siteName: "tuslibros.cl",
     locale: "es_CL",
@@ -38,51 +41,40 @@ export const metadata: Metadata = {
   },
 };
 
-// Antroposofía: por autor o por título/tema. Steiner es el grueso; el resto
-// son los autores y temas que orbitan (Waldorf, biodinámica, euritmia, Goethe
-// leído desde Steiner).
-const NEEDLES = [
-  "rudolf steiner",
-  "antropos",
-  "waldorf",
-  "euritm",
-  "biodin",
-  "goetheanum",
-  "ita wegman",
-  "karl könig",
-  "karl konig",
-  "sergei prokofieff",
-  "bernard lievegoed",
-  "teosof",
+// Espiritualidad y esoterismo: por autor, título o tag. Regex con borde de
+// palabra: "oculta" solo cuenta como "ciencia oculta", "zen" no matchea "Zentner".
+const NEEDLES: RegExp[] = [
+  /espiritu/, /esoter/, /budis/, /\bbuda\b/, /\bzen\b/, /meditaci/, /\byoga\b/, /tarot/, /astrolog/, /ciencia oculta/, /ciencias ocultas/, /ocultismo/, /iniciad/, /teosof/, /gnóstic/, /gnostic/, /místic/, /mistic/, /kabal/, /cábala/, /cabala/, /sufi/, /chamán/, /chaman/, /alquim/, /hermétic/, /hermetic/, /rosacruz/, /masónic/, /masonic/, /masoner/, /bhagavad/, /upanishad/, /\btao\b/, /taoís/, /lao tse/, /lao-tse/, /i ching/, /vedanta/, /\breiki\b/, /transpersonal/, /conciencia/, /\bkarma\b/, /kárm/, /reencarnaci/, /chakra/, /mindfulness/,
+  /ken wilber/, /rudolf steiner/, /antropos/, /krishnamurti/, /\bosho\b/, /dalai lama/, /thich nhat/, /eckhart tolle/, /carl jung/, /c\. g\. jung/, /gurdjieff/, /ouspensky/, /blavatsky/, /schuré/, /schure/, /dion fortune/, /alan watts/, /ramana/, /vivekananda/, /yogananda/, /aurobindo/, /paramahansa/, /pema chödrön/, /jorge adoum/, /mago jefa/, /eliphas/, /papus/, /guénon/, /guenon/, /castaneda/, /wayne dyer/, /deepak chopra/, /louise hay/, /gibran/, /siddhartha/,
 ];
 
 const faqs = [
   {
-    q: "¿Qué es la antroposofía?",
-    a: "Es la corriente que fundó Rudolf Steiner a comienzos del siglo XX: una forma de conocimiento que junta ciencia, filosofía y espiritualidad. De ahí salieron las escuelas Waldorf, la agricultura biodinámica, la medicina antroposófica y la euritmia. Los libros de base son los de Steiner; el resto de la literatura antroposófica los comenta o los aplica.",
+    q: "¿Qué libros de espiritualidad se consiguen usados en Chile?",
+    a: "Budismo y meditación (Thich Nhat Hanh, Dalai Lama, Pema Chödrön), Krishnamurti, Ken Wilber y la psicología transpersonal, Rudolf Steiner, la tradición esotérica europea (Schuré, Dion Fortune, Blavatsky, Papus) y bastante tarot y astrología. Casi todo sale de bibliotecas personales, así que aparece de a uno.",
   },
   {
-    q: "¿Por dónde empezar a leer antroposofía?",
-    a: "Si vienes de la filosofía, La filosofía de la libertad. Si quieres la cosmovisión completa, La ciencia oculta o Teosofía. Si llegaste por la pedagogía Waldorf, los ciclos de conferencias sobre educación son más directos que los libros de base.",
+    q: "¿Por qué estos libros son difíciles de encontrar?",
+    a: "Porque son ediciones de tiradas chicas, de editoriales como Kairós, Kier, Antroposófica o Sirio, que se agotan y no siempre vuelven. En librerías de cadena en Chile hay poco; el mercado usado es donde de verdad circulan.",
   },
   {
-    q: "¿Por qué cuesta encontrar estos libros en Chile?",
-    a: "Porque las ediciones en español son casi todas de Editorial Antroposófica (Buenos Aires), en tiradas chicas que se agotan y no siempre vuelven. En Chile no hay distribución estable, así que los ejemplares usados son la forma más realista de conseguirlos.",
+    q: "¿Por dónde empezar?",
+    a: "Depende de la puerta. Si es budismo, Thich Nhat Hanh o las Meditaciones de Marco Aurelio, que no es budista pero se lee igual. Si es la tradición occidental, Los grandes iniciados de Schuré. Si quieres el mapa que junta todo, Breve historia de todas las cosas de Ken Wilber.",
   },
   {
-    q: "¿Y si el título que busco no está?",
+    q: "¿Y si el libro que busco no está?",
     a: "Crea una solicitud en tuslibros.cl con el título y te aviso cuando alguien lo publique. Es gratis y funciona: la gente publica lo que sabe que alguien está buscando.",
   },
 ];
 
 const OBRAS = [
-  { title: "La filosofía de la libertad (1894)", desc: "El libro que Steiner consideraba la base de todo lo que escribió después: una teoría del conocimiento y de la acción libre, anterior a la antroposofía como tal." },
-  { title: "Teosofía (1904)", desc: "La primera exposición ordenada de su visión del ser humano: cuerpo, alma y espíritu, reencarnación y karma. Breve y sistemático." },
-  { title: "La ciencia oculta (1910)", desc: "La cosmovisión completa: la evolución de la Tierra y del ser humano, los mundos superiores, el camino de conocimiento. El libro de referencia." },
-  { title: "Ciclos de conferencias", desc: "Relaciones kármicas, el Curso de astronomía, las conferencias sobre educación y agricultura. Steiner habló mucho más de lo que escribió; estos volúmenes son sus charlas transcritas." },
+  { title: "Budismo y meditación", desc: "De los sutras a Thich Nhat Hanh. Lo más pedido del género y lo que más rápido se vende cuando aparece usado." },
+  { title: "Ken Wilber y la psicología transpersonal", desc: "El intento de juntar ciencia, psicología y tradiciones contemplativas en un solo mapa. Ediciones Kairós, varias descatalogadas." },
+  { title: "La tradición esotérica europea", desc: "Schuré, Blavatsky, Papus, Dion Fortune, Guénon, Steiner. Teosofía, hermetismo y antroposofía en ediciones antiguas que se buscan por el texto y por el objeto." },
+  { title: "Tarot, astrología y oráculos", desc: "Manuales y barajas comentadas. Salen seguido de bibliotecas personales y se van igual de rápido." },
 ];
 
-export default async function AntroposofiaPage() {
+export default async function EspiritualidadPage() {
   const supabase = await createClient();
 
   const { data: raw } = await supabase
@@ -94,7 +86,7 @@ export default async function AntroposofiaPage() {
   const matched = ((raw ?? []) as any[]).filter((item) => {
     if (!item.book) return false;
     const hay = `${item.book.title ?? ""} ${item.book.author ?? ""} ${(item.book.tags ?? []).join(" ")}`.toLowerCase();
-    return NEEDLES.some((n) => hay.includes(n));
+    return NEEDLES.some((n) => n.test(hay));
   }) as unknown as ListingWithBook[];
 
   const listings = sortListingsForDisplay(matched).slice(0, 24);
@@ -102,11 +94,11 @@ export default async function AntroposofiaPage() {
   const collectionJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Antroposofía: libros de Rudolf Steiner usados en Chile",
+    name: "Libros de espiritualidad y esoterismo usados en Chile",
     description:
-      "Libros de antroposofía de segunda mano en Chile: Rudolf Steiner, pedagogía Waldorf, agricultura biodinámica y autores afines.",
+      "Catálogo de libros de espiritualidad de segunda mano en Chile: budismo, meditación, psicología transpersonal, teosofía, tarot y tradición hermética.",
     url: URL,
-    about: { "@type": "Thing", name: "Antroposofía", sameAs: "https://es.wikipedia.org/wiki/Antroposof%C3%ADa" },
+    about: { "@type": "Thing", name: "Espiritualidad", sameAs: "https://es.wikipedia.org/wiki/Espiritualidad" },
   };
 
   const breadcrumbJsonLd = {
@@ -114,7 +106,7 @@ export default async function AntroposofiaPage() {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Inicio", item: "https://tuslibros.cl" },
-      { "@type": "ListItem", position: 2, name: "Antroposofía", item: URL },
+      { "@type": "ListItem", position: 2, name: "Espiritualidad", item: URL },
     ],
   };
 
@@ -136,21 +128,20 @@ export default async function AntroposofiaPage() {
 
       <div className="min-h-screen bg-cream">
         <main className="max-w-5xl mx-auto px-6 py-10">
-          <Breadcrumbs items={[{ label: "Inicio", href: "/" }, { label: "Antroposofía" }]} />
+          <Breadcrumbs items={[{ label: "Inicio", href: "/" }, { label: "Espiritualidad" }]} />
 
           <section className="mt-8 mb-12 max-w-3xl">
             <h1 className="font-display text-4xl sm:text-5xl font-bold text-ink leading-[1.05] tracking-tight">
-              Antroposofía —{" "}
-              <span className="italic text-brand-600">Steiner y los que vinieron después.</span>
+              Espiritualidad y esoterismo —{" "}
+              <span className="italic text-brand-600">libros usados en Chile.</span>
             </h1>
             <p className="mt-5 text-lg text-ink-muted leading-relaxed">
-              Los libros de Rudolf Steiner casi no se consiguen en Chile: las ediciones en español
-              son de tiradas chicas y se agotan. Acá están los que yo tengo y los que otros lectores
-              van publicando. Usados, con envío a todo el país o retiro en mano.
+              Budismo, meditación, Krishnamurti, Wilber, Steiner, Schuré, tarot, hermetismo. Ediciones de tiradas chicas que se
+              agotan y no vuelven. Usados, con envío a todo Chile o retiro en mano.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/autor/rudolf-steiner" className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 transition-colors shadow-sm">
-                Ver los libros de Steiner
+              <Link href="/search?q=espiritualidad" className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 transition-colors shadow-sm">
+                Buscar en todo el catálogo
               </Link>
               <Link href="/solicitudes" className="inline-flex items-center px-6 py-3 bg-white border border-ink/20 text-ink text-sm font-semibold rounded-xl hover:border-brand-500 hover:text-brand-600 transition-colors">
                 Avisar cuando llegue uno →
@@ -170,13 +161,13 @@ export default async function AntroposofiaPage() {
               <p className="font-display text-xl text-ink mb-2">No hay ejemplares disponibles hoy</p>
               <p className="text-sm text-ink-muted mb-6">Crea una solicitud y te aviso cuando aparezca uno.</p>
               <Link href="/solicitudes" className="inline-flex items-center px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition-colors">
-                Solicitar un libro de antroposofía
+                Solicitar un libro de espiritualidad
               </Link>
             </section>
           )}
 
           <section className="mb-16">
-            <h2 className="font-display text-2xl font-bold text-ink mb-4">Los libros de base de Steiner</h2>
+            <h2 className="font-display text-2xl font-bold text-ink mb-4">Las puertas de entrada</h2>
             <div className="grid md:grid-cols-2 gap-4">
               {OBRAS.map((b) => (
                 <div key={b.title} className="bg-white rounded-xl p-5 border border-cream-dark">
@@ -188,9 +179,9 @@ export default async function AntroposofiaPage() {
           </section>
 
           <section className="mb-16 bg-ink text-cream rounded-2xl p-8 md:p-10">
-            <h2 className="font-display text-2xl font-bold mb-3">¿Tienes libros de antroposofía que ya no lees?</h2>
+            <h2 className="font-display text-2xl font-bold mb-3">¿Tienes libros de espiritualidad que ya cumplieron su ciclo contigo?</h2>
             <p className="text-cream/80 text-sm leading-relaxed max-w-xl mb-6">
-              Hay gente buscándolos y casi nadie los vende. Publicar es gratis y solo cobro 8% cuando se vende por la plataforma.
+              Se buscan más de lo que se ofrecen: este mes hubo decenas de búsquedas sin resultado. Publicar es gratis y solo cobro 8% cuando se vende por la plataforma.
             </p>
             <Link href="/publish" className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 transition-colors">
               Publicar mis libros →
@@ -215,15 +206,15 @@ export default async function AntroposofiaPage() {
           <section className="mb-12 border-t border-cream-dark pt-10">
             <p className="text-xs text-ink-muted uppercase tracking-widest font-semibold mb-4">También puede interesarte</p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/autor/rudolf-steiner" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Rudolf Steiner</Link>
+              <Link href="/antroposofia" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Antroposofía</Link>
               <span className="text-ink-muted">·</span>
               <Link href="/autor/ken-wilber" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Ken Wilber</Link>
               <span className="text-ink-muted">·</span>
-              <Link href="/libros-antiguos" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Libros antiguos y de colección</Link>
-              <span className="text-ink-muted">·</span>
-              <Link href="/espiritualidad" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Espiritualidad y esoterismo</Link>
+              <Link href="/autor/rudolf-steiner" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Rudolf Steiner</Link>
               <span className="text-ink-muted">·</span>
               <Link href="/filosofia" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Filosofía</Link>
+              <span className="text-ink-muted">·</span>
+              <Link href="/libros-antiguos" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Libros antiguos y de colección</Link>
             </div>
           </section>
         </main>

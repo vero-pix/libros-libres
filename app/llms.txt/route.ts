@@ -155,6 +155,8 @@ Por ejemplo: /libros-usados/santiago, /libros-usados/concepcion,
 - https://tuslibros.cl/libros-de-historia-de-chile
 - https://tuslibros.cl/libros-antiguos (libros antiguos, primeras ediciones y de colección)
 - https://tuslibros.cl/antroposofia (Rudolf Steiner y antroposofía)
+- https://tuslibros.cl/filosofia (libros de filosofía usados)
+- https://tuslibros.cl/espiritualidad (espiritualidad, budismo, esoterismo)
 - https://tuslibros.cl/autor/[slug] — páginas de autor, por ejemplo /autor/ken-wilber, /autor/rudolf-steiner, /autor/pedro-prado
 - https://tuslibros.cl/categoria/[slug] — páginas por categoría, por ejemplo /categoria/no-ficcion-ensayo
 

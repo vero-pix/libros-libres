@@ -52,6 +52,7 @@ export default function Footer() {
               <li><Link href="/categoria/ficcion-novela" className="hover:text-coral transition-colors">Novela y Ficción</Link></li>
               <li><Link href="/categoria/ficcion-poesia" className="hover:text-coral transition-colors">Poesía</Link></li>
               <li><Link href="/categoria/no-ficcion-ensayo" className="hover:text-coral transition-colors">Ensayo</Link></li>
+              <li><Link href="/filosofia" className="hover:text-coral transition-colors">Filosofía</Link></li>
               <li><Link href="/categoria/no-ficcion-historia" className="hover:text-coral transition-colors">Historia</Link></li>
               <li><Link href="/categoria/academico-escolar" className="hover:text-coral transition-colors">Libros escolares</Link></li>
               <li><Link href="/categoria/academico-universitario" className="hover:text-coral transition-colors">Universitarios</Link></li>
