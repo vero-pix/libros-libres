@@ -8,6 +8,18 @@ import { extractCommune } from "@/lib/chilexpress";
 import crypto from "crypto";
 import { registrarComisionVenta } from "@/lib/commissions";
 
+/**
+ * Origen del envío para Shipit. La dirección del listing es más precisa, pero
+ * solo sirve si tiene calle y número: las cargas masivas dejan "Santiago, Región
+ * Metropolitana" y con eso Shipit ignora el origen y cae a la dirección default
+ * de la cuenta (la casa de Vero). Pasó con Libro de Ocasión el 05-09-2026.
+ */
+function resolverOrigen(listingAddress?: string | null, sellerAddress?: string | null): string | null {
+  const conNumero = (a?: string | null) => !!a && /^.+?\s+\d+/.test(a.split(",")[0]?.trim() ?? "");
+  if (conNumero(listingAddress)) return listingAddress as string;
+  return sellerAddress || listingAddress || null;
+}
+
 function verifySignature(req: NextRequest, body: Record<string, unknown>): boolean {
   const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
   if (!secret) {
@@ -231,8 +243,7 @@ export async function POST(req: NextRequest) {
             const addressParts = headOrder.buyer_address.split(",")[0]?.trim() ?? "";
             const streetMatch = addressParts.match(/^(.+?)\s+(\d+)/);
 
-            // Origen: dirección del listing (más precisa) o fallback a default_address del vendedor
-            const originRaw = listingData?.address || sellerData?.default_address;
+            const originRaw = resolverOrigen(listingData?.address, sellerData?.default_address);
             let shipitOrigin: Parameters<typeof createShipitOrder>[0]["origin"] | undefined;
             if (originRaw) {
               const originCommune = extractCommune(originRaw);
@@ -479,7 +490,7 @@ export async function POST(req: NextRequest) {
             const addressParts = shipitOrder.buyer_address.split(",")[0]?.trim() ?? "";
             const streetMatch = addressParts.match(/^(.+?)\s+(\d+)/);
 
-            const originRaw = listingData?.address || sellerData?.default_address;
+            const originRaw = resolverOrigen(listingData?.address, sellerData?.default_address);
             let shipitOrigin: Parameters<typeof createShipitOrder>[0]["origin"] | undefined;
             if (originRaw) {
               const originCommune = extractCommune(originRaw);
