@@ -28,3 +28,45 @@ export function getRegionForComuna(comuna: string): string | null {
   }
   return null;
 }
+
+/**
+ * Lleva cualquier forma en que llegue una región ("Región Metropolitana de
+ * Santiago", "Bío Bío", "Región del Biobío", "Lagos") al nombre corto oficial
+ * que usan las claves de REGIONES_CHILE. Si no la reconoce, devuelve lo que
+ * recibió limpio, para no perder el dato. Carlos de CIM vio en /tiendas tres
+ * filtros distintos para Biobío (05-09-2026): las filas de `cities` se creaban
+ * con el texto crudo de Google.
+ */
+export function normalizarRegion(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const limpio = raw
+    .replace(/\s+\d{4,}$/, "")
+    .replace(/^Regi[oó]n\s+(de\s+la\s+|del\s+|de\s+los\s+|de\s+las\s+|de\s+)?/i, "")
+    .replace(/\s+de\s+Santiago$/i, "")
+    .replace(/\s+y\s+de\s+la\s+Ant[aá]rtica\s+Chilena$/i, "")
+    .replace(/\s+del\s+General\s+Carlos\s+Ib[aá]ñez\s+del\s+Campo$/i, "")
+    .replace(/^Libertador\s+General\s+Bernardo\s+/i, "")
+    .trim();
+  if (!limpio) return null;
+  const fold = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z' ]/gi, "").toLowerCase();
+  const clave = fold(limpio).replace(/\s+/g, "");
+  const ALIAS: Record<string, string> = {
+    biobio: "Biobío",
+    lagos: "Los Lagos",
+    loslagos: "Los Lagos",
+    rios: "Los Ríos",
+    losrios: "Los Ríos",
+    araucania: "La Araucanía",
+    laaraucania: "La Araucanía",
+    ohiggins: "O'Higgins",
+    metropolitana: "Metropolitana",
+    rm: "Metropolitana",
+    magallanes: "Magallanes",
+    aysen: "Aysén",
+    nuble: "Ñuble",
+    aricayparinacota: "Arica y Parinacota",
+  };
+  if (ALIAS[clave]) return ALIAS[clave];
+  const oficial = Object.keys(REGIONES_CHILE).find((r) => fold(r).replace(/\s+/g, "") === clave);
+  return oficial ?? limpio;
+}

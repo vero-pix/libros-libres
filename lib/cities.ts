@@ -1,3 +1,4 @@
+import { normalizarRegion } from "@/lib/comunas";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createPublicClient } from "@/lib/supabase/public";
 import { comunaDesdeAddress } from "@/lib/comuna";
@@ -66,18 +67,12 @@ function claveComuna(s: string | null | undefined): string {
 }
 
 
-/** Nombre de región legible desde el componente "Región de X" de la dirección. */
+/** Nombre de región corto y oficial desde el componente "Región de X" de la dirección. */
 function regionDesdeAddress(address: string | null | undefined): string | null {
   if (!address) return null;
   const parts = address.split(",").map((p) => p.trim());
   const raw = parts.find((p) => /Regi[oó]n/i.test(p));
-  if (!raw) return null;
-  // "Región del Biobío 4130000" → "Biobío" · "Región Metropolitana de Santiago" → "Metropolitana"
-  return raw
-    .replace(/Regi[oó]n\s+(de\s+la\s+|del\s+|de\s+los\s+|de\s+las\s+|de\s+)?/i, "")
-    .replace(/\s+\d{4,}$/, "")
-    .replace(/\s+de\s+Santiago$/i, "")
-    .trim() || null;
+  return normalizarRegion(raw);
 }
 
 /**
