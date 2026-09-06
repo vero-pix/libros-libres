@@ -7,6 +7,7 @@ import { createShipitOrder, estimateBookPackageSize } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
 import crypto from "crypto";
 import { registrarComisionVenta } from "@/lib/commissions";
+import { VERO_INBOX } from "@/lib/veroInbox";
 
 /**
  * Origen del envío para Shipit. La dirección del listing es más precisa, pero
@@ -382,36 +383,42 @@ export async function POST(req: NextRequest) {
                     `}
                     <h3 style="color:#1a1a1a;font-size:16px">Cómo despachar</h3>
                     <ol style="padding-left:20px;color:#444;font-size:14px;line-height:1.7">
-                      <li>Empaca <strong>los ${itemCount} libros juntos</strong> en una caja o sobre resistente con burbuja</li>
-                      <li>Imprime y pega la etiqueta visible</li>
-                      <li>Lleva el paquete a ${deliveryMethod}</li>
-                      <li>Guarda el comprobante hasta confirmación de entrega</li>
+                      <li>Empaca <strong>${itemCount > 1 ? `los ${itemCount} libros juntos` : "el libro"}</strong> en una caja o sobre resistente con burbuja.</li>
+                      <li><strong>No lo lleves a ninguna sucursal:</strong> el courier pasa a buscarlo a tu casa. Yo confirmo el retiro y te aviso por WhatsApp el día y la hora.</li>
+                      <li>Pega la etiqueta en el paquete. Si todavía no la tienes, escribe bien claro el nombre del comprador y el número de seguimiento.</li>
+                      <li>Firma el comprobante que te deja el courier y guárdalo hasta que el comprador reciba el libro.</li>
                     </ol>
+                    <p style="font-size:14px;color:#444;line-height:1.6">Si el día del retiro el courier no aparece o hay cualquier problema, escríbele a Shipit al WhatsApp <strong>+56 9 3230 2514</strong> (lunes a viernes de 9:00 a 18:00) o a <a href="mailto:soporte@shipit.cl" style="color:#1a1a1a">soporte@shipit.cl</a> con el número de seguimiento. Y avísame a mí al <strong>+56 9 9458 3067</strong>.</p>
+                    <p style="font-size:14px;color:#444;line-height:1.6">Guía completa con fotos: <a href="${siteUrl}/como-despachar" style="color:#1a1a1a">tuslibros.cl/como-despachar</a></p>
                   `
                 : `
                     <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;margin:20px 0">
                       <p style="margin:0 0 8px 0;font-weight:600;color:#1e40af">🤝 Entrega en persona</p>
-                      <p style="margin:0;font-size:14px;color:#1e3a8a">Coordina con ${buyerName} lugar y hora para los ${itemCount} libros.</p>
+                      <p style="margin:0;font-size:14px;color:#1e3a8a">Coordina con ${buyerName} lugar y hora para ${itemCount > 1 ? `los ${itemCount} libros` : "la entrega"}. El pago ya está hecho: no le cobres de nuevo.</p>
                     </div>
                   `;
 
               await sendEmail({
                 to: sellerEmail,
-                subject: `Nueva venta: ${itemCount} libros — tuslibros.cl`,
+                from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+                replyTo: VERO_INBOX,
+                subject: itemCount > 1 ? `Nueva venta: ${itemCount} libros — tuslibros.cl` : `Vendiste un libro — tuslibros.cl`,
                 html: `
                   <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1a1a1a">
-                    <h2 style="margin:0 0 8px 0">¡Nueva venta de ${itemCount} libros! 🎉</h2>
-                    <p style="color:#666;margin:0 0 20px 0">Hola ${sellerName}, ${buyerName} te compró ${itemCount} libros en una sola transacción.</p>
+                    <h2 style="margin:0 0 8px 0">${itemCount > 1 ? `¡Nueva venta de ${itemCount} libros! 🎉` : "¡Vendiste un libro! 🎉"}</h2>
+                    <p style="color:#666;margin:0 0 20px 0">Hola ${sellerName}, ${buyerName} ${itemCount > 1 ? `te compró ${itemCount} libros en una sola transacción` : "te compró un libro"}. El pago ya está confirmado.</p>
                     <table style="width:100%;border-collapse:collapse;margin:16px 0;background:#fafafa;border-radius:8px;overflow:hidden">
                       ${itemsRows}
                       <tr><td style="padding:12px;font-weight:600;border-top:2px solid #ddd">Total</td><td style="padding:12px;font-weight:600;border-top:2px solid #ddd;text-align:right">$${bundleTotal.toLocaleString("es-CL")}</td></tr>
                     </table>
                     <p style="margin:8px 0;font-size:14px;color:#444"><strong>Comprador:</strong> ${buyerName}</p>
                     <p style="margin:8px 0;font-size:14px;color:#444"><strong>Dirección:</strong> ${buyerAddress}</p>
+                    <p style="margin:8px 0 16px 0;font-size:14px;color:#444">Para hablar con ${buyerName}, en <a href="${siteUrl}/mis-ventas" style="color:#1a1a1a">Mis Ventas</a> hay un botón <strong>"Escribir"</strong> al lado de su nombre.</p>
                     ${courierBlock}
                     <div style="text-align:center;margin-top:28px">
                       <a href="${siteUrl}/mis-ventas" style="color:#1a1a1a;text-decoration:underline;font-size:14px">Ver en Mis Ventas →</a>
                     </div>
+                    <p style="font-size:13px;color:#666;text-align:center;margin-top:16px">Revisa Mis Ventas cada uno o dos días aunque no te llegue correo, y si vendes un libro por fuera márcalo como vendido para que nadie lo compre acá.</p>
                     <p style="color:#999;font-size:12px;text-align:center;margin-top:24px">tuslibros.cl · Gracias por ser parte 📚</p>
                   </div>
                 `,

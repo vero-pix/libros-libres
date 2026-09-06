@@ -17,19 +17,32 @@ const steps = [
     n: 2,
     icon: "🖨️",
     title: "Imprime la etiqueta (si está disponible)",
-    body: 'Entra a Mis Ventas y busca tu orden. Si ves el botón "Descargar etiqueta", imprímela en hoja tamaño carta y pégala en la parte más plana del paquete con cinta transparente. ¿Sin impresora? En cualquier librería o cyber te la imprimen desde el celular. Si NO ves el botón, no te preocupes: significa que el courier Shipit trae el manifiesto impreso al momento del retiro — tú solo anotas el código de tracking y el nombre del destinatario en el paquete para identificarlo.',
+    body: 'La etiqueta te la mando yo por WhatsApp o correo apenas el courier la emite, y también aparece en Mis Ventas con el botón "Descargar etiqueta". Imprímela en hoja tamaño carta y pégala en la parte más plana del paquete con cinta transparente. ¿Sin impresora? En cualquier librería o cyber te la imprimen desde el celular. Si el día del retiro todavía no la tienes, escribe en el paquete, bien claro, el nombre del comprador y el número de seguimiento.',
   },
   {
     n: 3,
     icon: "🏠",
     title: "Deja el paquete listo para el retiro",
-    body: 'Shipit coordina un retiro a domicilio en la dirección que registraste. La fecha y ventana horaria de retiro aparece en el detalle de la orden (por ejemplo: "20 abril, 11:00–17:00"). Necesitas que alguien esté en casa durante esa ventana para entregar el paquete. Si la venta se paga antes de las 11 AM, el retiro suele quedar para ese mismo día; si es después, queda agendado para el siguiente día hábil.',
+    body: "No vas a ninguna sucursal: el courier pasa a buscarlo a la dirección que tienes en tu perfil. Yo confirmo el retiro con Shipit y te aviso por WhatsApp el día y la ventana horaria (por ejemplo, lunes de 11:00 a 17:00). Necesitas que alguien esté en casa en ese rango. Por eso es importante que tu dirección en el perfil tenga calle y número: si es un condominio, agrega el número de casa o depto.",
   },
   {
     n: 4,
     icon: "✅",
-    title: "Firma el manifiesto y guárdalo",
-    body: "Cuando llegue el courier, te entrega un manifiesto o comprobante de retiro para firmar (una copia queda contigo). Guárdalo hasta que el comprador confirme que recibió el libro — es tu respaldo si algo se pierde en el camino. No pagas nada al courier: el envío se factura directamente a la cuenta de tuslibros.cl a fin de mes.",
+    title: "Firma el comprobante y guárdalo",
+    body: "Cuando llegue el courier, te entrega un comprobante de retiro para firmar y una copia queda contigo. Guárdalo hasta que el comprador confirme que recibió el libro: es tu respaldo si algo se pierde en el camino. No pagas nada al courier. El envío lo pagó el comprador en el checkout y se cobra a la cuenta de tuslibros.cl.",
+  },
+];
+
+const contactos = [
+  {
+    quien: "Shipit (el retiro y el courier)",
+    detalle: "WhatsApp +56 9 3230 2514, lunes a viernes de 9:00 a 18:00, o soporte@shipit.cl. Ten a mano el número de seguimiento.",
+    href: "https://wa.me/56932302514",
+  },
+  {
+    quien: "Vero (tuslibros.cl)",
+    detalle: "WhatsApp +56 9 9458 3067. Para cualquier cosa: una etiqueta que no llega, un comprador que no responde, un libro que ya vendiste por fuera.",
+    href: "https://wa.me/56994583067",
   },
 ];
 
@@ -99,10 +112,44 @@ export default function ComoDespacharPage() {
           <h2 className="font-semibold text-amber-900 mb-2">⏱️ Plazo de despacho</h2>
           <p className="text-sm text-amber-800 leading-relaxed">
             Ten el paquete listo dentro de los <strong>2 días hábiles</strong> siguientes a la venta.
-            Shipit agenda el retiro con corte diario a las <strong>11:00 AM</strong>: si la venta se paga
-            después de esa hora, el retiro queda para el día hábil siguiente. Despachar a tiempo mantiene
+            El retiro se agenda para el día hábil siguiente a la confirmación. Despachar a tiempo mantiene
             a los compradores contentos y asegura la buena reputación de tu tienda.
           </p>
+        </section>
+
+        <section className="bg-white border border-cream-dark/40 rounded-xl p-6 mb-8">
+          <h2 className="font-semibold text-ink mb-3">💬 Cómo hablar con el comprador</h2>
+          <p className="text-sm text-ink-muted leading-relaxed">
+            En <Link href="/mis-ventas" className="text-brand-600 font-semibold hover:underline">Mis Ventas</Link>,
+            al lado del nombre de cada comprador, hay un botón <strong>&ldquo;Escribir&rdquo;</strong> que abre un chat
+            dentro del sitio. Úsalo para avisar que el libro salió, o para coordinar lugar y hora si la
+            venta es con entrega en persona. En ese caso el pago ya está hecho por MercadoPago: no le cobres de nuevo.
+          </p>
+        </section>
+
+        <section className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
+          <h2 className="font-semibold text-red-900 mb-3">🚨 Si algo sale mal el día del retiro</h2>
+          <p className="text-sm text-red-800 leading-relaxed mb-4">
+            El courier no apareció, la etiqueta no llegó, el paquete se devolvió. Estos son los contactos:
+          </p>
+          <ul className="space-y-3">
+            {contactos.map((c) => (
+              <li key={c.quien} className="text-sm text-red-900">
+                <a href={c.href} target="_blank" rel="noopener noreferrer" className="font-semibold hover:underline">
+                  {c.quien}
+                </a>
+                <span className="block text-red-800 mt-0.5">{c.detalle}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="bg-white border border-cream-dark/40 rounded-xl p-6 mb-8">
+          <h2 className="font-semibold text-ink mb-3">📌 Dos hábitos que evitan problemas</h2>
+          <ul className="text-sm text-ink-muted space-y-2 leading-relaxed">
+            <li>• <strong>Revisa Mis Ventas cada uno o dos días</strong>, aunque no te haya llegado el correo de aviso. A veces cae en spam.</li>
+            <li>• <strong>Si vendes un libro por fuera, márcalo como vendido</strong> en Mis Libros. Si alguien lo compra acá y ya no lo tienes, hay que devolverle la plata.</li>
+          </ul>
         </section>
 
         <section className="bg-white border border-cream-dark/40 rounded-xl p-6 mb-8">
