@@ -138,6 +138,17 @@ export async function notifySeller(
     bundleSize,
   };
 
+  // El gong avisaba el INTENTO de compra (al crear la orden) pero no el pago
+  // confirmado: Vero veía "intento" y tenía que adivinar si se pagó. Ahora suena
+  // la venta real, con el vendedor, para saber a quién hay que despacharle.
+  await sendGong(
+    `💰 <b>Venta pagada</b>\n\n` +
+      `📚 ${escapeHtml(titleSummary)}\n` +
+      `👤 Vendedor: <b>${escapeHtml(seller.full_name)}</b>\n` +
+      `🛒 Comprador: ${escapeHtml(buyer.full_name)}\n` +
+      `💵 Total: $${bundleTotal.toLocaleString("es-CL")}`
+  ).catch(() => {});
+
   console.log("[notifySeller] Venta confirmada:", {
     order: orderId,
     seller: seller.full_name,
