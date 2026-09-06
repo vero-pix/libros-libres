@@ -65,6 +65,26 @@ Este es el momento de mayor motivación. Enviar el mismo día.
 > Los pasos están acá: tuslibros.cl/como-despachar
 > Cualquier duda me escribes.
 
+### 5b · Instrucciones completas de despacho (cuando ya hay retiro agendado)
+
+Se manda junto con la etiqueta. Reemplazar comprador, dirección, fecha y ventana.
+
+> Te explico completo cómo funciona el despacho, para que lo tengas claro y no dependas de mí:
+>
+> 1. Empaca el libro en sobre acolchado o caja chica. Si son varios libros del mismo comprador, van juntos en un paquete.
+> 2. Pega la etiqueta en el paquete (va en este mensaje). Si no tienes impresora, escribe en el paquete, bien claro, el nombre del comprador y el número de seguimiento.
+> 3. No vas a ninguna sucursal. El courier pasa a buscar el paquete el [día] a [dirección], entre las 11:00 y las 17:00. Tiene que haber alguien en casa en ese rango.
+> 4. El chofer te deja un comprobante firmado. Guárdalo hasta que el comprador reciba el libro.
+> 5. No le pagas nada al courier: el envío ya lo pagó el comprador.
+>
+> Si el chofer no aparece o pasa cualquier cosa con el retiro, escríbele directo a Shipit por WhatsApp al +56 9 3230 2514 (de 9:00 a 18:00) o a soporte@shipit.cl, con el número de seguimiento. Y a mí me cuentas después.
+>
+> Para hablar con tus compradores, en Mis Ventas hay un botón "Escribir" al lado de cada nombre. Y revisa Mis Ventas cada uno o dos días, aunque no te llegue correo.
+
+### 5c · Al comprador, cuando el envío ya tiene seguimiento
+
+> Hola [nombre]! Soy Vero de tuslibros.cl. Tu libro "[título]" sale por [courier] el [día] y llega a [dirección] el [día]. El número de seguimiento es [número]; lo puedes seguir en [starken.cl / bluexpress.cl] y también aparece en Mis Pedidos. Cualquier cosa me escribes por acá.
+
 ---
 
 ## 6 · Reactivación (publicó y quedó ahí)
