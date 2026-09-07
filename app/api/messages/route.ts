@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
+import { detectarPagoFuera } from "@/lib/pagoFueraDetector";
 
 function orderParticipants(a: string, b: string): [string, string] {
   return a < b ? [a, b] : [b, a];
@@ -116,18 +117,29 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Insert message
-  const { data: message, error: msgErr } = await supabase
+  // Insert message. flagged_reason deja constancia si el texto trae teléfono,
+  // transferencia o efectivo (lib/pagoFueraDetector.ts); no bloquea el envío.
+  // Tolerante como logWebhook con mp_webhook_log: si la columna todavía no
+  // existe (migración 20260907 sin aplicar), se reintenta sin ella. Un aviso
+  // de fraude nunca puede tumbar el envío de un mensaje.
+  const base = { conversation_id: convId, sender_id: user.id, body: body.trim() };
+  const flagged_reason = detectarPagoFuera(body);
+  let { data: message, error: msgErr } = await supabase
     .from("messages")
-    .insert({
-      conversation_id: convId,
-      sender_id: user.id,
-      body: body.trim(),
-    })
+    .insert({ ...base, flagged_reason })
     .select("id, created_at")
     .single();
 
-  if (msgErr) return NextResponse.json({ error: msgErr.message }, { status: 500 });
+  if (msgErr && /flagged_reason/i.test(msgErr.message)) {
+    console.error("[messages] no se pudo guardar flagged_reason:", msgErr.message);
+    ({ data: message, error: msgErr } = await supabase
+      .from("messages")
+      .insert(base)
+      .select("id, created_at")
+      .single());
+  }
+
+  if (msgErr || !message) return NextResponse.json({ error: msgErr?.message ?? "No se pudo guardar" }, { status: 500 });
 
   // Update conversation timestamp
   await supabase

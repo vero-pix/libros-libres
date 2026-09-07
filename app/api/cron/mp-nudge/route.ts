@@ -135,6 +135,7 @@ function nudgeEmail(firstName: string, listings: number) {
   <div style="background:#fff8e8;border:1px solid #f0d98a;border-radius:10px;padding:14px 16px;margin:18px 0">
     <p style="margin:0 0 8px"><strong>Si quieres, conecta tu MercadoPago.</strong></p>
     <p style="margin:0 0 12px">Sin conectarlo solo te puede comprar alguien que coordine contigo en persona. Con MercadoPago te compran desde cualquier región y la plata te llega directa a ti. Se hace en 1 minuto desde tu perfil.</p>
+    <p style="margin:0 0 12px">Con MercadoPago conectado, las ventas de tus libros van por la plataforma: así el pago queda protegido para ti y para quien te compra. <a href="https://tuslibros.cl/ayuda/vender#cobrar" style="color:#1a3a6b">Cómo funciona el cobro →</a></p>
     <a href="https://tuslibros.cl/perfil" style="display:inline-block;background:#1a3a6b;color:#fff;text-decoration:none;padding:9px 18px;border-radius:8px;font-weight:600">Conectar MercadoPago</a>
   </div>
   <p>Y si prefieres partir sin conectarlo, no hay drama: tus libros siguen publicados igual y lo puedes hacer cuando quieras.</p>

@@ -11,9 +11,9 @@ export const metadata = {
 
 const linkClass = "text-brand-600 font-semibold hover:underline";
 
-function Seccion({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+function Seccion({ n, id, title, children }: { n: number; id?: string; title: string; children: React.ReactNode }) {
   return (
-    <section className="mb-12">
+    <section id={id} className="mb-12 scroll-mt-24">
       <h2 className="text-2xl font-bold text-ink mb-4 border-b-2 border-brand-600 pb-2 inline-block">
         {n}. {title}
       </h2>
@@ -71,7 +71,7 @@ export default function AyudaVenderPage() {
           </Tarjeta>
         </Seccion>
 
-        <Seccion n={2} title="Cobrar: conecta MercadoPago">
+        <Seccion n={2} id="cobrar" title="Cobrar: conecta MercadoPago">
           <p>
             Sin MercadoPago conectado solo te pueden comprar en persona. Con MercadoPago te compran desde cualquier
             región, el pago entra directo a tu cuenta y tuslibros nunca toca tu dinero.
