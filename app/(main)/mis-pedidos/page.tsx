@@ -9,7 +9,8 @@ const ORDER_SELECT = `
   *,
   listing:listings (
     *,
-    book:books (*)
+    book:books (*),
+    seller:users (username)
   ),
   buyer:users!orders_buyer_id_fkey (id, full_name, email, phone)
 `;

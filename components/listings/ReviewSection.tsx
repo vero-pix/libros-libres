@@ -78,7 +78,7 @@ export default function ReviewSection({ listingId }: Props) {
             .select("id")
             .eq("listing_id", listingId)
             .eq("buyer_id", user.id)
-            .eq("status", "paid")
+            .in("status", ["paid", "shipped", "delivered"])
             .limit(1)
             .maybeSingle();
 

@@ -116,7 +116,7 @@ export default function BookReviews({ bookId, bookTitle, initialReviews }: Props
   }
 
   return (
-    <section className="mt-12 border-t border-ink/10 pt-10">
+    <section id="resenas-libro" className="mt-12 border-t border-ink/10 pt-10">
       <div className="flex items-end justify-between mb-6">
         <h2 className="font-display text-2xl font-bold text-ink">Reseñas del libro</h2>
         {count > 0 && (

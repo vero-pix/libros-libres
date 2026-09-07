@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Order, OrderStatus } from "@/types";
 import BuyerCartsSection from "@/components/sales/BuyerCartsSection";
+import EntregadoButton from "@/components/sales/EntregadoButton";
 
 export const metadata = {
   title: "Mis Ventas",
@@ -44,7 +45,7 @@ export default async function MisVentasPage() {
     .from("orders")
     .select(`
       id, buyer_id, bundle_id, book_price, shipping_cost, service_fee, total, status,
-      courier, tracking_code, shipping_label_url, shipping_status, buyer_address, created_at,
+      courier, tracking_code, shipping_label_url, shipping_status, buyer_address, created_at, updated_at, shipping_updated_at,
       listing:listings(id, cover_image_url, book:books(title, author, cover_url)),
       buyer:users!orders_buyer_id_fkey(full_name, email)
     `)
@@ -63,19 +64,6 @@ export default async function MisVentasPage() {
   const shipmentByBundle = new Map<string, NonNullable<typeof rawShipments>[number]>();
   for (const sh of rawShipments ?? []) shipmentByBundle.set(sh.bundle_id, sh);
 
-  // Rentals where I'm the owner
-  const { data: rawRentals } = await supabase
-    .from("rentals")
-    .select(`
-      id, rental_price, deposit, commission, total, status,
-      period_days, start_date, end_date, created_at,
-      listing:listings(id, cover_image_url, book:books(title, author, cover_url)),
-      renter:users!rentals_renter_id_fkey(full_name, email)
-    `)
-    .eq("owner_id", user.id)
-    .order("created_at", { ascending: false });
-
-  const rentals = rawRentals ?? [];
 
   // Commissions
   const { data: rawCommissions } = await supabase
@@ -195,11 +183,8 @@ export default async function MisVentasPage() {
   const totalComisiones = commissions.reduce((sum, c) => sum + Number(c.commission_amount), 0);
   const gananciaVentas = totalVentas - commissions.filter(c => c.transaction_type === "sale").reduce((sum, c) => sum + Number(c.commission_amount), 0);
 
-  const paidRentals = rentals.filter((r: any) => r.status !== "pending");
-  const totalArriendos = paidRentals.reduce((sum: number, r: any) => sum + Number(r.rental_price), 0);
-  const gananciaArriendos = totalArriendos - commissions.filter(c => c.transaction_type === "rental").reduce((sum, c) => sum + Number(c.commission_amount), 0);
-
-  const gananciaTotal = gananciaVentas + gananciaArriendos;
+  // Los arriendos se descontinuaron el 24-07-2026; el panel dejó de mostrarlos el 07-09.
+  const gananciaTotal = gananciaVentas;
 
   return (
     <div className="min-h-screen bg-cream">
@@ -210,15 +195,12 @@ export default async function MisVentasPage() {
               Mis Ventas
             </h1>
             <p className="text-sm text-ink-muted mt-1">
-              Dashboard de ventas, arriendos y comisiones
+              Tus ventas y lo que ganaste
             </p>
           </div>
           <div className="text-right">
             <span className="text-xs uppercase tracking-wider text-ink-muted">Comisión</span>
             <p className="text-sm font-semibold text-brand-600">8% del precio del libro</p>
-            <p className="text-[11px] text-ink-muted mt-1 bg-green-50 text-green-700 px-2 py-0.5 rounded-full inline-block">
-              Comisión solo con MercadoPago · WhatsApp es gratis
-            </p>
           </div>
         </div>
 
@@ -234,9 +216,8 @@ export default async function MisVentasPage() {
         <BuyerCartsSection carts={buyerCarts} />
 
         {/* Stats cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-4 mb-8">
           <StatCard label="Ventas completadas" value={paidOrders.length.toString()} />
-          <StatCard label="Arriendos activos" value={paidRentals.length.toString()} />
           <StatCard
             label="Ganancia neta"
             value={`$${gananciaTotal.toLocaleString("es-CL")}`}
@@ -251,6 +232,7 @@ export default async function MisVentasPage() {
 
         {/* Detailed breakdown */}
         <div className="grid md:grid-cols-2 gap-4 mb-10">
+          {/* (la tarjeta de arriendos se quitó el 07-09-2026) */}
           <div className="bg-white rounded-xl border border-cream-dark/30 p-5">
             <h3 className="text-sm font-semibold text-ink mb-3">Ventas</h3>
             <div className="space-y-2 text-sm">
@@ -258,16 +240,6 @@ export default async function MisVentasPage() {
               <Row label="Comisiones" value={`-$${commissions.filter(c => c.transaction_type === "sale").reduce((s, c) => s + Number(c.commission_amount), 0).toLocaleString("es-CL")}`} muted />
               <div className="border-t border-cream-dark/20 pt-2">
                 <Row label="Ganancia neta ventas" value={`$${gananciaVentas.toLocaleString("es-CL")}`} bold />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl border border-cream-dark/30 p-5">
-            <h3 className="text-sm font-semibold text-ink mb-3">Arriendos</h3>
-            <div className="space-y-2 text-sm">
-              <Row label="Ingresos brutos" value={`$${totalArriendos.toLocaleString("es-CL")}`} />
-              <Row label="Comisiones" value={`-$${commissions.filter(c => c.transaction_type === "rental").reduce((s, c) => s + Number(c.commission_amount), 0).toLocaleString("es-CL")}`} muted />
-              <div className="border-t border-cream-dark/20 pt-2">
-                <Row label="Ganancia neta arriendos" value={`$${gananciaArriendos.toLocaleString("es-CL")}`} bold />
               </div>
             </div>
           </div>
@@ -281,15 +253,21 @@ export default async function MisVentasPage() {
           {orders.length > 0 ? (
             <div className="bg-white rounded-xl border border-cream-dark/30 overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-sm table-fixed">
+                  <colgroup>
+                    <col className="w-[30%]" />
+                    <col className="w-[24%]" />
+                    <col className="w-[11%]" />
+                    <col className="w-[25%]" />
+                    <col className="w-[10%]" />
+                  </colgroup>
                   <thead>
                     <tr className="border-b border-cream-dark/20 text-left text-xs text-ink-muted uppercase tracking-wider">
-                      <th className="px-4 py-3">Libro</th>
-                      <th className="px-4 py-3">Comprador</th>
-                      <th className="px-4 py-3">Precio</th>
-                      <th className="px-4 py-3">Envío</th>
-                      <th className="px-4 py-3">Estado</th>
-                      <th className="px-4 py-3">Fecha</th>
+                      <th className="px-3 py-3">Libro</th>
+                      <th className="px-3 py-3">Comprador</th>
+                      <th className="px-3 py-3">Precio</th>
+                      <th className="px-3 py-3">Envío</th>
+                      <th className="px-3 py-3">Fecha</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-cream-dark/10">
@@ -311,7 +289,7 @@ export default async function MisVentasPage() {
                         : null;
                       return (
                       <tr key={order.id} className="hover:bg-cream-warm/30 align-top">
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-3">
                           <div className="flex items-center gap-3">
                             {(order.listing?.cover_image_url ?? order.listing?.book?.cover_url) && (
                               <div className="relative w-8 h-11 shrink-0">
@@ -334,7 +312,7 @@ export default async function MisVentasPage() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-ink-muted">
+                        <td className="px-3 py-3 text-ink-muted">
                           <div className="min-w-0">
                             <p className="truncate">{order.buyer?.full_name ?? "—"}</p>
                             {!isInPerson && order.buyer_address && (
@@ -353,14 +331,33 @@ export default async function MisVentasPage() {
                             </Link>
                           </div>
                         </td>
-                        <td className="px-4 py-3 font-medium">
+                        <td className="px-3 py-3 font-medium">
                           ${Number(order.book_price).toLocaleString("es-CL")}
                         </td>
-                        <td className="px-4 py-3">
-                          {isInPerson ? (
-                            <span className="text-xs text-ink-muted">🤝 En persona</span>
+                        <td className="px-3 py-3">
+                          {order.status === "delivered" ? (
+                            <div className="space-y-0.5">
+                              <span className="text-xs font-medium text-green-700">
+                                ✅ Entregado el {new Date(order.shipping_updated_at ?? order.updated_at ?? order.created_at).toLocaleDateString("es-CL")}
+                              </span>
+                              <span className="text-[11px] text-ink-muted block">{isInPerson ? "En persona" : order.courier}</span>
+                            </div>
+                          ) : order.status === "cancelled" ? (
+                            <span className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_LABELS.cancelled?.class ?? ""}`}>Cancelado</span>
+                          ) : isInPerson ? (
+                            <div className="space-y-1.5">
+                              <span className="text-xs text-ink-muted block">🤝 En persona</span>
+                              {isPaid && (
+                                <EntregadoButton
+                                  bundleId={order.bundle_id ?? order.id}
+                                  label="Marcar entregado"
+                                  pregunta="¿Ya se lo entregaste?"
+                                  compact
+                                />
+                              )}
+                            </div>
                           ) : isPaid ? (
-                            <div className="space-y-1.5 min-w-[180px]">
+                            <div className="space-y-1.5 ">
                               <div className="text-xs font-medium text-ink">
                                 📦 {order.courier ?? "Courier"}
                               </div>
@@ -425,12 +422,7 @@ export default async function MisVentasPage() {
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3">
-                          <span className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_LABELS[order.status as OrderStatus]?.class ?? ""}`}>
-                            {STATUS_LABELS[order.status as OrderStatus]?.label ?? order.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-ink-muted text-xs">
+                        <td className="px-3 py-3 text-ink-muted text-xs">
                           {new Date(order.created_at).toLocaleDateString("es-CL")}
                         </td>
                       </tr>
@@ -442,79 +434,6 @@ export default async function MisVentasPage() {
             </div>
           ) : (
             <EmptyState text="Aún no tienes ventas" />
-          )}
-        </section>
-
-        {/* Rentals */}
-        <section className="mb-10">
-          <h2 className="font-display text-lg font-bold text-ink mb-4">
-            Arriendos ({rentals.length})
-          </h2>
-          {rentals.length > 0 ? (
-            <div className="bg-white rounded-xl border border-cream-dark/30 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-cream-dark/20 text-left text-xs text-ink-muted uppercase tracking-wider">
-                      <th className="px-4 py-3">Libro</th>
-                      <th className="px-4 py-3">Arrendatario</th>
-                      <th className="px-4 py-3">Precio</th>
-                      <th className="px-4 py-3">Período</th>
-                      <th className="px-4 py-3">Estado</th>
-                      <th className="px-4 py-3">Fecha</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-cream-dark/10">
-                    {rentals.map((rental: any) => (
-                      <tr key={rental.id} className="hover:bg-cream-warm/30">
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            {(rental.listing?.cover_image_url ?? rental.listing?.book?.cover_url) && (
-                              <div className="relative w-8 h-11 shrink-0">
-                                <Image
-                                  src={(rental.listing.cover_image_url ?? rental.listing.book.cover_url) as string}
-                                  alt=""
-                                  fill
-                                  className="object-cover rounded-sm"
-                                  sizes="32px"
-                                />
-                              </div>
-                            )}
-                            <div className="min-w-0">
-                              <p className="font-medium text-ink truncate">
-                                {rental.listing?.book?.title ?? "—"}
-                              </p>
-                              <p className="text-xs text-ink-muted truncate">
-                                {rental.listing?.book?.author ?? ""}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-ink-muted">
-                          {rental.renter?.full_name ?? "—"}
-                        </td>
-                        <td className="px-4 py-3 font-medium">
-                          ${Number(rental.rental_price).toLocaleString("es-CL")}
-                        </td>
-                        <td className="px-4 py-3 text-ink-muted">
-                          {rental.period_days} días
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className="text-xs px-2 py-0.5 rounded-full border bg-brand-50 text-brand-600 border-brand-200">
-                            {rental.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-ink-muted text-xs">
-                          {new Date(rental.created_at).toLocaleDateString("es-CL")}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ) : (
-            <EmptyState text="Aún no tienes arriendos" />
           )}
         </section>
 

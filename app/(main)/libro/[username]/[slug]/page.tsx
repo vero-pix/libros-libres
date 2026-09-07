@@ -3,6 +3,7 @@ import { permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import ListingDetail from "@/components/listings/ListingDetail";
 import BookReviews from "@/components/listings/BookReviews";
+import ReviewSection from "@/components/listings/ReviewSection";
 import ListingCard from "@/components/listings/ListingCard";
 import ListingViewTracker from "@/components/listings/ListingViewTracker";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -336,6 +337,13 @@ export default async function LibroPage({ params }: Props) {
 
           <div className="flex-1 min-w-0">
             <ListingDetail listing={listing} images={(images ?? []) as any} />
+
+            {/* Reseña del vendedor/ejemplar. El componente existía desde abril
+                pero no estaba montado en ninguna página: el correo "¿Cómo
+                llegó?" (07-09-2026) apunta acá con #resena-vendedor. */}
+            <div id="resena-vendedor">
+              <ReviewSection listingId={listing.id} />
+            </div>
 
             <BookReviews
               bookId={listing.book.id}

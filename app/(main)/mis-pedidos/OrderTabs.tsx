@@ -5,6 +5,8 @@ import { urlSeguimiento } from "@/lib/courier-tracking";
 import Link from "next/link";
 import Image from "next/image";
 import { OrderWithDetails } from "@/types";
+import EntregadoButton from "@/components/sales/EntregadoButton";
+import { libroUrl } from "@/lib/urls";
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Pendiente",
@@ -71,7 +73,9 @@ function groupByBundle(orders: OrderWithDetails[]): OrderGroup[] {
   return groups;
 }
 
-function BundleCard({ group }: { group: OrderGroup }) {
+const EN_PERSONA = ["Entrega en persona", "Punto de retiro"];
+
+function BundleCard({ group, esComprador }: { group: OrderGroup; esComprador: boolean }) {
   const firstListing = group.orders[0].listing;
   const firstBook = firstListing?.book;
   const firstCover = (firstListing as any)?.cover_image_url ?? firstBook?.cover_url;
@@ -83,11 +87,22 @@ function BundleCard({ group }: { group: OrderGroup }) {
   const status = group.firstOrder.status;
   const count = group.orders.length;
   const otherBooks = group.orders.slice(1);
+  const courier = group.firstOrder.courier;
+  const esCourier = !!courier && !EN_PERSONA.includes(courier);
+  // "Lo recibí": lo marca el comprador en envíos por courier (07-09-2026).
+  const puedeMarcarRecibido = esComprador && esCourier && (status === "paid" || status === "shipped");
+  const puedeResenar = esComprador && status === "delivered";
+  const fichaHref = libroUrl({
+    id: firstListing?.id ?? group.firstOrder.listing_id,
+    slug: (firstListing as any)?.slug,
+    seller: (firstListing as any)?.seller,
+  });
 
   return (
+    <div className="border border-gray-200 rounded-lg bg-white hover:shadow-md transition-shadow">
     <Link
       href={`/orders/${group.firstOrder.id}`}
-      className="block border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow"
+      className="block p-4"
     >
       <div className="flex gap-4">
         {firstCover && (
@@ -159,6 +174,26 @@ function BundleCard({ group }: { group: OrderGroup }) {
         </div>
       </div>
     </Link>
+    {(puedeMarcarRecibido || puedeResenar) && (
+      <div className="px-4 pb-4 -mt-1 flex flex-wrap items-center gap-3">
+        {puedeMarcarRecibido && (
+          <EntregadoButton
+            bundleId={group.bundleId ?? group.firstOrder.id}
+            label="Lo recibí"
+            pregunta="¿Te llegó el paquete?"
+          />
+        )}
+        {puedeResenar && (
+          <Link
+            href={`${fichaHref}#resena-vendedor`}
+            className="text-xs px-3 py-1.5 rounded-lg bg-brand-500 text-white hover:bg-brand-600"
+          >
+            ✍️ Dejar reseña
+          </Link>
+        )}
+      </div>
+    )}
+    </div>
   );
 }
 
@@ -215,7 +250,7 @@ export default function OrderTabs({
             }
           />
         ) : (
-          groups.map((g) => <BundleCard key={g.key} group={g} />)
+          groups.map((g) => <BundleCard key={g.key} group={g} esComprador={tab === "purchases"} />)
         )}
       </div>
     </div>

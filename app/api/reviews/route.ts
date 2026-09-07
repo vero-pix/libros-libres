@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     .select("id")
     .eq("listing_id", listing_id)
     .eq("buyer_id", user.id)
-    .eq("status", "paid")
+    .in("status", ["paid", "shipped", "delivered"])
     .limit(1)
     .maybeSingle();
 
