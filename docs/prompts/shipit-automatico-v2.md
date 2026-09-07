@@ -20,9 +20,13 @@
 | D4 | Apertura a producción **por vendedor** (`users.shipit_auto_enabled`): Vero → Libro de Ocasión → resto. |
 | D5 | Webhook de Shipit en **fase 2**. Fase 1 cubre tracking y etiqueta con el worker. (Pendiente de confirmar por Vero; se asume la recomendación.) |
 | D6 | **El origen es variable por vendedor** (`users.shipit_origin_id`), nunca la cuenta de Vero. Un envío sin origen resuelto no se crea. |
-| D7 | **La modalidad de despacho es elección del vendedor**, no de la plataforma: (a) *Retiro Héroe* — Shipit pasa a buscar el paquete (solo Región Metropolitana); (b) *Entrega en courier* — el vendedor imprime la etiqueta y deja el paquete en la sucursal del courier asignado. Se guarda como `users.shipit_dispatch_mode` (`pickup` / `dropoff`) con default según región del vendedor, y el vendedor puede cambiarlo por pedido desde `/mis-ventas` mientras el envío esté en `label_ready`. Los usuarios reportan que la falta de esta opción es limitante. |
+| D7 | **Revisada el 07-09-2026 tras el PROMPT 0.3.** Fase 1: **`dropoff` es el único modo automático** — el envío se crea por API sin retiro (es lo que la API hace por defecto: `last_pickup` queda `null`), el vendedor imprime la `pack_pdf` y deja el paquete en la sucursal del courier asignado. Solo Chilexpress, Starken y Bluexpress aceptan esto, así que la cotización en dropoff filtra a esos tres. **Retiro Héroe (`pickup`, solo RM) = botón "Pedir retiro a domicilio" en `/mis-ventas`** mientras el envío esté en `label_ready`: dispara gong a Vero, que lo solicita a mano en el panel de Shipit antes de las 11:00. Fase 1.5 (automatizar el pickup) cuando soporte responda si existe endpoint. Se guarda igual `users.shipit_dispatch_mode` (`pickup` / `dropoff`) como preferencia, pero en fase 1 solo cambia el texto del correo y muestra el botón. |
 
-**Nota sobre D7.** La guía v1 afirmaba que "el origen es siempre retiro a domicilio" y que dejar el paquete en sucursal "no existe". El centro de ayuda de Shipit dice otra cosa: el Retiro Héroe solo opera en la RM y, fuera de ella, el remitente **deja el paquete en la sucursal del courier asignado** con la etiqueta de Shipit. Es decir, el drop-off existe operativamente; lo que falta confirmar es cómo se expresa en `POST /v/shipments` (campo, o configuración de la cuenta/origen) y si un envío en la RM puede crearse sin agendar retiro. Eso es el PROMPT 0.3.
+**Nota sobre D7.** La guía v1 afirmaba que "el origen es siempre retiro a domicilio" y que dejar el paquete en sucursal "no existe". El PROMPT 0.3 (07-09-2026, informe en `docs/shipit/PROMPT_0.3_modalidad_despacho_2026-09-07.md`) lo resolvió con evidencia: `POST /v/shipments` **no agenda retiro** (`last_pickup: null`, `request_pickup: true`, `pickup_state: null` en los dos envíos de prueba desde el origen 100321); el Retiro Héroe es una "Solicitud de Retiro" manual en la plataforma de Shipit, sin endpoint documentado; y el centro de ayuda (artículo 360007479394) confirma que se puede "ir a dejar tus encomiendas directamente a la sucursal según el courier que se encuentre asignado (solo para Chilexpress, Starken y Bluexpress)". `DELETE /v/shipments/{id}` no está documentado pero funciona (deja el envío en `canceled_shipment`).
+
+**Registro de envíos de prueba (para reclamar si aparecen en la factura de septiembre):** ids **8911837** (ref `TEST-0907A`) y **8911838** (ref `TEST-0907B`), creados el 07-09-2026 ~01:50 UTC con `sandbox: true`, Chilexpress, origen 100321 → La Florida, $6.844 c/u. Volvieron con `is_sandbox: false` y tracking real (`713129353775`, `713129353790`). Anulados por API ~2 minutos después, en estado `in_preparation` (nunca en manos del courier); quedaron en `canceled_shipment` con `billing_date = 2026-09-07`.
+
+**Sandbox.** El campo `sandbox` del body **no hace nada** hasta que Shipit active el modo sandbox **por cuenta** (integraciones@shipit.cl; así lo dice el README del gem oficial). Por eso `SHIPIT_MODE` es solo `dry-run | live`. **No se crean más envíos de prueba en vivo.** La primera prueba `live` es una venta real de Vero con `shipit_auto_enabled = true`.
 
 ---
 
@@ -36,10 +40,11 @@ MP webhook (payment approved)
 
 Cron /api/cron/shipments  (cada 3 min, CRON_SECRET, SHIPIT_MODE)
    ├─ pending        → vendedor sin origen → needs_origin (gong + correo a Vero)   [no debería ocurrir por D1]
-   │                  → POST /v/shipments (sandbox si SHIPIT_MODE≠live) → created
+   │                  → POST /v/shipments (solo SHIPIT_MODE=live) → created
    ├─ created        → GET /v/shipments/{id} → tracking + pack_pdf → descargar PDF → Storage → label_ready
-   ├─ label_ready    → correo vendedor (etiqueta adjunta + link firmado + ventana retiro) + correo comprador (tracking) → notified
-   ├─ notified       → last_pickup con fecha → pickup_scheduled
+   ├─ label_ready    → correo vendedor (etiqueta adjunta + link firmado + "déjalo en la sucursal de {courier}") + correo comprador (tracking) → notified
+   ├─ notified       → (fase 1) el vendedor puede apretar "Pedir retiro a domicilio" → gong a Vero → Vero lo pide en el panel antes de las 11:00
+   │                  → (fase 1.5) last_pickup con fecha → pickup_scheduled
    └─ cualquier estado > 24 h sin avanzar → stalled (gong); attempts ≥ 5 → failed (gong)
 
 Fase 2: webhook Shipit → in_transit / delivered / failed
@@ -47,7 +52,7 @@ Fase 2: webhook Shipit → in_transit / delivered / failed
 
 Tres capas de idempotencia: `shipments.bundle_id UNIQUE` + `ON CONFLICT DO NOTHING`; `reference` determinista (`TL-` + 12 chars del bundle_id) y `UNIQUE`; transición condicional de estado antes de cada llamada externa, y consulta por `reference`/`id` antes de reintentar una creación fallida.
 
-`SHIPIT_MODE = dry-run | sandbox | live`. `dry-run` escribe en `shipit_events` lo que haría, sin llamar. `live` solo para vendedores con `shipit_auto_enabled = true`.
+`SHIPIT_MODE = dry-run | live`. `dry-run` escribe en `shipit_events` lo que haría, sin llamar. `live` solo para vendedores con `shipit_auto_enabled = true`. `sandbox` se agrega **solo cuando Shipit lo active por cuenta**; hasta entonces no se crean envíos de prueba en vivo (ver nota sobre D7).
 
 ### Modelo de datos
 
@@ -90,6 +95,11 @@ DIAGNÓSTICO:
    origen real del vendedor (users.default_address → comuna, o
    shipit_origin_id cuando exista) y un colchón SHIPPING_QUOTE_BUFFER_PCT
    por env (default 10) que se pueda bajar a 0 sin deploy.
+5. Modo dropoff (D7 revisada): la cotización solo puede devolver
+   couriers que aceptan el paquete en sucursal — chilexpress, starken y
+   bluexpress. Muéstrame dónde filtrar en getShipitQuotes() (por
+   courier.name de la respuesta de /v/rates) y qué pasa con la cotización
+   cuando ninguno de los tres tiene servicio para ese par de comunas.
 
 Entrega el diagnóstico con evidencia de código y la propuesta. Espera mi
 aprobación para implementar.
@@ -132,7 +142,7 @@ Espera mi aprobación.
 
 Criterio de aceptación: replay manual de un `payment.updated` de un pago ya aplicado no produce correos ni cambios; el log deja de mostrar `firma_invalida` para IPN.
 
-**PROMPT 0.3 — modalidad de despacho en la API de Shipit (bloquea D7)**
+**PROMPT 0.3 — modalidad de despacho en la API de Shipit (bloquea D7)** — ✅ **CERRADO el 07-09-2026.** Informe: `docs/shipit/PROMPT_0.3_modalidad_despacho_2026-09-07.md`. Resultado en la nota sobre D7. Se mantiene el texto como registro.
 
 ```
 Lee docs/prompts/shipit-automatico-v2.md, decisión D7. No implementes nada.
@@ -158,7 +168,7 @@ Héroe porque el vendedor va a dejar el paquete en la sucursal del courier.
 Entrega hallazgos con evidencia. Espera mi decisión.
 ```
 
-Criterio de aceptación: sabemos, con evidencia de API o respuesta escrita de Shipit, cómo crear un envío en modalidad `dropoff` y otro en `pickup`, y qué ve el vendedor en cada caso.
+Criterio de aceptación: sabemos, con evidencia de API o respuesta escrita de Shipit, cómo crear un envío en modalidad `dropoff` y otro en `pickup`, y qué ve el vendedor en cada caso. **Cumplido a medias:** `dropoff` = crear sin más; `pickup` no se puede por API (pendiente respuesta de soporte, correo enviado el 07-09).
 
 **Manual (Vero, 2 minutos):** panel de Shipit → Configuración → Direcciones → dejar "TusLibros" (100321) como origen predeterminado.
 
@@ -213,27 +223,36 @@ d) Cron /api/cron/shipments con la RPC de claim, máquina de estados,
    límite de 5 intentos, gong en needs_origin/stalled/failed.
 e) Descarga de etiqueta a Storage y URL firmada; /mis-ventas muestra
    estado y botón "Descargar etiqueta"; /mis-pedidos muestra tracking.
-f) Correos: vendedor (etiqueta adjunta + link + ventana de retiro,
-   plantilla 5b de docs/MENSAJES-ONBOARDING-VENDEDOR.md) y comprador
-   (tracking, plantilla 5c). Se envían desde el worker, una vez, con
-   registro en shipit_events kind='email'.
+f) Correos: vendedor (etiqueta adjunta + link, plantilla 5b de
+   docs/MENSAJES-ONBOARDING-VENDEDOR.md) y comprador (tracking, plantilla
+   5c). Se envían desde el worker, una vez, con registro en shipit_events
+   kind='email'. D7 revisada: el flujo por defecto del correo del
+   vendedor y de /como-despachar es "imprime la etiqueta y déjala en la
+   sucursal de {courier} más cercana"; el retiro a domicilio ya no es la
+   ventana que se anuncia, sino una opción a pedido ("si estás en la RM y
+   prefieres que pasen a buscarlo, pídelo desde Mis Ventas"). Actualizar
+   la plantilla 5b y /como-despachar en el mismo paso.
 g) Script scripts/shipit-origenes.mjs: lista GET /v/origins, propone
    match con users.default_address, y con --set user_id origin_id
    guarda shipit_origin_id. Vero = 100321.
 h) Checkout: si el vendedor no tiene shipit_origin_id, no ofrecer
    courier (solo entrega en persona) con un aviso al vendedor en
    /mis-libros: "Para vender con despacho, escríbele a Vero".
-i) Modalidad (D7): selector pickup/dropoff en /perfil del vendedor con
-   default por región; en /mis-ventas, cambio por pedido mientras el
-   envío esté en label_ready. El correo del vendedor cambia según la
-   modalidad (ventana de retiro vs. "imprime la etiqueta y déjalo en la
-   sucursal {courier} más cercana"). Depende del resultado del PROMPT 0.3.
+i) Modalidad (D7 revisada): dropoff es el único modo automático. En
+   /mis-ventas, mientras el envío esté en label_ready o notified y el
+   vendedor esté en la RM, botón "Pedir retiro a domicilio": guarda
+   shipments.pickup_requested_at, dispara gong a Vero con id de Shipit,
+   dirección y ventana, y muestra al vendedor "Vero lo pide en Shipit
+   antes de las 11:00; te avisamos la ventana". Vero lo solicita a mano
+   en el panel. Sin selector en /perfil por ahora (users.shipit_dispatch_mode
+   queda en la migración, default 'dropoff', sin UI). Fase 1.5: si soporte
+   confirma endpoint de retiro, el botón pasa a llamar a la API.
 
 Sin tests de concurrencia no se cierra el paso d): dos ejecuciones
 simultáneas del cron sobre la misma fila deben producir UN solo envío.
 ```
 
-Criterio de aceptación de FASE 1: con `SHIPIT_MODE=dry-run`, las 6 órdenes reales pagadas con courier de la semana del 01–06 de septiembre producen 6 filas en `shipments` y 6 eventos `dry-run` con el body exacto que se enviaría. Con `sandbox`, una venta de prueba de Vero y otra de Libro de Ocasión llegan a `label_ready` con PDF en Storage y correos enviados a buzones de prueba. Con `live` y `shipit_auto_enabled` solo para Vero, una venta real llega a `pickup_scheduled` sin intervención manual.
+Criterio de aceptación de FASE 1: con `SHIPIT_MODE=dry-run`, las 6 órdenes reales pagadas con courier de la semana del 01–06 de septiembre producen 6 filas en `shipments` y 6 eventos `dry-run` con el body exacto que se enviaría. Con `live` y `shipit_auto_enabled` solo para Vero, **una venta real de Vero** (sin envíos de prueba en vivo: el sandbox no está activo por cuenta) llega a `notified` con PDF en Storage, correo al vendedor con la etiqueta y correo al comprador con tracking, sin intervención manual; el paquete se deja en sucursal. `pickup_scheduled` queda para la fase 1.5.
 
 ### FASE 1b — recuperar lo atrapado
 
@@ -268,12 +287,14 @@ Conclusión: con el volumen actual, cambiar de agregador no resuelve nada que no
 
 ## Preguntas abiertas que la FASE 1 debe cerrar
 
-- ¿Shipit agenda el retiro el mismo día si el envío se crea antes de cierta hora? Registrar `last_pickup.schedule` de los primeros 10 envíos reales en `shipit_events` y anotar el patrón aquí.
+- ~~¿Shipit agenda el retiro el mismo día si el envío se crea antes de cierta hora?~~ Resuelto (PROMPT 0.3): la API no agenda nada; el retiro es una solicitud manual con corte a las 11:00.
+- ¿Existe endpoint para solicitar/cancelar el Retiro Héroe? ¿Plazo para dejar el paquete en sucursal sin retiro? ¿Sandbox por cuenta? Preguntado a integraciones@shipit.cl el 07-09-2026; al responder, actualizar D7 y abrir la fase 1.5.
 - ¿`pack_pdf` requiere sesión? (prompt 1.1, punto 6).
 - ¿`GET /v/shipments/reference` o `GET /v/shipments/{id}`? (prompt 1.1, punto 5).
 
 ## Referencias
 
-- https://developers.shipit.cl/reference/crear-un-envío.md — `reference` ≤ 15 chars, única por día de operación; `sandbox` boolean; `origin.origin_id` requiere multiorigen; la respuesta de creación trae `tracking_number` y `pack_pdf` en `null` al inicio.
+- https://developers.shipit.cl/reference/crear-un-envío.md — `reference` ≤ 15 chars, única por día de operación; `sandbox` boolean (**inerte hasta que Shipit active sandbox por cuenta**); `origin.origin_id` requiere multiorigen; la respuesta de creación trae `tracking_number` y `pack_pdf` en `null` al inicio y ~20 s después los completa. `DELETE /v/shipments/{id}` anula (no documentado, verificado el 07-09-2026).
+- `docs/shipit/PROMPT_0.3_modalidad_despacho_2026-09-07.md` — evidencia completa del PROMPT 0.3.
 - https://developers.shipit.cl/reference/configuración-webhook.md
 - Soporte Shipit: WhatsApp +56 9 3230 2514 (L–V 9:00–18:00), soporte@shipit.cl
