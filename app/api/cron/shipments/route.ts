@@ -12,6 +12,7 @@ import {
   SHIPIT_REGION_RM,
 } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
+import { foldAccents } from "@/lib/accentSearch";
 import { resolverOrigenEnvio } from "@/lib/shipping-quote";
 import { sendEmail } from "@/lib/email";
 import { VERO_INBOX } from "@/lib/veroInbox";
@@ -198,6 +199,12 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
 
   const calle = head.buyer_address.split(",")[0]?.trim() ?? "";
   const m = calle.match(/^(.+?)\s+(\d+[a-zA-Z]?)\s*(.*)$/);
+  // Sin comas ("Dublé Almeyda 2300 depto 502 Ñuñoa", "Pasaje Isla Nueva 799
+  // Curicó región del Maule") la comuna y la región quedan pegadas al
+  // complemento. Se recortan para mandar solo el depto/oficina.
+  const complemento = head.buyer_address.includes(",")
+    ? (m?.[3] ?? "")
+    : limpiarComplemento(m?.[3] ?? "", destCommune);
   const courier = String(head.courier ?? "").toLowerCase();
   const n = Math.max(1, items ?? 1);
 
@@ -211,7 +218,7 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
     destiny: {
       street: m?.[1] ?? calle,
       number: m?.[2] ?? "0",
-      complement: m?.[3] ?? "",
+      complement: complemento,
       commune_id: destCommuneId,
       commune_name: destCommune,
       full_name: comprador?.full_name ?? "Comprador",
@@ -325,6 +332,39 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
     .eq("bundle_id", fila.bundle_id);
 
   return { ...base, estado: "created", accion: "creado", nota: `shipit_id ${res.id}` };
+}
+
+/**
+ * Deja en el complemento solo el depto/oficina. Saca la comuna (donde esté),
+ * todo lo que venga desde "región …" y un "Chile" suelto. Compara sin tildes
+ * ni mayúsculas, pero conserva el texto original de lo que queda.
+ *   "depto 502 Ñuñoa" + "NUNOA"            → "depto 502"
+ *   "Curicó región del Maule" + "CURICO"   → ""
+ *   "of. 3 San Fernando, Chile" + "SAN FERNANDO" → "of. 3"
+ */
+function limpiarComplemento(complemento: string, comuna: string): string {
+  let tokens = complemento.trim().split(/\s+/).filter(Boolean);
+  const planos = () => tokens.map((t) => foldAccents(t).replace(/[,;.]+$/, ""));
+
+  // Desde "región" en adelante no es parte del complemento.
+  const iRegion = planos().findIndex((t) => t.startsWith("region"));
+  if (iRegion >= 0) tokens = tokens.slice(0, iRegion);
+
+  tokens = tokens.filter((_, i) => planos()[i] !== "chile");
+
+  // La comuna puede tener varias palabras ("san fernando"): se busca la secuencia.
+  const com = foldAccents(comuna).trim().split(/\s+/).filter(Boolean);
+  if (com.length) {
+    const p = planos();
+    for (let i = 0; i + com.length <= p.length; i++) {
+      if (com.every((w, k) => p[i + k] === w)) {
+        tokens.splice(i, com.length);
+        break;
+      }
+    }
+  }
+
+  return tokens.join(" ").replace(/^[\s,;\-–]+|[\s,;\-–]+$/g, "").trim();
 }
 
 /* ───────────────────────── created → label_ready ───────────────────────── */
