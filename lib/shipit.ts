@@ -587,6 +587,15 @@ export async function createShipitShipment(body: Record<string, unknown>): Promi
   if (!SHIPIT_EMAIL || !SHIPIT_TOKEN) {
     return { ...parseShipmentResponse(0, null), error: "missing_credentials" };
   }
+  // Guard de origen (D6): sin origin_id NO se crea. Si el body fuera sin
+  // `origin`, Shipit usaría el origen por defecto de la cuenta, que hoy es
+  // "ocasion" (Libro de Ocasión): el envío saldría cobrado y etiquetado desde
+  // la dirección equivocada. El worker ya manda esas filas a needs_origin;
+  // esto es la segunda barrera, por si alguien llama a esta función directo.
+  const originId = (body as any)?.origin?.origin_id;
+  if (typeof originId !== "number" || originId <= 0) {
+    return { ...parseShipmentResponse(0, null), error: "sin origin_id: no se crea (D6)" };
+  }
   const { status, data } = await shipitFetch("/shipments", { method: "POST", body: JSON.stringify(body) });
   return parseShipmentResponse(status, data);
 }

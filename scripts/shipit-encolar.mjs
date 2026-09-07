@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Encola en `shipments` las ventas pagadas con courier que todavía no tienen
- * fila. Idempotente (ON CONFLICT DO NOTHING por bundle_id). Sirve para:
+ * fila ni despacho (sin tracking_code y sin shipping_status='created'). Idempotente (ON CONFLICT DO NOTHING por bundle_id). Sirve para:
  *   - la fase 1b (recuperar lo que se pagó antes de que existiera la cola)
  *   - probar el worker en dry-run contra ventas reales
  *
@@ -33,9 +33,13 @@ const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUP
 let q = admin
   .from("orders")
   .select(
-    "id, bundle_id, seller_id, buyer_id, courier, shipping_cost, shipping_subsidy, buyer_address, created_at, seller:users!orders_seller_id_fkey(username)"
+    "id, bundle_id, seller_id, buyer_id, courier, shipping_cost, shipping_subsidy, buyer_address, created_at, tracking_code, shipping_status, seller:users!orders_seller_id_fkey(username)"
   )
   .eq("status", "paid")
+  // Ya despachadas a mano (o por el flujo viejo): tienen tracking o el
+  // borrador creado en Shipit. Encolarlas crearía un segundo envío.
+  .is("tracking_code", null)
+  .or("shipping_status.is.null,shipping_status.neq.created")
   .not("courier", "in", '("Entrega en persona","Punto de retiro")')
   .not("buyer_address", "is", null)
   .gte("created_at", desde)
