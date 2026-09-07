@@ -2,7 +2,12 @@
   "redirects": [
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "librolibre.cl" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "librolibre.cl"
+        }
+      ],
       "destination": "https://tuslibros.cl/:path*?utm_source=librolibre&utm_medium=redirect",
       "permanent": true
     }
@@ -35,6 +40,10 @@
     {
       "path": "/api/cron/health",
       "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/cron/shipments",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

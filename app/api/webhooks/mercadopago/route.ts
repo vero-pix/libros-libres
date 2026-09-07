@@ -3,9 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { paymentClient } from "@/lib/mercadopago";
 import { notifySeller, notifyPaymentFailed } from "@/lib/notifications";
 import { sendEmail } from "@/lib/email";
-import { createShipitOrder, estimateBookPackageSize } from "@/lib/shipit";
-import { extractCommune } from "@/lib/chilexpress";
-import { resolverOrigenEnvio } from "@/lib/shipping-quote";
+import { encolarEnvio } from "@/lib/shipments";
 import crypto from "crypto";
 import { registrarComisionVenta } from "@/lib/commissions";
 import { VERO_INBOX } from "@/lib/veroInbox";
@@ -17,14 +15,6 @@ import { WHATSAPP_SOPORTE_LEGIBLE } from "@/lib/soporte";
  * Metropolitana" y con eso Shipit ignora el origen y cae a la dirección default
  * de la cuenta (la casa de Vero). Pasó con Libro de Ocasión el 05-09-2026.
  */
-/**
- * Origen del envío. La regla vive en lib/shipping-quote.ts y es la MISMA que
- * usa la cotización del checkout: si acá se eligiera otra comuna, el precio
- * cobrado al comprador y el que cobra Shipit se separan (PROMPT 0.1, 07-09-2026).
- */
-function resolverOrigen(listingAddress?: string | null, sellerAddress?: string | null): string | null {
-  return resolverOrigenEnvio({ listingAddress, sellerDefaultAddress: sellerAddress })?.address ?? null;
-}
 
 function verifySignature(req: NextRequest, body: Record<string, unknown>): boolean {
   const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
@@ -271,13 +261,16 @@ export async function POST(req: NextRequest) {
           console.error(`[webhook] Error al registrar comisión del bundle ${externalRef}:`, err);
         }
 
-        // Shipit: un solo envío para el bundle, en la "primera" order (la que tiene shipping_cost > 0)
+        // Shipit: desde el 07-09-2026 el webhook NO crea el envío. Encola una
+        // fila en `shipments` (ON CONFLICT DO NOTHING) y el worker
+        // app/api/cron/shipments la crea según SHIPIT_MODE. Con dry-run no se
+        // crea nada en Shipit: la venta igual aparece en /mis-ventas y Vero
+        // despacha a mano desde el panel de Shipit mientras dure.
         try {
           // La "cabeza" del bundle es donde se cargaron shipping y fee. Con la
           // promo de envío gratis, `shipping_cost` puede ser 0 en todas las
-          // órdenes, así que buscar por `> 0` ya no la identifica: se mira
-          // también el subsidio, y el fallback al primero sigue siendo válido
-          // porque todas las órdenes llevan el mismo `buyer_address`.
+          // órdenes, así que se mira también el subsidio; el fallback al primero
+          // sigue siendo válido porque todas llevan el mismo `buyer_address`.
           const headOrder =
             bundleOrders.find((o: any) => o.shipping_cost > 0 || o.shipping_subsidy > 0) ??
             bundleOrders[0];
@@ -286,73 +279,16 @@ export async function POST(req: NextRequest) {
             headOrder.courier === "Punto de retiro";
 
           if (headOrder.buyer_address && !isInPerson) {
-            const [{ data: buyer }, { data: sellerData }, { data: listingData }] = await Promise.all([
-              supabase.from("users").select("full_name, email, phone").eq("id", headOrder.buyer_id).single(),
-              supabase.from("users").select("full_name, email, phone, default_address").eq("id", headOrder.seller_id).single(),
-              supabase.from("listings").select("address").eq("id", headOrder.listing_id).single(),
-            ]);
-
-            const commune = extractCommune(headOrder.buyer_address);
-            const addressParts = headOrder.buyer_address.split(",")[0]?.trim() ?? "";
-            const streetMatch = addressParts.match(/^(.+?)\s+(\d+)/);
-
-            const originRaw = resolverOrigen(listingData?.address, sellerData?.default_address);
-            let shipitOrigin: Parameters<typeof createShipitOrder>[0]["origin"] | undefined;
-            if (originRaw) {
-              const originCommune = extractCommune(originRaw);
-              const originParts = originRaw.split(",")[0]?.trim() ?? "";
-              const originStreetMatch = originParts.match(/^(.+?)\s+(\d+)/);
-              shipitOrigin = {
-                street: originStreetMatch?.[1] ?? originParts,
-                number: parseInt(originStreetMatch?.[2] ?? "0", 10),
-                commune_name: originCommune,
-                full_name: sellerData?.full_name ?? "Vendedor",
-                email: sellerData?.email ?? "",
-                phone: sellerData?.phone ?? "",
-              };
-            }
-
-            const shipitResult = await createShipitOrder({
-              orderId: headOrder.id,
-              itemCount: bundleOrders.length,
-              sizes: estimateBookPackageSize(bundleOrders.length),
-              origin: shipitOrigin,
-              destiny: {
-                street: streetMatch?.[1] ?? addressParts,
-                number: parseInt(streetMatch?.[2] ?? "0", 10),
-                commune_id: 0,
-                commune_name: commune,
-                full_name: buyer?.full_name ?? "Comprador",
-                email: buyer?.email ?? "",
-                phone: buyer?.phone ?? "",
-              },
-              courier: {
-                client: headOrder.courier ?? "starken",
-                price: headOrder.shipping_cost ?? 0,
-              },
+            await encolarEnvio(supabase, {
+              bundleId: externalRef,
+              orderHeadId: headOrder.id,
+              sellerId: headOrder.seller_id,
+              buyerId: headOrder.buyer_id,
+              quotedCost: Number(headOrder.shipping_cost ?? 0) + Number(headOrder.shipping_subsidy ?? 0),
             });
-
-            if (shipitResult.state !== "error") {
-              // Propagar tracking/label a TODAS las orders del bundle
-              await supabase
-                .from("orders")
-                .update({
-                  tracking_code: shipitResult.tracking_code ?? null,
-                  shipping_status: shipitResult.state,
-                  shipping_label_url: shipitResult.label_url ?? null,
-                  shipit_order_id: shipitResult.id || null,
-                  shipping_updated_at: new Date().toISOString(),
-                })
-                .eq("bundle_id", externalRef);
-            } else {
-              console.error(
-                `[webhook] Shipit order failed for bundle ${externalRef}:`,
-                shipitResult.error
-              );
-            }
           }
         } catch (shipitErr) {
-          console.error("[webhook] Shipit creation error (bundle):", shipitErr);
+          console.error("[webhook] no se pudo encolar el envío (bundle):", shipitErr);
         }
 
         // Emails de bundle
@@ -530,10 +466,11 @@ export async function POST(req: NextRequest) {
           console.error("[webhook] notifySeller error:", err)
         );
 
+        // Shipit: igual que en el bundle, se encola y el worker decide.
         try {
           const { data: shipitOrder } = await supabase
             .from("orders")
-            .select("id, buyer_id, seller_id, listing_id, buyer_address, shipping_cost, courier")
+            .select("id, buyer_id, seller_id, bundle_id, buyer_address, shipping_cost, shipping_subsidy, courier")
             .eq("id", order.id)
             .single();
 
@@ -542,65 +479,16 @@ export async function POST(req: NextRequest) {
             shipitOrder?.courier === "Punto de retiro";
 
           if (shipitOrder?.buyer_address && !isInPerson) {
-            const [{ data: buyer }, { data: sellerData }, { data: listingData }] = await Promise.all([
-              supabase.from("users").select("full_name, email, phone").eq("id", shipitOrder.buyer_id).single(),
-              supabase.from("users").select("full_name, email, phone, default_address").eq("id", shipitOrder.seller_id).single(),
-              supabase.from("listings").select("address").eq("id", shipitOrder.listing_id).single(),
-            ]);
-
-            const commune = extractCommune(shipitOrder.buyer_address);
-            const addressParts = shipitOrder.buyer_address.split(",")[0]?.trim() ?? "";
-            const streetMatch = addressParts.match(/^(.+?)\s+(\d+)/);
-
-            const originRaw = resolverOrigen(listingData?.address, sellerData?.default_address);
-            let shipitOrigin: Parameters<typeof createShipitOrder>[0]["origin"] | undefined;
-            if (originRaw) {
-              const originCommune = extractCommune(originRaw);
-              const originParts = originRaw.split(",")[0]?.trim() ?? "";
-              const originStreetMatch = originParts.match(/^(.+?)\s+(\d+)/);
-              shipitOrigin = {
-                street: originStreetMatch?.[1] ?? originParts,
-                number: parseInt(originStreetMatch?.[2] ?? "0", 10),
-                commune_name: originCommune,
-                full_name: sellerData?.full_name ?? "Vendedor",
-                email: sellerData?.email ?? "",
-                phone: sellerData?.phone ?? "",
-              };
-            }
-
-            const shipitResult = await createShipitOrder({
-              orderId: order.id,
-              origin: shipitOrigin,
-              destiny: {
-                street: streetMatch?.[1] ?? addressParts,
-                number: parseInt(streetMatch?.[2] ?? "0", 10),
-                commune_id: 0,
-                commune_name: commune,
-                full_name: buyer?.full_name ?? "Comprador",
-                email: buyer?.email ?? "",
-                phone: buyer?.phone ?? "",
-              },
-              courier: {
-                client: shipitOrder.courier ?? "starken",
-                price: shipitOrder.shipping_cost ?? 0,
-              },
+            await encolarEnvio(supabase, {
+              bundleId: shipitOrder.bundle_id ?? shipitOrder.id,
+              orderHeadId: shipitOrder.id,
+              sellerId: shipitOrder.seller_id,
+              buyerId: shipitOrder.buyer_id,
+              quotedCost: Number(shipitOrder.shipping_cost ?? 0) + Number(shipitOrder.shipping_subsidy ?? 0),
             });
-
-            if (shipitResult.state !== "error") {
-              await supabase
-                .from("orders")
-                .update({
-                  tracking_code: shipitResult.tracking_code ?? null,
-                  shipping_status: shipitResult.state,
-                  shipping_label_url: shipitResult.label_url ?? null,
-                  shipit_order_id: shipitResult.id || null,
-                  shipping_updated_at: new Date().toISOString(),
-                })
-                .eq("id", order.id);
-            }
           }
         } catch (shipitErr) {
-          console.error("[webhook] Shipit creation error:", shipitErr);
+          console.error("[webhook] no se pudo encolar el envío:", shipitErr);
         }
       }
 

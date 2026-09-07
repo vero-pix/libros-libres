@@ -49,14 +49,24 @@ async function loadCommunes(): Promise<{ id: number; name: string }[]> {
  * para toda comuna acentuada: 287 de 1.671 libros activos, 116 solo de
  * Concepción. Por eso se compara sobre texto plegado. (4 ago 2026)
  */
-async function findCommuneId(communeName: string): Promise<number | null> {
+export async function findCommuneId(communeName: string): Promise<number | null> {
+  return (await findCommune(communeName))?.id ?? null;
+}
+
+/**
+ * Igual que `findCommuneId` pero devuelve también el nombre canónico de Shipit.
+ * Importa cuando la dirección viene sin comas ("Dublé Almeyda 2300 depto 502
+ * Ñuñoa"): el id se resuelve bien por inclusión, pero el nombre que se manda
+ * en `commune_name` tiene que ser "ÑUÑOA", no la dirección entera.
+ */
+export async function findCommune(communeName: string): Promise<{ id: number; name: string } | null> {
   const communes = await loadCommunes();
   const wanted = foldAccents(communeName).trim();
   if (!wanted) return null;
 
   // Exact match
   const exact = communes.find((c) => foldAccents(c.name) === wanted);
-  if (exact) return exact.id;
+  if (exact) return exact;
 
   // Partial match. Se exige un mínimo de largo porque un `includes` con
   // términos cortos empareja cualquier cosa.
@@ -65,7 +75,7 @@ async function findCommuneId(communeName: string): Promise<number | null> {
     const name = foldAccents(c.name);
     return name.includes(wanted) || wanted.includes(name);
   });
-  if (partial) return partial.id;
+  if (partial) return partial;
 
   return null;
 }
@@ -337,7 +347,11 @@ function extractLabelUrl(data: any): string | undefined {
 }
 
 /**
- * Crea una orden/envío en Shipit.
+ * @deprecated Endpoint viejo (`orders.shipit.cl/v/orders`). Desde el 07-09-2026
+ * el webhook de MercadoPago ya no lo llama: encola en `shipments` y el worker
+ * (app/api/cron/shipments) crea el envío con `createShipitShipment()` contra
+ * `api.shipit.cl/v/shipments`. Se deja para el script de recuperación de la
+ * fase 1b y se borra cuando ese script muera.
  * Docs: POST https://orders.shipit.cl/v/orders
  */
 export async function createShipitOrder(input: ShipitOrderInput): Promise<ShipitOrderResult> {
@@ -434,5 +448,164 @@ export async function createShipitOrder(input: ShipitOrderInput): Promise<Shipit
   }
 }
 
-/** Resuelve nombre de comuna a ID de Shipit (exportado para uso externo) */
-export { findCommuneId };
+/* ── API de Envíos (api.shipit.cl/v/shipments) — fase 1 ── */
+
+/**
+ * Ids de courier que exige `courier.id` al crear. Verificados contra
+ * `GET /v/couriers` el 07-09-2026 (Chilexpress 1, Starken 2, Bluexpress 8).
+ * Coinciden con `courier.name` de `/v/rates` y con `orders.courier`.
+ */
+export const COURIER_IDS: Record<string, number> = {
+  chilexpress: 1,
+  starken: 2,
+  bluexpress: 8,
+};
+
+export interface ShipitShipmentInput {
+  /** `TL-` + 12 chars del bundle_id. Máximo 15 caracteres, único por día. */
+  reference: string;
+  /** `users.shipit_origin_id`. Null solo en dry-run: el body queda con origin_id null. */
+  originId: number | null;
+  /** Libros del bundle. */
+  items: number;
+  sizes: { length: number; width: number; height: number; weight: number };
+  /** El que eligió y pagó el comprador (`orders.courier`). */
+  courier: string;
+  destiny: {
+    street: string;
+    number: string;
+    complement?: string;
+    commune_id: number;
+    commune_name: string;
+    full_name: string;
+    email?: string;
+    phone?: string;
+  };
+  /** Solo para `seller.id` del body (trazabilidad en el panel de Shipit). */
+  sellerRef?: string;
+}
+
+export interface ShipitShipmentResult {
+  id: number | null;
+  /** `created` al crear; `in_preparation` ~20 s después; `canceled_shipment` tras DELETE. */
+  status: string | null;
+  courier: string | null;
+  tracking_number: string | null;
+  pack_pdf: string | null;
+  total_price: number | null;
+  last_pickup: unknown;
+  error?: string;
+  httpStatus: number;
+  /** Respuesta completa: se guarda entera en `shipit_events.response`. */
+  raw: unknown;
+}
+
+/**
+ * Body exacto de `POST /v/shipments`. Es una función pura a propósito: el
+ * dry-run registra en `shipit_events` lo que se mandaría, byte por byte.
+ */
+export function armarBodyShipit(input: ShipitShipmentInput): Record<string, unknown> {
+  const courier = input.courier.toLowerCase();
+  return {
+    kind: 0, // canal de venta: shipit
+    platform: 2, // api
+    reference: input.reference,
+    items: input.items,
+    sizes: input.sizes,
+    // Inerte hasta que Shipit active el modo sandbox por cuenta (correo del
+    // 07-09-2026). Se deja explícito para que nadie crea que protege algo.
+    sandbox: false,
+    seller: input.sellerRef ? { id: input.sellerRef, name: "tuslibros" } : undefined,
+    destiny: {
+      street: input.destiny.street,
+      number: input.destiny.number,
+      complement: input.destiny.complement ?? "",
+      commune_id: input.destiny.commune_id,
+      commune_name: input.destiny.commune_name.toUpperCase(),
+      full_name: input.destiny.full_name,
+      email: input.destiny.email ?? "",
+      phone: input.destiny.phone ?? "",
+      kind: "home_delivery",
+    },
+    courier: {
+      id: COURIER_IDS[courier] ?? null,
+      client: courier,
+      // Fuerza el courier que pagó el comprador; sin esto Shipit reasigna.
+      selected: true,
+      // `payable` = PAGO CONTRA ENTREGA: el destinatario paga el flete al
+      // recibir, con recargo. NO significa "envío pagado". Siempre false: el
+      // comprador ya pagó el flete en el checkout.
+      payable: false,
+    },
+    origin: { origin_id: input.originId },
+  };
+}
+
+function parseShipmentResponse(status: number, data: any): ShipitShipmentResult {
+  const err =
+    !data || typeof data !== "object"
+      ? `respuesta no JSON (HTTP ${status})`
+      : data.error ?? data.message ?? (status >= 400 ? `HTTP ${status}` : undefined);
+  return {
+    id: typeof data?.id === "number" ? data.id : null,
+    status: data?.status ?? null,
+    courier: data?.courier_for_client ?? null,
+    tracking_number: data?.tracking_number ?? null,
+    pack_pdf: data?.pack_pdf ?? null,
+    total_price: typeof data?.total_price === "number" ? data.total_price : null,
+    last_pickup: data?.last_pickup ?? null,
+    error: status >= 400 || data?.id === undefined ? String(err ?? `HTTP ${status}`) : undefined,
+    httpStatus: status,
+    raw: data,
+  };
+}
+
+async function shipitFetch(path: string, init: RequestInit): Promise<{ status: number; data: any }> {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 15_000);
+  try {
+    const res = await fetch(`${BASE_URL}${path}`, { ...init, headers: HEADERS, signal: ctrl.signal });
+    const text = await res.text();
+    let data: any = null;
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = { raw_text: text.slice(0, 500) };
+    }
+    return { status: res.status, data };
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+/**
+ * Crea el envío. No reintenta: el reintento lo decide el worker según el
+ * estado de la fila. Verificado el 07-09-2026: responde `id` y `status:
+ * created` al instante; `tracking_number` y `pack_pdf` llegan ~20 s después.
+ */
+export async function createShipitShipment(body: Record<string, unknown>): Promise<ShipitShipmentResult> {
+  if (!SHIPIT_EMAIL || !SHIPIT_TOKEN) {
+    return { ...parseShipmentResponse(0, null), error: "missing_credentials" };
+  }
+  const { status, data } = await shipitFetch("/shipments", { method: "POST", body: JSON.stringify(body) });
+  return parseShipmentResponse(status, data);
+}
+
+/**
+ * Consulta por id. `GET /v/shipments/reference/{ref}` devuelve 400 (probado el
+ * 07-09-2026), así que el id es la única llave: se guarda apenas llega.
+ */
+export async function getShipitShipment(id: number): Promise<ShipitShipmentResult> {
+  const { status, data } = await shipitFetch(`/shipments/${id}`, { method: "GET" });
+  return parseShipmentResponse(status, data);
+}
+
+/**
+ * Anula un envío. No está documentado; verificado el 07-09-2026 ("Envío
+ * eliminado", queda en `canceled_shipment`). Lo usa un humano (script o ruta
+ * admin), nunca el worker por su cuenta.
+ */
+export async function deleteShipitShipment(id: number): Promise<{ ok: boolean; httpStatus: number; raw: unknown }> {
+  const { status, data } = await shipitFetch(`/shipments/${id}`, { method: "DELETE" });
+  return { ok: status >= 200 && status < 300, httpStatus: status, raw: data };
+}
