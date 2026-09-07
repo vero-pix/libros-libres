@@ -63,6 +63,12 @@ export default function MyListings({ listings: initial }: Props) {
   const [filter, setFilter] = useState<"all" | ListingStatus>("all");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"recent" | "views_desc" | "views_asc">("recent");
+  // Cuántas filas se pintan. Con 1.700 publicaciones, renderizarlas todas de una
+  // vez traba el navegador; el buscador y los filtros siguen mirando la lista
+  // completa, solo se pinta de a tandas.
+  const TANDA = 60;
+  const [visibles, setVisibles] = useState(TANDA);
+  useEffect(() => setVisibles(TANDA), [filter, search, sortBy]);
   const supabase = createClient();
 
   const filtered = (filter === "all" ? listings : listings.filter((l) => l.status === filter))
@@ -222,7 +228,14 @@ export default function MyListings({ listings: initial }: Props) {
       </div>
 
       {/* Listings */}
-      {filtered.map((listing) => (
+      {filtered.length > 0 && (
+        <p className="text-xs text-gray-500">
+          {filtered.length === listings.length
+            ? `${listings.length} publicaciones`
+            : `${filtered.length} de ${listings.length} publicaciones`}
+        </p>
+      )}
+      {filtered.slice(0, visibles).map((listing) => (
         <ListingRow
           key={listing.id}
           listing={listing}
@@ -240,6 +253,15 @@ export default function MyListings({ listings: initial }: Props) {
           }}
         />
       ))}
+
+      {filtered.length > visibles && (
+        <button
+          onClick={() => setVisibles((v) => v + TANDA)}
+          className="w-full bg-white border border-gray-200 rounded-xl py-3 text-sm font-medium text-brand-600 hover:bg-brand-50"
+        >
+          Mostrar {Math.min(TANDA, filtered.length - visibles)} más ({filtered.length - visibles} restantes)
+        </button>
+      )}
 
       {filtered.length === 0 && (
         <p className="text-center text-gray-400 py-8">

@@ -4,6 +4,7 @@ import { comunaDesdeAddress } from "@/lib/comuna";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useMemo, useRef } from "react";
+import { useRouter } from "next/navigation";
 import type { ListingWithBook } from "@/types";
 import { addRecentlyViewed } from "./RecentlyViewed";
 import { createClient } from "@/lib/supabase/client";
@@ -150,7 +151,27 @@ export default function ListingDetail({ listing, images = [] }: Props) {
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
   const authorHub = authorLanding(book.author); // landing de autor (SEO: concentra autoridad en el hub)
   const [isOwner, setIsOwner] = useState(false);
-  const isSold = listing.status === "completed";
+  const router = useRouter();
+  // "Marcar como vendido" desde la ficha (07-09-2026): el vendedor llega a su
+  // libro desde Google o el catálogo y lo cierra ahí mismo, sin buscarlo entre
+  // cientos en /mis-libros.
+  const [marcando, setMarcando] = useState<"idle" | "confirm" | "saving" | "done">("idle");
+  const isSold = listing.status === "completed" || marcando === "done";
+
+  async function marcarVendido() {
+    setMarcando("saving");
+    const { error } = await createClient()
+      .from("listings")
+      .update({ status: "completed" })
+      .eq("id", listing.id);
+    if (error) {
+      alert("No se pudo marcar como vendido. Inténtalo desde Mis Libros.");
+      setMarcando("idle");
+      return;
+    }
+    setMarcando("done");
+    router.refresh();
+  }
 
   // La comuna se deriva igual que el dato que ya se muestra en la ficha (address
   // partido por comas). No mandamos la dirección completa: solo la comuna.
@@ -254,12 +275,46 @@ export default function ListingDetail({ listing, images = [] }: Props) {
           <div className="flex items-start justify-between gap-2">
             <h1 className="font-display text-2xl sm:text-3xl font-bold text-ink leading-tight">{book.title}</h1>
             {isOwner && (
-              <Link
-                href={`/mis-libros?edit=${listing.id}`}
-                className="flex-shrink-0 text-xs text-brand-600 hover:bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors"
-              >
-                Editar
-              </Link>
+              <div className="flex-shrink-0 flex items-center gap-1.5">
+                {!isSold && marcando === "idle" && (
+                  <button
+                    type="button"
+                    onClick={() => setMarcando("confirm")}
+                    className="text-xs text-ink hover:bg-cream-warm px-3 py-1.5 rounded-lg border border-cream-dark/40 transition-colors"
+                  >
+                    Marcar como vendido
+                  </button>
+                )}
+                {(marcando === "confirm" || marcando === "saving") && (
+                  <span className="inline-flex items-center gap-1.5 text-xs">
+                    <span className="text-ink-muted">¿Ya lo vendiste?</span>
+                    <button
+                      type="button"
+                      disabled={marcando === "saving"}
+                      onClick={marcarVendido}
+                      className="bg-ink text-cream px-3 py-1.5 rounded-lg disabled:opacity-60"
+                    >
+                      {marcando === "saving" ? "Guardando…" : "Sí, vendido"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMarcando("idle")}
+                      className="px-3 py-1.5 rounded-lg border border-cream-dark/40"
+                    >
+                      No
+                    </button>
+                  </span>
+                )}
+                {marcando === "done" && (
+                  <span className="text-xs text-green-700 font-medium">✅ Marcado como vendido</span>
+                )}
+                <Link
+                  href={`/mis-libros?edit=${listing.id}`}
+                  className="text-xs text-brand-600 hover:bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors"
+                >
+                  Editar
+                </Link>
+              </div>
             )}
           </div>
           <Link

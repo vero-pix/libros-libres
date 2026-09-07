@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { paginar } from "@/lib/supabase/paginar";
 import MyListings from "./MyListings";
 import MercadoPagoNudge from "@/components/listings/MercadoPagoNudge";
 import WantedBounty from "@/components/listings/WantedBounty";
@@ -25,13 +26,19 @@ export default async function MisLibrosPage() {
     .eq("id", user.id)
     .single();
 
-  const { data } = await supabase
-    .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, username)`)
-    .eq("seller_id", user.id)
-    .order("created_at", { ascending: false });
+  // Sin `paginar`, Supabase corta en 1.000 filas y no avisa: Libro de Ocasión
+  // (1.723 publicaciones) veía solo las 1.000 más nuevas y no podía marcar
+  // vendidas las otras 723. Reportado el 07-09-2026.
+  const data = await paginar<ListingWithBook>((desde, hasta) =>
+    supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, username)`)
+      .eq("seller_id", user.id)
+      .order("created_at", { ascending: false })
+      .range(desde, hasta) as any
+  );
 
-  const listings = (data as unknown as ListingWithBook[]) ?? [];
+  const listings = data ?? [];
   const missingContact = !profile?.public_email && !profile?.instagram && !profile?.phone;
 
   // Camino de vuelta para quien descartó el aviso en el éxito de publicación.
