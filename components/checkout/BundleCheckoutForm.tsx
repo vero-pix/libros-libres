@@ -144,6 +144,7 @@ export default function BundleCheckoutForm({
             body: JSON.stringify({
               listing_id: firstListingId,
               buyer_address: addr,
+              item_count: listings.length,
             }),
           });
 
@@ -205,7 +206,7 @@ export default function BundleCheckoutForm({
         setQuoting(false);
       }
     },
-    [firstListingId]
+    [firstListingId, listings.length]
   );
 
   useEffect(() => {

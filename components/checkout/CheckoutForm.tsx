@@ -139,6 +139,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
             body: JSON.stringify({
               listing_id: listing.id,
               buyer_address: addr,
+              item_count: 1,
             }),
           });
 

@@ -5,6 +5,7 @@ import { notifySeller, notifyPaymentFailed } from "@/lib/notifications";
 import { sendEmail } from "@/lib/email";
 import { createShipitOrder, estimateBookPackageSize } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
+import { resolverOrigenEnvio } from "@/lib/shipping-quote";
 import crypto from "crypto";
 import { registrarComisionVenta } from "@/lib/commissions";
 import { VERO_INBOX } from "@/lib/veroInbox";
@@ -16,10 +17,13 @@ import { WHATSAPP_SOPORTE_LEGIBLE } from "@/lib/soporte";
  * Metropolitana" y con eso Shipit ignora el origen y cae a la dirección default
  * de la cuenta (la casa de Vero). Pasó con Libro de Ocasión el 05-09-2026.
  */
+/**
+ * Origen del envío. La regla vive en lib/shipping-quote.ts y es la MISMA que
+ * usa la cotización del checkout: si acá se eligiera otra comuna, el precio
+ * cobrado al comprador y el que cobra Shipit se separan (PROMPT 0.1, 07-09-2026).
+ */
 function resolverOrigen(listingAddress?: string | null, sellerAddress?: string | null): string | null {
-  const conNumero = (a?: string | null) => !!a && /^.+?\s+\d+/.test(a.split(",")[0]?.trim() ?? "");
-  if (conNumero(listingAddress)) return listingAddress as string;
-  return sellerAddress || listingAddress || null;
+  return resolverOrigenEnvio({ listingAddress, sellerDefaultAddress: sellerAddress })?.address ?? null;
 }
 
 function verifySignature(req: NextRequest, body: Record<string, unknown>): boolean {

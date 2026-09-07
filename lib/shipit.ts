@@ -98,6 +98,26 @@ export interface ShipitQuoteResult {
 }
 
 /**
+ * Couriers que aceptan que el remitente deje el paquete en su sucursal con la
+ * etiqueta de Shipit, sin Retiro Héroe. Es la modalidad `dropoff` de la
+ * decisión D7 (docs/prompts/shipit-automatico-v2.md). La lista sale del
+ * centro de ayuda de Shipit (artículo 360007479394): "solo para Chilexpress,
+ * Starken y Bluexpress". Los nombres son los que devuelve `/v/rates` en
+ * `courier.name`, en minúsculas.
+ */
+export const DROPOFF_COURIERS = ["chilexpress", "starken", "bluexpress"] as const;
+
+export interface ShipitQuoteOptions {
+  /**
+   * Si viene, solo se devuelven cotizaciones de estos couriers (por
+   * `courier.name`). Cuando Shipit respondió con precios pero ninguno es de
+   * la lista, el resultado es `unavailable: true`: para ese vendedor no hay
+   * despacho posible, y el checkout no debe caer a la tarifa de referencia.
+   */
+  allowedCouriers?: readonly string[];
+}
+
+/**
  * Get shipping quotes from Shipit.
  * Requires commune names — resolves to commune_id internally.
  */
@@ -109,6 +129,7 @@ export async function getShipitQuotes(
   width: number = 15,
   length: number = 22,
   dest?: Partial<ShipitDestination>,
+  opts: ShipitQuoteOptions = {},
 ): Promise<ShipitQuoteResult> {
   if (!SHIPIT_EMAIL || !SHIPIT_TOKEN) {
     console.error("[shipit] Missing SHIPIT_EMAIL or SHIPIT_TOKEN");
@@ -187,8 +208,13 @@ export async function getShipitQuotes(
       };
     }
 
+    const permitido = (p: any) =>
+      !opts.allowedCouriers ||
+      opts.allowedCouriers.includes(String(p.courier?.name ?? "").toLowerCase());
+
     const quotes = prices
       .filter((p: any) => p.price > 0 && p.available_to_shipping !== false)
+      .filter(permitido)
       .map((p: any, i: number) => ({
         service: p.courier?.display_name ?? p.courier?.name ?? `Servicio ${i + 1}`,
         serviceCode: i,
@@ -200,12 +226,16 @@ export async function getShipitQuotes(
       }))
       .sort((a: ShippingQuote, b: ShippingQuote) => a.price - b.price);
 
-    // Todos los precios vinieron marcados como no despachables.
+    // Todos los precios vinieron marcados como no despachables, o ninguno es
+    // de un courier permitido para la modalidad del vendedor.
     if (!quotes.length) {
+      const filtrados = opts.allowedCouriers && prices.some((p: any) => p.price > 0);
       return {
         quotes: [],
         unavailable: true,
-        reason: `Shipit no tiene servicio entre ${originCommune} y ${destCommune}`,
+        reason: filtrados
+          ? `Ningún courier con entrega en sucursal (${opts.allowedCouriers!.join(", ")}) llega de ${originCommune} a ${destCommune}`
+          : `Shipit no tiene servicio entre ${originCommune} y ${destCommune}`,
       };
     }
 
