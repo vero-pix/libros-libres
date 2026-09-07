@@ -38,7 +38,7 @@ MP webhook (payment approved)
    ├─ si cambió a paid y hay courier: INSERT shipments(bundle_id, status='pending') ON CONFLICT DO NOTHING
    └─ 200 OK. Sin llamadas a Shipit ni correos de etiqueta aquí.
 
-Cron /api/cron/shipments  (cada 3 min, CRON_SECRET, SHIPIT_MODE)
+Cron /api/cron/shipments  (cada 5 min, CRON_SECRET, SHIPIT_MODE)
    ├─ pending        → vendedor sin origen → needs_origin (gong + correo a Vero)   [no debería ocurrir por D1]
    │                  → POST /v/shipments (solo SHIPIT_MODE=live) → created
    ├─ created        → GET /v/shipments/{id} → tracking + pack_pdf → descargar PDF → Storage → label_ready
@@ -212,7 +212,10 @@ Aprobado el diseño del prompt 1.1. Implementa en este orden y detente
 después de cada paso para que lo revise:
 
 a) Migración + tipos: aplicar la migración en producción y verificar
-   con \d o pg_policies antes de seguir con b).
+   con \d o pg_policies antes de seguir con b). ✅ Hecho el 07-09-2026:
+   supabase/migrations/20260908_shipments.sql aplicada y verificada
+   (tablas, constraints, RLS, RPC con rollback). Falta solo generar los
+   tipos TS (paso b).
 b) createShipitShipment() y getShipitShipment() en lib/shipit.ts, con
    registro en shipit_events. SHIPIT_MODE=dry-run por defecto en
    .env.local.
