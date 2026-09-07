@@ -12,8 +12,21 @@
 -- is_admin(), que ya es SECURITY DEFINER + STABLE y hace exactamente eso.
 --
 -- Permisos resultantes = los mismos de antes. No se abre ni cierra nada.
+--
+-- Verificado en seco el 07-09-2026 (transacción con rollback, conteos como
+-- anon, como vero y como un uid que no existe en users): idénticos antes y
+-- después. Dos diferencias, las dos de "error" a "0 filas":
+--   · anon sobre orders/commissions daba "permission denied for function
+--     is_admin" (anon no tenía EXECUTE sobre is_admin; hoy se le da).
+--   · anon sobre page_views daba "permission denied for table users": el
+--     EXISTS a mano leía users.role, columna que anon no puede ver desde el
+--     cierre de PII del 25-08. is_admin() es SECURITY DEFINER y no choca.
 
 begin;
+
+-- is_admin() solo tenía EXECUTE para postgres, service_role y authenticated.
+-- Como ahora la usan policies que también evalúa anon, hay que dárselo.
+grant execute on function public.is_admin() to anon, authenticated;
 
 -- api_keys ------------------------------------------------------------------
 drop policy if exists sellers_delete_own_keys on public.api_keys;
