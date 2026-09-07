@@ -153,9 +153,25 @@ const getPublicStats = unstable_cache(
       sellers.push(...((data ?? []) as { seller_id: string }[]));
       if (!data || data.length < 1000) break;
     }
-    const { count: views } = await serviceClient
-      .from("page_views")
-      .select("*", { count: "exact", head: true });
+    // Visitas totales: cifra precalculada por el cron diario en site_stats
+    // (migración 20260907_site_stats). Antes era un count(*) exacto de toda
+    // page_views cada 5 minutos: un recorrido completo de la tabla más grande
+    // del proyecto por un número que cambia poco. Si la fila no existe todavía
+    // (cron sin correr), cae al conteo una vez; el caché lo amortigua.
+    let views: number | null = null;
+    const { data: stat } = await serviceClient
+      .from("site_stats")
+      .select("value")
+      .eq("key", "page_views_total")
+      .maybeSingle();
+    if (stat && typeof stat.value === "number") {
+      views = stat.value;
+    } else {
+      const { count } = await serviceClient
+        .from("page_views")
+        .select("id", { count: "exact", head: true });
+      views = count;
+    }
     const { data: sold } = await serviceClient
       .from("listings")
       .select("updated_at")

@@ -157,6 +157,23 @@ export async function POST() {
     }),
   });
 
+  // Contador de visitas de la home: un count(*) de page_views al día, guardado
+  // en site_stats, en vez de uno cada 5 minutos desde la home (migración
+  // 20260907_site_stats). Si falla, la home cae a contar ella misma.
+  try {
+    const { count: pageViewsTotal } = await supabase
+      .from("page_views")
+      .select("id", { count: "exact", head: true });
+    if (typeof pageViewsTotal === "number") {
+      const { error: statsErr } = await supabase
+        .from("site_stats")
+        .upsert({ key: "page_views_total", value: pageViewsTotal, updated_at: new Date().toISOString() });
+      if (statsErr) console.error("[daily-summary] site_stats:", statsErr.message);
+    }
+  } catch (e) {
+    console.error("[daily-summary] site_stats falló:", e);
+  }
+
   return NextResponse.json({
     ok: true,
     stats: {
