@@ -168,7 +168,7 @@ Héroe porque el vendedor va a dejar el paquete en la sucursal del courier.
 Entrega hallazgos con evidencia. Espera mi decisión.
 ```
 
-Criterio de aceptación: sabemos, con evidencia de API o respuesta escrita de Shipit, cómo crear un envío en modalidad `dropoff` y otro en `pickup`, y qué ve el vendedor en cada caso. **Cumplido a medias:** `dropoff` = crear sin más; `pickup` no se puede por API (pendiente respuesta de soporte, correo enviado el 07-09).
+Criterio de aceptación: sabemos, con evidencia de API o respuesta escrita de Shipit, cómo crear un envío en modalidad `dropoff` y otro en `pickup`, y qué ve el vendedor en cada caso. **Cumplido a medias:** `dropoff` = crear sin más; `pickup` no se puede por API (pendiente respuesta de soporte, correo enviado el 07-09 a la 01:00).
 
 **Manual (Vero, 2 minutos):** panel de Shipit → Configuración → Direcciones → dejar "TusLibros" (100321) como origen predeterminado.
 
@@ -288,7 +288,7 @@ Conclusión: con el volumen actual, cambiar de agregador no resuelve nada que no
 ## Preguntas abiertas que la FASE 1 debe cerrar
 
 - ~~¿Shipit agenda el retiro el mismo día si el envío se crea antes de cierta hora?~~ Resuelto (PROMPT 0.3): la API no agenda nada; el retiro es una solicitud manual con corte a las 11:00.
-- ¿Existe endpoint para solicitar/cancelar el Retiro Héroe? ¿Plazo para dejar el paquete en sucursal sin retiro? ¿Sandbox por cuenta? Preguntado a integraciones@shipit.cl el 07-09-2026; al responder, actualizar D7 y abrir la fase 1.5.
+- ¿Existe endpoint para solicitar/cancelar el Retiro Héroe? ¿Plazo para dejar el paquete en sucursal sin retiro? ¿Sandbox por cuenta? Correo enviado a integraciones@shipit.cl (cc soporte) el **07-09-2026 a la 01:00** desde el correo personal de Vero; al responder, actualizar D7 y abrir la fase 1.5. Si no hay respuesta el 10-09, insistir por WhatsApp (+56 9 3230 2514).
 - ¿`pack_pdf` requiere sesión? (prompt 1.1, punto 6).
 - ¿`GET /v/shipments/reference` o `GET /v/shipments/{id}`? (prompt 1.1, punto 5).
 
