@@ -13,6 +13,12 @@
 --
 -- Permisos resultantes = los mismos de antes. No se abre ni cierra nada.
 --
+-- APLICADA en producción el 07-09-2026 (SQL Editor). Verificación posterior
+-- sobre pg_policies: 63 policies, 0 auth.uid()/is_admin() sin envolver,
+-- 0 EXISTS manuales sobre users, 0 pares (tabla, cmd) con más de una policy
+-- permissive, anon con EXECUTE sobre is_admin(). pg_stat_statements
+-- reseteado a las 02:02 UTC del 07-09 (23:02 Chile del 06-09).
+--
 -- Verificado en seco el 07-09-2026 (transacción con rollback, conteos como
 -- anon, como vero y como un uid que no existe en users): idénticos antes y
 -- después. Dos diferencias, las dos de "error" a "0 filas":
