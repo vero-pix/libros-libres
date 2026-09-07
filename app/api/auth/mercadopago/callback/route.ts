@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { avisarOrigenFaltante } from "@/lib/shipit-origen";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 /**
@@ -84,6 +85,10 @@ export async function GET(request: NextRequest) {
       `${siteUrl}/perfil?mp_error=save_failed`
     );
   }
+
+  // D1 revisada: si el vendedor está fuera de la RM y no tiene origen en
+  // Shipit, Vero recibe los datos para crearlo. Nunca frena el redirect.
+  await avisarOrigenFaltante(admin, state, "conectó MercadoPago");
 
   return NextResponse.redirect(`${siteUrl}/perfil?mp_connected=true`);
 }

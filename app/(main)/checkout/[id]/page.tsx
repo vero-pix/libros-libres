@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { avisarOrigenFaltante, estadoOrigenVendedor } from "@/lib/shipit-origen";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import type { ListingWithBook } from "@/types";
 
@@ -44,6 +46,15 @@ export default async function CheckoutPage({ params }: Props) {
         .single()
     : { data: null };
 
+  // D1 revisada: fuera de la RM sin origen en Shipit no se ofrece courier.
+  // El intento de compra es la señal para que Vero cree el origen (gong,
+  // máximo uno al día por vendedor).
+  const admin = createServiceRoleClient();
+  const origen = await estadoOrigenVendedor(admin, typedListing.seller_id);
+  if (!origen.courierDisponible) {
+    avisarOrigenFaltante(admin, typedListing.seller_id, "recibió un intento de compra con courier").catch(() => {});
+  }
+
   // Render checkout directly, handling missing info inside CheckoutForm
   return (
     <div className="min-h-screen bg-cream">
@@ -58,6 +69,7 @@ export default async function CheckoutPage({ params }: Props) {
           buyerAddress={buyerProfile?.default_address ?? ""}
           buyerName={buyerProfile?.full_name ?? ""}
           buyerPhone={buyerProfile?.phone ?? ""}
+          courierDisponible={origen.courierDisponible}
         />
       </main>
     </div>

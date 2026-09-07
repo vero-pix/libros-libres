@@ -28,6 +28,8 @@ const FALLBACK_OPTIONS: ShippingQuote[] = [
 interface Props {
   listing: ListingWithBook;
   buyerAddress: string;
+  /** D1 revisada: false para vendedores fuera de la RM sin origen en Shipit. */
+  courierDisponible?: boolean;
   buyerName: string;
   buyerPhone: string;
 }
@@ -46,7 +48,7 @@ const DELIVERY_OPTIONS = [
   { value: "courier" as const, label: "Envío courier", desc: "Recibe en tu domicilio vía Shipit", icon: "📦", enabled: true },
 ];
 
-export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPhone }: Props) {
+export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPhone, courierDisponible = true }: Props) {
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("in_person");
   const [address, setAddress] = useState(buyerAddress);
   const [phone, setPhone] = useState(buyerPhone);
@@ -65,11 +67,15 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
 
   // Dónde está el libro. Se muestra en la opción de encuentro en persona.
   const comunaVendedor = comunaDesdeAddress((listing as any).address);
-  const opcionesEntrega = DELIVERY_OPTIONS.map((o) =>
-    o.value === "in_person" && comunaVendedor
-      ? { ...o, desc: `Gratis — coordinas con el vendedor en ${comunaVendedor}` }
-      : o
-  );
+  const opcionesEntrega = DELIVERY_OPTIONS.map((o) => {
+    if (o.value === "in_person" && comunaVendedor) {
+      return { ...o, desc: `Gratis — coordinas con el vendedor en ${comunaVendedor}` };
+    }
+    if (o.value === "courier" && !courierDisponible) {
+      return { ...o, enabled: false, desc: "Este vendedor todavía no despacha por courier. Coordina la entrega en persona." };
+    }
+    return o;
+  });
 
   // Shipping quotes
   const [quotes, setQuotes] = useState<ShippingQuote[]>([]);

@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { avisarOrigenFaltante, estadoOrigenVendedor } from "@/lib/shipit-origen";
 import BundleCheckoutForm from "@/components/checkout/BundleCheckoutForm";
 import type { ListingWithBook } from "@/types";
 
@@ -57,6 +59,13 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
 
   const typedListings = listings as unknown as ListingWithBook[];
 
+  // D1 revisada: fuera de la RM sin origen en Shipit no se ofrece courier.
+  const admin = createServiceRoleClient();
+  const origen = await estadoOrigenVendedor(admin, listings[0].seller_id);
+  if (!origen.courierDisponible) {
+    avisarOrigenFaltante(admin, listings[0].seller_id, "recibió un intento de compra con courier").catch(() => {});
+  }
+
   const { data: buyerProfile } = await supabase
     .from("users")
     .select("full_name, default_address, phone")
@@ -106,6 +115,7 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
           listings={typedListings}
           buyerAddress={buyerProfile?.default_address ?? ""}
           buyerName={buyerProfile?.full_name ?? ""}
+          courierDisponible={origen.courierDisponible}
         />
       </main>
     </div>

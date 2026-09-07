@@ -456,6 +456,7 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
   const listingAddress = (Array.isArray(head.listing) ? head.listing[0] : head.listing)?.address ?? null;
   const origen = resolverOrigenEnvio({ listingAddress, sellerDefaultAddress: vendedor.default_address });
   const comunaDestino = (await findCommune(extractCommune(head.buyer_address ?? "")))?.name ?? extractCommune(head.buyer_address ?? "");
+  const comunaOrigenShipit = origen ? await findCommune(origen.commune) : null;
 
   const datos = {
     vendedorNombre: vendedor.full_name,
@@ -466,6 +467,7 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
     comunaDestino: capitalizar(comunaDestino),
     comunaOrigen: origen?.commune ?? "",
     direccionEntrega: head.buyer_address ?? "",
+    enRM: comunaOrigenShipit?.region_id === SHIPIT_REGION_RM,
   };
 
   // Mientras Google Workspace esté caído, vero@tuslibros.cl no recibe: el

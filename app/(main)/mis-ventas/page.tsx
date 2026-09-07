@@ -5,6 +5,9 @@ import Image from "next/image";
 import type { Order, OrderStatus } from "@/types";
 import BuyerCartsSection from "@/components/sales/BuyerCartsSection";
 import EntregadoButton from "@/components/sales/EntregadoButton";
+import PedirRetiroButton from "@/components/sales/PedirRetiroButton";
+import { findCommune, SHIPIT_REGION_RM } from "@/lib/shipit";
+import { extractCommune } from "@/lib/chilexpress";
 
 export const metadata = {
   title: "Mis Ventas",
@@ -34,11 +37,14 @@ export default async function MisVentasPage() {
   // Profile
   const { data: profile } = await supabase
     .from("users")
-    .select("full_name, mercadopago_user_id")
+    .select("full_name, mercadopago_user_id, default_address")
     .eq("id", user.id)
     .single();
 
   const mpConnected = !!profile?.mercadopago_user_id;
+  // ¿Está en la Región Metropolitana? Solo ahí existe el Retiro Héroe (D7).
+  const comunaVendedor = profile?.default_address ? await findCommune(extractCommune(profile.default_address)) : null;
+  const vendedorEnRM = comunaVendedor?.region_id === SHIPIT_REGION_RM;
 
   // Orders where I'm the seller
   const { data: rawOrders } = await supabase
@@ -367,7 +373,7 @@ export default async function MisVentasPage() {
                                 </div>
                               )}
                               {shipment && shipment.status !== "canceled" ? (
-                                <EstadoEnvio shipment={shipment} />
+                                <EstadoEnvio shipment={shipment} enRM={vendedorEnRM} />
                               ) : order.shipping_label_url ? (
                                 <a
                                   href={order.shipping_label_url}
@@ -529,6 +535,7 @@ function EmptyState({ text }: { text: string }) {
  */
 function EstadoEnvio({
   shipment,
+  enRM,
 }: {
   shipment: {
     id: string;
@@ -536,7 +543,9 @@ function EstadoEnvio({
     courier: string | null;
     label_path: string | null;
     dispatch_mode: string;
+    pickup_requested_at: string | null;
   };
+  enRM: boolean;
 }) {
   const courier = shipment.courier
     ? shipment.courier.charAt(0).toUpperCase() + shipment.courier.slice(1)
@@ -554,10 +563,13 @@ function EstadoEnvio({
           📄 Descargar etiqueta
         </a>
         <span className="text-[11px] text-ink-muted block">
-          {shipment.dispatch_mode === "pickup"
-            ? "Pégala al paquete. Te aviso la ventana de retiro."
+          {shipment.pickup_requested_at
+            ? `Retiro pedido el ${new Date(shipment.pickup_requested_at).toLocaleDateString("es-CL")}. Vero lo coordina con Shipit y te avisa la ventana.`
             : `Imprímela, pégala al paquete y déjalo en la sucursal de ${courier} más cercana.`}
         </span>
+        {enRM && !shipment.pickup_requested_at && ["label_ready", "notified"].includes(shipment.status) && (
+          <PedirRetiroButton shipmentId={shipment.id} />
+        )}
       </div>
     );
   }

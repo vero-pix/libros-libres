@@ -27,6 +27,8 @@ const FALLBACK_OPTIONS: ShippingQuote[] = [
 interface Props {
   listings: ListingWithBook[];
   buyerAddress: string;
+  /** D1 revisada: false para vendedores fuera de la RM sin origen en Shipit. */
+  courierDisponible?: boolean;
   buyerName: string;
 }
 
@@ -53,6 +55,7 @@ export default function BundleCheckoutForm({
   listings,
   buyerAddress,
   buyerName,
+  courierDisponible = true,
 }: Props) {
   // Dónde están los libros. Sin esto el comprador toma la opción gratis que viene
   // marcada por defecto sin saber que el vendedor está en otra región: el
@@ -64,11 +67,15 @@ export default function BundleCheckoutForm({
         .filter((c): c is string => !!c)
     )
   );
-  const opcionesEntrega = DELIVERY_OPTIONS.map((o) =>
-    o.value === "in_person" && comunasVendedor.length
-      ? { ...o, desc: `Gratis — coordinas con el vendedor en ${comunasVendedor.join(" y ")}` }
-      : o
-  );
+  const opcionesEntrega = DELIVERY_OPTIONS.map((o) => {
+    if (o.value === "in_person" && comunasVendedor.length) {
+      return { ...o, desc: `Gratis — coordinas con el vendedor en ${comunasVendedor.join(" y ")}` };
+    }
+    if (o.value === "courier" && !courierDisponible) {
+      return { ...o, enabled: false, desc: "Este vendedor todavía no despacha por courier. Coordina la entrega en persona." };
+    }
+    return o;
+  });
 
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("in_person");
   const [address, setAddress] = useState(buyerAddress);

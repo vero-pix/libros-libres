@@ -54,6 +54,8 @@ export interface DatosCorreoEtiqueta {
   comunaDestino: string;
   comunaOrigen: string;
   direccionEntrega: string;
+  /** Vendedor en la Región Metropolitana: puede pedir retiro a domicilio desde Mis Ventas. */
+  enRM?: boolean;
 }
 
 /** Correo 1 · al vendedor cuando la etiqueta está lista (label_ready). */
@@ -75,6 +77,7 @@ export function correoVendedorEtiqueta(d: DatosCorreoEtiqueta): { subject: strin
     </ol>
     <p>El seguimiento empieza a moverse cuando la sucursal escanea el paquete; hasta entonces aparece sin novedad, es normal.</p>
     ${boton(`${SITE}/mis-ventas`, "Ver mi venta y descargar la etiqueta")}
+    ${d.enRM ? `<p>Si prefieres que pasen a buscar el paquete a tu casa, en Mis Ventas hay un botón "Pedir retiro a domicilio". Lo coordino yo con Shipit y te aviso la ventana.</p>` : ""}
     <p>Si en la sucursal te ponen algún problema con la etiqueta, escríbele directo a Shipit por WhatsApp al +56 9 3230 2514 (de 9:00 a 18:00) con el número de seguimiento. Y a mí me cuentas después.</p>
     <p>Para hablar con tu comprador, en Mis Ventas hay un botón "Escribir" al lado de su nombre. Y revisa Mis Ventas cada uno o dos días, aunque no te llegue correo.</p>
   `);
