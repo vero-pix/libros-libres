@@ -5,7 +5,7 @@ import AyudaContacto from "@/components/ayuda/AyudaContacto";
 export const metadata = {
   title: "Guía del vendedor — cómo vender libros usados en tuslibros.cl",
   description:
-    "Publicar es gratis, cobras por MercadoPago y el courier pasa a buscar el libro a tu casa. Qué hacer cuando vendes, cómo coordinar una entrega en persona y qué pasa si algo falla.",
+    "Publicar es gratis, cobras por MercadoPago y despachas dejando el paquete en una sucursal del courier. Qué hacer cuando vendes, cómo coordinar una entrega en persona y qué pasa si algo falla.",
   alternates: { canonical: "https://tuslibros.cl/ayuda/vender" },
 };
 
@@ -33,7 +33,7 @@ export default function AyudaVenderPage() {
         <div className="max-w-3xl mx-auto px-4 py-16 sm:py-20 text-center">
           <h1 className="font-display text-4xl sm:text-5xl font-bold text-ink mb-3">Guía del vendedor</h1>
           <p className="text-ink-muted text-lg max-w-xl mx-auto">
-            Publicar es gratis, cobras por MercadoPago y el courier pasa a buscar el libro a tu casa.
+            Publicar es gratis, cobras por MercadoPago y despachas dejando el paquete en una sucursal del courier.
           </p>
         </div>
       </div>
@@ -108,27 +108,22 @@ export default function AyudaVenderPage() {
                 Empaca el libro en sobre acolchado o caja chica. Si son varios libros del mismo comprador, van juntos
                 en un solo paquete.
               </li>
-              {/* [D7] Cambia cuando exista la modalidad "dejar en courier". */}
               <li>
-                El courier pasa a buscar el paquete <strong className="text-ink">a tu casa</strong>. Vero confirma el
-                retiro y te avisa día y ventana horaria. No vas a ninguna sucursal y no le pagas nada al courier: el
-                envío ya lo pagó el comprador.
+                Descarga la etiqueta desde Mis Ventas (botón{" "}
+                <strong className="text-ink">Descargar etiqueta</strong>) o desde el correo, y pégala en el paquete.
+                Si no tienes impresora, escribe en el paquete, bien claro, el nombre del comprador y el número de
+                seguimiento.
               </li>
               <li>
-                Pega la etiqueta en el paquete. La descargas desde Mis Ventas (botón{" "}
-                <strong className="text-ink">Descargar etiqueta</strong>) o desde el correo. Si no tienes impresora,
-                escribe en el paquete, bien claro, el nombre del comprador y el número de seguimiento.
+                Deja el paquete en una <strong className="text-ink">sucursal del courier indicado</strong> (Starken,
+                Bluexpress o Chilexpress). No pagas nada al courier: el envío ya lo pagó el comprador.
               </li>
-              <li>Guarda el comprobante firmado que te deja el chofer hasta que el comprador reciba el libro.</li>
+              <li>Guarda el comprobante que te dan en la sucursal hasta que el comprador reciba el libro.</li>
             </ol>
-            {/* [D7 — activar cuando exista]
             <p className="mt-4">
-              Si prefieres dejar el paquete tú en una sucursal del courier, elige{" "}
-              <strong className="text-ink">&ldquo;Yo lo dejo en el courier&rdquo;</strong> en Mis Ventas antes de que
-              se emita la etiqueta. Imprimes la etiqueta, la pegas y lo entregas en la sucursal indicada. Fuera de la
-              Región Metropolitana esta es la modalidad por defecto.
+              Si prefieres que pasen a buscarlo a tu casa (solo Región Metropolitana), usa el botón{" "}
+              <strong className="text-ink">Pedir retiro a domicilio</strong> en Mis Ventas.
             </p>
-            */}
             <p className="mt-4 text-sm">
               Paso a paso con más detalle:{" "}
               <Link href="/como-despachar" className={linkClass}>cómo despachar un libro</Link>.
@@ -154,8 +149,9 @@ export default function AyudaVenderPage() {
           <Tarjeta>
             <ul className="space-y-3">
               <li>
-                <strong className="text-ink">El courier no llegó el día del retiro:</strong> escribe a Shipit
-                (WhatsApp o correo, en Mis Ventas) con tu número de seguimiento, y avísanos.
+                <strong className="text-ink">En la sucursal no reciben el paquete o hay un problema con la
+                etiqueta:</strong> escribe a Shipit (WhatsApp o correo, en Mis Ventas) con tu número de seguimiento, y
+                avísanos.
               </li>
               <li>
                 <strong className="text-ink">El comprador no responde para coordinar la entrega en persona:</strong>{" "}

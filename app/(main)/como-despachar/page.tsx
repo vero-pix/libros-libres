@@ -17,26 +17,26 @@ const steps = [
   {
     n: 2,
     icon: "🖨️",
-    title: "Imprime la etiqueta (si está disponible)",
-    body: 'La etiqueta te la mando yo por WhatsApp o correo apenas el courier la emite, y también aparece en Mis Ventas con el botón "Descargar etiqueta". Imprímela en hoja tamaño carta y pégala en la parte más plana del paquete con cinta transparente. ¿Sin impresora? En cualquier librería o cyber te la imprimen desde el celular. Si el día del retiro todavía no la tienes, escribe en el paquete, bien claro, el nombre del comprador y el número de seguimiento.',
+    title: "Descarga la etiqueta y pégala",
+    body: 'La etiqueta aparece en Mis Ventas con el botón "Descargar etiqueta" y también te llega por correo apenas el courier la emite. Imprímela en hoja tamaño carta y pégala en la parte más plana del paquete con cinta transparente. ¿Sin impresora? En cualquier librería o cyber te la imprimen desde el celular.',
   },
   {
     n: 3,
-    icon: "🏠",
-    title: "Deja el paquete listo para el retiro",
-    body: "No vas a ninguna sucursal: el courier pasa a buscarlo a la dirección que tienes en tu perfil. Yo confirmo el retiro con Shipit y te aviso por WhatsApp el día y la ventana horaria (por ejemplo, lunes de 11:00 a 17:00). Necesitas que alguien esté en casa en ese rango. Por eso es importante que tu dirección en el perfil tenga calle y número: si es un condominio, agrega el número de casa o depto.",
+    icon: "🏪",
+    title: "Déjalo en una sucursal del courier",
+    body: "Lleva el paquete con la etiqueta pegada a una sucursal del courier indicado en la etiqueta: Starken, Bluexpress o Chilexpress. No pagas nada al courier: el envío lo pagó el comprador en el checkout y se cobra a la cuenta de tuslibros.cl. Si prefieres que pasen a buscarlo a tu casa y estás en la Región Metropolitana, usa el botón \"Pedir retiro a domicilio\" en Mis Ventas.",
   },
   {
     n: 4,
     icon: "✅",
-    title: "Firma el comprobante y guárdalo",
-    body: "Cuando llegue el courier, te entrega un comprobante de retiro para firmar y una copia queda contigo. Guárdalo hasta que el comprador confirme que recibió el libro: es tu respaldo si algo se pierde en el camino. No pagas nada al courier. El envío lo pagó el comprador en el checkout y se cobra a la cuenta de tuslibros.cl.",
+    title: "Guarda el comprobante",
+    body: "En la sucursal te dan un comprobante con el número de seguimiento. Guárdalo hasta que el comprador confirme que recibió el libro: es tu respaldo si algo se pierde en el camino.",
   },
 ];
 
 const contactos = [
   {
-    quien: "Shipit (el retiro y el courier)",
+    quien: "Shipit (la etiqueta y el courier)",
     detalle: "WhatsApp +56 9 3230 2514, lunes a viernes de 9:00 a 18:00, o soporte@shipit.cl. Ten a mano el número de seguimiento.",
     href: "https://wa.me/56932302514",
   },
@@ -71,15 +71,16 @@ export default function ComoDespacharPage() {
 
         <section className="mb-12 bg-gradient-to-br from-brand-50 to-cream-warm border border-brand-200 rounded-2xl p-6 sm:p-7">
           <div className="flex items-start gap-3 mb-2">
-            <span className="text-2xl">🏠</span>
+            <span className="text-2xl">🏪</span>
             <h2 className="font-display text-xl sm:text-2xl font-bold text-ink">
-              El courier pasa a buscar a tu casa
+              Dejas el paquete en una sucursal del courier
             </h2>
           </div>
           <p className="text-sm sm:text-base text-ink-muted leading-relaxed">
-            No tienes que ir a ninguna sucursal ni hacer fila. Cuando se confirma una venta, Shipit coordina
-            un retiro a domicilio y un courier pasa por el paquete a la dirección que tienes registrada.
-            Tú solo lo dejas listo y esperas en casa en la ventana que te indica la orden.
+            Cuando se confirma una venta te llega la etiqueta. La descargas desde Mis Ventas o el correo, la
+            pegas en el paquete y lo dejas en una sucursal del courier indicado: Starken, Bluexpress o
+            Chilexpress. No pagas nada al courier. Si prefieres que pasen a buscarlo a tu casa y estás en la
+            Región Metropolitana, usa el botón <strong>&ldquo;Pedir retiro a domicilio&rdquo;</strong> en Mis Ventas.
           </p>
         </section>
 
@@ -112,9 +113,8 @@ export default function ComoDespacharPage() {
         <section className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-8">
           <h2 className="font-semibold text-amber-900 mb-2">⏱️ Plazo de despacho</h2>
           <p className="text-sm text-amber-800 leading-relaxed">
-            Ten el paquete listo dentro de los <strong>2 días hábiles</strong> siguientes a la venta.
-            El retiro se agenda para el día hábil siguiente a la confirmación. Despachar a tiempo mantiene
-            a los compradores contentos y asegura la buena reputación de tu tienda.
+            Deja el paquete en la sucursal dentro de los <strong>2 días hábiles</strong> siguientes a la venta.
+            Despachar a tiempo mantiene a los compradores contentos y asegura la buena reputación de tu tienda.
           </p>
         </section>
 
@@ -129,9 +129,10 @@ export default function ComoDespacharPage() {
         </section>
 
         <section className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
-          <h2 className="font-semibold text-red-900 mb-3">🚨 Si algo sale mal el día del retiro</h2>
+          <h2 className="font-semibold text-red-900 mb-3">🚨 Si algo sale mal</h2>
           <p className="text-sm text-red-800 leading-relaxed mb-4">
-            El courier no apareció, la etiqueta no llegó, el paquete se devolvió. Estos son los contactos:
+            En la sucursal no reciben el paquete, la etiqueta no llegó, el paquete se devolvió. Estos son los
+            contactos:
           </p>
           <ul className="space-y-3">
             {contactos.map((c) => (

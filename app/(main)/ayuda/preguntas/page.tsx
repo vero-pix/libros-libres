@@ -17,7 +17,7 @@ type Pregunta = {
   a: string;
   /** Enlace opcional que se muestra después de la respuesta. */
   link?: { href: string; label: string };
-  /** Bloques [D7] que se publican cuando exista la modalidad "dejar en courier". */
+  /** Matiz que se agrega al final de la respuesta (por ejemplo, el retiro a domicilio en la RM). */
   d7?: string;
 };
 
@@ -41,10 +41,8 @@ const preguntas: Pregunta[] = [
   },
   {
     q: "¿El courier pasa a buscar el libro o tengo que llevarlo?",
-    // [D7] Cambia cuando exista la modalidad "dejar en courier".
-    a: "Pasa a buscarlo a tu casa; te avisamos día y hora.",
-    // [D7 — activar cuando exista]
-    d7: "También puedes elegir dejarlo tú en una sucursal.",
+    a: "Lo llevas tú: descargas la etiqueta desde Mis Ventas o el correo, la pegas en el paquete y lo dejas en una sucursal del courier indicado (Starken, Bluexpress o Chilexpress). No pagas nada al courier.",
+    d7: "Si prefieres que pasen a buscarlo a tu casa (solo Región Metropolitana), usa el botón Pedir retiro a domicilio en Mis Ventas.",
     link: { href: "/ayuda/vender", label: "Ver la guía del vendedor" },
   },
   {
@@ -88,7 +86,7 @@ export default function AyudaPreguntasPage() {
               <div className="px-5 py-4 text-ink-muted leading-relaxed">
                 <p>
                   {p.a}
-                  {/* [D7 — activar cuando exista]: {p.d7 && <> {p.d7}</>} */}
+                  {p.d7 && <> {p.d7}</>}
                 </p>
                 {p.link && (
                   <p className="mt-2 text-sm">

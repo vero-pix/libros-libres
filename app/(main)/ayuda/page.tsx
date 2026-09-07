@@ -14,7 +14,7 @@ const caminos = [
     href: "/ayuda/vender",
     icon: "📚",
     title: "Quiero vender",
-    body: "Publicar es gratis, cobras por MercadoPago y el courier pasa a buscar el libro a tu casa.",
+    body: "Publicar es gratis, cobras por MercadoPago y despachas dejando el paquete en una sucursal del courier.",
   },
   {
     href: "/ayuda/comprar",

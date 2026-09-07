@@ -1,6 +1,6 @@
 # Centro de ayuda de tuslibros.cl — contenido para publicar
 
-**07-09-2026.** Texto listo para las páginas `/ayuda`, `/ayuda/vender`, `/ayuda/comprar` y `/ayuda/preguntas`. Describe el flujo **real de hoy**; los bloques marcados `[D7]` cambian cuando exista la modalidad "dejar en courier" y hay que actualizarlos en ese momento. Español de Chile, tú, sin emojis. Los datos de contacto de Shipit y de soporte se toman de `VERO_INBOX` y de la constante de WhatsApp de soporte, no se escriben a mano.
+**07-09-2026.** Texto listo para las páginas `/ayuda`, `/ayuda/vender`, `/ayuda/comprar` y `/ayuda/preguntas`. Describe el flujo **real de hoy**: drop-off en sucursal como modo por defecto, con el retiro a domicilio como opción a pedido y solo en la Región Metropolitana. Los bloques `[D7]` se activaron el 07-09-2026 con la fase 1 de Shipit en producción; si la fase 1.5 automatiza el retiro por API, hay que volver a revisarlos. Español de Chile, tú, sin emojis. Los datos de contacto de Shipit y de soporte se toman de `VERO_INBOX` y de la constante de WhatsApp de soporte, no se escriben a mano.
 
 ---
 
@@ -44,11 +44,11 @@ Te avisamos por correo y en **Mis Ventas**. Revisa Mis Ventas cada uno o dos dí
 **Si el comprador eligió despacho:**
 
 1. Empaca el libro en sobre acolchado o caja chica. Si son varios libros del mismo comprador, van juntos en un solo paquete.
-2. `[D7]` El courier pasa a buscar el paquete **a tu casa**. Vero confirma el retiro y te avisa día y ventana horaria. No vas a ninguna sucursal y no le pagas nada al courier: el envío ya lo pagó el comprador.
-3. Pega la etiqueta en el paquete. La descargas desde Mis Ventas (botón **Descargar etiqueta**) o desde el correo. Si no tienes impresora, escribe en el paquete, bien claro, el nombre del comprador y el número de seguimiento.
-4. Guarda el comprobante firmado que te deja el chofer hasta que el comprador reciba el libro.
+2. Descarga la etiqueta desde Mis Ventas (botón **Descargar etiqueta**) o desde el correo, y pégala en el paquete. Si no tienes impresora, escribe en el paquete, bien claro, el nombre del comprador y el número de seguimiento.
+3. Deja el paquete en una **sucursal del courier indicado** (Starken, Bluexpress o Chilexpress). No pagas nada al courier: el envío ya lo pagó el comprador.
+4. Guarda el comprobante que te dan en la sucursal hasta que el comprador reciba el libro.
 
-`[D7 — activar cuando exista]` Si prefieres dejar el paquete tú en una sucursal del courier, elige **"Yo lo dejo en el courier"** en Mis Ventas antes de que se emita la etiqueta. Imprimes la etiqueta, la pegas y lo entregas en la sucursal indicada. Fuera de la Región Metropolitana esta es la modalidad por defecto.
+Si prefieres que pasen a buscarlo a tu casa (solo Región Metropolitana), usa el botón **Pedir retiro a domicilio** en Mis Ventas.
 
 **Si el comprador eligió entrega en persona:**
 
@@ -109,7 +109,7 @@ Hoy despachamos solo dentro de Chile.
 
 **¿Quién paga el envío?** El comprador, al momento de pagar. El vendedor no paga nada al courier.
 
-**¿El courier pasa a buscar el libro o tengo que llevarlo?** `[D7]` Pasa a buscarlo a tu casa; te avisamos día y hora. `[D7 — activar cuando exista]` También puedes elegir dejarlo tú en una sucursal.
+**¿El courier pasa a buscar el libro o tengo que llevarlo?** Lo llevas tú: descargas la etiqueta desde Mis Ventas o el correo, la pegas en el paquete y lo dejas en una sucursal del courier indicado (Starken, Bluexpress o Chilexpress). No pagas nada al courier. Si prefieres que pasen a buscarlo a tu casa (solo Región Metropolitana), usa el botón **Pedir retiro a domicilio** en Mis Ventas.
 
 **¿Puedo vender libros subrayados?** Sí, indicando el estado "con marcas".
 

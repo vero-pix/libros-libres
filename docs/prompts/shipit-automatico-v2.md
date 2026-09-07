@@ -283,6 +283,55 @@ Webhook de Shipit (`/v/webhooks/package`): configuración, firma, endpoint `app/
 
 ---
 
+---
+
+## Estado al 07-09-2026 (cierre de la fase 1)
+
+**En producción.** `SHIPIT_MODE=live` en Vercel (variable recreada por la API
+REST como `encrypted`: el CLI 54 no toma el valor por stdin y la deja vacía).
+El webhook de MercadoPago encola en `shipments`; el worker
+`/api/cron/shipments` corre cada 5 minutos y lleva la fila de `pending` a
+`notified` sola: crea el envío, baja la `pack_pdf` al bucket privado `labels`,
+espeja tracking en `orders` y manda los dos correos.
+
+**Vendedores abiertos** (`users.shipit_auto_enabled = true`):
+
+| Vendedor | Origen Shipit | Nota |
+|---|---|---|
+| vero | 100321 "TusLibros" | Providencia |
+| libro.de.ocasion | 121573 | General Bulnes 749, Depto 1805, Santiago Centro |
+| nicole.sepulveda | 121772 | 12 Sur 3174, Talca — fuera de la RM, origen propio obligatorio |
+| cimlibros | — (usa el compartido) | La Florida, RM: sale con el 100321 |
+
+**Origen compartido 100321 para la RM.** Un vendedor de la Región
+Metropolitana sin `shipit_origin_id` sale con el 100321 en dropoff (D1
+revisada). Fuera de la RM sin origen propio, la fila pasa a `needs_origin` y el
+worker manda el gong a Vero con los seis campos para crear el origen en el
+panel.
+
+**Primeros envíos automáticos, sin intervención manual:**
+
+| Referencia | Vendedor | Shipit | Tracking | Costo real vs. cotizado |
+|---|---|---|---|---|
+| TL-274d6debfbfb | libro.de.ocasion | 8917390 | Starken 277273291 | $4.475 vs. $4.367 |
+| TL-5c373dbf97b5 | nicole.sepulveda | 8917415 | Bluexpress 2397879422 | $7.524 vs. $7.130 |
+
+Las dos cotizaciones son anteriores al colchón del 10 % (PROMPT 0.1), que se
+desplegó el mismo día: la diferencia la absorbió Vero. Revisar el 21-09 si el
+colchón alcanza.
+
+**Modo de prueba: OFF.** El sandbox de Shipit es por cuenta y afectaría también
+los envíos que Vero crea en el panel, así que quedó apagado por decisión. No
+cargar `SHIPIT_MODE=sandbox` en Vercel.
+
+**Webhook de Shipit: configurado, endpoint pendiente.** En el panel de Shipit
+hay un webhook apuntando a `https://tuslibros.cl/api/webhooks/shipit`. La ruta
+existe (exige `x-shipit-token`, 405 a GET) pero solo toca `orders`; todavía no
+escribe en `shipments`. Es el trabajo de la fase 2.
+
+**Ids a revisar en la factura de septiembre:** 8911837, 8911838 y 8916147. Los
+tres se anularon, pero quedaron con `billing_date`.
+
 ## ¿Hay alternativa a Shipit?
 
 Evaluación al 07-09-2026, sin cambiar de proveedor en esta etapa:

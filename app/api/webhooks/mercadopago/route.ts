@@ -372,11 +372,12 @@ export async function POST(req: NextRequest) {
                     <h3 style="color:#1a1a1a;font-size:16px">Cómo despachar</h3>
                     <ol style="padding-left:20px;color:#444;font-size:14px;line-height:1.7">
                       <li>Empaca <strong>${itemCount > 1 ? `los ${itemCount} libros juntos` : "el libro"}</strong> en una caja o sobre resistente con burbuja.</li>
-                      <li><strong>No lo lleves a ninguna sucursal:</strong> el courier pasa a buscarlo a tu casa. Yo confirmo el retiro y te aviso por WhatsApp el día y la hora.</li>
-                      <li>Pega la etiqueta en el paquete. Si todavía no la tienes, escribe bien claro el nombre del comprador y el número de seguimiento.</li>
-                      <li>Firma el comprobante que te deja el courier y guárdalo hasta que el comprador reciba el libro.</li>
+                      <li>Descarga la etiqueta desde <a href="${siteUrl}/mis-ventas" style="color:#1a1a1a">Mis Ventas</a> o desde el correo y pégala en el paquete. Si todavía no la tienes, escribe bien claro el nombre del comprador y el número de seguimiento.</li>
+                      <li><strong>Déjalo en una sucursal del courier indicado</strong> (Starken, Bluexpress o Chilexpress). No pagas nada al courier: el envío ya lo pagó el comprador.</li>
+                      <li>Guarda el comprobante que te dan en la sucursal hasta que el comprador reciba el libro.</li>
                     </ol>
-                    <p style="font-size:14px;color:#444;line-height:1.6">Si el día del retiro el courier no aparece o hay cualquier problema, escríbele a Shipit al WhatsApp <strong>+56 9 3230 2514</strong> (lunes a viernes de 9:00 a 18:00) o a <a href="mailto:soporte@shipit.cl" style="color:#1a1a1a">soporte@shipit.cl</a> con el número de seguimiento. Y avísame a mí al <strong>${WHATSAPP_SOPORTE_LEGIBLE}</strong>.</p>
+                    <p style="font-size:14px;color:#444;line-height:1.6">Si prefieres que pasen a buscarlo a tu casa (solo Región Metropolitana), usa el botón <strong>Pedir retiro a domicilio</strong> en <a href="${siteUrl}/mis-ventas" style="color:#1a1a1a">Mis Ventas</a>.</p>
+                    <p style="font-size:14px;color:#444;line-height:1.6">Si en la sucursal no reciben el paquete o hay cualquier problema, escríbele a Shipit al WhatsApp <strong>+56 9 3230 2514</strong> (lunes a viernes de 9:00 a 18:00) o a <a href="mailto:soporte@shipit.cl" style="color:#1a1a1a">soporte@shipit.cl</a> con el número de seguimiento. Y avísame a mí al <strong>${WHATSAPP_SOPORTE_LEGIBLE}</strong>.</p>
                     <p style="font-size:14px;color:#444;line-height:1.6">Guía completa: <a href="${siteUrl}/ayuda/vender" style="color:#1a1a1a">tuslibros.cl/ayuda/vender</a></p>
                   `
                 : `
