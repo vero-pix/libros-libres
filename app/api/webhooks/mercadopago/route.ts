@@ -99,8 +99,28 @@ async function logWebhook(datos: {
   }
 }
 
+/**
+ * Notificación IPN (formato viejo de MercadoPago): `{ topic, resource }`, sin
+ * `type`/`action` y sin firma. Del 03 al 07 de septiembre de 2026 llegaron 173
+ * así y TODAS se rechazaban con 401 por firma inválida, y MP las reintentaba en
+ * ráfagas. No traen nada que el evento firmado (`type: "payment"`) no traiga:
+ * se responden 200 sin procesar, con log, para que MP deje de insistir.
+ */
+function esIpn(body: any): boolean {
+  return !!body && !body.type && !body.action && (body.topic !== undefined || body.resource !== undefined);
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
+
+  if (esIpn(body)) {
+    await logWebhook({
+      resultado: "ipn_ignorada",
+      detalle: `topic=${body.topic ?? "?"} resource=${body.resource ?? "?"}`,
+      payload: body,
+    });
+    return NextResponse.json({ received: true, ignored: "ipn" });
+  }
 
   if (!verifySignature(req, body)) {
     console.error("[webhook] Invalid signature");
@@ -160,6 +180,30 @@ export async function POST(req: NextRequest) {
         status = "pending";
     }
 
+    // Transición idempotente (PROMPT 0.2, 07-09-2026). Una fila pagada no se
+    // vuelve a tocar nunca, y un evento repetido del mismo pago con el mismo
+    // estado no cambia filas. Solo si el UPDATE devolvió filas se ejecutan los
+    // efectos (listings, comisión, Shipit, correos). Antes, un
+    // `payment.updated` reenviado por MP para un pago ya aplicado volvía a
+    // marcar vendido, registrar comisión, crear envío y mandar dos correos.
+    const filtroReplay = (q: any) => {
+      q = q.neq("status", "paid");
+      if (status !== "paid") {
+        q = q.or(`status.neq.${status},mercadopago_payment_id.is.null,mercadopago_payment_id.neq.${String(paymentId)}`);
+      }
+      return q;
+    };
+    const responderReplay = async (que: string) => {
+      await logWebhook({
+        payment_id: String(paymentId), external_ref: externalRef,
+        mp_status: payment.status ?? null, mp_status_detail: payment.status_detail ?? null,
+        amount: payment.transaction_amount ?? null,
+        resultado: "ya_aplicado", orders_afectadas: 0,
+        detalle: `${que} → ${status} (sin cambios)`, payload: body,
+      });
+      return NextResponse.json({ received: true, status, replay: true });
+    };
+
     // Detectar: ¿bundle, order singular, o rental?
     // externalRef puede ser:
     //   (a) order.id  — compat legacy
@@ -174,14 +218,17 @@ export async function POST(req: NextRequest) {
 
     if (bundleOrders && bundleOrders.length > 0) {
       // ── BUNDLE ORDER ──
-      await supabase
-        .from("orders")
-        .update({
-          status,
-          mercadopago_payment_id: String(paymentId),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("bundle_id", externalRef);
+      const { data: cambiadas } = await filtroReplay(
+        supabase
+          .from("orders")
+          .update({
+            status,
+            mercadopago_payment_id: String(paymentId),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("bundle_id", externalRef)
+      ).select("id");
+      if (!cambiadas?.length) return responderReplay("bundle");
 
       if (status === "paid") {
         const listingIds = bundleOrders.map((o: any) => o.listing_id);
@@ -447,7 +494,7 @@ export async function POST(req: NextRequest) {
         payment_id: String(paymentId), external_ref: externalRef,
         mp_status: payment.status ?? null, mp_status_detail: payment.status_detail ?? null,
         amount: payment.transaction_amount ?? null,
-        resultado: "aplicado", orders_afectadas: bundleOrders?.length ?? 0,
+        resultado: "aplicado", orders_afectadas: cambiadas.length,
         detalle: `bundle → ${status}`, payload: body,
       });
       return NextResponse.json({ received: true, status, bundle: true });
@@ -461,14 +508,17 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (order) {
-      await supabase
-        .from("orders")
-        .update({
-          status,
-          mercadopago_payment_id: String(paymentId),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", order.id);
+      const { data: cambiadas } = await filtroReplay(
+        supabase
+          .from("orders")
+          .update({
+            status,
+            mercadopago_payment_id: String(paymentId),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", order.id)
+      ).select("id");
+      if (!cambiadas?.length) return responderReplay("order");
 
       if (status === "paid") {
         await supabase
@@ -578,14 +628,17 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (rental) {
-      await supabase
-        .from("rentals")
-        .update({
-          status,
-          mercadopago_payment_id: String(paymentId),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", rental.id);
+      const { data: cambiadas } = await filtroReplay(
+        supabase
+          .from("rentals")
+          .update({
+            status,
+            mercadopago_payment_id: String(paymentId),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", rental.id)
+      ).select("id");
+      if (!cambiadas?.length) return responderReplay("rental");
 
       if (status === "paid") {
         await supabase
