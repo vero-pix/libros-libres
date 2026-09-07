@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WHATSAPP_SOPORTE_LEGIBLE, waSoporte } from "@/lib/soporte";
 
 export const metadata = {
   title: "Cómo despachar",
@@ -41,8 +42,8 @@ const contactos = [
   },
   {
     quien: "Vero (tuslibros.cl)",
-    detalle: "WhatsApp +56 9 9458 3067. Para cualquier cosa: una etiqueta que no llega, un comprador que no responde, un libro que ya vendiste por fuera.",
-    href: "https://wa.me/56994583067",
+    detalle: `WhatsApp ${WHATSAPP_SOPORTE_LEGIBLE}. Para cualquier cosa: una etiqueta que no llega, un comprador que no responde, un libro que ya vendiste por fuera.`,
+    href: waSoporte(),
   },
 ];
 

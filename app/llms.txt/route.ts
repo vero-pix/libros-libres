@@ -126,7 +126,10 @@ ${comunas.join(", ")}.
 
 - https://tuslibros.cl/ — catálogo completo
 - https://tuslibros.cl/como-funciona — guía de compra y venta
-- https://tuslibros.cl/faq — envíos, pagos y devoluciones
+- https://tuslibros.cl/ayuda — centro de ayuda
+- https://tuslibros.cl/ayuda/vender — guía del vendedor: publicar, cobrar por MercadoPago, despacho
+- https://tuslibros.cl/ayuda/comprar — guía del comprador: buscar, pagar, recibir
+- https://tuslibros.cl/ayuda/preguntas — preguntas frecuentes: comisión, envíos, pagos
 - https://tuslibros.cl/solicitudes — pedir un libro que no está en el catálogo
 - https://tuslibros.cl/vender — publicar libros
 - https://tuslibros.cl/tiendas — librerías y vendedores del sitio

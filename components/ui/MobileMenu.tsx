@@ -86,7 +86,7 @@ export default function MobileMenu({ loggedIn }: Props) {
         <Section>
           <Item href="/como-funciona" label="Cómo funciona" />
           <Item href="/novedades" label="Novedades" />
-          <Item href="/faq" label="FAQ" />
+          <Item href="/ayuda" label="Centro de ayuda" />
           <Item href="/sobre-nosotros" label="Sobre nosotros" />
           <Item href="/alianzas" label="Alianzas institucionales" />
           <Item href="/historia" label="Nuestra historia" />

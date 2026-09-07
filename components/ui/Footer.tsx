@@ -1,5 +1,6 @@
 import Link from "next/link";
 import NewsletterForm from "./NewsletterForm";
+import { waSoporte } from "@/lib/soporte";
 
 export default function Footer() {
   return (
@@ -68,7 +69,10 @@ export default function Footer() {
               <li><Link href="/sobre-nosotros" className="hover:text-coral transition-colors">Sobre nosotros</Link></li>
               <li><Link href="/historia" className="hover:text-coral transition-colors">Nuestra historia</Link></li>
               <li><Link href="/como-funciona" className="hover:text-coral transition-colors">Cómo funciona</Link></li>
-              <li><Link href="/faq" className="hover:text-coral transition-colors">FAQ</Link></li>
+              <li><Link href="/ayuda" className="hover:text-coral transition-colors">Centro de ayuda</Link></li>
+              <li><Link href="/ayuda/vender" className="hover:text-coral transition-colors">Guía del vendedor</Link></li>
+              <li><Link href="/ayuda/comprar" className="hover:text-coral transition-colors">Guía del comprador</Link></li>
+              <li><Link href="/ayuda/preguntas" className="hover:text-coral transition-colors">Preguntas frecuentes</Link></li>
               <li><Link href="/alianzas" className="hover:text-coral transition-colors">Alianzas</Link></li>
               {/* <li><Link href="/gente-de-confianza" ...>Gente de confianza</Link></li> guardada por ahora (20 jul 2026) */}
             </ul>
@@ -155,7 +159,7 @@ export default function Footer() {
               </svg>
             </a>
           </div>
-          <a href="https://wa.me/56994583067?text=Hola%20Vero%2C%20tengo%20una%20duda%20sobre%20tuslibros.cl" target="_blank" rel="noopener" className="hover:text-coral transition-colors">¿Dudas? Escríbeme por WhatsApp</a>
+          <a href={waSoporte("Hola Vero, tengo una duda sobre tuslibros.cl")} target="_blank" rel="noopener" className="hover:text-coral transition-colors">¿Dudas? Escríbeme por WhatsApp</a>
         </div>
       </div>
     </footer>

@@ -8,6 +8,7 @@ import { extractCommune } from "@/lib/chilexpress";
 import crypto from "crypto";
 import { registrarComisionVenta } from "@/lib/commissions";
 import { VERO_INBOX } from "@/lib/veroInbox";
+import { WHATSAPP_SOPORTE_LEGIBLE } from "@/lib/soporte";
 
 /**
  * Origen del envío para Shipit. La dirección del listing es más precisa, pero
@@ -388,8 +389,8 @@ export async function POST(req: NextRequest) {
                       <li>Pega la etiqueta en el paquete. Si todavía no la tienes, escribe bien claro el nombre del comprador y el número de seguimiento.</li>
                       <li>Firma el comprobante que te deja el courier y guárdalo hasta que el comprador reciba el libro.</li>
                     </ol>
-                    <p style="font-size:14px;color:#444;line-height:1.6">Si el día del retiro el courier no aparece o hay cualquier problema, escríbele a Shipit al WhatsApp <strong>+56 9 3230 2514</strong> (lunes a viernes de 9:00 a 18:00) o a <a href="mailto:soporte@shipit.cl" style="color:#1a1a1a">soporte@shipit.cl</a> con el número de seguimiento. Y avísame a mí al <strong>+56 9 9458 3067</strong>.</p>
-                    <p style="font-size:14px;color:#444;line-height:1.6">Guía completa con fotos: <a href="${siteUrl}/como-despachar" style="color:#1a1a1a">tuslibros.cl/como-despachar</a></p>
+                    <p style="font-size:14px;color:#444;line-height:1.6">Si el día del retiro el courier no aparece o hay cualquier problema, escríbele a Shipit al WhatsApp <strong>+56 9 3230 2514</strong> (lunes a viernes de 9:00 a 18:00) o a <a href="mailto:soporte@shipit.cl" style="color:#1a1a1a">soporte@shipit.cl</a> con el número de seguimiento. Y avísame a mí al <strong>${WHATSAPP_SOPORTE_LEGIBLE}</strong>.</p>
+                    <p style="font-size:14px;color:#444;line-height:1.6">Guía completa: <a href="${siteUrl}/ayuda/vender" style="color:#1a1a1a">tuslibros.cl/ayuda/vender</a></p>
                   `
                 : `
                     <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;margin:20px 0">

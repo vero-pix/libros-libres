@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { sendEmail } from "@/lib/email";
 import { VERO_INBOX } from "@/lib/veroInbox";
+import { motivoDescarteContacto, CONTACTO_MENSAJE_INVALIDO } from "@/lib/contactValidation";
 
 /**
  * POST /api/contact
- * Saves contact form submissions to Supabase.
- * Invisible to user — messages go to vero@tuslibros.cl via admin panel or future email integration.
+ * Guarda el formulario de contacto en `contact_messages` y avisa a VERO_INBOX.
+ *
+ * Los mensajes que no pasan la validación (lib/contactValidation.ts) se guardan
+ * igual, con `discarded_reason`, para poder mirar qué se está filtrando: no
+ * mandan correo y el panel de admin no los muestra.
  */
 export async function POST(req: NextRequest) {
   const { name, email, message } = (await req.json()) as {
@@ -24,6 +28,19 @@ export async function POST(req: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { cookies: { getAll: () => [], setAll: () => {} } }
   );
+
+  const motivo = motivoDescarteContacto(message);
+  if (motivo) {
+    const { error } = await supabase.from("contact_messages").insert({
+      name,
+      email,
+      message,
+      read: true,
+      discarded_reason: motivo,
+    });
+    if (error) console.error("Contact form (descartado) error:", error.message);
+    return NextResponse.json({ error: CONTACTO_MENSAJE_INVALIDO }, { status: 400 });
+  }
 
   const { error } = await supabase.from("contact_messages").insert({
     name,

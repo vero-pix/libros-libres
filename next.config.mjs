@@ -20,6 +20,9 @@ const nextConfig = {
         destination: 'https://tuslibros.cl/:path*',
         permanent: true,
       },
+      // Centro de ayuda (sept 2026): /faq se reemplazó por /ayuda/preguntas.
+      // statusCode 301 explícito: `permanent: true` en Next es 308.
+      { source: '/faq', destination: '/ayuda/preguntas', statusCode: 301 },
       // SEO landing pages — libros de alta demanda con página dedicada.
       // Redirigen ANTES que el middleware para transferir link equity (308).
       { source: '/libro/algebra-de-baldor', destination: '/algebra-de-baldor', permanent: true },

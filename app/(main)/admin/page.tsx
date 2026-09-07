@@ -62,6 +62,8 @@ export default async function AdminPage() {
     supabase
       .from("contact_messages")
       .select("*")
+      // Los descartados por la validación del formulario no se muestran.
+      .is("discarded_reason", null)
       .order("created_at", { ascending: false })
       .limit(50),
     supabase

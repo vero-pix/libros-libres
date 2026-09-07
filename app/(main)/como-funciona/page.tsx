@@ -128,8 +128,8 @@ export default function ComoFuncionaPage() {
             </Link>
           </div>
           <p className="text-ink-muted">¿Tienes dudas?</p>
-          <Link href="/faq" className="text-brand-600 font-semibold hover:underline text-lg">
-            Visita nuestras Preguntas Frecuentes &rarr;
+          <Link href="/ayuda" className="text-brand-600 font-semibold hover:underline text-lg">
+            Visita el centro de ayuda &rarr;
           </Link>
         </div>
       </main>

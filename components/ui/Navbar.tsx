@@ -104,7 +104,7 @@ export default async function Navbar() {
                 items={[
                   { href: "/como-funciona", label: "Cómo funciona" },
                   { href: "/novedades", label: "Novedades" },
-                  { href: "/faq", label: "FAQ" },
+                  { href: "/ayuda", label: "Centro de ayuda" },
                   { href: "/sobre-nosotros", label: "Sobre nosotros" },
                   { href: "/alianzas", label: "Alianzas institucionales" },
                   { href: "/historia", label: "Nuestra historia" },

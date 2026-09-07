@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import PurchaseTracker from "@/components/analytics/PurchaseTracker";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { waSoporte } from "@/lib/soporte";
 
 interface Props {
   params: { id: string };
@@ -224,9 +225,9 @@ export default async function OrderPage({ params, searchParams }: Props) {
                   </Link>
                 )}
                 <a
-                  href={`https://wa.me/56994583067?text=${encodeURIComponent(
+                  href={waSoporte(
                     `Hola Vero, intenté pagar "${bundleOrders[0]?.listing?.book?.title ?? "un libro"}" en tuslibros.cl y el pago no pasó. ¿Me ayudas?`
-                  )}`}
+                  )}
                   target="_blank"
                   rel="noopener"
                   className="flex items-center justify-between gap-3 border border-gray-300 text-gray-800 hover:bg-gray-50 font-medium px-5 py-3 rounded-md text-sm transition-colors"
@@ -236,7 +237,11 @@ export default async function OrderPage({ params, searchParams }: Props) {
                 </a>
               </div>
               <p className="mt-4 text-xs text-gray-500 leading-relaxed">
-                En la ficha puedes pagar con otra tarjeta, con débito o con saldo de MercadoPago. Si el vendedor entrega en persona, también puedes coordinar transferencia con él.
+                En la ficha puedes pagar con otra tarjeta, con débito o con saldo de MercadoPago.{" "}
+                <Link href="/ayuda/comprar#pagar" className="text-brand-600 font-semibold hover:underline">
+                  Por qué un pago puede ser rechazado y qué hacer
+                </Link>
+                .
               </p>
             </div>
           )}

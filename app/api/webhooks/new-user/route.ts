@@ -3,6 +3,7 @@ import { sendEmail } from "@/lib/email";
 import { sendGong, escapeHtml } from "@/lib/notifications";
 import { createPublicClient } from "@/lib/supabase/public";
 import { VERO_INBOX } from "@/lib/veroInbox";
+import { waSoporte } from "@/lib/soporte";
 
 const ADMIN_EMAIL = VERO_INBOX;
 const WEBHOOK_SECRET = process.env.SUPABASE_WEBHOOK_SECRET;
@@ -119,6 +120,8 @@ export async function POST(req: NextRequest) {
                 <p style="margin:0;font-weight:600;color:#1a1a1a">2. Conecta tu MercadoPago</p>
                 <p style="margin:4px 0 8px;color:#666;font-size:14px">Es lo que falta para que te puedan pagar. Sin eso, solo te compra quien coordine contigo en persona. Con MercadoPago te compran desde cualquier región y la plata te llega directa a ti.<br><br>En la misma página puedes activar el despacho con Shipit: imprimes la etiqueta y un courier pasa a buscar el libro a tu casa. No tienes que ir a ninguna oficina.</p>
                 <a href="https://tuslibros.cl/perfil" style="color:#d4a017;font-size:14px;font-weight:600;text-decoration:none">Conectar MercadoPago y Shipit →</a>
+                <span style="color:#bbb">&nbsp;·&nbsp;</span>
+                <a href="https://tuslibros.cl/ayuda/vender" style="color:#d4a017;font-size:14px;text-decoration:none">guía del vendedor</a>
               </div>
 
               <div style="background:#f5f0e8;padding:16px;border-radius:12px">
@@ -142,6 +145,8 @@ export async function POST(req: NextRequest) {
                 También sirve. Acá hay ${cuantos} por gente en todo Chile, y se busca por autor, título o género.
               </p>
               <a href="https://tuslibros.cl/search" style="display:inline-block;background:#f5f0e8;color:#1a1a1a;padding:10px 18px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">Buscar un libro →</a>
+              <span style="color:#bbb">&nbsp;·&nbsp;</span>
+              <a href="https://tuslibros.cl/ayuda/comprar" style="color:#d4a017;font-size:14px;text-decoration:none">guía del comprador</a>
 
               <p style="margin:18px 0 12px;color:#333;font-size:15px;line-height:1.6">
                 Y si no está el que andas buscando, déjalo pedido. Le llega a los vendedores y yo te aviso cuando aparezca.
@@ -150,7 +155,7 @@ export async function POST(req: NextRequest) {
             </div>
 
             <p style="color:#888;font-size:13px;margin-top:20px">
-              Si algo se traba, escríbeme por <a href="https://wa.me/56994583067" style="color:#d4a017">WhatsApp</a> o mira las <a href="https://tuslibros.cl/faq" style="color:#d4a017">preguntas frecuentes</a>. Dudas, reclamos, ideas — me llegan todas y las leo yo.
+              Si algo se traba, escríbeme por <a href="${waSoporte()}" style="color:#d4a017">WhatsApp</a> o mira el <a href="https://tuslibros.cl/ayuda" style="color:#d4a017">centro de ayuda</a>. Dudas, reclamos, ideas — me llegan todas y las leo yo.
             </p>
 
             <p style="color:#aaa;font-size:12px;margin-top:16px">— Vero</p>

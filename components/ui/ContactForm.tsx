@@ -1,17 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import {
+  CONTACTO_MIN_CARACTERES,
+  CONTACTO_MENSAJE_INVALIDO,
+  motivoDescarteContacto,
+} from "@/lib/contactValidation";
 
 export default function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Mismas reglas que /api/contact (lib/contactValidation.ts).
+  const MIN_CARACTERES = CONTACTO_MIN_CARACTERES;
+  const mensajeLimpio = message.trim();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !message.trim()) return;
+    if (!name.trim() || !email.trim() || !mensajeLimpio) return;
+    if (motivoDescarteContacto(mensajeLimpio)) {
+      setErrorMsg(CONTACTO_MENSAJE_INVALIDO);
+      setStatus("error");
+      return;
+    }
 
+    setErrorMsg(null);
     setStatus("loading");
     try {
       const res = await fetch("/api/contact", {
@@ -25,9 +41,12 @@ export default function ContactForm() {
         setEmail("");
         setMessage("");
       } else {
+        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        setErrorMsg(body?.error ?? null);
         setStatus("error");
       }
     } catch {
+      setErrorMsg(null);
       setStatus("error");
     }
   }
@@ -74,11 +93,13 @@ export default function ContactForm() {
             onChange={(e) => setMessage(e.target.value)}
             required
             rows={4}
+            minLength={MIN_CARACTERES}
             className="w-full px-4 py-2.5 border border-cream-dark/40 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
           />
+          <p className="mt-1 text-xs text-ink-muted">Mínimo {MIN_CARACTERES} caracteres.</p>
         </div>
         {status === "error" && (
-          <p className="text-sm text-red-600">Error al enviar. Intenta de nuevo.</p>
+          <p className="text-sm text-red-600">{errorMsg ?? "Error al enviar. Intenta de nuevo."}</p>
         )}
         <button
           type="submit"
