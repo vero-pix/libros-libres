@@ -43,7 +43,7 @@ export default async function MisVentasPage() {
   const { data: rawOrders } = await supabase
     .from("orders")
     .select(`
-      id, buyer_id, book_price, shipping_cost, service_fee, total, status,
+      id, buyer_id, bundle_id, book_price, shipping_cost, service_fee, total, status,
       courier, tracking_code, shipping_label_url, shipping_status, buyer_address, created_at,
       listing:listings(id, cover_image_url, book:books(title, author, cover_url)),
       buyer:users!orders_buyer_id_fkey(full_name, email)
@@ -52,6 +52,16 @@ export default async function MisVentasPage() {
     .order("created_at", { ascending: false });
 
   const orders = rawOrders ?? [];
+
+  // Envíos del worker de Shipit (fase 1, 07-09-2026). Una fila por bundle;
+  // la RLS deja ver solo los del vendedor. Si hay fila, manda sobre las
+  // columnas viejas de `orders` (shipping_status / shipping_label_url).
+  const { data: rawShipments } = await supabase
+    .from("shipments")
+    .select("id, bundle_id, status, courier, tracking_number, label_path, dispatch_mode, pickup_requested_at")
+    .eq("seller_id", user.id);
+  const shipmentByBundle = new Map<string, NonNullable<typeof rawShipments>[number]>();
+  for (const sh of rawShipments ?? []) shipmentByBundle.set(sh.bundle_id, sh);
 
   // Rentals where I'm the owner
   const { data: rawRentals } = await supabase
@@ -287,7 +297,11 @@ export default async function MisVentasPage() {
                       const isInPerson = order.courier === "Entrega en persona" || order.courier === "Punto de retiro" || !order.courier;
                       const isPaid = order.status === "paid" || order.status === "shipped" || order.status === "delivered";
                       const ageHours = (Date.now() - new Date(order.created_at).getTime()) / 36e5;
-                      const labelStuck = isPaid && !isInPerson && !order.shipping_label_url && ageHours > 1;
+                      const shipment = order.bundle_id ? shipmentByBundle.get(order.bundle_id) : undefined;
+                      // Con fila en `shipments` la alarma vieja no aplica: el
+                      // worker es el que dice en qué está el envío.
+                      const labelStuck =
+                        isPaid && !isInPerson && !order.shipping_label_url && ageHours > 1 && !shipment;
                       const supportMailto = labelStuck
                         ? `mailto:soporte@shipit.cl?subject=${encodeURIComponent(
                             `Ayuda con envío — orden ${order.id.slice(0, 8)}`
@@ -350,12 +364,14 @@ export default async function MisVentasPage() {
                               <div className="text-xs font-medium text-ink">
                                 📦 {order.courier ?? "Courier"}
                               </div>
-                              {order.tracking_code && (
+                              {(shipment?.tracking_number ?? order.tracking_code) && (
                                 <div className="text-[11px] font-mono text-ink-muted">
-                                  {order.tracking_code}
+                                  {shipment?.tracking_number ?? order.tracking_code}
                                 </div>
                               )}
-                              {order.shipping_label_url ? (
+                              {shipment && shipment.status !== "canceled" ? (
+                                <EstadoEnvio shipment={shipment} />
+                              ) : order.shipping_label_url ? (
                                 <a
                                   href={order.shipping_label_url}
                                   target="_blank"
@@ -585,4 +601,66 @@ function EmptyState({ text }: { text: string }) {
       {text}
     </div>
   );
+}
+
+
+/**
+ * Estado del envío según el worker de Shipit. Textos en 1ª persona (Vero) y
+ * con salida siempre: nunca un cartel que solo informe el bloqueo.
+ */
+function EstadoEnvio({
+  shipment,
+}: {
+  shipment: {
+    id: string;
+    status: string;
+    courier: string | null;
+    label_path: string | null;
+    dispatch_mode: string;
+  };
+}) {
+  const courier = shipment.courier
+    ? shipment.courier.charAt(0).toUpperCase() + shipment.courier.slice(1)
+    : "el courier";
+
+  if (shipment.label_path && ["label_ready", "notified", "pickup_scheduled", "in_transit", "delivered"].includes(shipment.status)) {
+    return (
+      <div className="space-y-1">
+        <a
+          href={`/api/shipments/${shipment.id}/label`}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-block text-[11px] bg-ink text-cream px-2 py-1 rounded-md hover:bg-ink/90"
+        >
+          📄 Descargar etiqueta
+        </a>
+        <span className="text-[11px] text-ink-muted block">
+          {shipment.dispatch_mode === "pickup"
+            ? "Pégala al paquete. Te aviso la ventana de retiro."
+            : `Imprímela, pégala al paquete y déjalo en la sucursal de ${courier} más cercana.`}
+        </span>
+      </div>
+    );
+  }
+
+  if (["needs_origin", "stalled", "failed"].includes(shipment.status)) {
+    return (
+      <div className="space-y-1">
+        <span className="text-[11px] text-amber-700 block font-medium">
+          El envío quedó trabado y ya me avisó el sistema.
+        </span>
+        <span className="text-[11px] text-ink-muted block">
+          Lo estoy resolviendo. Si en un día no tienes noticias, escríbeme.
+        </span>
+        <a
+          href="https://wa.me/56994583067"
+          className="inline-block text-[11px] bg-ink text-cream px-2 py-1 rounded-md hover:bg-ink/90"
+        >
+          Escribirle a Vero
+        </a>
+      </div>
+    );
+  }
+
+  return <span className="text-[11px] text-amber-700">Etiqueta en preparación… te la dejo aquí apenas salga.</span>;
 }

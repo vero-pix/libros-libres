@@ -40,10 +40,10 @@ export const dynamic = "force-dynamic";
  *             users.shipit_auto_enabled = true; el resto se registra como
  *             dry-run con note='shipit_auto_enabled=false'.
  *
- * Pasos implementados en este archivo (PROMPT 1.2 d):
- *   pending → created            crear el envío
- *   created → (sigue en created) consultar tracking/costo y espejarlos en orders
- * Los pasos e) etiqueta a Storage y f) correos van aparte y NO están acá.
+ * Pasos implementados en este archivo (PROMPT 1.2 d y e):
+ *   pending → created       crear el envío
+ *   created → label_ready   tracking + pack_pdf descargado al bucket privado `labels`
+ * El paso f) (correos, label_ready → notified) todavía no está acá.
  *
  * Diseño completo: docs/shipit/PROMPT_1.1_diseno_2026-09-07.md
  */
@@ -86,10 +86,10 @@ export async function GET(request: Request) {
           resumen.push(await pasoCrear(admin, fila, modo));
           break;
         case "created":
-          resumen.push(await pasoConsultar(admin, fila, modo));
+          resumen.push(await pasoEtiqueta(admin, fila, modo));
           break;
         default:
-          // label_ready / notified: pasos e) y f), todavía no implementados.
+          // label_ready / notified: paso f) (correos), todavía no implementado.
           // Se sueltan para dentro de 6 horas para no recorrerlos cada 5 min.
           await reprogramarEnvio(admin, fila.id, 6 * 60);
           resumen.push({ reference: fila.reference, estado: fila.status, accion: "sin paso implementado" });
@@ -291,9 +291,12 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
   return { ...base, estado: "created", accion: "creado", nota: `shipit_id ${res.id}` };
 }
 
-/* ───────────────────────── created → (tracking) ───────────────────────── */
+/* ───────────────────────── created → label_ready ───────────────────────── */
 
-async function pasoConsultar(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
+/** Bucket privado; path = `shipments/{shipment.id}.pdf`. Sin policies: solo service role. */
+const LABELS_BUCKET = "labels";
+
+async function pasoEtiqueta(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
   if (!fila.shipit_id) throw new Error("fila en created sin shipit_id");
   const s = await getShipitShipment(fila.shipit_id);
   await registrarEventoShipit(admin, {
@@ -309,26 +312,68 @@ async function pasoConsultar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
   if (!s.tracking_number || !s.pack_pdf) {
     // Shipit tarda ~20 s en completar. Reintento suave, sin contar como fallo.
     await reprogramarEnvio(admin, fila.id, 5);
-    return { reference: fila.reference, estado: "created", accion: "esperando tracking" };
+    return { reference: fila.reference, estado: "created", accion: "esperando tracking/pack_pdf" };
   }
 
-  await admin
-    .from("shipments")
-    .update({ tracking_number: s.tracking_number, courier: s.courier ?? fila.courier, real_cost: s.total_price })
-    .eq("id", fila.id);
+  // La URL de pack_pdf es un objeto público de S3 con nombre, dirección y
+  // teléfono del comprador (verificado el 07-09-2026: 200 sin auth). Por eso
+  // se baja acá, se guarda en el bucket privado y la URL de Shipit no se
+  // persiste ni se manda a nadie (D3).
+  const path = `shipments/${fila.id}.pdf`;
+  const pdf = await descargarPdf(s.pack_pdf);
+  const { error: upErr } = await admin.storage
+    .from(LABELS_BUCKET)
+    .upload(path, pdf, { contentType: "application/pdf", upsert: true });
+  if (upErr) throw new Error(`Storage upload: ${upErr.message}`);
+  await registrarEventoShipit(admin, {
+    shipmentId: fila.id,
+    kind: "label",
+    mode: modo,
+    note: `${path} · ${pdf.byteLength} bytes`,
+    httpStatus: 200,
+  });
+
+  const ok = await transicionEnvio(admin, fila.id, "created", "label_ready", {
+    tracking_number: s.tracking_number,
+    label_path: path,
+    real_cost: s.total_price,
+    courier: s.courier ?? fila.courier,
+  });
+  if (!ok) return { reference: fila.reference, estado: "created", accion: "ya en label_ready (otro proceso)" };
+
+  // Espejo para /mis-ventas y /mis-pedidos. shipping_label_url queda null a
+  // propósito: la etiqueta se sirve por /api/shipments/{id}/label con URL firmada.
   await admin
     .from("orders")
-    .update({ tracking_code: s.tracking_number, shipping_updated_at: new Date().toISOString() })
+    .update({
+      tracking_code: s.tracking_number,
+      shipping_status: "label_ready",
+      shipping_label_url: null,
+      shipping_updated_at: new Date().toISOString(),
+    })
     .eq("bundle_id", fila.bundle_id);
 
-  // El paso e) (descargar pack_pdf a Storage y pasar a label_ready) no está
-  // implementado todavía. Hasta entonces la fila se queda en created y se
-  // vuelve a mirar cada 6 horas.
-  await reprogramarEnvio(admin, fila.id, 6 * 60);
   return {
     reference: fila.reference,
-    estado: "created",
-    accion: "tracking guardado; etiqueta pendiente (paso e)",
-    nota: s.tracking_number,
+    estado: "label_ready",
+    accion: "etiqueta guardada",
+    nota: `${s.tracking_number} · ${path}`,
   };
+}
+
+async function descargarPdf(url: string): Promise<Buffer> {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 20_000);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal });
+    if (!res.ok) throw new Error(`pack_pdf HTTP ${res.status}`);
+    const buf = Buffer.from(await res.arrayBuffer());
+    if (buf.byteLength < 1024 || buf.subarray(0, 4).toString("latin1") !== "%PDF") {
+      throw new Error(`pack_pdf no es un PDF válido (${buf.byteLength} bytes)`);
+    }
+    if (buf.byteLength > 2 * 1024 * 1024) throw new Error("pack_pdf supera 2 MB");
+    return buf;
+  } finally {
+    clearTimeout(t);
+  }
 }
