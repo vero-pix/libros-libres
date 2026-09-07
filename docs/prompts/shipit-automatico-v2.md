@@ -226,6 +226,9 @@ d) Cron /api/cron/shipments con la RPC de claim, máquina de estados,
    límite de 5 intentos, gong en needs_origin/stalled/failed.
 e) Descarga de etiqueta a Storage y URL firmada; /mis-ventas muestra
    estado y botón "Descargar etiqueta"; /mis-pedidos muestra tracking.
+   ✅ Hecho el 07-09-2026 (`1fa97bc`), salvo /mis-pedidos, que queda
+   para f) junto con el correo al comprador. Probado con el envío real
+   8916147 (TL-d31c30184750): PDF en labels/shipments/{id}.pdf.
 f) Correos: vendedor (etiqueta adjunta + link, plantilla 5b de
    docs/MENSAJES-ONBOARDING-VENDEDOR.md) y comprador (tracking, plantilla
    5c). Se envían desde el worker, una vez, con registro en shipit_events
@@ -287,6 +290,11 @@ Evaluación al 07-09-2026, sin cambiar de proveedor en esta etapa:
 | **Starken / Blue directo** | Igual que Chilexpress | Sí / limitado a Santiago | Sí | Contrato | Igual que arriba |
 
 Conclusión: con el volumen actual, cambiar de agregador no resuelve nada que no resuelva antes la arquitectura de esta guía. La única razón para mirar Envíame es si Shipit no permite crear un envío sin retiro en la RM; se sabrá con el PROMPT 0.3.
+
+## Tareas separadas, después de la fase 1
+
+- **Caché de fetch de Next 14 en los crons.** El 07-09-2026 se descubrió que Next guarda en disco (`.next/cache/fetch-cache`) las respuestas de Supabase en rutas GET, incluidos RPC por POST: el worker de Shipit leyó `users` congelado durante una hora. `createServiceRoleClient` ya hace fetch con `cache: "no-store"`. Falta revisar `health`, `daily-summary`, `mp-nudge` y `requests-digest`, que usan `createClient` de supabase-js directo y pueden estar leyendo datos viejos. Pasarlos a `createServiceRoleClient`.
+- **Sandbox de Shipit.** Activado por Vero en la suite el 07-09, pero la API respondió `is_sandbox: false` al envío 8916147 creado con `sandbox: true`. No cargar `SHIPIT_MODE=sandbox` en Vercel hasta que Shipit confirme **por escrito** que la API responde `is_sandbox: true`. Mientras tanto: dry-run, y el primer envío automático es `live` con la próxima venta de Vero con courier (`shipit_auto_enabled` solo en `vero`).
 
 ## Preguntas abiertas que la FASE 1 debe cerrar
 
