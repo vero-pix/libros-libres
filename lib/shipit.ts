@@ -20,10 +20,13 @@ export interface ShippingQuote {
 }
 
 // Cache communes in memory (loaded once per cold start)
-let communesCache: { id: number; name: string }[] | null = null;
+let communesCache: { id: number; name: string; region_id: number | null }[] | null = null;
+
+/** `region_id` de la Región Metropolitana en `GET /v/communes` (Providencia, La Florida, Colina… = 7). */
+export const SHIPIT_REGION_RM = 7;
 
 /** Load all Shipit communes and cache them */
-async function loadCommunes(): Promise<{ id: number; name: string }[]> {
+async function loadCommunes(): Promise<{ id: number; name: string; region_id: number | null }[]> {
   if (communesCache) return communesCache;
 
   try {
@@ -33,6 +36,7 @@ async function loadCommunes(): Promise<{ id: number; name: string }[]> {
     communesCache = (data as any[]).map((c) => ({
       id: c.id,
       name: (c.name as string).toUpperCase(),
+      region_id: typeof c.region_id === "number" ? c.region_id : null,
     }));
     return communesCache;
   } catch {
@@ -59,7 +63,9 @@ export async function findCommuneId(communeName: string): Promise<number | null>
  * Ñuñoa"): el id se resuelve bien por inclusión, pero el nombre que se manda
  * en `commune_name` tiene que ser "ÑUÑOA", no la dirección entera.
  */
-export async function findCommune(communeName: string): Promise<{ id: number; name: string } | null> {
+export async function findCommune(
+  communeName: string
+): Promise<{ id: number; name: string; region_id: number | null } | null> {
   const communes = await loadCommunes();
   const wanted = foldAccents(communeName).trim();
   if (!wanted) return null;
@@ -464,8 +470,10 @@ export const COURIER_IDS: Record<string, number> = {
 export interface ShipitShipmentInput {
   /** `TL-` + 12 chars del bundle_id. Máximo 15 caracteres, único por día. */
   reference: string;
-  /** `users.shipit_origin_id`. Null solo en dry-run: el body queda con origin_id null. */
+  /** `users.shipit_origin_id`, o el origen compartido 100321 para vendedores de la RM sin origen (D1 revisada). Null solo en dry-run. */
   originId: number | null;
+  /** `true` solo con SHIPIT_MODE=sandbox. La referencia va con prefijo TEST-. */
+  sandbox?: boolean;
   /** Libros del bundle. */
   items: number;
   sizes: { length: number; width: number; height: number; weight: number };
@@ -509,12 +517,13 @@ export function armarBodyShipit(input: ShipitShipmentInput): Record<string, unkn
   return {
     kind: 0, // canal de venta: shipit
     platform: 2, // api
-    reference: input.reference,
+    // En sandbox la referencia SIEMPRE lleva TEST- (nunca TL-): así en el
+    // panel de Shipit se distingue a simple vista lo que no es una venta.
+    reference: input.sandbox ? "TEST-" + input.reference.replace(/^TL-/, "").slice(0, 10) : input.reference,
     items: input.items,
     sizes: input.sizes,
-    // Inerte hasta que Shipit active el modo sandbox por cuenta (correo del
-    // 07-09-2026). Se deja explícito para que nadie crea que protege algo.
-    sandbox: false,
+    // Solo hace algo si Shipit activó el sandbox por cuenta (07-09-2026).
+    sandbox: input.sandbox === true,
     seller: input.sellerRef ? { id: input.sellerRef, name: "tuslibros" } : undefined,
     destiny: {
       street: input.destiny.street,
@@ -618,3 +627,11 @@ export async function deleteShipitShipment(id: number): Promise<{ ok: boolean; h
   const { status, data } = await shipitFetch(`/shipments/${id}`, { method: "DELETE" });
   return { ok: status >= 200 && status < 300, httpStatus: status, raw: data };
 }
+
+/**
+ * Origen compartido de tuslibros (D1 revisada, 07-09-2026): un vendedor de la
+ * Región Metropolitana sin origen propio sale con el origen 100321 "TusLibros"
+ * en modo dropoff (él mismo deja el paquete en la sucursal). Fuera de la RM no
+ * hay origen por defecto: el envío pasa a needs_origin.
+ */
+export const SHIPIT_DEFAULT_ORIGIN_RM = Number(process.env.SHIPIT_DEFAULT_ORIGIN_ID) || 100321;

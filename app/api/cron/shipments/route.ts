@@ -8,6 +8,8 @@ import {
   findCommune,
   getShipitShipment,
   DROPOFF_COURIERS,
+  SHIPIT_DEFAULT_ORIGIN_RM,
+  SHIPIT_REGION_RM,
 } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
 import { resolverOrigenEnvio } from "@/lib/shipping-quote";
@@ -36,9 +38,15 @@ export const dynamic = "force-dynamic";
  *   dry-run → arma el body exacto de POST /v/shipments y lo registra en
  *             shipit_events (kind='dry-run'). No llama a Shipit, no manda
  *             correos ni gong, no cambia de estado.
- *   live    → crea de verdad, pero SOLO para vendedores con
+ *   sandbox → igual que live pero con `sandbox: true` y referencia TEST-.
+ *             Shipit lo activó por cuenta el 07-09-2026.
+ *   live    → crea de verdad. sandbox y live exigen
  *             users.shipit_auto_enabled = true; el resto se registra como
  *             dry-run con note='shipit_auto_enabled=false'.
+ *
+ * Origen (D1 revisada): vendedor con shipit_origin_id → ese. Sin origen y en
+ * la Región Metropolitana → origen compartido 100321 en dropoff. Sin origen
+ * y fuera de la RM → needs_origin + gong.
  *
  * Pasos implementados en este archivo (PROMPT 1.2 d y e):
  *   pending → created       crear el envío
@@ -104,7 +112,7 @@ export async function GET(request: Request) {
         last_error: msg,
         ...(agotado ? { status: "failed" as const } : {}),
       });
-      if (agotado && modo === "live") {
+      if (agotado && modo !== "dry-run") {
         await sendGong(`🔴 Envío ${escapeHtml(fila.reference)} falló ${intentos} veces: ${escapeHtml(msg)}`);
       }
       resumen.push({ reference: fila.reference, estado: fila.status, accion: agotado ? "failed" : "error", nota: msg });
@@ -114,7 +122,7 @@ export async function GET(request: Request) {
   // Barrido de atascados: solo en live. En dry-run las filas se quedan en
   // pending a propósito, y eso no es un atasco.
   let stalled = 0;
-  if (modo === "live") {
+  if (modo !== "dry-run") {
     const { data } = await admin
       .from("shipments")
       .update({ status: "stalled" })
@@ -133,7 +141,7 @@ export async function GET(request: Request) {
 /* ───────────────────────── pending → created ───────────────────────── */
 
 async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
-  const [{ data: head }, { data: vendedor }, { data: comprador }, { count: items }] = await Promise.all([
+  const [qHead, qVendedor, qComprador, qItems] = await Promise.all([
     admin
       .from("orders")
       .select("id, listing_id, buyer_address, courier, listing:listings(address)")
@@ -147,6 +155,15 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
     admin.from("users").select("full_name, email, phone").eq("id", fila.buyer_id).single(),
     admin.from("orders").select("id", { count: "exact", head: true }).eq("bundle_id", fila.bundle_id),
   ]);
+  // Un select que falla (por ejemplo, PostgREST sin recargar el esquema tras
+  // la migración) NO puede pasar por "vendedor sin origen": se corta acá.
+  for (const [que, q] of [["orden cabeza", qHead], ["vendedor", qVendedor], ["comprador", qComprador]] as const) {
+    if (q.error) throw new Error(`select ${que}: ${q.error.message}`);
+  }
+  const head = qHead.data;
+  const vendedor = qVendedor.data;
+  const comprador = qComprador.data;
+  const items = qItems.count;
 
   if (!head?.buyer_address) throw new Error("la orden cabeza no tiene buyer_address");
   const listingAddress = (Array.isArray(head.listing) ? head.listing[0] : head.listing)?.address ?? null;
@@ -156,6 +173,17 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
     sellerDefaultAddress: vendedor?.default_address,
   });
   if (!origen) throw new Error("sin dirección de origen (listing ni vendedor)");
+
+  // D1 revisada: sin origen propio, un vendedor de la RM sale con el origen
+  // compartido de tuslibros (dropoff). Fuera de la RM, needs_origin.
+  const comunaOrigen = await findCommune(origen.commune);
+  const enRM = comunaOrigen?.region_id === SHIPIT_REGION_RM;
+  let originId: number | null = vendedor?.shipit_origin_id ?? null;
+  let notaOrigen = "";
+  if (!originId && enRM && fila.dispatch_mode === "dropoff") {
+    originId = SHIPIT_DEFAULT_ORIGIN_RM;
+    notaOrigen = ` · origen compartido ${SHIPIT_DEFAULT_ORIGIN_RM} (RM sin origen propio)`;
+  }
 
   const destCrudo = extractCommune(head.buyer_address);
   const comunaDestino = await findCommune(destCrudo);
@@ -170,7 +198,8 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
 
   const body = armarBodyShipit({
     reference: fila.reference,
-    originId: vendedor?.shipit_origin_id ?? null,
+    originId,
+    sandbox: modo === "sandbox",
     items: n,
     sizes: estimateBookPackageSize(n),
     courier,
@@ -192,7 +221,7 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
     estado: "pending",
     accion: "",
     vendedor: vendedor?.username ?? vendedor?.full_name ?? fila.seller_id,
-    origen: `${origen.commune} (${vendedor?.shipit_origin_id ?? "sin origin_id"})`,
+    origen: `${origen.commune} (${originId ?? "sin origin_id"})${notaOrigen}`,
     courier,
     destino: destCommune,
     costo_cotizado: fila.quoted_cost,
@@ -212,17 +241,19 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
       kind: "dry-run",
       mode: "dry-run",
       request: body,
-      note: motivoDry + (vendedor?.shipit_origin_id ? "" : " · sin shipit_origin_id"),
+      note: motivoDry + (originId ? "" : " · sin shipit_origin_id") + notaOrigen,
     });
     await reprogramarEnvio(admin, fila.id, 60);
     return { ...base, accion: "dry-run", nota: motivoDry };
   }
 
-  // ── live ─────────────────────────────────────────────────────────────────
-  if (!vendedor?.shipit_origin_id) {
+  // ── sandbox / live ────────────────────────────────────────────────────────
+  if (!originId) {
     if (await transicionEnvio(admin, fila.id, "pending", "needs_origin")) {
       await sendGong(
-        `🟠 ${escapeHtml(base.vendedor ?? "")} vendió con courier (${escapeHtml(fila.reference)}) y no tiene origen en Shipit. Crear el origen y guardar users.shipit_origin_id.`
+        `🟠 ${escapeHtml(base.vendedor ?? "")} vendió con courier (${escapeHtml(fila.reference)}) desde ${escapeHtml(origen.commune)}, fuera de la RM, y no tiene origen en Shipit.\n` +
+          `Crear el origen en el panel con estos datos y guardar users.shipit_origin_id:\n` +
+          `${escapeHtml(vendedor?.full_name ?? "")} · ${escapeHtml(origen.address)} · ${escapeHtml(vendedor?.phone ?? "sin teléfono")} · ${escapeHtml(vendedor?.email ?? "sin correo")}`
       );
     }
     return { ...base, accion: "needs_origin" };
@@ -256,7 +287,7 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
   await registrarEventoShipit(admin, {
     shipmentId: fila.id,
     kind: "create",
-    mode: "live",
+    mode: modo,
     request: body,
     response: res.raw,
     httpStatus: res.httpStatus,

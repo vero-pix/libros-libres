@@ -9,15 +9,22 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * app/api/cron/shipments (avanza). Siempre con service role.
  */
 
-export type ShipitMode = "dry-run" | "live";
+export type ShipitMode = "dry-run" | "sandbox" | "live";
 
 /**
- * `SHIPIT_MODE` ausente o con cualquier valor que no sea `live` ⇒ dry-run.
- * No existe `sandbox`: el campo del body es inerte hasta que Shipit active el
- * modo por cuenta, y no se crean envíos de prueba en vivo.
+ * `SHIPIT_MODE` ausente o con cualquier otro valor ⇒ dry-run.
+ * `sandbox`: Shipit lo activó por cuenta el 07-09-2026 (desde la suite). Los
+ * envíos van con `sandbox: true` y referencia `TEST-…`; los del panel siguen
+ * con `is_sandbox: false` (verificado sobre 6 envíos reales el mismo día).
  */
 export function getShipitMode(): ShipitMode {
-  return process.env.SHIPIT_MODE === "live" ? "live" : "dry-run";
+  const m = process.env.SHIPIT_MODE;
+  return m === "live" || m === "sandbox" ? m : "dry-run";
+}
+
+/** Prefijo obligatorio de la referencia en sandbox: nunca `TL-` (15 chars máx). */
+export function referenciaSandbox(reference: string): string {
+  return "TEST-" + reference.replace(/^TL-/, "").slice(0, 10);
 }
 
 export const SHIPMENT_STATUSES = [

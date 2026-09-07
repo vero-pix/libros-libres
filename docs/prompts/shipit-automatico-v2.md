@@ -14,7 +14,7 @@
 
 | # | Decisión |
 |---|---|
-| D1 | El origen Shipit de un vendedor se crea **al conectar MercadoPago**, en el panel de Shipit, antes de habilitar courier para ese vendedor. Sin `shipit_origin_id` el checkout de ese vendedor **no ofrece courier**, solo entrega en persona. Vero sale del loop post-venta. |
+| D1 | **Revisada el 07-09-2026 (opción A + C).** Vendedor **de la Región Metropolitana** sin origen propio: sale con el origen compartido **100321 "TusLibros"** en modo dropoff (él deja el paquete en sucursal); no necesita origen propio. Vendedor **fuera de la RM**: sin `shipit_origin_id` el envío pasa a `needs_origin` y el worker manda gong a Vero con nombre, calle, número, comuna, teléfono y correo listos para pegar en el panel de Shipit. Además, cuando un vendedor de regiones conecta MercadoPago o publica con courier, se valida que `default_address` tenga calle, número y comuna y se manda el mismo gong (paso h). Vero crea el origen en el panel y guarda `shipit_origin_id` con `scripts/shipit-origenes.mjs --set`. |
 | D2 | La cotización se hace con el `origin_id` real del vendedor (fase 0). Mientras se valida, colchón temporal de **+10%** sobre la cotización, configurable por env, con fecha de retiro a dos semanas. |
 | D3 | La etiqueta se descarga en el servidor a Supabase Storage (bucket privado). Al vendedor le llega **adjunta por correo y con link firmado (7 días)** desde `/mis-ventas`. Nunca se persiste ni se envía la URL de Shipit. |
 | D4 | Apertura a producción **por vendedor** (`users.shipit_auto_enabled`): Vero → Libro de Ocasión → resto. |
@@ -52,7 +52,7 @@ Fase 2: webhook Shipit → in_transit / delivered / failed
 
 Tres capas de idempotencia: `shipments.bundle_id UNIQUE` + `ON CONFLICT DO NOTHING`; `reference` determinista (`TL-` + 12 chars del bundle_id) y `UNIQUE`; transición condicional de estado antes de cada llamada externa, y consulta por `reference`/`id` antes de reintentar una creación fallida.
 
-`SHIPIT_MODE = dry-run | live`. `dry-run` escribe en `shipit_events` lo que haría, sin llamar. `live` solo para vendedores con `shipit_auto_enabled = true`. `sandbox` se agrega **solo cuando Shipit lo active por cuenta**; hasta entonces no se crean envíos de prueba en vivo (ver nota sobre D7).
+`SHIPIT_MODE = dry-run | sandbox | live`. `dry-run` escribe en `shipit_events` lo que haría, sin llamar. `sandbox` (Shipit lo activó por cuenta el 07-09-2026 desde la suite) crea con `sandbox: true` y referencia **`TEST-…`, nunca `TL-`**; los envíos reales del panel siguen con `is_sandbox: false`. `live` crea de verdad. `sandbox` y `live` exigen `shipit_auto_enabled = true` en el vendedor.
 
 ### Modelo de datos
 
