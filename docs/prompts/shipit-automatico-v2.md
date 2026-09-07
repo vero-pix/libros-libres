@@ -244,6 +244,9 @@ g) Script scripts/shipit-origenes.mjs: lista GET /v/origins, propone
 h) Checkout: si el vendedor no tiene shipit_origin_id, no ofrecer
    courier (solo entrega en persona) con un aviso al vendedor en
    /mis-libros: "Para vender con despacho, escríbele a Vero".
+   ✅ Hecho el 07-09-2026 (`a5d7c62`) según D1 revisada: bloquea solo
+   fuera de la RM sin origen; gong a Vero con los seis datos al conectar
+   MP o al abrir un checkout, máximo uno al día por vendedor.
 i) Modalidad (D7 revisada): dropoff es el único modo automático. En
    /mis-ventas, mientras el envío esté en label_ready o notified y el
    vendedor esté en la RM, botón "Pedir retiro a domicilio": guarda
@@ -253,6 +256,8 @@ i) Modalidad (D7 revisada): dropoff es el único modo automático. En
    en el panel. Sin selector en /perfil por ahora (users.shipit_dispatch_mode
    queda en la migración, default 'dropoff', sin UI). Fase 1.5: si soporte
    confirma endpoint de retiro, el botón pasa a llamar a la API.
+   ✅ Hecho el 07-09-2026 (`a5d7c62`): POST /api/shipments/{id}/pickup +
+   botón en /mis-ventas + párrafo en el correo del vendedor (solo RM).
 
 Sin tests de concurrencia no se cierra el paso d): dos ejecuciones
 simultáneas del cron sobre la misma fila deben producir UN solo envío.
@@ -294,7 +299,8 @@ Conclusión: con el volumen actual, cambiar de agregador no resuelve nada que no
 ## Tareas separadas, después de la fase 1
 
 - **Caché de fetch de Next 14 en los crons.** El 07-09-2026 se descubrió que Next guarda en disco (`.next/cache/fetch-cache`) las respuestas de Supabase en rutas GET, incluidos RPC por POST: el worker de Shipit leyó `users` congelado durante una hora. `createServiceRoleClient` ya hace fetch con `cache: "no-store"`. Falta revisar `health`, `daily-summary`, `mp-nudge` y `requests-digest`, que usan `createClient` de supabase-js directo y pueden estar leyendo datos viejos. Pasarlos a `createServiceRoleClient`.
-- **Sandbox de Shipit.** Activado por Vero en la suite el 07-09, pero la API respondió `is_sandbox: false` al envío 8916147 creado con `sandbox: true`. No cargar `SHIPIT_MODE=sandbox` en Vercel hasta que Shipit confirme **por escrito** que la API responde `is_sandbox: true`. Mientras tanto: dry-run, y el primer envío automático es `live` con la próxima venta de Vero con courier (`shipit_auto_enabled` solo en `vero`).
+- **Sandbox de Shipit: APAGADO por decisión (07-09-2026).** Vero lo activó en la suite y la API igual respondió `is_sandbox: false` al envío 8916147 creado con `sandbox: true`. Como el modo de prueba es **por cuenta** y afectaría también los envíos que Vero crea desde el panel, queda apagado. No cargar `SHIPIT_MODE=sandbox` en Vercel. Modo vigente: dry-run; el primer envío automático es `live` con la próxima venta de Vero con courier (`shipit_auto_enabled` solo en `vero`).
+- **Webhook de Shipit (fase 2).** En el panel de Shipit hay un webhook apuntando a `https://tuslibros.cl/api/webhooks/shipit`. La ruta existe desde abril (`app/api/webhooks/shipit/route.ts`): exige el header `x-shipit-token` (401 sin él, 405 a GET), busca la orden por `tracking_code` y mapea el estado de Shipit a `orders.status`. Hoy no escribe en `shipments`. Fase 2 = validar el token que manda Shipit, leer `shipit_id` y mover `shipments` a `in_transit` / `delivered`.
 
 ## Preguntas abiertas que la FASE 1 debe cerrar
 
