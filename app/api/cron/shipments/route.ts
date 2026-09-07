@@ -13,6 +13,9 @@ import {
 } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
 import { resolverOrigenEnvio } from "@/lib/shipping-quote";
+import { sendEmail } from "@/lib/email";
+import { VERO_INBOX } from "@/lib/veroInbox";
+import { correoCompradorTracking, correoVendedorEtiqueta, REMITENTE_VERO, REPLY_TO_VERO } from "@/lib/shipit-emails";
 import {
   BACKOFF_MIN,
   MAX_ATTEMPTS,
@@ -48,10 +51,10 @@ export const dynamic = "force-dynamic";
  * la Región Metropolitana → origen compartido 100321 en dropoff. Sin origen
  * y fuera de la RM → needs_origin + gong.
  *
- * Pasos implementados en este archivo (PROMPT 1.2 d y e):
+ * Pasos implementados en este archivo (PROMPT 1.2 d, e y f):
  *   pending → created       crear el envío
  *   created → label_ready   tracking + pack_pdf descargado al bucket privado `labels`
- * El paso f) (correos, label_ready → notified) todavía no está acá.
+ *   label_ready → notified  correo al vendedor (etiqueta lista) y al comprador (tracking)
  *
  * Diseño completo: docs/shipit/PROMPT_1.1_diseno_2026-09-07.md
  */
@@ -96,9 +99,11 @@ export async function GET(request: Request) {
         case "created":
           resumen.push(await pasoEtiqueta(admin, fila, modo));
           break;
+        case "label_ready":
+          resumen.push(await pasoNotificar(admin, fila, modo));
+          break;
         default:
-          // label_ready / notified: paso f) (correos), todavía no implementado.
-          // Se sueltan para dentro de 6 horas para no recorrerlos cada 5 min.
+          // notified: fase 1.5 (retiro). Se suelta para dentro de 6 horas.
           await reprogramarEnvio(admin, fila.id, 6 * 60);
           resumen.push({ reference: fila.reference, estado: fila.status, accion: "sin paso implementado" });
       }
@@ -407,4 +412,101 @@ async function descargarPdf(url: string): Promise<Buffer> {
   } finally {
     clearTimeout(t);
   }
+}
+
+/* ───────────────────────── label_ready → notified ───────────────────────── */
+
+/**
+ * Un correo por destinatario, nunca dos. La guarda es la fila de
+ * `shipit_events` (kind='email', note='vendedor' | 'comprador'): si ya existe,
+ * no se vuelve a mandar aunque la corrida anterior haya muerto a medias. La
+ * transición a notified se hace al final, cuando los dos salieron.
+ */
+async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
+  if (modo === "dry-run") {
+    // En dry-run no se escribe a nadie. La fila espera a que el modo cambie.
+    await reprogramarEnvio(admin, fila.id, 6 * 60);
+    return { reference: fila.reference, estado: "label_ready", accion: "dry-run: correos no enviados" };
+  }
+  if (!fila.tracking_number) throw new Error("label_ready sin tracking_number");
+
+  const [qHead, qBundle, qVendedor, qComprador, qEnviados] = await Promise.all([
+    admin.from("orders").select("buyer_address, listing:listings(address)").eq("id", fila.order_head_id).single(),
+    admin
+      .from("orders")
+      .select("listing:listings(book:books(title))")
+      .eq("bundle_id", fila.bundle_id)
+      .order("created_at"),
+    admin.from("users").select("full_name, email, default_address").eq("id", fila.seller_id).single(),
+    admin.from("users").select("full_name, email").eq("id", fila.buyer_id).single(),
+    admin.from("shipit_events").select("note").eq("shipment_id", fila.id).eq("kind", "email"),
+  ]);
+  for (const [que, q] of [["orden cabeza", qHead], ["bundle", qBundle], ["vendedor", qVendedor], ["comprador", qComprador]] as const) {
+    if (q.error) throw new Error(`select ${que}: ${q.error.message}`);
+  }
+  const head = qHead.data!;
+  const vendedor = qVendedor.data!;
+  const comprador = qComprador.data!;
+  const yaEnviados = new Set((qEnviados.data ?? []).map((e) => e.note));
+
+  const titulos = (qBundle.data ?? [])
+    .map((o: any) => (Array.isArray(o.listing) ? o.listing[0] : o.listing)?.book)
+    .map((b: any) => (Array.isArray(b) ? b[0] : b)?.title)
+    .filter((t: unknown): t is string => typeof t === "string" && t.length > 0);
+  const listingAddress = (Array.isArray(head.listing) ? head.listing[0] : head.listing)?.address ?? null;
+  const origen = resolverOrigenEnvio({ listingAddress, sellerDefaultAddress: vendedor.default_address });
+  const comunaDestino = (await findCommune(extractCommune(head.buyer_address ?? "")))?.name ?? extractCommune(head.buyer_address ?? "");
+
+  const datos = {
+    vendedorNombre: vendedor.full_name,
+    compradorNombre: comprador.full_name,
+    titulos,
+    courier: fila.courier,
+    tracking: fila.tracking_number,
+    comunaDestino: capitalizar(comunaDestino),
+    comunaOrigen: origen?.commune ?? "",
+    direccionEntrega: head.buyer_address ?? "",
+  };
+
+  // Mientras Google Workspace esté caído, vero@tuslibros.cl no recibe: el
+  // correo de vendedor de Vero va a su buzón real (VERO_INBOX). Sacar cuando
+  // vuelva Workspace (ver lib/veroInbox.ts).
+  const correoVendedor = vendedor.email === "vero@tuslibros.cl" ? VERO_INBOX : vendedor.email;
+  const enviados: string[] = [];
+
+  if (!yaEnviados.has("vendedor")) {
+    if (!correoVendedor) throw new Error("vendedor sin correo");
+    const m = correoVendedorEtiqueta(datos);
+    const r = await sendEmail({ to: correoVendedor, from: REMITENTE_VERO, replyTo: REPLY_TO_VERO, subject: m.subject, html: m.html });
+    if (!r?.id) throw new Error("Resend no aceptó el correo del vendedor");
+    await registrarEventoShipit(admin, { shipmentId: fila.id, kind: "email", mode: modo, note: "vendedor", response: { resend_id: r.id, to: correoVendedor, subject: m.subject }, httpStatus: 200 });
+    enviados.push(`vendedor ${r.id}`);
+  }
+  if (!yaEnviados.has("comprador")) {
+    if (!comprador.email) throw new Error("comprador sin correo");
+    const m = correoCompradorTracking(datos);
+    const r = await sendEmail({ to: comprador.email, from: REMITENTE_VERO, replyTo: REPLY_TO_VERO, subject: m.subject, html: m.html });
+    if (!r?.id) throw new Error("Resend no aceptó el correo del comprador");
+    await registrarEventoShipit(admin, { shipmentId: fila.id, kind: "email", mode: modo, note: "comprador", response: { resend_id: r.id, to: comprador.email, subject: m.subject }, httpStatus: 200 });
+    enviados.push(`comprador ${r.id}`);
+  }
+
+  const ok = await transicionEnvio(admin, fila.id, "label_ready", "notified");
+  await admin
+    .from("orders")
+    .update({ shipping_status: "notified", shipping_updated_at: new Date().toISOString() })
+    .eq("bundle_id", fila.bundle_id);
+  return {
+    reference: fila.reference,
+    estado: ok ? "notified" : "label_ready",
+    accion: enviados.length ? `correos enviados: ${enviados.join(", ")}` : "correos ya enviados antes",
+  };
+}
+
+function capitalizar(s: string): string {
+  return s
+    .toLowerCase()
+    .split(" ")
+    .map((w) => (w.length > 2 ? w.charAt(0).toUpperCase() + w.slice(1) : w))
+    .join(" ");
 }

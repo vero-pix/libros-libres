@@ -12,7 +12,8 @@ interface SendEmailParams {
   replyTo?: string;
 }
 
-export async function sendEmail({ to, from = "noreply@tuslibros.cl", subject, html, replyTo }: SendEmailParams) {
+/** Respuesta de Resend: `{ id }` si salió; `null` si no hay API key o Resend rechazó. */
+export async function sendEmail({ to, from = "noreply@tuslibros.cl", subject, html, replyTo }: SendEmailParams): Promise<{ id: string } | null> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.warn("[email] RESEND_API_KEY not set — skipping email");

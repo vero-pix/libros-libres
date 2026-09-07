@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { urlSeguimiento } from "@/lib/courier-tracking";
 import Link from "next/link";
 import Image from "next/image";
 import { OrderWithDetails } from "@/types";
@@ -137,7 +138,22 @@ function BundleCard({ group }: { group: OrderGroup }) {
               <span>Courier: {group.firstOrder.courier}</span>
             )}
             {group.firstOrder.tracking_code && (
-              <span>Tracking: {group.firstOrder.tracking_code}</span>
+              <span>
+                Tracking:{" "}
+                {urlSeguimiento(group.firstOrder.courier, group.firstOrder.tracking_code) ? (
+                  <a
+                    href={urlSeguimiento(group.firstOrder.courier, group.firstOrder.tracking_code)!}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="font-mono text-brand-600 hover:underline"
+                  >
+                    {group.firstOrder.tracking_code}
+                  </a>
+                ) : (
+                  <span className="font-mono">{group.firstOrder.tracking_code}</span>
+                )}
+              </span>
             )}
           </div>
         </div>
