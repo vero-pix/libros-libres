@@ -7,6 +7,7 @@ import {
   estimateBookPackageSize,
   findCommune,
   getShipitShipment,
+  leerRetiroShipit,
   DROPOFF_COURIERS,
   SHIPIT_DEFAULT_ORIGIN_RM,
   SHIPIT_REGION_RM,
@@ -56,6 +57,7 @@ export const dynamic = "force-dynamic";
  *   pending → created       crear el envío
  *   created → label_ready   tracking + pack_pdf descargado al bucket privado `labels`
  *   label_ready → notified  correo al vendedor (etiqueta lista) y al comprador (tracking)
+ *   notified → pickup_scheduled  si Shipit ya agendó un retiro (last_pickup)
  *
  * Diseño completo: docs/shipit/PROMPT_1.1_diseno_2026-09-07.md
  */
@@ -103,8 +105,11 @@ export async function GET(request: Request) {
         case "label_ready":
           resumen.push(await pasoNotificar(admin, fila, modo));
           break;
+        case "notified":
+          resumen.push(await pasoRetiro(admin, fila, modo));
+          break;
         default:
-          // notified: fase 1.5 (retiro). Se suelta para dentro de 6 horas.
+          // pickup_scheduled y estados de fase 2. Se sueltan para dentro de 6 horas.
           await reprogramarEnvio(admin, fila.id, 6 * 60);
           resumen.push({ reference: fila.reference, estado: fila.status, accion: "sin paso implementado" });
       }
@@ -542,6 +547,84 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
     reference: fila.reference,
     estado: ok ? "notified" : "label_ready",
     accion: enviados.length ? `correos enviados: ${enviados.join(", ")}` : "correos ya enviados antes",
+  };
+}
+
+/* ────────────────────── notified → pickup_scheduled ────────────────────── */
+
+/**
+ * ¿Shipit agendó un retiro para este envío? La API lo cuenta en `last_pickup`
+ * de `GET /v/shipments/{id}`, venga el retiro de donde venga: nuestro botón
+ * "Pedir retiro a domicilio" o un humano en el panel de Shipit.
+ *
+ * Existe por el caso de Casa Emunah (08-09-2026): un retiro creado a mano en
+ * el panel juntó sus dos envíos, el chofer llegó a la puerta y /mis-ventas le
+ * seguía diciendo que dejara el paquete en Starken. La plataforma tenía el
+ * dato a un GET de distancia y no lo miraba.
+ *
+ * Sin retiro la fila se queda en `notified` y se vuelve a mirar en 6 horas: el
+ * retiro puede aparecer después del correo. Con retiro pasa a
+ * `pickup_scheduled` con fecha y ventana, que es lo que lee /mis-ventas.
+ */
+async function pasoRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
+  if (modo === "dry-run" || !fila.shipit_id) {
+    await reprogramarEnvio(admin, fila.id, 6 * 60);
+    return { reference: fila.reference, estado: "notified", accion: "dry-run: no se consulta el retiro" };
+  }
+
+  const s = await getShipitShipment(fila.shipit_id);
+  await registrarEventoShipit(admin, {
+    shipmentId: fila.id,
+    kind: "get",
+    mode: modo,
+    response: s.raw,
+    httpStatus: s.httpStatus,
+    note: "retiro",
+  });
+  // Un GET que falla no es un envío roto: se reintenta en la próxima corrida
+  // sin gastar intentos (el paquete sigue despachable a mano).
+  if (s.error) {
+    await reprogramarEnvio(admin, fila.id, 60);
+    return { reference: fila.reference, estado: "notified", accion: "GET falló, se reintenta", nota: s.error };
+  }
+
+  const retiro = leerRetiroShipit(s.last_pickup);
+  if (!retiro) {
+    await reprogramarEnvio(admin, fila.id, 6 * 60);
+    return { reference: fila.reference, estado: "notified", accion: "sin retiro agendado" };
+  }
+
+  const ok = await transicionEnvio(admin, fila.id, "notified", "pickup_scheduled", {
+    pickup_date: retiro.date,
+    pickup_window: retiro.window,
+  });
+  if (!ok) return { reference: fila.reference, estado: "notified", accion: "ya avanzó (otro proceso)" };
+
+  await admin
+    .from("orders")
+    .update({ shipping_status: "pickup_scheduled", shipping_updated_at: new Date().toISOString() })
+    .eq("bundle_id", fila.bundle_id);
+
+  // Retiro que nadie pidió por la plataforma: lo creó un humano en el panel.
+  // El vendedor ya recibió un correo diciéndole que lo dejara en la sucursal,
+  // así que alguien tiene que avisarle antes de que el chofer viaje al vacío.
+  if (!fila.pickup_requested_at) {
+    await sendGong(
+      [
+        `🚚 Shipit agendó un retiro que <b>no se pidió por la plataforma</b> para ${escapeHtml(fila.reference)}.`,
+        `• ${escapeHtml(retiro.date)}${retiro.window ? ` · ${escapeHtml(retiro.window)}` : ""}${retiro.isManual ? " · creado a mano en el panel" : ""}`,
+        `• ${escapeHtml(retiro.place ?? "sin dirección en la respuesta")}`,
+        `• Envío Shipit ${fila.shipit_id} · ${escapeHtml(fila.courier ?? "")} · retiro ${retiro.id ?? "—"}`,
+        `El vendedor ya tiene el correo que le dice que lo deje en la sucursal: avísale que pasan a buscarlo.`,
+      ].join("\n")
+    );
+  }
+
+  return {
+    reference: fila.reference,
+    estado: "pickup_scheduled",
+    accion: "retiro agendado",
+    nota: `${retiro.date}${retiro.window ? ` ${retiro.window}` : ""}${fila.pickup_requested_at ? "" : " (no pedido por la plataforma)"}`,
   };
 }
 

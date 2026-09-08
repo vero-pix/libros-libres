@@ -635,3 +635,61 @@ export async function deleteShipitShipment(id: number): Promise<{ ok: boolean; h
  * hay origen por defecto: el envío pasa a needs_origin.
  */
 export const SHIPIT_DEFAULT_ORIGIN_RM = Number(process.env.SHIPIT_DEFAULT_ORIGIN_ID) || 100321;
+
+/**
+ * Retiro agendado que Shipit devuelve en `last_pickup` (verificado el
+ * 08-09-2026 sobre el pickup 914462 de Libro de Ocasión).
+ *
+ * Nace del caso de Casa Emunah: el retiro lo había creado un humano en el
+ * panel de Shipit (`is_manual: true`), la plataforma no lo sabía y /mis-ventas
+ * le seguía diciendo a la vendedora que dejara el paquete en Starken mientras
+ * el chofer tocaba el timbre. La API ya lo contaba; nadie lo leía.
+ */
+export interface ShipitRetiro {
+  id: number | null;
+  /** `pending`, `shipped`, … tal como lo manda Shipit. */
+  status: string | null;
+  /** ISO `YYYY-MM-DD` de `schedule.date`. */
+  date: string;
+  /** Ventana tal cual: `"11:00 - 17:00"`. Null si Shipit no la manda. */
+  window: string | null;
+  /** Dirección donde pasan (`address.place`), para el gong. */
+  place: string | null;
+  /** `true` cuando lo creó un humano en el panel, no nuestra API. */
+  isManual: boolean;
+}
+
+/** Retiros que ya no van a pasar: no deben tapar el "déjalo en la sucursal". */
+const PICKUP_STATUS_MUERTOS = ["canceled", "cancelled", "failed", "rejected", "expired"];
+
+/**
+ * Lee `last_pickup` y devuelve el retiro solo si sigue en pie: `schedule.active`,
+ * con fecha, no archivado y en un estado vivo. Cualquier otra cosa ⇒ null, y el
+ * envío se queda en dropoff. Nunca lanza: la respuesta viene de fuera.
+ */
+export function leerRetiroShipit(lastPickup: unknown): ShipitRetiro | null {
+  const p = lastPickup as any;
+  if (!p || typeof p !== "object") return null;
+  if (p.archive === true) return null;
+
+  const schedule = p.schedule;
+  if (!schedule || typeof schedule !== "object" || schedule.active === false) return null;
+
+  const date = typeof schedule.date === "string" ? schedule.date.slice(0, 10) : "";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+
+  const status = typeof p.status === "string" ? p.status : null;
+  if (status && PICKUP_STATUS_MUERTOS.includes(status.toLowerCase())) return null;
+
+  const window = typeof schedule.range_time === "string" && schedule.range_time.trim() ? schedule.range_time.trim() : null;
+  const place = typeof p.address?.place === "string" ? p.address.place.trim() : null;
+
+  return {
+    id: typeof p.id === "number" ? p.id : null,
+    status,
+    date,
+    window,
+    place: place || null,
+    isManual: p.is_manual === true,
+  };
+}

@@ -65,7 +65,7 @@ export default async function MisVentasPage() {
   // columnas viejas de `orders` (shipping_status / shipping_label_url).
   const { data: rawShipments } = await supabase
     .from("shipments")
-    .select("id, bundle_id, status, courier, tracking_number, label_path, dispatch_mode, pickup_requested_at")
+    .select("id, bundle_id, status, courier, tracking_number, label_path, dispatch_mode, pickup_requested_at, pickup_date, pickup_window")
     .eq("seller_id", user.id);
   const shipmentByBundle = new Map<string, NonNullable<typeof rawShipments>[number]>();
   for (const sh of rawShipments ?? []) shipmentByBundle.set(sh.bundle_id, sh);
@@ -533,6 +533,26 @@ function EmptyState({ text }: { text: string }) {
  * Estado del envío según el worker de Shipit. Textos en 1ª persona (Vero) y
  * con salida siempre: nunca un cartel que solo informe el bloqueo.
  */
+/**
+ * `pickup_date` es un `date` de Postgres ("2026-09-08"): se arma con los tres
+ * números a mano. `new Date("2026-09-08")` es medianoche UTC y en Chile (UTC-4)
+ * se lee como el día anterior — el vendedor tendría el paquete listo tarde.
+ */
+function fechaRetiro(iso: string): string {
+  const [a, m, d] = iso.split("-").map(Number);
+  if (!a || !m || !d) return iso;
+  // es-CL mete una coma ("martes, 8 de septiembre") que no se dice al hablar.
+  return new Date(a, m - 1, d)
+    .toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long" })
+    .replace(",", "");
+}
+
+/** Shipit manda la ventana como "11:00 - 17:00". */
+function ventanaRetiro(w: string): string {
+  const m = w.match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
+  return m ? `entre las ${m[1]} y las ${m[2]}` : `en la ventana ${w}`;
+}
+
 function EstadoEnvio({
   shipment,
   enRM,
@@ -544,12 +564,15 @@ function EstadoEnvio({
     label_path: string | null;
     dispatch_mode: string;
     pickup_requested_at: string | null;
+    pickup_date: string | null;
+    pickup_window: string | null;
   };
   enRM: boolean;
 }) {
   const courier = shipment.courier
     ? shipment.courier.charAt(0).toUpperCase() + shipment.courier.slice(1)
     : "el courier";
+  const retiro = shipment.status === "pickup_scheduled" && shipment.pickup_date ? shipment.pickup_date : null;
 
   if (shipment.label_path && ["label_ready", "notified", "pickup_scheduled", "in_transit", "delivered"].includes(shipment.status)) {
     return (
@@ -562,12 +585,23 @@ function EstadoEnvio({
         >
           📄 Descargar etiqueta
         </a>
-        <span className="text-[11px] text-ink-muted block">
-          {shipment.pickup_requested_at
-            ? `Retiro pedido el ${new Date(shipment.pickup_requested_at).toLocaleDateString("es-CL")}. Vero lo coordina con Shipit y te avisa la ventana.`
-            : `Imprímela, pégala al paquete y déjalo en la sucursal de ${courier} más cercana.`}
-        </span>
-        {enRM && !shipment.pickup_requested_at && ["label_ready", "notified"].includes(shipment.status) && (
+        {retiro ? (
+          <span className="text-[11px] text-ink block">
+            Imprímela, pégala al paquete y tenlo listo:{" "}
+            <strong>
+              {courier} pasa a buscarlo el {fechaRetiro(retiro)}
+              {shipment.pickup_window ? ` ${ventanaRetiro(shipment.pickup_window)}` : ""}
+            </strong>
+            . No lo lleves a la sucursal.
+          </span>
+        ) : (
+          <span className="text-[11px] text-ink-muted block">
+            {shipment.pickup_requested_at
+              ? `Retiro pedido el ${new Date(shipment.pickup_requested_at).toLocaleDateString("es-CL")}. Vero lo coordina con Shipit y te avisa la ventana.`
+              : `Imprímela, pégala al paquete y déjalo en la sucursal de ${courier} más cercana.`}
+          </span>
+        )}
+        {enRM && !retiro && !shipment.pickup_requested_at && ["label_ready", "notified"].includes(shipment.status) && (
           <PedirRetiroButton shipmentId={shipment.id} />
         )}
       </div>
