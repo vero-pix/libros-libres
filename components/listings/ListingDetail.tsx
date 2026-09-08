@@ -13,6 +13,7 @@ import ImageGallery from "./ImageGallery";
 import ShareButtons from "./ShareButtons";
 import ContactSellerButton from "@/components/messages/ContactSellerButton";
 import PriceCompare from "@/components/listings/PriceCompare";
+import MercadoPagoNudge from "@/components/listings/MercadoPagoNudge";
 import SellerOtherListings from "./SellerOtherListings";
 import { libroUrl } from "@/lib/urls";
 import { trackEvent } from "@/utils/analytics";
@@ -466,6 +467,14 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
               </div>
             </div>
           </div>
+
+          {/* Estado del cobro, solo para el dueño y solo si no puede cobrar. Va
+              acá, sobre su propia ficha, porque es donde ve el libro tal como lo
+              ve un comprador: publicado, visible y sin botón de comprar. No se
+              puede cerrar; desaparece solo cuando conecta. (08-09-2026) */}
+          {isOwner && !listing.seller?.mercadopago_user_id && (
+            <MercadoPagoNudge ubicacion="ficha_dueno" nPublicaciones={1} />
+          )}
 
           {/* Comparador de precios — solo para el dueño (referencia de precio).
               Al comprador NO se lo mostramos: mandaba a Buscalibre/MercadoLibre con

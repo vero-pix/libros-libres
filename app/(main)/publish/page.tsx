@@ -42,7 +42,9 @@ export default async function PublishPage({ searchParams }: Props) {
               {[
                 { num: "1", text: "Busca el libro" },
                 { num: "2", text: "Ponle precio" },
+                // 4º paso, 08-09-2026: el sitio prometía tres, el vendedor los cumplía y cobrar quedaba como un aviso lateral ignorable.
                 { num: "3", text: "Marca ubicación" },
+                { num: "4", text: "Conecta para cobrar" },
               ].map((step, i) => (
                 <div key={step.num} className="flex items-center gap-2">
                   {i > 0 && (
@@ -180,6 +182,7 @@ export default async function PublishPage({ searchParams }: Props) {
               { num: "1", text: "Busca el libro (o ingreso manual)" },
               { num: "2", text: "Ponle precio" },
               { num: "3", text: "Marca ubicación" },
+              { num: "4", text: "Conecta para cobrar" },
             ].map((step, i) => (
               <div key={step.num} className="flex items-center gap-2">
                 {i > 0 && (

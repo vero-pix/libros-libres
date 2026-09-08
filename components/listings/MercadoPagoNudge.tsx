@@ -18,13 +18,16 @@ import { trackEvent } from "@/utils/analytics";
  * existe y termina volviendo a /perfil?mp_connected=true.
  */
 
-export type NudgeUbicacion = "publish_exito" | "mis_libros";
+export type NudgeUbicacion = "publish_exito" | "mis_libros" | "ficha_dueno";
 
 // El descarte en el éxito de publicación dura la sesión (no repetir el mensaje
 // en la misma sesión). El de /mis-libros persiste entre sesiones.
 const STORAGE: Record<NudgeUbicacion, { key: string; scope: "session" | "local" }> = {
   publish_exito: { key: "tl_mp_nudge_off_publish", scope: "session" },
   mis_libros: { key: "tl_mp_nudge_off_mislibros", scope: "local" },
+  // En su propia ficha NO se puede descartar: es el estado real de ese libro,
+  // no un aviso. La clave existe solo para cumplir el tipo.
+  ficha_dueno: { key: "tl_mp_nudge_off_ficha", scope: "session" },
 };
 
 /** Clave que deja el origen para que /perfil pueda atribuir el mp_conectado. */
@@ -55,6 +58,12 @@ export default function MercadoPagoNudge({ ubicacion, nPublicaciones }: Props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    // En la propia ficha no hay descarte posible: es estado, no aviso.
+    if (ubicacion === "ficha_dueno") {
+      setVisible(true);
+      track("mp_aviso_visto", ubicacion, nPublicaciones);
+      return;
+    }
     const { key, scope } = STORAGE[ubicacion];
     if (store(scope)?.getItem(key) === "1") return;
     setVisible(true);
@@ -83,9 +92,40 @@ export default function MercadoPagoNudge({ ubicacion, nPublicaciones }: Props) {
 
   if (!visible) return null;
 
-  const titulo = "Te falta un paso para que te puedan pagar";
+  // El texto dice lo que le PASA a sus libros, no lo que tiene que configurar.
+  // El anterior ("Te falta un paso para que te puedan pagar") hablaba de un
+  // trámite pendiente y se leía como opcional: 63 vendedores publicaron 568
+  // libros sin enterarse de que nadie podía comprárselos. (08-09-2026)
+  const plural = nPublicaciones !== 1;
+  const titulo = plural
+    ? `Tus ${nPublicaciones} libros todavía no se pueden comprar`
+    : "Tu libro todavía no se puede comprar";
   const cuerpo =
-    "Sin MercadoPago conectado, solo te puede comprar alguien que coordine contigo en persona. Conectándolo te compran desde cualquier región — y la plata te llega directa a ti.";
+    `Están publicados y se ven en la tienda, pero nadie puede pagarlos por el sitio: quien lo quiera tiene que ubicarte y coordinar contigo en persona, y la mayoría no lo hace. ` +
+    `Cuando conectes tu cuenta para cobrar, ${plural ? "se vuelven comprables" : "se vuelve comprable"} en un clic desde cualquier región y la plata te llega directa a ti.`;
+
+  // ── Estado en la propia ficha del vendedor ──
+  // No se puede cerrar y no dice "conecta MercadoPago" en el título: dice que
+  // ese libro, el que está mirando, no se puede comprar.
+  if (ubicacion === "ficha_dueno") {
+    return (
+      <div className="mx-6 sm:mx-8 mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
+        <p className="text-sm font-semibold text-amber-900">Este libro todavía no se puede comprar</p>
+        <p className="mt-1 text-xs leading-relaxed text-amber-800">
+          Está publicado y visible, pero nadie puede pagarlo por el sitio. Quien lo quiera tiene que
+          ubicarte y coordinar contigo en persona. Conectando tu cuenta para cobrar, se vuelve
+          comprable en un clic desde cualquier región.
+        </p>
+        <a
+          href="/api/auth/mercadopago"
+          onClick={connect}
+          className="mt-3 inline-block rounded-lg bg-[#009ee3] px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#007eb5]"
+        >
+          Activar los pagos de mi tienda
+        </a>
+      </div>
+    );
+  }
 
   // ── Franja discreta en /mis-libros ──
   // Sigue el patrón del aviso de "Completa tu perfil de contacto" que ya vive acá.
@@ -103,7 +143,7 @@ export default function MercadoPagoNudge({ ubicacion, nPublicaciones }: Props) {
             onClick={connect}
             className="inline-block mt-3 px-4 py-2 bg-[#009ee3] hover:bg-[#007eb5] text-white text-xs font-semibold rounded-lg transition-colors"
           >
-            Conectar MercadoPago
+            Activar los pagos de mi tienda
           </a>
         </div>
         <button
@@ -120,26 +160,32 @@ export default function MercadoPagoNudge({ ubicacion, nPublicaciones }: Props) {
     );
   }
 
-  // ── Tarjeta en el estado de éxito de /publish ──
-  // Va DESPUÉS de la celebración: el libro publicado es la buena noticia.
+  // ── Paso 4 en el estado de éxito de /publish ──
+  // Va DESPUÉS de la celebración: el libro publicado es la buena noticia y queda
+  // detrás. Desde el 08-09-2026 se presenta como el paso que falta, no como una
+  // sugerencia: los tres pasos que el sitio prometía ya están cumplidos y este
+  // es el cuarto. Sigue sin bloquear nada — "Lo hago después" cierra la tarjeta.
   return (
-    <div className="bg-white rounded-xl border border-brand-200 p-5 text-left">
-      <p className="font-semibold text-ink text-sm mb-1.5">{titulo}</p>
-      <p className="text-xs text-ink-muted leading-relaxed">{cuerpo}</p>
-      <div className="flex flex-col sm:flex-row gap-2 mt-4">
+    <div className="rounded-xl border-2 border-brand-300 bg-white p-5 text-left">
+      <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-brand-600">
+        Paso 4 de 4 · te falta este
+      </p>
+      <p className="mb-1.5 text-sm font-semibold text-ink">{titulo}</p>
+      <p className="text-xs leading-relaxed text-ink-muted">{cuerpo}</p>
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
         <a
           href="/api/auth/mercadopago"
           onClick={connect}
-          className="flex-1 text-center px-4 py-2.5 bg-[#009ee3] hover:bg-[#007eb5] text-white text-sm font-semibold rounded-xl transition-colors"
+          className="flex-1 rounded-xl bg-[#009ee3] px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-[#007eb5]"
         >
-          Conectar MercadoPago
+          Activar los pagos de mi tienda
         </a>
         <button
           type="button"
           onClick={dismiss}
-          className="px-4 py-2.5 border border-cream-dark/40 text-ink-muted hover:text-ink hover:bg-cream-warm text-sm font-medium rounded-xl transition-colors"
+          className="rounded-xl border border-cream-dark/40 px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-cream-warm hover:text-ink"
         >
-          Ahora no
+          Lo hago después
         </button>
       </div>
     </div>
