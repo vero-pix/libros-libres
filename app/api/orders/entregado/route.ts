@@ -95,6 +95,7 @@ export async function POST(req: NextRequest) {
         vendedorNombre: vendedor?.full_name,
         titulo: titulos.length > 1 ? `tus ${titulos.length} libros` : titulos[0] ?? "tu libro",
         fichaPath: libroUrl({ id: listing.id, slug: listing.slug, seller: { username: seller?.username } }),
+        orderId: head.id,
       });
       const r = await sendEmail({
         to: comprador.email,
