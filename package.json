@@ -24,7 +24,8 @@
     "seo:paises": "tsx scripts/seo/paises.ts",
     "feed:validar": "node scripts/feed-validar.mjs",
     "demanda": "npx tsx scripts/demanda-no-servida.mjs",
-    "demanda:interna": "node scripts/demanda-interna.mjs"
+    "demanda:interna": "node scripts/demanda-interna.mjs",
+    "prebuild": "node scripts/check-env.mjs"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
