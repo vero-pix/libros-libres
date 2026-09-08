@@ -253,4 +253,117 @@ export const AUTHORS: Record<string, AuthorConfig> = {
       { q: '¿Aparecen ediciones antiguas?', a: 'Sí. Conviven ediciones de bolsillo bien gastadas con tapas duras de colección, y a veces aparecen los volúmenes de Seix Barral de los años setenta y ochenta.' },
     ],
   },
+
+  // Segundo lote, 08-09-2026. Variantes tomadas de scripts/autores-candidatos.mjs
+  // y verificadas contra books.author en todos los estados de listing. Se
+  // incluyen TODAS, con tildes faltantes, espacios sobrantes y la diéresis de
+  // "Märquez": configurar solo la forma correcta dejaba 7 de 21 libros de García
+  // Márquez fuera de su propia página.
+  'gabriel-garcia-marquez': {
+    slug: 'gabriel-garcia-marquez',
+    displayName: 'Gabriel García Márquez',
+    dbAuthors: [
+      'Gabriel García Márquez',
+      'Gabriel García Marquez',
+      'Gabriel Garcia Marquez',
+      'Gabriel García Márquez ',
+      'Gabriel García Märquez',
+    ],
+    seoTitle: 'Gabriel García Márquez — Libros Usados en Chile',
+    seoDescription:
+      'Libros de Gabriel García Márquez usados en Chile: Cien años de soledad, El amor en los tiempos del cólera, El coronel no tiene quien le escriba, Relato de un náufrago. Envío a todo Chile.',
+    keywords: ['gabriel garcia marquez', 'garcia marquez libros usados', 'cien anos de soledad usado', 'el amor en los tiempos del colera', 'el coronel no tiene quien le escriba', 'relato de un naufrago', 'garcia marquez segunda mano chile'],
+    subtitle: 'El que todos tienen y pocos devuelven',
+    bio: 'Hay quien llegó a García Márquez por obligación del colegio y quien no ha salido nunca. Cien años de soledad es el que todos tienen, pero el catálogo de segunda mano guarda cosas mejores: El amor en los tiempos del cólera, las crónicas, los cuentos que se leen de una sentada. Son ejemplares que ya vivieron en otra casa, muchos con el lomo quebrado en la misma página donde alguien se detuvo. Buen lugar para encontrar el que te falta.',
+    faqs: [
+      { q: '¿Qué libros de García Márquez se consiguen usados?', a: 'Además de Cien años de soledad y El amor en los tiempos del cólera, circulan El coronel no tiene quien le escriba, El otoño del patriarca, Los funerales de la Mamá Grande, Noticia de un secuestro y Relato de un náufrago.' },
+      { q: '¿Y su obra periodística?', a: 'Sí, es de lo más interesante que aparece usado y casi no se reedita: Textos costeños, Entre cachacos, De Europa y América, Notas de prensa y Por la libre. Son los tomos de su trabajo como reportero antes y durante su carrera de novelista.' },
+      { q: '¿Por dónde empezar si no es por Cien años de soledad?', a: 'El coronel no tiene quien le escriba es breve y da el tono. Relato de un náufrago funciona bien si prefieres la crónica al realismo mágico.' },
+    ],
+  },
+
+  'julio-cortazar': {
+    slug: 'julio-cortazar',
+    displayName: 'Julio Cortázar',
+    dbAuthors: ['Julio Cortázar', 'Julio Cortázar '],
+    seoTitle: 'Julio Cortázar — Libros Usados en Chile',
+    seoDescription:
+      'Libros de Julio Cortázar usados en Chile: Rayuela, Final del juego, Las armas secretas, Los premios, Libro de Manuel. Cuentos y novelas de segunda mano con envío a todo Chile.',
+    keywords: ['julio cortazar', 'cortazar libros usados', 'rayuela usado', 'final del juego cortazar', 'las armas secretas', 'libro de manuel', 'cortazar cuentos segunda mano'],
+    subtitle: 'De los que se releen por temporadas',
+    bio: 'Cortázar es autor de relectura: Rayuela no se lee una vez, se lee por temporadas de la vida. Acá aparecen sus novelas, pero sobre todo los cuentos, que son donde muchos lo queremos más. Ediciones usadas, algunas de esas colecciones antiguas de bolsillo que ya no se imprimen. Si andas detrás de un título específico o de una edición en particular, este es de los autores que más rota, así que vale revisar seguido.',
+    faqs: [
+      { q: '¿Qué libros de Cortázar se consiguen usados?', a: 'Rayuela aparece seguido, en ediciones de bolsillo y también la anotada de Cátedra. De los cuentos circulan Final del juego, Las armas secretas, Alguien que anda por ahí y Un tal Lucas. De las novelas, Los premios, Libro de Manuel y 62, modelo para armar.' },
+      { q: '¿Por dónde empezar?', a: 'Si nunca lo has leído, los cuentos antes que Rayuela: Final del juego o Las armas secretas dan el tono sin pedirte una estructura. Rayuela se disfruta más cuando ya conoces su manera de escribir.' },
+      { q: '¿Aparecen ediciones antiguas?', a: 'Sí, es de los autores donde más se ven colecciones de bolsillo de los setenta y ochenta que ya no se reimprimen.' },
+    ],
+  },
+
+  'jose-saramago': {
+    slug: 'jose-saramago',
+    displayName: 'José Saramago',
+    dbAuthors: ['José Saramago', 'Jose Saramago'],
+    seoTitle: 'José Saramago — Libros Usados en Chile',
+    seoDescription:
+      'Libros de José Saramago usados en Chile: Ensayo sobre la ceguera, Memorial del convento, El evangelio según Jesucristo, Todos los nombres, La caverna. Envío a todo Chile.',
+    keywords: ['jose saramago', 'saramago libros usados', 'ensayo sobre la ceguera usado', 'memorial del convento', 'el evangelio segun jesucristo', 'todos los nombres saramago', 'saramago segunda mano chile'],
+    subtitle: 'La prosa que parece no respirar',
+    bio: 'Saramago escribía sin puntos donde otros los pondrían, y esa prosa que parece no respirar es justo la que engancha. El Ensayo sobre la ceguera es el que más circula, pero está también el Saramago de las novelas históricas y las fábulas políticas. Son ejemplares de segunda mano, muchos de lectores que lo descubrieron tarde y quisieron tenerlo todo. Acá se arma una biblioteca suya de a poco, un tomo a la vez.',
+    faqs: [
+      { q: '¿Qué libros de Saramago se consiguen usados?', a: 'Ensayo sobre la ceguera es el más frecuente. También aparecen Memorial del convento, El año de la muerte de Ricardo Reis, El evangelio según Jesucristo, La balsa de piedra, Todos los nombres, La caverna y Levantado del suelo.' },
+      { q: '¿Por dónde empezar a leer a Saramago?', a: 'Ensayo sobre la ceguera es la entrada habitual y la más directa. Si prefieres la novela histórica, Memorial del convento; si te interesa el Saramago más personal, Las pequeñas memorias.' },
+      { q: '¿Cuesta acostumbrarse a su puntuación?', a: 'Las primeras páginas cuestan y después se vuelve natural. Los diálogos van dentro del párrafo, separados por comas, y esa es la marca de su estilo.' },
+    ],
+  },
+
+  'jorge-luis-borges': {
+    slug: 'jorge-luis-borges',
+    displayName: 'Jorge Luis Borges',
+    dbAuthors: ['Jorge Luis Borges'],
+    seoTitle: 'Jorge Luis Borges — Libros Usados en Chile',
+    seoDescription:
+      'Libros de Jorge Luis Borges usados en Chile: Ficciones, El Aleph, Obra poética, Elogio de la sombra, Prólogos y las Obras completas. Ediciones de segunda mano con envío a todo Chile.',
+    keywords: ['jorge luis borges', 'borges libros usados', 'ficciones borges', 'el aleph usado', 'obras completas borges', 'borges obra poetica', 'borges segunda mano chile'],
+    subtitle: 'De los que no se botan: se heredan',
+    bio: 'A Borges se le vuelve siempre, aunque nunca se le termine de entender del todo, y quizás por eso sus libros no se botan: se heredan. En el catálogo aparecen Ficciones, El Aleph, los ensayos, las antologías de la Biblioteca de Babel que él mismo dirigió. Ediciones usadas, algunas viejas y buscadas. Es de los autores donde el ejemplar de segunda mano vale tanto como el nuevo, porque muchas de sus mejores ediciones ya no están en librería.',
+    faqs: [
+      { q: '¿Qué libros de Borges se consiguen usados?', a: 'Ficciones y El Aleph son los más buscados. También circulan Obra poética, Elogio de la sombra, La rosa profunda, Prólogos con un prólogo de prólogos, Introducción a la literatura inglesa y tomos sueltos de las Obras completas.' },
+      { q: '¿Por dónde empezar?', a: 'Ficciones es la entrada clásica: cuentos breves donde ya está todo su mundo. El Aleph funciona igual de bien. Los ensayos y prólogos son para después.' },
+      { q: '¿Sirve comprar tomos sueltos de las Obras completas?', a: 'Sí, cada tomo agrupa libros distintos y se leen por separado. Es la forma más habitual de armar su obra en el circuito usado, porque los juegos completos rara vez aparecen enteros.' },
+    ],
+  },
+
+  'mario-benedetti': {
+    slug: 'mario-benedetti',
+    displayName: 'Mario Benedetti',
+    dbAuthors: ['Mario Benedetti'],
+    seoTitle: 'Mario Benedetti — Libros y Poesía Usados en Chile',
+    seoDescription:
+      'Libros de Mario Benedetti usados en Chile: Cuentos completos, La muerte y otras sorpresas, Poemas de la oficina, Vivir adrede, Geografías. Poesía y narrativa con envío a todo Chile.',
+    keywords: ['mario benedetti', 'benedetti libros usados', 'benedetti poemas', 'poemas de la oficina', 'la muerte y otras sorpresas', 'benedetti cuentos completos', 'benedetti segunda mano chile'],
+    subtitle: 'El más prestado y el menos devuelto',
+    bio: 'Pocos autores se prestan tanto como Benedetti, y pocos se recuperan tan poco: por eso el circuito de segunda mano es donde de verdad viven sus libros. Está el Benedetti de los poemas que todos citamos sin saber que son de él, y está el narrador, el de La tregua. Acá hay ediciones usadas repartidas por el país, desde los poemarios de bolsillo hasta las novelas. Si te prestaron uno y no volvió, este es el lugar para reponerlo.',
+    faqs: [
+      { q: '¿Qué libros de Benedetti se consiguen usados?', a: 'De poesía aparecen Poemas de la oficina, La casa y el ladrillo, El mundo que respiro y Vivir adrede. De narrativa, Cuentos completos, La muerte y otras sorpresas, Esta mañana y otros cuentos, Geografías y Andamios.' },
+      { q: '¿Conviene la poesía o la narrativa?', a: 'Depende de qué buscas. Los poemarios son los que más se regalan y se prestan; los cuentos, como La muerte y otras sorpresas, muestran al Benedetti más filoso.' },
+      { q: '¿Se consiguen los Inventarios?', a: 'Sí, sus recopilaciones de poesía aparecen de vez en cuando, incluidas las ediciones De viva voz que vienen con CD y él mismo leyendo.' },
+    ],
+  },
+
+  'marcela-paz': {
+    slug: 'marcela-paz',
+    displayName: 'Marcela Paz',
+    dbAuthors: ['Marcela Paz'],
+    seoTitle: 'Marcela Paz y Papelucho — Libros Usados en Chile',
+    seoDescription:
+      'Libros de Marcela Paz usados en Chile: Papelucho, Papelucho misionero, Papelucho perdido, Papelucho y el marciano, Mi hermano hippie. Envío a todo Chile o retiro en mano.',
+    keywords: ['marcela paz', 'papelucho', 'papelucho libros usados', 'papelucho misionero', 'papelucho perdido', 'coleccion papelucho', 'papelucho segunda mano chile'],
+    subtitle: 'La voz de niño que no envejeció',
+    bio: 'Papelucho es de los pocos personajes que cruzan generaciones enteras en Chile: el que leíste tú es probablemente el mismo que leyeron tus papás. Marcela Paz creó una voz de niño que no ha envejecido, y por eso sus libros pasan de mano en mano, de hermano a hermano, de casa en casa. Acá aparecen ediciones usadas de la serie, ideales para armar la colección o reponer el que quedó deshecho de tanto releer. De los que se compran para regalar y para volver a tener.',
+    faqs: [
+      { q: '¿Qué Papeluchos se consiguen usados?', a: 'Aparecen el Papelucho original y varios de la serie: Papelucho misionero, Papelucho perdido, Papelucho y el marciano, Mi hermano hippie, Adiós Planeta y ¿Soy dix-leso?.' },
+      { q: '¿Sirven para el colegio?', a: 'Sí, varios títulos de la serie son lectura complementaria habitual en básica, y por eso el ejemplar usado es la forma más razonable de conseguirlos año a año.' },
+      { q: '¿Se puede armar la colección completa?', a: 'De a poco. Los títulos entran y salen del catálogo según lo que publiquen los vendedores, así que conviene crear una solicitud para que te avisemos cuando llegue el que te falta.' },
+    ],
+  },
 };
