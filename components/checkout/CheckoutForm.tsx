@@ -49,7 +49,13 @@ const DELIVERY_OPTIONS = [
 ];
 
 export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPhone, courierDisponible = true }: Props) {
-  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("in_person");
+  // Sin preselección: antes venía marcado "in_person", que además es el gratis,
+  // así que quien no leía elegía por omisión retirar un libro que podía estar a
+  // 500 km. La entrega se elige a conciencia. (08-09-2026)
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod | null>(null);
+  // Confirmación explícita cuando elige retirar: la comuna del vendedor dejó de
+  // ser una línea que se puede pasar por alto.
+  const [confirmaRetiro, setConfirmaRetiro] = useState(false);
   const [address, setAddress] = useState(buyerAddress);
   const [phone, setPhone] = useState(buyerPhone);
   const [guestName, setGuestName] = useState(buyerName);
@@ -86,6 +92,15 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   // ninguna: el comprador le daba, no pasaba nada y se iba. Esto nombra la que
   // falta, en el orden en que se llena la página.
   const motivoBloqueo = (): string | null => {
+    // Los dos primeros son de este cambio: sin nombrarlos, sacar la
+    // preselección dejaría el botón apagado sin decir por qué, que es
+    // exactamente el bug mudo que ya tuvo este checkout.
+    if (!deliveryMethod) return "Elige cómo quieres recibir el libro.";
+    if (deliveryMethod === "in_person" && !confirmaRetiro) {
+      return comunaVendedor
+        ? `Confirma que puedes retirar en ${comunaVendedor}.`
+        : "Confirma que vas a coordinar el retiro con quien te vende.";
+    }
     if (!phone) return "Escribe tu teléfono de WhatsApp para coordinar la entrega.";
     if (!isCourier) return null;
     if (!address) return "Escribe la dirección donde quieres recibir el libro.";
@@ -381,12 +396,45 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                   name="delivery"
                   value={opt.value}
                   checked={deliveryMethod === opt.value}
-                  onChange={() => opt.enabled && setDeliveryMethod(opt.value)}
+                  onChange={() => {
+                    if (!opt.enabled) return;
+                    setDeliveryMethod(opt.value);
+                    setConfirmaRetiro(false);
+                  }}
                   disabled={!opt.enabled}
                   className="w-4 h-4 text-brand-600 border-cream-dark focus:ring-brand-500"
                 />
               </label>
             ))}
+
+            {/* La comuna del vendedor deja de ser una línea pasiva: si elige
+                retirar, tiene que confirmar que puede llegar hasta allá. Nace
+                de casos reales — alguien en Ñuñoa compró un libro que estaba en
+                Concepción creyendo que lo iba a buscar, y el despacho terminó
+                pagándolo la casa. (08-09-2026) */}
+            {deliveryMethod === "in_person" && (
+              <label className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 cursor-pointer animate-fade-in">
+                <input
+                  type="checkbox"
+                  checked={confirmaRetiro}
+                  onChange={(e) => setConfirmaRetiro(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-amber-400 text-brand-600 focus:ring-brand-500"
+                />
+                <span className="text-xs leading-relaxed text-amber-900">
+                  {comunaVendedor ? (
+                    <>
+                      Confirmo que puedo retirar en <strong>{comunaVendedor}</strong>. El libro está ahí y lo
+                      coordinas directo con quien te lo vende: esta compra no incluye despacho.
+                    </>
+                  ) : (
+                    <>
+                      Confirmo que voy a coordinar el retiro directamente con quien me vende.{" "}
+                      <strong>Esta compra no incluye despacho.</strong>
+                    </>
+                  )}
+                </span>
+              </label>
+            )}
           </div>
         </div>
 
@@ -626,6 +674,8 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                 onClick={handleSubmit}
                 disabled={
                   loading ||
+                  !deliveryMethod ||
+                  (deliveryMethod === "in_person" && !confirmaRetiro) ||
                   (isCourier &&
                     (!address || !selectedQuote || shippingUnavailable || !addressHasNumber)) ||
                   !phone

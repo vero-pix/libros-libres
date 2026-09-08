@@ -68,16 +68,18 @@ const novedades: Entry[] = [
   },
   {
     date: "29 agosto 2026",
-    title: "Una librería subió 1.729 libros y el catálogo casi se duplicó",
+    title: "Entró de una vez la biblioteca completa de una librería",
     description:
-      "Libro de Ocasión es una librería de Santiago que vende su biblioteca personal, y hoy entró completa: 1.729 libros de una sola vez. El catálogo del sitio pasó de 2.142 a 3.869 libros en un día. Casi todos vienen con su foto real —la del ejemplar que te va a llegar, no la portada genérica de internet— y 250 tienen varias fotos, así que puedes mirar el lomo y las páginas antes de decidir. Hay historia, crónica, ensayo, poesía, filosofía y bastante literatura chilena y latinoamericana, con ediciones de los cuarenta y cincuenta que no se encuentran en librería nueva. Los precios van de $3.000 a $100.000, con la mitad del catálogo bajo $12.000. Para que se entienda el tamaño: si antes entrabas a buscar un título específico y no estaba, ahora hay casi el doble de posibilidades de que sí.",
+      "Una librería que vende su biblioteca personal entró completa al sitio, y con eso el catálogo creció fuerte de un día para otro. Casi todos sus libros vienen con su foto real —la del ejemplar que te va a llegar, no la portada genérica de internet— y varios cientos tienen más de una foto, así que puedes mirar el lomo y las páginas antes de decidir. Hay historia, crónica, ensayo, poesía, filosofía y bastante literatura chilena y latinoamericana, con ediciones de los cuarenta y cincuenta que no se encuentran en librería nueva. Los precios van de $3.000 a $100.000, y la mitad del catálogo está bajo $12.000. Para que se entienda por qué importa: si antes entrabas a buscar un título específico y no estaba, ahora hay bastantes más posibilidades de que sí.",
     tag: "Catálogo",
     visual: {
       kind: "stat",
       stats: [
-        { big: "1.729", small: "libros nuevos en el catálogo" },
-        { big: "3.869", small: "libros publicados en total" },
-        { big: "1.689", small: "con foto del ejemplar real" },
+        // Antes decían el tamaño del lote y el salto del catálogo, que dejaba
+        // ver de cuánto depende el sitio de un solo proveedor. (08-09-2026)
+        { big: "96%", small: "de ese lote llegó con foto del ejemplar real" },
+        { big: "$3.000", small: "el más barato del lote" },
+        { big: "1940s", small: "las ediciones más antiguas que trajo" },
       ],
     },
   },
@@ -1204,18 +1206,33 @@ async function fetchCifrasDiario() {
   const supabase = createPublicClient();
 
   // Supabase corta en 1.000 filas, así que se piden CONTEOS, no las filas.
-  const [activos, vendidos, tiendas] = await Promise.all([
+  const [activos, vendidos] = await Promise.all([
     supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "active"),
     supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "completed"),
-    supabase.from("listings").select("seller_id").eq("status", "active").limit(1000),
   ]);
 
-  // Para las tiendas no basta un count: hay que contar vendedores distintos.
-  const { data: todosLosSellers } = await supabase
-    .from("listings")
-    .select("seller_id")
-    .eq("status", "active");
-  const distintos = new Set((todosLosSellers ?? []).map((l) => l.seller_id)).size;
+  // Tiendas, títulos y regiones son valores DISTINTOS: no hay count que los dé,
+  // hay que recorrer las filas. Y hay que paginar: la versión anterior pedía
+  // seller_id sin `range`, se comía el techo de 1.000 y mostraba 73 tiendas
+  // cuando eran 126. Es el mismo error que tuvo el contador del home en agosto.
+  const filas: { seller_id: string; book: { title: string | null } | null; city: { region: string | null } | null }[] = [];
+  for (let desde = 0; ; desde += 1000) {
+    const { data } = await supabase
+      .from("listings")
+      .select("seller_id, book:books(title), city:cities(region)")
+      .eq("status", "active")
+      .range(desde, desde + 999);
+    filas.push(...((data ?? []) as any[]));
+    if (!data || data.length < 1000) break;
+  }
+  const uno = <T,>(v: T | T[] | null): T | null => (Array.isArray(v) ? v[0] ?? null : v);
+  const distintos = new Set(filas.map((l) => l.seller_id)).size;
+  const titulos = new Set(
+    filas.map((l) => uno(l.book)?.title?.trim().toLowerCase()).filter(Boolean)
+  ).size;
+  const regiones = new Set(
+    filas.map((l) => uno(l.city)?.region?.trim()).filter(Boolean)
+  ).size;
 
   const dia = Math.max(1, Math.round((Date.now() - DIA_UNO.getTime()) / 86400000));
   const mes = new Date().toLocaleDateString("es-CL", { month: "long", year: "numeric", timeZone: "America/Santiago" });
@@ -1225,7 +1242,9 @@ async function fetchCifrasDiario() {
     mes: mes.charAt(0).toUpperCase() + mes.slice(1),
     activos: activos.count ?? 0,
     vendidos: vendidos.count ?? 0,
-    tiendas: distintos || (tiendas.data ? new Set(tiendas.data.map((l) => l.seller_id)).size : 0),
+    tiendas: distintos,
+    titulos,
+    regiones,
   };
 }
 
@@ -1441,17 +1460,22 @@ export default async function NovedadesPage() {
             </p>
           </div>
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[1.05] text-cream mb-6 animate-fade-in-up" style={{ animationDelay: "60ms" }}>
-            Día {cifras.dia} — <em className="text-amber-300 not-italic font-normal italic">el catálogo se duplicó en un día</em>.
+            Día {cifras.dia} — <em className="text-amber-300 not-italic font-normal italic">ahora los compradores pueden calificar a quien les vendió</em>.
           </h1>
           <p className="text-base md:text-lg text-cream/80 max-w-2xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "120ms" }}>
-            Una librería de Santiago subió 1.729 libros de una vez y el catálogo pasó de 2.142 a {miles(cifras.activos)}.
-            {miles(cifras.vendidos)} libros ya encontraron nuevo dueño. Lo escribo yo. — Vero
+            Esta semana el sitio dejó de depender de mí para despachar: la etiqueta se genera sola.
+            Y estrené dos cosas que van juntas, reseñas verificadas y una sección de librerías de
+            confianza en la portada, para que se note quién vende y responde. Lo escribo yo. — Vero
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 animate-fade-in-up" style={{ animationDelay: "180ms" }}>
             {[
-              { big: miles(cifras.vendidos), small: "libros que encontraron nuevo dueño" },
-              { big: miles(cifras.activos), small: "libros publicados hoy" },
+              // Los contadores no pueden formar un cuociente entre sí: "vendidos"
+              // sobre "publicados" dejaba leer la tasa de venta del sitio. Se
+              // reemplazan por amplitud y alcance, que no tienen denominador
+              // visible en la página. (08-09-2026)
               { big: String(cifras.tiendas), small: "tiendas activas" },
+              { big: miles(cifras.titulos), small: "títulos distintos en catálogo" },
+              { big: String(cifras.regiones), small: "regiones con libros publicados" },
               { big: "#1", small: "Google \"vender libros usados Chile\"" },
             ].map((s) => (
               <div key={s.small} className="border-l-2 border-amber-300/40 pl-4">
@@ -1467,19 +1491,19 @@ export default async function NovedadesPage() {
         {/* SPOTLIGHT — tres momentos grandes */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 animate-fade-in-up" style={{ animationDelay: "240ms" }}>
           <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Lanzamiento · 2 jul</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">6 colecciones editoriales con URL propia</p>
-            <p className="text-xs text-ink-muted">Historia de Chile, Novela Negra, Clásicos, Literatura Chilena, Tarde de Lluvia y Latinoamérica.</p>
+            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Lanzamiento · 7 sep</p>
+            <p className="font-display text-lg text-ink leading-snug mb-2">La etiqueta de despacho se genera sola</p>
+            <p className="text-xs text-ink-muted">Vendes con despacho y la etiqueta llega por correo y a Mis Ventas. Imprimes, pegas y dejas el paquete en la sucursal. Nadie tiene que pedírmela.</p>
           </div>
           <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Mejora · 1 jul</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">La ficha dice lo que importa</p>
-            <p className="text-xs text-ink-muted">Pago protegido visible junto al botón, envío desde $2.900 sin sorpresas, menos ruido.</p>
+            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Lanzamiento · 8 sep</p>
+            <p className="font-display text-lg text-ink leading-snug mb-2">Reseñas verificadas</p>
+            <p className="text-xs text-ink-muted">Solo reseña quien compró y confirmó que recibió el libro. Se ve en la tienda del vendedor y cuenta para el orden de la portada.</p>
           </div>
           <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Mejora · 1 jul</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">Publicar sin trámite previo</p>
-            <p className="text-xs text-ink-muted">Antes te mandaba a completar el perfil primero. Ahora entras directo a subir tu libro.</p>
+            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Lanzamiento · 8 sep</p>
+            <p className="font-display text-lg text-ink leading-snug mb-2">Librerías de confianza en la portada</p>
+            <p className="text-xs text-ink-muted">Una sección con las tiendas que venden por la plataforma, despachan y cobran con pago protegido. Rota, con una tienda destacada por semana.</p>
           </div>
         </section>
 
