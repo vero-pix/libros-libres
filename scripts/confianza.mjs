@@ -15,6 +15,9 @@
  *   node scripts/confianza.mjs semana <vendedor> [--hasta AAAA-MM-DD] [--frase "..."]
  *   node scripts/confianza.mjs semana --auto
  *   node scripts/confianza.mjs casa --frase "..."   |   casa --off  |  casa --on
+ *   node scripts/confianza.mjs destacado <tag> --titulo "..." [--subtitulo "..."]
+ *                                              [--coleccion <slug>] [--hasta AAAA-MM-DD]
+ *   node scripts/confianza.mjs destacado --auto
  *
  * Ojo: la portada del home cachea 5 minutos (unstable_cache), así que un cambio
  * de frase o de tienda de la semana tarda hasta ese rato en verse.
@@ -214,6 +217,69 @@ if (cmd === "semana") {
   });
   console.log(`Tienda de la semana: ${v.full_name} (${username}), hasta el ${hasta}.`);
   if (frase) console.log(`  Frase: "${frase}"`);
+  console.log("  Se ve en el home dentro de 5 minutos (caché de la portada).");
+  process.exit(0);
+}
+
+/* ──────────────────── primera fila de colecciones del home ──────────────────── */
+
+if (cmd === "destacado") {
+  const actual = await leerConfig("destacado_home");
+
+  if (tiene("auto") || tiene("off")) {
+    await escribirConfig("destacado_home", {});
+    console.log("Primera fila del home: vuelve a la configuración estática del código.");
+    process.exit(0);
+  }
+
+  const tag = sueltos[0];
+  if (!tag) {
+    salir(
+      'Falta el tag.\n' +
+        '  node scripts/confianza.mjs destacado literatura-chilena --titulo "Para el 18" \\\n' +
+        '       --subtitulo "Escritoras y escritores de acá, para leer estos días" \\\n' +
+        '       --coleccion literatura-chilena --hasta 2026-09-18\n' +
+        '  node scripts/confianza.mjs destacado --auto     (vuelve a lo estático)'
+    );
+  }
+
+  // El tag tiene que existir en el catálogo, y con al menos 3 libros: bajo eso
+  // la fila no se muestra y el cambio pasaría inadvertido.
+  const { data: libros, error: eLibros } = await admin
+    .from("listings")
+    .select("id, book:books!inner(tags)", { count: "exact", head: false })
+    .eq("status", "active")
+    .neq("deprioritized", true)
+    .contains("book.tags", [tag])
+    .limit(50);
+  if (eLibros) salir(eLibros.message);
+  const n = libros?.length ?? 0;
+  if (n < 3) salir(`El tag "${tag}" tiene ${n} libro(s) activos y la fila necesita al menos 3. No se guardó nada.`);
+
+  if (n === 3) console.warn(`  Aviso: "${tag}" tiene justo 3 libros, el mínimo para que la fila aparezca.`);
+
+  // El título y el subtítulo solo se heredan si NO cambia el tag: arrastrar el
+  // subtítulo de una colección a otra deja la fila diciendo cualquier cosa.
+  const mismoTag = actual.tag === tag;
+  const titulo = opcion("titulo") ?? (mismoTag ? actual.title : null);
+  if (!titulo) salir('Falta --titulo "..."');
+  const subtitulo = opcion("subtitulo") ?? (mismoTag ? actual.subtitle ?? "" : "");
+  const coleccion = opcion("coleccion") ?? null;
+  const hasta = opcion("hasta") ?? null;
+  if (hasta && !/^\d{4}-\d{2}-\d{2}$/.test(hasta)) salir(`Fecha inválida: "${hasta}". Formato AAAA-MM-DD.`);
+
+  await escribirConfig("destacado_home", {
+    tag,
+    collectionSlug: coleccion,
+    title: titulo,
+    subtitle: subtitulo,
+    until: hasta,
+  });
+  console.log(`Primera fila del home: "${titulo}"`);
+  if (subtitulo) console.log(`  Subtítulo: "${subtitulo}"`);
+  console.log(`  Tag: ${tag} (${n >= 50 ? "50+" : n} libros activos)`);
+  console.log(`  Ver todo: ${coleccion ? `/coleccion/${coleccion}` : `/?tag=${tag}`}`);
+  console.log(`  Vigente hasta: ${hasta ?? "sin fecha (hasta que se cambie)"}`);
   console.log("  Se ve en el home dentro de 5 minutos (caché de la portada).");
   process.exit(0);
 }

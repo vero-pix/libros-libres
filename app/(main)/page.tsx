@@ -265,6 +265,13 @@ const EXCLUDED_SUBCATEGORIES = ["no-ficcion-ensayo", "no-ficcion-humanidades"];
 
 // Colecciones editoriales curadas por Vero (orden = prioridad al deduplicar).
 // collectionSlug: URL canónica /coleccion/[slug] cuando existe la página dedicada.
+//
+// La PRIMERA fila es un espacio editorial: se puede reemplazar por temporada
+// desde `site_config.destacado_home`, sin deploy, con
+// `node scripts/confianza.mjs destacado ...`. Cuando esa configuración vence o
+// está vacía, vuelve la fila que está acá abajo. Se hizo así porque "Para una
+// tarde de lluvia" seguía en la portada en septiembre, cuando en Santiago ya no
+// llueve, y rotarla obligaba a editar código y desplegar. (08-09-2026)
 const COLLECTION_CONFIGS = [
   { tag: "tarde-de-lluvia", collectionSlug: "tarde-de-lluvia", title: "Para una tarde de lluvia", subtitle: "Curado por Vero · lectura lenta, sin apuro" },
   { tag: "literatura-chilena", collectionSlug: "literatura-chilena", title: "Literatura chilena", subtitle: "Escritoras y escritores de acá" },
@@ -281,12 +288,35 @@ const COLLECTION_CONFIGS = [
 // Trae todas las colecciones y deduplica: un libro va a la PRIMERA colección que lo
 // contiene (por orden de COLLECTION_CONFIGS), nunca a dos. Antes cada ColeccionRow
 // buscaba aislada y un libro multi-tag salía repetido en varias filas.
+/**
+ * Config efectiva de las filas. Si `site_config.destacado_home` está vigente,
+ * ocupa el primer lugar en vez de la fila estática; si su tag ya estaba más
+ * abajo, se saca de ahí para no repetir la misma colección dos veces.
+ */
+async function configDeColecciones(supabase: ReturnType<typeof createPublicClient>) {
+  const { data } = await supabase.from("site_config").select("value").eq("key", "destacado_home").maybeSingle();
+  const d = data?.value as { tag?: string; collectionSlug?: string; title?: string; subtitle?: string; until?: string } | undefined;
+
+  const hoy = new Date().toISOString().slice(0, 10);
+  const vigente = d?.tag && d?.title && (!d.until || d.until >= hoy);
+  if (!vigente) return COLLECTION_CONFIGS;
+
+  const destacada = {
+    tag: d!.tag!,
+    collectionSlug: d!.collectionSlug || undefined,
+    title: d!.title!,
+    subtitle: d!.subtitle ?? "",
+  };
+  return [destacada, ...COLLECTION_CONFIGS.slice(1).filter((c) => c.tag !== destacada.tag)];
+}
+
 const getCollections = unstable_cache(
   async () => {
     const supabase = createPublicClient();
+    const configs = await configDeColecciones(supabase);
     const SEL = `*, book:books!inner(*), seller:users(id, username, full_name, avatar_url)`;
     const raw = await Promise.all(
-      COLLECTION_CONFIGS.map((c) =>
+      configs.map((c) =>
         supabase
           .from("listings")
           .select(SEL)
