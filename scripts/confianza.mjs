@@ -146,32 +146,71 @@ if (cmd === "resenas") {
 
 /* ──────────────────────── ocultar / mostrar reseña ──────────────────────── */
 
+const SELECT_RESENA =
+  "id, order_id, rating, comment, created_at, hidden_at, hidden_reason, seller:users!reviews_seller_id_fkey(username), reviewer:users!reviews_reviewer_id_fkey(full_name)";
+
+function pintarResena(r, etiqueta) {
+  const s = Array.isArray(r.seller) ? r.seller[0] : r.seller;
+  const c = Array.isArray(r.reviewer) ? r.reviewer[0] : r.reviewer;
+  console.log(`\n  ${etiqueta}`);
+  console.log(`    id       : ${r.id}`);
+  console.log(`    orden    : ${r.order_id ?? "—"}`);
+  console.log(`    nota     : ${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}`);
+  console.log(`    a        : ${s?.username ?? "?"}   por: ${c?.full_name ?? "?"}`);
+  if (r.comment) console.log(`    texto    : "${r.comment}"`);
+  console.log(`    visible  : ${r.hidden_at ? `NO — oculta el ${r.hidden_at.slice(0, 10)}` : "sí"}`);
+  if (r.hidden_reason) console.log(`    motivo   : ${r.hidden_reason}`);
+}
+
 if (cmd === "ocultar" || cmd === "mostrar") {
   const id = sueltos[0];
-  if (!id) salir(`Falta el id de la reseña.  node scripts/confianza.mjs ${cmd} <id> ${cmd === "ocultar" ? '"motivo"' : ""}`);
+  if (!id) {
+    salir(
+      `Falta el id.  node scripts/confianza.mjs ${cmd} <idReseña|idOrden> ${cmd === "ocultar" ? '"motivo"' : ""}`
+    );
+  }
 
-  const { data: r } = await admin.from("reviews").select("id, seller_id, hidden_at").eq("id", id).maybeSingle();
-  if (!r) salir(`No existe la reseña ${id}.`);
+  // Se acepta el id de la reseña o el de la orden: desde el correo o desde
+  // /mis-ventas lo que se tiene a mano es la orden, no la reseña.
+  let { data: r } = await admin.from("reviews").select(SELECT_RESENA).eq("id", id).maybeSingle();
+  let via = "id de reseña";
+  if (!r) {
+    const porOrden = await admin.from("reviews").select(SELECT_RESENA).eq("order_id", id).maybeSingle();
+    r = porOrden.data;
+    via = "id de orden";
+  }
+  if (!r) salir(`No hay ninguna reseña con ese id, ni de reseña ni de orden: ${id}`);
+  console.log(`Encontrada por ${via}.`);
+
+  pintarResena(r, "ANTES");
 
   if (cmd === "ocultar") {
     const motivo = sueltos[1];
     // El motivo es obligatorio: una reseña se oculta por spam, datos personales
-    // o incumplimiento de los términos, nunca por ser negativa. Dejarlo escrito
+    // o incumplimiento de los términos, NUNCA por ser negativa. Dejarlo escrito
     // es lo que permite revisar la decisión después.
-    if (!motivo) salir('Falta el motivo. Ej: node scripts/confianza.mjs ocultar <id> "trae el teléfono del comprador"');
+    if (!motivo) {
+      salir(
+        '\nFalta el motivo. Se oculta por spam, datos personales o incumplimiento de los términos, nunca por ser negativa.\n' +
+          '  Ej: node scripts/confianza.mjs ocultar <id> "trae el teléfono del comprador"'
+      );
+    }
     const { error } = await admin
       .from("reviews")
       .update({ hidden_at: new Date().toISOString(), hidden_reason: motivo })
-      .eq("id", id);
+      .eq("id", r.id);
     if (error) salir(error.message);
-    console.log(`Reseña ${id} oculta. Motivo: "${motivo}".`);
-    console.log("  La fila NO se borró: se puede volver a mostrar.");
   } else {
-    const { error } = await admin.from("reviews").update({ hidden_at: null, hidden_reason: null }).eq("id", id);
+    const { error } = await admin.from("reviews").update({ hidden_at: null, hidden_reason: null }).eq("id", r.id);
     if (error) salir(error.message);
-    console.log(`Reseña ${id} visible de nuevo.`);
   }
-  await refrescar(r.seller_id);
+
+  const { data: despues } = await admin.from("reviews").select(SELECT_RESENA).eq("id", r.id).maybeSingle();
+  pintarResena(despues, "DESPUÉS");
+  console.log("\n  La fila nunca se borra: ocultar es reversible con `mostrar`.");
+
+  const { data: dueno } = await admin.from("reviews").select("seller_id").eq("id", r.id).maybeSingle();
+  await refrescar(dueno.seller_id);
   process.exit(0);
 }
 
@@ -195,9 +234,24 @@ if (cmd === "semana") {
     salir(`${username} fue la tienda de la semana anterior y no puede repetir dos semanas seguidas.`);
   }
 
+  // Reglas C3 y C4, que se hacen cumplir acá y no con un aviso: un aviso que no
+  // bloquea no sirve de nada.
+  if (username === "vero") {
+    salir("vero está fuera del criterio automático (C3). Su lugar es el slot fijo: usa `casa --frase`.");
+  }
+  if (username === "libro.de.ocasion") {
+    salir(
+      "libro.de.ocasion no puede ser la tienda de la semana (C4): tiene el 44% del catálogo y sería la cara permanente del sitio."
+    );
+  }
+
   const { data: stat } = await admin.from("seller_stats").select("is_trusted").eq("seller_id", v.id).maybeSingle();
   if (!stat?.is_trusted) {
-    console.warn(`  Aviso: ${username} no califica hoy por el criterio automático. Se fija igual, porque es una decisión editorial.`);
+    salir(
+      `${username} no califica como librería de confianza hoy.\n` +
+        "  Necesita MercadoPago conectado, al menos 1 venta pagada en 90 días y 5 libros activos.\n" +
+        "  Revisa con: node scripts/seller-stats.mjs --todos"
+    );
   }
 
   const frase = opcion("frase") ?? actual.frase ?? "";
