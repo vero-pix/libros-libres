@@ -1,5 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { createPublicClient } from "@/lib/supabase/public";
+
+export const revalidate = 3600; // 1 hora
 
 export const metadata: Metadata = {
   title: "Nuestra historia",
@@ -13,7 +16,40 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HistoriaPage() {
+/**
+ * Los numeros del reel (1.628 libros, 63 vendedores) eran verdad en julio de
+ * 2026 y hoy ya no. Se leen de la BD para que el cierre de la pagina envejezca
+ * solo, sin que nadie tenga que acordarse de editarlo.
+ */
+async function contarCatalogo() {
+  try {
+    const supabase = createPublicClient();
+    const vendedores = new Set<string>();
+    let libros = 0;
+
+    for (let desde = 0; ; desde += 1000) {
+      const { data, count } = await supabase
+        .from("listings")
+        .select("seller_id", { count: "exact" })
+        .eq("status", "active")
+        .range(desde, desde + 999);
+
+      if (count != null) libros = count;
+      for (const fila of data ?? []) {
+        vendedores.add((fila as { seller_id: string }).seller_id);
+      }
+      if (!data || data.length < 1000) break;
+    }
+
+    return { libros, vendedores: vendedores.size };
+  } catch {
+    // Si la BD no responde, la pagina se muestra igual y el bloque se calla.
+    return null;
+  }
+}
+
+export default async function HistoriaPage() {
+  const catalogo = await contarCatalogo();
   return (
     <div className="min-h-screen bg-cream">
       <article className="max-w-2xl mx-auto px-4 py-16 sm:py-24">
@@ -131,6 +167,76 @@ export default function HistoriaPage() {
 
           <p className="text-right text-sm italic text-ink mt-8">— Vero</p>
         </div>
+
+        {/* El reel */}
+        <figure className="mt-16 pt-12 border-t border-cream-dark">
+          <figcaption className="text-center mb-6">
+            <p className="text-xs font-medium tracking-[0.3em] uppercase text-brand-600 mb-3">
+              En video
+            </p>
+            <h2 className="font-display text-2xl font-bold text-ink mb-3 text-balance">
+              Lo mismo, pero grabado
+            </h2>
+            <p className="text-ink-muted text-sm max-w-md mx-auto leading-relaxed">
+              Un minuto paseando por mi casa cuando todavía tenía más libros
+              que estantes. Tiene subtítulos, así que lo puedes ver sin audio.
+            </p>
+          </figcaption>
+
+          <video
+            className="w-full max-w-[340px] mx-auto rounded-2xl border border-cream-dark shadow-sm"
+            controls
+            preload="metadata"
+            playsInline
+            width={720}
+            height={1280}
+            poster="/video/reel-tuslibros-poster.jpg"
+            aria-describedby="reel-descripcion"
+          >
+            <source src="/video/reel-tuslibros.mp4" type="video/mp4" />
+            Tu navegador no puede reproducir este video.
+          </video>
+
+          <p id="reel-descripcion" className="sr-only">
+            Recorrido por la casa de Vero: libros apilados en el suelo, en el
+            sillón y en estantes desbordados. Los subtítulos cuentan que había
+            más libros que estantes, que decidió encerrarse un par de días a
+            construir el sitio con un mapa interactivo, y termina mostrando el
+            mapa con vendedores en Las Condes, Ñuñoa y Macul.
+          </p>
+        </figure>
+
+        {/* Los numeros que el video ya no tiene al dia */}
+        {catalogo && catalogo.libros > 0 && (
+          <div className="mt-10 bg-cream-dark/60 rounded-2xl px-6 py-8 text-center">
+            <p className="text-ink-muted text-sm max-w-md mx-auto leading-relaxed mb-6">
+              En el video digo 1.628 libros y 63 vendedores. Era verdad cuando
+              lo grabé. Esto es lo que hay ahora mismo:
+            </p>
+            <div className="flex flex-wrap items-baseline justify-center gap-x-10 gap-y-4">
+              <p>
+                <span className="block font-display text-4xl font-bold text-ink tabular-nums leading-none">
+                  {catalogo.libros.toLocaleString("es-CL")}
+                </span>
+                <span className="block text-sm text-ink-muted mt-1.5">
+                  libros publicados
+                </span>
+              </p>
+              <p>
+                <span className="block font-display text-4xl font-bold text-ink tabular-nums leading-none">
+                  {catalogo.vendedores.toLocaleString("es-CL")}
+                </span>
+                <span className="block text-sm text-ink-muted mt-1.5">
+                  {catalogo.vendedores === 1 ? "vendedor" : "vendedores"}
+                </span>
+              </p>
+            </div>
+            <p className="text-xs text-ink-muted mt-6 italic">
+              Se actualiza solo. Si el número subió desde que escribí esto,
+              mejor.
+            </p>
+          </div>
+        )}
 
         {/* CTA */}
         <div className="mt-16 pt-12 border-t border-cream-dark text-center">
