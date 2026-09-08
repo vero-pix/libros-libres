@@ -663,6 +663,18 @@ export interface ShipitRetiro {
 const PICKUP_STATUS_MUERTOS = ["canceled", "cancelled", "failed", "rejected", "expired"];
 
 /**
+ * Retiros que YA se concretaron: el chofer pasó y se llevó el paquete. Shipit
+ * usa `shipped` (visto en el retiro 913989 el 08-09-2026); los otros son
+ * defensivos, por si el vocabulario cambia.
+ */
+const PICKUP_STATUS_CUMPLIDOS = ["shipped", "picked_up", "done", "completed", "delivered"];
+
+/** El chofer ya pasó: el paquete va en camino, no hay nada que reagendar. */
+export function retiroCumplido(r: ShipitRetiro | null): boolean {
+  return !!r?.status && PICKUP_STATUS_CUMPLIDOS.includes(r.status.toLowerCase());
+}
+
+/**
  * Lee `last_pickup` y devuelve el retiro solo si sigue en pie: `schedule.active`,
  * con fecha, no archivado y en un estado vivo. Cualquier otra cosa ⇒ null, y el
  * envío se queda en dropoff. Nunca lanza: la respuesta viene de fuera.
@@ -692,4 +704,21 @@ export function leerRetiroShipit(lastPickup: unknown): ShipitRetiro | null {
     place: place || null,
     isManual: p.is_manual === true,
   };
+}
+
+/**
+ * Anula un retiro. `DELETE /v/pickups/{id}` no está en la documentación
+ * pública y no se pudo probar en vivo sin botar el retiro real de una
+ * vendedora, así que se trata como incierto a propósito: el que llama nunca
+ * asume que funcionó — si `ok` es false, avisa a Vero para que lo anule en el
+ * panel. Nunca lanza.
+ */
+export async function anularRetiroShipit(pickupId: number): Promise<{ ok: boolean; httpStatus: number; raw: unknown }> {
+  if (!SHIPIT_EMAIL || !SHIPIT_TOKEN) return { ok: false, httpStatus: 0, raw: "missing_credentials" };
+  try {
+    const { status, data } = await shipitFetch(`/pickups/${pickupId}`, { method: "DELETE" });
+    return { ok: status >= 200 && status < 300, httpStatus: status, raw: data };
+  } catch (e) {
+    return { ok: false, httpStatus: 0, raw: String(e) };
+  }
 }

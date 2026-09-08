@@ -6,6 +6,7 @@ import type { Order, OrderStatus } from "@/types";
 import BuyerCartsSection from "@/components/sales/BuyerCartsSection";
 import EntregadoButton from "@/components/sales/EntregadoButton";
 import PedirRetiroButton from "@/components/sales/PedirRetiroButton";
+import RetiroFallidoAcciones from "@/components/sales/RetiroFallidoAcciones";
 import { findCommune, SHIPIT_REGION_RM } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
 
@@ -574,7 +575,7 @@ function EstadoEnvio({
     : "el courier";
   const retiro = shipment.status === "pickup_scheduled" && shipment.pickup_date ? shipment.pickup_date : null;
 
-  if (shipment.label_path && ["label_ready", "notified", "pickup_scheduled", "in_transit", "delivered"].includes(shipment.status)) {
+  if (shipment.label_path && ["label_ready", "notified", "pickup_scheduled", "pickup_failed", "in_transit", "delivered"].includes(shipment.status)) {
     return (
       <div className="space-y-1">
         <a
@@ -585,7 +586,14 @@ function EstadoEnvio({
         >
           📄 Descargar etiqueta
         </a>
-        {retiro ? (
+        {shipment.status === "pickup_failed" ? (
+          <div className="space-y-1">
+            <span className="text-[11px] text-amber-700 block font-medium">
+              El retiro no se concretó{shipment.pickup_date ? ` (estaba para el ${fechaRetiro(shipment.pickup_date)})` : ""}. La venta sigue en pie: elige cómo sale el paquete.
+            </span>
+            <RetiroFallidoAcciones shipmentId={shipment.id} />
+          </div>
+        ) : retiro ? (
           <span className="text-[11px] text-ink block">
             Imprímela, pégala al paquete y tenlo listo:{" "}
             <strong>

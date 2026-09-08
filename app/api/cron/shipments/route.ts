@@ -8,6 +8,7 @@ import {
   findCommune,
   getShipitShipment,
   leerRetiroShipit,
+  retiroCumplido,
   DROPOFF_COURIERS,
   SHIPIT_DEFAULT_ORIGIN_RM,
   SHIPIT_REGION_RM,
@@ -17,11 +18,18 @@ import { foldAccents } from "@/lib/accentSearch";
 import { resolverOrigenEnvio } from "@/lib/shipping-quote";
 import { sendEmail } from "@/lib/email";
 import { VERO_INBOX } from "@/lib/veroInbox";
-import { correoCompradorTracking, correoVendedorEtiqueta, REMITENTE_VERO, REPLY_TO_VERO } from "@/lib/shipit-emails";
+import {
+  correoCompradorTracking,
+  correoVendedorEtiqueta,
+  correoVendedorRetiroFallido,
+  REMITENTE_VERO,
+  REPLY_TO_VERO,
+} from "@/lib/shipit-emails";
 import {
   BACKOFF_MIN,
   MAX_ATTEMPTS,
   getShipitMode,
+  hoyEnChile,
   registrarEventoShipit,
   reprogramarEnvio,
   transicionEnvio,
@@ -58,6 +66,7 @@ export const dynamic = "force-dynamic";
  *   created → label_ready   tracking + pack_pdf descargado al bucket privado `labels`
  *   label_ready → notified  correo al vendedor (etiqueta lista) y al comprador (tracking)
  *   notified → pickup_scheduled  si Shipit ya agendó un retiro (last_pickup)
+ *   pickup_scheduled → in_transit | pickup_failed  según pase o no el chofer
  *
  * Diseño completo: docs/shipit/PROMPT_1.1_diseno_2026-09-07.md
  */
@@ -108,8 +117,11 @@ export async function GET(request: Request) {
         case "notified":
           resumen.push(await pasoRetiro(admin, fila, modo));
           break;
+        case "pickup_scheduled":
+          resumen.push(await pasoSeguirRetiro(admin, fila, modo));
+          break;
         default:
-          // pickup_scheduled y estados de fase 2. Se sueltan para dentro de 6 horas.
+          // Estados de fase 2. Se sueltan para dentro de 6 horas.
           await reprogramarEnvio(admin, fila.id, 6 * 60);
           resumen.push({ reference: fila.reference, estado: fila.status, accion: "sin paso implementado" });
       }
@@ -550,6 +562,146 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
   };
 }
 
+/* ───────────── pickup_scheduled → in_transit | pickup_failed ───────────── */
+
+/**
+ * Un retiro agendado no es un retiro hecho. Acá se mira qué pasó con él:
+ *
+ *   · el chofer pasó (`last_pickup.status` cumplido) → in_transit, listo.
+ *   · el retiro sigue en pie y su fecha no ha llegado → esperar, refrescando
+ *     fecha y ventana por si Shipit las movió.
+ *   · el retiro se anuló, desapareció, o su fecha ya pasó → `pickup_failed`:
+ *     correo al vendedor con las tres salidas y gong a Vero.
+ *
+ * El vencimiento se evalúa con `hoyEnChile()` y solo cuando la fecha quedó
+ * ATRÁS, nunca el mismo día: el chofer tiene hasta el final de su ventana, y
+ * un envío no se declara fallido mientras la camioneta todavía puede llegar.
+ */
+async function pasoSeguirRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
+  if (modo === "dry-run" || !fila.shipit_id) {
+    await reprogramarEnvio(admin, fila.id, 6 * 60);
+    return { reference: fila.reference, estado: "pickup_scheduled", accion: "dry-run: no se sigue el retiro" };
+  }
+
+  const s = await getShipitShipment(fila.shipit_id);
+  await registrarEventoShipit(admin, {
+    shipmentId: fila.id,
+    kind: "get",
+    mode: modo,
+    response: s.raw,
+    httpStatus: s.httpStatus,
+    note: "seguimiento-retiro",
+  });
+  if (s.error) {
+    await reprogramarEnvio(admin, fila.id, 60);
+    return { reference: fila.reference, estado: "pickup_scheduled", accion: "GET falló, se reintenta", nota: s.error };
+  }
+
+  const retiro = leerRetiroShipit(s.last_pickup);
+
+  // El chofer pasó. No hay nada que reagendar ni que avisar.
+  if (retiroCumplido(retiro)) {
+    const ok = await transicionEnvio(admin, fila.id, "pickup_scheduled", "in_transit");
+    if (ok) {
+      await admin
+        .from("orders")
+        .update({ status: "shipped", shipping_status: "in_transit", shipping_updated_at: new Date().toISOString() })
+        .eq("bundle_id", fila.bundle_id)
+        .in("status", ["paid"]);
+    }
+    return { reference: fila.reference, estado: ok ? "in_transit" : "pickup_scheduled", accion: "el retiro se concretó" };
+  }
+
+  // Sigue en pie y todavía no le llega el día: refrescar y esperar.
+  if (retiro && retiro.date >= hoyEnChile()) {
+    if (retiro.date !== fila.pickup_date || retiro.window !== fila.pickup_window || retiro.id !== fila.pickup_id) {
+      await admin
+        .from("shipments")
+        .update({ pickup_date: retiro.date, pickup_window: retiro.window, pickup_id: retiro.id })
+        .eq("id", fila.id);
+    }
+    await reprogramarEnvio(admin, fila.id, 6 * 60);
+    return {
+      reference: fila.reference,
+      estado: "pickup_scheduled",
+      accion: "retiro vigente",
+      nota: `${retiro.date}${retiro.window ? ` ${retiro.window}` : ""}`,
+    };
+  }
+
+  // Anulado, desaparecido o con la fecha atrás: el vendedor tiene que decidir.
+  const motivo = retiro ? `la ventana del ${retiro.date} pasó sin que retiraran` : "el retiro se anuló o desapareció de Shipit";
+  const ok = await transicionEnvio(admin, fila.id, "pickup_scheduled", "pickup_failed", {
+    pickup_date: retiro?.date ?? null,
+    pickup_window: retiro?.window ?? null,
+  });
+  if (!ok) return { reference: fila.reference, estado: "pickup_scheduled", accion: "ya avanzó (otro proceso)" };
+
+  await admin
+    .from("orders")
+    .update({ shipping_status: "pickup_failed", shipping_updated_at: new Date().toISOString() })
+    .eq("bundle_id", fila.bundle_id);
+
+  await avisarRetiroFallido(admin, fila, motivo, modo);
+
+  return { reference: fila.reference, estado: "pickup_failed", accion: "retiro fallido", nota: motivo };
+}
+
+/**
+ * Correo al vendedor con las tres salidas y gong a Vero. El correo sale una
+ * sola vez por envío (guarda en shipit_events, igual que pasoNotificar): si el
+ * vendedor no hace nada, no se le insiste por correo — el estado ya está en
+ * Mis Ventas.
+ */
+async function avisarRetiroFallido(admin: Admin, fila: ShipmentRow, motivo: string, modo: ShipitMode): Promise<void> {
+  const { data: yaAvisado } = await admin
+    .from("shipit_events")
+    .select("id")
+    .eq("shipment_id", fila.id)
+    .eq("kind", "email")
+    .eq("note", "retiro-fallido")
+    .limit(1);
+  if (yaAvisado?.length) return;
+
+  const [{ data: vendedor }, { data: bundle }] = await Promise.all([
+    admin.from("users").select("full_name, email").eq("id", fila.seller_id).single(),
+    admin.from("orders").select("listing:listings(book:books(title))").eq("bundle_id", fila.bundle_id).order("created_at"),
+  ]);
+
+  const titulos = (bundle ?? [])
+    .map((o: any) => (Array.isArray(o.listing) ? o.listing[0] : o.listing)?.book)
+    .map((b: any) => (Array.isArray(b) ? b[0] : b)?.title)
+    .filter((t: unknown): t is string => typeof t === "string" && t.length > 0);
+
+  const correo = vendedor?.email === "vero@tuslibros.cl" ? VERO_INBOX : vendedor?.email;
+  if (correo) {
+    const m = correoVendedorRetiroFallido({
+      vendedorNombre: vendedor?.full_name ?? null,
+      titulos,
+      courier: fila.courier,
+      motivo,
+    });
+    const r = await sendEmail({ to: correo, from: REMITENTE_VERO, replyTo: REPLY_TO_VERO, subject: m.subject, html: m.html });
+    await registrarEventoShipit(admin, {
+      shipmentId: fila.id,
+      kind: "email",
+      mode: modo,
+      note: "retiro-fallido",
+      response: { resend_id: r?.id ?? null, to: correo, subject: m.subject },
+      httpStatus: r?.id ? 200 : null,
+    });
+  }
+
+  await sendGong(
+    [
+      `🟠 Retiro fallido en ${escapeHtml(fila.reference)}: ${escapeHtml(motivo)}.`,
+      `• ${escapeHtml(titulos.join(" · ") || "sin títulos")}`,
+      `• ${escapeHtml(vendedor?.full_name ?? fila.seller_id)} · ${escapeHtml(fila.courier ?? "")}`,
+      `El vendedor tiene las tres salidas en Mis Ventas: reagendar, dejarlo en sucursal o cancelar la venta.`,
+    ].join("\n")
+  );
+}
+
 /* ────────────────────── notified → pickup_scheduled ────────────────────── */
 
 /**
@@ -593,10 +745,18 @@ async function pasoRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pr
     await reprogramarEnvio(admin, fila.id, 6 * 60);
     return { reference: fila.reference, estado: "notified", accion: "sin retiro agendado" };
   }
+  // El vendedor ya dijo que este retiro no va (eligió dejarlo en sucursal).
+  // Shipit puede seguir mostrándolo si el DELETE no pasó; no se le vuelve a
+  // anunciar un camión que él descartó.
+  if (fila.pickup_dismissed_id && retiro.id === fila.pickup_dismissed_id) {
+    await reprogramarEnvio(admin, fila.id, 6 * 60);
+    return { reference: fila.reference, estado: "notified", accion: "retiro descartado por el vendedor" };
+  }
 
   const ok = await transicionEnvio(admin, fila.id, "notified", "pickup_scheduled", {
     pickup_date: retiro.date,
     pickup_window: retiro.window,
+    pickup_id: retiro.id,
   });
   if (!ok) return { reference: fila.reference, estado: "notified", accion: "ya avanzó (otro proceso)" };
 

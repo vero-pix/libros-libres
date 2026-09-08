@@ -16,6 +16,19 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: "Cancelado",
 };
 
+/**
+ * Qué está pasando con el despacho, en una línea, para el que compró. Sale de
+ * `orders.shipping_status`, que el worker de Shipit espeja desde `shipments`.
+ *
+ * Existe por la pieza B (08-09-2026): cuando un retiro falla, el comprador
+ * tiene que enterarse por la misma pantalla y no por el silencio.
+ */
+const ENVIO_TEXTO: Record<string, string> = {
+  pickup_scheduled: "El courier va a buscar tu paquete donde el vendedor. Cuando lo tenga, el seguimiento empieza a moverse.",
+  pickup_failed: "El retiro no se concretó y el vendedor está decidiendo cómo despacharlo. Te aviso apenas el paquete salga; no tienes que hacer nada.",
+  canceled: "Esta compra quedó cancelada porque el vendedor no pudo despacharla. Te devuelvo la plata por MercadoPago.",
+};
+
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
   paid: "bg-blue-100 text-blue-800",
@@ -171,6 +184,11 @@ function BundleCard({ group, esComprador }: { group: OrderGroup; esComprador: bo
               </span>
             )}
           </div>
+          {ENVIO_TEXTO[(group.firstOrder as any).shipping_status] && (
+            <p className="mt-2 text-xs text-amber-700">
+              {ENVIO_TEXTO[(group.firstOrder as any).shipping_status]}
+            </p>
+          )}
         </div>
       </div>
     </Link>

@@ -33,6 +33,7 @@ export const SHIPMENT_STATUSES = [
   "label_ready",
   "notified",
   "pickup_scheduled",
+  "pickup_failed",
   "in_transit",
   "delivered",
   "needs_origin",
@@ -60,6 +61,8 @@ export interface ShipmentRow {
   label_path: string | null;
   pickup_date: string | null;
   pickup_window: string | null;
+  pickup_id: number | null;
+  pickup_dismissed_id: number | null;
   quoted_cost: number | null;
   real_cost: number | null;
   attempts: number;
@@ -81,6 +84,20 @@ export type ShipitEventKind =
   | "dry-run"
   | "transition"
   | "error";
+
+/**
+ * Hoy en Chile como `YYYY-MM-DD`. `pickup_date` es un `date` de Postgres y
+ * compararlo contra UTC adelanta el día: a las 21:00 de Chile ya es mañana en
+ * UTC y un retiro vigente se leería como vencido.
+ */
+export function hoyEnChile(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Santiago",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
 
 /** Minutos de espera según el número de intentos fallidos. */
 export const BACKOFF_MIN = [1, 5, 15, 60, 240] as const;

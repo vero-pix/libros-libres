@@ -103,3 +103,68 @@ export function correoCompradorTracking(d: DatosCorreoEtiqueta): { subject: stri
   `);
   return { subject, html };
 }
+
+export interface DatosCorreoRetiroFallido {
+  vendedorNombre: string | null;
+  titulos: string[];
+  courier: string | null;
+  /** Qué pasó, en las palabras del worker: "la ventana del 2026-09-08 pasó sin que retiraran". */
+  motivo: string;
+}
+
+/**
+ * Correo 3 · al vendedor cuando el retiro no se concretó.
+ *
+ * La regla de la casa: nunca dejar una pantalla de compra sin salida. Acá el
+ * equivalente es no dejar al vendedor con un aviso de que algo falló y el
+ * único camino de escribirle a Vero. Las tres salidas están en Mis Ventas y
+ * el correo solo las nombra.
+ */
+export function correoVendedorRetiroFallido(d: DatosCorreoRetiroFallido): { subject: string; html: string } {
+  const courier = nombreCourier(d.courier);
+  const libros = queLibros(d.titulos);
+  const asuntoQue = d.titulos.length > 1 ? `${d.titulos.length} libros` : d.titulos[0] ?? "tu libro";
+  const subject = `El retiro no se concretó — ${asuntoQue}`;
+  const html = marco(`
+    <p>Hola ${esc(primerNombre(d.vendedorNombre, "vendedor"))}!</p>
+    <p>El retiro de ${libros.corto} quedó sin hacerse: ${esc(d.motivo)}. No es tu culpa ni un problema con la venta — el paquete sigue vendido y pagado, solo hay que decidir cómo sale.${libros.lista}</p>
+    <p>En Mis Ventas tienes tres botones, y cualquiera de los tres resuelve solo, sin escribirme:</p>
+    <ul style="padding-left:20px">
+      <li><strong>Pedir otro retiro</strong> — vuelven a pasar a buscarlo. Yo coordino la ventana con Shipit y te aviso.</li>
+      <li><strong>Lo dejo en sucursal</strong> — anulo el retiro para que nadie viaje al vacío y tú llevas el paquete con la misma etiqueta a ${esc(courier)}.</li>
+      <li><strong>No puedo despacharlo</strong> — cancelo la venta, le aviso al comprador, le devuelvo la plata y tu libro vuelve a quedar publicado.</li>
+    </ul>
+    ${boton(`${SITE}/mis-ventas`, "Elegir qué hacer")}
+    <p>La etiqueta que ya tienes sigue sirviendo, no hay que imprimir otra.</p>
+  `);
+  return { subject, html };
+}
+
+export interface DatosCorreoVentaCancelada {
+  compradorNombre: string | null;
+  titulos: string[];
+  /** Total pagado por el bundle, en pesos. */
+  total: number;
+}
+
+/**
+ * Correo 4 · al comprador cuando el vendedor no pudo despachar.
+ *
+ * El reembolso lo hace Vero a mano en MercadoPago (el split ya pagó al
+ * vendedor), así que el correo promete el plazo real y no pide nada al
+ * comprador salvo esperar.
+ */
+export function correoCompradorVentaCancelada(d: DatosCorreoVentaCancelada): { subject: string; html: string } {
+  const libros = queLibros(d.titulos);
+  const asuntoQue = d.titulos.length > 1 ? `tus ${d.titulos.length} libros` : d.titulos[0] ?? "tu libro";
+  const subject = `Tuve que cancelar tu compra — ${asuntoQue}`;
+  const monto = new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(d.total);
+  const html = marco(`
+    <p>Hola ${esc(primerNombre(d.compradorNombre, ""))}! Soy Vero de tuslibros.cl.</p>
+    <p>Malas noticias con ${libros.corto}: el vendedor no pudo despacharlo y preferí cancelar la compra antes que tenerte esperando un paquete que no iba a llegar.${libros.lista}</p>
+    <p><strong>Te devuelvo los ${esc(monto)} completos</strong>, envío incluido. El reembolso lo hago por MercadoPago, por la misma vía en que pagaste, dentro de los próximos días hábiles. No tienes que hacer nada.</p>
+    <p>Si el libro te seguía interesando, escríbeme respondiendo este correo y lo busco en el catálogo o te aviso cuando aparezca otro ejemplar.</p>
+    <p>Lamento el paseo.</p>
+  `);
+  return { subject, html };
+}
