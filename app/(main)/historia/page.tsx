@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { createPublicClient } from "@/lib/supabase/public";
 
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
     description:
       "Una primera versión, una pausa obligada, y una segunda oportunidad.",
     type: "article",
+    images: [{ url: "/img/vero-og.jpg", width: 1200, height: 630, alt: "Vero, la persona detrás de tuslibros.cl" }],
   },
 };
 
@@ -66,6 +68,22 @@ export default async function HistoriaPage() {
             Por Vero
           </p>
         </header>
+
+        {/* El retrato va antes del relato: quien entra acá quiere saber quién
+            escribe. `priority` porque es el LCP de la página. Con tope de
+            altura: la foto es vertical y a ancho completo dejaba el relato
+            bajo el pliegue en móvil; el foco va sobre la cara. */}
+        <figure className="mb-12">
+          <Image
+            src="/img/vero-retrato.jpg"
+            alt="Vero, la persona detrás de tuslibros.cl"
+            width={1086}
+            height={1448}
+            priority
+            sizes="(max-width: 640px) 100vw, 672px"
+            className="w-full max-h-[420px] sm:max-h-[520px] rounded-2xl object-cover object-[center_28%] shadow-sm"
+          />
+        </figure>
 
         {/* Body */}
         <div className="space-y-6 text-ink-muted leading-relaxed text-lg">

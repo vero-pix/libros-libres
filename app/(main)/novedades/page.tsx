@@ -10,6 +10,11 @@ export const metadata = {
   description:
     "Lo que pasó en tuslibros.cl: el catálogo casi se dobló en un mes (ya son 1.380 libros), 178 títulos nuevos en una semana, colecciones editoriales, ficha de compra rediseñada y publicar sin fricción.",
   alternates: { canonical: "https://tuslibros.cl/novedades" },
+  openGraph: {
+    title: "Diario de tuslibros.cl",
+    description: "Lo que se arregla, lo que se estrena y lo que se aprende, contado por quien lo hace.",
+    images: [{ url: "/img/vero-og.jpg", width: 1200, height: 630, alt: "Vero, la persona detrás de tuslibros.cl" }],
+  },
 };
 
 export const revalidate = 300;
@@ -1511,8 +1516,23 @@ export default async function NovedadesPage() {
           <p className="text-base md:text-lg text-cream max-w-2xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "120ms" }}>
             Esta semana el sitio dejó de depender de mí para despachar: la etiqueta se genera sola.
             Y estrené dos cosas que van juntas, reseñas verificadas y una sección de librerías de
-            confianza en la portada, para que se note quién vende y responde. Lo escribo yo. — Vero
+            confianza en la portada, para que se note quién vende y responde.
           </p>
+          {/* Firma con cara: el diario está escrito en primera persona y hasta
+              ahora la persona no aparecía por ninguna parte. */}
+          <div className="flex items-center gap-3 mt-5 animate-fade-in-up" style={{ animationDelay: "150ms" }}>
+            <Image
+              src="/img/vero-retrato-sq.jpg"
+              alt="Vero, la persona detrás de tuslibros.cl"
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full object-cover border border-cream/40 shrink-0"
+            />
+            {/* `text-cream` sin fracción: las variantes text-cream/N no generan
+                CSS en este proyecto (el color es un hex dentro de una var, no
+                canales), así que el texto heredaba el azul del padre. */}
+            <span className="text-sm text-cream">Lo escribo yo. — Vero</span>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 animate-fade-in-up" style={{ animationDelay: "180ms" }}>
             {[
               // Los contadores no pueden formar un cuociente entre sí: "vendidos"

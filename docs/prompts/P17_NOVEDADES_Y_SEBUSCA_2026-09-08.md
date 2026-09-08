@@ -50,6 +50,19 @@ MÉTRICA
    con orden, comprados por el solicitante. Suma la línea "Se busca:
    cumplidos / vendidos / al solicitante" al cron daily-summary.
 
+FOTO DE VERO (archivo ya en public/img/vero-retrato-original.png, 1086×1448)
+8. Genera con sharp: vero-retrato.jpg (hero, 1086 ancho, calidad 82),
+   vero-retrato-sq.jpg (cuadrado 480×480 centrado en la cara, para firma y
+   avatar), vero-og.jpg (1200×630, recorte horizontal con cara a la
+   derecha y libros a la izquierda). Borra el PNG original del repo tras
+   generar (2,4 MB, no va a producción).
+   Colócala en: (a) app/(main)/historia/page.tsx, arriba del relato,
+   antes del reel, con alt "Vero, la persona detrás de tuslibros.cl";
+   (b) firma del diario en /novedades junto a "Lo escribo yo. — Vero",
+   versión cuadrada de 40 px; (c) avatar de la tienda "vero"
+   (users.avatar_url o el bucket que corresponda); (d) openGraph.images de
+   /historia y /novedades con vero-og.jpg. NO en la home.
+
 Verificación: npm run build; /novedades en móvil con las cuatro cosas
 visibles; un pedido de prueba sin correo se rechaza; un pedido con correo
 + listing que calza dispara correo al solicitante y al vendedor (usa

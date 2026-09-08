@@ -35,9 +35,19 @@ export default function SobreNosotrosPage() {
     <div className="min-h-screen bg-cream">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }} />
 
-      {/* Hero — encabezado limpio de marca (sin foto stock, mejor contraste) */}
+      {/* Hero. La foto va acá y no a media página: el encabezado decía "Hola,
+          soy Vero" sobre un espacio vacío, y quien entra a esta página entra a
+          ver quién está detrás. `priority` porque es el LCP de la página. */}
       <div className="bg-cream-warm border-b border-cream-dark">
-        <div className="max-w-3xl mx-auto px-4 py-16 sm:py-20 text-center">
+        <div className="max-w-3xl mx-auto px-4 py-14 sm:py-16 text-center">
+          <Image
+            src="/img/vero-retrato-sq.jpg"
+            alt="Verónica Velásquez, fundadora de tuslibros.cl"
+            width={480}
+            height={480}
+            priority
+            className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover border-4 border-white shadow-md mx-auto mb-6"
+          />
           <h1 className="font-display text-4xl sm:text-5xl font-bold text-ink mb-3">Hola, soy Vero</h1>
           <p className="text-ink-muted text-lg max-w-xl mx-auto">Y esta es la historia detrás de tuslibros.cl</p>
         </div>
@@ -82,14 +92,8 @@ export default function SobreNosotrosPage() {
           <h2 className="text-2xl font-bold text-ink mb-4 border-b-2 border-brand-600 pb-2 inline-block">
             Un poco más de mí
           </h2>
-          <div className="bg-white rounded-xl shadow-sm border border-cream-dark p-6 sm:flex sm:items-start sm:gap-6">
-            <Image
-              src="/vero.jpg"
-              alt="Verónica Velásquez, fundadora de tuslibros.cl"
-              width={112}
-              height={112}
-              className="w-28 h-28 rounded-full object-cover border-2 border-brand-600/30 shrink-0 mx-auto sm:mx-0 mb-4 sm:mb-0"
-            />
+          {/* Sin foto acá: ahora está en el encabezado y repetirla sobraba. */}
+          <div className="bg-white rounded-xl shadow-sm border border-cream-dark p-6">
             <div className="space-y-4 text-ink-muted leading-relaxed">
               <p>
                 Soy economista e ingeniera comercial, y llevo años emprendiendo. tuslibros.cl lo construí yo misma —sí, programando— apoyándome en inteligencia artificial para hacer sola lo que antes habría necesitado un equipo entero. Me gusta esa idea: una persona con una obsesión y las herramientas de hoy alcanzan para construir algo real.
