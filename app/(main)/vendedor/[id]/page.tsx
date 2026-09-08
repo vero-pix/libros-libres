@@ -42,7 +42,10 @@ export async function generateMetadata({ params }: Props) {
   // Sin "| tuslibros.cl": el template de app/layout.tsx ya lo agrega ("%s | tuslibros.cl").
   // Venía duplicado en la pestaña y en el resultado de Google.
   const title = `${name} — Libros usados${location}`;
-  const description = `Compra libros de ${name}${location}.${bio} Envío seguro con MercadoPago o coordinación por WhatsApp.`;
+  // Antes prometía "coordinación por WhatsApp" en TODOS los vendedores, incluidos
+  // aquellos a los que la política de WhatsApp les esconde el botón por tener
+  // MercadoPago: Google mostraba algo que la página no cumplía. (08-09-2026)
+  const description = `Compra libros de ${name}${location}.${bio} Pago protegido con MercadoPago y despacho a todo Chile.`;
   const slug = seller?.username ?? params.id;
   const canonicalUrl = `https://tuslibros.cl/vendedor/${slug}`;
 
@@ -104,26 +107,46 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
     listings = sortListingsForDisplay(listings);
   }
 
-  // Seller reviews: reviews for all listings owned by this seller
-  const listingIds = listings.map((l) => l.id);
-  let sellerReviews: { id: string; rating: number; comment: string | null; created_at: string; reviewer: { full_name: string | null } | null; listing: { id: string; book: { title: string } } | null }[] = [];
-  let avgRating = 0;
-  let totalReviews = 0;
+  // Reseñas del vendedor. Se consultan por `seller_id`, no por la lista de
+  // listings: así también aparecen las de ejemplares ya vendidos, que es
+  // justamente donde hay reseña. Las ocultas las filtra la RLS.
+  const { data: reviewsData } = await supabase
+    .from("reviews")
+    .select("id, rating, comment, created_at, reviewer:users!reviewer_id(full_name), listing:listings!listing_id(id, book:books(title))")
+    .eq("seller_id", seller.id)
+    .order("created_at", { ascending: false })
+    .limit(10);
+  // PostgREST tipa las relaciones como arreglos aunque sean uno a uno; el
+  // render las lee con la forma singular, igual que antes de este cambio.
+  const sellerReviews = (reviewsData ?? []) as unknown as {
+    id: string; rating: number; comment: string | null; created_at: string;
+    reviewer: { full_name: string | null } | null;
+    listing: { id: string; book: { title: string } } | null;
+  }[];
 
-  if (listingIds.length > 0) {
-    const { data: reviewsData } = await supabase
-      .from("reviews")
-      .select("id, rating, comment, created_at, reviewer:users!reviewer_id(full_name), listing:listings!listing_id(id, book:books(title))")
-      .in("listing_id", listingIds)
-      .order("created_at", { ascending: false })
-      .limit(10);
+  // Agregados ya calculados por el cron. El promedio y el conteo salen de acá y
+  // no de las 10 reseñas de arriba: contar sobre una página daba "10 reseñas"
+  // aunque hubiera 40.
+  const { data: stats } = await supabase
+    .from("seller_stats")
+    .select("paid_total, reviews_count, reviews_avg, courier_habitual")
+    .eq("seller_id", seller.id)
+    .maybeSingle();
 
-    sellerReviews = (reviewsData as any) ?? [];
-    totalReviews = sellerReviews.length;
-    if (totalReviews > 0) {
-      avgRating = sellerReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews;
-    }
-  }
+  const ventasPlataforma = stats?.paid_total ?? 0;
+  const totalReviews = stats?.reviews_count ?? 0;
+  const avgRating = stats?.reviews_avg != null ? Number(stats.reviews_avg) : 0;
+  // Bajo 3 reseñas no se publica promedio (decisión C5): con una o dos, una
+  // sola opinión define la nota de la tienda entera.
+  const MIN_RESENAS_PARA_PROMEDIO = 3;
+  const mostrarPromedio = totalReviews >= MIN_RESENAS_PARA_PROMEDIO;
+
+  // Courier del último envío real. Viene de seller_stats y no de `shipments`
+  // porque esa tabla es privada por RLS: para un visitante anónimo la consulta
+  // volvía vacía y la línea no aparecía nunca. Si nunca despachó, no se muestra.
+  const courierHabitual = stats?.courier_habitual
+    ? stats.courier_habitual.charAt(0).toUpperCase() + stats.courier_habitual.slice(1)
+    : null;
 
   // Stats
   const totalListings = listings.length;
@@ -188,6 +211,21 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
               )}
             </div>
 
+            {/* Prueba de que la tienda funciona: venta, reseñas y despacho. */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 text-sm text-gray-600">
+              {ventasPlataforma > 0 && (
+                <span className="font-medium text-gray-900">
+                  {ventasPlataforma} {ventasPlataforma === 1 ? "venta" : "ventas"} por la plataforma
+                </span>
+              )}
+              {courierHabitual && (
+                <>
+                  {ventasPlataforma > 0 && <span className="text-gray-300">·</span>}
+                  <span>Despacha con {courierHabitual}</span>
+                </>
+              )}
+            </div>
+
             {/* Stats */}
             <div className="flex gap-6 mt-4">
               <div>
@@ -196,7 +234,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
                   {totalListings === 1 ? "libro publicado" : "libros publicados"}
                 </p>
               </div>
-              {totalReviews > 0 && (
+              {mostrarPromedio && (
                 <div>
                   <p className="text-2xl font-bold text-gray-900">
                     {"★".repeat(Math.round(avgRating))}{"☆".repeat(5 - Math.round(avgRating))}{" "}
@@ -290,18 +328,10 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
                 @{(seller as any).instagram}
               </a>
             )}
-            {(seller as any).public_email && (
-              <a
-                href={`mailto:${(seller as any).public_email}`}
-                className="inline-flex items-center gap-2 px-4 py-2.5 border-2 border-blue-400 text-blue-500 hover:bg-blue-50 font-semibold rounded-xl transition-colors text-sm"
-              >
-                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-none stroke-current" xmlns="http://www.w3.org/2000/svg" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="4" width="20" height="16" rx="2" />
-                  <path d="M22 4l-10 8L2 4" />
-                </svg>
-                Email
-              </a>
-            )}
+            {/* El correo del vendedor ya no se publica (decisión C6, 08-09-2026):
+                era un dato personal expuesto y un canal fuera de la plataforma.
+                La columna `public_email` sigue en la base, solo deja de mostrarse.
+                El contacto va por la mensajería interna. */}
             <Link
               href={`/mensajes?to=${seller.id}`}
               className="inline-flex items-center gap-2 px-4 py-2.5 border-2 border-brand-400 text-brand-600 hover:bg-brand-50 font-semibold rounded-xl transition-colors text-sm"
@@ -350,12 +380,16 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
           </div>
         )}
 
-        {/* Seller reviews */}
-        {sellerReviews.length > 0 && (
-          <section className="mt-10 pt-8 border-t border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Reseñas recientes
-            </h2>
+        {/* Reseñas de compradores */}
+        <section className="mt-10 pt-8 border-t border-gray-100">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Reseñas de compradores
+          </h2>
+          {sellerReviews.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              Aún sin reseñas. Las primeras compras entregadas aparecerán aquí.
+            </p>
+          ) : (
             <div className="space-y-3">
               {sellerReviews.map((r) => (
                 <div key={r.id} className="bg-gray-50 rounded-lg p-4">
@@ -380,9 +414,39 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
                 </div>
               ))}
             </div>
-          </section>
-        )}
+          )}
+        </section>
       </main>
+
+      {/* JSON-LD. La página no tenía ninguno: se agrega el Organization y, solo
+          con 3 reseñas o más, el aggregateRating. Publicarlo con una sola reseña
+          hace que Google muestre una estrella que no representa nada. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: seller.full_name,
+            url: `https://tuslibros.cl/vendedor/${seller.username ?? seller.id}`,
+            ...(seller.avatar_url ? { logo: seller.avatar_url } : {}),
+            ...(seller.city
+              ? { address: { "@type": "PostalAddress", addressLocality: seller.city, addressCountry: "CL" } }
+              : {}),
+            ...(mostrarPromedio
+              ? {
+                  aggregateRating: {
+                    "@type": "AggregateRating",
+                    ratingValue: avgRating.toFixed(1),
+                    reviewCount: totalReviews,
+                    bestRating: 5,
+                    worstRating: 1,
+                  },
+                }
+              : {}),
+          }),
+        }}
+      />
     </div>
   );
 }
