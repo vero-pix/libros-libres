@@ -183,7 +183,7 @@ paso para revisión:
 
 a) Migración: seller_stats, reviews (o ajustes), featured_seller_blocked,
    config de tienda de la semana. RLS.
-b) Refresco de seller_stats + trust_score. Script scripts/_seller_stats.mjs
+b) Refresco de seller_stats + trust_score. Script scripts/seller-stats.mjs
    que imprima la tabla de is_trusted=true ordenada por score, para
    validar contra la tabla del PROMPT 1.
 c) Componente TrustedStoreCard + sección del home. Solo is_trusted y
@@ -477,7 +477,7 @@ Excepción razonable: llamar al refresco de **un** vendedor cuando una orden pas
 - `components/home/TrustedStoresSection.tsx` (sección completa)
 - `components/home/TrustedStoreCard.tsx` (tarjeta estándar, slot casa y slot semana como variantes)
 - `app/(main)/resena/[orderId]/page.tsx`
-- `scripts/_seller_stats.mjs` (validación: imprime `is_trusted` ordenado por score)
+- `scripts/seller-stats.mjs` (validación: imprime `is_trusted` ordenado por score)
 
 **Modificados**
 - `app/(main)/page.tsx` — sacar `getFeaturedSellers` (líneas 338-371), leer `seller_stats`
