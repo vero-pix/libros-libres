@@ -31,7 +31,7 @@
  *   node scripts/outreach_activacion.mjs                 # dry-run, las 3 cohortes
  *   node scripts/outreach_activacion.mjs --cohort=A
  *   node scripts/outreach_activacion.mjs --send --cohort=A --max=13
- *   node scripts/outreach_activacion.mjs --send --test    # solo a Vero, 1 por plantilla
+ *   node scripts/outreach_activacion.mjs --send --test    # solo a Vero (VERO_INBOX_EMAIL), 1 por plantilla
  */
 import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
@@ -57,18 +57,26 @@ const LINK_PUBLISH = `${SITE}/publish`;
 // sesión, así el enlace del correo no pierde el clic (ver esa ruta, 08-09-2026).
 const LINK_MP = `${SITE}/api/auth/mercadopago`;
 const FROM = "Vero de tuslibros.cl <noreply@tuslibros.cl>";
-const REPLY_TO = "veronicavelasquez@mac.com"; // vero@tuslibros.cl está suspendida
-const TEST_TO = "veronicavelasquez@mac.com";
+// Buzón de Vero: sale de VERO_INBOX_EMAIL, igual que lib/veroInbox.ts. Con
+// Google Workspace caído apunta al correo personal, así que no va escrito acá
+// —este repo es público— y cuando Workspace vuelva se arregla solo.
+const REPLY_TO = process.env.VERO_INBOX_EMAIL || "vero@tuslibros.cl";
+const TEST_TO = REPLY_TO;
 
 // Cuentas internas + el bot que escapó a la heurística de botDetection.ts (B.6).
-const EXCLUIDOS = new Set([
-  "vero@economics.cl",
-  "veronicavelasquez@mac.com",
-  "veronicavelasquez@tuslibros.com",
-  "capir@tuslibros.cl",
-  "mislibros@yopmail.com",
-  "roger.floyd@atco.com",
-]);
+// El buzón personal de Vero entra por VERO_INBOX_EMAIL, no escrito acá: este
+// repo es público.
+const EXCLUIDOS = new Set(
+  [
+    "vero@economics.cl",
+    "vero@tuslibros.cl",
+    "veronicavelasquez@tuslibros.com",
+    "capir@tuslibros.cl",
+    "mislibros@yopmail.com",
+    "roger.floyd@atco.com",
+    REPLY_TO,
+  ].map((e) => e.toLowerCase())
+);
 
 // ─────────────────────────────────────────────────────────── helpers
 
