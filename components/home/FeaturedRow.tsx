@@ -3,30 +3,14 @@ import Image from "next/image";
 import type { ListingWithBook } from "@/types";
 import { libroUrl } from "@/lib/urls";
 
-interface FeaturedSeller {
-  id: string;
-  full_name: string;
-  avatar_url: string | null;
-  city?: string | null;
-  bio?: string | null;
-  username?: string | null;
-  _listing_count?: number;
-}
-
 interface Props {
   featuredListings: ListingWithBook[];
-  featuredSellers: FeaturedSeller[];
 }
 
-export default function FeaturedRow({ featuredListings, featuredSellers }: Props) {
-  if (featuredListings.length === 0 && featuredSellers.length === 0) return null;
-
-  // Orden aleatorio en cada carga para que ningún vendedor quede siempre arriba.
-  const shuffledSellers = [...featuredSellers];
-  for (let i = shuffledSellers.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffledSellers[i], shuffledSellers[j]] = [shuffledSellers[j], shuffledSellers[i]];
-  }
+export default function FeaturedRow({ featuredListings }: Props) {
+  // Las tiendas se movieron a TrustedStoresSection (08-09-2026): salían del flag
+  // users.featured, sin orden y barajadas en cada carga. Acá quedan solo libros.
+  if (featuredListings.length === 0) return null;
 
   return (
     <div className="space-y-8 mb-8">
@@ -89,63 +73,6 @@ export default function FeaturedRow({ featuredListings, featuredSellers }: Props
         </section>
       )}
 
-      {/* Vendedores destacados */}
-      {featuredSellers.length > 0 && (
-        <section>
-          <div className="flex items-center gap-2 mb-4">
-            <h2 className="font-display text-base font-semibold text-ink">Librerías de confianza</h2>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">· {featuredSellers.length} tiendas</span>
-          </div>
-          <div className="overflow-hidden -mx-2 px-2">
-            <div
-              className="marquee-track flex gap-4 w-max pb-2"
-              style={{ ["--marquee-duration" as string]: `${shuffledSellers.length * 7}s` }}
-            >
-            {[...shuffledSellers, ...shuffledSellers].map((seller, i) => (
-              <Link
-                key={`${seller.id}-${i}`}
-                href={`/vendedor/${seller.username ?? seller.id}`}
-                className="group flex-shrink-0 w-64 flex items-center gap-3 bg-white rounded-xl border border-cream-dark/30 p-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
-              >
-                <div className="relative w-14 h-14 rounded-full bg-brand-100 flex items-center justify-center overflow-hidden border-2 border-amber-300 shrink-0 group-hover:border-brand-500 transition-colors">
-                  {seller.avatar_url ? (
-                    <Image
-                      src={seller.avatar_url}
-                      alt={seller.full_name}
-                      fill
-                      className="object-cover"
-                      sizes="56px"
-                    />
-                  ) : (
-                    <span className="text-brand-600 font-bold text-xl">
-                      {seller.full_name[0]?.toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-ink group-hover:text-brand-600 transition-colors truncate">
-                    {seller.full_name}
-                  </p>
-                  {seller.city && (
-                    <p className="text-xs text-ink-muted truncate">
-                      {seller.city}
-                    </p>
-                  )}
-                  <div className="flex items-center gap-2 mt-1">
-                    {seller._listing_count != null && (
-                      <span className="text-xs text-ink-muted">{seller._listing_count} libros</span>
-                    )}
-                    <span className="text-xs font-semibold text-brand-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                      Ver tienda →
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-            </div>
-          </div>
-        </section>
-      )}
     </div>
   );
 }

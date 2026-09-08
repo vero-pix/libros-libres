@@ -13,6 +13,7 @@ import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
 import { getCachedCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import FeaturedRow from "@/components/home/FeaturedRow";
+import TrustedStoresSection from "@/components/home/TrustedStoresSection";
 import CollectibleRow from "@/components/home/CollectibleRow";
 import RecentRow from "@/components/home/RecentRow";
 import ColeccionRow from "@/components/home/ColeccionRow";
@@ -335,40 +336,107 @@ const getRecentListings = unstable_cache(
   { revalidate: 300 }
 );
 
-const getFeaturedSellers = unstable_cache(
+/**
+ * "Librerías de confianza" — sale de `seller_stats`, no del flag `users.featured`.
+ *
+ * El criterio viejo era `.eq("featured", true).limit(10)` sin ORDER BY: con 15
+ * marcados para 10 cupos, cuáles aparecían lo decidía Postgres, y los que más
+ * venden ni siquiera estaban marcados. Ahora manda `is_trusted` + `trust_score`,
+ * que refresca /api/cron/seller-stats cada hora.
+ *
+ * Dos slots aparte de la rotación (decisión C4), configurados en `site_config`:
+ * la selección de la casa (Vero, fija y rotulada) y la tienda de la semana.
+ */
+const getTrustedStores = unstable_cache(
   async () => {
     const supabase = createPublicClient();
-    const BARBARA_ID = "b075dd7f-bb0c-4379-8e60-1585bebdcb44";
-    
-    // 1. Buscamos a los destacados pero priorizando a Barbara
-    const { data } = await supabase
-      .from("users")
-      .select("id, full_name, avatar_url, city, bio, username")
-      .eq("featured", true)
-      .limit(10);
-      
-    if (!data) return [];
-    
-    // 2. Mover a Barbara al inicio si está en la lista, o asegurar que esté
-    let sortedSellers = [...data];
-    const barbaraIndex = sortedSellers.findIndex(s => s.id === BARBARA_ID);
-    if (barbaraIndex > -1) {
-      const [barbara] = sortedSellers.splice(barbaraIndex, 1);
-      sortedSellers.unshift(barbara);
+
+    const [{ data: config }, { data: stats }] = await Promise.all([
+      supabase.from("site_config").select("key, value").in("key", ["casa_slot", "tienda_semana"]),
+      supabase
+        .from("seller_stats")
+        .select(
+          "seller_id, paid_total, reviews_count, reviews_avg, top_listing_ids, trust_score, seller:users(username, full_name, city, avatar_url)"
+        )
+        .eq("is_trusted", true)
+        .order("trust_score", { ascending: false })
+        .limit(12),
+    ]);
+
+    const conf = (k: string) => (config ?? []).find((c) => c.key === k)?.value as Record<string, any> | undefined;
+    const casaConf = conf("casa_slot");
+    const semanaConf = conf("tienda_semana");
+
+    // La casa no está en `is_trusted` (C3 excluye a vero), así que se trae aparte.
+    let casaStat: any = null;
+    if (casaConf?.activo && casaConf?.seller_id) {
+      const { data } = await supabase
+        .from("seller_stats")
+        .select(
+          "seller_id, paid_total, reviews_count, reviews_avg, top_listing_ids, seller:users(username, full_name, city, avatar_url)"
+        )
+        .eq("seller_id", casaConf.seller_id)
+        .maybeSingle();
+      casaStat = data;
     }
 
-    return Promise.all(
-      sortedSellers.map(async (seller) => {
-        const { count } = await supabase
-          .from("listings")
-          .select("id", { count: "exact", head: true })
-          .eq("seller_id", seller.id)
-          .eq("status", "active");
-        return { ...seller, _listing_count: count ?? 0 };
-      })
+    // Tienda de la semana: la fijada si sigue vigente; si no, el mejor score que
+    // no sea el de la semana pasada ni libro.de.ocasion (no abre ni repite, C4).
+    const hoy = new Date().toISOString().slice(0, 10);
+    const vigente = semanaConf?.seller_id && (!semanaConf?.until || semanaConf.until >= hoy);
+    const nombre = (s: any) => (Array.isArray(s?.seller) ? s.seller[0] : s?.seller) ?? {};
+    let semanaStat =
+      (vigente ? (stats ?? []).find((s) => s.seller_id === semanaConf!.seller_id) : null) ??
+      (stats ?? []).find(
+        (s) => s.seller_id !== semanaConf?.anterior && nombre(s).username !== "libro.de.ocasion"
+      ) ??
+      null;
+
+    const rotativas = (stats ?? []).filter((s) => s.seller_id !== semanaStat?.seller_id).slice(0, 8);
+
+    // Una sola consulta para todas las portadas de todas las tarjetas.
+    const ids = Array.from(
+      new Set([casaStat, semanaStat, ...rotativas].flatMap((s: any) => s?.top_listing_ids ?? []))
     );
+    const { data: portadas } = ids.length
+      ? await supabase
+          .from("listings")
+          .select("id, cover_image_url, book:books(title, cover_url)")
+          .in("id", ids)
+      : { data: [] as any[] };
+    const porId = new Map((portadas ?? []).map((l: any) => [l.id, l]));
+
+    const armar = (s: any, frase?: string | null) => {
+      if (!s) return null;
+      const u = nombre(s);
+      return {
+        seller_id: s.seller_id,
+        username: u.username ?? null,
+        full_name: u.full_name ?? "Vendedor",
+        city: u.city ?? null,
+        avatar_url: u.avatar_url ?? null,
+        ventas: s.paid_total ?? 0,
+        reviews_count: s.reviews_count ?? 0,
+        reviews_avg: s.reviews_avg != null ? Number(s.reviews_avg) : null,
+        frase: frase ?? null,
+        portadas: (s.top_listing_ids ?? [])
+          .map((id: string) => porId.get(id))
+          .filter(Boolean)
+          .map((l: any) => {
+            const b = Array.isArray(l.book) ? l.book[0] : l.book;
+            // Con foto propia, book.cover_url viene null: manda cover_image_url.
+            return { id: l.id, url: l.cover_image_url ?? b?.cover_url ?? null, titulo: b?.title ?? "" };
+          }),
+      };
+    };
+
+    return {
+      casa: armar(casaStat, casaConf?.frase),
+      semana: armar(semanaStat, semanaConf?.frase),
+      tiendas: rotativas.map((s) => armar(s)).filter(Boolean) as NonNullable<ReturnType<typeof armar>>[],
+    };
   },
-  ["home-featured-sellers-v2"],
+  ["home-trusted-stores-v1"],
   { revalidate: 300 }
 );
 
@@ -442,9 +510,9 @@ export default async function HomePage({ searchParams }: Props) {
   const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || city_id || collectibleOnly);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
-  const [featuredListings, featuredSellers, collectibleListings, recentListings, collectionsRaw, totalActiveCount, availableTags, publicStats] = await Promise.all([
+  const [featuredListings, trustedStores, collectibleListings, recentListings, collectionsRaw, totalActiveCount, availableTags, publicStats] = await Promise.all([
     getFeaturedListings() as unknown as Promise<ListingWithBook[]>,
-    getFeaturedSellers(),
+    getTrustedStores(),
     getCollectibleListings() as unknown as Promise<ListingWithBook[]>,
     getRecentListings() as unknown as Promise<ListingWithBook[]>,
     getCollections() as unknown as Promise<{ tag: string; collectionSlug?: string; title: string; subtitle: string; listings: ListingWithBook[] }[]>,
@@ -564,8 +632,15 @@ export default async function HomePage({ searchParams }: Props) {
         hasFilters={hasFilters}
         heroBooks={heroBooks}
         featuredRow={
-          !hasFilters && (featuredRowListings.length > 0 || featuredSellers.length > 0) ? (
-            <FeaturedRow featuredListings={featuredRowListings} featuredSellers={featuredSellers} />
+          !hasFilters ? (
+            <>
+              {featuredRowListings.length > 0 && <FeaturedRow featuredListings={featuredRowListings} />}
+              <TrustedStoresSection
+                casa={trustedStores.casa}
+                semana={trustedStores.semana}
+                tiendas={trustedStores.tiendas}
+              />
+            </>
           ) : null
         }
         testimonialBanner={null /* testimonios viejos (Z./Camilo, abr) ocultos hasta tener nuevos */}
