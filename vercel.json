@@ -44,6 +44,10 @@
     {
       "path": "/api/cron/shipments",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/seller-stats",
+      "schedule": "0 * * * *"
     }
   ]
 }

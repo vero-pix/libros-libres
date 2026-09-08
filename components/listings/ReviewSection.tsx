@@ -72,26 +72,20 @@ export default function ReviewSection({ listingId }: Props) {
         setAlreadyReviewed(hasReview);
 
         if (!hasReview) {
-          // Check if user bought/rented
+          // Solo una orden ENTREGADA habilita la reseña (decisión C5). Antes
+          // bastaba con 'paid' o 'shipped', pero desde el 08-09-2026 la policy
+          // de la base exige 'delivered': ofrecer el formulario en ese caso era
+          // prometer algo que el servidor iba a rechazar.
           const { data: order } = await supabase
             .from("orders")
             .select("id")
             .eq("listing_id", listingId)
             .eq("buyer_id", user.id)
-            .in("status", ["paid", "shipped", "delivered"])
+            .eq("status", "delivered")
             .limit(1)
             .maybeSingle();
 
-          const { data: rental } = await supabase
-            .from("rentals")
-            .select("id")
-            .eq("listing_id", listingId)
-            .eq("renter_id", user.id)
-            .eq("status", "paid")
-            .limit(1)
-            .maybeSingle();
-
-          setCanReview(!!(order || rental));
+          setCanReview(!!order);
         }
       }
 
@@ -165,7 +159,9 @@ export default function ReviewSection({ listingId }: Props) {
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows={2}
-            maxLength={500}
+            /* 300 es el tope que valida el servidor (COMENTARIO_MAX en
+               app/api/reviews/route.ts). Antes decía 500 y el envío fallaba. */
+            maxLength={300}
             placeholder="Comentario (opcional)"
             className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
           />
