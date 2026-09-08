@@ -32,6 +32,12 @@ const STATUS_CONFIG: Record<
   },
 };
 
+/**
+ * Formas de entrega que no pasan por courier: las coordinan las dos personas.
+ * Mismo criterio que /api/orders/entregado y el webhook de MercadoPago.
+ */
+const EN_PERSONA = ["Entrega en persona", "Punto de retiro"];
+
 const STATUS_ALIAS: Record<string, string> = {
   paid: "success",
   approved: "success",
@@ -112,6 +118,16 @@ export default async function OrderPage({ params, searchParams }: Props) {
   // Tracking/courier viene de la order "cabeza" (la que tiene shipping_cost > 0)
   const headOrder = bundleOrders.find((o: any) => Number(o.shipping_cost) > 0) ?? order;
 
+  // Compra en persona ya pagada: el pago terminó, la entrega recién empieza y
+  // hay que decirle al comprador qué pasa ahora. Hasta el 08-09-2026 esta
+  // pantalla le decía "el vendedor coordinará la entrega" y lo mandaba al home:
+  // una compradora pagó, no encontró por dónde escribir y terminó en el
+  // WhatsApp de Vero.
+  const esEnPersona = EN_PERSONA.includes(headOrder.courier ?? "") || !headOrder.courier;
+  const mostrarCoordinacion = paymentStatus === "success" && isBuyer && esEnPersona;
+  const quienVende = seller?.full_name?.split(" ")[0] ?? "quien te vendió el libro";
+  const queCompro = isBundle ? `${bundleOrders.length} libros` : bundleOrders[0]?.listing?.book?.title ?? "un libro";
+
   return (
     <div className="min-h-screen bg-gray-50">
       {paymentStatus === "success" && (
@@ -127,7 +143,9 @@ export default async function OrderPage({ params, searchParams }: Props) {
             {config.title}
           </h1>
           <p className="text-gray-600 text-sm mb-6 text-center">
-            {config.description}
+            {mostrarCoordinacion
+              ? `Ya le avisé a ${quienVende}: te va a escribir para coordinar dónde y cuándo entregarte ${isBundle ? "los libros" : "el libro"}.`
+              : config.description}
           </p>
 
           <div className="border-t border-gray-100 pt-4 mb-6">
@@ -185,14 +203,50 @@ export default async function OrderPage({ params, searchParams }: Props) {
             )}
           </div>
 
-          <div className="flex gap-3 justify-center">
-            <Link
-              href="/"
-              className="bg-brand-500 hover:bg-brand-600 text-white font-medium px-6 py-2.5 rounded-md text-sm transition-colors"
-            >
-              Volver al inicio
-            </Link>
-          </div>
+          {mostrarCoordinacion ? (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-700 leading-relaxed">
+                <strong>No pagues nada al recibirlo</strong>: {isBundle ? "los libros ya están pagados" : "el libro ya está pagado"} acá.
+                Solo queda ponerse de acuerdo en el lugar y la hora.
+              </p>
+              {seller?.id && (
+                <Link
+                  href={`/mensajes?to=${seller.id}`}
+                  className="flex items-center justify-between gap-3 bg-brand-500 hover:bg-brand-600 text-white font-medium px-5 py-3 rounded-md text-sm transition-colors"
+                >
+                  <span className="truncate">Escribirle a {quienVende} para coordinar la entrega</span>
+                  <span aria-hidden>→</span>
+                </Link>
+              )}
+              <Link
+                href="/mis-pedidos"
+                className="flex items-center justify-between gap-3 border border-gray-300 text-gray-800 hover:bg-gray-50 font-medium px-5 py-3 rounded-md text-sm transition-colors"
+              >
+                <span>Ver mi pedido</span>
+                <span aria-hidden>→</span>
+              </Link>
+              <a
+                href={waSoporte(
+                  `Hola Vero, compré "${queCompro}" en tuslibros.cl con entrega en persona y todavía no me escriben para coordinar. ¿Me ayudas?`
+                )}
+                target="_blank"
+                rel="noopener"
+                className="flex items-center justify-between gap-3 border border-gray-300 text-gray-800 hover:bg-gray-50 font-medium px-5 py-3 rounded-md text-sm transition-colors"
+              >
+                <span>Pasaron dos días y no me escriben</span>
+                <span aria-hidden>→</span>
+              </a>
+            </div>
+          ) : (
+            <div className="flex gap-3 justify-center">
+              <Link
+                href="/"
+                className="bg-brand-500 hover:bg-brand-600 text-white font-medium px-6 py-2.5 rounded-md text-sm transition-colors"
+              >
+                Volver al inicio
+              </Link>
+            </div>
+          )}
 
           {paymentStatus === "failure" && isBuyer && (
             <div className="mt-8 border-t border-gray-100 pt-6">
