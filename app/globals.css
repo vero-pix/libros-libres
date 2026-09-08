@@ -39,6 +39,36 @@
     --line: #e0d6c2;
     --line-strong: #cbbd9f;
 
+
+    /* Los mismos colores en canales RGB. Existen porque Tailwind no puede
+       aplicar opacidad sobre un hex guardado en una variable: `text-cream/80`
+       compilaba a `rgb(#f6f0e8 / .8)`, que el navegador descarta, y la
+       propiedad quedaba sin efecto. Las variables hex de arriba se mantienen
+       porque hay CSS que las usa directo. (08-09-2026) */
+    --brand-500-rgb: 224 153 12;
+    --brand-600-rgb: 199 136 0;
+    --brand-950-rgb: 42 29 2;
+    --gold-rgb: 224 153 12;
+    --gold-deep-rgb: 168 110 0;
+    --ink-rgb: 26 61 160;
+    --ink-deep-rgb: 16 42 115;
+    --ink-night-rgb: 12 26 68;
+    --ink-light-rgb: 45 94 74;
+    --ink-muted-rgb: 90 98 115;
+    --coral-rgb: 223 82 57;
+    --coral-deep-rgb: 181 61 40;
+    --green-rgb: 45 94 74;
+    --green-deep-rgb: 27 61 46;
+    --paper-rgb: 244 238 226;
+    --paper-2-rgb: 236 228 211;
+    --paper-card-rgb: 251 247 238;
+    --paper-edge-rgb: 231 220 198;
+    --cream-rgb: 246 240 232;
+    --cream-warm-rgb: 228 221 209;
+    --cream-dark-rgb: 208 201 188;
+    --line-rgb: 224 214 194;
+    --line-strong-rgb: 203 189 159;
+
     --background: 40 33% 97%;
     --foreground: 222 47% 11%;
   }

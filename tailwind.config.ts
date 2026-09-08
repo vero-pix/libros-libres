@@ -9,6 +9,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // Los colores salen de `rgb(var(--x-rgb) / <alpha-value>)` y no de
+      // `var(--x)` directo: con el hex dentro de la variable, Tailwind no podía
+      // generar las variantes con opacidad y clases como `text-cream/80` o
+      // `border-cream-dark/30` no existían en el CSS compilado — cientos de
+      // usos en el sitio no hacían nada. (08-09-2026)
       colors: {
         brand: {
           50: "#fefcf5",
@@ -16,51 +21,51 @@ const config: Config = {
           200: "#fbe8b8",
           300: "#f8d98a",
           400: "#f0c040",
-          500: "var(--brand-500)",
-          600: "var(--brand-600)",
+          500: "rgb(var(--brand-500-rgb) / <alpha-value>)",
+          600: "rgb(var(--brand-600-rgb) / <alpha-value>)",
           700: "#966d09",
           800: "#7a580a",
           900: "#5e4408",
-          950: "var(--brand-950)",
+          950: "rgb(var(--brand-950-rgb) / <alpha-value>)",
         },
         gold: {
-          DEFAULT: "var(--gold)",
-          deep: "var(--gold-deep)",
+          DEFAULT: "rgb(var(--gold-rgb) / <alpha-value>)",
+          deep: "rgb(var(--gold-deep-rgb) / <alpha-value>)",
         },
         navy: {
-          DEFAULT: "var(--ink)",
-          light: "var(--ink-light)",
+          DEFAULT: "rgb(var(--ink-rgb) / <alpha-value>)",
+          light: "rgb(var(--ink-light-rgb) / <alpha-value>)",
           dark: "#1a120b",
         },
         ink: {
-          DEFAULT: "var(--ink)",
-          deep: "var(--ink-deep)",
-          night: "var(--ink-night)",
-          light: "var(--ink-light)",
-          muted: "var(--ink-muted)",
+          DEFAULT: "rgb(var(--ink-rgb) / <alpha-value>)",
+          deep: "rgb(var(--ink-deep-rgb) / <alpha-value>)",
+          night: "rgb(var(--ink-night-rgb) / <alpha-value>)",
+          light: "rgb(var(--ink-light-rgb) / <alpha-value>)",
+          muted: "rgb(var(--ink-muted-rgb) / <alpha-value>)",
         },
         coral: {
-          DEFAULT: "var(--coral)",
-          deep: "var(--coral-deep)",
+          DEFAULT: "rgb(var(--coral-rgb) / <alpha-value>)",
+          deep: "rgb(var(--coral-deep-rgb) / <alpha-value>)",
         },
         green: {
-          DEFAULT: "var(--green)",
-          deep: "var(--green-deep)",
+          DEFAULT: "rgb(var(--green-rgb) / <alpha-value>)",
+          deep: "rgb(var(--green-deep-rgb) / <alpha-value>)",
         },
         paper: {
-          DEFAULT: "var(--paper)",
-          2: "var(--paper-2)",
-          card: "var(--paper-card)",
-          edge: "var(--paper-edge)",
+          DEFAULT: "rgb(var(--paper-rgb) / <alpha-value>)",
+          2: "rgb(var(--paper-2-rgb) / <alpha-value>)",
+          card: "rgb(var(--paper-card-rgb) / <alpha-value>)",
+          edge: "rgb(var(--paper-edge-rgb) / <alpha-value>)",
         },
         cream: {
-          DEFAULT: "var(--cream)",
-          warm: "var(--cream-warm)",
-          dark: "var(--cream-dark)",
+          DEFAULT: "rgb(var(--cream-rgb) / <alpha-value>)",
+          warm: "rgb(var(--cream-warm-rgb) / <alpha-value>)",
+          dark: "rgb(var(--cream-dark-rgb) / <alpha-value>)",
         },
         line: {
-          DEFAULT: "var(--line)",
-          strong: "var(--line-strong)",
+          DEFAULT: "rgb(var(--line-rgb) / <alpha-value>)",
+          strong: "rgb(var(--line-strong-rgb) / <alpha-value>)",
         },
         link: "#8b5e3c",
         "black-soft": "#33302b",
