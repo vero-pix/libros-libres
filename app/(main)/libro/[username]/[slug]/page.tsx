@@ -146,6 +146,22 @@ export default async function LibroPage({ params }: Props) {
     .eq("listing_id", listing.id)
     .order("sort_order", { ascending: true });
 
+  // Prueba del vendedor para la ficha (paso e). Sale de `seller_stats`, que es
+  // público: nada de la superficie pública puede depender de una tabla con RLS
+  // restrictiva, como pasó con el courier y `shipments`.
+  const { data: statsVendedor } = await supabase
+    .from("seller_stats")
+    .select("paid_total, reviews_count, reviews_avg")
+    .eq("seller_id", listing.seller_id)
+    .maybeSingle();
+  const sellerStats = statsVendedor
+    ? {
+        ventas: statsVendedor.paid_total ?? 0,
+        reviews_count: statsVendedor.reviews_count ?? 0,
+        reviews_avg: statsVendedor.reviews_avg != null ? Number(statsVendedor.reviews_avg) : null,
+      }
+    : null;
+
   // Reseñas de OBRA (books.id): se muestran en TODAS las copias del mismo libro.
   // Editorial primero, luego las más recientes.
   const { data: bookReviews } = await supabase
@@ -336,7 +352,7 @@ export default async function LibroPage({ params }: Props) {
           <CategoriesSidebar categoryTree={categoryTree} activeCategory={(listing.book as any).category} activeSubcategory={(listing.book as any).subcategory} />
 
           <div className="flex-1 min-w-0">
-            <ListingDetail listing={listing} images={(images ?? []) as any} />
+            <ListingDetail listing={listing} images={(images ?? []) as any} sellerStats={sellerStats} />
 
             {/* Reseña del vendedor/ejemplar. El componente existía desde abril
                 pero no estaba montado en ninguna página: el correo "¿Cómo

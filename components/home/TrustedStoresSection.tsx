@@ -38,6 +38,19 @@ export default function TrustedStoresSection({
         {tiendas.map((t) => (
           <TrustedStoreCard key={t.seller_id} tienda={t} />
         ))}
+
+        {/* Cierra la grilla y aprovecha el hueco que dejan las tiendas que
+            califican (hoy 8, y no hay una novena que cumpla el criterio). Va
+            con borde punteado y sin portadas para que se lea como invitación y
+            no como una tienda más. */}
+        <Link
+          href="/publish"
+          className="group flex flex-col justify-center gap-1 rounded-xl border border-dashed border-brand-300 bg-cream-warm/40 p-4 text-center transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-500 hover:bg-cream-warm"
+        >
+          <span className="font-semibold text-ink">¿Vendes libros?</span>
+          <span className="text-xs text-ink-muted">Publicar es gratis</span>
+          <span className="mt-1 text-xs font-semibold text-brand-600">Publicar un libro →</span>
+        </Link>
       </div>
 
       <div className="mt-4 text-right">

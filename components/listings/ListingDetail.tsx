@@ -143,9 +143,15 @@ const MP_NOT_RECEIVING = new Set<string>([]);
 interface Props {
   listing: ListingWithBook;
   images?: { id: string; image_url: string }[];
+  /**
+   * Prueba del vendedor, desde `seller_stats`. Es el punto de decisión de
+   * compra: acá el comprador elige a quién le compra, no solo qué compra.
+   * Promedio solo con 3 reseñas o más (decisión C5).
+   */
+  sellerStats?: { ventas: number; reviews_count: number; reviews_avg: number | null } | null;
 }
 
-export default function ListingDetail({ listing, images = [] }: Props) {
+export default function ListingDetail({ listing, images = [], sellerStats = null }: Props) {
   const { book } = listing;
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
@@ -494,6 +500,20 @@ export default function ListingDetail({ listing, images = [] }: Props) {
                   <span className="text-[10px] font-semibold text-[#009EE3]">· Pago seguro</span>
                 )}
               </div>
+              {/* Misma línea de prueba que la tarjeta del home. Acá pesa más:
+                  es donde el comprador decide. */}
+              {sellerStats && sellerStats.ventas > 0 && (
+                <p className="text-[11px] text-ink-muted mt-0.5">
+                  {sellerStats.ventas} {sellerStats.ventas === 1 ? "venta" : "ventas"} por la plataforma
+                  {sellerStats.reviews_count >= 3 && sellerStats.reviews_avg != null && (
+                    <>
+                      {" · "}
+                      {sellerStats.reviews_avg.toFixed(1).replace(".", ",")} ({sellerStats.reviews_count}{" "}
+                      {sellerStats.reviews_count === 1 ? "reseña" : "reseñas"})
+                    </>
+                  )}
+                </p>
+              )}
             </div>
             <Link
               href={`/vendedor/${listing.seller?.username ?? listing.seller_id}`}
