@@ -141,21 +141,54 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { cookies: { getAll: () => [], setAll: () => {} } }
     );
 
+    // Se ordena por CATÁLOGO ACTIVO, no por updated_at. El orden anterior
+    // reflejaba cuándo alguien editó su perfil, así que 125 de los 200 cupos se
+    // los llevaban perfiles sin un solo libro y quedaban 52 tiendas con
+    // catálogo fuera del sitemap — entre ellas la que la portada estaba
+    // destacando como tienda de la semana. (08-09-2026)
+    //
+    // El conteo sale de seller_stats, que el cron refresca cada hora: agregarlo
+    // acá con un group by obligaría a leer las ~3.900 filas de listings en cada
+    // generación del sitemap.
     const { data: sellers } = await supabaseForSellers
-      .from("users")
-      .select("username, updated_at")
-      .not("username", "is", null)
-      .order("updated_at", { ascending: false })
-      .limit(200);
+      .from("seller_stats")
+      .select("active_listings, updated_at, seller:users!inner(username, updated_at)")
+      .gt("active_listings", 0)
+      .order("active_listings", { ascending: false })
+      .limit(1000);
 
     sellerPages = (sellers ?? [])
-      .filter((s) => s.username)
+      .map((s) => {
+        const u = Array.isArray(s.seller) ? s.seller[0] : s.seller;
+        return { username: u?.username as string | null, updatedAt: u?.updated_at as string | undefined };
+      })
+      .filter((s): s is { username: string; updatedAt: string | undefined } => !!s.username)
       .map((s) => ({
         url: `${baseUrl}/vendedor/${s.username}`,
-        lastModified: new Date(s.updated_at),
+        lastModified: s.updatedAt ? new Date(s.updatedAt) : new Date(),
         changeFrequency: "weekly" as const,
         priority: 0.7,
       }));
+
+    // Red de seguridad: si seller_stats estuviera vacía (migración recién
+    // aplicada, cron que no ha corrido), el sitemap perdería TODAS las tiendas
+    // de golpe. Ahí se vuelve al criterio anterior.
+    if (sellerPages.length === 0) {
+      const { data: fallback } = await supabaseForSellers
+        .from("users")
+        .select("username, updated_at")
+        .not("username", "is", null)
+        .order("updated_at", { ascending: false })
+        .limit(200);
+      sellerPages = (fallback ?? [])
+        .filter((s) => s.username)
+        .map((s) => ({
+          url: `${baseUrl}/vendedor/${s.username}`,
+          lastModified: new Date(s.updated_at),
+          changeFrequency: "weekly" as const,
+          priority: 0.7,
+        }));
+    }
   } catch {
     // Continue without seller pages
   }
