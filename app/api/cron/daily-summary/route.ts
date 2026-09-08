@@ -65,6 +65,57 @@ export async function POST() {
   const totalRevenue = paidOrders.reduce((sum, o) => sum + (o.total ?? 0), 0);
   const normalListings = listings.filter((l) => !l.deprioritized);
 
+  // "Se busca": cumplidos / vendidos / al solicitante. Cumplido solo quiere
+  // decir que se mandó el aviso; lo que interesa saber es si además terminó en
+  // venta, y si se la llevó quien pidió el libro. La versión con detalle está
+  // en scripts/sebusca_cierre.mjs. (08-09-2026)
+  const seBusca = await (async () => {
+    try {
+      const { data: pedidos } = await supabase
+        .from("book_requests")
+        .select("requester_user_id, requester_email, fulfilled_at, fulfilled_listing_id")
+        .eq("fulfilled", true)
+        .not("fulfilled_listing_id", "is", null);
+      if (!pedidos?.length) return { cumplidos: 0, vendidos: 0, alSolicitante: 0 };
+
+      const listingIds = Array.from(
+        new Set(pedidos.map((p: any) => p.fulfilled_listing_id as string))
+      );
+      const { data: ordenes } = await supabase
+        .from("orders")
+        .select("listing_id, buyer_id, created_at, buyer:users!buyer_id(email)")
+        .in("listing_id", listingIds)
+        .in("status", ["paid", "shipped", "delivered", "completed"]);
+
+      let vendidos = 0;
+      let alSolicitante = 0;
+      for (const p of pedidos as any[]) {
+        // Una compra anterior al cumplimiento no la gatilló el aviso.
+        const suyas = (ordenes ?? []).filter(
+          (o: any) =>
+            o.listing_id === p.fulfilled_listing_id &&
+            (!p.fulfilled_at || new Date(o.created_at) >= new Date(p.fulfilled_at))
+        );
+        if (!suyas.length) continue;
+        vendidos++;
+        const correo = (p.requester_email || "").trim().toLowerCase();
+        if (
+          suyas.some(
+            (o: any) =>
+              (p.requester_user_id && o.buyer_id === p.requester_user_id) ||
+              (correo && (o.buyer?.email || "").toLowerCase() === correo)
+          )
+        ) {
+          alSolicitante++;
+        }
+      }
+      return { cumplidos: pedidos.length, vendidos, alSolicitante };
+    } catch (e) {
+      console.error("[daily-summary] Se busca falló:", e);
+      return null;
+    }
+  })();
+
   // --- HTML ---
   const section = (title: string, content: string) => `
     <div style="margin-bottom:28px">
@@ -136,6 +187,17 @@ export async function POST() {
   ${flaggedHtml}
   ${section("Órdenes", ordersHtml)}
   ${section("Lo que buscaron (top 10)", searchesHtml)}
+  ${
+    seBusca
+      ? section(
+          "Se busca",
+          row(
+            `${seBusca.cumplidos} cumplidos · ${seBusca.vendidos} vendidos · ${seBusca.alSolicitante} al solicitante`,
+            seBusca.vendidos === 0 && seBusca.cumplidos > 0 ? "avisa, pero todavía no cierra ventas" : ""
+          )
+        )
+      : ""
+  }
 
   <div style="margin-top:32px;padding-top:20px;border-top:1px solid #e8e0d0;text-align:center">
     <a href="${SITE}/admin" style="display:inline-block;padding:10px 24px;background:#1a1a2e;color:#faf7f1;text-decoration:none;border-radius:8px;font-size:13px;font-weight:600">Abrir panel admin →</a>

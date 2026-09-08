@@ -17,7 +17,12 @@ export default function RequestForm({ hasSession = false }: { hasSession?: boole
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [notes, setNotes] = useState("");
+  // Dos campos separados a propósito: el aviso automático sale por correo, así
+  // que el WhatsApp es un extra para que Vero pueda insistir, nunca el único
+  // contacto. Cuando era un solo campo "email o WhatsApp", 52 pedidos quedaron
+  // sin correo y solo se podían cerrar a mano. (08-09-2026)
   const [contact, setContact] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
   const [location, setLocation] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -28,14 +33,19 @@ export default function RequestForm({ hasSession = false }: { hasSession?: boole
     setStatus("loading");
     setErrorMsg(null);
 
-    // Auto-detectar si el contacto es email o whatsapp
-    const isEmail = /@/.test(contact);
+    const correo = contact.trim();
+    if (!hasSession && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+      setStatus("idle");
+      setErrorMsg("Déjanos tu correo: es por ahí que te avisamos cuando el libro aparezca.");
+      return;
+    }
+
     const body = {
       title: title.trim(),
       author: author.trim() || undefined,
       notes: notes.trim() || undefined,
-      requester_email: isEmail ? contact.trim() : undefined,
-      requester_whatsapp: !isEmail ? contact.trim() : undefined,
+      requester_email: correo || undefined,
+      requester_whatsapp: whatsapp.trim() || undefined,
       requester_location: location.trim() || undefined,
     };
 
@@ -206,20 +216,38 @@ export default function RequestForm({ hasSession = false }: { hasSession?: boole
 
       <label className="block">
         <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-          {hasSession ? "Tu email o WhatsApp (opcional)" : "Tu email o WhatsApp"}
+          {hasSession ? "Tu correo (opcional)" : "Tu correo"}
         </span>
         <input
-          type="text"
+          type="email"
+          inputMode="email"
           value={contact}
           onChange={(e) => setContact(e.target.value)}
           required={!hasSession}
-          placeholder="+56912345678 o tu@correo.cl"
+          placeholder="tu@correo.cl"
           className="mt-1.5 w-full px-3 py-2.5 border border-cream-dark rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
         />
         <span className="text-[11px] text-ink-muted mt-1 block">
           {hasSession
-            ? "Ya tenemos tu correo de la cuenta. Déjalo en blanco si te sirve ese."
-            : "Sin esto no hay cómo avisarte cuando el libro aparezca. No se muestra público."}
+            ? "Ya tenemos el de tu cuenta. Déjalo en blanco si te sirve ese."
+            : "Te avisamos por correo cuando aparezca. No se muestra público."}
+        </span>
+      </label>
+
+      <label className="block">
+        <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+          Tu WhatsApp (opcional)
+        </span>
+        <input
+          type="tel"
+          inputMode="tel"
+          value={whatsapp}
+          onChange={(e) => setWhatsapp(e.target.value)}
+          placeholder="+56912345678"
+          className="mt-1.5 w-full px-3 py-2.5 border border-cream-dark rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+        />
+        <span className="text-[11px] text-ink-muted mt-1 block">
+          Por si el correo se te pierde. No reemplaza al correo y no se muestra público.
         </span>
       </label>
 

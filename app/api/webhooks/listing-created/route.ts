@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     const { data: listing } = await supabase
       .from("listings")
       .select(
-        "id, slug, price, modality, address, latitude, longitude, city_id, deprioritized, seller_id, book:books(title, author), seller:users(full_name, username, city)"
+        "id, slug, price, modality, address, latitude, longitude, city_id, deprioritized, seller_id, book:books(title, author), seller:users(full_name, username, city, email)"
       )
       .eq("id", listingId)
       .single();
@@ -272,6 +272,51 @@ export async function POST(req: Request) {
                   .eq("id", req.id);
               } catch (e: any) {
                 console.error("Error marking request fulfilled:", e);
+              }
+
+              // Y avisarle al vendedor que su libro estaba pedido. Publicar a
+              // ciegas y que además alguien lo estuviera buscando es la mejor
+              // noticia que puede recibir alguien que recién publica: sabe que
+              // hay demanda real y no un catálogo mudo. Sin datos del
+              // solicitante — su comuna no basta para identificarlo, su correo
+              // sí. (08-09-2026)
+              // Misma salvedad que en cron/shipments: la cuenta vendedora de Vero
+              // usa vero@tuslibros.cl, que no recibe con Workspace caído.
+              const sellerEmailBruto = (listing as any).seller?.email as string | undefined;
+              const sellerEmail =
+                sellerEmailBruto === "vero@tuslibros.cl" ? VERO_INBOX : sellerEmailBruto;
+              if (sellerEmail && resendKey) {
+                const zona = req.requester_location?.trim();
+                const sellerMatchHtml = `
+<div style="font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#ffffff;color:#151522;border:1px solid #e5e7eb;border-radius:16px">
+  <p style="color:#d4a017;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:0 0 8px 0">Tu libro estaba pedido</p>
+  <h2 style="font-family:Georgia,serif;font-size:24px;margin:0 0 16px 0;color:#1a1a2e">Alguien buscaba justo lo que publicaste</h2>
+  <p style="font-size:16px;line-height:1.6;color:#4b5563;margin-bottom:24px">
+    Publicaste <strong>${escape(title)}</strong> y resulta que alguien${zona ? ` en ${escape(zona)}` : ""} lo estaba buscando en la sección "Se busca". Ya le avisamos que apareció.
+  </p>
+  <div style="background:#f9fafb;padding:20px;border-radius:12px;margin-bottom:24px;border:1px solid #f3f4f6">
+    <p style="margin:0;font-weight:700;color:#111827">${escape(title)}</p>
+    <p style="margin:4px 0 0 0;font-size:14px;color:#6b7280">${escape(author)}</p>
+  </div>
+  <a href="${url}" style="display:inline-block;padding:14px 28px;background:#1a1a2e;color:#ffffff;text-decoration:none;border-radius:8px;font-size:16px;font-weight:600">Ver tu publicación →</a>
+  <p style="margin-top:24px;font-size:13px;color:#9ca3af">
+    Si tienes más libros parecidos, este es buen momento para publicarlos. — Vero
+  </p>
+</div>`;
+                await fetch("https://api.resend.com/emails", {
+                  method: "POST",
+                  headers: {
+                    Authorization: `Bearer ${resendKey}`,
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    from: "Vero de tuslibros.cl <noreply@tuslibros.cl>",
+                    to: [sellerEmail],
+                    reply_to: VERO_INBOX,
+                    subject: `Tu ${title} lo estaba buscando alguien`,
+                    html: sellerMatchHtml,
+                  }),
+                }).catch((e) => console.error("Error sending seller match email:", e));
               }
             } else {
               console.log(`[listing-created] match flojo para ${req.id}: aviso enviado, solicitud sigue abierta`);

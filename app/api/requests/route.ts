@@ -87,11 +87,21 @@ export async function POST(req: NextRequest) {
     data: { user },
   } = await ssrClient.auth.getUser();
 
-  // Sin correo, sin WhatsApp y sin sesión, el pedido entra al vacío: si el libro
-  // aparece, no hay a quién avisarle. Pasaron 17 así antes de este chequeo.
-  if (!user && !requester_email?.trim() && !requester_whatsapp?.trim()) {
+  // El aviso de "apareció tu libro" sale por correo: es lo único que la
+  // plataforma manda sola. Aceptar WhatsApp EN VEZ de correo dejaba pedidos que
+  // solo se pueden cerrar si Vero escribe a mano — 52 así, más 17 sin ningún
+  // contacto. Desde el 08-09-2026 se exige correo o sesión iniciada; el
+  // WhatsApp se sigue guardando, pero como dato adicional.
+  const correoLimpio = requester_email?.trim() || null;
+  if (!user && !correoLimpio) {
     return NextResponse.json(
-      { error: "Déjanos tu correo o WhatsApp, si no no tenemos cómo avisarte cuando aparezca." },
+      { error: "Déjanos tu correo: es por ahí que te avisamos cuando el libro aparezca." },
+      { status: 400 }
+    );
+  }
+  if (correoLimpio && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correoLimpio)) {
+    return NextResponse.json(
+      { error: "Ese correo no se ve bien. Revísalo, si no no vamos a poder avisarte." },
       { status: 400 }
     );
   }
@@ -110,7 +120,7 @@ export async function POST(req: NextRequest) {
       isbn: resolvedIsbn,
       notes: notes?.trim() || null,
       requester_name: requester_name?.trim() || null,
-      requester_email: requester_email?.trim() || null,
+      requester_email: correoLimpio,
       requester_whatsapp: requester_whatsapp?.trim() || null,
       requester_location: requester_location?.trim() || null,
       requester_user_id: user?.id ?? null,

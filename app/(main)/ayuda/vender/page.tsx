@@ -95,7 +95,8 @@ export default function AyudaVenderPage() {
           </Tarjeta>
         </Seccion>
 
-        <Seccion n={3} title="Vendiste: qué pasa y qué tienes que hacer">
+        {/* id: destino del link "La etiqueta se genera sola" de /novedades */}
+        <Seccion n={3} id="despacho" title="Vendiste: qué pasa y qué tienes que hacer">
           <p>
             Te avisamos por correo y en <Link href="/mis-ventas" className={linkClass}>Mis Ventas</Link>. Revisa Mis
             Ventas cada uno o dos días aunque no te llegue correo.

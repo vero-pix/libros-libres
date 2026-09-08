@@ -39,6 +39,15 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "8 septiembre 2026",
+    title: "El reel: la historia en 60 segundos",
+    description:
+      "Grabé un video corto contando de dónde salió tuslibros y para qué existe. Dura un minuto y está al final de la página de la historia, si tienes curiosidad.",
+    tag: "Lanzamiento",
+    link: "/historia#reel",
+    linkText: "Ver el reel",
+  },
+  {
     date: "30 agosto 2026",
     title: "530 libros del catálogo no se podían comprar y yo no lo sabía",
     description:
@@ -1378,7 +1387,7 @@ async function fetchFulfilledRequests(): Promise<Entry[]> {
     .from("book_requests")
     .select(`
       id, title, author, requester_location, fulfilled_at,
-      fulfilled_listing:listings!fulfilled_listing_id(id, slug, cover_image_url, seller:users(username))
+      fulfilled_listing:listings!fulfilled_listing_id(id, slug, status, cover_image_url, seller:users(username))
     `)
     .eq("fulfilled", true)
     .not("fulfilled_at", "is", null)
@@ -1391,12 +1400,20 @@ async function fetchFulfilledRequests(): Promise<Entry[]> {
     const dateStr = `${d.getDate()} ${mesesES[d.getMonth()]} ${d.getFullYear()}`;
     const seller = r.fulfilled_listing?.seller?.username;
     const slug = r.fulfilled_listing?.slug;
-    const link = seller && slug ? `/libro/${seller}/${slug}` : null;
+    // El libro que cumplió el pedido pudo venderse (o borrarse) después. Si ya
+    // no está activo, no se ofrece un link que lleva a una ficha muerta.
+    const sigueALaVenta = r.fulfilled_listing?.status === "active";
+    const link = sigueALaVenta && seller && slug ? `/libro/${seller}/${slug}` : null;
     const locationText = r.requester_location ? ` en ${r.requester_location}` : "";
+    const cierre = sigueALaVenta
+      ? "Esta semana apareció: un vendedor lo publicó y ahora está disponible para comprar."
+      : "Un vendedor lo publicó y ya se vendió.";
+    // r.author puede venir null: "1984 de null" salía impreso en la caluga.
+    const detalle = r.author ? `${r.title} de ${r.author}` : r.title;
     return {
       date: dateStr,
       title: `¡Cumplida! Alguien pedía "${r.title}" y apareció`,
-      description: `Alguien${locationText} buscaba este libro en la sección "Se busca". Esta semana apareció: un vendedor lo publicó y ahora está disponible para comprar. La economía inversa funcionando — los compradores piden, los vendedores aparecen.`,
+      description: `Alguien${locationText} buscaba este libro en la sección "Se busca". ${cierre} La economía inversa funcionando — los compradores piden, los vendedores aparecen.`,
       tag: "Cumplida",
       link: link ?? undefined,
       linkText: link ? "Ver el libro" : undefined,
@@ -1404,7 +1421,7 @@ async function fetchFulfilledRequests(): Promise<Entry[]> {
         kind: "milestone",
         icon: "🎯",
         metric: "Pedido → publicado",
-        detail: `${r.title} de ${r.author}`,
+        detail: detalle,
       },
     } as Entry;
   });
@@ -1418,10 +1435,34 @@ function parseSpanishDate(s: string): number {
   return new Date(Number(m[3]), meses[m[2].toLowerCase()] ?? 0, Number(m[1])).getTime();
 }
 
+/**
+ * La tienda de la semana sale de `site_config.tienda_semana`, igual que en la
+ * portada: rota sin deploy, así que la caluga no puede llevarla escrita a mano.
+ * Si no hay tienda vigente el link cae a la sección de la home.
+ */
+async function fetchTiendaSemanaHref(): Promise<string> {
+  const supabase = createPublicClient();
+  const { data } = await supabase
+    .from("site_config")
+    .select("value")
+    .eq("key", "tienda_semana")
+    .maybeSingle();
+  const conf = data?.value as { seller_id?: string; until?: string } | undefined;
+  if (!conf?.seller_id) return "/#librerias-confianza";
+  if (conf.until && new Date(conf.until) < new Date()) return "/#librerias-confianza";
+  const { data: seller } = await supabase
+    .from("users")
+    .select("username")
+    .eq("id", conf.seller_id)
+    .maybeSingle();
+  return `/vendedor/${seller?.username ?? conf.seller_id}`;
+}
+
 export default async function NovedadesPage() {
   const pool = await fetchListingPool();
   const fulfilled = await fetchFulfilledRequests();
   const cifras = await fetchCifrasDiario();
+  const tiendaSemanaHref = await fetchTiendaSemanaHref();
   const miles = (n: number) => n.toLocaleString("es-CL");
 
   // Mezclar novedades hardcoded + cumplimientos dinámicos, ordenar desc por fecha
@@ -1449,7 +1490,12 @@ export default async function NovedadesPage() {
             className="object-cover opacity-50"
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-ink via-ink/85 to-ink/60" />
+          {/* El velo llegaba a ink/60 en la esquina inferior derecha y ahí el
+              párrafo de bajada quedaba en 3,31:1 sobre la foto: ilegible en
+              móvil, que es donde el texto cae justo en esa zona. Con ink/80 y
+              el texto en cream lleno queda sobre 5,7:1, AA holgado, y la foto
+              se sigue viendo. (08-09-2026) */}
+          <div className="absolute inset-0 bg-gradient-to-br from-ink via-ink/90 to-ink/80" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(212,160,23,0.18),transparent_55%)]" />
         </div>
         <div className="relative max-w-5xl mx-auto px-6 pt-14 pb-20 md:pt-20 md:pb-28">
@@ -1462,7 +1508,7 @@ export default async function NovedadesPage() {
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[1.05] text-cream mb-6 animate-fade-in-up" style={{ animationDelay: "60ms" }}>
             Día {cifras.dia} — <em className="text-amber-300 not-italic font-normal italic">ahora los compradores pueden calificar a quien les vendió</em>.
           </h1>
-          <p className="text-base md:text-lg text-cream/80 max-w-2xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "120ms" }}>
+          <p className="text-base md:text-lg text-cream max-w-2xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "120ms" }}>
             Esta semana el sitio dejó de depender de mí para despachar: la etiqueta se genera sola.
             Y estrené dos cosas que van juntas, reseñas verificadas y una sección de librerías de
             confianza en la portada, para que se note quién vende y responde. Lo escribo yo. — Vero
@@ -1490,21 +1536,43 @@ export default async function NovedadesPage() {
       <main className="max-w-3xl mx-auto px-4 md:px-6 -mt-10 md:-mt-14 relative z-10 pb-16">
         {/* SPOTLIGHT — tres momentos grandes */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 animate-fade-in-up" style={{ animationDelay: "240ms" }}>
-          <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Lanzamiento · 7 sep</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">La etiqueta de despacho se genera sola</p>
-            <p className="text-xs text-ink-muted">Vendes con despacho y la etiqueta llega por correo y a Mis Ventas. Imprimes, pegas y dejas el paquete en la sucursal. Nadie tiene que pedírmela.</p>
-          </div>
-          <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Lanzamiento · 8 sep</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">Reseñas verificadas</p>
-            <p className="text-xs text-ink-muted">Solo reseña quien compró y confirmó que recibió el libro. Se ve en la tienda del vendedor y cuenta para el orden de la portada.</p>
-          </div>
-          <div className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md transition-shadow">
-            <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">Lanzamiento · 8 sep</p>
-            <p className="font-display text-lg text-ink leading-snug mb-2">Librerías de confianza en la portada</p>
-            <p className="text-xs text-ink-muted">Una sección con las tiendas que venden por la plataforma, despachan y cobran con pago protegido. Rota, con una tienda destacada por semana.</p>
-          </div>
+          {[
+            {
+              fecha: "Lanzamiento · 7 sep",
+              titulo: "La etiqueta de despacho se genera sola",
+              texto: "Vendes con despacho y la etiqueta llega por correo y a Mis Ventas. Imprimes, pegas y dejas el paquete en la sucursal. Nadie tiene que pedírmela.",
+              href: "/ayuda/vender#despacho",
+              cta: "Cómo funciona",
+            },
+            {
+              fecha: "Lanzamiento · 8 sep",
+              titulo: "Reseñas verificadas",
+              texto: "Solo reseña quien compró y confirmó que recibió el libro. Se ve en la tienda del vendedor y cuenta para el orden de la portada.",
+              href: tiendaSemanaHref,
+              cta: "Ver una tienda",
+            },
+            {
+              fecha: "Lanzamiento · 8 sep",
+              titulo: "Librerías de confianza en la portada",
+              texto: "Una sección con las tiendas que venden por la plataforma, despachan y cobran con pago protegido. Rota, con una tienda destacada por semana.",
+              href: "/#librerias-confianza",
+              cta: "Verlas en la portada",
+            },
+          ].map((c) => (
+            <Link
+              key={c.titulo}
+              href={c.href}
+              className="group bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-5 hover:shadow-md hover:border-amber-700/40 transition-all flex flex-col"
+            >
+              <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-2">{c.fecha}</p>
+              <p className="font-display text-lg text-ink leading-snug mb-2">{c.titulo}</p>
+              <p className="text-xs text-ink-muted flex-1">{c.texto}</p>
+              <span className="mt-3 text-xs font-semibold text-amber-800 inline-flex items-center gap-1">
+                {c.cta}
+                <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+              </span>
+            </Link>
+          ))}
         </section>
 
         <div className="mb-10">

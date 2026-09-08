@@ -168,8 +168,8 @@ export default async function HistoriaPage() {
           <p className="text-right text-sm italic text-ink mt-8">— Vero</p>
         </div>
 
-        {/* El reel */}
-        <figure className="mt-16 pt-12 border-t border-cream-dark">
+        {/* El reel. El id es el destino de "Ver el reel" desde /novedades. */}
+        <figure id="reel" className="mt-16 pt-12 border-t border-cream-dark scroll-mt-24">
           <figcaption className="text-center mb-6">
             <p className="text-xs font-medium tracking-[0.3em] uppercase text-brand-600 mb-3">
               En video

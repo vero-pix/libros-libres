@@ -24,7 +24,9 @@ export default function TrustedStoresSection({
   if (!casa && !semana && tiendas.length === 0) return null;
 
   return (
-    <section>
+    // El id lo usa el link de la caluga de /novedades. Con scroll-mt para que
+    // el navbar fijo no tape el titular al aterrizar desde el ancla.
+    <section id="librerias-confianza" className="scroll-mt-24">
       <div className="mb-1 flex items-center gap-2">
         <h2 className="font-display text-base font-semibold text-ink">Librerías de confianza</h2>
       </div>
