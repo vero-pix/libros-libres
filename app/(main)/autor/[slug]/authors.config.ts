@@ -212,4 +212,45 @@ export const AUTHORS: Record<string, AuthorConfig> = {
       { q: '¿Son difíciles de encontrar?', a: 'Sí. Las ediciones en español son de tiradas pequeñas y en Chile hay poca oferta usada. Crea una solicitud para que te avise cuando entre un título específico.' },
     ],
   },
+
+  // Agregados el 08-09-2026. Hasta acá devolvían 404 pese a ser los dos autores
+  // con más catálogo repartido: Neruda 21 libros de 7 vendedores, Vargas Llosa
+  // 20 de 8. Variantes verificadas contra books.author en TODOS los estados de
+  // listing: cada uno tiene UN solo string exacto, sin espacios sobrantes.
+  // Quedan fuera a propósito las entradas que son listas de participantes de
+  // antologías, y "Plinio Apuleyo Mendoza | Carlos Montaner | Álvaro Vargas
+  // Llosa", que es Álvaro, el hijo, otra persona.
+  'pablo-neruda': {
+    slug: 'pablo-neruda',
+    displayName: 'Pablo Neruda',
+    dbAuthors: ['Pablo Neruda'],
+    seoTitle: 'Pablo Neruda — Libros y Poesía Usados en Chile',
+    seoDescription:
+      'Libros de Pablo Neruda usados en Chile: Canto General, Residencia en la tierra, Memorial de Isla Negra, Los versos del capitán. Envío a todo Chile o retiro en mano.',
+    keywords: ['pablo neruda', 'neruda libros usados', 'canto general neruda', 'veinte poemas de amor', 'residencia en la tierra', 'memorial de isla negra', 'poesia chilena usada', 'neruda segunda mano chile'],
+    subtitle: 'El que está en todas las casas',
+    bio: 'Cuesta encontrar una casa chilena sin un Neruda en alguna repisa, y quizás por eso volver a él siempre se siente como volver a algo propio. Están los veinte poemas que todos leímos a destiempo, y está el Neruda político, el de las odas a las cosas simples, el de Isla Negra. Acá vas a encontrar ediciones de segunda mano que pasaron por otras manos antes que las tuyas — que es, al final, la mejor forma de leer poesía.',
+    faqs: [
+      { q: '¿Qué libros de Neruda se consiguen usados?', a: 'De todo: desde 20 poemas de amor y una canción desesperada y Canto General hasta los tardíos, como Jardín de invierno, Fin de mundo o Las piedras del cielo. También circulan Residencia en la tierra, Memorial de Isla Negra y las Obras Completas.' },
+      { q: '¿Por dónde empezar a leer a Neruda?', a: 'Si nunca lo has leído en serio, 20 poemas funciona como puerta de entrada. Si ya pasaste por ahí, Residencia en la tierra muestra al Neruda más oscuro y Odas elementales al que le escribe a la cebolla y al calcetín.' },
+      { q: '¿Vale la pena comprarlo usado?', a: 'Es de los autores más editados en Chile, así que las ediciones antiguas de Losada, Nascimento o Quimantú aparecen seguido y a buen precio. Muchas traen dedicatorias de otros lectores.' },
+    ],
+  },
+
+  'mario-vargas-llosa': {
+    slug: 'mario-vargas-llosa',
+    displayName: 'Mario Vargas Llosa',
+    dbAuthors: ['Mario Vargas Llosa'],
+    seoTitle: 'Mario Vargas Llosa — Libros Usados en Chile',
+    seoDescription:
+      'Libros de Mario Vargas Llosa usados en Chile: Conversación en La Catedral, La casa verde, La fiesta del chivo, La tía Julia y el escribidor. Envío a todo Chile o retiro en mano.',
+    keywords: ['mario vargas llosa', 'vargas llosa libros usados', 'conversacion en la catedral', 'la casa verde vargas llosa', 'la fiesta del chivo', 'la tia julia y el escribidor', 'historia de mayta', 'vargas llosa segunda mano chile'],
+    subtitle: 'El que se presta y no vuelve',
+    bio: 'Vargas Llosa es de esos autores que se prestan y no vuelven, así que el circuito de segunda mano es casi el hábitat natural de sus libros. Está el Vargas Llosa monumental de Conversación en La Catedral, y está el más liviano, el de las novelas de amor y humor. Acá conviven los dos, en ediciones que van desde el bolsillo gastado hasta tapas duras de colección. Buen lugar para completar una lectura pendiente.',
+    faqs: [
+      { q: '¿Qué libros de Vargas Llosa se consiguen usados?', a: 'Los que más circulan son Conversación en La Catedral, La casa verde, Historia de Mayta, La tía Julia y el escribidor, La fiesta del chivo y los relatos de Los jefes y Los cachorros.' },
+      { q: '¿Por dónde empezar?', a: 'La tía Julia y el escribidor es la entrada más amable, con humor y menos exigente en estructura. Si buscas la novela grande, Conversación en La Catedral es la obra mayor, aunque pide paciencia con los saltos de tiempo.' },
+      { q: '¿Aparecen ediciones antiguas?', a: 'Sí. Conviven ediciones de bolsillo bien gastadas con tapas duras de colección, y a veces aparecen los volúmenes de Seix Barral de los años setenta y ochenta.' },
+    ],
+  },
 };
