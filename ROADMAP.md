@@ -344,7 +344,11 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 - [ ] **Constituir SpA + postular Startup Chile SUP** — acordado desde 23 abril.
 - [ ] **3 DMs warm a ángeles** — deck USD 80-120k en `docs/deck_valorizacion.pptx`.
 - [ ] **Ping a Alfredo Enrione** — profesor ESE, serie LinkedIn Clásicos en el Directorio. Ofrecer café/Zoom 30min.
-- [ ] **Decisión AdSense** — Google aprobó el sitio. DECIDIDO no activar ahora (revenue simbólico, mostraría competidores, daña Core Web Vitals). Revisitar cuando sesiones ≥10k/mes y bounce <50%. Pub ID: `ca-pub-7953415124311211`.
+- [x] **AdSense activado en prueba (09-09-2026)** — se revierte la decisión de no activar. Dos bloques manuales, ninguno sobre el botón de comprar:
+  bajo la paginación de `/search` (slot `3807842439`) y al final de la ficha (slot `7144452219`). Pub ID `ca-pub-7953415124311211`.
+  **Los anuncios automáticos del sitio quedaron DESACTIVADOS a propósito**: encendidos, Google colocaba anuncios donde quisiera, incluso sobre el botón de comprar.
+  Componente `components/ads/AdSlot.tsx`; sin las variables `NEXT_PUBLIC_ADSENSE_SLOT_*` no renderiza nada.
+  Qué mirar antes de dejarlo fijo: el LCP de la ficha (hoy 89) y si la tasa de captura se mueve. Si molesta, se apaga borrando las dos variables en Vercel.
 
 ---
 
@@ -393,7 +397,7 @@ Cadencia sugerida: una landing por día hábil. Cada una apunta a una keyword co
 - ~~Infinite scroll~~ — paginación numérica es mejor para SEO
 - ~~Suscripciones mensuales~~ — foco en comisiones por venta
 - ~~Fee fijo~~ — nunca habrá fee fijo
-- ~~AdSense (por ahora)~~ — no activar hasta sesiones ≥10k/mes
+- ~~AdSense (por ahora)~~ — **revertido el 09-09-2026**: se activó en prueba con dos bloques manuales. Ver arriba.
 - ~~Upgrade Next.js 16 / Tailwind 4~~ — no ahora, sin beneficio inmediato vs riesgo de quiebre
 
 ---
