@@ -37,14 +37,18 @@ const CONNECTIONS = [
 export default function ShelfTransformation() {
   const [phase, setPhase] = useState<"shelf" | "transform" | "network">("shelf");
 
+  // La red de comunas es lo que esta ilustracion quiere contar, y en el ciclo
+  // original aparecia recien al segundo 6 de 10: quien pasaba de largo veia una
+  // estanteria borrosa y nada mas. Ahora arranca en la red —lo bueno primero— y
+  // el ciclo le da 7 de cada 13 segundos. (08-09-2026)
   useEffect(() => {
     const cycle = () => {
-      setPhase("shelf");
-      setTimeout(() => setPhase("transform"), 3500);
-      setTimeout(() => setPhase("network"), 6000);
+      setPhase("network");
+      setTimeout(() => setPhase("shelf"), 7000);
+      setTimeout(() => setPhase("transform"), 10500);
     };
     cycle();
-    const interval = setInterval(cycle, 10000);
+    const interval = setInterval(cycle, 13000);
     return () => clearInterval(interval);
   }, []);
 
@@ -241,8 +245,8 @@ export default function ShelfTransformation() {
                     x={node.x}
                     y={node.y + 18}
                     textAnchor="middle"
-                    className="text-[7px] font-sans"
-                    fill="#6b6b7b"
+                    className="text-[9px] font-sans font-medium"
+                    fill="#4b4b5a"
                   >
                     {node.label}
                   </text>

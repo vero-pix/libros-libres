@@ -19,9 +19,11 @@ export const metadata: Metadata = {
 };
 
 /**
- * Los numeros del reel (1.628 libros, 63 vendedores) eran verdad en julio de
- * 2026 y hoy ya no. Se leen de la BD para que el cierre de la pagina envejezca
- * solo, sin que nadie tenga que acordarse de editarlo.
+ * El reel cierra con cifras quemadas en el video: 3.902 libros, 127 tiendas y
+ * 12 regiones al 08-09-2026. La version anterior decia 1.628 libros y 63
+ * vendedores, de julio, y envejecio sin que nadie lo notara. Por eso el cierre
+ * de ESTA pagina se lee de la BD: envejece solo. Cuando el video se vuelva a
+ * quedar corto, hay que regrabarlo — el texto de aca ya no.
  */
 async function contarCatalogo() {
   try {
