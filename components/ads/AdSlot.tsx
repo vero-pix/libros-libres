@@ -11,10 +11,13 @@
  *   Core Web Vitals el 04-09-2026 y no vale la pena devolver ese punto.
  * - Nunca montar esto por encima del botón de comprar. La fuga hacia afuera
  *   ya es el problema del negocio; no se le agrega una salida más arriba.
+ * - Si Google no tiene anuncio que servir, o el visitante trae bloqueador,
+ *   el bloque entero desaparece. Sin esto queda un hueco de 280px con la
+ *   palabra "Publicidad" flotando arriba, que es peor que no tener anuncios.
  */
 
 import Script from "next/script";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
@@ -28,6 +31,8 @@ export default function AdSlot({
   minHeight?: number;
 }) {
   const empujado = useRef(false);
+  const ins = useRef<HTMLModElement>(null);
+  const [vacio, setVacio] = useState(false);
 
   useEffect(() => {
     if (!CLIENT || !slot || empujado.current) return;
@@ -35,14 +40,35 @@ export default function AdSlot({
     try {
       ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
     } catch {
-      // AdSense bloqueado por el navegador: el hueco queda vacío y ya.
+      // AdSense bloqueado por el navegador.
+      setVacio(true);
+      return;
     }
+
+    // AdSense marca el <ins> con data-ad-status="unfilled" cuando no tiene
+    // nada que mostrar. Ahi escondemos el bloque completo.
+    const nodo = ins.current;
+    if (!nodo) return;
+    const observador = new MutationObserver(() => {
+      if (nodo.getAttribute("data-ad-status") === "unfilled") setVacio(true);
+    });
+    observador.observe(nodo, { attributes: true, attributeFilter: ["data-ad-status"] });
+
+    // Si a los 8 segundos el script ni siquiera pinto el <ins>, no llego.
+    const reloj = setTimeout(() => {
+      if (!nodo.getAttribute("data-ad-status")) setVacio(true);
+    }, 8000);
+
+    return () => {
+      observador.disconnect();
+      clearTimeout(reloj);
+    };
   }, [slot]);
 
   if (!CLIENT || !slot) return null;
 
   return (
-    <div className={`my-12 ${className}`}>
+    <div className={`my-12 ${className}`} hidden={vacio}>
       <Script
         id="adsbygoogle-init"
         src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${CLIENT}`}
@@ -57,6 +83,7 @@ export default function AdSlot({
         style={{ minHeight }}
       >
         <ins
+          ref={ins}
           className="adsbygoogle block"
           style={{ display: "block", minHeight }}
           data-ad-client={CLIENT}
