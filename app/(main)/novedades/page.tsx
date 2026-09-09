@@ -1229,11 +1229,11 @@ async function fetchCifrasDiario() {
   // hay que recorrer las filas. Y hay que paginar: la versión anterior pedía
   // seller_id sin `range`, se comía el techo de 1.000 y mostraba 73 tiendas
   // cuando eran 126. Es el mismo error que tuvo el contador del home en agosto.
-  const filas: { seller_id: string; book: { title: string | null } | null; city: { region: string | null } | null }[] = [];
+  const filas: { seller_id: string; book: { title: string | null } | null; city: { name: string | null; region: string | null } | null }[] = [];
   for (let desde = 0; ; desde += 1000) {
     const { data } = await supabase
       .from("listings")
-      .select("seller_id, book:books(title), city:cities(region)")
+      .select("seller_id, book:books(title), city:cities(name, region)")
       .eq("status", "active")
       .range(desde, desde + 999);
     filas.push(...((data ?? []) as any[]));
@@ -1247,6 +1247,9 @@ async function fetchCifrasDiario() {
   const regiones = new Set(
     filas.map((l) => uno(l.city)?.region?.trim()).filter(Boolean)
   ).size;
+  const comunas = new Set(
+    filas.map((l) => uno(l.city)?.name?.trim()).filter(Boolean)
+  ).size;
 
   const dia = Math.max(1, Math.round((Date.now() - DIA_UNO.getTime()) / 86400000));
   const mes = new Date().toLocaleDateString("es-CL", { month: "long", year: "numeric", timeZone: "America/Santiago" });
@@ -1259,6 +1262,7 @@ async function fetchCifrasDiario() {
     tiendas: distintos,
     titulos,
     regiones,
+    comunas,
   };
 }
 
@@ -1541,8 +1545,12 @@ export default async function NovedadesPage() {
               // visible en la página. (08-09-2026)
               { big: String(cifras.tiendas), small: "tiendas activas" },
               { big: miles(cifras.titulos), small: "títulos distintos en catálogo" },
-              { big: String(cifras.regiones), small: "regiones con libros publicados" },
-              { big: "#1", small: "Google \"vender libros usados Chile\"" },
+              { big: String(cifras.regiones), small: "regiones con catálogo" },
+              // Acá decía "#1 · Google vender libros usados Chile". El 08-09-2026
+              // Search Console daba posición 17,25 en Chile a 7 días: el contador
+              // llevaba semanas mintiendo. Se reemplaza por un dato propio, que
+              // no depende de que Google nos ponga o nos saque. (08-09-2026)
+              { big: String(cifras.comunas), small: "comunas con libros publicados" },
             ].map((s) => (
               <div key={s.small} className="border-l-2 border-amber-300/40 pl-4">
                 <p className="font-display text-3xl md:text-4xl text-cream leading-none">{s.big}</p>
