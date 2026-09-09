@@ -69,9 +69,14 @@ export async function POST(req: Request) {
 
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
-    if (!token || !chatId) {
-      console.warn("Telegram env vars missing — skipping notification");
-      return NextResponse.json({ ok: true, skipped: true });
+    // Acá había un `return` cuando faltaba el token, y quedaba ANTES del cruce
+    // con "Se busca". O sea: sin Telegram no se cerraba ningún pedido y no
+    // salían los correos al solicitante ni al vendedor, con el endpoint
+    // respondiendo 200 y nada en los logs. El gong es opcional; el match no.
+    // (08-09-2026)
+    const hayTelegram = Boolean(token && chatId);
+    if (!hayTelegram) {
+      console.warn("Telegram env vars missing — sigue el resto del webhook, solo se salta el gong");
     }
 
     // Auto-deprioritización por contenido político/controversial.
@@ -134,24 +139,26 @@ export async function POST(req: Request) {
       (commune ? `\n📍 ${escape(commune)}` : "") +
       `\n\n<a href="${url}">Ver libro →</a>`;
 
-    const tgRes = await fetch(
-      `https://api.telegram.org/bot${token}/sendMessage`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: message,
-          parse_mode: "HTML",
-          disable_web_page_preview: false,
-        }),
-      }
-    );
+    if (hayTelegram) {
+      const tgRes = await fetch(
+        `https://api.telegram.org/bot${token}/sendMessage`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: message,
+            parse_mode: "HTML",
+            disable_web_page_preview: false,
+          }),
+        }
+      );
 
-    if (!tgRes.ok) {
-      const err = await tgRes.text();
-      console.error("Telegram send failed:", err);
-      // No retornamos error — seguimos con el email aunque Telegram falle
+      if (!tgRes.ok) {
+        const err = await tgRes.text();
+        console.error("Telegram send failed:", err);
+        // No retornamos error — seguimos con el email aunque Telegram falle
+      }
     }
 
     // Email a admin vía Resend (complementa al Telegram)
@@ -214,15 +221,17 @@ export async function POST(req: Request) {
             console.log(`[listing-created] 🎯 Match found for request ${req.id}: ${title}`);
             
             // 1. Avisar a Vero (Admin) por Telegram
-            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                chat_id: chatId,
-                text: `🎯 <b>¡MATCH DE DESEO!</b>\n\nAlguien publicó un libro que estaba en la lista de espera:\n\n📖 <b>${escape(title)}</b>\n✍️ ${escape(author)}\n👤 Pedido por: ${escape(req.requester_email || req.requester_whatsapp || "Anónimo")}\n\n<a href="${url}">Ver publicación y avisar →</a>`,
-                parse_mode: "HTML",
-              }),
-            }).catch(() => {});
+            if (hayTelegram) {
+              await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text: `🎯 <b>¡MATCH DE DESEO!</b>\n\nAlguien publicó un libro que estaba en la lista de espera:\n\n📖 <b>${escape(title)}</b>\n✍️ ${escape(author)}\n👤 Pedido por: ${escape(req.requester_email || req.requester_whatsapp || "Anónimo")}\n\n<a href="${url}">Ver publicación y avisar →</a>`,
+                  parse_mode: "HTML",
+                }),
+              }).catch(() => {});
+            }
 
             // 2. Avisar al comprador por Email (si dejó uno)
             if (req.requester_email && resendKey) {

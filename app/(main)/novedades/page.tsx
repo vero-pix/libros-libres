@@ -5,17 +5,44 @@ import PromoBanner from "@/components/ui/PromoBanner";
 import { libroUrl } from "@/lib/urls";
 import type { ListingWithBook } from "@/types";
 
-export const metadata = {
-  title: "Diario de tuslibros.cl — Julio 2026",
-  description:
-    "Lo que pasó en tuslibros.cl: el catálogo casi se dobló en un mes (ya son 1.380 libros), 178 títulos nuevos en una semana, colecciones editoriales, ficha de compra rediseñada y publicar sin fricción.",
-  alternates: { canonical: "https://tuslibros.cl/novedades" },
-  openGraph: {
-    title: "Diario de tuslibros.cl",
-    description: "Lo que se arregla, lo que se estrena y lo que se aprende, contado por quien lo hace.",
-    images: [{ url: "/img/vero-og.jpg", width: 1200, height: 630, alt: "Vero, la persona detrás de tuslibros.cl" }],
-  },
-};
+const MESES_ES = [
+  "enero", "febrero", "marzo", "abril", "mayo", "junio",
+  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+];
+
+/** "8 septiembre 2026" → Date. Es el formato en que están escritas las entradas. */
+function fechaEntrada(date: string): Date {
+  const [dia, mes, anio] = date.split(" ");
+  const i = MESES_ES.indexOf((mes ?? "").toLowerCase());
+  return new Date(Number(anio), i === -1 ? 0 : i, Number(dia) || 1);
+}
+
+/**
+ * El título y la descripción decían "Julio 2026" y "ya son 1.380 libros":
+ * escritos a mano en julio y congelados ahí mientras el diario seguía. Ahora
+ * salen de la entrada más nueva, que es lo que la página realmente muestra.
+ * (08-09-2026)
+ */
+export function generateMetadata() {
+  const ultima = [...novedades].sort(
+    (a, b) => fechaEntrada(b.date).getTime() - fechaEntrada(a.date).getTime()
+  )[0];
+  const d = fechaEntrada(ultima.date);
+  const mes = MESES_ES[d.getMonth()];
+  const periodo = `${mes.charAt(0).toUpperCase()}${mes.slice(1)} ${d.getFullYear()}`;
+  return {
+    title: `Diario de tuslibros.cl — ${periodo}`,
+    description:
+      `Lo último en tuslibros.cl: ${ultima.title}. Y todo lo que se arregló, ` +
+      `se estrenó y se aprendió antes, contado por quien lo hace.`,
+    alternates: { canonical: "https://tuslibros.cl/novedades" },
+    openGraph: {
+      title: "Diario de tuslibros.cl",
+      description: "Lo que se arregla, lo que se estrena y lo que se aprende, contado por quien lo hace.",
+      images: [{ url: "/img/vero-og.jpg", width: 1200, height: 630, alt: "Vero, la persona detrás de tuslibros.cl" }],
+    },
+  };
+}
 
 export const revalidate = 300;
 
@@ -1381,13 +1408,7 @@ function TagPill({ tag, isRecent }: { tag: string; isRecent: boolean }) {
 }
 
 function daysAgo(date: string): number {
-  const meses: Record<string, number> = {
-    enero: 0, febrero: 1, marzo: 2, abril: 3, mayo: 4, junio: 5,
-    julio: 6, agosto: 7, septiembre: 8, octubre: 9, noviembre: 10, diciembre: 11,
-  };
-  const parts = date.split(" ");
-  const d = new Date(Number(parts[2]), meses[parts[1]] ?? 0, Number(parts[0]));
-  return Math.floor((Date.now() - d.getTime()) / 86400000);
+  return Math.floor((Date.now() - fechaEntrada(date).getTime()) / 86400000);
 }
 
 async function fetchFulfilledRequests(): Promise<Entry[]> {
