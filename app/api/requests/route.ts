@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@/lib/supabase/server";
 import { buscarEnCatalogo, type CatalogoMatch } from "@/lib/bookRequestMatch";
+import { looksLikeBotName } from "@/lib/botDetection";
 
 /**
  * GET /api/requests
@@ -102,6 +103,32 @@ export async function POST(req: NextRequest) {
   if (correoLimpio && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correoLimpio)) {
     return NextResponse.json(
       { error: "Ese correo no se ve bien. Revísalo, si no no vamos a poder avisarte." },
+      { status: 400 }
+    );
+  }
+
+  // Un bot llenó el formulario el 08-09-2026 con título, autor y comuna de
+  // letras al azar ("TnTyffQwfnjRdhzdpk") y quedó publicado en la vitrina del
+  // "Se busca". Pedir correo no lo frenó: usó un gmail con el truco de puntos,
+  // así que isLikelyBotEmail tampoco sirve acá. Lo que sí delata al bot es la
+  // forma de los textos, y para eso ya existe looksLikeBotName. Se revisan los
+  // tres campos visibles: basta con que uno sea aleatorio.
+  // looksLikeBotName sola no basta acá: está calibrada para nombres, y un
+  // título escrito pegado tipo "CienAnosDeSoledad" da el mismo perfil de
+  // mayúsculas que la basura del bot. La segunda señal es la proporción de
+  // vocales: el castellano pegado ronda el 45%, las cadenas al azar quedan
+  // bajo el 25%. Se piden las dos.
+  const pareceAlAzar = (campo: string | null | undefined): boolean => {
+    const t = (campo ?? "").trim();
+    if (!looksLikeBotName(t)) return false;
+    const vocales = (t.match(/[aeiouáéíóúü]/gi) ?? []).length;
+    return vocales / t.length < 0.35;
+  };
+  const campoAleatorio = [resolvedTitle, resolvedAuthor, requester_location].find(pareceAlAzar);
+  if (campoAleatorio) {
+    console.warn(`[requests] rechazado por texto aleatorio: ${campoAleatorio}`);
+    return NextResponse.json(
+      { error: "Revisa el título y el autor: así como están no podemos buscar el libro." },
       { status: 400 }
     );
   }
