@@ -5,6 +5,7 @@ import ListingDetail from "@/components/listings/ListingDetail";
 import BookReviews from "@/components/listings/BookReviews";
 import ReviewSection from "@/components/listings/ReviewSection";
 import ListingCard from "@/components/listings/ListingCard";
+import AdSlot from "@/components/ads/AdSlot";
 import ListingViewTracker from "@/components/listings/ListingViewTracker";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
@@ -412,6 +413,11 @@ export default async function LibroPage({ params }: Props) {
                 </div>
               </section>
             )}
+
+            {/* Ultimo bloque de la ficha: despues de la resena, de los libros
+                del autor y de los del genero. El boton de comprar queda muy
+                arriba, fuera de competencia. */}
+            <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_FICHA} />
           </div>
         </div>
       </main>

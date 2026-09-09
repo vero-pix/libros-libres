@@ -11,6 +11,7 @@ import SearchResultsToggle from "@/components/listings/SearchResultsToggle";
 import PromoBanner from "@/components/ui/PromoBanner";
 import BookRequestForm from "@/components/listings/BookRequestForm";
 import Pagination from "@/components/ui/Pagination";
+import AdSlot from "@/components/ads/AdSlot";
 import SearchEventTracker from "@/components/analytics/SearchEventTracker";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import { translateGenre } from "@/lib/genres";
@@ -347,6 +348,9 @@ export default async function SearchPage({ searchParams }: Props) {
                   </div>
                 </SearchResultsToggle>
                 <Pagination currentPage={currentPage} totalPages={totalPages} buildHref={buildHref} />
+                {/* Bajo los resultados y bajo la paginacion: quien llega aca
+                    ya vio el catalogo entero y no encontro lo suyo. */}
+                <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BUSQUEDA} />
               </>
             ) : (
               <div className="py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
