@@ -86,7 +86,13 @@ export default function BookMap({ onListingsLoaded, onUserLocation, flyToListing
       onUserLocation?.({ lat: e.coords.latitude, lng: e.coords.longitude });
     });
 
-    map.on("load", () => {
+    // Antes esto colgaba del evento "load". Con mapbox-gl 3.20 (el lock subió
+    // solo desde ^3.10) ese evento dejó de dispararse con streets-v12: el mapa
+    // pinta las calles, isStyleLoaded() se queda en false para siempre y no
+    // llega ni un error. Resultado: la fuente y las capas nunca se agregaban y
+    // el mapa quedaba sin una sola burbuja. "style.load" sí dispara, y es el
+    // evento que Mapbox documenta para agregar fuentes y capas. (09-09-2026)
+    const montarCapas = () => {
       // Pedir ubicación al cargar para que el orden "Cercanía" funcione sin
       // apretar el botón. Si el usuario deniega, el mapa queda en el centro
       // por defecto (Santiago) — sin romper nada.
@@ -209,7 +215,10 @@ export default function BookMap({ onListingsLoaded, onUserLocation, flyToListing
       map.on("mouseleave", "unclustered", () => { map.getCanvas().style.cursor = ""; });
 
       setMapLoaded(true);
-    });
+    };
+
+    if (map.isStyleLoaded()) montarCapas();
+    else map.once("style.load", montarCapas);
 
     mapRef.current = map;
     return () => {
