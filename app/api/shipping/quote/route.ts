@@ -59,18 +59,25 @@ export async function POST(req: NextRequest) {
   // `authenticated` (no por anon), y esta ruta exige sesión.
   const { data: listing } = await supabase
     .from("listings")
-    .select("address, seller_id, seller:users(default_address)")
+    .select("address, seller_id, seller:users(default_address, shipit_origin_commune)")
     .eq("id", listing_id)
     .single();
 
   const seller = (Array.isArray(listing?.seller) ? listing?.seller[0] : listing?.seller) as
-    | { default_address: string | null }
+    | { default_address: string | null; shipit_origin_commune: string | null }
     | null
     | undefined;
 
+  // `shipit_origin_commune` manda cuando el vendedor despacha desde una comuna
+  // distinta a la del libro. Sin esto se cotizaba desde la dirección del
+  // listing: el libro de Bárbara está en Algarrobo, donde ningún courier
+  // retira, y ella deja los paquetes en San Antonio. El checkout ofrecía
+  // courier —porque ya tenía shipit_origin_id— y después Shipit respondía que
+  // no hay servicio, dejando la compra trabada. (09-09-2026)
   const origen = resolverOrigenEnvio({
     listingAddress: listing?.address,
     sellerDefaultAddress: seller?.default_address,
+    shipitOriginCommune: seller?.shipit_origin_commune,
   });
 
   if (!origen) {
