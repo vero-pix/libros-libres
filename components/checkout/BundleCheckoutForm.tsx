@@ -100,7 +100,7 @@ export default function BundleCheckoutForm({
   const [shippingUnavailable, setShippingUnavailable] = useState(false);
   // Paquete del mismo vendedor que todavía no sale: estos libros se suman ahí
   // y el despacho no se cobra de nuevo. Ver lib/envio-pendiente.ts.
-  const [envioAbierto, setEnvioAbierto] = useState<{ titulos: string[]; fletePagado: number } | null>(null);
+  const [envioAbierto, setEnvioAbierto] = useState<{ titulos: string[]; fletePagado: number; cupo: number } | null>(null);
 
   const seller = listings[0].seller;
   const totalBookPrice = listings.reduce(
@@ -131,7 +131,7 @@ export default function BundleCheckoutForm({
   // Sumarse a un paquete abierto gana sobre la promo: no hay flete que cobrar
   // porque no hay un segundo viaje. El servidor decide lo mismo al crear la
   // orden; acá es solo para que la pantalla diga la verdad.
-  const seSumaAPaqueteAbierto = isCourier && !!envioAbierto;
+  const seSumaAPaqueteAbierto = isCourier && !!envioAbierto && listings.length <= envioAbierto.cupo;
   const shippingCost = seSumaAPaqueteAbierto ? 0 : promo.cobrarAlComprador;
   const total = totalBookPrice + shippingCost;
 

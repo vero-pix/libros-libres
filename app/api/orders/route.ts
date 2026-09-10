@@ -279,10 +279,13 @@ export async function POST(req: NextRequest) {
     fleteCotizado,
     esCourier: !isInPerson,
   });
-  const shippingCost = isInPerson || envioAbierto ? 0 : promo.cobrarAlComprador;
+  // El bulto tiene tope: si lo que se está comprando no cabe, este pedido
+  // viaja por su cuenta y paga su flete. Ver MAX_LIBROS_POR_PAQUETE.
+  const cabeEnElPaquete = !!envioAbierto && listings.length <= envioAbierto.cupo;
+  const shippingCost = isInPerson || cabeEnElPaquete ? 0 : promo.cobrarAlComprador;
   // Sumarse a un paquete existente no le cuesta nada a Vero: el flete de ese
   // envío ya lo pagó el comprador en la compra anterior. No es un subsidio.
-  const shippingSubsidy = isInPerson || envioAbierto ? 0 : promo.subsidio;
+  const shippingSubsidy = isInPerson || cabeEnElPaquete ? 0 : promo.subsidio;
 
   const { rate: commissionRate, commission } = useSplit
     ? calculateCommission(totalBookPrice)
@@ -325,7 +328,7 @@ export async function POST(req: NextRequest) {
       // Estos libros viajan en un paquete que el vendedor ya está armando.
       // Lo lee /mis-ventas y el correo del despacho para decirle que NO haga
       // una etiqueta nueva. Ver lib/envio-pendiente.ts.
-      merged_into_bundle_id: envioAbierto?.bundleId ?? null,
+      merged_into_bundle_id: cabeEnElPaquete ? envioAbierto!.bundleId : null,
     };
   });
 

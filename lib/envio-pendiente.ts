@@ -14,8 +14,27 @@
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-/** Estados en los que el paquete todavía se puede engordar sin romper nada. */
-const ESTADOS_ABIERTOS = ["pending", "created"] as const;
+/**
+ * Estados en los que el paquete todavía se puede engordar.
+ *
+ * El corte NO es "antes de la etiqueta" sino "antes de que el chofer pase": la
+ * etiqueta lleva remitente y destinatario, que no cambian porque entren más
+ * libros, y sirve igual. Se probó contra el caso real: entre que la compra se
+ * paga y el cron imprime la etiqueta pasan ~2 minutos, así que cortar en
+ * `created` dejaba una ventana inútil — Don Luis volvió a comprar a los 18
+ * minutos y no habría entrado.
+ *
+ * `pickup_failed` queda fuera a propósito: ahí el vendedor ya está decidiendo
+ * qué hacer con un despacho que se cayó, y no es momento de sumarle libros.
+ */
+const ESTADOS_ABIERTOS = ["pending", "created", "label_ready", "notified", "pickup_scheduled"] as const;
+
+/**
+ * Tope de libros por bulto. Un paquete que crece sin límite cambia de tramo de
+ * peso en el courier y el vendedor termina con un cobro extra que nadie le
+ * avisó. Ocho libros es un bulto que todavía entra en una caja chica.
+ */
+const MAX_LIBROS_POR_PAQUETE = 8;
 
 /** Ventana de gracia: más allá de esto el vendedor ya empacó, aunque el estado diga otra cosa. */
 const HORAS_DE_GRACIA = 24;
@@ -28,6 +47,8 @@ export interface EnvioAbierto {
   direccion: string;
   titulos: string[];
   creadoEn: string;
+  /** Cuántos libros más admite este bulto antes de tocar el tope. */
+  cupo: number;
 }
 
 /** Normaliza una dirección para comparar: sin tildes, sin dobles espacios, minúsculas. */
@@ -78,6 +99,8 @@ export async function buscarEnvioAbierto(
 
     if (!ordenes?.length) continue;
     if (normalizarDireccion(ordenes[0].buyer_address) !== objetivo) continue;
+    // Ya va lleno: que el siguiente pedido viaje por su cuenta.
+    if (ordenes.length >= MAX_LIBROS_POR_PAQUETE) continue;
 
     const titulos = ordenes
       .map((o: any) => (Array.isArray(o.listing) ? o.listing[0] : o.listing)?.book)
@@ -90,6 +113,7 @@ export async function buscarEnvioAbierto(
       direccion: ordenes[0].buyer_address ?? "",
       titulos,
       creadoEn: envio.created_at,
+      cupo: MAX_LIBROS_POR_PAQUETE - ordenes.length,
     };
   }
 

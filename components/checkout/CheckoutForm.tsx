@@ -54,7 +54,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   // 500 km. La entrega se elige a conciencia. (08-09-2026)
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod | null>(null);
   // Paquete del mismo vendedor todavía sin salir: estos libros se suman ahí.
-  const [envioAbierto, setEnvioAbierto] = useState<{ titulos: string[]; fletePagado: number } | null>(null);
+  const [envioAbierto, setEnvioAbierto] = useState<{ titulos: string[]; fletePagado: number; cupo: number } | null>(null);
   // Confirmación explícita cuando elige retirar: la comuna del vendedor dejó de
   // ser una línea que se puede pasar por alto.
   const [confirmaRetiro, setConfirmaRetiro] = useState(false);
@@ -144,7 +144,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   // Sumarse a un paquete abierto gana sobre la promo: no hay segundo viaje que
   // cobrar. El servidor decide lo mismo al crear la orden.
   // Ver lib/envio-pendiente.ts (caso Don Luis, 09-09-2026).
-  const seSumaAPaqueteAbierto = isCourier && !!envioAbierto;
+  const seSumaAPaqueteAbierto = isCourier && !!envioAbierto && 1 <= envioAbierto.cupo;
   const shippingCost = seSumaAPaqueteAbierto ? 0 : promo.cobrarAlComprador;
   const total = discountedBookPrice + shippingCost;
 

@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
   // el cliente no tiene por qué poder nombrarlo.
   return NextResponse.json({
     envio: envio
-      ? { titulos: envio.titulos, fletePagado: envio.fletePagado, creadoEn: envio.creadoEn }
+      ? { titulos: envio.titulos, fletePagado: envio.fletePagado, creadoEn: envio.creadoEn, cupo: envio.cupo }
       : null,
   });
 }
