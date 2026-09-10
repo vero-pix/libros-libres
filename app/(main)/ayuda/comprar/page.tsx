@@ -77,6 +77,15 @@ export default function AyudaComprarPage() {
             </p>
           </Tarjeta>
           <Tarjeta>
+            <h3 className="font-semibold text-ink text-lg mb-2">Si compras dos veces al mismo vendedor</h3>
+            <p>
+              Mientras él no haya despachado, tus libros nuevos se suman al paquete que ya está armando y{" "}
+              <strong>no pagas despacho de nuevo</strong>: es el mismo viaje. Lo verás en el checkout, donde el envío
+              aparece como &ldquo;ya pagado&rdquo;, y le avisamos a él para que los meta en el mismo bulto. Deja de
+              aplicar cuando el courier ya pasó a buscarlo o cuando el paquete llega a ocho libros.
+            </p>
+          </Tarjeta>
+          <Tarjeta>
             <h3 className="font-semibold text-ink text-lg mb-2">Entrega en persona</h3>
             <p>
               Coordinas con el vendedor desde <Link href="/mis-pedidos" className={linkClass}>Mis Pedidos → Escribir</Link>.

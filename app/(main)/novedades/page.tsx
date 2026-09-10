@@ -71,6 +71,13 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 
 const novedades: Entry[] = [
   {
+    date: "10 septiembre 2026",
+    title: "Si vuelves a comprarle al mismo vendedor, no pagas el despacho de nuevo",
+    description:
+      "Me lo hizo ver una vendedora, no el sistema. Un comprador le había pedido libros tres veces en tres días y me escribió: «parece que ha pagado mil envíos». Fui a mirar y era cierto: $16.230 de despacho sobre $75.000 en libros. Dos de esas compras eran del mismo día, con 18 minutos de diferencia, a la misma dirección, y los dos paquetes tenían agendado el mismo retiro. El chofer iba a pasar una vez y llevarse dos bultos que podían ser uno. Cuando compras varios libros de una, el sitio siempre los juntó en un envío. Lo que no miraba era si ya tenías un paquete armándose donde ese mismo vendedor: cada compra nueva empezaba de cero y cotizaba flete otra vez. Ahora sí lo mira. Si le compras de nuevo al mismo vendedor, a la misma dirección, y él todavía no despacha, tus libros se suman a ese paquete y no pagas envío por segunda vez. A él le llega un correo diciéndole que los meta en el mismo bulto y que use la etiqueta que ya tiene. Se corta cuando el paquete llega a ocho libros o cuando el chofer ya pasó, que es cuando dejaría de ser el mismo viaje.",
+    tag: "Lanzamiento",
+  },
+  {
     date: "8 septiembre 2026",
     title: "El reel: la historia en 60 segundos",
     description:
@@ -1587,10 +1594,10 @@ export default async function NovedadesPage() {
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 animate-fade-in-up" style={{ animationDelay: "240ms" }}>
           {[
             {
-              fecha: "Lanzamiento · 7 sep",
-              titulo: "La etiqueta de despacho se genera sola",
-              texto: "Vendes con despacho y la etiqueta llega por correo y a Mis Ventas. Imprimes, pegas y dejas el paquete en la sucursal. Nadie tiene que pedírmela.",
-              href: "/ayuda/vender#despacho",
+              fecha: "Lanzamiento · 10 sep",
+              titulo: "Un solo despacho aunque compres en dos veces",
+              texto: "Si le compras de nuevo al mismo vendedor y todavía no despacha, tus libros se suman a ese paquete y no pagas envío otra vez.",
+              href: "/ayuda/comprar#recibir",
               cta: "Cómo funciona",
             },
             {
