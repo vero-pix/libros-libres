@@ -70,21 +70,21 @@ export default function VitrinaDemanda({ libros }: Props) {
           href={urlLibro(principal)}
           className="group flex bg-paper-card border-2 border-brand-500 rounded-2xl overflow-hidden shadow-card hover:shadow-book transition-all duration-300"
         >
-          <div className="relative w-[38%] min-w-[130px] max-w-[210px] bg-cream-warm flex-shrink-0">
+          <div className="relative w-[32%] min-w-[110px] max-w-[168px] bg-cream-warm flex-shrink-0">
             <Image
               src={principal.coverUrl!}
               alt={principal.titulo}
               fill
               className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
-              sizes="210px"
+              sizes="168px"
             />
           </div>
-          <div className="flex flex-col p-5 sm:p-6 flex-grow min-w-0">
+          <div className="flex flex-col p-4 sm:p-5 flex-grow min-w-0">
             <span className="self-start inline-flex items-center gap-1.5 bg-brand-500 text-brand-950 font-mono text-[10px] font-medium px-2.5 py-1.5 rounded tracking-wide mb-3">
               <IconoLupa />
               {principal.busquedas} PERSONAS LO BUSCARON
             </span>
-            <h3 className="font-display text-lg sm:text-2xl font-semibold text-ink leading-tight line-clamp-3">
+            <h3 className="font-display text-base sm:text-xl font-semibold text-ink leading-tight line-clamp-3">
               {principal.titulo}
             </h3>
             {principal.autor && (
@@ -93,7 +93,7 @@ export default function VitrinaDemanda({ libros }: Props) {
             <div className="mt-auto pt-4">
               <div className="flex items-baseline gap-2.5 flex-wrap">
                 {principal.precio != null && (
-                  <span className="text-2xl sm:text-3xl font-bold text-ink tracking-tight tabular-nums">
+                  <span className="text-xl sm:text-2xl font-bold text-ink tracking-tight tabular-nums">
                     ${principal.precio.toLocaleString("es-CL")}
                   </span>
                 )}
@@ -144,7 +144,7 @@ export default function VitrinaDemanda({ libros }: Props) {
                   <p className="font-display italic text-[11px] text-ink-muted mt-0.5 line-clamp-1">{l.autor}</p>
                 )}
                 {l.precio != null && (
-                  <span className="text-base font-bold text-ink tracking-tight mt-2 tabular-nums">
+                  <span className="text-base font-bold text-ink tracking-tight mt-auto pt-2 tabular-nums">
                     ${l.precio.toLocaleString("es-CL")}
                   </span>
                 )}
