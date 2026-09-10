@@ -93,8 +93,21 @@ function FanBook({ b }: { b: ReturnType<typeof weeklyHeroBooks>[number] }) {
 }
 
 /* Portada real del catálogo, con las mismas posiciones/rotaciones del abanico.
-   Enlaza a la ficha del libro. object-cover para que cualquier proporción llene el slot. */
-function RealFanBook({ book, pos }: { book: HeroBook; pos: string }) {
+   Enlaza a la ficha del libro. object-cover para que cualquier proporción llene el slot.
+
+   `eager` a propósito (10-09-2026): estas seis portadas son lo más grande de la
+   primera pantalla, o sea el elemento que define el LCP de la portada — y venían
+   con `loading="lazy"`, que le pide al navegador justamente lo contrario. Semrush
+   medía 3,0–4,0s donde Google quiere menos de 2,5.
+
+   Las tres primeras llevan además `fetchPriority="high"`: son las de más arriba en
+   el abanico y las que gana el LCP. Poner las seis en alta prioridad no ayuda —
+   compiten entre ellas por el mismo ancho de banda y ninguna llega antes.
+
+   Siguen siendo `<img>` y no `next/image` a propósito: la optimización de imágenes
+   es lo que más factura del plan de Vercel y ya se acotó por costo el 17-08-2026
+   (ver `next.config.mjs`). Esto arregla el LCP sin agregar ni una transformación. */
+function RealFanBook({ book, pos, prioridad }: { book: HeroBook; pos: string; prioridad: boolean }) {
   return (
     <Link
       href={book.href}
@@ -103,7 +116,14 @@ function RealFanBook({ book, pos }: { book: HeroBook; pos: string }) {
     >
       <span aria-hidden className="absolute inset-y-0 left-0 w-2 z-[2] bg-gradient-to-r from-black/30 via-white/10 to-black/10" />
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={book.cover} alt={book.title} loading="lazy" className="w-full h-full object-cover" />
+      <img
+        src={book.cover}
+        alt={book.title}
+        loading="eager"
+        fetchPriority={prioridad ? "high" : "auto"}
+        decoding="async"
+        className="w-full h-full object-cover"
+      />
     </Link>
   );
 }
@@ -167,7 +187,7 @@ export default function HeroBar({ heroBooks }: Props) {
           <div className="relative h-[460px] hidden lg:block">
             {useReal
               ? heroBooks!.slice(0, 6).map((b, i) => (
-                  <RealFanBook key={b.href} book={b} pos={HERO_SLOTS[i].pos} />
+                  <RealFanBook key={b.href} book={b} pos={HERO_SLOTS[i].pos} prioridad={i < 3} />
                 ))
               : weeklyHeroBooks().map((b) => <FanBook key={b.t} b={b} />)}
             <div className="absolute z-[6] left-[40%] top-[188px] rotate-[2deg] bg-white border border-line rounded-full px-3.5 py-2 shadow-card flex items-center gap-2.5 font-mono text-[11px] font-semibold text-ink whitespace-nowrap">
