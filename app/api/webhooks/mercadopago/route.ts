@@ -9,6 +9,7 @@ import { registrarComisionVenta } from "@/lib/commissions";
 import { VERO_INBOX } from "@/lib/veroInbox";
 import { WHATSAPP_SOPORTE_LEGIBLE } from "@/lib/soporte";
 import { correoCompradorCompraConfirmada } from "@/lib/order-emails";
+import { correoVendedorLibrosQueSeSuman } from "@/lib/shipit-emails";
 
 /**
  * Origen del envío para Shipit. La dirección del listing es más precisa, pero
@@ -99,6 +100,68 @@ async function logWebhook(datos: {
  */
 function esIpn(body: any): boolean {
   return !!body && !body.type && !body.action && (body.topic !== undefined || body.resource !== undefined);
+}
+
+
+/**
+ * Le avisa al vendedor que los libros recién comprados van en un paquete que
+ * él ya está armando — y por eso NO se encoló un envío nuevo.
+ *
+ * Nunca lanza: este aviso no puede tumbar el webhook que acaba de marcar la
+ * venta como pagada. Si el correo falla, la venta igual queda registrada y se
+ * ve en /mis-ventas con la marca `merged_into_bundle_id`.
+ */
+async function avisarLibrosQueSeSuman(
+  sb: any,
+  bundleNuevo: string,
+  bundleDestino: string
+): Promise<void> {
+  try {
+    const [qNuevas, qDestino, qEnvio] = await Promise.all([
+      sb.from("orders")
+        .select("seller_id, listing:listings(book:books(title)), seller:users!orders_seller_id_fkey(full_name, email), buyer:users!orders_buyer_id_fkey(full_name)")
+        .eq("bundle_id", bundleNuevo),
+      sb.from("orders").select("listing:listings(book:books(title))").eq("bundle_id", bundleDestino),
+      sb.from("shipments").select("tracking_number, courier").eq("bundle_id", bundleDestino).maybeSingle(),
+    ]);
+
+    const nuevas = qNuevas.data ?? [];
+    if (!nuevas.length) return;
+
+    const titulo = (o: any) => {
+      const l = Array.isArray(o.listing) ? o.listing[0] : o.listing;
+      const b = Array.isArray(l?.book) ? l.book[0] : l?.book;
+      return b?.title as string | undefined;
+    };
+    const limpiar = (xs: any[]) => xs.map(titulo).filter((t): t is string => !!t);
+
+    const cabeza = nuevas[0];
+    const vendedor = Array.isArray(cabeza.seller) ? cabeza.seller[0] : cabeza.seller;
+    const comprador = Array.isArray(cabeza.buyer) ? cabeza.buyer[0] : cabeza.buyer;
+    if (!vendedor?.email) return;
+
+    const m = correoVendedorLibrosQueSeSuman({
+      vendedorNombre: vendedor.full_name ?? null,
+      compradorNombre: comprador?.full_name ?? null,
+      titulosNuevos: limpiar(nuevas),
+      titulosDelPaquete: limpiar(qDestino.data ?? []),
+      tracking: qEnvio.data?.tracking_number ?? null,
+      courier: qEnvio.data?.courier ?? null,
+    });
+
+    // Mientras Workspace esté caído, el correo de Vero vendedora va a su buzón
+    // real. Ver lib/veroInbox.ts.
+    const destino = vendedor.email === "vero@tuslibros.cl" ? VERO_INBOX : vendedor.email;
+    await sendEmail({
+      to: destino,
+      from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+      replyTo: VERO_INBOX,
+      subject: m.subject,
+      html: m.html,
+    });
+  } catch (e) {
+    console.error("[webhook] no se pudo avisar de los libros que se suman:", e);
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -204,7 +267,7 @@ export async function POST(req: NextRequest) {
     // Intentar primero como bundle_id
     const { data: bundleOrders } = await supabase
       .from("orders")
-      .select("id, listing_id, bundle_id, seller_id, buyer_id, buyer_address, courier, shipping_cost, shipping_subsidy, book_price")
+      .select("id, listing_id, bundle_id, seller_id, buyer_id, buyer_address, courier, shipping_cost, shipping_subsidy, book_price, merged_into_bundle_id")
       .eq("bundle_id", externalRef);
 
     if (bundleOrders && bundleOrders.length > 0) {
@@ -279,7 +342,13 @@ export async function POST(req: NextRequest) {
             headOrder.courier === "Entrega en persona" ||
             headOrder.courier === "Punto de retiro";
 
-          if (headOrder.buyer_address && !isInPerson) {
+          // Si esta compra se suma a un paquete que el vendedor todavía no
+          // despacha, NO se encola un envío nuevo: sería una segunda etiqueta
+          // para el mismo bulto, que es justo lo que se está evitando.
+          // Ver lib/envio-pendiente.ts (caso Don Luis, 09-09-2026).
+          if (headOrder.merged_into_bundle_id) {
+            await avisarLibrosQueSeSuman(supabase, externalRef, headOrder.merged_into_bundle_id);
+          } else if (headOrder.buyer_address && !isInPerson) {
             await encolarEnvio(supabase, {
               bundleId: externalRef,
               orderHeadId: headOrder.id,
@@ -478,7 +547,7 @@ export async function POST(req: NextRequest) {
         try {
           const { data: shipitOrder } = await supabase
             .from("orders")
-            .select("id, buyer_id, seller_id, bundle_id, buyer_address, shipping_cost, shipping_subsidy, courier")
+            .select("id, buyer_id, seller_id, bundle_id, buyer_address, shipping_cost, shipping_subsidy, courier, merged_into_bundle_id")
             .eq("id", order.id)
             .single();
 
@@ -486,7 +555,13 @@ export async function POST(req: NextRequest) {
             shipitOrder?.courier === "Entrega en persona" ||
             shipitOrder?.courier === "Punto de retiro";
 
-          if (shipitOrder?.buyer_address && !isInPerson) {
+          if (shipitOrder?.merged_into_bundle_id) {
+            await avisarLibrosQueSeSuman(
+              supabase,
+              shipitOrder.bundle_id ?? shipitOrder.id,
+              shipitOrder.merged_into_bundle_id
+            );
+          } else if (shipitOrder?.buyer_address && !isInPerson) {
             await encolarEnvio(supabase, {
               bundleId: shipitOrder.bundle_id ?? shipitOrder.id,
               orderHeadId: shipitOrder.id,

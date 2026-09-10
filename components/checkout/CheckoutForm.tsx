@@ -53,6 +53,8 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   // así que quien no leía elegía por omisión retirar un libro que podía estar a
   // 500 km. La entrega se elige a conciencia. (08-09-2026)
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod | null>(null);
+  // Paquete del mismo vendedor todavía sin salir: estos libros se suman ahí.
+  const [envioAbierto, setEnvioAbierto] = useState<{ titulos: string[]; fletePagado: number } | null>(null);
   // Confirmación explícita cuando elige retirar: la comuna del vendedor dejó de
   // ser una línea que se puede pasar por alto.
   const [confirmaRetiro, setConfirmaRetiro] = useState(false);
@@ -139,7 +141,11 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
     fleteCotizado,
     esCourier: isCourier,
   });
-  const shippingCost = promo.cobrarAlComprador;
+  // Sumarse a un paquete abierto gana sobre la promo: no hay segundo viaje que
+  // cobrar. El servidor decide lo mismo al crear la orden.
+  // Ver lib/envio-pendiente.ts (caso Don Luis, 09-09-2026).
+  const seSumaAPaqueteAbierto = isCourier && !!envioAbierto;
+  const shippingCost = seSumaAPaqueteAbierto ? 0 : promo.cobrarAlComprador;
   const total = discountedBookPrice + shippingCost;
 
   const fetchQuotes = useCallback(
@@ -227,6 +233,33 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
       fetchQuotes(buyerAddress);
     }
   }, [buyerAddress, fetchQuotes]);
+
+  // ¿Hay un paquete de este vendedor sin despachar, a esta misma dirección?
+  // Un fallo acá deja el flete normal, que es el comportamiento de siempre.
+  useEffect(() => {
+    const sellerId = listing.seller_id;
+    if (!sellerId || !isCourier || address.trim().length < 5) {
+      setEnvioAbierto(null);
+      return;
+    }
+    let vigente = true;
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/orders/envio-abierto?seller_id=${encodeURIComponent(sellerId)}&address=${encodeURIComponent(address)}`
+        );
+        if (!res.ok) return;
+        const data = await res.json();
+        if (vigente) setEnvioAbierto(data.envio ?? null);
+      } catch {
+        /* sin respuesta, flete normal */
+      }
+    }, 600);
+    return () => {
+      vigente = false;
+      clearTimeout(t);
+    };
+  }, [listing.seller_id, isCourier, address]);
 
   async function handleApplyCode() {
     if (!discountInput.trim()) return;
@@ -477,6 +510,23 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                   Falta el número de la calle. Sin él el courier no puede entregar.
                 </p>
               )}
+              {seSumaAPaqueteAbierto && (
+                <div className="mt-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 animate-fade-in">
+                  <p className="text-xs font-bold text-green-900 mb-1">
+                    Este libro va en el paquete que ya tienes en camino
+                  </p>
+                  <p className="text-xs text-green-800">
+                    {listing.seller?.full_name?.split(" ")[0] ?? "El vendedor"} todavía
+                    no despacha tu compra anterior
+                    {envioAbierto!.titulos.length > 0 && (
+                      <> (<strong>{envioAbierto!.titulos.slice(0, 2).join(", ")}</strong>
+                      {envioAbierto!.titulos.length > 2 ? " y otros" : ""})</>
+                    )}
+                    , así que este libro se suma al mismo envío y{" "}
+                    <strong>no pagas despacho de nuevo</strong>.
+                  </p>
+                </div>
+              )}
               {quoteError && !shippingUnavailable && (
                 <p className="mt-3 text-xs text-amber-700">
                   {quoteError}
@@ -629,6 +679,15 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
               <span className="text-ink font-bold">
                 {!isCourier ? (
                   "Gratis"
+                ) : seSumaAPaqueteAbierto ? (
+                  <>
+                    {selectedQuote && (
+                      <span className="text-ink-muted font-medium line-through mr-1.5">
+                        ${fleteCotizado.toLocaleString("es-CL")}
+                      </span>
+                    )}
+                    <span className="text-green-700">Ya pagado</span>
+                  </>
                 ) : !selectedQuote ? (
                   "—"
                 ) : promo.aplica ? (
@@ -649,7 +708,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
               <span className="text-ink font-bold uppercase tracking-wider">Total</span>
               <div className="text-right">
                 <p className="text-2xl font-black text-ink leading-none">
-                  ${(isCourier && !selectedQuote) ? "—" : total.toLocaleString("es-CL")}
+                  ${(isCourier && !selectedQuote && !seSumaAPaqueteAbierto) ? "—" : total.toLocaleString("es-CL")}
                 </p>
                 <p className="text-[10px] text-ink-muted font-medium mt-1 uppercase tracking-tighter">IVA incluido</p>
               </div>

@@ -13,6 +13,7 @@ import { refreshSellerToken } from "@/lib/mercadopago-oauth";
 import { sendGong, escapeHtml } from "@/lib/notifications";
 import crypto from "crypto";
 import { calcularEnvioPromo } from "@/lib/shipping-promo";
+import { buscarEnvioAbierto } from "@/lib/envio-pendiente";
 
 /**
  * POST /api/orders
@@ -248,6 +249,28 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // ¿Este comprador ya tiene un paquete armándose donde este vendedor? Entonces
+  // no se le cobra el flete de nuevo: los libros nuevos van en el mismo bulto.
+  // Se resuelve acá y no en el navegador por la misma razón que la promo — un
+  // curl no puede reclamar envío gratis inventando un bundle previo.
+  // Ver lib/envio-pendiente.ts (caso Don Luis, 09-09-2026).
+  const envioAbierto = isInPerson
+    ? null
+    : await buscarEnvioAbierto(
+        // Cliente de servicio: `shipments` no es legible por el comprador y
+        // esta consulta decide plata, así que no puede depender de RLS.
+        createSupabaseClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          { auth: { persistSession: false } }
+        ),
+        {
+          buyerId: user.id,
+          sellerId,
+          direccion: buyer_address ?? null,
+        }
+      );
+
   // Envío gratis sobre el umbral: se decide acá, no en el navegador.
   // Ver lib/shipping-promo.ts (25 ago 2026).
   const promo = calcularEnvioPromo({
@@ -256,8 +279,10 @@ export async function POST(req: NextRequest) {
     fleteCotizado,
     esCourier: !isInPerson,
   });
-  const shippingCost = isInPerson ? 0 : promo.cobrarAlComprador;
-  const shippingSubsidy = promo.subsidio;
+  const shippingCost = isInPerson || envioAbierto ? 0 : promo.cobrarAlComprador;
+  // Sumarse a un paquete existente no le cuesta nada a Vero: el flete de ese
+  // envío ya lo pagó el comprador en la compra anterior. No es un subsidio.
+  const shippingSubsidy = isInPerson || envioAbierto ? 0 : promo.subsidio;
 
   const { rate: commissionRate, commission } = useSplit
     ? calculateCommission(totalBookPrice)
@@ -297,6 +322,10 @@ export async function POST(req: NextRequest) {
       bundle_id: bundleId,
       discount_code: discount_code?.toUpperCase() ?? null,
       discount_amount: itemDiscount,
+      // Estos libros viajan en un paquete que el vendedor ya está armando.
+      // Lo lee /mis-ventas y el correo del despacho para decirle que NO haga
+      // una etiqueta nueva. Ver lib/envio-pendiente.ts.
+      merged_into_bundle_id: envioAbierto?.bundleId ?? null,
     };
   });
 

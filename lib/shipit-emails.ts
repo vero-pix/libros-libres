@@ -191,3 +191,43 @@ export function correoCompradorVentaCancelada(d: DatosCorreoVentaCancelada): { s
   `);
   return { subject, html };
 }
+
+export interface DatosLibrosQueSeSuman {
+  vendedorNombre: string | null;
+  compradorNombre: string | null;
+  /** Los libros recién comprados, que hay que meter al paquete que ya está armando. */
+  titulosNuevos: string[];
+  /** Lo que ya iba en ese paquete, para que reconozca cuál es. */
+  titulosDelPaquete: string[];
+  tracking: string | null;
+  courier: string | null;
+}
+
+/**
+ * Correo 4 · al vendedor cuando una compra nueva se suma a un paquete que
+ * todavía no despacha.
+ *
+ * Es el correo que hace honesta la promesa que se le hizo al comprador: él no
+ * pagó despacho porque estos libros viajan en un bulto que ya existe. Si el
+ * vendedor no se entera, arma un segundo paquete y el flete lo termina
+ * poniendo alguien. Ver lib/envio-pendiente.ts (caso Don Luis, 09-09-2026).
+ */
+export function correoVendedorLibrosQueSeSuman(d: DatosLibrosQueSeSuman): { subject: string; html: string } {
+  const courier = nombreCourier(d.courier);
+  const nuevos = queLibros(d.titulosNuevos);
+  const cuantos = d.titulosNuevos.length > 1 ? `${d.titulosNuevos.length} libros más` : "un libro más";
+  const subject = `${d.compradorNombre ?? "Tu comprador"} compró ${cuantos} — van en el mismo paquete`;
+  const html = marco(`
+    <p>Hola ${esc(primerNombre(d.vendedorNombre, "vendedor"))}!</p>
+    <p>${esc(d.compradorNombre ?? "Tu comprador")} volvió y se llevó ${nuevos.corto}. Como el paquete anterior todavía no sale, <strong>estos libros van en el mismo bulto</strong> — no hay que hacer una etiqueta nueva ni pagar otro despacho.${nuevos.lista}</p>
+    <p>El paquete es el que ya tienes armado${d.tracking ? ` con el seguimiento <strong>${esc(d.tracking)}</strong> de ${esc(courier)}` : ""}${d.titulosDelPaquete.length ? `, donde iban ${esc(d.titulosDelPaquete.slice(0, 3).join(", "))}${d.titulosDelPaquete.length > 3 ? " y otros" : ""}` : ""}.</p>
+    <ol style="padding-left:20px">
+      <li>Abre el paquete si ya lo cerraste y suma estos libros.</li>
+      <li>Deja la <strong>misma etiqueta</strong> que ya tenías pegada. Sigue siendo válida.</li>
+      <li>Nada más: el despacho ya está pagado y el retiro ya está agendado.</li>
+    </ol>
+    <p>Le cobramos el despacho una sola vez a propósito: es el mismo viaje. A ti se te paga cada libro completo, como siempre.</p>
+    ${boton(`${SITE}/mis-ventas`, "Ver la venta")}
+  `);
+  return { subject, html };
+}

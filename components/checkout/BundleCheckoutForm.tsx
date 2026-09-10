@@ -98,6 +98,9 @@ export default function BundleCheckoutForm({
 
   /** Shipit confirmó que no hay despacho posible entre estas comunas. */
   const [shippingUnavailable, setShippingUnavailable] = useState(false);
+  // Paquete del mismo vendedor que todavía no sale: estos libros se suman ahí
+  // y el despacho no se cobra de nuevo. Ver lib/envio-pendiente.ts.
+  const [envioAbierto, setEnvioAbierto] = useState<{ titulos: string[]; fletePagado: number } | null>(null);
 
   const seller = listings[0].seller;
   const totalBookPrice = listings.reduce(
@@ -125,7 +128,11 @@ export default function BundleCheckoutForm({
     fleteCotizado,
     esCourier: isCourier,
   });
-  const shippingCost = promo.cobrarAlComprador;
+  // Sumarse a un paquete abierto gana sobre la promo: no hay flete que cobrar
+  // porque no hay un segundo viaje. El servidor decide lo mismo al crear la
+  // orden; acá es solo para que la pantalla diga la verdad.
+  const seSumaAPaqueteAbierto = isCourier && !!envioAbierto;
+  const shippingCost = seSumaAPaqueteAbierto ? 0 : promo.cobrarAlComprador;
   const total = totalBookPrice + shippingCost;
 
   const firstListingId = listings[0].id;
@@ -221,6 +228,34 @@ export default function BundleCheckoutForm({
       fetchQuotes(buyerAddress);
     }
   }, [buyerAddress, fetchQuotes]);
+
+  // ¿Hay un paquete de este vendedor todavía sin salir, a esta misma
+  // dirección? Se pregunta con la dirección escrita, porque sumarse solo tiene
+  // sentido si el bulto va al mismo lugar. Un fallo acá deja el flete normal.
+  useEffect(() => {
+    const sellerId = seller?.id;
+    if (!sellerId || !isCourier || address.trim().length < 5) {
+      setEnvioAbierto(null);
+      return;
+    }
+    let vigente = true;
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/orders/envio-abierto?seller_id=${encodeURIComponent(sellerId)}&address=${encodeURIComponent(address)}`
+        );
+        if (!res.ok) return;
+        const data = await res.json();
+        if (vigente) setEnvioAbierto(data.envio ?? null);
+      } catch {
+        /* sin respuesta se cobra el flete normal, que es lo de siempre */
+      }
+    }, 600);
+    return () => {
+      vigente = false;
+      clearTimeout(t);
+    };
+  }, [seller?.id, isCourier, address]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -390,6 +425,25 @@ export default function BundleCheckoutForm({
         </div>
       )}
 
+      {seSumaAPaqueteAbierto && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-5">
+          <h2 className="font-semibold text-green-900 mb-1 text-sm">
+            Estos libros van en el paquete que ya tienes en camino
+          </h2>
+          <p className="text-xs text-green-800">
+            {seller?.full_name ?? "El vendedor"} todavía no despacha tu compra
+            anterior
+            {envioAbierto!.titulos.length > 0 && (
+              <> (<strong>{envioAbierto!.titulos.slice(0, 2).join(", ")}</strong>
+              {envioAbierto!.titulos.length > 2 ? " y otros" : ""})</>
+            )}
+            , así que estos libros se suman al mismo envío y{" "}
+            <strong>no pagas despacho de nuevo</strong>. Le avisamos para que los
+            meta en el mismo paquete.
+          </p>
+        </div>
+      )}
+
       {isCourier && shippingUnavailable && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-5">
           <h2 className="font-semibold text-amber-900 mb-1 text-sm">
@@ -468,6 +522,15 @@ export default function BundleCheckoutForm({
             <span className="text-gray-900">
               {!isCourier ? (
                 "Gratis"
+              ) : seSumaAPaqueteAbierto ? (
+                <>
+                  {selectedQuote && (
+                    <span className="text-gray-400 line-through mr-1.5">
+                      ${fleteCotizado.toLocaleString("es-CL")}
+                    </span>
+                  )}
+                  <span className="text-green-700 font-semibold">Ya pagado</span>
+                </>
               ) : !selectedQuote ? (
                 "Ingresa dirección"
               ) : promo.aplica ? (
