@@ -56,6 +56,26 @@ export interface DatosCorreoEtiqueta {
   direccionEntrega: string;
   /** Vendedor en la Región Metropolitana: puede pedir retiro a domicilio desde Mis Ventas. */
   enRM?: boolean;
+  /**
+   * Retiro ya agendado cuando sale el correo (`last_pickup` de Shipit).
+   * Sin esto el correo mandaba SIEMPRE a sucursal: a Libro de Ocasión le
+   * llegó "llévalo al mesón, no hay que esperar a nadie" el mismo día que
+   * Starken pasaba a buscarlo, y tuvo que preguntar cuál de las dos seguir
+   * (09-09-2026). La app ya lo sabía; el correo no lo miraba.
+   */
+  retiro?: { date: string; window: string | null } | null;
+}
+
+/** "el jueves 10 de septiembre entre las 11:00 y las 17:00" (sin ventana, solo el día). */
+function cuandoPasan(r: { date: string; window: string | null }): string {
+  const [y, m, d] = r.date.split("-").map(Number);
+  const fecha = new Date(Date.UTC(y, (m ?? 1) - 1, d ?? 1));
+  // es-CL mete una coma ("jueves, 10 de septiembre") que en la frase queda mal.
+  const dia = new Intl.DateTimeFormat("es-CL", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })
+    .format(fecha)
+    .replace(",", "");
+  if (!r.window) return `el ${dia}`;
+  return `el ${dia} entre las ${r.window.replace(/\s*-\s*/, " y las ")}`;
 }
 
 /** Correo 1 · al vendedor cuando la etiqueta está lista (label_ready). */
@@ -71,13 +91,16 @@ export function correoVendedorEtiqueta(d: DatosCorreoEtiqueta): { subject: strin
     <ol style="padding-left:20px">
       <li>Empaca el libro en sobre acolchado o caja chica. Si son varios libros del mismo comprador, van juntos en un paquete.</li>
       <li>Descarga la etiqueta desde Mis Ventas, imprímela y pégala en el paquete. Si no tienes impresora, escribe en el paquete, bien claro, el nombre del comprador y el número de seguimiento.</li>
-      <li>Lleva el paquete a la <strong>sucursal ${esc(courier)} más cercana</strong>, idealmente hoy o mañana, y entrégalo en el mesón con la etiqueta puesta. No hay que agendar nada ni esperar a nadie.</li>
-      <li>Pide el comprobante de recepción y guárdalo hasta que el comprador reciba el libro.</li>
+      ${d.retiro
+        ? `<li><strong>No lo lleves a sucursal.</strong> ${esc(courier)} pasa a buscarlo a tu dirección <strong>${esc(cuandoPasan(d.retiro))}</strong>. Solo déjalo empaquetado y con la etiqueta puesta, listo para entregárselo al chofer.</li>`
+        : `<li>Lleva el paquete a la <strong>sucursal ${esc(courier)} más cercana</strong>, idealmente hoy o mañana, y entrégalo en el mesón con la etiqueta puesta. No hay que agendar nada ni esperar a nadie.</li>`}
+      <li>Pide el comprobante de recepción${d.retiro ? " al chofer" : ""} y guárdalo hasta que el comprador reciba el libro.</li>
       <li>No le pagas nada al courier: el envío ya lo pagó el comprador.</li>
     </ol>
-    <p>El seguimiento empieza a moverse cuando la sucursal escanea el paquete; hasta entonces aparece sin novedad, es normal.</p>
+    <p>El seguimiento empieza a moverse cuando ${d.retiro ? "el chofer entrega el paquete en el centro de distribución" : "la sucursal escanea el paquete"}; hasta entonces aparece sin novedad, es normal.</p>
     ${boton(`${SITE}/mis-ventas`, "Ver mi venta y descargar la etiqueta")}
-    ${d.enRM ? `<p>Si prefieres que pasen a buscar el paquete a tu casa, en Mis Ventas hay un botón "Pedir retiro a domicilio". Lo coordino yo con Shipit y te aviso la ventana.</p>` : ""}
+    ${d.enRM && !d.retiro ? `<p>Si prefieres que pasen a buscar el paquete a tu casa, en Mis Ventas hay un botón "Pedir retiro a domicilio". Lo coordino yo con Shipit y te aviso la ventana.</p>` : ""}
+    ${d.retiro ? `<p>Si a esa hora no vas a estar, en Mis Ventas puedes reagendar el retiro o elegir "Lo dejo en sucursal" — así nadie viaja al vacío y la etiqueta sigue sirviendo igual.</p>` : ""}
     <p>Si en la sucursal te ponen algún problema con la etiqueta, escríbele directo a Shipit por WhatsApp al +56 9 3230 2514 (de 9:00 a 18:00) con el número de seguimiento. Y a mí me cuentas después.</p>
     <p>Para hablar con tu comprador, en Mis Ventas hay un botón "Escribir" al lado de su nombre. Y revisa Mis Ventas cada uno o dos días, aunque no te llegue correo.</p>
   `);
@@ -93,11 +116,11 @@ export function correoCompradorTracking(d: DatosCorreoEtiqueta): { subject: stri
   const seguimiento = urlSeguimiento(d.courier, d.tracking);
   const html = marco(`
     <p>Hola ${esc(primerNombre(d.compradorNombre, ""))}! Soy Vero de tuslibros.cl.</p>
-    <p>${libros.corto.replace(/^<strong>tus/, "<strong>Tus")} ${d.titulos.length > 1 ? "salen" : "sale"} por <strong>${esc(courier)}</strong> desde ${esc(d.comunaOrigen)} y ${d.titulos.length > 1 ? "llegan" : "llega"} a ${esc(d.direccionEntrega)}. Una vez que el vendedor lo entrega en la sucursal, ${esc(courier)} demora entre 1 y 3 días hábiles.${libros.lista}</p>
+    <p>${libros.corto.replace(/^<strong>tus/, "<strong>Tus")} ${d.titulos.length > 1 ? "salen" : "sale"} por <strong>${esc(courier)}</strong> desde ${esc(d.comunaOrigen)} y ${d.titulos.length > 1 ? "llegan" : "llega"} a ${esc(d.direccionEntrega)}. Una vez que ${d.retiro ? "el courier pasa a buscarlo" : "el vendedor lo entrega en la sucursal"}, ${esc(courier)} demora entre 1 y 3 días hábiles.${libros.lista}</p>
     <p>Número de seguimiento: <strong>${esc(d.tracking)}</strong></p>
     ${seguimiento ? boton(seguimiento, `Seguir el envío en ${courier}`) : ""}
     <p>También lo ves en Mis Pedidos: <a href="${SITE}/mis-pedidos">${SITE}/mis-pedidos</a></p>
-    <p>El vendedor deja el paquete en la sucursal del courier en los próximos dos días hábiles, así que el seguimiento puede tardar un poco en mostrar movimiento. Si pasan tres días hábiles sin novedad, me escribes y lo reviso con Shipit.</p>
+    <p>${d.retiro ? `${esc(courier)} pasa a buscar el paquete donde el vendedor ${esc(cuandoPasan(d.retiro))}` : "El vendedor deja el paquete en la sucursal del courier en los próximos dos días hábiles"}, así que el seguimiento puede tardar un poco en mostrar movimiento. Si pasan tres días hábiles sin novedad, me escribes y lo reviso con Shipit.</p>
     <p>El pago ya está hecho: no tienes que pagar nada al recibir.</p>
     <p>Cualquier cosa, respóndeme a este correo.</p>
   `);

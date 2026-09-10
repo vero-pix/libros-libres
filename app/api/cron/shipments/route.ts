@@ -515,7 +515,25 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
   const comunaDestino = (await findCommune(extractCommune(head.buyer_address ?? "")))?.name ?? extractCommune(head.buyer_address ?? "");
   const comunaOrigenShipit = origen ? await findCommune(origen.commune) : null;
 
+  // El retiro se mira ANTES de escribir el correo (acá el modo ya no es
+  // dry-run). El paso `notified → pickup_scheduled` ya lo consultaba, pero
+  // corre DESPUÉS: el vendedor
+  // alcanzaba a recibir "llévalo a sucursal" aunque el camión ya estuviera
+  // agendado, y /mis-ventas le decía lo contrario (caso Libro de Ocasión,
+  // 09-09-2026). Si el GET falla, el correo sale como antes: a sucursal.
+  let retiroAgendado: { date: string; window: string | null } | null = null;
+  if (fila.shipit_id) {
+    try {
+      const sPrev = await getShipitShipment(fila.shipit_id);
+      const r = sPrev.error ? null : leerRetiroShipit(sPrev.last_pickup);
+      if (r && r.id !== fila.pickup_dismissed_id) retiroAgendado = { date: r.date, window: r.window };
+    } catch {
+      retiroAgendado = null;
+    }
+  }
+
   const datos = {
+    retiro: retiroAgendado,
     vendedorNombre: vendedor.full_name,
     compradorNombre: comprador.full_name,
     titulos,
