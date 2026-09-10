@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { COVER_GRADIENTS } from "@/components/listings/BookCover";
 import type { HeroBook } from "./HomeShell";
 
 interface Props {
@@ -19,15 +20,18 @@ const CATEGORY_CHIPS = [
   { label: "Ofertas", href: "/?sort=price_asc" },
 ];
 
-/* Abanico decorativo (puro CSS). Los 6 espacios (posición + color) son fijos;
+/* Abanico decorativo (puro CSS). Los colores son los mismos de las cubiertas
+   sin foto — se llamaban por su hex y ahora por su nombre, para que el dia que
+   cambie la paleta el abanico cambie con ella.
+   Los 6 espacios (posición + color) son fijos;
    los títulos rotan semanalmente desde HERO_POOL para que el hero se sienta vivo. */
 const HERO_SLOTS = [
-  { bg: "linear-gradient(160deg,#8a3131,#5e1d1d)", light: false, pos: "left-0 top-7 w-[150px] rotate-[-7deg] z-[2]" },
-  { bg: "linear-gradient(160deg,#f3ead7,#ddcfb2)", light: true, pos: "left-[25%] top-0 w-[162px] rotate-[-2deg] z-[4]" },
-  { bg: "linear-gradient(160deg,#23489f,#16307a)", light: false, pos: "left-[53%] top-5 w-[150px] rotate-[4deg] z-[3]" },
-  { bg: "linear-gradient(160deg,#33684f,#1b3d2e)", light: false, pos: "left-[6%] top-[215px] w-[136px] rotate-[-4deg] z-[3]" },
-  { bg: "linear-gradient(160deg,#df5239,#a8331f)", light: false, pos: "left-[40%] top-[210px] w-[140px] rotate-[3deg] z-[5]" },
-  { bg: "linear-gradient(160deg,#e0990c,#9e6a00)", light: true, pos: "left-[64%] top-[230px] w-[132px] rotate-[-6deg] z-[2]" },
+  { bg: COVER_GRADIENTS.ox, light: false, pos: "left-0 top-7 w-[150px] rotate-[-7deg] z-[2]" },
+  { bg: COVER_GRADIENTS.cream, light: true, pos: "left-[25%] top-0 w-[162px] rotate-[-2deg] z-[4]" },
+  { bg: COVER_GRADIENTS.ink, light: false, pos: "left-[53%] top-5 w-[150px] rotate-[4deg] z-[3]" },
+  { bg: COVER_GRADIENTS.green, light: false, pos: "left-[6%] top-[215px] w-[136px] rotate-[-4deg] z-[3]" },
+  { bg: COVER_GRADIENTS.coral, light: false, pos: "left-[40%] top-[210px] w-[140px] rotate-[3deg] z-[5]" },
+  { bg: COVER_GRADIENTS.gold, light: true, pos: "left-[64%] top-[230px] w-[132px] rotate-[-6deg] z-[2]" },
 ];
 
 /* Clásicos chilenos y latinoamericanos. El abanico toma 6 consecutivos por semana. */

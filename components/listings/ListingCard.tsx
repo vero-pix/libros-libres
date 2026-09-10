@@ -2,6 +2,7 @@
 import { comunaDesdeAddress } from "@/lib/comuna";
 
 import Image from "next/image";
+import BookCover from "./BookCover";
 import Link from "next/link";
 import { memo, useState, useCallback, useTransition } from "react";
 import dynamic from "next/dynamic";
@@ -19,29 +20,6 @@ const QuickViewModal = dynamic(() => import("./QuickViewModal"), {
 
 const BLUR_PLACEHOLDER =
   "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI2NyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjVmMGU4Ii8+PC9zdmc+";
-
-/* Paletas de cubierta para el objeto-libro SIN foto (fallback con identidad). */
-const COVER_GRADIENTS: Record<string, string> = {
-  ink: "linear-gradient(160deg,#23489f,#16307a)",
-  coral: "linear-gradient(160deg,#df5239,#a8331f)",
-  gold: "linear-gradient(160deg,#e0990c,#9e6a00)",
-  green: "linear-gradient(160deg,#33684f,#1b3d2e)",
-  ox: "linear-gradient(160deg,#8a3131,#5e1d1d)",
-  night: "linear-gradient(160deg,#1c2333,#0c1018)",
-  cream: "linear-gradient(160deg,#f3ead7,#ddcfb2)",
-  teal: "linear-gradient(160deg,#1f5f63,#0f3a3d)",
-  sand: "linear-gradient(160deg,#cda86a,#9c7a3e)",
-  plum: "linear-gradient(160deg,#5b3a72,#3a2350)",
-};
-const COVER_KEYS = Object.keys(COVER_GRADIENTS);
-const LIGHT_COVERS = new Set(["cream", "sand", "gold"]);
-
-/* Variante estable por título → mismo libro, mismo color siempre. */
-function coverVariant(seed: string): string {
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  return COVER_KEYS[h % COVER_KEYS.length];
-}
 
 function isRecent(createdAt: string) {
   const diff = Date.now() - new Date(createdAt).getTime();
@@ -116,7 +94,6 @@ const ListingCard = memo(function ListingCard({
   showDistance = true,
 }: Props) {
   const [showQuickView, setShowQuickView] = useState(false);
-  const [imgError, setImgError] = useState(false);
   const [cartState, setCartState] = useState<"idle" | "loading" | "added">("idle");
   const [, startTransition] = useTransition();
   const { book } = listing;
@@ -171,30 +148,6 @@ const ListingCard = memo(function ListingCard({
 
   /* ---------- Objeto-libro: cubierta dibujada (fallback sin foto) ---------- */
 
-  const variant = coverVariant(book.title || String(listing.id));
-  const light = LIGHT_COVERS.has(variant);
-  const drawnCover = (
-    <div
-      className="w-full h-full flex flex-col justify-between p-3"
-      style={{ background: COVER_GRADIENTS[variant] }}
-    >
-      <span className={`font-mono text-[8px] uppercase tracking-[0.16em] font-semibold ${light ? "text-black/55" : "text-white/70"}`}>
-        tuslibros
-      </span>
-      <div>
-        <span className={`block w-7 h-px mb-2 ${light ? "bg-black/40" : "bg-white/55"}`} />
-        <h4 className={`font-display ${light ? "text-ink" : "text-white"} text-[13px] leading-[1.08] font-medium ${light ? "italic" : ""}`}>
-          {book.title}
-        </h4>
-        {book.author && (
-          <div className={`font-mono text-[8px] uppercase tracking-wider mt-1.5 ${light ? "text-ink/60" : "text-white/75"}`}>
-            {book.author.split(" ").slice(-1)[0]}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
   /* ---------- Render ---------- */
 
   return (
@@ -207,32 +160,14 @@ const ListingCard = memo(function ListingCard({
           {/* PORTADA = OBJETO-LIBRO sobre fondo papel */}
           <div className="relative px-5 pt-5 pb-3.5 bg-gradient-to-b from-[#f6f0e4] to-[#efe7d6] flex justify-center overflow-hidden">
             {/* el libro */}
-            <div className="relative w-[64%] aspect-[148/225] rounded-[2px_4px_4px_2px] shadow-book overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
-              {coverUrl && !imgError ? (
-                <Image
-                  src={coverUrl}
-                  // Con autor y "libro usado": es el texto que Google Imágenes
-                  // usa para entender la portada, y la gente busca ediciones
-                  // por imagen. Julio cerró con 0 clics desde ese canal.
-                  alt={
-                    book.author
-                      ? `${book.title} — ${book.author}, libro usado`
-                      : `${book.title}, libro usado`
-                  }
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 32vw, (max-width: 1024px) 22vw, 13vw"
-                  placeholder="blur"
-                  blurDataURL={BLUR_PLACEHOLDER}
-                  onError={() => setImgError(true)}
-                  onLoad={(e) => {
-                    const img = e.currentTarget as HTMLImageElement;
-                    if (img.naturalWidth < 10 || img.naturalHeight < 10) setImgError(true);
-                  }}
-                />
-              ) : (
-                drawnCover
-              )}
+            <div className="relative w-[64%] rounded-[2px_4px_4px_2px] shadow-book overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+              <BookCover
+                title={book.title}
+                author={book.author}
+                coverUrl={coverUrl}
+                sizes="(max-width: 640px) 32vw, (max-width: 1024px) 22vw, 13vw"
+                blurDataURL={BLUR_PLACEHOLDER}
+              />
               {/* lomo */}
               <span
                 aria-hidden

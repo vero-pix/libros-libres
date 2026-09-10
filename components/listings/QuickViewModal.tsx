@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import BookCover from "@/components/listings/BookCover";
 import Link from "next/link";
 import { useEffect } from "react";
 import type { ListingWithBook } from "@/types";
@@ -59,23 +59,15 @@ export default function QuickViewModal({ listing, onClose }: Props) {
 
         <div className="flex flex-col sm:flex-row">
           {/* Cover */}
-          <div className="relative aspect-[3/4] sm:w-48 sm:flex-shrink-0 bg-cream-warm flex items-center justify-center">
-            {coverUrl ? (
-              <Image
-                src={coverUrl}
-                alt={book.title}
-                fill
-                className="object-contain p-4"
-                sizes="(max-width: 640px) 100vw, 192px"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-brand-50 to-cream-warm flex items-center justify-center">
-                <svg className="w-16 h-16 text-brand-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.331 0 4.473.89 6.074 2.356M12 6.042a8.968 8.968 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.356M12 6.042V20.356" />
-                </svg>
-              </div>
-            )}
-          </div>
+          <BookCover
+            title={book.title}
+            author={book.author}
+            coverUrl={coverUrl}
+            ratio="portrait"
+            sizes="(max-width: 640px) 100vw, 192px"
+            className="sm:w-48 sm:flex-shrink-0 bg-cream-warm"
+            imageClassName="object-contain p-4"
+          />
 
           {/* Info */}
           <div className="p-5 flex-1 flex flex-col">

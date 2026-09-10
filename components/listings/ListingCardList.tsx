@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import BookCover from "./BookCover";
 import Link from "next/link";
 import { memo, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
@@ -34,21 +34,15 @@ const ListingCardList = memo(function ListingCardList({ listing }: Props) {
       <div className="group bg-white overflow-hidden hover:shadow-xl transition-all duration-300 flex">
         {/* Cover */}
         <Link href={libroUrl(listing)} className="relative w-32 sm:w-40 flex-shrink-0 bg-cream-warm flex items-center justify-center overflow-hidden">
-          {coverUrl ? (
-            <Image
-              src={coverUrl}
-              alt={book.title}
-              fill
-              className="object-contain p-3 group-hover:scale-105 transition-transform duration-500"
-              sizes="160px"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-brand-50 to-cream-warm flex items-center justify-center">
-              <svg className="w-10 h-10 text-brand-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.331 0 4.473.89 6.074 2.356M12 6.042a8.968 8.968 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.356M12 6.042V20.356" />
-              </svg>
-            </div>
-          )}
+          <BookCover
+            title={book.title}
+            author={book.author}
+            coverUrl={coverUrl}
+            ratio="portrait"
+            sizes="160px"
+            className="w-full"
+            imageClassName="object-contain p-3 group-hover:scale-105 transition-transform duration-500"
+          />
           {listing.condition === "new" && (
             <span className="absolute top-2 left-2 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-brand-500 text-white">
               Nuevo

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import BookCover from "@/components/listings/BookCover";
 import type { ListingWithBook } from "@/types";
 import { libroUrl } from "@/lib/urls";
 
@@ -32,21 +32,14 @@ export default function CollectibleRow({ listings }: Props) {
               href={libroUrl(listing)}
               className="flex-shrink-0 w-36 group"
             >
-              <div className="relative w-36 h-48 rounded-lg overflow-hidden bg-ink/5 border-2 border-amber-700/40 shadow-sm group-hover:shadow-lg group-hover:border-amber-700/80 transition-all">
-                {coverUrl ? (
-                  <Image
-                    src={coverUrl}
-                    alt={book.title}
-                    fill
-                    className="object-cover"
-                    sizes="144px"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-ink-muted text-xs p-2 text-center">
-                    {book.title}
-                  </div>
-                )}
-              </div>
+              <BookCover
+                title={book.title}
+                author={book.author}
+                coverUrl={coverUrl}
+                ratio="portrait"
+                sizes="144px"
+                className="w-36 rounded-lg bg-ink/5 border-2 border-amber-700/40 shadow-sm group-hover:shadow-lg group-hover:border-amber-700/80 transition-all"
+              />
               <p className="text-xs font-semibold text-ink mt-2 line-clamp-2 leading-tight group-hover:text-brand-600 transition-colors">
                 {book.title}
               </p>

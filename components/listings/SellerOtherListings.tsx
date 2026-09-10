@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import BookCover from "@/components/listings/BookCover";
 import { createClient } from "@/lib/supabase/client";
 import type { ListingWithBook } from "@/types";
 import { libroUrl } from "@/lib/urls";
@@ -45,13 +45,14 @@ export default function SellerOtherListings({ sellerId, sellerUsername, currentL
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {others.map((l) => (
           <Link key={l.id} href={libroUrl(l)} className="group">
-            <div className="aspect-[3/4] relative bg-cream rounded-xl border border-cream-dark/30 overflow-hidden mb-2 group-hover:shadow-md transition-all">
-              {(l.cover_image_url || l.book.cover_url) ? (
-                <Image src={(l.cover_image_url || l.book.cover_url) as string} alt={l.book.title} fill className="object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-2xl">📚</div>
-              )}
-            </div>
+            <BookCover
+              title={l.book.title}
+              author={l.book.author}
+              coverUrl={l.cover_image_url || l.book.cover_url}
+              ratio="portrait"
+              sizes="(max-width: 640px) 33vw, 160px"
+              className="bg-cream rounded-xl border border-cream-dark/30 mb-2 group-hover:shadow-md transition-all"
+            />
             <p className="text-xs font-bold text-ink line-clamp-1 group-hover:text-brand-600 transition-colors">{l.book.title}</p>
             <p className="text-[10px] font-bold text-brand-600 mt-0.5">${l.price?.toLocaleString("es-CL")}</p>
           </Link>

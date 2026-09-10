@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import BookCover from "@/components/listings/BookCover";
 import type { ListingWithBook } from "@/types";
 import { libroUrl } from "@/lib/urls";
 
@@ -34,20 +34,15 @@ export default function RecentRow({ listings }: Props) {
               href={libroUrl(listing)}
               className="flex-shrink-0 w-36 group"
             >
-              <div className="relative w-36 h-48 rounded-lg overflow-hidden bg-cream-warm border border-cream-dark/30 shadow-sm group-hover:shadow-md transition-shadow">
-                {coverUrl ? (
-                  <Image
-                    src={coverUrl}
-                    alt={book.title}
-                    fill
-                    className="object-cover"
-                    sizes="144px"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-ink-muted text-xs p-2 text-center">
-                    {book.title}
-                  </div>
-                )}
+              <div className="relative w-36">
+                <BookCover
+                  title={book.title}
+                  author={book.author}
+                  coverUrl={coverUrl}
+                  ratio="portrait"
+                  sizes="144px"
+                  className="rounded-lg bg-cream-warm border border-cream-dark/30 shadow-sm group-hover:shadow-md transition-shadow"
+                />
                 <div className="absolute bottom-1.5 left-1.5">
                   <span className="text-[10px] font-medium bg-black/60 text-white px-1.5 py-0.5 rounded-full">
                     {label}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import BookCover from "@/components/listings/BookCover";
 import { libroUrl } from "@/lib/urls";
 import type { ListingWithBook } from "@/types";
 import Chupalla from "@/components/ui/Chupalla";
@@ -48,20 +48,15 @@ export default function ColeccionRow({ tag, collectionSlug, title, subtitle, lis
               href={libroUrl(listing)}
               className="flex-shrink-0 w-36 group"
             >
-              <div className="relative w-36 h-48 rounded-lg overflow-hidden bg-cream-warm border border-cream-dark/30 shadow-sm group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-300">
-                {coverUrl ? (
-                  <Image
-                    src={coverUrl}
-                    alt={book.title}
-                    fill
-                    className="object-cover"
-                    sizes="144px"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-ink-muted text-[10px] p-2 text-center font-display italic">
-                    {book.title}
-                  </div>
-                )}
+              <div className="relative w-36">
+                <BookCover
+                  title={book.title}
+                  author={book.author}
+                  coverUrl={coverUrl}
+                  ratio="portrait"
+                  sizes="144px"
+                  className="rounded-lg bg-cream-warm border border-cream-dark/30 shadow-sm group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-300"
+                />
                 {listing.price != null && (
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-2 pb-2 pt-4">
                     <span className="text-white text-xs font-semibold font-mono">

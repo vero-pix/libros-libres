@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { COVER_GRADIENTS, LIGHT_COVERS, coverVariant } from "./BookCover";
 
 interface Props {
   mainImage: string | null;
@@ -10,26 +11,8 @@ interface Props {
   author?: string;
 }
 
-/* Cubierta dibujada cuando no hay foto (fallback con identidad). */
-const COVER_GRADIENTS: Record<string, string> = {
-  ink: "linear-gradient(160deg,#23489f,#16307a)",
-  coral: "linear-gradient(160deg,#df5239,#a8331f)",
-  gold: "linear-gradient(160deg,#e0990c,#9e6a00)",
-  green: "linear-gradient(160deg,#33684f,#1b3d2e)",
-  ox: "linear-gradient(160deg,#8a3131,#5e1d1d)",
-  night: "linear-gradient(160deg,#1c2333,#0c1018)",
-  cream: "linear-gradient(160deg,#f3ead7,#ddcfb2)",
-  teal: "linear-gradient(160deg,#1f5f63,#0f3a3d)",
-  sand: "linear-gradient(160deg,#cda86a,#9c7a3e)",
-  plum: "linear-gradient(160deg,#5b3a72,#3a2350)",
-};
-const COVER_KEYS = Object.keys(COVER_GRADIENTS);
-const LIGHT_COVERS = new Set(["cream", "sand", "gold"]);
-function coverVariant(seed: string): string {
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  return COVER_KEYS[h % COVER_KEYS.length];
-}
+/* La cubierta sin foto vive en BookCover: era la misma tabla de diez
+   degradados copiada literal en los dos archivos. */
 
 const SPINE = "absolute inset-y-0 left-0 w-2.5 z-[2] bg-gradient-to-r from-black/30 via-white/10 to-black/10";
 
