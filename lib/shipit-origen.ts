@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { sendGong, escapeHtml } from "./notifications";
 import { extractCommune } from "./chilexpress";
-import { findCommune, SHIPIT_REGION_RM } from "./shipit";
+import { findCommune, SHIPIT_REGION_RM, crearOrigenShipit } from "./shipit";
 
 /**
  * D1 revisada (07-09-2026): quién puede vender con courier y qué pasa si no.
@@ -105,5 +105,74 @@ export async function avisarOrigenFaltante(admin: Admin, sellerId: string, motiv
   } catch (err) {
     console.error("[shipit-origen] aviso falló:", err);
     return false;
+  }
+}
+
+/**
+ * Crea el origen del vendedor en Shipit y lo guarda, cuando hay datos para
+ * hacerlo. Devuelve el id creado, o null si no se pudo (y en ese caso el
+ * llamador debe avisar a Vero como siempre).
+ *
+ * Existe porque crearlos a mano no escaló: el 10-09-2026 había 15 vendedores
+ * de regiones con MercadoPago conectado y sin origen — 105 libros que solo se
+ * podían entregar en persona— y nadie se había enterado, porque el aviso se
+ * programó después de que ellos conectaran. Lo que se puede resolver solo, se
+ * resuelve solo.
+ *
+ * NO inventa datos: sin calle, número o comuna reconocida por Shipit devuelve
+ * null. Y no duplica: si ya existe un origen en esa misma calle y número, lo
+ * enlaza en vez de crear otro.
+ */
+export async function crearOrigenSiSePuede(admin: Admin, sellerId: string): Promise<number | null> {
+  try {
+    const e = await estadoOrigenVendedor(admin, sellerId);
+    if (!e.vendedor || e.tieneOrigen || e.enRM) return null;
+
+    // La dirección del perfil puede venir a medias; las publicaciones suelen
+    // traerla completa (así se resolvieron 9 de los 15 en septiembre).
+    let dir = e.vendedor.default_address;
+    if (!calleYNumero(dir)) {
+      const { data: ls } = await admin
+        .from("listings")
+        .select("address")
+        .eq("seller_id", sellerId)
+        .eq("status", "active")
+        .not("address", "is", null)
+        .limit(5);
+      for (const l of ls ?? []) {
+        if (calleYNumero(l.address)) { dir = l.address; break; }
+      }
+    }
+
+    const cn = calleYNumero(dir);
+    if (!cn || !e.comuna || !e.vendedor.email) return null;
+
+    const comuna = await findCommune(e.comuna);
+    if (!comuna) return null;
+
+    const id = await crearOrigenShipit({
+      nombre: e.vendedor.full_name ?? e.vendedor.username ?? "Vendedor",
+      email: e.vendedor.email,
+      telefono: String(e.vendedor.phone ?? "").replace(/\D/g, ""),
+      calle: cn.calle,
+      numero: cn.numero,
+      communeId: comuna.id,
+    });
+    if (!id) return null;
+
+    const { error } = await admin
+      .from("users")
+      .update({ shipit_origin_id: id, shipit_origin_commune: comuna.name })
+      .eq("id", sellerId);
+    // El origen quedó creado en Shipit aunque no se pudiera guardar: se avisa
+    // para que nadie cree un duplicado buscándolo.
+    if (error) {
+      console.error("[shipit-origen] origen", id, "creado pero no guardado:", error.message);
+      return null;
+    }
+    return id;
+  } catch (err) {
+    console.error("[shipit-origen] no se pudo crear el origen:", err);
+    return null;
   }
 }

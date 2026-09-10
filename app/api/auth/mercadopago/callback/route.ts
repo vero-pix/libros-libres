@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { avisarOrigenFaltante } from "@/lib/shipit-origen";
+import { avisarOrigenFaltante, crearOrigenSiSePuede } from "@/lib/shipit-origen";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 /**
@@ -86,9 +86,14 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // D1 revisada: si el vendedor está fuera de la RM y no tiene origen en
-  // Shipit, Vero recibe los datos para crearlo. Nunca frena el redirect.
-  await avisarOrigenFaltante(admin, state, "conectó MercadoPago");
+  // Fuera de la RM hace falta un origen propio en Shipit para poder despachar.
+  // Se intenta crear solo: en septiembre de 2026 quedaron 15 vendedores sin
+  // origen porque dependía de que Vero lo hiciera a mano, y 105 libros
+  // quedaron limitados a entrega en persona sin que nadie se enterara.
+  // Si faltan datos (calle, número, comuna), cae al aviso de siempre.
+  // Nunca frena el redirect.
+  const origenCreado = await crearOrigenSiSePuede(admin, state);
+  if (!origenCreado) await avisarOrigenFaltante(admin, state, "conectó MercadoPago");
 
   return NextResponse.redirect(`${siteUrl}/perfil?mp_connected=true`);
 }

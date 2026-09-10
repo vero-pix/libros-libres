@@ -722,3 +722,57 @@ export async function anularRetiroShipit(pickupId: number): Promise<{ ok: boolea
     return { ok: false, httpStatus: 0, raw: String(e) };
   }
 }
+
+/**
+ * Crea un origen (dirección de retiro) en Shipit y devuelve su id.
+ *
+ * `POST /v/origins` no está en la documentación pública pero funciona, y es
+ * como se crearon los orígenes de septiembre 2026. Devuelve null ante
+ * cualquier problema: un origen que no se pudo crear se resuelve avisando a
+ * Vero, nunca tumbando el flujo que lo pidió.
+ */
+export async function crearOrigenShipit(input: {
+  nombre: string;
+  email: string;
+  telefono: string;
+  calle: string;
+  numero: string;
+  communeId: number;
+  complemento?: string;
+}): Promise<number | null> {
+  if (!SHIPIT_EMAIL || !SHIPIT_TOKEN) {
+    console.error("[shipit] crearOrigen sin credenciales");
+    return null;
+  }
+  try {
+    const { status, data } = await shipitFetch("/origins", {
+      method: "POST",
+      body: JSON.stringify({
+        origin: {
+          name: input.nombre,
+          address_book_attributes: {
+            full_name: input.nombre,
+            email: input.email,
+            phone: input.telefono,
+            address_attributes: {
+              street: input.calle,
+              number: input.numero,
+              complement: input.complemento ?? "",
+              commune_id: input.communeId,
+              zip_code: "",
+            },
+          },
+        },
+      }),
+    });
+    const id = (data as { id?: number } | null)?.id;
+    if (status >= 400 || typeof id !== "number") {
+      console.error("[shipit] crearOrigen respondió", status, JSON.stringify(data).slice(0, 200));
+      return null;
+    }
+    return id;
+  } catch (err) {
+    console.error("[shipit] crearOrigen falló:", err);
+    return null;
+  }
+}
