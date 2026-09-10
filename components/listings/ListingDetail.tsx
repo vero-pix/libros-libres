@@ -150,9 +150,15 @@ interface Props {
    * Promedio solo con 3 reseñas o más (decisión C5).
    */
   sellerStats?: { ventas: number; reviews_count: number; reviews_avg: number | null } | null;
+  /**
+   * Cuántos OTROS ejemplares del mismo título están a la venta. 0 significa
+   * que este es el único en todo el sitio — la ventaja real del libro usado
+   * sobre una librería, que la ficha no estaba diciendo.
+   */
+  otrosEjemplares?: number;
 }
 
-export default function ListingDetail({ listing, images = [], sellerStats = null }: Props) {
+export default function ListingDetail({ listing, images = [], sellerStats = null , otrosEjemplares = 0 }: Props) {
   const { book } = listing;
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
@@ -383,6 +389,25 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
               </div>
             );
           })()}
+
+          {/* Pieza única. Solo cuando es verdad: si hay otro ejemplar del mismo
+              título se dice eso, que también sirve (hay dónde elegir). */}
+          {!isSold && listing.modality !== "loan" && (
+            <div className="mt-3">
+              {otrosEjemplares === 0 ? (
+                <span className="inline-flex items-center gap-2 text-[13px] font-medium text-[--coral] bg-[--coral]/8 border border-[--coral]/20 rounded-full px-3 py-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 2 15 9l7 .5-5.5 4.5L18 21l-6-3.5L6 21l1.5-7L2 9.5 9 9z"></path>
+                  </svg>
+                  Único ejemplar en tuslibros
+                </span>
+              ) : (
+                <span className="text-[13px] text-ink-muted">
+                  Hay {otrosEjemplares === 1 ? "otro ejemplar" : `otros ${otrosEjemplares} ejemplares`} de este título en el sitio
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Grid de metadata */}
           <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3">
