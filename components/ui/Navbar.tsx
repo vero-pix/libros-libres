@@ -9,6 +9,7 @@ import HeaderSearchBar from "./HeaderSearchBar";
 import WhatsAppSoporteLink from "./WhatsAppSoporteLink";
 import MobileMenu from "./MobileMenu";
 import UnreadBadge from "@/components/messages/UnreadBadge";
+import { esSemanaDel18 } from "@/lib/fiestasPatrias";
 
 export default async function Navbar() {
   const supabase = await createClient();
@@ -52,12 +53,14 @@ export default async function Navbar() {
     cartCount = count ?? 0;
   }
 
+  const festivo = esSemanaDel18();
+
   return (
     <header className="shrink-0 sticky top-0 z-50 bg-cream/90 backdrop-blur-md border-b border-line">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center gap-3 sm:gap-5 h-[66px]">
-          <Logo withTagline className="hidden sm:flex" />
-          <Logo className="sm:hidden" />
+          <Logo withTagline festivo={festivo} className="hidden sm:flex" />
+          <Logo festivo={festivo} className="sm:hidden" />
 
           {/* Búsqueda — pill editorial */}
           <div className="hidden md:flex w-full max-w-[380px]">

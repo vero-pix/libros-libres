@@ -295,7 +295,7 @@ const COLLECTION_CONFIGS = [
  */
 async function configDeColecciones(supabase: ReturnType<typeof createPublicClient>) {
   const { data } = await supabase.from("site_config").select("value").eq("key", "destacado_home").maybeSingle();
-  const d = data?.value as { tag?: string; collectionSlug?: string; title?: string; subtitle?: string; until?: string } | undefined;
+  const d = data?.value as { tag?: string; collectionSlug?: string; title?: string; subtitle?: string; until?: string; adorno?: string } | undefined;
 
   const hoy = new Date().toISOString().slice(0, 10);
   const vigente = d?.tag && d?.title && (!d.until || d.until >= hoy);
@@ -306,6 +306,7 @@ async function configDeColecciones(supabase: ReturnType<typeof createPublicClien
     collectionSlug: d!.collectionSlug || undefined,
     title: d!.title!,
     subtitle: d!.subtitle ?? "",
+    adorno: d!.adorno,
   };
   return [destacada, ...COLLECTION_CONFIGS.slice(1).filter((c) => c.tag !== destacada.tag)];
 }
@@ -339,7 +340,7 @@ const getCollections = unstable_cache(
         used.add(l.id);
         listings.push(l);
       }
-      return { tag: c.tag, collectionSlug: c.collectionSlug, title: c.title, subtitle: c.subtitle, listings };
+      return { tag: c.tag, collectionSlug: c.collectionSlug, title: c.title, subtitle: c.subtitle, adorno: (c as { adorno?: string }).adorno, listings };
     });
   },
   ["home-collections-v1"],
@@ -545,7 +546,7 @@ export default async function HomePage({ searchParams }: Props) {
     getTrustedStores(),
     getCollectibleListings() as unknown as Promise<ListingWithBook[]>,
     getRecentListings() as unknown as Promise<ListingWithBook[]>,
-    getCollections() as unknown as Promise<{ tag: string; collectionSlug?: string; title: string; subtitle: string; listings: ListingWithBook[] }[]>,
+    getCollections() as unknown as Promise<{ tag: string; collectionSlug?: string; title: string; subtitle: string; adorno?: string; listings: ListingWithBook[] }[]>,
     getTotalActiveCount(),
     getAvailableTags(),
     getPublicStats(),
@@ -723,7 +724,7 @@ export default async function HomePage({ searchParams }: Props) {
             {/* Colecciones editoriales curadas por Vero — deduplicadas entre sí y contra las filas */}
             {!hasFilters &&
               collections.map((c) => (
-                <ColeccionRow key={c.tag} tag={c.tag} collectionSlug={c.collectionSlug} title={c.title} subtitle={c.subtitle} listings={c.listings} />
+                <ColeccionRow key={c.tag} tag={c.tag} collectionSlug={c.collectionSlug} title={c.title} subtitle={c.subtitle} adorno={c.adorno} listings={c.listings} />
               ))}
 
             {!hasFilters && collectibleRowListings.length > 0 && (

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { libroUrl } from "@/lib/urls";
 import type { ListingWithBook } from "@/types";
+import Chupalla from "@/components/ui/Chupalla";
 
 interface Props {
   tag: string;
@@ -9,17 +10,24 @@ interface Props {
   title: string;
   subtitle: string;
   listings: ListingWithBook[];
+  /** Adorno estacional del destacado (`site_config.destacado_home.adorno`). Hoy solo "chupalla". */
+  adorno?: string;
 }
 
 // Presentacional: los listings (ya deduplicados entre colecciones y filas) llegan por prop.
-export default function ColeccionRow({ tag, collectionSlug, title, subtitle, listings }: Props) {
+export default function ColeccionRow({ tag, collectionSlug, title, subtitle, listings, adorno }: Props) {
   if (!listings || listings.length < 3) return null;
 
   return (
     <section className="mb-8">
       <div className="flex items-baseline justify-between mb-4">
         <div>
-          <h2 className="font-display text-base font-semibold text-ink">{title}</h2>
+          <h2 className="font-display text-base font-semibold text-ink relative inline-block">
+            {title}
+            {adorno === "chupalla" && (
+              <Chupalla id="chupalla-fila" className="chupalla-float absolute -top-3 -right-5 w-9 h-auto pointer-events-none" />
+            )}
+          </h2>
           <p className="text-[11px] font-mono text-ink-muted mt-0.5">{subtitle}</p>
         </div>
         <Link

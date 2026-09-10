@@ -93,6 +93,22 @@
   display: none !important;
 }
 
+/* Chupalla del 18: cuelga sobre el título de la fila destacada y se mece apenas.
+   El giro base va acá (no en una clase de Tailwind) para no pelear con el
+   transform de la animación. */
+@keyframes chupalla-float {
+  0%, 100% { transform: rotate(-14deg) translateY(0); }
+  50%      { transform: rotate(-9deg) translateY(-2px); }
+}
+.chupalla-float {
+  transform: rotate(-14deg);
+  transform-origin: 55% 85%;
+  animation: chupalla-float 4.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chupalla-float { animation: none; }
+}
+
 /* Marquee libros destacados.
    La duración va por variable: con 28s fijos, una tira de 12 pedidos pasaba a
    ~2,3s por ítem y no se alcanzaba a leer, mientras una de 3 se arrastraba.
