@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { verificarTokenResena } from "@/lib/resenaToken";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 function createSupabaseFromCookies(cookieStore: Awaited<ReturnType<typeof cookies>>) {
   return createServerClient(
@@ -70,12 +72,17 @@ export async function POST(req: NextRequest) {
   const supabase = createSupabaseFromCookies(cookieStore);
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
 
   const body = await req.json();
-  const { listing_id, rating, comment } = body;
+  const { listing_id, rating, comment, order_id, t } = body;
+
+  // Dos caminos para probar quién reseña: la sesión, o el token firmado que
+  // viaja en el link del correo. El segundo existe porque exigir contraseña
+  // para dejar dos líneas costaba la reseña entera. Ver lib/resenaToken.ts.
+  const conToken = !!order_id && verificarTokenResena(order_id, t);
+  if (!user && !conToken) {
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
 
   if (!listing_id || !rating || rating < 1 || rating > 5) {
     return NextResponse.json({ error: "listing_id y rating (1-5) requeridos" }, { status: 400 });
@@ -92,27 +99,45 @@ export async function POST(req: NextRequest) {
   // La orden entregada es la que habilita la reseña y la que aporta order_id y
   // seller_id. Se pide la más reciente por si el mismo comprador le compró el
   // mismo ejemplar más de una vez (posible con un listing repuesto).
-  const { data: entregada } = await supabase
-    .from("orders")
-    .select("id, seller_id")
-    .eq("listing_id", listing_id)
-    .eq("buyer_id", user.id)
-    .eq("status", "delivered")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // Con token no hay sesión que satisfaga RLS: se lee y escribe con permisos
+  // de servicio, pero solo sobre la orden que el token firma.
+  const admin = conToken && !user ? createServiceRoleClient() : supabase;
+
+  const { data: entregada } = conToken && !user
+    ? await admin
+        .from("orders")
+        .select("id, seller_id, buyer_id, listing_id, status")
+        .eq("id", order_id)
+        .maybeSingle()
+        .then((r) => ({
+          data:
+            r.data && r.data.status === "delivered" && r.data.listing_id === listing_id
+              ? r.data
+              : null,
+        }))
+    : await supabase
+        .from("orders")
+        .select("id, seller_id, buyer_id")
+        .eq("listing_id", listing_id)
+        .eq("buyer_id", user!.id)
+        .eq("status", "delivered")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
   if (!entregada) {
     // Se distingue "no lo compraste" de "todavía no lo marcas como recibido":
     // el segundo caso tiene arreglo y el comprador tiene que saber cuál es.
-    const { data: enCurso } = await supabase
-      .from("orders")
-      .select("id")
-      .eq("listing_id", listing_id)
-      .eq("buyer_id", user.id)
-      .in("status", ["paid", "shipped"])
-      .limit(1)
-      .maybeSingle();
+    const { data: enCurso } = user
+      ? await supabase
+          .from("orders")
+          .select("id")
+          .eq("listing_id", listing_id)
+          .eq("buyer_id", user.id)
+          .in("status", ["paid", "shipped"])
+          .limit(1)
+          .maybeSingle()
+      : { data: null };
 
     if (enCurso) {
       return NextResponse.json(
@@ -126,11 +151,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { data: review, error } = await supabase
+  const { data: review, error } = await admin
     .from("reviews")
     .insert({
       listing_id,
-      reviewer_id: user.id,
+      // Con token el autor sale de la orden, no de una sesión que no existe.
+      reviewer_id: user?.id ?? (entregada as { buyer_id?: string }).buyer_id,
       order_id: entregada.id,
       seller_id: entregada.seller_id,
       rating: Math.round(rating),

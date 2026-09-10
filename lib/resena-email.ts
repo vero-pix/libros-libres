@@ -1,3 +1,4 @@
+import { urlResena } from "./resenaToken";
 /**
  * Correo "¿Cómo llegó {título}?" al comprador cuando el pedido se marca como
  * entregado. Texto de Vero, aprobado el 07-09-2026. Un botón principal (la
@@ -33,7 +34,9 @@ export function correoResena(d: DatosCorreoResena): { subject: string; html: str
   // comprador caía en medio de una página de venta y el formulario recién
   // aparecía después de tres consultas del cliente. /resena/{orderId} resuelve
   // el pedido en el servidor y pinta las estrellas de una.
-  const resena = `${SITE}/resena/${d.orderId}`;
+  // Con token: el comprador entra desde el correo y reseña sin escribir su
+  // contraseña. Pedirla era perder la reseña. Ver lib/resenaToken.ts.
+  const resena = urlResena(d.orderId, SITE);
   const subject = `¿Cómo llegó ${d.titulo}?`;
   const html = `
     <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1a1a1a;line-height:1.5">

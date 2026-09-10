@@ -16,9 +16,14 @@ const COMENTARIO_MAX = 300;
 export default function ReviewForm({
   listingId,
   vendedorNombre,
+  orderId,
+  /** Token del link del correo: permite reseñar sin sesión. Ver lib/resenaToken.ts. */
+  token,
 }: {
   listingId: string;
   vendedorNombre: string;
+  orderId?: string;
+  token?: string;
 }) {
   const router = useRouter();
   const [rating, setRating] = useState(0);
@@ -40,7 +45,7 @@ export default function ReviewForm({
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listing_id: listingId, rating, comment }),
+        body: JSON.stringify({ listing_id: listingId, rating, comment, order_id: orderId, t: token }),
       });
       const data = await res.json();
       if (!res.ok) {

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
+import { verificarTokenResena } from "@/lib/resenaToken";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { createClient } from "@/lib/supabase/server";
 import ReviewForm from "@/components/reviews/ReviewForm";
 import { libroUrl } from "@/lib/urls";
@@ -32,18 +34,32 @@ function Marco({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default async function ResenaPage({ params }: { params: { orderId: string } }) {
+export default async function ResenaPage({
+  params,
+  searchParams,
+}: {
+  params: { orderId: string };
+  searchParams: { t?: string };
+}) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Sin sesión no se muestra nada del pedido: se manda a entrar y se vuelve acá.
-  if (!user) {
+  // El link del correo trae un token firmado. Sin él, sin sesión no se muestra
+  // nada del pedido. Con él, se puede reseñar sin entrar: pedirle la contraseña
+  // a alguien que solo quiere dejar dos líneas es perder la reseña.
+  // Ver lib/resenaToken.ts.
+  const conToken = verificarTokenResena(params.orderId, searchParams?.t);
+
+  if (!user && !conToken) {
     redirect(`/login?next=${encodeURIComponent(`/resena/${params.orderId}`)}`);
   }
 
-  const { data: orden } = await supabase
+  // Con token se lee con permisos de servicio: no hay sesión que satisfaga RLS.
+  const lector = conToken && !user ? createServiceRoleClient() : supabase;
+
+  const { data: orden } = await lector
     .from("orders")
     .select(
       "id, status, buyer_id, listing_id, seller_id, listing:listings(id, slug, cover_image_url, seller:users(full_name, username), book:books(title, author, cover_url))"
@@ -53,7 +69,7 @@ export default async function ResenaPage({ params }: { params: { orderId: string
 
   // Una orden ajena y una inexistente dan el mismo mensaje: no se confirma que
   // el pedido exista a alguien que no es su comprador.
-  if (!orden || orden.buyer_id !== user.id) {
+  if (!orden || (user && !conToken && orden.buyer_id !== user.id)) {
     return (
       <Marco>
         <h1 className="font-display text-xl font-bold text-ink">No encontramos ese pedido</h1>
@@ -90,7 +106,7 @@ export default async function ResenaPage({ params }: { params: { orderId: string
   }
 
   // Si ya reseñó, se le muestra su reseña en vez del formulario vacío.
-  const { data: yaHecha } = await supabase
+  const { data: yaHecha } = await lector
     .from("reviews")
     .select("id, rating, comment")
     .eq("order_id", orden.id)
@@ -127,7 +143,12 @@ export default async function ResenaPage({ params }: { params: { orderId: string
           </Link>
         </div>
       ) : (
-        <ReviewForm listingId={orden.listing_id} vendedorNombre={vendedorNombre} />
+        <ReviewForm
+          listingId={orden.listing_id}
+          vendedorNombre={vendedorNombre}
+          orderId={orden.id}
+          token={conToken ? searchParams!.t : undefined}
+        />
       )}
 
       {listing && (
