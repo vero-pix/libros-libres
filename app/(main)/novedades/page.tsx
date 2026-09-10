@@ -52,7 +52,13 @@ type Visual =
   | { kind: "covers"; match: (l: PoolListing) => boolean; limit?: number; caption?: string }
   | { kind: "quote"; text: string; who: string; book?: string; match?: (l: PoolListing) => boolean }
   | { kind: "stat"; stats: Array<{ big: string; small: string }> }
-  | { kind: "milestone"; icon: string; metric: string; detail: string };
+  | { kind: "milestone"; icon: string; metric: string; detail: string }
+  | {
+      kind: "opciones";
+      /** Dos caminos que el lector elige entre sí. Con más de dos, deja de ser una decisión y es una lista. */
+      opciones: Array<{ icono: "sucursal" | "camion"; titulo: string; texto: string }>;
+      pie?: string;
+    };
 
 type Entry = {
   date: string;
@@ -70,6 +76,31 @@ const titleMatches = (l: PoolListing, needles: string[]) => {
 };
 
 const novedades: Entry[] = [
+  {
+    date: "10 septiembre 2026",
+    title: "Ahora eliges tú cómo sale tu paquete",
+    description:
+      "Esta me la enseñó Felipe, de Libros de la Buhardilla. Vendió un libro, vio que se generaba la etiqueta y me escribió: la vez anterior lo había dejado en Starken sin problema, pero ahora le decíamos que tenía que estar en su casa entre las 11 y las 17 porque pasaban a buscarlo. Iba en un bus de vuelta a Santiago y llegaba a las 16:00. La misma semana otra vendedora me había preguntado lo mismo: el correo le decía una cosa y la app le decía otra. El problema de fondo era que el sitio estaba adivinando. Miraba lo que hacía el courier y de ahí deducía qué instrucción darle al vendedor, y con gente que despacha de maneras distintas, adivinar siempre le iba a fallar a alguien. Ahora no adivina: en tu perfil eliges cómo despachas y eso manda. Si marcas que lo dejas tú en la sucursal, aunque el courier agende un retiro por su lado, a ti te vamos a seguir diciendo lo que elegiste — y me aviso yo para resolverlo por detrás, sin que tengas que enterarte.",
+    tag: "Lanzamiento",
+    link: "/perfil",
+    linkText: "Elegir cómo despacho",
+    visual: {
+      kind: "opciones",
+      opciones: [
+        {
+          icono: "sucursal",
+          titulo: "Lo dejo yo en la sucursal",
+          texto: "Imprimes la etiqueta, la pegas y entregas el paquete en el mesón cuando te acomode. No tienes que esperar a nadie ni estar en un horario.",
+        },
+        {
+          icono: "camion",
+          titulo: "Que vengan a buscarlo",
+          texto: "El courier pasa por tu dirección en una ventana de horario. Sirve si tienes local, o si prefieres no moverte.",
+        },
+      ],
+      pie: "Está en tu perfil, debajo de la dirección. Lo puedes cambiar cuando quieras, y vale para todas tus ventas con despacho.",
+    },
+  },
   {
     date: "10 septiembre 2026",
     title: "Si vuelves a comprarle al mismo vendedor, no pagas el despacho de nuevo",
@@ -1601,11 +1632,11 @@ export default async function NovedadesPage() {
               cta: "Cómo funciona",
             },
             {
-              fecha: "Lanzamiento · 8 sep",
-              titulo: "Reseñas verificadas",
-              texto: "Solo reseña quien compró y confirmó que recibió el libro. Se ve en la tienda del vendedor y cuenta para el orden de la portada.",
-              href: tiendaSemanaHref,
-              cta: "Ver una tienda",
+              fecha: "Lanzamiento · 10 sep",
+              titulo: "Eliges tú cómo sale tu paquete",
+              texto: "En tu perfil marcas si lo dejas tú en la sucursal o si prefieres que pasen a buscarlo. Lo que elijas manda, aunque el courier agende otra cosa.",
+              href: "/perfil",
+              cta: "Elegir cómo despacho",
             },
             {
               fecha: "Lanzamiento · 8 sep",
@@ -1740,6 +1771,62 @@ export default async function NovedadesPage() {
                       <p className="text-xs text-ink-muted mt-0.5">{v.detail}</p>
                     </div>
                   </div>
+                </article>
+              );
+            }
+
+            // OPCIONES — dos caminos, lado a lado, para una decisión que toma el vendedor
+            if (v?.kind === "opciones") {
+              const iconos = {
+                sucursal: (
+                  <>
+                    <path d="M3 21h18M5 21V9l7-5 7 5v12" />
+                    <path d="M9 21v-6h6v6" />
+                  </>
+                ),
+                camion: (
+                  <>
+                    <path d="M1 6h13v10H1zM14 9h4l3 3v4h-7z" />
+                    <circle cx="5.5" cy="18.5" r="1.8" />
+                    <circle cx="17.5" cy="18.5" r="1.8" />
+                  </>
+                ),
+              };
+              return (
+                <article
+                  key={i}
+                  className="bg-white rounded-2xl border border-cream-dark/40 shadow-sm p-6 md:p-8 animate-fade-in-up"
+                  style={{ animationDelay: `${Math.min(i * 30, 300)}ms` }}
+                >
+                  {base}
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    {v.opciones.map((o) => (
+                      <div
+                        key={o.titulo}
+                        className="bg-cream-warm/50 rounded-xl border border-cream-dark/40 p-5 flex flex-col"
+                      >
+                        <svg
+                          width="26"
+                          height="26"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="text-amber-700"
+                          aria-hidden
+                        >
+                          {iconos[o.icono]}
+                        </svg>
+                        <p className="font-display text-lg text-ink leading-tight mt-3">{o.titulo}</p>
+                        <p className="text-[13px] text-ink-muted leading-relaxed mt-1.5">{o.texto}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {v.pie && (
+                    <p className="text-xs text-ink-muted mt-3.5 border-t border-cream-dark/40 pt-3">{v.pie}</p>
+                  )}
                 </article>
               );
             }
