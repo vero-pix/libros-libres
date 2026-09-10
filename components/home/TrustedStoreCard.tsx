@@ -22,6 +22,8 @@ export interface TiendaConfianza {
   ventas: number;
   reviews_count: number;
   reviews_avg: number | null;
+  /** Mediana de días entre publicar y vender. Null con menos de 2 ventas. */
+  dias_hasta_venta?: number | null;
   portadas: { id: string; url: string | null; titulo: string }[];
   frase?: string | null;
 }
@@ -29,13 +31,43 @@ export interface TiendaConfianza {
 /** Umbral bajo el cual no se muestra promedio de reseñas (decisión C5). */
 const MIN_RESENAS_PARA_PROMEDIO = 3;
 
+/**
+ * Desde cuántas ventas el número suma en vez de restar.
+ *
+ * "1 venta por la plataforma" se leía peor que no decir nada: invita a
+ * comparar y el que compara se va. Cuatro de las ocho librerías de confianza
+ * mostraban exactamente eso. Bajo el umbral se prueba la tienda por otro lado
+ * — reseñas, rapidez o catálogo — hasta que el contador aguante mirarse.
+ */
+const MIN_VENTAS_PARA_MOSTRAR = 10;
+
+/**
+ * La línea de prueba de la tarjeta, por orden de lo que más convence:
+ * ventas (si son suficientes) › reseñas › rapidez de venta › catálogo.
+ */
 export function lineaDePrueba(t: TiendaConfianza): string {
-  const ventas = `${t.ventas} ${t.ventas === 1 ? "venta" : "ventas"} por la plataforma`;
-  if (t.reviews_count >= MIN_RESENAS_PARA_PROMEDIO && t.reviews_avg != null) {
-    const prom = t.reviews_avg.toFixed(1).replace(".", ",");
-    return `${ventas} · ${prom} (${t.reviews_count} ${t.reviews_count === 1 ? "reseña" : "reseñas"})`;
+  const resenas =
+    t.reviews_count >= MIN_RESENAS_PARA_PROMEDIO && t.reviews_avg != null
+      ? `${t.reviews_avg.toFixed(1).replace(".", ",")} (${t.reviews_count} ${t.reviews_count === 1 ? "reseña" : "reseñas"})`
+      : null;
+
+  if (t.ventas >= MIN_VENTAS_PARA_MOSTRAR) {
+    const ventas = `${t.ventas} ventas por la plataforma`;
+    return resenas ? `${ventas} · ${resenas}` : ventas;
   }
-  return ventas;
+
+  if (resenas) return resenas;
+
+  // "Vende en 6 días" dice lo mismo que queremos decir —acá se vende— sin
+  // exponer un contador de una cifra.
+  if (t.dias_hasta_venta != null) {
+    const d = t.dias_hasta_venta;
+    if (d <= 1) return "Sus libros se venden el mismo día";
+    if (d <= 7) return `Sus libros se venden en ${d} días`;
+    if (d <= 21) return `Sus libros se venden en unas ${Math.round(d / 7)} semanas`;
+  }
+
+  return `${t.portadas.length > 0 ? "" : ""}Vende con pago protegido y despacho a todo Chile`;
 }
 
 function Portadas({ portadas, alto }: { portadas: TiendaConfianza["portadas"]; alto: number }) {

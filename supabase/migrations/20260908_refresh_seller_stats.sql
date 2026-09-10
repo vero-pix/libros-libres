@@ -63,6 +63,23 @@ begin
       and (p_seller_id is null or l.seller_id = p_seller_id)
     group by l.seller_id, l.id, l.created_at
   ),
+  -- Mediana de dias entre publicar y vender. Ver el comentario de la columna:
+  -- "1 venta" resta, "vendio en 3 dias" suma. Se pide un minimo de 2 ventas
+  -- porque con una sola no hay mediana, hay anecdota.
+  rapidez as (
+    select o.seller_id,
+           percentile_cont(0.5) within group (
+             order by (o.created_at::date - l.created_at::date)
+           )::integer as dias
+    from public.orders o
+    join public.listings l on l.id = o.listing_id
+    where o.status in ('paid','delivered')
+      and o.created_at >= now() - interval '180 days'
+      and o.created_at::date >= l.created_at::date
+      and (p_seller_id is null or o.seller_id = p_seller_id)
+    group by o.seller_id
+    having count(*) >= 2
+  ),
   top3 as (
     select seller_id, array_agg(listing_id order by rn) as ids
     from (
@@ -85,6 +102,7 @@ begin
            rv.prom                                                as reviews_avg,
            s.last_sale_at,
            coalesce(t.ids, '{}'::uuid[])                          as top_listing_ids,
+           rap.dias                                               as dias_hasta_venta,
            -- C2, con el catálogo topado en 250 (5 puntos) para que el tamaño no
            -- domine el orden: sin el tope, 1.713 libros valen 34 puntos.
            round(
@@ -103,15 +121,16 @@ begin
     left join activos a  on a.seller_id  = v.id
     left join resenas rv on rv.seller_id = v.id
     left join top3    t  on t.seller_id  = v.id
+    left join rapidez rap on rap.seller_id = v.id
   )
   insert into public.seller_stats as ss (
     seller_id, paid_90d, delivered_90d, paid_total, active_listings,
     mp_connected, shipit_auto_enabled, reviews_count, reviews_avg,
-    last_sale_at, top_listing_ids, trust_score, is_trusted, updated_at
+    last_sale_at, top_listing_ids, trust_score, is_trusted, dias_hasta_venta, updated_at
   )
   select seller_id, paid_90d, delivered_90d, paid_total, active_listings,
          mp, shipit_auto, reviews_count, reviews_avg,
-         last_sale_at, top_listing_ids, trust_score, is_trusted, now()
+         last_sale_at, top_listing_ids, trust_score, is_trusted, dias_hasta_venta, now()
   from calculo
   on conflict (seller_id) do update set
     paid_90d            = excluded.paid_90d,
@@ -126,6 +145,7 @@ begin
     top_listing_ids     = excluded.top_listing_ids,
     trust_score         = excluded.trust_score,
     is_trusted          = excluded.is_trusted,
+    dias_hasta_venta    = excluded.dias_hasta_venta,
     updated_at          = now();
 
   get diagnostics v_filas = row_count;

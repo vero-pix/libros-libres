@@ -427,7 +427,7 @@ const getTrustedStores = unstable_cache(
       supabase
         .from("seller_stats")
         .select(
-          "seller_id, paid_total, reviews_count, reviews_avg, top_listing_ids, trust_score, seller:users(username, full_name, city, avatar_url)"
+          "seller_id, paid_total, reviews_count, reviews_avg, dias_hasta_venta, top_listing_ids, trust_score, seller:users(username, full_name, city, avatar_url)"
         )
         .eq("is_trusted", true)
         .order("trust_score", { ascending: false })
@@ -444,7 +444,7 @@ const getTrustedStores = unstable_cache(
       const { data } = await supabase
         .from("seller_stats")
         .select(
-          "seller_id, paid_total, reviews_count, reviews_avg, top_listing_ids, seller:users(username, full_name, city, avatar_url)"
+          "seller_id, paid_total, reviews_count, reviews_avg, dias_hasta_venta, top_listing_ids, seller:users(username, full_name, city, avatar_url)"
         )
         .eq("seller_id", casaConf.seller_id)
         .maybeSingle();
@@ -489,6 +489,7 @@ const getTrustedStores = unstable_cache(
         ventas: s.paid_total ?? 0,
         reviews_count: s.reviews_count ?? 0,
         reviews_avg: s.reviews_avg != null ? Number(s.reviews_avg) : null,
+        dias_hasta_venta: s.dias_hasta_venta ?? null,
         frase: frase ?? null,
         portadas: (s.top_listing_ids ?? [])
           .map((id: string) => porId.get(id))
