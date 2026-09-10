@@ -65,7 +65,9 @@ test("dropdown Ayuda abre al hover y muestra items", async ({ page }) => {
   await ayudaBtn.hover();
   // Scopeamos al header para no confundir con los links del footer
   await expect(header.getByRole("link", { name: /cómo funciona/i })).toBeVisible({ timeout: 2000 });
-  await expect(header.getByRole("link", { name: /faq/i })).toBeVisible();
+  // El item se llama "Centro de ayuda", no "FAQ" (corregido 10-09-2026: el test
+  // buscaba un link que no existe desde que el menu se reorganizo).
+  await expect(header.getByRole("link", { name: /centro de ayuda/i })).toBeVisible();
 });
 
 test("dropdown Ayuda muestra el botón y es interactivo", async ({ page }) => {
@@ -78,36 +80,52 @@ test("dropdown Ayuda muestra el botón y es interactivo", async ({ page }) => {
   await expect(ayudaBtn).toBeEnabled();
 });
 
-test("CTA 'Ver N libros' del hero navega a /search", async ({ page }) => {
+test("CTA del hero lleva al catálogo de la portada", async ({ page }) => {
+  // Corregido 10-09-2026. El CTA dice "Explorar libros" y baja al catálogo de la
+  // misma página (#tienda), no navega a /search: el test viejo esperaba /search y
+  // terminaba tomando el primer link que calzara, que era /solicitudes.
   await page.goto("/");
-  const verLibrosLink = page.getByRole("link", { name: /ver.*libros|ver catálogo|explorar catálogo/i }).first();
-  await expect(verLibrosLink).toBeVisible();
-  const href = await verLibrosLink.getAttribute("href");
-  expect(href).toMatch(/\/search/);
+  const cta = page.getByRole("link", { name: /explorar libros/i }).first();
+  await expect(cta).toBeVisible();
+  expect(await cta.getAttribute("href")).toBe("#tienda");
+  // y el ancla existe de verdad
+  await expect(page.locator("#tienda")).toHaveCount(1);
 });
 
-test("comparador de precios visible en ficha de libro", async ({ page }) => {
+test("la ficha de libro siempre ofrece una salida de compra", async ({ page }) => {
   // Ir a una ficha conocida del catálogo
   await page.goto("/");
   const ficha = page.locator("a[href^='/libro/']").first();
   if (!(await ficha.isVisible().catch(() => false))) {
-    test.skip(true, "No hay listings de tipo /libro/ para probar el comparador");
+    test.skip(true, "No hay listings de tipo /libro/ para probar");
     return;
   }
   const href = await ficha.getAttribute("href");
   await page.goto(href!);
-  // El comparador debe aparecer con links a Buscalibre, MercadoLibre, IberLibro, Facebook
-  await expect(page.getByText(/comparar precios/i)).toBeVisible({ timeout: 5000 });
-  await expect(page.getByRole("link", { name: /buscalibre/i })).toBeVisible();
-  await expect(page.getByRole("link", { name: /mercadolibre/i })).toBeVisible();
+  // El comparador de precios se saco del sitio; el test quedo probando algo que ya
+  // no existe. Ahora prueba lo que la ficha SI tiene y no puede faltar nunca: la
+  // salida de compra. Ver la regla "nunca dejar una pantalla de compra sin salida".
+  await expect(page.getByText(/cómo lo recibes/i)).toBeVisible({ timeout: 5000 });
+  const salida = page.getByRole("button", { name: /comprar con mercadopago|agregar al carrito/i })
+    .or(page.getByRole("link", { name: /whatsapp|solicitudes|avísame/i }));
+  await expect(salida.first()).toBeVisible();
 });
 
-test("home: libros destacados visibles arriba del fold en desktop", async ({ page, browserName }) => {
+test("home: se ven libros sin scrollear en desktop", async ({ page, browserName }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  // El heading "Libros destacados" debería estar en el top ~800px del document
-  const heading = page.getByRole("heading", { name: /libros destacados/i }).first();
-  await expect(heading).toBeVisible();
-  const box = await heading.boundingBox();
-  expect(box?.y).toBeLessThan(900); // above the fold
+  // Qué se prueba acá, corregido el 10-09-2026: que al entrar se vean libros de
+  // verdad sin scrollear. Antes se medía el heading "Libros destacados", que dejó de
+  // existir en el rediseño editorial de mayo — y su reemplazo, "Esta semana en el
+  // velador", quedó a 1.707px, casi dos pantallas abajo. Medir el heading probaba
+  // el orden de las secciones; lo que le importa a quien llega es ver un libro.
+  const primerLibro = page.locator("a[href^='/libro/']").first();
+  await expect(primerLibro).toBeVisible();
+  const box = await primerLibro.boundingBox();
+  expect(box?.y).toBeLessThan(900); // sin scrollear
+
+  // Y la fila destacada existe en alguna parte de la página.
+  await expect(
+    page.getByRole("heading", { name: /esta semana en el velador/i }).first()
+  ).toBeVisible();
 });
