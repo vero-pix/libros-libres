@@ -13,6 +13,8 @@ import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
 import { getCachedCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import FeaturedRow from "@/components/home/FeaturedRow";
+import VitrinaDemanda from "@/components/home/VitrinaDemanda";
+import { librosMasBuscados } from "@/lib/demandaBusqueda";
 import TrustedStoresSection from "@/components/home/TrustedStoresSection";
 import CollectibleRow from "@/components/home/CollectibleRow";
 import RecentRow from "@/components/home/RecentRow";
@@ -347,6 +349,25 @@ const getCollections = unstable_cache(
   { revalidate: 300 }
 );
 
+/**
+ * La vitrina que sale de lo que la gente busca. Una hora de caché: el ranking
+ * de búsquedas no se mueve en minutos y la consulta cruza búsquedas con
+ * catálogo, que no es gratis.
+ */
+const getVitrinaDemanda = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    try {
+      return await librosMasBuscados(supabase, { dias: 30, cuantos: 4 });
+    } catch {
+      // Que la vitrina falle no puede voltear el home: se cae a la fila curada.
+      return [];
+    }
+  },
+  ["home-vitrina-demanda-v1"],
+  { revalidate: 3600 }
+);
+
 const getRecentListings = unstable_cache(
   async () => {
     const supabase = createPublicClient();
@@ -541,7 +562,7 @@ export default async function HomePage({ searchParams }: Props) {
   const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || city_id || collectibleOnly);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
-  const [featuredListings, trustedStores, collectibleListings, recentListings, collectionsRaw, totalActiveCount, availableTags, publicStats] = await Promise.all([
+  const [featuredListings, trustedStores, collectibleListings, recentListings, collectionsRaw, totalActiveCount, availableTags, publicStats, vitrinaDemanda] = await Promise.all([
     getFeaturedListings() as unknown as Promise<ListingWithBook[]>,
     getTrustedStores(),
     getCollectibleListings() as unknown as Promise<ListingWithBook[]>,
@@ -550,6 +571,7 @@ export default async function HomePage({ searchParams }: Props) {
     getTotalActiveCount(),
     getAvailableTags(),
     getPublicStats(),
+    getVitrinaDemanda(),
   ]);
 
   // Dedupe entre filas de la portada: un libro no puede salir en dos filas.
@@ -665,6 +687,7 @@ export default async function HomePage({ searchParams }: Props) {
         featuredRow={
           !hasFilters ? (
             <>
+              <VitrinaDemanda libros={vitrinaDemanda} />
               {featuredRowListings.length > 0 && <FeaturedRow featuredListings={featuredRowListings} />}
               <TrustedStoresSection
                 casa={trustedStores.casa}
