@@ -5,7 +5,7 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 ## Stack
 
 - **Next.js 14.2** (App Router) + TypeScript + React 18
-- **Tailwind v3** + shadcn/ui
+- **Tailwind v3** — **NO hay shadcn/ui** (verificado 10-09-2026: cero `@radix-ui`, cero `class-variance-authority`, sin `components.json`). `components/ui/` son componentes propios, coincide el nombre de la carpeta y no el contenido. Tampoco hay `framer-motion` ni `lucide-react`: los iconos son SVG en línea
 - **Supabase** (Postgres + Storage + Auth)
 - **MercadoPago** split payment (tokens de vendedor + marketplace_fee)
 - **Shipit** para etiquetas de courier
@@ -54,6 +54,9 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 - **`git push` a main: autorizado, sin preguntar** (27-07-2026). El **deploy a producción sí** requiere autorización explícita de Vero. Esto reemplaza la regla del CLAUDE.md global, que sigue vigente para los otros proyectos.
 - **Nunca commitear con `--no-verify`** ni saltarse hooks.
 - Preferir editar archivos existentes sobre crear nuevos.
+- **El botón sale de `components/ui/Button.tsx`** (`Button` / `ButtonLink`), no se escribe inline. Antes existía en ~15 variantes con cuatro radios y cuatro alturas.
+- **La portada del libro sale de `components/listings/BookCover.tsx`.** Estaba repetida en once archivos, y la cubierta dibujada para los libros sin foto existía solo en la grilla: en los otros diez salía texto plano, un icono gris o un emoji.
+- **Las animaciones se definen en `tailwind.config.ts`.** No usar clases de `tailwindcss-animate` (`animate-in`, `fade-in`, `slide-in-from-*`): el plugin NO está instalado y esas clases no existen en el CSS. Pasó con siete, entre ellas el `animate-shake` del error del checkout. Comprobar con `grep -o "animate-[a-z-]*" .next/static/css/*.css`.
 
 ## `/novedades`
 
@@ -82,10 +85,10 @@ Antes de afirmar cualquier dato de negocio, mirar acá. Si un documento contradi
 | Visión de largo plazo | `docs_desde_claude/MASTER_PLAN.md` | |
 | Features pendientes y entregadas | `ROADMAP.md` | Actualizado el 25-08-2026. El plan de julio que sigue más abajo en ese archivo está marcado como histórico: su diagnóstico quedó superado |
 | Onboarding de vendedores | `docs/MENSAJES-ONBOARDING-VENDEDOR.md` · `docs/guia-vender-v2.html` | |
-| Cuándo se muestra el WhatsApp del vendedor | `lib/whatsapp-policy.ts` | Código, no documento. **Con MercadoPago conectado NO se muestra** (competía con el botón de comprar); sin MP se muestra siempre, incluso con courier. Experimento abierto el 25-08-2026 — no revertirlo sin mirar la métrica de abajo |
-| Tasa de captura (la métrica del negocio) | `scripts/_captura.mjs` | Cuánto del volumen vendido pasa por la plataforma y deja comisión. Baseline agosto 2026: 0,8% ($800 en el mes). **Leer ~8 sept 2026** |
+| Cuándo se muestra el WhatsApp del vendedor | `lib/whatsapp-policy.ts` | Código, no documento. **Con MercadoPago conectado NO se muestra** (competía con el botón de comprar); sin MP se muestra siempre, incluso con courier. **Experimento CERRADO el 10-09-2026: se queda.** Medido a 17 días — la captura pasó de 0,8% a 37,6% y el volumen no cayó ($71.249/día antes, $63.351/día después). No reabrir la pregunta sin volver a medir |
+| Tasa de captura (la métrica del negocio) | `scripts/_captura.mjs` | Cuánto del volumen vendido pasa por la plataforma y deja comisión. Baseline pre-experimento (agosto al día 25): 0,8%, $800. **Leído el 10-09-2026: septiembre va en 40,7% y $22.823 de comisión en 10 días**, contra $4.880 en todo agosto. **Volver a leer ~10-10-2026.** ⚠️ Los `scripts/_*.mjs` NO están versionados (los tapa el `.gitignore`): existen solo en el disco de Vero y no aparecen en un worktree |
 | Estado de las landings de Vero (Wilber, Steiner, antroposofía, antiguos) y del correo con Workspace caído | `docs_desde_claude/ESTADO_2026-09-04.md` | Medir el **18-09-2026** con `npm run seo:gsc`. Pendiente: 2ª tanda de sinopsis (~145 fichas de vero con plantilla) |
-| Lectura del experimento del WhatsApp | `scripts/_captura_experimento.mjs` | Parte agosto-septiembre en antes/después del 25-08 y muestra el detalle diario. Diagnóstico vigente: `docs_desde_claude/DIAGNOSTICO_2026-09-02.md` |
+| Lectura del experimento del WhatsApp | `scripts/_captura_experimento.mjs` | Parte agosto-septiembre en antes/después del 25-08 y muestra el detalle diario. Diagnóstico vigente: `docs_desde_claude/DIAGNOSTICO_2026-09-02.md`. **Resultado 10-09-2026: 1 venta pagada en los 24 días previos contra 25 en los 17 siguientes.** Ojo al leerlo: 12 de esas 25 son de `libro.de.ocasion`, que se registró el 29-08 con MP y 83 libros. Las otras 13 son de siete vendedores antiguos, que antes cerraban por WhatsApp — ahí está la prueba de que el cambio es del experimento y no del vendedor nuevo |
 
 **Documentos históricos — NO usar como fuente:**
 
