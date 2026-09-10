@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ButtonLink } from "@/components/ui/Button";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
@@ -191,12 +192,12 @@ export default async function PabloNerudaPage() {
               usado más abajo.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="#disponibles" className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 transition-colors shadow-sm">
+              <ButtonLink href="#disponibles" className="shadow-sm">
                 Ver ejemplares disponibles
-              </Link>
-              <Link href="/solicitudes" className="inline-flex items-center px-6 py-3 bg-white border border-ink/20 text-ink text-sm font-semibold rounded-xl hover:border-brand-500 hover:text-brand-600 transition-colors">
+              </ButtonLink>
+              <ButtonLink href="/solicitudes" variant="outline">
                 Avisar cuando llegue uno →
-              </Link>
+              </ButtonLink>
             </div>
           </section>
 
@@ -297,9 +298,9 @@ export default async function PabloNerudaPage() {
               Hay compradores buscando activamente. Los libros de Neruda en buen estado se venden rápido.
               Publicar es gratis y la comisión es solo 8% cuando se vende.
             </p>
-            <Link href="/publish" className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 transition-colors">
+            <ButtonLink href="/publish">
               Publicar mis libros →
-            </Link>
+            </ButtonLink>
           </section>
 
           <section className="mb-12">

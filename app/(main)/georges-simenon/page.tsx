@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ButtonLink } from "@/components/ui/Button";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
@@ -146,12 +147,12 @@ export default async function SimenonPage() {
               Novela negra y novelas psicológicas de segunda mano, con envío a todo el país.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/search?q=simenon" className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 transition-colors shadow-sm">
+              <ButtonLink href="/search?q=simenon" className="shadow-sm">
                 Ver ejemplares disponibles
-              </Link>
-              <Link href="/solicitudes" className="inline-flex items-center px-6 py-3 bg-white border border-ink/20 text-ink text-sm font-semibold rounded-xl hover:border-brand-500 hover:text-brand-600 transition-colors">
+              </ButtonLink>
+              <ButtonLink href="/solicitudes" variant="outline">
                 Avisar cuando llegue uno →
-              </Link>
+              </ButtonLink>
             </div>
           </section>
 
@@ -206,9 +207,9 @@ export default async function SimenonPage() {
             <p className="text-cream/80 text-sm leading-relaxed max-w-xl mb-6">
               Los lectores de novela negra buscan completar colecciones. Publicar es gratis y solo cobramos 8% cuando se vende.
             </p>
-            <Link href="/publish" className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 transition-colors">
+            <ButtonLink href="/publish">
               Publicar mis libros →
-            </Link>
+            </ButtonLink>
           </section>
 
           <section className="mb-12">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ButtonLink } from "@/components/ui/Button";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
@@ -125,12 +126,12 @@ export default async function NovelaNegraPage() {
               gastar de más. Pago protegido con MercadoPago y envío a todo Chile.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/search?q=novela%20negra" className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 transition-colors shadow-sm">
+              <ButtonLink href="/search?q=novela%20negra" className="shadow-sm">
                 Ver disponibles
-              </Link>
-              <Link href="/solicitudes" className="inline-flex items-center px-6 py-3 bg-white border border-ink/20 text-ink text-sm font-semibold rounded-xl hover:border-brand-500 hover:text-brand-600 transition-colors">
+              </ButtonLink>
+              <ButtonLink href="/solicitudes" variant="outline">
                 Pedir uno que no está
-              </Link>
+              </ButtonLink>
             </div>
           </section>
 
@@ -161,9 +162,9 @@ export default async function NovelaNegraPage() {
               El género negro tiene lectores fieles todo el año. Publicar es gratis y
               cobramos una comisión pequeña solo cuando el libro se vende.
             </p>
-            <Link href="/publish" className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 transition-colors">
+            <ButtonLink href="/publish">
               Publicar un libro →
-            </Link>
+            </ButtonLink>
           </section>
 
           <section className="mb-12">

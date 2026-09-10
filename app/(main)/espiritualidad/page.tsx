@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ButtonLink } from "@/components/ui/Button";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
@@ -140,12 +141,12 @@ export default async function EspiritualidadPage() {
               agotan y no vuelven. Usados, con envío a todo Chile o retiro en mano.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/search?q=espiritualidad" className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 transition-colors shadow-sm">
+              <ButtonLink href="/search?q=espiritualidad" className="shadow-sm">
                 Buscar en todo el catálogo
-              </Link>
-              <Link href="/solicitudes" className="inline-flex items-center px-6 py-3 bg-white border border-ink/20 text-ink text-sm font-semibold rounded-xl hover:border-brand-500 hover:text-brand-600 transition-colors">
+              </ButtonLink>
+              <ButtonLink href="/solicitudes" variant="outline">
                 Avisar cuando llegue uno →
-              </Link>
+              </ButtonLink>
             </div>
           </section>
 
@@ -183,9 +184,9 @@ export default async function EspiritualidadPage() {
             <p className="text-cream/80 text-sm leading-relaxed max-w-xl mb-6">
               Se buscan más de lo que se ofrecen: este mes hubo decenas de búsquedas sin resultado. Publicar es gratis y solo cobro 8% cuando se vende por la plataforma.
             </p>
-            <Link href="/publish" className="inline-flex items-center px-6 py-3 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 transition-colors">
+            <ButtonLink href="/publish">
               Publicar mis libros →
-            </Link>
+            </ButtonLink>
           </section>
 
           <section className="mb-12">
