@@ -109,7 +109,21 @@ export default function Footer() {
             <span className="hidden sm:inline">·</span>
             <span>Santiago, Chile</span>
             <span className="hidden sm:inline">·</span>
-            <a href="/sobre-nosotros" className="hover:text-coral transition-colors">Un proyecto de Verónica Velásquez</a>
+            <a href="/sobre-nosotros" className="group hover:text-coral transition-colors inline-flex items-center gap-1.5">
+              Hecho con
+              {/* Late al pasar el mouse. Quien pidió menos movimiento no ve el latido. */}
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+                className="text-coral motion-safe:group-hover:animate-pulse"
+              >
+                <path d="M12 21s-7.5-4.6-9.6-9A5.4 5.4 0 0 1 12 5.7a5.4 5.4 0 0 1 9.6 6.3C19.5 16.4 12 21 12 21z" />
+              </svg>
+              por Verónica Velásquez
+            </a>
           </div>
           <div className="flex items-center gap-4">
             <a
