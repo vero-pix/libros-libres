@@ -526,7 +526,13 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
     try {
       const sPrev = await getShipitShipment(fila.shipit_id);
       const r = sPrev.error ? null : leerRetiroShipit(sPrev.last_pickup);
-      if (r && r.id !== fila.pickup_dismissed_id) retiroAgendado = { date: r.date, window: r.window };
+      // Misma regla que en `pasoRetiro`: solo se le anuncia un retiro que él
+      // quería. Un retiro que Shipit agendó por su cuenta sobre un envío
+      // dropoff no puede cambiarle la instrucción del correo.
+      const loQueria = !!fila.pickup_requested_at || fila.dispatch_mode === "pickup";
+      if (r && loQueria && r.id !== fila.pickup_dismissed_id) {
+        retiroAgendado = { date: r.date, window: r.window };
+      }
     } catch {
       retiroAgendado = null;
     }
@@ -771,6 +777,38 @@ async function pasoRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pr
     return { reference: fila.reference, estado: "notified", accion: "retiro descartado por el vendedor" };
   }
 
+  // Manda lo que eligió el vendedor, no lo que hizo el courier.
+  //
+  // Shipit agenda retiros a mano en su panel sobre envíos que se crearon en
+  // `dropoff`. Antes esos retiros pisaban la instrucción: el vendedor recibía
+  // el correo "déjalo en la sucursal" y después /mis-ventas le decía "espera
+  // el camión". Le pasó a Casa Emunah el 09-09-2026 y a Buhardilla el 10-09,
+  // que estaba en un bus y no podía estar en su casa a las 11:00.
+  //
+  // Ahora el retiro solo se anuncia si el vendedor lo quería: porque lo pidió
+  // por la plataforma, o porque su modo es `pickup`. Si no, el envío se queda
+  // en dropoff con la etiqueta que ya tiene y Vero recibe el aviso para
+  // anular el retiro en el panel.
+  const loQueriaElVendedor = !!fila.pickup_requested_at || fila.dispatch_mode === "pickup";
+
+  if (!loQueriaElVendedor) {
+    // Se marca como descartado para que la próxima corrida no lo vuelva a
+    // mirar, igual que cuando el vendedor aprieta "Lo dejo en sucursal".
+    await admin.from("shipments").update({ pickup_dismissed_id: retiro.id }).eq("id", fila.id);
+    await reprogramarEnvio(admin, fila.id, 6 * 60);
+    await sendGong(
+      [
+        `🚚 Shipit agendó un retiro que <b>nadie pidió</b> para ${escapeHtml(fila.reference)} — el envío es <b>dropoff</b>.`,
+        `• ${escapeHtml(retiro.date)}${retiro.window ? ` · ${escapeHtml(retiro.window)}` : ""}${retiro.isManual ? " · creado a mano en el panel" : ""}`,
+        `• ${escapeHtml(retiro.place ?? "sin dirección en la respuesta")}`,
+        `• Envío Shipit ${fila.shipit_id} · ${escapeHtml(fila.courier ?? "")} · retiro ${retiro.id ?? "—"}`,
+        `<b>Al vendedor NO se le cambió la instrucción</b>: sigue viendo "déjalo en la sucursal", que es lo que eligió.`,
+        `Anular el retiro en el panel de Shipit para que el chofer no viaje al vacío.`,
+      ].join("\n")
+    );
+    return { reference: fila.reference, estado: "notified", accion: "retiro no pedido: se respeta el dropoff" };
+  }
+
   const ok = await transicionEnvio(admin, fila.id, "notified", "pickup_scheduled", {
     pickup_date: retiro.date,
     pickup_window: retiro.window,
@@ -782,21 +820,6 @@ async function pasoRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pr
     .from("orders")
     .update({ shipping_status: "pickup_scheduled", shipping_updated_at: new Date().toISOString() })
     .eq("bundle_id", fila.bundle_id);
-
-  // Retiro que nadie pidió por la plataforma: lo creó un humano en el panel.
-  // El vendedor ya recibió un correo diciéndole que lo dejara en la sucursal,
-  // así que alguien tiene que avisarle antes de que el chofer viaje al vacío.
-  if (!fila.pickup_requested_at) {
-    await sendGong(
-      [
-        `🚚 Shipit agendó un retiro que <b>no se pidió por la plataforma</b> para ${escapeHtml(fila.reference)}.`,
-        `• ${escapeHtml(retiro.date)}${retiro.window ? ` · ${escapeHtml(retiro.window)}` : ""}${retiro.isManual ? " · creado a mano en el panel" : ""}`,
-        `• ${escapeHtml(retiro.place ?? "sin dirección en la respuesta")}`,
-        `• Envío Shipit ${fila.shipit_id} · ${escapeHtml(fila.courier ?? "")} · retiro ${retiro.id ?? "—"}`,
-        `El vendedor ya tiene el correo que le dice que lo deje en la sucursal: avísale que pasan a buscarlo.`,
-      ].join("\n")
-    );
-  }
 
   return {
     reference: fila.reference,
