@@ -60,7 +60,7 @@ export default function BookRequestForm({ initialTitle = "" }: BookRequestFormPr
 
   if (isDone) {
     return (
-      <div className="bg-brand-50 p-8 rounded-2xl border border-brand-100 text-center animate-in fade-in zoom-in duration-500">
+      <div className="bg-brand-50 p-8 rounded-2xl border border-brand-100 text-center animate-zoom-in">
         <div className="text-4xl mb-4">✨</div>
         <h3 className="text-xl font-bold text-ink">¡Pedido guardado!</h3>
         <p className="text-ink-muted mt-2">

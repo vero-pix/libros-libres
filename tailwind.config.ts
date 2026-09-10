@@ -79,6 +79,11 @@ const config: Config = {
         book: "0 2px 2px rgba(23,20,16,.04), 0 12px 22px -10px rgba(23,20,16,.30), 0 30px 50px -28px rgba(23,20,16,.34)",
         card: "0 1px 2px rgba(23,20,16,.04), 0 14px 30px -18px rgba(23,20,16,.22)",
       },
+      // Las animaciones de entrada se definen todas acá. Antes se usaban clases
+      // de `tailwindcss-animate` (`animate-in fade-in slide-in-from-bottom-4`,
+      // `animate-shake`, `animate-fade-in`, `animate-fade-up`) sin tener el
+      // plugin instalado: no existian en el CSS compilado y no hacian nada.
+      // El error del checkout, por ejemplo, nunca se sacudio. (10-09-2026)
       keyframes: {
         scan: {
           "0%": { top: "0%" },
@@ -88,10 +93,39 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(20px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "zoom-in": {
+          "0%": { opacity: "0", transform: "scale(.95)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        "slide-up-full": {
+          "0%": { transform: "translateY(100%)" },
+          "100%": { transform: "translateY(0)" },
+        },
+        "fade-out": {
+          "0%": { opacity: "1" },
+          "100%": { opacity: "0" },
+        },
+        shake: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "20%, 60%": { transform: "translateX(-4px)" },
+          "40%, 80%": { transform: "translateX(4px)" },
+        },
       },
       animation: {
         scan: "scan 2s ease-in-out infinite",
         "fade-in-up": "fade-in-up 0.6s ease-out forwards",
+        // alias de fade-in-up: el sitio usa los dos nombres
+        "fade-up": "fade-in-up 0.6s ease-out forwards",
+        "fade-in": "fade-in 0.3s ease-out forwards",
+        "zoom-in": "zoom-in 0.5s ease-out forwards",
+        "slide-up-full": "slide-up-full 0.3s ease-out forwards",
+        // el destello del escaner: se apaga solo, no se queda blanco
+        "fade-out": "fade-out 0.3s ease-out forwards",
+        shake: "shake 0.4s ease-in-out",
       },
     },
   },

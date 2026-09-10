@@ -131,7 +131,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black flex flex-col animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] bg-black flex flex-col animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 bg-black/40 backdrop-blur-md text-white border-b border-white/10">
         <div className="flex flex-col">
@@ -154,7 +154,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
 
         {/* Detection Flash Overlay */}
         {isFlashing && (
-          <div className="absolute inset-0 z-10 bg-white animate-out fade-out duration-300 pointer-events-none" />
+          <div className="absolute inset-0 z-10 bg-white animate-fade-out pointer-events-none" />
         )}
 
         {/* Camera Error Message */}

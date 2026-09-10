@@ -131,3 +131,20 @@
     animation: none;
   }
 }
+
+/* Animaciones de entrada: quien pidió menos movimiento ve el contenido ya
+   puesto, no aparecer. Van listadas una a una y NO con un `*` global, para no
+   apagar los indicadores de progreso (`animate-spin`, `animate-pulse`) ni el
+   escáner, que comunican que algo está pasando. Los `animationDelay` inline
+   quedan inertes al no haber animación que retrasar. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-up,
+  .animate-fade-in,
+  .animate-zoom-in,
+  .animate-slide-up-full {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

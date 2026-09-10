@@ -695,7 +695,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
 
       {/* Mobile Sticky Buy Bar */}
       {listing.price != null && listing.modality !== "loan" && !isSold && (
-        <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-paper-card border-t border-line shadow-[0_-8px_16px_rgba(0,0,0,0.05)] z-50 flex items-center justify-between gap-4 animate-in slide-in-from-bottom-full duration-300">
+        <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-paper-card border-t border-line shadow-[0_-8px_16px_rgba(0,0,0,0.05)] z-50 flex items-center justify-between gap-4 animate-slide-up-full">
           <div className="flex flex-col">
             <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Precio</span>
             <span className="text-xl font-bold text-black leading-none">${listing.price.toLocaleString("es-CL")}</span>

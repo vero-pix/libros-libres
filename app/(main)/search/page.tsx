@@ -353,7 +353,7 @@ export default async function SearchPage({ searchParams }: Props) {
                 <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BUSQUEDA} />
               </>
             ) : (
-              <div className="py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="py-8 animate-fade-in-up">
                 {/* Economy Inversa CTA */}
                 <div className="bg-amber-50 rounded-2xl border border-amber-200 p-8 mb-12 shadow-sm text-center">
                   <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-100 text-amber-600 rounded-full mb-4">
