@@ -14,6 +14,8 @@ import HomeShell from "@/components/home/HomeShell";
 import { getCachedCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import FeaturedRow from "@/components/home/FeaturedRow";
 import VitrinaDemanda from "@/components/home/VitrinaDemanda";
+import CalugaPieza from "@/components/home/CalugaPieza";
+import { leerPiezaDestacada } from "@/lib/piezaDestacada";
 import { librosMasBuscados } from "@/lib/demandaBusqueda";
 import TrustedStoresSection from "@/components/home/TrustedStoresSection";
 import CollectibleRow from "@/components/home/CollectibleRow";
@@ -368,6 +370,23 @@ const getVitrinaDemanda = unstable_cache(
   { revalidate: 3600 }
 );
 
+/**
+ * "La pieza" del sidebar. Media hora de caché: se cambia a mano en
+ * `site_config`, no cada minuto. Ver lib/piezaDestacada.ts.
+ */
+const getPiezaDestacada = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    try {
+      return await leerPiezaDestacada(supabase);
+    } catch {
+      return null;
+    }
+  },
+  ["home-pieza-destacada-v1"],
+  { revalidate: 1800 }
+);
+
 const getRecentListings = unstable_cache(
   async () => {
     const supabase = createPublicClient();
@@ -562,7 +581,7 @@ export default async function HomePage({ searchParams }: Props) {
   const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || city_id || collectibleOnly);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
-  const [featuredListings, trustedStores, collectibleListings, recentListings, collectionsRaw, totalActiveCount, availableTags, publicStats, vitrinaDemanda] = await Promise.all([
+  const [featuredListings, trustedStores, collectibleListings, recentListings, collectionsRaw, totalActiveCount, availableTags, publicStats, vitrinaDemanda, piezaDestacada] = await Promise.all([
     getFeaturedListings() as unknown as Promise<ListingWithBook[]>,
     getTrustedStores(),
     getCollectibleListings() as unknown as Promise<ListingWithBook[]>,
@@ -572,6 +591,7 @@ export default async function HomePage({ searchParams }: Props) {
     getAvailableTags(),
     getPublicStats(),
     getVitrinaDemanda(),
+    getPiezaDestacada(),
   ]);
 
   // Dedupe entre filas de la portada: un libro no puede salir en dos filas.
@@ -737,7 +757,7 @@ export default async function HomePage({ searchParams }: Props) {
         />
 
         <div className="flex gap-10">
-          <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalCount} availableTags={availableTags} />
+          <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalCount} availableTags={availableTags} caluga={<CalugaPieza pieza={piezaDestacada} />} />
 
           <div className="flex-1 min-w-0">
             {!hasFilters && recentRowListings.length > 0 && (

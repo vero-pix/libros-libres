@@ -32,6 +32,11 @@ const FEATURED_TAGS = [
 
 interface Props {
   categoryTree: CategoryNode[];
+  /**
+   * La caluga de "la pieza", renderizada en el servidor y pasada como nodo:
+   * este componente es de cliente y no puede leer la base por su cuenta.
+   */
+  caluga?: React.ReactNode;
   activeCategory?: string;
   activeSubcategory?: string;
   activeTag?: string;
@@ -46,6 +51,7 @@ export default function CategoriesSidebar({
   activeTag,
   totalCount,
   availableTags,
+  caluga,
 }: Props) {
   const tagSet = availableTags ? new Set(availableTags) : null;
   // Open the group that contains the active subcategory
@@ -70,6 +76,8 @@ export default function CategoriesSidebar({
 
   return (
     <aside className="w-56 shrink-0 hidden lg:block sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto">
+      {caluga}
+
       <h2 className="font-display font-bold text-base text-ink mb-4 tracking-tight">
         Categorías
       </h2>
