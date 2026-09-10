@@ -129,3 +129,16 @@ test("home: se ven libros sin scrollear en desktop", async ({ page, browserName 
     page.getByRole("heading", { name: /esta semana en el velador/i }).first()
   ).toBeVisible();
 });
+
+test("una URL que no existe devuelve 404 de verdad, con salidas", async ({ page }) => {
+  // Agregado el 10-09-2026 junto con `app/not-found.tsx`. Importan las dos cosas:
+  // que el código HTTP sea 404 (un "soft 404" que responde 200 confunde a Google,
+  // y el grueso del tráfico llega de ahí) y que la página ofrezca por dónde seguir.
+  const res = await page.goto("/esta-ruta-no-existe-de-verdad");
+  expect(res?.status()).toBe(404);
+  await expect(page.getByRole("heading", { name: /esta página no está/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /buscar en el catálogo/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /pedir que lo busquemos/i })).toBeVisible();
+  // y la barra de navegación, para no dejar a nadie encerrado
+  await expect(page.getByRole("banner")).toBeVisible();
+});
