@@ -21,7 +21,7 @@ export default async function PerfilPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("full_name, username, email, phone, bio, avatar_url, public_email, instagram, default_latitude, default_longitude, default_address, pickup_points, mercadopago_user_id, mercadopago_connected_at")
+    .select("full_name, username, email, phone, bio, avatar_url, public_email, instagram, default_latitude, default_longitude, default_address, pickup_points, mercadopago_user_id, mercadopago_connected_at, shipit_dispatch_mode")
     .eq("id", user.id)
     .single();
 
@@ -72,6 +72,7 @@ export default async function PerfilPage() {
           defaultLng={profile?.default_longitude ?? null}
           defaultAddress={profile?.default_address ?? null}
           initialPickupPoints={(profile?.pickup_points as { label: string; comuna?: string | null }[]) ?? []}
+          initialDispatchMode={profile?.shipit_dispatch_mode ?? null}
         />
         <div className="mt-4">
           <MercadoPagoConnect

@@ -19,6 +19,8 @@ interface Props {
   defaultLng?: number | null;
   defaultAddress?: string | null;
   initialPickupPoints?: PickupPoint[];
+  /** "dropoff" = lo dejo yo en la sucursal · "pickup" = que vengan a buscarlo. */
+  initialDispatchMode?: string | null;
 }
 
 interface PickupPoint {
@@ -79,6 +81,7 @@ export default function ProfileForm({
   defaultLng,
   defaultAddress,
   initialPickupPoints,
+  initialDispatchMode,
 }: Props) {
   const supabase = createClient();
 
@@ -103,6 +106,9 @@ export default function ProfileForm({
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Cómo sale el paquete cuando vende con despacho. Manda sobre lo que
+  // agende el courier por su cuenta — ver el cron de envíos.
+  const [dispatchMode, setDispatchMode] = useState(initialDispatchMode === "pickup" ? "pickup" : "dropoff");
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -274,6 +280,7 @@ export default function ProfileForm({
       pickup_points: pickupPoints
         .filter((p) => p.label.trim())
         .map((p) => ({ label: p.label.trim(), comuna: (p.comuna ?? "").trim() || null })),
+      shipit_dispatch_mode: dispatchMode,
     };
     // Solo se manda si cambió: mandarlo igual chocaría contra el índice único
     // consigo mismo en algunas configuraciones.
@@ -676,6 +683,57 @@ export default function ProfileForm({
           {locationSaved && (
             <p className="text-xs text-green-600">✓ Ubicación guardada correctamente.</p>
           )}
+
+          {/* Cómo sale el paquete. Vale para todas sus ventas con despacho. */}
+          <div className="pt-4 mt-2 border-t border-gray-100">
+            <h3 className="text-sm font-semibold text-gray-700">Cuando vendas con despacho</h3>
+            <p className="text-xs text-gray-500 mt-0.5 mb-3">
+              Tú eliges cómo sale el paquete. Lo puedes cambiar cuando quieras.
+            </p>
+
+            <div className="grid gap-2">
+              {[
+                {
+                  value: "dropoff",
+                  titulo: "Lo dejo yo en la sucursal",
+                  texto: "Imprimes la etiqueta, la pegas y entregas el paquete en el mesón cuando te acomode. No tienes que esperar a nadie.",
+                },
+                {
+                  value: "pickup",
+                  titulo: "Que vengan a buscarlo",
+                  texto: "El courier pasa a tu dirección en una ventana de horario. Tienes que estar ahí para entregarlo.",
+                },
+              ].map((o) => (
+                <label
+                  key={o.value}
+                  className={`flex gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                    dispatchMode === o.value
+                      ? "border-brand-500 bg-brand-50"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="dispatch_mode"
+                    id={`dispatch-${o.value}`}
+                    value={o.value}
+                    checked={dispatchMode === o.value}
+                    onChange={() => setDispatchMode(o.value)}
+                    className="mt-0.5 accent-brand-500"
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium text-gray-800">{o.titulo}</span>
+                    <span className="block text-xs text-gray-500 mt-0.5">{o.texto}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+
+            <p className="text-[11px] text-gray-500 mt-2.5">
+              Si el courier agenda un retiro que tú no pediste, mandamos lo que elegiste acá y te
+              avisamos.
+            </p>
+          </div>
 
           {/* Aplicar a lo ya publicado */}
           {savedAddress && savedCoords && publishedCount != null && publishedCount > 0 && (
