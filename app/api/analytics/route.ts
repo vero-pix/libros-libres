@@ -31,7 +31,7 @@ function parseUserAgent(ua: string): { browser: string; os: string; device: stri
 /** POST /api/analytics — log a page view */
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { path, referrer, listing_id, session_id } = body;
+  const { path, referrer, listing_id, session_id, visitor_id } = body;
 
   if (!path) {
     return NextResponse.json({ error: "path required" }, { status: 400 });
@@ -70,6 +70,9 @@ export async function POST(req: NextRequest) {
     user_id: user?.id || null,
     listing_id: listing_id || null,
     session_id: session_id || null,
+    // Persistente entre sesiones. Permite saber si alguien volvió otro día,
+    // que es lo que mide el experimento de AdSense (11-09-2026).
+    visitor_id: visitor_id ? String(visitor_id).slice(0, 64) : null,
   });
 
   // Si el usuario está logueado, backfillar las pageviews previas de esta

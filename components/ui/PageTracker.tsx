@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { getVisitorId } from "@/lib/visitorId";
 
 declare global {
   interface Window {
@@ -95,6 +96,9 @@ export default function PageTracker() {
       referrer: document.referrer || null,
       listing_id,
       session_id: getSessionId(),
+      // Persistente entre sesiones: es lo que permite saber si alguien volvió
+      // otro día. Necesario para el experimento de AdSense (11-09-2026).
+      visitor_id: getVisitorId(),
     });
 
     if (navigator.sendBeacon) {

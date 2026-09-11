@@ -18,6 +18,7 @@
 
 import Script from "next/script";
 import { useEffect, useRef, useState } from "react";
+import { getVisitorId } from "@/lib/visitorId";
 
 const CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
@@ -59,9 +60,44 @@ export default function AdSlot({
       if (!nodo.getAttribute("data-ad-status")) setVacio(true);
     }, 8000);
 
+    // ── Medición del experimento (11-09-2026) ──────────────────────────────
+    // Google no dice quién hizo clic en un anuncio. El truco estándar: cuando
+    // la ventana pierde el foco y el elemento activo es el iframe del bloque,
+    // el clic fue en el anuncio. Se manda con sendBeacon porque la pestaña se
+    // está yendo y un fetch normal se cancelaría a medio camino.
+    let avisado = false;
+    const alPerderFoco = () => {
+      if (avisado) return;
+      const activo = document.activeElement;
+      if (!activo || activo.tagName !== "IFRAME") return;
+      if (!nodo.contains(activo)) return;
+      avisado = true;
+      const vid = getVisitorId();
+      if (!vid) return; // almacenamiento bloqueado: no se mide, no se rompe nada
+      let sid: string | null = null;
+      try {
+        sid = sessionStorage.getItem("_tl_sid");
+      } catch {
+        sid = null;
+      }
+      const cuerpo = JSON.stringify({
+        visitor_id: vid,
+        session_id: sid,
+        path: window.location.pathname,
+        slot,
+      });
+      try {
+        navigator.sendBeacon("/api/ads/exit", new Blob([cuerpo], { type: "application/json" }));
+      } catch {
+        // Si sendBeacon no está, se pierde el registro. No vale interrumpir la salida.
+      }
+    };
+    window.addEventListener("blur", alPerderFoco);
+
     return () => {
       observador.disconnect();
       clearTimeout(reloj);
+      window.removeEventListener("blur", alPerderFoco);
     };
   }, [slot]);
 
