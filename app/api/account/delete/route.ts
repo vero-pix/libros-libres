@@ -93,7 +93,9 @@ export async function POST(request: Request) {
   await admin.from("cart_items").delete().eq("user_id", user.id);
   await admin.from("page_views").delete().eq("user_id", user.id);
   await admin.from("listings").delete().eq("seller_id", user.id);
-  await admin.from("book_requests").delete().eq("user_id", user.id);
+  // La columna es requester_user_id, no user_id: con el nombre equivocado el
+  // borrado fallaba en silencio y los "Se busca" quedaban huérfanos (11-09-2026).
+  await admin.from("book_requests").delete().eq("requester_user_id", user.id);
 
   const { data: perfil } = await admin
     .from("users")
