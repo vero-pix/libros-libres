@@ -17,10 +17,20 @@ interface Props {
 const SPINE = "absolute inset-y-0 left-0 w-2.5 z-[2] bg-gradient-to-r from-black/30 via-white/10 to-black/10";
 
 export default function ImageGallery({ mainImage, images, alt, author }: Props) {
+  // Se deduplica por URL: la portada casi siempre es TAMBIÉN la primera de
+  // `listing_images` —así la deja el formulario de publicar—, y sin esto la
+  // ficha mostraba "1/2" con la misma foto dos veces y una flecha que no
+  // llevaba a ninguna parte. Eran 25 fichas activas. (13-09-2026)
+  const vistas = new Set<string>();
   const allImages = [
     ...(mainImage && mainImage.trim() ? [{ id: "main", image_url: mainImage }] : []),
     ...images.filter((img) => img.image_url && img.image_url.trim()),
-  ];
+  ].filter((img) => {
+    const url = img.image_url.trim();
+    if (vistas.has(url)) return false;
+    vistas.add(url);
+    return true;
+  });
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [errorIds, setErrorIds] = useState<Set<string>>(new Set());
