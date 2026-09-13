@@ -70,31 +70,35 @@ export default function VitrinaDemanda({ libros }: Props) {
           href={urlLibro(principal)}
           className="group flex bg-paper-card border-2 border-brand-500 rounded-2xl overflow-hidden shadow-card hover:shadow-book transition-all duration-300"
         >
-          {/* La portada iba al 32% con un tope de 168px y con eso la tarjeta se
-              comía la fila: al lado de tres portadas de 3/4, esta se leía como
-              un banner. Al 26% y con tope de 124px pesa lo mismo que las otras
-              tres juntas, que es lo que corresponde. (12-09-2026) */}
-          <div className="relative w-[26%] min-w-[92px] max-w-[124px] bg-cream-warm flex-shrink-0">
+          {/* La portada ocupa el 42% y llena su columna entera. Antes iba al 26%
+              y quedaba como una tira flaca al costado, con el agravante de que
+              el contenido usaba `mt-auto`: el precio se iba al fondo y entre el
+              autor y el precio quedaba un hueco blanco enorme. Ahora el bloque
+              de texto se centra vertical y la tarjeta no tiene vacíos.
+              (12-09-2026) */}
+          <div className="relative w-[42%] min-w-[128px] max-w-[210px] bg-cream-warm flex-shrink-0">
             <Image
               src={principal.coverUrl!}
               alt={principal.titulo}
               fill
               className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
-              sizes="124px"
+              sizes="(max-width: 1024px) 42vw, 210px"
             />
           </div>
-          <div className="flex flex-col p-3.5 sm:p-4 flex-grow min-w-0">
-            <span className="self-start inline-flex items-center gap-1.5 bg-brand-500 text-brand-950 font-mono text-[9.5px] font-medium px-2 py-1 rounded tracking-wide mb-2">
+          <div className="flex flex-col justify-center gap-2 p-4 sm:p-5 flex-grow min-w-0">
+            <span className="self-start inline-flex items-center gap-1.5 bg-brand-500 text-brand-950 font-mono text-[9.5px] font-medium px-2 py-1 rounded tracking-wide">
               <IconoLupa size={10} />
               {principal.busquedas} PERSONAS LO BUSCARON
             </span>
-            <h3 className="font-display text-[15px] sm:text-lg font-semibold text-ink leading-tight line-clamp-2">
-              {principal.titulo}
-            </h3>
-            {principal.autor && (
-              <p className="font-display italic text-[12.5px] text-ink-muted mt-0.5 line-clamp-1">{principal.autor}</p>
-            )}
-            <div className="mt-auto pt-3">
+            <div>
+              <h3 className="font-display text-base sm:text-lg font-semibold text-ink leading-tight line-clamp-2">
+                {principal.titulo}
+              </h3>
+              {principal.autor && (
+                <p className="font-display italic text-[12.5px] text-ink-muted mt-0.5 line-clamp-1">{principal.autor}</p>
+              )}
+            </div>
+            <div>
               <div className="flex items-baseline gap-2 flex-wrap">
                 {principal.precio != null && (
                   <span className="text-lg sm:text-xl font-bold text-ink tracking-tight tabular-nums">
@@ -108,14 +112,14 @@ export default function VitrinaDemanda({ libros }: Props) {
                 )}
               </div>
               {principal.vendedorNombre && (
-                <p className="text-[11px] text-ink-muted mt-1.5">
+                <p className="text-[11px] text-ink-muted mt-1">
                   vende <span className="font-semibold text-green">{principal.vendedorNombre}</span>
                 </p>
               )}
-              <span className="mt-3 flex items-center justify-center h-9 rounded-lg bg-ink text-cream text-[13px] font-semibold group-hover:bg-ink-deep transition-colors">
-                Ver el libro
-              </span>
             </div>
+            <span className="flex items-center justify-center h-9 rounded-lg bg-ink text-cream text-[13px] font-semibold group-hover:bg-ink-deep transition-colors">
+              Ver el libro
+            </span>
           </div>
         </Link>
 
