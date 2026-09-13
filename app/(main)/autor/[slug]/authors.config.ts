@@ -366,4 +366,45 @@ export const AUTHORS: Record<string, AuthorConfig> = {
       { q: '¿Se puede armar la colección completa?', a: 'De a poco. Los títulos entran y salen del catálogo según lo que publiquen los vendedores, así que conviene crear una solicitud para que te avisemos cuando llegue el que te falta.' },
     ],
   },
+
+  // Isabel Allende es la autora más buscada del sitio: 29 búsquedas en 30 días.
+  // Hasta el 12-09-2026 esas 29 personas veían "todavía no lo tenemos" aunque
+  // había ejemplares: el filtro de contenido político escondía sus libros por
+  // el apellido. Ver el comentario de AUTORES_VETADOS en
+  // app/api/webhooks/listing-created/route.ts.
+  'isabel-allende': {
+    slug: 'isabel-allende',
+    displayName: 'Isabel Allende',
+    dbAuthors: ['Isabel Allende', 'Isabel Allende '],
+    seoTitle: 'Isabel Allende — Libros Usados en Chile',
+    seoDescription:
+      'Libros de Isabel Allende usados en Chile: La casa de los espíritus, Paula, La isla bajo el mar, De amor y de sombra y más. Envío a todo el país o retiro en mano.',
+    keywords: ['isabel allende', 'isabel allende libros', 'la casa de los espiritus', 'paula isabel allende', 'la isla bajo el mar', 'isabel allende libros usados', 'isabel allende segunda mano chile'],
+    subtitle: 'La chilena más leída del mundo',
+    bio: 'Isabel Allende es la autora en español más leída del planeta, y en Chile sus libros están en todas las casas: prestados, regalados, heredados. La casa de los espíritus abrió el camino en 1982 y desde entonces no ha parado. Paula, escrito frente a la cama de su hija, es de esos libros que la gente recuerda dónde estaba cuando lo leyó. Acá aparecen ejemplares usados de su obra, que es justo como circula: de mano en mano.',
+    faqs: [
+      { q: '¿Qué libros de Isabel Allende se consiguen usados?', a: 'Los que más circulan son La casa de los espíritus, De amor y de sombra, Eva Luna, Paula, Hija de la fortuna, Retrato en sepia, La isla bajo el mar y El cuaderno de Maya. También aparecen los tres de la trilogía juvenil, empezando por La Ciudad de las Bestias.' },
+      { q: '¿Por cuál empezar?', a: 'La casa de los espíritus es la puerta de entrada habitual y la que más se pide. Si prefieres algo más íntimo y menos coral, Paula es el otro camino: una carta larga a su hija, escrita mientras ella agonizaba.' },
+      { q: 'No veo el título que busco, ¿qué hago?', a: 'Sus libros se mueven rápido porque son de los que todos quieren. Crea una solicitud en tuslibros.cl con el título exacto y te avisamos apenas alguien lo publique.' },
+    ],
+  },
+
+  // 19 búsquedas de "truman capote" en 90 días, con stock. Incluye los dos de
+  // la colección Cara y Cruz de Norma, que traen dos obras en un volumen.
+  'truman-capote': {
+    slug: 'truman-capote',
+    displayName: 'Truman Capote',
+    dbAuthors: ['Truman Capote'],
+    seoTitle: 'Truman Capote — Libros Usados en Chile',
+    seoDescription:
+      'Libros de Truman Capote usados en Chile: A sangre fría, Otras voces otros ámbitos, Cuentos completos, Color local. Envío a todo Chile o retiro en mano.',
+    keywords: ['truman capote', 'truman capote libros', 'a sangre fria', 'desayuno en tiffanys', 'otras voces otros ambitos', 'capote libros usados', 'cara y cruz norma'],
+    subtitle: 'El que inventó la novela de no ficción',
+    bio: 'Truman Capote escribió A sangre fría siguiendo durante seis años el asesinato de una familia en Kansas, y de paso inventó un género: la novela de no ficción. Pero Capote es más que ese libro. Están los cuentos del sur, está Desayuno en Tiffany\'s, y está el cronista que se metió en la alta sociedad de Nueva York hasta que lo echaron por contarla. Se lee rápido y no se olvida.',
+    faqs: [
+      { q: '¿Qué libros de Capote se consiguen usados?', a: 'A sangre fría es el más pedido y el que más circula. También aparecen Otras voces, otros ámbitos —su primera novela—, los Cuentos completos y Color local, la selección de crónicas.' },
+      { q: '¿Qué es la colección Cara y Cruz?', a: 'Es una colección de Editorial Norma que reúne dos obras en un mismo volumen, con material de contexto sobre el autor. Color local de Capote es una de ellas: dos libros por el precio de uno, y no siempre se encuentran.' },
+      { q: '¿Está Desayuno en Tiffany\'s?', a: 'Entra y sale del catálogo: es de los que se venden apenas se publican. Crea una solicitud y te avisamos cuando ingrese un ejemplar.' },
+    ],
+  },
 };

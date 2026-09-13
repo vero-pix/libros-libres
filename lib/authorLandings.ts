@@ -15,6 +15,10 @@ const AUTHOR_LANDINGS: { match: string; slug: string; label: string }[] = [
   // authors.config entero al bundle cliente de ListingDetail.
   { match: "wilber", slug: "/autor/ken-wilber", label: "Ken Wilber" },
   { match: "rudolf steiner", slug: "/autor/rudolf-steiner", label: "Rudolf Steiner" },
+  // "isabel allende" completo y no "allende" a secas: Salvador Allende y los
+  // libros sobre él son otro catálogo y no van a la landing de la novelista.
+  { match: "isabel allende", slug: "/autor/isabel-allende", label: "Isabel Allende" },
+  { match: "truman capote", slug: "/autor/truman-capote", label: "Truman Capote" },
 ];
 
 export function authorLanding(author?: string | null): { slug: string; label: string } | null {

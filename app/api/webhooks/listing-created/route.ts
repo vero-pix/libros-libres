@@ -80,8 +80,8 @@ export async function POST(req: Request) {
     }
 
     // Auto-deprioritización por contenido político/controversial.
-    // Se matchea con word-boundary en título y autor. Si ya está deprioritized
-    // (por ej. flag manual), no lo volvemos a actualizar.
+    // Se matchea con word-boundary. Si ya está deprioritized (por ej. flag
+    // manual), no lo volvemos a actualizar.
     const POLITICAL_KEYWORDS = [
       "allende", "pinochet", "unidad popular", "dictadura",
       "fidel castro", "stalin", "hitler", "mein kampf",
@@ -95,16 +95,35 @@ export async function POST(req: Request) {
       "shibari", "bondage", "kamasutra", "kama sutra",
       "erotico", "erótico", "pornograf",
     ];
-    const matchesPolitical = (text: string) => {
-      const t = (text || "").toLowerCase();
-      return POLITICAL_KEYWORDS.some((k) => {
-        const re = new RegExp(`\\b${k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+
+    // En el AUTOR solo valen los nombres completos. Un apellido suelto acá es
+    // una persona, no un tema: "allende" escondió los cuatro libros de Isabel
+    // Allende —la autora más buscada del sitio, 29 búsquedas al mes— y
+    // "pinochet" se llevó a Héctor Pinochet Ciudad y su libro de cuentos
+    // fantásticos. Si el autor ES el personaje, calza igual por nombre y
+    // apellido. (12-09-2026)
+    const AUTORES_VETADOS = [
+      "augusto pinochet", "salvador allende", "adolf hitler", "fidel castro",
+      "iosif stalin", "josé stalin", "benito mussolini", "karl marx",
+      "sebastián piñera", "ricardo lagos", "michelle bachelet",
+      "eduardo frei montalva", "patricio aylwin", "jaime guzmán",
+    ];
+
+    // El borde es (?<!letra)…(?!letra) y no \b: en JS \b no considera letra a
+    // una vocal con tilde, así que veía un borde de palabra dentro de
+    // "archipiélagos" y ahí encontraba "lagos". Una novela de Alice Kellen
+    // quedó marcada como contenido político por eso.
+    const calza = (texto: string, claves: string[]) => {
+      const t = (texto || "").toLowerCase();
+      return claves.some((k) => {
+        const re = new RegExp(`(?<![\\p{L}\\p{N}])${k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}\\p{N}])`, "iu");
         return re.test(t);
       });
     };
+    const matchesPolitical = (text: string) => calza(text, POLITICAL_KEYWORDS);
     try {
       const bookForCheck = (listing as any).book ?? {};
-      if (!(listing as any).deprioritized && (matchesPolitical(bookForCheck.title || "") || matchesPolitical(bookForCheck.author || ""))) {
+      if (!(listing as any).deprioritized && (matchesPolitical(bookForCheck.title || "") || calza(bookForCheck.author || "", AUTORES_VETADOS))) {
         await supabase.from("listings").update({ deprioritized: true }).eq("id", listingId);
         console.log(`[listing-created] Auto-deprioritized político: ${bookForCheck.title}`);
       }
