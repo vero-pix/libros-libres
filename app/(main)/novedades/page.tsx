@@ -3,6 +3,7 @@ import Image from "next/image";
 import { createPublicClient } from "@/lib/supabase/public";
 import PromoBanner from "@/components/ui/PromoBanner";
 import { libroUrl } from "@/lib/urls";
+import { configVigente } from "@/lib/siteConfigVigente";
 import type { ListingWithBook } from "@/types";
 
 const MESES_ES = [
@@ -1515,9 +1516,10 @@ async function fetchTiendaSemanaHref(): Promise<string> {
     .select("value")
     .eq("key", "tienda_semana")
     .maybeSingle();
-  const conf = data?.value as { seller_id?: string; until?: string } | undefined;
+  const conf = configVigente(
+    data?.value as { seller_id?: string; since?: string; until?: string; programados?: unknown } | undefined
+  );
   if (!conf?.seller_id) return "/#librerias-confianza";
-  if (conf.until && new Date(conf.until) < new Date()) return "/#librerias-confianza";
   const { data: seller } = await supabase
     .from("users")
     .select("username")

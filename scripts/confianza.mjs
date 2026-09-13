@@ -18,9 +18,22 @@
  *   node scripts/confianza.mjs destacado <tag> --titulo "..." [--subtitulo "..."]
  *                                              [--coleccion <slug>] [--hasta AAAA-MM-DD]
  *   node scripts/confianza.mjs destacado --auto
+ *   node scripts/confianza.mjs programados            (qué hay en la cola)
+ *   node scripts/confianza.mjs programados --borrar   (vacía la cola)
+ *
+ * PROGRAMAR A FUTURO — `--desde AAAA-MM-DD[THH:mm]` (hora de Chile)
+ *
+ *   Sin --desde, el cambio entra al tiro y pisa lo que haya.
+ *   Con --desde, NO se toca lo que está al aire: la entrada se guarda en la cola
+ *   `programados` y el home la toma sola cuando llega la hora. Así se deja listo
+ *   el relevo de una fila estacional sin apagar la que está corriendo:
+ *
+ *     node scripts/confianza.mjs destacado primavera --titulo "..." \
+ *          --desde 2026-09-19T22:00 --hasta 2026-10-15
  *
  * Ojo: la portada del home cachea 5 minutos (unstable_cache), así que un cambio
- * de frase o de tienda de la semana tarda hasta ese rato en verse.
+ * de frase o de tienda de la semana tarda hasta ese rato en verse. Un --desde
+ * tampoco entra al minuto exacto: entra dentro de los 5 minutos siguientes.
  */
 import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
@@ -58,6 +71,48 @@ async function escribirConfig(key, value) {
     .from("site_config")
     .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: "key" });
   if (error) salir(`No se pudo guardar ${key}: ${error.message}`);
+}
+
+/**
+ * Lee `--desde` y lo normaliza a "AAAA-MM-DDTHH:mm" (hora de Chile).
+ * Una fecha sin hora entra a las 00:00 de ese día.
+ */
+function leerDesde() {
+  const desde = opcion("desde");
+  if (!desde) return null;
+  const m = desde.match(/^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}))?$/);
+  if (!m) salir(`Fecha inválida: "${desde}". Formato AAAA-MM-DD o AAAA-MM-DDTHH:mm (hora de Chile).`);
+  return `${m[1]}T${m[2] ?? "00:00"}`;
+}
+
+/** El instante actual en Chile con el mismo formato, para comparar como string. */
+function ahoraEnChile() {
+  const dia = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Santiago",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+  const hora = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "America/Santiago",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(new Date());
+  return `${dia}T${hora}`;
+}
+
+/**
+ * Mete una entrada en la cola `programados` de una config, sin tocar lo que está
+ * al aire. Reemplaza la que tenga el mismo `since` (reprogramar es corregir, no
+ * duplicar) y descarta las que ya vencieron, para que la cola no crezca sola.
+ */
+function encolar(actual, entrada) {
+  const hoy = ahoraEnChile().slice(0, 10);
+  const cola = (Array.isArray(actual.programados) ? actual.programados : [])
+    .filter((p) => p?.since !== entrada.since)
+    .filter((p) => !p?.until || p.until >= hoy);
+  return [...cola, entrada].sort((a, b) => String(a.since).localeCompare(String(b.since)));
 }
 
 async function porUsername(username) {
@@ -257,11 +312,34 @@ if (cmd === "semana") {
   const frase = opcion("frase") ?? actual.frase ?? "";
   if (frase.length > 120) salir(`La frase tiene ${frase.length} caracteres y el tope son 120.`);
 
-  // Por defecto, una semana desde hoy.
-  const hasta = opcion("hasta") ?? new Date(Date.now() + 7 * 86400_000).toISOString().slice(0, 10);
+  const desde = leerDesde();
+
+  // Por defecto, una semana desde que empieza a regir. Se suma sobre la fecha
+  // calendario (mediodía UTC) para que el horario de verano no corra el día.
+  const arranque = desde ? Date.parse(`${desde.slice(0, 10)}T12:00:00Z`) : Date.now();
+  const hasta = opcion("hasta") ?? new Date(arranque + 7 * 86400_000).toISOString().slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(hasta)) salir(`Fecha inválida: "${hasta}". Formato AAAA-MM-DD.`);
+  if (desde && hasta < desde.slice(0, 10)) {
+    salir(`La tienda terminaría (${hasta}) antes de empezar (${desde}). No se guardó nada.`);
+  }
+
+  if (desde) {
+    // Programada: la tienda de hoy sigue en su lugar hasta que llegue la hora.
+    await escribirConfig("tienda_semana", {
+      ...actual,
+      programados: encolar(actual, { since: desde, seller_id: v.id, until: hasta, frase }),
+    });
+    console.log(`Programada la tienda de la semana: ${v.full_name} (${username}).`);
+    console.log(`  Entra el ${desde.replace("T", " a las ")} (hora de Chile), hasta el ${hasta}.`);
+    if (frase) console.log(`  Frase: "${frase}"`);
+    console.log("  Revisa la cola con: node scripts/confianza.mjs programados");
+    process.exit(0);
+  }
 
   await escribirConfig("tienda_semana", {
+    ...(Array.isArray(actual.programados) && actual.programados.length
+      ? { programados: actual.programados }
+      : {}),
     seller_id: v.id,
     until: hasta,
     frase,
@@ -293,6 +371,8 @@ if (cmd === "destacado") {
         '  node scripts/confianza.mjs destacado literatura-chilena --titulo "Para el 18" \\\n' +
         '       --subtitulo "Escritoras y escritores de acá, para leer estos días" \\\n' +
         '       --coleccion literatura-chilena --hasta 2026-09-18\n' +
+        '  node scripts/confianza.mjs destacado primavera --titulo "..." --desde 2026-09-19T22:00\n' +
+        '       (--desde la deja programada sin apagar la que está al aire)\n' +
         '  node scripts/confianza.mjs destacado --auto     (vuelve a lo estático)'
     );
   }
@@ -321,13 +401,51 @@ if (cmd === "destacado") {
   const coleccion = opcion("coleccion") ?? null;
   const hasta = opcion("hasta") ?? null;
   if (hasta && !/^\d{4}-\d{2}-\d{2}$/.test(hasta)) salir(`Fecha inválida: "${hasta}". Formato AAAA-MM-DD.`);
+  const desde = leerDesde();
+  if (desde && hasta && hasta < desde.slice(0, 10)) {
+    salir(`La fila terminaría (${hasta}) antes de empezar (${desde}). No se guardó nada.`);
+  }
 
-  await escribirConfig("destacado_home", {
+  const fila = {
     tag,
     collectionSlug: coleccion,
     title: titulo,
     subtitle: subtitulo,
     until: hasta,
+    // El adorno estacional solo se arrastra si sigue siendo la misma fila.
+    ...(mismoTag && actual.adorno ? { adorno: actual.adorno } : {}),
+  };
+
+  if (desde) {
+    // Programada: no se toca la fila que está al aire.
+    await escribirConfig("destacado_home", {
+      ...actual,
+      programados: encolar(actual, { ...fila, since: desde }),
+    });
+    console.log(`Programada la primera fila del home: "${titulo}"`);
+    console.log(`  Entra el ${desde.replace("T", " a las ")} (hora de Chile).`);
+    console.log(`  Tag: ${tag} (${n >= 50 ? "50+" : n} libros activos)`);
+    console.log(`  Vigente hasta: ${hasta ?? "sin fecha (hasta que se cambie)"}`);
+    console.log(`  Mientras tanto sigue al aire: ${actual.title ? `"${actual.title}"` : "la fila estática del código"}.`);
+    // Un hueco entre que muere la fila de hoy y nace la programada devuelve la
+    // fila estática del código, que es justo la que se quería evitar.
+    if (actual.until && actual.until < desde.slice(0, 10)) {
+      console.warn(
+        `\n  ⚠️  Hueco: "${actual.title}" vence el ${actual.until} y esta entra el ${desde.slice(0, 10)}.\n` +
+          `     En el medio el home muestra la fila estática ("Para una tarde de lluvia").\n` +
+          `     Para empalmar, estira la de hoy: --hasta ${desde.slice(0, 10)}`
+      );
+    }
+    console.log("  Revisa la cola con: node scripts/confianza.mjs programados");
+    process.exit(0);
+  }
+
+  await escribirConfig("destacado_home", {
+    // Se preserva la cola: cambiar la fila de hoy no debe borrar lo programado.
+    ...(Array.isArray(actual.programados) && actual.programados.length
+      ? { programados: actual.programados }
+      : {}),
+    ...fila,
   });
   console.log(`Primera fila del home: "${titulo}"`);
   if (subtitulo) console.log(`  Subtítulo: "${subtitulo}"`);
@@ -335,6 +453,52 @@ if (cmd === "destacado") {
   console.log(`  Ver todo: ${coleccion ? `/coleccion/${coleccion}` : `/?tag=${tag}`}`);
   console.log(`  Vigente hasta: ${hasta ?? "sin fecha (hasta que se cambie)"}`);
   console.log("  Se ve en el home dentro de 5 minutos (caché de la portada).");
+  process.exit(0);
+}
+
+/* ──────────────────────────── cola programada ──────────────────────────── */
+
+if (cmd === "programados") {
+  const ahora = ahoraEnChile();
+  const destacado = await leerConfig("destacado_home");
+  const semana = await leerConfig("tienda_semana");
+
+  if (tiene("borrar")) {
+    await escribirConfig("destacado_home", { ...destacado, programados: [] });
+    await escribirConfig("tienda_semana", { ...semana, programados: [] });
+    console.log("Cola vacía. Lo que está al aire no se tocó.");
+    process.exit(0);
+  }
+
+  console.log(`Ahora en Chile: ${ahora}\n`);
+
+  const pinta = (titulo, cola, describir) => {
+    console.log(titulo);
+    const entradas = Array.isArray(cola) ? cola : [];
+    if (!entradas.length) {
+      console.log("  (nada en cola)\n");
+      return;
+    }
+    for (const p of entradas) {
+      const estado = p.since > ahora ? "espera" : p.until && p.until < ahora.slice(0, 10) ? "vencida" : "AL AIRE";
+      console.log(`  [${estado}] desde ${p.since} hasta ${p.until ?? "sin fecha"} — ${describir(p)}`);
+    }
+    console.log("");
+  };
+
+  pinta("Primera fila del home:", destacado.programados, (p) => `"${p.title}" (tag ${p.tag})`);
+
+  const ids = (Array.isArray(semana.programados) ? semana.programados : []).map((p) => p.seller_id).filter(Boolean);
+  const { data: vendedores } = ids.length
+    ? await admin.from("users").select("id, username, full_name").in("id", ids)
+    : { data: [] };
+  const nombre = (id) => {
+    const u = vendedores?.find((x) => x.id === id);
+    return u ? `${u.full_name} (${u.username})` : id;
+  };
+  pinta("Tienda de la semana:", semana.programados, (p) => nombre(p.seller_id));
+
+  console.log("Para vaciar la cola: node scripts/confianza.mjs programados --borrar");
   process.exit(0);
 }
 

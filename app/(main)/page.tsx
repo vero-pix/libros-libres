@@ -24,6 +24,7 @@ import ColeccionRow from "@/components/home/ColeccionRow";
 import RequestsRow from "@/components/home/RequestsRow";
 import HeroRequestStrip from "@/components/home/HeroRequestStrip";
 import { sortListingsForDisplay } from "@/lib/sortListings";
+import { configVigente } from "@/lib/siteConfigVigente";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
@@ -299,18 +300,20 @@ const COLLECTION_CONFIGS = [
  */
 async function configDeColecciones(supabase: ReturnType<typeof createPublicClient>) {
   const { data } = await supabase.from("site_config").select("value").eq("key", "destacado_home").maybeSingle();
-  const d = data?.value as { tag?: string; collectionSlug?: string; title?: string; subtitle?: string; until?: string; adorno?: string } | undefined;
+  const d = configVigente(
+    data?.value as
+      | { tag?: string; collectionSlug?: string; title?: string; subtitle?: string; since?: string; until?: string; adorno?: string; programados?: unknown }
+      | undefined
+  );
 
-  const hoy = new Date().toISOString().slice(0, 10);
-  const vigente = d?.tag && d?.title && (!d.until || d.until >= hoy);
-  if (!vigente) return COLLECTION_CONFIGS;
+  if (!d?.tag || !d?.title) return COLLECTION_CONFIGS;
 
   const destacada = {
-    tag: d!.tag!,
-    collectionSlug: d!.collectionSlug || undefined,
-    title: d!.title!,
-    subtitle: d!.subtitle ?? "",
-    adorno: d!.adorno,
+    tag: d.tag,
+    collectionSlug: d.collectionSlug || undefined,
+    title: d.title,
+    subtitle: d.subtitle ?? "",
+    adorno: d.adorno,
   };
   return [destacada, ...COLLECTION_CONFIGS.slice(1).filter((c) => c.tag !== destacada.tag)];
 }
@@ -453,11 +456,10 @@ const getTrustedStores = unstable_cache(
 
     // Tienda de la semana: la fijada si sigue vigente; si no, el mejor score que
     // no sea el de la semana pasada ni libro.de.ocasion (no abre ni repite, C4).
-    const hoy = new Date().toISOString().slice(0, 10);
-    const vigente = semanaConf?.seller_id && (!semanaConf?.until || semanaConf.until >= hoy);
+    const semanaVigente = configVigente(semanaConf);
     const nombre = (s: any) => (Array.isArray(s?.seller) ? s.seller[0] : s?.seller) ?? {};
     let semanaStat =
-      (vigente ? (stats ?? []).find((s) => s.seller_id === semanaConf!.seller_id) : null) ??
+      (semanaVigente?.seller_id ? (stats ?? []).find((s) => s.seller_id === semanaVigente.seller_id) : null) ??
       (stats ?? []).find(
         (s) => s.seller_id !== semanaConf?.anterior && nombre(s).username !== "libro.de.ocasion"
       ) ??
@@ -504,7 +506,14 @@ const getTrustedStores = unstable_cache(
 
     return {
       casa: armar(casaStat, casaConf?.frase),
-      semana: armar(semanaStat, semanaConf?.frase),
+      // La frase es de la tienda que se fijó a mano: si la que se muestra salió
+      // del automático (porque la fijada venció), la frase no le corresponde.
+      semana: armar(
+        semanaStat,
+        semanaVigente?.seller_id && semanaVigente.seller_id === semanaStat?.seller_id
+          ? semanaVigente.frase
+          : undefined
+      ),
       tiendas: rotativas.map((s) => armar(s)).filter(Boolean) as NonNullable<ReturnType<typeof armar>>[],
     };
   },
