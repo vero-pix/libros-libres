@@ -70,30 +70,34 @@ export default function VitrinaDemanda({ libros }: Props) {
           href={urlLibro(principal)}
           className="group flex bg-paper-card border-2 border-brand-500 rounded-2xl overflow-hidden shadow-card hover:shadow-book transition-all duration-300"
         >
-          <div className="relative w-[32%] min-w-[110px] max-w-[168px] bg-cream-warm flex-shrink-0">
+          {/* La portada iba al 32% con un tope de 168px y con eso la tarjeta se
+              comía la fila: al lado de tres portadas de 3/4, esta se leía como
+              un banner. Al 26% y con tope de 124px pesa lo mismo que las otras
+              tres juntas, que es lo que corresponde. (12-09-2026) */}
+          <div className="relative w-[26%] min-w-[92px] max-w-[124px] bg-cream-warm flex-shrink-0">
             <Image
               src={principal.coverUrl!}
               alt={principal.titulo}
               fill
               className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
-              sizes="168px"
+              sizes="124px"
             />
           </div>
-          <div className="flex flex-col p-4 sm:p-5 flex-grow min-w-0">
-            <span className="self-start inline-flex items-center gap-1.5 bg-brand-500 text-brand-950 font-mono text-[10px] font-medium px-2.5 py-1.5 rounded tracking-wide mb-3">
-              <IconoLupa />
+          <div className="flex flex-col p-3.5 sm:p-4 flex-grow min-w-0">
+            <span className="self-start inline-flex items-center gap-1.5 bg-brand-500 text-brand-950 font-mono text-[9.5px] font-medium px-2 py-1 rounded tracking-wide mb-2">
+              <IconoLupa size={10} />
               {principal.busquedas} PERSONAS LO BUSCARON
             </span>
-            <h3 className="font-display text-base sm:text-xl font-semibold text-ink leading-tight line-clamp-3">
+            <h3 className="font-display text-[15px] sm:text-lg font-semibold text-ink leading-tight line-clamp-2">
               {principal.titulo}
             </h3>
             {principal.autor && (
-              <p className="font-display italic text-sm text-ink-muted mt-1 line-clamp-1">{principal.autor}</p>
+              <p className="font-display italic text-[12.5px] text-ink-muted mt-0.5 line-clamp-1">{principal.autor}</p>
             )}
-            <div className="mt-auto pt-4">
-              <div className="flex items-baseline gap-2.5 flex-wrap">
+            <div className="mt-auto pt-3">
+              <div className="flex items-baseline gap-2 flex-wrap">
                 {principal.precio != null && (
-                  <span className="text-xl sm:text-2xl font-bold text-ink tracking-tight tabular-nums">
+                  <span className="text-lg sm:text-xl font-bold text-ink tracking-tight tabular-nums">
                     ${principal.precio.toLocaleString("es-CL")}
                   </span>
                 )}
@@ -104,11 +108,11 @@ export default function VitrinaDemanda({ libros }: Props) {
                 )}
               </div>
               {principal.vendedorNombre && (
-                <p className="text-[11.5px] text-ink-muted mt-2">
+                <p className="text-[11px] text-ink-muted mt-1.5">
                   vende <span className="font-semibold text-green">{principal.vendedorNombre}</span>
                 </p>
               )}
-              <span className="mt-4 flex items-center justify-center h-11 rounded-lg bg-ink text-cream text-sm font-semibold group-hover:bg-ink-deep transition-colors">
+              <span className="mt-3 flex items-center justify-center h-9 rounded-lg bg-ink text-cream text-[13px] font-semibold group-hover:bg-ink-deep transition-colors">
                 Ver el libro
               </span>
             </div>
