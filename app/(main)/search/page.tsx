@@ -178,9 +178,14 @@ export default async function SearchPage({ searchParams }: Props) {
       `,
         { count: "exact", head: opts?.head ?? false }
       )
-      .in("status", ["active", "completed"])
-      .neq("deprioritized", true);
+      .in("status", ["active", "completed"]);
 
+    // El buscador SÍ muestra lo despriorizado; la home no. Decisión de Vero,
+    // 12-09-2026, y es lo que decía la migración que creó el flag: "sin
+    // esconderlos, siguen siendo comprables vía búsqueda directa". Mientras se
+    // excluían acá, 46 libros de historia política de Chile no existían para
+    // quien los fuera a buscar por su nombre. Igual salen al final del listado:
+    // el `.order("deprioritized")` de más abajo se mantiene.
     if (matchingBookIds !== null) qb = qb.in("book_id", matchingBookIds);
     if (category) qb = qb.eq("book.category", category);
     if (subcategory) qb = qb.eq("book.subcategory", subcategory);
@@ -256,7 +261,9 @@ export default async function SearchPage({ searchParams }: Props) {
         .from("listings")
         .select("id", { count: "exact", head: true })
         .in("status", ["active", "completed"])
-        .neq("deprioritized", true)
+        // Sin el filtro, igual que la consulta que se muestra: si acá se
+        // excluyera, `search_queries.results_count` seguiría anotando ceros
+        // falsos y la vitrina por demanda decidiría con datos malos.
         .in("book_id", matchingBookIds);
       return count ?? 0;
     };

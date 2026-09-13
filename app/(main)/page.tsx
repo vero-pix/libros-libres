@@ -257,6 +257,10 @@ const getCollectibleListings = unstable_cache(
       .from("listings")
       .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
       .eq("status", "active")
+      // Faltaba: un libro despriorizado marcado como coleccionable y con
+      // precio alto entraba igual a la portada. Ninguna fila del home muestra
+      // contenido despriorizado — el buscador sí. (12-09-2026)
+      .neq("deprioritized", true)
       .eq("is_collectible", true)
       .gte("price", CURATED_MIN_PRICE)
       .limit(12);
@@ -475,6 +479,12 @@ const getTrustedStores = unstable_cache(
       ? await supabase
           .from("listings")
           .select("id, cover_image_url, book:books(title, cover_url)")
+          // `top_listing_ids` sale de refresh_seller_stats, que ordena por
+          // visitas y no sabe nada de `deprioritized`: por eso las tarjetas de
+          // tres tiendas mostraban en la portada Mein Kampf, un libro de
+          // shibari y un Stalin. Se filtra acá al leer, que es más barato que
+          // recrear la función. La tarjeta muestra las portadas que queden.
+          .neq("deprioritized", true)
           .in("id", ids)
       : { data: [] as any[] };
     const porId = new Map((portadas ?? []).map((l: any) => [l.id, l]));

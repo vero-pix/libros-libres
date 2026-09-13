@@ -11,6 +11,7 @@
  * mismo patrón que `destacado_home`. Sin fila configurada no se muestra nada.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { hoyEnChile } from "@/lib/fiestasPatrias";
 
 export interface PiezaDestacada {
   titulo: string;
@@ -44,8 +45,9 @@ export async function leerPiezaDestacada(sb: SupabaseClient): Promise<PiezaDesta
   const cfg = data.value as ConfigPieza;
   if (!cfg.slug || !cfg.gancho) return null;
 
-  const hoy = new Date().toISOString().slice(0, 10);
-  if (cfg.until && cfg.until < hoy) return null;
+  // Día chileno, no UTC: con `toISOString()` una caluga con `until` del 18 se
+  // apagaba a las 20:00 del 17 acá. Mismo arreglo que el destacado del home.
+  if (cfg.until && cfg.until < hoyEnChile()) return null;
 
   const { data: listing } = await sb
     .from("listings")
