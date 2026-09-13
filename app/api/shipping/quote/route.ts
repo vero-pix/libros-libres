@@ -42,10 +42,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  const { listing_id, buyer_address, item_count } = (await req.json()) as {
+  const { listing_id, buyer_address, item_count, buyer_commune } = (await req.json()) as {
     listing_id: string;
     buyer_address: string;
     item_count?: number;
+    /** Comuna elegida en el checkout. Manda sobre lo que se pueda parsear. */
+    buyer_commune?: string;
   };
 
   if (!listing_id || !buyer_address) {
@@ -88,7 +90,10 @@ export async function POST(req: NextRequest) {
   }
 
   const originCommune = origen.commune;
-  const destCommune = extractCommune(buyer_address);
+  // La comuna elegida a mano gana sobre la parseada del string libre: el
+  // parser es el que producía los "No reconocimos la comuna de tu dirección" y
+  // el fallback de $2.900 que casi siempre queda bajo el costo real.
+  const destCommune = buyer_commune?.trim() || extractCommune(buyer_address);
 
   // Medidas reales del paquete: las mismas que usa la creación del envío.
   const items = Math.max(1, Math.min(20, Math.round(Number(item_count) || 1)));

@@ -167,7 +167,7 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
   const [qHead, qVendedor, qComprador, qItems] = await Promise.all([
     admin
       .from("orders")
-      .select("id, listing_id, buyer_address, courier, listing:listings(address)")
+      .select("id, listing_id, buyer_address, buyer_commune, courier, listing:listings(address)")
       .eq("id", fila.order_head_id)
       .single(),
     admin
@@ -208,7 +208,10 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
     notaOrigen = ` · origen compartido ${SHIPIT_DEFAULT_ORIGIN_RM} (RM sin origen propio)`;
   }
 
-  const destCrudo = extractCommune(head.buyer_address);
+  // La comuna elegida en el checkout manda sobre la parseada: `extractCommune`
+  // adivina desde un string libre y ahí nacían los "Shipit no reconoce la
+  // comuna de destino". Las órdenes viejas no la traen y siguen por el parser.
+  const destCrudo = head.buyer_commune?.trim() || extractCommune(head.buyer_address);
   const comunaDestino = await findCommune(destCrudo);
   if (!comunaDestino) throw new Error(`Shipit no reconoce la comuna de destino: ${destCrudo}`);
   const destCommune = comunaDestino.name;

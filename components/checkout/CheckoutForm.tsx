@@ -6,6 +6,8 @@ import type { ListingWithBook } from "@/types";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
 import { calcularEnvioPromo } from "@/lib/shipping-promo";
 import { comunaDesdeAddress } from "@/lib/comuna";
+import { getRegionForComuna } from "@/lib/comunas";
+import ComunaSelect from "./ComunaSelect";
 
 interface ShippingQuote {
   service: string;
@@ -59,6 +61,10 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   // ser una línea que se puede pasar por alto.
   const [confirmaRetiro, setConfirmaRetiro] = useState(false);
   const [address, setAddress] = useState(buyerAddress);
+  // La comuna del comprador como dato propio, no adivinada del string libre.
+  // Se pide SIEMPRE, también en retiro en persona: sin ella el sistema no sabe
+  // dónde está el comprador y no puede avisarle que el libro está a 500 km.
+  const [comuna, setComuna] = useState(() => comunaDesdeAddress(buyerAddress) ?? "");
   const [phone, setPhone] = useState(buyerPhone);
   const [guestName, setGuestName] = useState(buyerName);
   const [guestEmail, setGuestEmail] = useState("");
@@ -75,6 +81,17 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
 
   // Dónde está el libro. Se muestra en la opción de encuentro en persona.
   const comunaVendedor = comunaDesdeAddress((listing as any).address);
+  // Retiro entre regiones distintas: se avisa, no se prohíbe. Hay gente que
+  // viaja, que manda a alguien o que ya lo habló con el vendedor. Lo que no
+  // puede pasar es que se entere después de pagar (Ñuñoa → Concepción,
+  // 28-08-2026). Si falta cualquiera de las dos comunas no se supone nada.
+  const regionComprador = comuna ? getRegionForComuna(comuna) : null;
+  const regionVendedor = comunaVendedor ? getRegionForComuna(comunaVendedor) : null;
+  const retiroEntreRegiones =
+    deliveryMethod === "in_person" &&
+    !!regionComprador &&
+    !!regionVendedor &&
+    regionComprador !== regionVendedor;
   const opcionesEntrega = DELIVERY_OPTIONS.map((o) => {
     if (o.value === "in_person" && comunaVendedor) {
       return { ...o, desc: `Gratis — coordinas con el vendedor en ${comunaVendedor}` };
@@ -97,6 +114,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
     // Los dos primeros son de este cambio: sin nombrarlos, sacar la
     // preselección dejaría el botón apagado sin decir por qué, que es
     // exactamente el bug mudo que ya tuvo este checkout.
+    if (!comuna) return "Elige tu comuna: con eso sabemos si el libro te puede llegar.";
     if (!deliveryMethod) return "Elige cómo quieres recibir el libro.";
     if (deliveryMethod === "in_person" && !confirmaRetiro) {
       return comunaVendedor
@@ -166,6 +184,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
             body: JSON.stringify({
               listing_id: listing.id,
               buyer_address: addr,
+              buyer_commune: comuna || undefined,
               item_count: 1,
             }),
           });
@@ -315,6 +334,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
           shipping_service: isCourier ? selectedQuote!.service : deliveryMethod === "in_person" ? "Entrega en persona" : "Punto de retiro",
           shipping_courier: isCourier ? selectedQuote!.courier : undefined,
           buyer_address: isCourier ? address : deliveryMethod,
+          buyer_commune: comuna || undefined,
           discount_code: discountCode ?? undefined,
           guest_info: isGuest ? {
             name: guestName,
@@ -404,6 +424,20 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
             <h2 className="text-sm font-bold text-ink uppercase tracking-wider">Forma de entrega</h2>
           </div>
           <div className="px-6 py-5 space-y-3">
+            {/* La comuna va ANTES de elegir cómo recibir: es lo que decide si el
+                retiro tiene sentido y lo que usan los couriers para cotizar. */}
+            <div className="pb-2">
+              <label htmlFor="comuna-comprador" className="block text-xs font-semibold text-ink mb-1.5">
+                ¿En qué comuna estás?
+              </label>
+              <ComunaSelect id="comuna-comprador" value={comuna} onChange={setComuna} />
+              {comunaVendedor && (
+                <p className="mt-1.5 text-[11px] text-ink-muted">
+                  El libro está en <strong>{comunaVendedor}</strong>.
+                </p>
+              )}
+            </div>
+
             {opcionesEntrega.map((opt) => (
               <label
                 key={opt.value}
@@ -445,6 +479,41 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                 de casos reales — alguien en Ñuñoa compró un libro que estaba en
                 Concepción creyendo que lo iba a buscar, y el despacho terminó
                 pagándolo la casa. (08-09-2026) */}
+            {/* Regiones distintas: se avisa fuerte y se ofrece la salida (el
+                courier), pero la decisión sigue siendo del comprador. Nunca un
+                cartel que solo informe el problema. */}
+            {retiroEntreRegiones && (
+              <div className="rounded-xl border border-red-300 bg-red-50 p-4 animate-fade-in">
+                <p className="text-xs font-bold text-red-900">
+                  Ojo: {comuna} y {comunaVendedor} están en regiones distintas.
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-red-800">
+                  Son {regionComprador} y {regionVendedor}. El retiro en persona significa que vas
+                  tú a buscarlo — no hay despacho incluido.
+                </p>
+                {courierDisponible ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDeliveryMethod("courier");
+                      setConfirmaRetiro(false);
+                    }}
+                    className="mt-3 inline-flex items-center h-9 px-4 rounded-lg bg-ink text-cream text-xs font-semibold hover:bg-ink-deep transition-colors"
+                  >
+                    Mejor que me lo despachen
+                  </button>
+                ) : (
+                  <p className="mt-2 text-xs text-red-800">
+                    Este vendedor todavía no despacha por courier. Escríbenos al{" "}
+                    <a href="https://wa.me/56994583067" className="font-semibold underline" target="_blank" rel="noopener noreferrer">
+                      +56 9 9458 3067
+                    </a>{" "}
+                    y vemos cómo llega.
+                  </p>
+                )}
+              </div>
+            )}
+
             {deliveryMethod === "in_person" && (
               <label className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 cursor-pointer animate-fade-in">
                 <input

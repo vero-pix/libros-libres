@@ -70,7 +70,10 @@ export async function POST(req: NextRequest) {
         email: guest_info.email.toLowerCase().trim(),
         full_name: guest_info.name,
         phone: guest_info.phone,
-        city: body.buyer_address?.split(",").slice(-1)[0]?.trim() || null
+        // La comuna elegida en el checkout. Antes salía del último tramo de
+        // `buyer_address`, que casi siempre es "Chile" y en retiro en persona
+        // guardaba el literal "in_person" como ciudad del comprador.
+        city: body.buyer_commune?.trim() || null
       });
 
       user = newAuthUser.user as any;
@@ -92,6 +95,7 @@ export async function POST(req: NextRequest) {
     shipping_service,
     shipping_courier,
     buyer_address,
+    buyer_commune,
     discount_code,
   } = body as {
     shipping_speed: "standard" | "express";
@@ -99,6 +103,8 @@ export async function POST(req: NextRequest) {
     shipping_service?: string;
     shipping_courier?: string;
     buyer_address?: string;
+    /** Comuna del comprador, de la lista cerrada de lib/comunas.ts. */
+    buyer_commune?: string;
     discount_code?: string;
   };
 
@@ -322,6 +328,9 @@ export async function POST(req: NextRequest) {
       shipping_speed,
       courier,
       buyer_address: buyer_address ?? null,
+      // Se guarda también cuando el retiro es en persona: es el único dato de
+      // dónde está el comprador, porque ahí `buyer_address` dice "in_person".
+      buyer_commune: buyer_commune?.trim() || null,
       bundle_id: bundleId,
       discount_code: discount_code?.toUpperCase() ?? null,
       discount_amount: itemDiscount,

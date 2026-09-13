@@ -6,6 +6,8 @@ import type { ListingWithBook } from "@/types";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
 import { calcularEnvioPromo } from "@/lib/shipping-promo";
 import { comunaDesdeAddress } from "@/lib/comuna";
+import { getRegionForComuna } from "@/lib/comunas";
+import ComunaSelect from "./ComunaSelect";
 
 interface ShippingQuote {
   service: string;
@@ -79,6 +81,9 @@ export default function BundleCheckoutForm({
 
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("in_person");
   const [address, setAddress] = useState(buyerAddress);
+  // Igual que en CheckoutForm: la comuna es un dato que se elige, no algo que
+  // se adivine parseando el string de la dirección.
+  const [comuna, setComuna] = useState(() => comunaDesdeAddress(buyerAddress) ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -87,7 +92,20 @@ export default function BundleCheckoutForm({
   const [quoting, setQuoting] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
   // Mismo problema que en CheckoutForm: el botón se apagaba sin decir qué falta.
+  // Se avisa, no se prohíbe: hay quien viaja o manda a alguien. Lo que no puede
+  // pasar es que se entere después de pagar.
+  const regionComprador = comuna ? getRegionForComuna(comuna) : null;
+  const retiroEntreRegiones =
+    deliveryMethod === "in_person" &&
+    !!regionComprador &&
+    comunasVendedor.length > 0 &&
+    comunasVendedor.every((c) => {
+      const r = getRegionForComuna(c);
+      return r !== null && r !== regionComprador;
+    });
+
   const motivoBloqueo = (): string | null => {
+    if (!comuna) return "Elige tu comuna: con eso sabemos si los libros te pueden llegar.";
     if (!isCourier) return null;
     if (!address) return "Escribe la dirección donde quieres recibir los libros.";
     if (!addressHasNumber) return "Falta el número de la calle en tu dirección.";
@@ -158,6 +176,7 @@ export default function BundleCheckoutForm({
             body: JSON.stringify({
               listing_id: firstListingId,
               buyer_address: addr,
+              buyer_commune: comuna || undefined,
               item_count: listings.length,
             }),
           });
@@ -278,6 +297,7 @@ export default function BundleCheckoutForm({
               : "Punto de retiro",
           shipping_courier: isCourier ? selectedQuote!.courier : undefined,
           buyer_address: isCourier ? address : deliveryMethod,
+          buyer_commune: comuna || undefined,
         }),
       });
 
@@ -363,6 +383,47 @@ export default function BundleCheckoutForm({
       {/* Forma de entrega */}
       <div className="bg-white rounded-lg border border-gray-200 p-5">
         <h2 className="font-semibold text-gray-900 mb-4">Forma de entrega</h2>
+        {/* La comuna primero: decide si el retiro tiene sentido y es lo que
+            usan los couriers para cotizar. */}
+        <div className="mb-4">
+          <label htmlFor="comuna-bundle" className="block text-xs font-semibold text-ink mb-1.5">
+            ¿En qué comuna estás?
+          </label>
+          <ComunaSelect id="comuna-bundle" value={comuna} onChange={setComuna} />
+          {comunasVendedor.length > 0 && (
+            <p className="mt-1.5 text-[11px] text-ink-muted">
+              {comunasVendedor.length === 1 ? "El vendedor está en" : "Los libros están en"}{" "}
+              <strong>{comunasVendedor.join(" y ")}</strong>.
+            </p>
+          )}
+          {retiroEntreRegiones && (
+            <div className="mt-3 rounded-xl border border-red-300 bg-red-50 p-3.5">
+              <p className="text-xs font-bold text-red-900">
+                Ojo: estás en otra región que {comunasVendedor.join(" y ")}.
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-red-800">
+                El retiro en persona significa que vas tú a buscar los libros — no hay despacho incluido.
+              </p>
+              {courierDisponible ? (
+                <button
+                  type="button"
+                  onClick={() => setDeliveryMethod("courier")}
+                  className="mt-2.5 inline-flex items-center h-9 px-4 rounded-lg bg-ink text-cream text-xs font-semibold hover:bg-ink-deep transition-colors"
+                >
+                  Mejor que me los despachen
+                </button>
+              ) : (
+                <p className="mt-2 text-xs text-red-800">
+                  Este vendedor todavía no despacha por courier. Escríbenos al{" "}
+                  <a href="https://wa.me/56994583067" className="font-semibold underline" target="_blank" rel="noopener noreferrer">
+                    +56 9 9458 3067
+                  </a>{" "}
+                  y vemos cómo llegan.
+                </p>
+              )}
+            </div>
+          )}
+        </div>
         <div className="space-y-2">
           {opcionesEntrega.map((opt) => (
             <label
