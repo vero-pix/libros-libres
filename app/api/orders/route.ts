@@ -96,6 +96,7 @@ export async function POST(req: NextRequest) {
     shipping_courier,
     buyer_address,
     buyer_commune,
+    payment_method,
     discount_code,
   } = body as {
     shipping_speed: "standard" | "express";
@@ -105,6 +106,8 @@ export async function POST(req: NextRequest) {
     buyer_address?: string;
     /** Comuna del comprador, de la lista cerrada de lib/comunas.ts. */
     buyer_commune?: string;
+    /** "transfer" para pagar por transferencia; cualquier otra cosa, MercadoPago. */
+    payment_method?: string;
     discount_code?: string;
   };
 
@@ -122,7 +125,7 @@ export async function POST(req: NextRequest) {
   const { data: listings, error: listingsError } = await supabase
     .from("listings")
     .select(
-      `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_user_id, on_vacation)`
+      `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_user_id, on_vacation, acepta_transferencia, datos_transferencia)`
     )
     .in("id", listingIds)
     .eq("status", "active");
@@ -180,7 +183,18 @@ export async function POST(req: NextRequest) {
     email: string;
     phone: string;
     mercadopago_user_id: string | null;
+    acepta_transferencia?: boolean | null;
+    datos_transferencia?: string | null;
   };
+
+  // Transferencia directa al vendedor. Solo si ESE vendedor la tiene activada y
+  // dejó sus datos: el método lo propone el cliente, pero acá se vuelve a
+  // comprobar contra la base — si no, cualquiera podría saltarse el cobro
+  // mandando `payment_method: "transfer"` con un curl.
+  const porTransferencia =
+    payment_method === "transfer" &&
+    !!seller.acepta_transferencia &&
+    !!seller.datos_transferencia?.trim();
 
   // Validar y aplicar código de descuento
   let discountPct = 0;
@@ -297,7 +311,10 @@ export async function POST(req: NextRequest) {
     ? calculateCommission(totalBookPrice)
     : { rate: 0, commission: 0 };
 
-  const serviceFee = isInPerson ? 0 : useSplit ? commission : SERVICE_FEE;
+  // Por transferencia no hay comisión: no existe el split que la retenga, y
+  // cobrársela al comprador significaría que el vendedor la recibe y después
+  // tendría que devolverla. La venta igual queda registrada en el sitio.
+  const serviceFee = isInPerson || porTransferencia ? 0 : useSplit ? commission : SERVICE_FEE;
   const bundleGrandTotal = totalBookPrice + shippingCost + serviceFee;
 
   // Generar bundle_id (siempre, también para single-item)
@@ -332,6 +349,7 @@ export async function POST(req: NextRequest) {
       // dónde está el comprador, porque ahí `buyer_address` dice "in_person".
       buyer_commune: buyer_commune?.trim() || null,
       bundle_id: bundleId,
+      payment_method: porTransferencia ? "transfer" : "mercadopago",
       discount_code: discount_code?.toUpperCase() ?? null,
       discount_amount: itemDiscount,
       // Estos libros viajan en un paquete que el vendedor ya está armando.
@@ -361,6 +379,28 @@ export async function POST(req: NextRequest) {
   // Preferencia MP
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+  // Transferencia: no hay pasarela que abrir. La orden ya está creada y queda
+  // esperando que el vendedor confirme que la plata llegó, desde Mis Ventas.
+  // Se devuelve la URL de la orden en vez de `init_point`; los datos bancarios
+  // se muestran ahí y en el correo, nunca antes de confirmar el pedido.
+  if (porTransferencia) {
+    sendGong(
+      `\u{1F4B8} Pedido por TRANSFERENCIA — $${bundleGrandTotal.toLocaleString("es-CL")}\n` +
+        `Vendedor: ${escapeHtml(seller.full_name ?? "—")}\n` +
+        `Comprador: ${escapeHtml(user.user_metadata?.full_name || user.email || "Alguien")}\n` +
+        `Queda pendiente hasta que confirme el pago en Mis Ventas.`
+    ).catch(() => {});
+
+    return NextResponse.json({
+      bundle_id: bundleId,
+      order_ids: createdOrders.map((o: any) => o.id),
+      order_id: firstOrderId,
+      payment_method: "transfer",
+      redirect_to: `/orders/${firstOrderId}?pago=transferencia`,
+      total: bundleGrandTotal,
+    });
+  }
 
   try {
     const items = [

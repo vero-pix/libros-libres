@@ -34,6 +34,8 @@ interface Props {
   courierDisponible?: boolean;
   buyerName: string;
   buyerPhone: string;
+  /** El vendedor habilitó cobrar por transferencia además de MercadoPago. */
+  aceptaTransferencia?: boolean;
 }
 
 type DeliveryMethod = "courier" | "in_person" | "pickup_point";
@@ -50,7 +52,10 @@ const DELIVERY_OPTIONS = [
   { value: "courier" as const, label: "Envío courier", desc: "Recibe en tu domicilio vía Shipit", icon: "📦", enabled: true },
 ];
 
-export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPhone, courierDisponible = true }: Props) {
+export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPhone, courierDisponible = true, aceptaTransferencia = false }: Props) {
+  // Forma de pago. Solo se pregunta si el vendedor habilitó la transferencia;
+  // si no, es MercadoPago y la pregunta no aparece.
+  const [formaPago, setFormaPago] = useState<"mercadopago" | "transfer">("mercadopago");
   // Sin preselección: antes venía marcado "in_person", que además es el gratis,
   // así que quien no leía elegía por omisión retirar un libro que podía estar a
   // 500 km. La entrega se elige a conciencia. (08-09-2026)
@@ -335,6 +340,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
           shipping_courier: isCourier ? selectedQuote!.courier : undefined,
           buyer_address: isCourier ? address : deliveryMethod,
           buyer_commune: comuna || undefined,
+          payment_method: aceptaTransferencia ? formaPago : undefined,
           discount_code: discountCode ?? undefined,
           guest_info: isGuest ? {
             name: guestName,
@@ -348,6 +354,13 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
 
       if (!res.ok) {
         setError(data.error ?? "Error al procesar el pedido");
+        return;
+      }
+
+      // Por transferencia no hay pasarela: la orden queda creada y la página
+      // del pedido muestra los datos para transferir.
+      if (data.redirect_to) {
+        window.location.href = data.redirect_to;
         return;
       }
 
@@ -791,6 +804,38 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
               </div>
             )}
 
+            {/* Forma de pago: solo aparece si el vendedor habilitó la
+                transferencia. Con una sola forma no hay nada que preguntar. */}
+            {sellerHasMP && aceptaTransferencia && (
+              <div className="space-y-2 pb-1">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted">Cómo pagas</p>
+                {[
+                  { v: "mercadopago" as const, t: "MercadoPago", d: "Tarjeta, débito o cuotas. Retenemos el pago hasta que confirmes que llegó." },
+                  { v: "transfer" as const, t: "Transferencia", d: "Le transfieres directo al vendedor. Te mostramos los datos al confirmar el pedido." },
+                ].map((o) => (
+                  <label
+                    key={o.v}
+                    className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                      formaPago === o.v ? "border-brand-500 bg-brand-50/40" : "border-cream-dark hover:border-brand-200"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="forma-pago"
+                      value={o.v}
+                      checked={formaPago === o.v}
+                      onChange={() => setFormaPago(o.v)}
+                      className="mt-0.5 w-4 h-4 text-brand-600 border-cream-dark focus:ring-brand-500"
+                    />
+                    <span className="min-w-0">
+                      <span className="block text-xs font-bold text-ink">{o.t}</span>
+                      <span className="block text-[11px] text-ink-muted leading-relaxed">{o.d}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+
             {sellerHasMP && !loading && motivoBloqueo() && (
               <p className="text-xs text-amber-700 text-center">
                 {motivoBloqueo()}
@@ -815,6 +860,8 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Procesando...
                   </div>
+                ) : aceptaTransferencia && formaPago === "transfer" ? (
+                  "Confirmar pedido y ver los datos"
                 ) : (
                   `Pagar con MercadoPago`
                 )}

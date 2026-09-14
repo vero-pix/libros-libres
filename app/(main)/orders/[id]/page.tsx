@@ -30,6 +30,12 @@ const STATUS_CONFIG: Record<
     description: "Tu pago está siendo procesado. Te notificaremos cuando se confirme.",
     color: "text-yellow-600",
   },
+  transferencia: {
+    title: "Pedido confirmado",
+    description:
+      "El libro queda reservado a tu nombre. Transfiere con los datos de abajo y el vendedor confirma cuando le llegue.",
+    color: "text-ink",
+  },
 };
 
 /**
@@ -58,7 +64,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
   const { data: order } = await supabase
     .from("orders")
     .select(
-      `*, listing:listings(*, book:books(title, author, cover_url)), seller:users!orders_seller_id_fkey(id, username, full_name)`
+      `*, listing:listings(*, book:books(title, author, cover_url)), seller:users!orders_seller_id_fkey(id, username, full_name, datos_transferencia)`
     )
     .eq("id", params.id)
     .single();
@@ -84,7 +90,15 @@ export default async function OrderPage({ params, searchParams }: Props) {
     }
   }
 
-  const rawStatus = searchParams.status ?? order.status;
+  // Pedido por transferencia: no hay pasarela que haya devuelto un estado, así
+  // que esta pantalla ES el comprobante. Muestra los datos para transferir
+  // mientras el vendedor no confirme que la plata llegó.
+  const esTransferencia = order.payment_method === "transfer";
+  const transferenciaPendiente = esTransferencia && order.status === "pending";
+
+  const rawStatus = esTransferencia
+    ? (order.status === "pending" ? "transferencia" : order.status)
+    : (searchParams.status ?? order.status);
   const paymentStatus = STATUS_ALIAS[rawStatus] ?? rawStatus;
 
   // Por qué no pasó el pago. MercadoPago lo manda al webhook y queda en
@@ -147,6 +161,36 @@ export default async function OrderPage({ params, searchParams }: Props) {
               ? `Ya le avisé a ${quienVende}: te va a escribir para coordinar dónde y cuándo entregarte ${isBundle ? "los libros" : "el libro"}.`
               : config.description}
           </p>
+
+          {/* Datos para transferir. Se muestran acá y en el correo, nunca antes
+              de confirmar el pedido, y solo a quien compró. */}
+          {transferenciaPendiente && isBuyer && (
+            <div className="mb-6 rounded-xl border-2 border-ink/15 bg-cream/60 p-5">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-1">
+                Transfiere a
+              </p>
+              <p className="text-2xl font-bold text-ink tabular-nums mb-3">
+                ${bundleTotal.toLocaleString("es-CL")}
+              </p>
+              {(seller as any)?.datos_transferencia ? (
+                <pre className="whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-ink bg-white border border-gray-200 rounded-lg p-3.5 overflow-x-auto">
+{(seller as any).datos_transferencia}
+                </pre>
+              ) : (
+                <p className="text-sm text-amber-800">
+                  {quienVende} todavía no cargó sus datos de transferencia. Escríbenos por{" "}
+                  <a href={waSoporte("Compré por transferencia y no veo los datos")} className="font-semibold underline" target="_blank" rel="noopener noreferrer">
+                    WhatsApp
+                  </a>{" "}
+                  y te los damos al tiro.
+                </p>
+              )}
+              <p className="mt-3 text-xs text-gray-600 leading-relaxed">
+                Pon el número de pedido <strong className="font-mono">{order.id.slice(0, 8)}</strong> en el mensaje
+                de la transferencia. Cuando {quienVende} confirme que llegó, te avisamos por correo y empieza el despacho.
+              </p>
+            </div>
+          )}
 
           <div className="border-t border-gray-100 pt-4 mb-6">
             <p className="text-xs uppercase tracking-wider text-gray-500 mb-3">

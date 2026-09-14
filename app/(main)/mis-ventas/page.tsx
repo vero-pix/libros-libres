@@ -6,6 +6,7 @@ import type { Order, OrderStatus } from "@/types";
 import BuyerCartsSection from "@/components/sales/BuyerCartsSection";
 import EntregadoButton from "@/components/sales/EntregadoButton";
 import PedirRetiroButton from "@/components/sales/PedirRetiroButton";
+import ConfirmarTransferencia from "@/components/sales/ConfirmarTransferencia";
 import RetiroFallidoAcciones from "@/components/sales/RetiroFallidoAcciones";
 import { findCommune, SHIPIT_REGION_RM } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
@@ -51,7 +52,7 @@ export default async function MisVentasPage() {
   const { data: rawOrders } = await supabase
     .from("orders")
     .select(`
-      id, buyer_id, bundle_id, book_price, shipping_cost, service_fee, total, status,
+      id, buyer_id, bundle_id, book_price, shipping_cost, service_fee, total, status, payment_method,
       courier, tracking_code, shipping_label_url, shipping_status, buyer_address, created_at, updated_at, shipping_updated_at,
       listing:listings(id, cover_image_url, book:books(title, author, cover_url)),
       buyer:users!orders_buyer_id_fkey(full_name, email)
@@ -184,7 +185,10 @@ export default async function MisVentasPage() {
     buyerCarts.sort((a, b) => b.daysInCart - a.daysInCart);
   }
 
-  // Stats
+  // Stats. Las de transferencia siguen en `pending` hasta que el vendedor
+  // confirme que la plata llegó, así que no cuentan como venta todavía — pero
+  // sí se muestran en la tabla, porque si no, el vendedor no tendría dónde
+  // confirmarlas.
   const paidOrders = orders.filter((o: any) => o.status !== "pending" && o.status !== "cancelled");
   const totalVentas = paidOrders.reduce((sum: number, o: any) => sum + Number(o.book_price), 0);
   const totalComisiones = commissions.reduce((sum, c) => sum + Number(c.commission_amount), 0);
@@ -342,7 +346,17 @@ export default async function MisVentasPage() {
                           ${Number(order.book_price).toLocaleString("es-CL")}
                         </td>
                         <td className="px-3 py-3">
-                          {order.status === "delivered" ? (
+                          {order.payment_method === "transfer" && order.status === "pending" ? (
+                            <div className="space-y-1.5">
+                              <span className="text-xs font-medium text-ink block">
+                                💸 Esperando transferencia
+                              </span>
+                              <ConfirmarTransferencia
+                                bundleId={order.bundle_id ?? order.id}
+                                monto={Number(order.total)}
+                              />
+                            </div>
+                          ) : order.status === "delivered" ? (
                             <div className="space-y-0.5">
                               <span className="text-xs font-medium text-green-700">
                                 ✅ Entregado el {new Date(order.shipping_updated_at ?? order.updated_at ?? order.created_at).toLocaleDateString("es-CL")}
