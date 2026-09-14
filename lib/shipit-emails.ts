@@ -94,7 +94,7 @@ export function correoVendedorEtiqueta(d: DatosCorreoEtiqueta): { subject: strin
       ${d.retiro
         ? `<li><strong>${esc(courier)} va a pasar a buscarlo</strong> a tu dirección <strong>${esc(cuandoPasan(d.retiro))}</strong>. Shipit agenda ese retiro solo, aunque no lo hayas pedido. Si vas a estar, déjalo empaquetado y con la etiqueta puesta y se lo entregas al chofer.<br/><strong>Y si prefieres dejarlo tú en una sucursal ${esc(courier)}, hazlo nomás</strong>: la misma etiqueta sirve igual y no tienes que avisarle a nadie. Si el chofer llega y no hay paquete, el retiro se cierra solo.</li>`
         : `<li>Lleva el paquete a la <strong>sucursal ${esc(courier)} más cercana</strong>, idealmente hoy o mañana, y entrégalo en el mesón con la etiqueta puesta. No hay que agendar nada ni esperar a nadie.</li>`}
-      <li>Pide el comprobante de recepción${d.retiro ? " al chofer" : ""} y guárdalo hasta que el comprador reciba el libro.</li>
+      <li>${d.retiro ? "Pídele el comprobante de recepción al chofer" : "En la sucursal no siempre entregan comprobante, y no hace falta: cuando escanean la etiqueta, el envío queda registrado y yo lo veo"}.</li>
       <li>No le pagas nada al courier: el envío ya lo pagó el comprador.</li>
     </ol>
     <p>El seguimiento empieza a moverse cuando ${d.retiro ? "el chofer entrega el paquete en el centro de distribución" : "la sucursal escanea el paquete"}; hasta entonces aparece sin novedad, es normal.</p>
