@@ -17,14 +17,12 @@ interface ShippingQuote {
   courier?: string;
 }
 
-const FALLBACK_OPTIONS: ShippingQuote[] = [
-  {
-    service: "Estándar",
-    serviceCode: 0,
-    deliveryTime: "3-5 días hábiles",
-    price: 2900,
-  },
-];
+// Sin cotización NO se ofrece un envío de referencia. Hasta el 14-09-2026 había
+// un "Estándar $2.900" de respaldo: el comprador lo pagaba y el despacho podía no
+// existir (Melipeuco, 5 ago). Sin precio real, se dice y se deja la salida de
+// encuentro en persona.
+const MSG_SIN_COTIZACION =
+  "No pudimos calcular el envío a tu dirección. Revisa que tenga calle, número y comuna, y aprieta “Calcular envío” de nuevo. También puedes elegir encuentro en persona.";
 
 interface Props {
   listings: ListingWithBook[];
@@ -115,6 +113,7 @@ export default function BundleCheckoutForm({
     if (!address) return "Escribe la dirección donde quieres recibir los libros.";
     if (!addressHasNumber) return "Falta el número de la calle en tu dirección.";
     if (shippingUnavailable) return "No hay courier que llegue a tu dirección. Cambia a encuentro en persona.";
+    if (quoteError && !selectedQuote) return quoteError;
     if (!selectedQuote) return "Aprieta \u201cCalcular envío\u201d y elige una opción de despacho.";
     return null;
   };
@@ -212,23 +211,19 @@ export default function BundleCheckoutForm({
           return;
         }
 
-        // Sin opciones se cae a las tarifas de referencia, VENGA COMO VENGA la
-        // respuesta. El endpoint devuelve 200 con `quotes: []` a propósito
-        // ("so fallback works"), pero el fallback vivía detrás de `!res.ok` y
-        // por lo tanto nunca corría: el comprador quedaba con el botón muerto
-        // en "Ingresa dirección" habiendo escrito su dirección, y sin ver el
-        // motivo. Una compradora lo reportó por correo. (4 ago 2026)
+        // Sin opciones, VENGA COMO VENGA la respuesta (el endpoint devuelve 200
+        // con `quotes: []`), se dice por qué y el botón nombra el motivo. Antes
+        // se caía a un envío de $2.900 inventado; y antes de eso, a un botón
+        // muerto sin explicación (4 ago 2026). Ninguna de las dos.
         if (!res.ok || q.length === 0) {
-          {
-            const crudo = data.error ?? "Error al cotizar envío";
-            setQuoteError(
-              /no reconoce la comuna de destino/i.test(crudo)
-                ? "No reconocimos la comuna de tu dirección. Escríbela completa y sepárala con coma — por ejemplo: Av. Apoquindo 3000, Las Condes."
-                : crudo
-            );
-          }
-          setQuotes(FALLBACK_OPTIONS);
-          setSelectedService(FALLBACK_OPTIONS[0].serviceCode);
+          const crudo = data.error ?? "";
+          setQuoteError(
+            /no reconoce la comuna de destino/i.test(crudo)
+              ? "No reconocimos la comuna de tu dirección. Escríbela completa y sepárala con coma — por ejemplo: Av. Apoquindo 3000, Las Condes."
+              : MSG_SIN_COTIZACION
+          );
+          setQuotes([]);
+          setSelectedService(null);
           return;
         }
 
@@ -236,10 +231,10 @@ export default function BundleCheckoutForm({
         const cheapest = q.reduce((a, b) => (a.price < b.price ? a : b));
         setSelectedService(cheapest.serviceCode);
       } catch {
-        setQuoteError("Error de conexión al cotizar");
+        setQuoteError(MSG_SIN_COTIZACION);
         setShippingUnavailable(false);
-        setQuotes(FALLBACK_OPTIONS);
-        setSelectedService(FALLBACK_OPTIONS[0].serviceCode);
+        setQuotes([]);
+        setSelectedService(null);
       } finally {
         setQuoting(false);
       }
@@ -530,14 +525,15 @@ export default function BundleCheckoutForm({
         </div>
       )}
 
+      {isCourier && !shippingUnavailable && quoteError && quotes.length === 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-5">
+          <p className="text-xs text-amber-800">{quoteError}</p>
+        </div>
+      )}
+
       {isCourier && quotes.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <h2 className="font-semibold text-gray-900 mb-4">Opciones de envío</h2>
-          {quoteError && (
-            <p className="text-xs text-amber-600 mb-3">
-              {quoteError} — mostrando precio estimado.
-            </p>
-          )}
           <div className="space-y-3">
             {quotes.map((q) => (
               <label

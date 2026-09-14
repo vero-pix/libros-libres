@@ -17,15 +17,12 @@ interface ShippingQuote {
   courier?: string;
 }
 
-// Fallback cuando no hay API de courier o falla la cotización
-const FALLBACK_OPTIONS: ShippingQuote[] = [
-  {
-    service: "Estándar",
-    serviceCode: 0,
-    deliveryTime: "3-5 días hábiles",
-    price: 2900,
-  },
-];
+// Sin cotización NO se ofrece un envío de referencia. Hasta el 14-09-2026 había
+// un "Estándar $2.900" de respaldo: el comprador lo pagaba y el despacho podía no
+// existir (Melipeuco, 5 ago). Sin precio real, se dice y se deja la salida de
+// encuentro en persona.
+const MSG_SIN_COTIZACION =
+  "No pudimos calcular el envío a tu dirección. Revisa que tenga calle, número y comuna, y aprieta “Calcular envío” de nuevo. También puedes elegir encuentro en persona.";
 
 interface Props {
   listing: ListingWithBook;
@@ -131,6 +128,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
     if (!address) return "Escribe la dirección donde quieres recibir el libro.";
     if (!addressHasNumber) return "Falta el número de la calle en tu dirección.";
     if (shippingUnavailable) return "No hay courier que llegue a tu dirección. Cambia a encuentro en persona.";
+    if (quoteError && !selectedQuote) return quoteError;
     if (!selectedQuote) return "Aprieta \u201cCalcular envío\u201d y elige una opción de despacho.";
     return null;
   };
@@ -180,8 +178,8 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
       setShippingUnavailable(false);
 
       try {
-        // Un reintento antes de caer al fallback de $2.900, que casi siempre
-        // queda bajo el costo real. Ver comentario en BundleCheckoutForm.
+        // Un reintento antes de rendirse: sin cotización no hay envío que
+        // ofrecer (ver MSG_SIN_COTIZACION).
         const pedirCotizacion = () =>
           fetch("/api/shipping/quote", {
             method: "POST",
@@ -229,10 +227,10 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
           setQuoteError(
             /no reconoce la comuna de destino/i.test(crudo)
               ? "No reconocimos la comuna de tu dirección. Escríbela completa y sepárala con coma — por ejemplo: Av. Apoquindo 3000, Las Condes."
-              : crudo
+              : MSG_SIN_COTIZACION
           );
-          setQuotes(FALLBACK_OPTIONS);
-          setSelectedService(FALLBACK_OPTIONS[0].serviceCode);
+          setQuotes([]);
+          setSelectedService(null);
           return;
         }
 
@@ -240,10 +238,10 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
         const cheapest = q.reduce((a, b) => (a.price < b.price ? a : b));
         setSelectedService(cheapest.serviceCode);
       } catch {
-        setQuoteError("Error de conexión al cotizar");
+        setQuoteError(MSG_SIN_COTIZACION);
         setShippingUnavailable(false);
-        setQuotes(FALLBACK_OPTIONS);
-        setSelectedService(FALLBACK_OPTIONS[0].serviceCode);
+        setQuotes([]);
+        setSelectedService(null);
       } finally {
         setQuoting(false);
       }
