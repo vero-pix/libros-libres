@@ -987,7 +987,7 @@ function capitalizar(s: string): string {
 async function recordarDetenidos(admin: Admin, modo: ShipitMode): Promise<number> {
   const { data: filas } = await admin
     .from("shipments")
-    .select("id, reference, order_head_id, seller_id, tracking_number, courier, created_at, shipit_id")
+    .select("id, reference, bundle_id, order_head_id, seller_id, tracking_number, courier, created_at, shipit_id")
     .eq("status", "notified")
     .lt("created_at", new Date(Date.now() - 3 * 24 * 3600_000).toISOString());
 
@@ -1026,9 +1026,16 @@ async function recordarDetenidos(admin: Admin, modo: ShipitMode): Promise<number
         .maybeSingle(),
     ]);
 
+    // Si el envío lleva varios libros, se nombran todos por cantidad. Con solo
+    // el título de la orden cabeza, a Libro de Ocasión le llegó "Todavía no
+    // sale: El sexto" por un paquete de cuatro, y entendió que faltaba uno. (14-09-2026)
+    const { count: cuantos } = await admin
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("bundle_id", fila.bundle_id);
     const listingHead: any = Array.isArray(head?.listing) ? head?.listing[0] : head?.listing;
     const bookHead: any = Array.isArray(listingHead?.book) ? listingHead.book[0] : listingHead?.book;
-    const libro: string = bookHead?.title ?? "el libro";
+    const libro: string = (cuantos ?? 0) > 1 ? `tus ${cuantos} libros` : bookHead?.title ?? "el libro";
     const diasDesdeLaCompra = head?.created_at
       ? Math.floor((Date.now() - new Date(head.created_at).getTime()) / 86_400_000)
       : dias;
