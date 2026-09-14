@@ -19,6 +19,7 @@ import { foldAccents } from "@/lib/accentSearch";
 import { resolverOrigenEnvio } from "@/lib/shipping-quote";
 import { sendEmail } from "@/lib/email";
 import { VERO_INBOX } from "@/lib/veroInbox";
+import { pedirResena } from "@/lib/resena-email";
 import {
   correoCompradorTracking,
   correoVendedorEtiqueta,
@@ -68,6 +69,8 @@ export const dynamic = "force-dynamic";
  *   label_ready → notified  correo al vendedor (etiqueta lista) y al comprador (tracking)
  *   notified → pickup_scheduled  si Shipit ya agendó un retiro (last_pickup)
  *   pickup_scheduled → in_transit | pickup_failed  según pase o no el chofer
+ *   notified | pickup_scheduled | in_transit → in_transit | delivered
+ *                           según el `status` que devuelve Shipit (seguirCourier)
  *
  * Diseño completo: docs/shipit/PROMPT_1.1_diseno_2026-09-07.md
  */
@@ -120,6 +123,9 @@ export async function GET(request: Request) {
           break;
         case "pickup_scheduled":
           resumen.push(await pasoSeguirRetiro(admin, fila, modo));
+          break;
+        case "in_transit":
+          resumen.push(await pasoEnCamino(admin, fila, modo));
           break;
         default:
           // Estados de fase 2. Se sueltan para dentro de 6 horas.
@@ -645,6 +651,9 @@ async function pasoSeguirRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMod
     return { reference: fila.reference, estado: "pickup_scheduled", accion: "GET falló, se reintenta", nota: s.error };
   }
 
+  const avance = await seguirCourier(admin, fila, s, modo);
+  if (avance) return avance;
+
   const retiro = leerRetiroShipit(s.last_pickup);
 
   // El chofer pasó. No hay nada que reagendar ni que avisar.
@@ -788,6 +797,12 @@ async function pasoRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pr
     return { reference: fila.reference, estado: "notified", accion: "GET falló, se reintenta", nota: s.error };
   }
 
+  // Antes que el retiro, lo que dice el courier. Un envío en dropoff que el
+  // vendedor ya dejó en la sucursal nunca tiene retiro: si solo se miraba
+  // `last_pickup`, se quedaba en `notified` para siempre aunque hubiera llegado.
+  const avance = await seguirCourier(admin, fila, s, modo);
+  if (avance) return avance;
+
   const retiro = leerRetiroShipit(s.last_pickup);
   if (!retiro) {
     await reprogramarEnvio(admin, fila.id, 6 * 60);
@@ -853,6 +868,93 @@ async function pasoRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pr
   };
 }
 
+/* ──────────────────── lo que dice el courier → in_transit | delivered ──────────────────── */
+
+/**
+ * Lee el `status` de `GET /v/shipments/{id}` y avanza el envío si el courier
+ * ya lo movió. Devuelve null si no hay nada que avanzar.
+ *
+ * Hasta el 14-09-2026 el cron hacía ese GET cada 6 horas, guardaba la respuesta
+ * entera en `shipit_events`… y solo leía `last_pickup`. Los dos libros de
+ * Buhardilla se entregaron el 9 y el 11 de septiembre, con firma de quien
+ * recibió, y seguían en `notified`: las órdenes en "pagado", sin correo de
+ * reseña, y el 14 el vendedor recibió "el seguimiento sigue sin moverse". Lo
+ * mismo con Libro de Ocasión (entregado el 12). Y `in_transit` ni siquiera se
+ * volvía a consultar.
+ *
+ * Estados de Shipit vistos en respuestas reales: created, in_preparation,
+ * in_route, delivered, canceled_shipment. `in_transit` viene del webhook.
+ */
+const SHIPIT_EN_CAMINO = ["in_route", "in_transit"];
+
+async function seguirCourier(
+  admin: Admin,
+  fila: ShipmentRow,
+  s: { status: string | null },
+  modo: ShipitMode
+): Promise<ResumenFila | null> {
+  const estado = (s.status ?? "").toLowerCase();
+  const ahora = new Date().toISOString();
+
+  if (estado === "delivered") {
+    const ok = await transicionEnvio(admin, fila.id, fila.status, "delivered");
+    if (!ok) return { reference: fila.reference, estado: fila.status, accion: "ya avanzó (otro proceso)" };
+
+    // Igual que "Lo recibí": solo toca órdenes en paid/shipped, y el correo de
+    // reseña sale solo si alguna cambió (si el comprador ya confirmó, no se repite).
+    const { data: cambiadas } = await admin
+      .from("orders")
+      .update({ status: "delivered", shipping_status: "delivered", shipping_updated_at: ahora, updated_at: ahora })
+      .eq("bundle_id", fila.bundle_id)
+      .in("status", ["paid", "shipped"])
+      .select("id");
+    if (cambiadas?.length && modo !== "dry-run") await pedirResena(admin, fila.bundle_id);
+
+    return { reference: fila.reference, estado: "delivered", accion: "entregado según el courier" };
+  }
+
+  if (SHIPIT_EN_CAMINO.includes(estado) && fila.status !== "in_transit") {
+    const ok = await transicionEnvio(admin, fila.id, fila.status, "in_transit");
+    if (!ok) return { reference: fila.reference, estado: fila.status, accion: "ya avanzó (otro proceso)" };
+    await admin
+      .from("orders")
+      .update({ status: "shipped", shipping_status: "in_transit", shipping_updated_at: ahora })
+      .eq("bundle_id", fila.bundle_id)
+      .in("status", ["paid"]);
+    return { reference: fila.reference, estado: "in_transit", accion: "el courier ya lo tiene" };
+  }
+
+  return null;
+}
+
+/** in_transit → delivered. Se mira cada 6 horas hasta que el courier lo entregue. */
+async function pasoEnCamino(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
+  if (modo === "dry-run" || !fila.shipit_id) {
+    await reprogramarEnvio(admin, fila.id, 6 * 60);
+    return { reference: fila.reference, estado: "in_transit", accion: "dry-run: no se sigue el envío" };
+  }
+
+  const s = await getShipitShipment(fila.shipit_id);
+  await registrarEventoShipit(admin, {
+    shipmentId: fila.id,
+    kind: "get",
+    mode: modo,
+    response: s.raw,
+    httpStatus: s.httpStatus,
+    note: "en-camino",
+  });
+  if (s.error) {
+    await reprogramarEnvio(admin, fila.id, 60);
+    return { reference: fila.reference, estado: "in_transit", accion: "GET falló, se reintenta", nota: s.error };
+  }
+
+  const avance = await seguirCourier(admin, fila, s, modo);
+  if (avance) return avance;
+
+  await reprogramarEnvio(admin, fila.id, 6 * 60);
+  return { reference: fila.reference, estado: "in_transit", accion: "sigue en camino", nota: s.status ?? undefined };
+}
+
 function capitalizar(s: string): string {
   return s
     .toLowerCase()
@@ -885,7 +987,7 @@ function capitalizar(s: string): string {
 async function recordarDetenidos(admin: Admin, modo: ShipitMode): Promise<number> {
   const { data: filas } = await admin
     .from("shipments")
-    .select("id, reference, order_head_id, seller_id, tracking_number, courier, created_at")
+    .select("id, reference, order_head_id, seller_id, tracking_number, courier, created_at, shipit_id")
     .eq("status", "notified")
     .lt("created_at", new Date(Date.now() - 3 * 24 * 3600_000).toISOString());
 
@@ -905,6 +1007,15 @@ async function recordarDetenidos(admin: Admin, modo: ShipitMode): Promise<number
       .eq("note", nota)
       .limit(1);
     if (yaAvisado?.length) continue;
+
+    // El aviso dice "el seguimiento sigue sin moverse": hay que haberlo mirado
+    // recién. El 14-09-2026 salió sin mirar y le llegó a Buhardilla por dos
+    // libros que Starken había entregado tres y cinco días antes. Si Shipit no
+    // responde o el paquete ya salió, no se avisa: la próxima corrida del paso
+    // `notified` lo avanza.
+    if (!fila.shipit_id) continue;
+    const actual = await getShipitShipment(fila.shipit_id);
+    if (actual.error || !["created", "in_preparation"].includes((actual.status ?? "").toLowerCase())) continue;
 
     const [{ data: vendedor }, { data: head }] = await Promise.all([
       admin.from("users").select("full_name, email").eq("id", fila.seller_id).maybeSingle(),

@@ -1,4 +1,11 @@
 import { urlResena } from "./resenaToken";
+import { sendEmail } from "./email";
+import { VERO_INBOX } from "./veroInbox";
+import { libroUrl } from "./urls";
+import type { createServiceRoleClient } from "./supabase/service-role";
+
+type Admin = ReturnType<typeof createServiceRoleClient>;
+
 /**
  * Correo "¿Cómo llegó {título}?" al comprador cuando el pedido se marca como
  * entregado. Texto de Vero, aprobado el 07-09-2026. Un botón principal (la
@@ -49,4 +56,53 @@ export function correoResena(d: DatosCorreoResena): { subject: string; html: str
       <p style="margin-top:28px">Vero<br/><span style="color:#777">tuslibros.cl</span></p>
     </div>`;
   return { subject, html };
+}
+
+/**
+ * Manda el correo de reseña al comprador de un bundle. Lo llaman los dos
+ * caminos que marcan un pedido como entregado: "Lo recibí" (/api/orders/entregado)
+ * y el courier, cuando Shipit dice `delivered` (cron de envíos). Nunca lanza:
+ * un correo que falla no puede frenar la entrega. Devuelve el id de Resend.
+ */
+export async function pedirResena(admin: Admin, bundleId: string): Promise<string | null> {
+  try {
+    const { data: orders } = await admin
+      .from("orders")
+      .select("id, buyer_id, seller_id, listing:listings(id, slug, seller:users(username), book:books(title))")
+      .eq("bundle_id", bundleId)
+      .order("created_at");
+    const head = orders?.[0];
+    if (!head) return null;
+
+    const [{ data: comprador }, { data: vendedor }] = await Promise.all([
+      admin.from("users").select("full_name, email").eq("id", head.buyer_id).single(),
+      admin.from("users").select("full_name, username").eq("id", head.seller_id).single(),
+    ]);
+    const titulos = (orders ?? [])
+      .map((o: any) => (Array.isArray(o.listing) ? o.listing[0] : o.listing)?.book)
+      .map((b: any) => (Array.isArray(b) ? b[0] : b)?.title)
+      .filter((t: unknown): t is string => typeof t === "string" && t.length > 0);
+    const listing: any = Array.isArray(head.listing) ? head.listing[0] : head.listing;
+    const seller: any = Array.isArray(listing?.seller) ? listing.seller[0] : listing?.seller;
+    if (!comprador?.email || !listing) return null;
+
+    const m = correoResena({
+      compradorNombre: comprador.full_name,
+      vendedorNombre: vendedor?.full_name,
+      titulo: titulos.length > 1 ? `tus ${titulos.length} libros` : titulos[0] ?? "tu libro",
+      fichaPath: libroUrl({ id: listing.id, slug: listing.slug, seller: { username: seller?.username } }),
+      orderId: head.id,
+    });
+    const r = await sendEmail({
+      to: comprador.email,
+      from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+      replyTo: VERO_INBOX,
+      subject: m.subject,
+      html: m.html,
+    });
+    return r?.id ?? null;
+  } catch (e) {
+    console.error("[resena] correo de reseña:", e);
+    return null;
+  }
 }

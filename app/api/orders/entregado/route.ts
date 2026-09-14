@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
-import { sendEmail } from "@/lib/email";
-import { VERO_INBOX } from "@/lib/veroInbox";
-import { correoResena } from "@/lib/resena-email";
-import { libroUrl } from "@/lib/urls";
+import { pedirResena } from "@/lib/resena-email";
 
 export const dynamic = "force-dynamic";
 
@@ -36,9 +33,7 @@ export async function POST(req: NextRequest) {
   const admin = createServiceRoleClient();
   const { data: orders, error } = await admin
     .from("orders")
-    .select(
-      "id, buyer_id, seller_id, status, courier, listing:listings(id, slug, seller:users(username), book:books(title))"
-    )
+    .select("id, buyer_id, seller_id, status, courier")
     .eq("bundle_id", bundle_id)
     .order("created_at");
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -77,38 +72,7 @@ export async function POST(req: NextRequest) {
     .in("status", ["created", "label_ready", "notified", "pickup_scheduled", "in_transit"]);
 
   // Correo de reseña al comprador. Nunca frena la respuesta.
-  let resendId: string | null = null;
-  try {
-    const [{ data: comprador }, { data: vendedor }] = await Promise.all([
-      admin.from("users").select("full_name, email").eq("id", head.buyer_id).single(),
-      admin.from("users").select("full_name, username").eq("id", head.seller_id).single(),
-    ]);
-    const titulos = orders
-      .map((o: any) => (Array.isArray(o.listing) ? o.listing[0] : o.listing)?.book)
-      .map((b: any) => (Array.isArray(b) ? b[0] : b)?.title)
-      .filter((t: unknown): t is string => typeof t === "string" && t.length > 0);
-    const listing: any = Array.isArray(head.listing) ? head.listing[0] : head.listing;
-    const seller: any = Array.isArray(listing?.seller) ? listing.seller[0] : listing?.seller;
-    if (comprador?.email && listing) {
-      const m = correoResena({
-        compradorNombre: comprador.full_name,
-        vendedorNombre: vendedor?.full_name,
-        titulo: titulos.length > 1 ? `tus ${titulos.length} libros` : titulos[0] ?? "tu libro",
-        fichaPath: libroUrl({ id: listing.id, slug: listing.slug, seller: { username: seller?.username } }),
-        orderId: head.id,
-      });
-      const r = await sendEmail({
-        to: comprador.email,
-        from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
-        replyTo: VERO_INBOX,
-        subject: m.subject,
-        html: m.html,
-      });
-      resendId = r?.id ?? null;
-    }
-  } catch (e) {
-    console.error("[entregado] correo de reseña:", e);
-  }
+  const resendId = await pedirResena(admin, bundle_id);
 
   return NextResponse.json({ ok: true, delivered: cambiadas.length, review_email: resendId });
 }
