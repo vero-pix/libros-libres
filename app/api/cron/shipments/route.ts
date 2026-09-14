@@ -976,14 +976,18 @@ function capitalizar(s: string): string {
  * Vero— recibiera un solo aviso. Eran 13 días de espera cuando se descubrió,
  * y se descubrió mirando el panel de Shipit a mano.
  *
- * Dos avisos y no más, para que el recordatorio no se vuelva ruido:
- *   · a los 3 días  → correo a quien vende, con el número de seguimiento.
- *   · a los 7 días  → gong a Vero, porque ahí ya hay que intervenir a mano.
+ * Tres avisos y no más, para que el recordatorio no se vuelva ruido:
+ *   · a los 3 días del envío  → correo a quien vende, con el número de seguimiento.
+ *   · a los 5 días de la compra → correo a quien compró: esperar o devolución.
+ *   · a los 7 días del envío  → gong a Vero, porque ahí ya hay que intervenir a mano.
  *
  * Cada aviso se registra en `shipit_events` y se comprueba antes de mandarlo:
  * este cron corre cada 5 minutos y sin esa guarda mandaría el mismo correo
  * 288 veces al día.
  */
+const DIAS_AVISO_COMPRADOR = 5;
+const NOTA_COMPRADOR = "recordatorio-comprador-5d";
+
 async function recordarDetenidos(admin: Admin, modo: ShipitMode): Promise<number> {
   const { data: filas } = await admin
     .from("shipments")
@@ -998,15 +1002,15 @@ async function recordarDetenidos(admin: Admin, modo: ShipitMode): Promise<number
     const hito = dias >= 7 ? "7d" : "3d";
     const nota = `recordatorio-${hito}`;
 
-    // ¿Ya se avisó de este hito? `kind: "gong"` sirve para los dos casos: lo
-    // que identifica al aviso es la nota, no el tipo.
-    const { data: yaAvisado } = await admin
+    // ¿Ya se avisó? Lo que identifica a cada aviso es la nota, no el tipo.
+    const { data: avisos } = await admin
       .from("shipit_events")
-      .select("id")
+      .select("note")
       .eq("shipment_id", fila.id)
-      .eq("note", nota)
-      .limit(1);
-    if (yaAvisado?.length) continue;
+      .in("note", [nota, NOTA_COMPRADOR]);
+    const yaAvisadoHito = !!avisos?.some((a) => a.note === nota);
+    const yaAvisadoComprador = !!avisos?.some((a) => a.note === NOTA_COMPRADOR);
+    if (yaAvisadoHito && yaAvisadoComprador) continue;
 
     // El aviso dice "el seguimiento sigue sin moverse": hay que haberlo mirado
     // recién. El 14-09-2026 salió sin mirar y le llegó a Buhardilla por dos
@@ -1021,7 +1025,7 @@ async function recordarDetenidos(admin: Admin, modo: ShipitMode): Promise<number
       admin.from("users").select("full_name, email").eq("id", fila.seller_id).maybeSingle(),
       admin
         .from("orders")
-        .select("created_at, listing:listings(book:books(title))")
+        .select("created_at, buyer_id, listing:listings(book:books(title))")
         .eq("id", fila.order_head_id)
         .maybeSingle(),
     ]);
@@ -1040,6 +1044,43 @@ async function recordarDetenidos(admin: Admin, modo: ShipitMode): Promise<number
       ? Math.floor((Date.now() - new Date(head.created_at).getTime()) / 86_400_000)
       : dias;
     const courier = nombreCourier(fila.courier);
+
+    // Al comprador, a los 5 días de la compra: que no se entere por Vero, a
+    // mano, trece días después. Pasó con Ana Gabriela (Álgebra de Baldor,
+    // 14-09-2026): tuvo que ser Vero la que le escribiera, y ella ya había
+    // cancelado por su cuenta. Se le dan las dos salidas, y la devolución la
+    // aprueba Vero al leer la respuesta (el reply-to es su buzón).
+    if (!yaAvisadoComprador && diasDesdeLaCompra >= DIAS_AVISO_COMPRADOR && head?.buyer_id) {
+      const { data: comprador } = await admin
+        .from("users")
+        .select("full_name, email")
+        .eq("id", head.buyer_id)
+        .maybeSingle();
+      if (comprador?.email) {
+        const quien = String(comprador.full_name ?? "").split(" ")[0] || "";
+        const tuLibro = (cuantos ?? 0) > 1 ? libro : bookHead?.title ?? "tu libro";
+        await sendEmail({
+          to: comprador.email === "vero@tuslibros.cl" ? VERO_INBOX : comprador.email,
+          from: REMITENTE_VERO,
+          replyTo: REPLY_TO_VERO,
+          subject: `Tu pedido todavía no sale: ${tuLibro}`,
+          html: `
+            <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1a1a1a;line-height:1.6">
+              <p>Hola ${escapeHtml(quien)}!</p>
+              <p>Soy Vero, de tuslibros.cl. Te escribo porque compraste <strong>${escapeHtml(tuLibro)}</strong> hace ${diasDesdeLaCompra} días y todavía no sale: quien lo vende aún no lo deja en ${escapeHtml(courier)}. Ya le avisé.</p>
+              <p>Tienes dos opciones, y la decisión es tuya:</p>
+              <p><strong>Esperar.</strong> No tienes que hacer nada. Puedes seguir el envío con el número <strong>${escapeHtml(fila.tracking_number ?? "—")}</strong> en la página de ${escapeHtml(courier)}.</p>
+              <p><strong>No esperar más.</strong> Respóndeme este correo y te devuelvo la plata completa.</p>
+              <p>Perdón por la demora.</p>
+              <p style="margin-top:28px">Vero<br/><span style="color:#777">tuslibros.cl</span></p>
+            </div>`,
+        }).catch(() => {});
+        await registrarEventoShipit(admin, { shipmentId: fila.id, kind: "email", mode: modo, note: NOTA_COMPRADOR });
+        avisados++;
+      }
+    }
+
+    if (yaAvisadoHito) continue;
 
     if (hito === "3d" && vendedor?.email) {
       const quien = String(vendedor.full_name ?? "").split(" ")[0] || "";
