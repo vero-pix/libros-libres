@@ -92,7 +92,7 @@ export function correoVendedorEtiqueta(d: DatosCorreoEtiqueta): { subject: strin
       <li>Empaca el libro en sobre acolchado o caja chica. Si son varios libros del mismo comprador, van juntos en un paquete.</li>
       <li>Descarga la etiqueta desde Mis Ventas, imprímela y pégala en el paquete. Si no tienes impresora, escribe en el paquete, bien claro, el nombre del comprador y el número de seguimiento.</li>
       ${d.retiro
-        ? `<li><strong>No lo lleves a sucursal.</strong> ${esc(courier)} pasa a buscarlo a tu dirección <strong>${esc(cuandoPasan(d.retiro))}</strong>. Solo déjalo empaquetado y con la etiqueta puesta, listo para entregárselo al chofer.</li>`
+        ? `<li><strong>${esc(courier)} va a pasar a buscarlo</strong> a tu dirección <strong>${esc(cuandoPasan(d.retiro))}</strong>. Shipit agenda ese retiro solo, aunque no lo hayas pedido. Si vas a estar, déjalo empaquetado y con la etiqueta puesta y se lo entregas al chofer.<br/><strong>Y si prefieres dejarlo tú en una sucursal ${esc(courier)}, hazlo nomás</strong>: la misma etiqueta sirve igual y no tienes que avisarle a nadie. Si el chofer llega y no hay paquete, el retiro se cierra solo.</li>`
         : `<li>Lleva el paquete a la <strong>sucursal ${esc(courier)} más cercana</strong>, idealmente hoy o mañana, y entrégalo en el mesón con la etiqueta puesta. No hay que agendar nada ni esperar a nadie.</li>`}
       <li>Pide el comprobante de recepción${d.retiro ? " al chofer" : ""} y guárdalo hasta que el comprador reciba el libro.</li>
       <li>No le pagas nada al courier: el envío ya lo pagó el comprador.</li>
@@ -100,7 +100,7 @@ export function correoVendedorEtiqueta(d: DatosCorreoEtiqueta): { subject: strin
     <p>El seguimiento empieza a moverse cuando ${d.retiro ? "el chofer entrega el paquete en el centro de distribución" : "la sucursal escanea el paquete"}; hasta entonces aparece sin novedad, es normal.</p>
     ${boton(`${SITE}/mis-ventas`, "Ver mi venta y descargar la etiqueta")}
     ${d.enRM && !d.retiro ? `<p>Si prefieres que pasen a buscar el paquete a tu casa, en Mis Ventas hay un botón "Pedir retiro a domicilio". Lo coordino yo con Shipit y te aviso la ventana.</p>` : ""}
-    ${d.retiro ? `<p>Si a esa hora no vas a estar, en Mis Ventas puedes reagendar el retiro o elegir "Lo dejo en sucursal" — así nadie viaja al vacío y la etiqueta sigue sirviendo igual.</p>` : ""}
+    ${d.retiro ? `<p>En Mis Ventas puedes reagendar el retiro o marcar "Lo dejo en sucursal", para que deje de aparecerte.</p>` : ""}
     <p>Si en la sucursal te ponen algún problema con la etiqueta, escríbele directo a Shipit por WhatsApp al +56 9 3230 2514 (de 9:00 a 18:00) con el número de seguimiento. Y a mí me cuentas después.</p>
     <p>Para hablar con tu comprador, en Mis Ventas hay un botón "Escribir" al lado de su nombre. Y revisa Mis Ventas cada uno o dos días, aunque no te llegue correo.</p>
   `);

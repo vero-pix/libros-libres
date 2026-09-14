@@ -114,7 +114,33 @@ export async function GET(request: Request) {
     }
   }
 
-  console.log(`[cron/cleanup-bots] ${dry ? "DRY " : ""}users_borrados=${deleted.length} subs_borrados=${subsDeleted.length} saltados=${skipped.length}`);
+  // Intentos de compra que nunca se pagaron.
+  //
+  // Cuando alguien llega al checkout se crean las órdenes ANTES de mandarlo a
+  // MercadoPago. Si abandona el pago, esas órdenes quedaban en `pending` para
+  // siempre y el vendedor las veía en Mis Ventas como "pendiente de pago",
+  // mezcladas con sus ventas de verdad. Libro de Ocasión tenía ocho así desde
+  // el 11-09 y preguntó si esa persona creía haber comprado (14-09-2026).
+  //
+  // Se cancelan a las 48 horas sin `mercadopago_payment_id`. El plazo es
+  // holgado a propósito: MercadoPago puede demorar en confirmar una
+  // transferencia bancaria, y cancelar una compra buena es mucho peor que
+  // dejar una mala un día más. Las de `payment_method = transfer` NO se tocan:
+  // esas esperan a que el vendedor confirme a mano, sin plazo.
+  let caducadas: string[] = [];
+  if (!dry) {
+    const { data: viejas } = await supabase
+      .from("orders")
+      .update({ status: "cancelled", updated_at: new Date().toISOString() })
+      .eq("status", "pending")
+      .eq("payment_method", "mercadopago")
+      .is("mercadopago_payment_id", null)
+      .lt("created_at", new Date(Date.now() - 48 * 3600_000).toISOString())
+      .select("id");
+    caducadas = (viejas ?? []).map((o: { id: string }) => o.id);
+  }
+
+  console.log(`[cron/cleanup-bots] ${dry ? "DRY " : ""}users_borrados=${deleted.length} subs_borrados=${subsDeleted.length} saltados=${skipped.length} ordenes_caducadas=${caducadas.length}`);
   return NextResponse.json({
     dry,
     deletedCount: deleted.length,
@@ -123,5 +149,6 @@ export async function GET(request: Request) {
     subsDeleted,
     skipped,
     reactivated,
+    ordenesCaducadas: caducadas.length,
   });
 }

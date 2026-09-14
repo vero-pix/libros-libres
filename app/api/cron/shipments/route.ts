@@ -529,11 +529,19 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
     try {
       const sPrev = await getShipitShipment(fila.shipit_id);
       const r = sPrev.error ? null : leerRetiroShipit(sPrev.last_pickup);
-      // Misma regla que en `pasoRetiro`: solo se le anuncia un retiro que él
-      // quería. Un retiro que Shipit agendó por su cuenta sobre un envío
-      // dropoff no puede cambiarle la instrucción del correo.
-      const loQueria = !!fila.pickup_requested_at || fila.dispatch_mode === "pickup";
-      if (r && loQueria && r.id !== fila.pickup_dismissed_id) {
+      // Se anuncia TODO retiro vigente, lo haya pedido el vendedor o no.
+      //
+      // Antes se exigía que él lo hubiera pedido, para que un retiro agendado
+      // por Shipit no le cambiara la instrucción. La intención era buena y el
+      // resultado fue el contrario: Shipit agenda un retiro automático ~3
+      // minutos después de CADA envío que creamos (verificado el 14-09-2026:
+      // envío 8930624 creado 00:32, pickup 916909 creado 00:35, y no se puede
+      // cancelar por API — `DELETE /v/pickups/{id}` responde 404). Así que el
+      // correo decía "llévalo a sucursal" mientras el chofer iba igual, y
+      // Libro de Ocasión tuvo que llamar una por una a las personas para que no
+      // fueran. Callar el retiro no lo evita: solo deja al vendedor sin saber.
+      const dismissed = r?.id != null && r.id === fila.pickup_dismissed_id;
+      if (r && !dismissed) {
         retiroAgendado = { date: r.date, window: r.window };
       }
     } catch {
