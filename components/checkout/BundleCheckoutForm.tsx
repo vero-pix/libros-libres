@@ -31,6 +31,8 @@ interface Props {
   buyerAddress: string;
   /** D1 revisada: false para vendedores fuera de la RM sin origen en Shipit. */
   courierDisponible?: boolean;
+  /** El vendedor habilitó cobrar por transferencia además de MercadoPago. */
+  aceptaTransferencia?: boolean;
   buyerName: string;
 }
 
@@ -58,7 +60,10 @@ export default function BundleCheckoutForm({
   buyerAddress,
   buyerName,
   courierDisponible = true,
+  aceptaTransferencia = false,
 }: Props) {
+  // Forma de pago. Solo se pregunta si el vendedor habilitó la transferencia.
+  const [formaPago, setFormaPago] = useState<"mercadopago" | "transfer">("mercadopago");
   // Dónde están los libros. Sin esto el comprador toma la opción gratis que viene
   // marcada por defecto sin saber que el vendedor está en otra región: el
   // 28-08-2026 se pagó un libro de Concepción para retirar "en persona" desde Ñuñoa.
@@ -298,6 +303,7 @@ export default function BundleCheckoutForm({
           shipping_courier: isCourier ? selectedQuote!.courier : undefined,
           buyer_address: isCourier ? address : deliveryMethod,
           buyer_commune: comuna || undefined,
+          payment_method: aceptaTransferencia ? formaPago : undefined,
         }),
       });
 
@@ -305,6 +311,12 @@ export default function BundleCheckoutForm({
 
       if (!res.ok) {
         setError(data.error ?? "Error al procesar el pedido");
+        return;
+      }
+
+      // Por transferencia no hay pasarela: la página del pedido muestra los datos.
+      if (data.redirect_to) {
+        window.location.href = data.redirect_to;
         return;
       }
 
@@ -627,6 +639,37 @@ export default function BundleCheckoutForm({
         </div>
       )}
 
+      {/* Forma de pago: solo si el vendedor habilitó la transferencia. */}
+      {sellerHasMP && aceptaTransferencia && (
+        <div className="space-y-2">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted">Cómo pagas</p>
+          {[
+            { v: "mercadopago" as const, t: "MercadoPago", d: "Tarjeta, débito o cuotas. Retenemos el pago hasta que confirmes que llegó." },
+            { v: "transfer" as const, t: "Transferencia", d: "Le transfieres directo al vendedor. Te mostramos los datos al confirmar el pedido." },
+          ].map((o) => (
+            <label
+              key={o.v}
+              className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                formaPago === o.v ? "border-brand-500 bg-brand-50/40" : "border-cream-dark hover:border-brand-200"
+              }`}
+            >
+              <input
+                type="radio"
+                name="forma-pago-bundle"
+                value={o.v}
+                checked={formaPago === o.v}
+                onChange={() => setFormaPago(o.v)}
+                className="mt-0.5 w-4 h-4 text-brand-600 border-cream-dark focus:ring-brand-500"
+              />
+              <span className="min-w-0">
+                <span className="block text-xs font-bold text-ink">{o.t}</span>
+                <span className="block text-[11px] text-ink-muted leading-relaxed">{o.d}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      )}
+
       {sellerHasMP && !loading && motivoBloqueo() && (
         <p className="text-xs text-amber-700 text-center">{motivoBloqueo()}</p>
       )}
@@ -644,14 +687,16 @@ export default function BundleCheckoutForm({
           >
             {loading
               ? "Procesando..."
-              : isCourier
-                ? selectedQuote
-                  ? `Pagar $${total.toLocaleString("es-CL")} con MercadoPago`
-                  : "Ingresa dirección para cotizar envío"
-                : `Pagar $${total.toLocaleString("es-CL")} con MercadoPago`}
+              : isCourier && !selectedQuote
+                ? "Ingresa dirección para cotizar envío"
+                : aceptaTransferencia && formaPago === "transfer"
+                  ? `Confirmar pedido por $${total.toLocaleString("es-CL")}`
+                  : `Pagar $${total.toLocaleString("es-CL")} con MercadoPago`}
           </button>
           <p className="text-xs text-gray-400 text-center">
-            Serás redirigido a MercadoPago para completar el pago de forma segura, en una sola transacción por los {listings.length} libros.
+            {aceptaTransferencia && formaPago === "transfer"
+              ? `Al confirmar te mostramos los datos para transferir. Los ${listings.length} libros quedan reservados a tu nombre.`
+              : `Serás redirigido a MercadoPago para completar el pago de forma segura, en una sola transacción por los ${listings.length} libros.`}
           </p>
         </>
       )}

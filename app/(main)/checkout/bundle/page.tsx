@@ -37,7 +37,7 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
   const { data: listings } = await supabase
     .from("listings")
     .select(
-      `*, book:books(*), seller:users(id, full_name, avatar_url, phone, mercadopago_user_id)`
+      `*, book:books(*), seller:users(id, full_name, avatar_url, phone, mercadopago_user_id, acepta_transferencia, datos_transferencia)`
     )
     .in("id", ids)
     .eq("status", "active");
@@ -116,6 +116,10 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
           buyerAddress={buyerProfile?.default_address ?? ""}
           buyerName={buyerProfile?.full_name ?? ""}
           courierDisponible={origen.courierDisponible}
+          aceptaTransferencia={
+            !!(typedListings[0]?.seller as any)?.acepta_transferencia &&
+            !!String((typedListings[0]?.seller as any)?.datos_transferencia ?? "").trim()
+          }
         />
       </main>
     </div>
