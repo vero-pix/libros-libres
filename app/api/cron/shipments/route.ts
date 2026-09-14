@@ -14,6 +14,7 @@ import {
   SHIPIT_REGION_RM,
 } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
+import { nombreCourier } from "@/lib/courier-tracking";
 import { foldAccents } from "@/lib/accentSearch";
 import { resolverOrigenEnvio } from "@/lib/shipping-quote";
 import { sendEmail } from "@/lib/email";
@@ -146,19 +147,31 @@ export async function GET(request: Request) {
   // pending a propósito, y eso no es un atasco.
   let stalled = 0;
   if (modo !== "dry-run") {
+    // OJO: mide sobre `created_at`, NO sobre `updated_at`. Con `updated_at`
+    // este barrido no detectaba NADA, porque el propio cron toca esa columna
+    // cada vez que consulta el envio: nunca envejecia. El Algebra de Baldor de
+    // Ana Gabriela estuvo 7 dias detenido, consultado 28 veces, sin que saltara
+    // una sola alarma. (14-09-2026)
+    //
+    // Y `notified` sale de esta lista: ahi la etiqueta ya esta lista y lo que
+    // falta es que una persona lleve el paquete. Eso no es un envio roto que
+    // haya que marcar `stalled` (la etiqueta sirve igual cuando la lleve) sino
+    // alguien a quien recordarle. Se trata aparte, en recordarDetenidos().
     const { data } = await admin
       .from("shipments")
       .update({ status: "stalled" })
-      .in("status", ["pending", "created", "label_ready", "notified"])
-      .lt("updated_at", new Date(Date.now() - 24 * 3600_000).toISOString())
+      .in("status", ["pending", "created", "label_ready"])
+      .lt("created_at", new Date(Date.now() - 24 * 3600_000).toISOString())
       .select("reference");
     stalled = data?.length ?? 0;
     for (const s of data ?? []) {
-      await sendGong(`🟠 Envío ${escapeHtml(s.reference)} lleva más de 24 h sin avanzar`);
+      await sendGong(`\u{1F7E0} Envio ${escapeHtml(s.reference)} lleva mas de 24 h sin avanzar`);
     }
   }
 
-  return NextResponse.json({ modo, procesados: resumen.length, stalled, resumen });
+  const recordados = modo === "dry-run" ? 0 : await recordarDetenidos(admin, modo);
+
+  return NextResponse.json({ modo, procesados: resumen.length, stalled, recordados, resumen });
 }
 
 /* ───────────────────────── pending → created ───────────────────────── */
@@ -846,4 +859,105 @@ function capitalizar(s: string): string {
     .split(" ")
     .map((w) => (w.length > 2 ? w.charAt(0).toUpperCase() + w.slice(1) : w))
     .join(" ");
+}
+
+/* ──────────────── recordatorio de envíos que no salen ──────────────── */
+
+/**
+ * Un envío en `notified` tiene la etiqueta lista y el tracking asignado: lo
+ * único que falta es que una persona lleve el paquete al courier. Eso no lo
+ * puede hacer el sistema, pero sí puede dejar de mirar en silencio.
+ *
+ * Hasta el 14-09-2026 no miraba nada: el Álgebra de Baldor que Ana Gabriela
+ * pagó el 1 de septiembre estuvo 7 días en este estado, consultado 28 veces
+ * cada cinco horas, sin que nadie —ni la vendedora, ni la compradora, ni
+ * Vero— recibiera un solo aviso. Eran 13 días de espera cuando se descubrió,
+ * y se descubrió mirando el panel de Shipit a mano.
+ *
+ * Dos avisos y no más, para que el recordatorio no se vuelva ruido:
+ *   · a los 3 días  → correo a quien vende, con el número de seguimiento.
+ *   · a los 7 días  → gong a Vero, porque ahí ya hay que intervenir a mano.
+ *
+ * Cada aviso se registra en `shipit_events` y se comprueba antes de mandarlo:
+ * este cron corre cada 5 minutos y sin esa guarda mandaría el mismo correo
+ * 288 veces al día.
+ */
+async function recordarDetenidos(admin: Admin, modo: ShipitMode): Promise<number> {
+  const { data: filas } = await admin
+    .from("shipments")
+    .select("id, reference, order_head_id, seller_id, tracking_number, courier, created_at")
+    .eq("status", "notified")
+    .lt("created_at", new Date(Date.now() - 3 * 24 * 3600_000).toISOString());
+
+  let avisados = 0;
+
+  for (const fila of filas ?? []) {
+    const dias = Math.floor((Date.now() - new Date(fila.created_at).getTime()) / 86_400_000);
+    const hito = dias >= 7 ? "7d" : "3d";
+    const nota = `recordatorio-${hito}`;
+
+    // ¿Ya se avisó de este hito? `kind: "gong"` sirve para los dos casos: lo
+    // que identifica al aviso es la nota, no el tipo.
+    const { data: yaAvisado } = await admin
+      .from("shipit_events")
+      .select("id")
+      .eq("shipment_id", fila.id)
+      .eq("note", nota)
+      .limit(1);
+    if (yaAvisado?.length) continue;
+
+    const [{ data: vendedor }, { data: head }] = await Promise.all([
+      admin.from("users").select("full_name, email").eq("id", fila.seller_id).maybeSingle(),
+      admin
+        .from("orders")
+        .select("created_at, listing:listings(book:books(title))")
+        .eq("id", fila.order_head_id)
+        .maybeSingle(),
+    ]);
+
+    const listingHead: any = Array.isArray(head?.listing) ? head?.listing[0] : head?.listing;
+    const bookHead: any = Array.isArray(listingHead?.book) ? listingHead.book[0] : listingHead?.book;
+    const libro: string = bookHead?.title ?? "el libro";
+    const diasDesdeLaCompra = head?.created_at
+      ? Math.floor((Date.now() - new Date(head.created_at).getTime()) / 86_400_000)
+      : dias;
+    const courier = nombreCourier(fila.courier);
+
+    if (hito === "3d" && vendedor?.email) {
+      const quien = String(vendedor.full_name ?? "").split(" ")[0] || "";
+      await sendEmail({
+        to: vendedor.email,
+        from: REMITENTE_VERO,
+        replyTo: REPLY_TO_VERO,
+        subject: `Todavía no sale: ${libro}`,
+        html: `
+          <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1a1a1a;line-height:1.6">
+            <p>Hola ${escapeHtml(quien)}!</p>
+            <p>El envío de <strong>${escapeHtml(libro)}</strong> todavía no llega a ${escapeHtml(courier)}. La etiqueta está lista desde hace ${dias} días y el seguimiento (<strong>${escapeHtml(fila.tracking_number ?? "—")}</strong>) sigue sin moverse.</p>
+            <p>Quien lo compró pagó hace ${diasDesdeLaCompra} días y está esperando.</p>
+            <p>Solo falta dejar el paquete en una sucursal ${escapeHtml(courier)} con la etiqueta pegada. La descargas desde <a href="https://tuslibros.cl/mis-ventas">Mis Ventas</a>. No tienes que pagar nada: el envío ya está pagado.</p>
+            <p>Si hay algún problema —el libro ya no está, la etiqueta no imprime, lo que sea— respóndeme este correo y lo resolvemos. Prefiero saberlo a que siga esperando.</p>
+            <p style="margin-top:28px">Vero<br/><span style="color:#777">tuslibros.cl</span></p>
+          </div>`,
+      }).catch(() => {});
+    }
+
+    if (hito === "7d") {
+      await sendGong(
+        `\u{1F534} ${escapeHtml(fila.reference)} lleva ${dias} días sin salir\n` +
+          `${escapeHtml(libro)} · ${escapeHtml(String(vendedor?.full_name ?? "—"))}\n` +
+          `Quien compró lleva ${diasDesdeLaCompra} días esperando. Hay que intervenir.`
+      ).catch(() => {});
+    }
+
+    await registrarEventoShipit(admin, {
+      shipmentId: fila.id,
+      kind: "gong",
+      mode: modo,
+      note: nota,
+    });
+    avisados++;
+  }
+
+  return avisados;
 }
