@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import ContactForm from "@/components/ui/ContactForm";
+import { otrosProyectos, TODOS_LOS_PROYECTOS_URL } from "@/lib/otrosProyectos";
 
 export const metadata = {
   title: "Sobre tuslibros.cl — marketplace chileno de libros usados",
@@ -116,6 +117,35 @@ export default function SobreNosotrosPage() {
               <p className="text-right text-sm italic text-ink">— Vero</p>
             </div>
           </div>
+        </section>
+
+        {/* Otros proyectos (15-09-2026). Lista en lib/otrosProyectos.ts */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
+            Lo que hago cuando no estoy acá
+          </h2>
+          <p className="text-ink-muted mb-6">¿Qué hace una economista armando un marketplace de libros? Lo mismo que en todo lo demás: probar ideas hasta ver cuál funciona.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {otrosProyectos.map((p) => (
+              <a
+                key={p.url}
+                href={p.url}
+                target="_blank"
+                rel="noopener"
+                className="group bg-white rounded-xl shadow-sm border border-cream-dark p-5 hover:-translate-y-0.5 hover:shadow-md hover:border-brand-200 transition-all"
+              >
+                <h3 className="font-bold text-ink group-hover:text-brand-600 transition-colors">
+                  {p.titulo} <span aria-hidden className="inline-block transition-transform group-hover:translate-x-0.5">↗</span>
+                </h3>
+                <p className="text-ink-muted text-sm mt-1 leading-relaxed">{p.bajada}</p>
+              </a>
+            ))}
+          </div>
+          <p className="mt-4 text-sm text-center">
+            <a href={TODOS_LOS_PROYECTOS_URL} target="_blank" rel="noopener" className="text-brand-600 hover:text-brand-700 underline">
+              Ver todos en economics.cl
+            </a>
+          </p>
         </section>
 
         {/* Values */}

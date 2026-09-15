@@ -1,6 +1,7 @@
 import Link from "next/link";
 import NewsletterForm from "./NewsletterForm";
 import { waSoporte } from "@/lib/soporte";
+import { otrosProyectos, TODOS_LOS_PROYECTOS_URL } from "@/lib/otrosProyectos";
 
 export default function Footer() {
   return (
@@ -103,6 +104,27 @@ export default function Footer() {
               <li><Link href="/search" className="hover:text-coral transition-colors">Buscar</Link></li>
             </ul>
           </div>
+        </div>
+      </div>
+
+      {/* Otros proyectos de Vero (15-09-2026). Lista en lib/otrosProyectos.ts */}
+      <div className="bg-cream border-t border-line">
+        <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col md:flex-row md:items-baseline gap-3 md:gap-6 text-sm">
+          <h4 className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink font-semibold shrink-0">Otros proyectos de Vero</h4>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-ink-muted">
+            {otrosProyectos.map((p) => (
+              <li key={p.url}>
+                <a href={p.url} target="_blank" rel="noopener" title={p.bajada} className="hover:text-coral transition-colors">
+                  {p.titulo}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href={TODOS_LOS_PROYECTOS_URL} target="_blank" rel="noopener" className="font-semibold text-coral hover:text-coral-deep transition-colors">
+                Ver todos →
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
 
