@@ -8,6 +8,9 @@ import EntregadoButton from "@/components/sales/EntregadoButton";
 import PedirRetiroButton from "@/components/sales/PedirRetiroButton";
 import ConfirmarTransferencia from "@/components/sales/ConfirmarTransferencia";
 import RetiroFallidoAcciones from "@/components/sales/RetiroFallidoAcciones";
+import DespachoCoordinadoForm from "@/components/sales/DespachoCoordinadoForm";
+import { nombreCourier } from "@/lib/courier-tracking";
+import { ESTADO_COORDINADO_DESPACHADO, ESTADO_COORDINADO_PENDIENTE } from "@/lib/shipping/coordinado";
 import { findCommune, SHIPIT_REGION_RM } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
 
@@ -299,8 +302,11 @@ export default async function MisVentasPage() {
                       const shipment = order.bundle_id ? shipmentByBundle.get(order.bundle_id) : undefined;
                       // Con fila en `shipments` la alarma vieja no aplica: el
                       // worker es el que dice en qué está el envío.
+                      const esCoordinado =
+                        order.shipping_status === ESTADO_COORDINADO_PENDIENTE ||
+                        order.shipping_status === ESTADO_COORDINADO_DESPACHADO;
                       const labelStuck =
-                        isPaid && !isInPerson && !order.shipping_label_url && ageHours > 1 && !shipment;
+                        isPaid && !isInPerson && !esCoordinado && !order.shipping_label_url && ageHours > 1 && !shipment;
                       const supportMailto = labelStuck
                         ? `mailto:soporte@shipit.cl?subject=${encodeURIComponent(
                             `Ayuda con envío — orden ${order.id.slice(0, 8)}`
@@ -385,6 +391,27 @@ export default async function MisVentasPage() {
                                   pregunta="¿Ya se lo entregaste?"
                                   compact
                                 />
+                              )}
+                            </div>
+                          ) : isPaid && esCoordinado ? (
+                            <div className="space-y-1.5">
+                              <div className="text-xs font-medium text-ink">📦 Despacho coordinado</div>
+                              {order.shipping_status === ESTADO_COORDINADO_PENDIENTE ? (
+                                <>
+                                  <span className="text-[11px] text-ink-muted block">
+                                    Lo despachas tú{Number(order.shipping_cost) > 0
+                                      ? `: los $${Number(order.shipping_cost).toLocaleString("es-CL")} del envío te llegaron con la venta`
+                                      : ""}. Llévalo a cualquier sucursal y registra el seguimiento.
+                                  </span>
+                                  <DespachoCoordinadoForm bundleId={order.bundle_id ?? order.id} />
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-[11px] text-ink-muted block">{nombreCourier(order.courier)}</span>
+                                  {order.tracking_code && (
+                                    <span className="text-[11px] font-mono text-ink-muted block">{order.tracking_code}</span>
+                                  )}
+                                </>
                               )}
                             </div>
                           ) : isPaid ? (

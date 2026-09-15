@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { avisarOrigenFaltante, estadoOrigenVendedor } from "@/lib/shipit-origen";
+import { obtenerTarifasCoordinado } from "@/lib/shipping/coordinado";
 import BundleCheckoutForm from "@/components/checkout/BundleCheckoutForm";
 import type { ListingWithBook } from "@/types";
 
@@ -61,8 +62,15 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
 
   // D1 revisada: fuera de la RM sin origen en Shipit no se ofrece courier.
   const admin = createServiceRoleClient();
-  const origen = await estadoOrigenVendedor(admin, listings[0].seller_id);
-  if (!origen.courierDisponible) {
+  const [origen, tarifasCoordinado] = await Promise.all([
+    estadoOrigenVendedor(admin, listings[0].seller_id),
+    obtenerTarifasCoordinado(admin),
+  ]);
+  // Ver checkout/[id]: con despacho coordinado, el origen en Shipit deja de ser requisito.
+  const coordinadoDisponible = !!tarifasCoordinado && !!(listings[0] as any).seller?.mercadopago_user_id;
+  const courierDisponible =
+    (origen.courierDisponible && !tarifasCoordinado?.apagar_shipit) || coordinadoDisponible;
+  if (!origen.courierDisponible && !coordinadoDisponible) {
     avisarOrigenFaltante(admin, listings[0].seller_id, "recibió un intento de compra con courier").catch(() => {});
   }
 
@@ -115,7 +123,7 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
           listings={typedListings}
           buyerAddress={buyerProfile?.default_address ?? ""}
           buyerName={buyerProfile?.full_name ?? ""}
-          courierDisponible={origen.courierDisponible}
+          courierDisponible={courierDisponible}
           aceptaTransferencia={
             !!(typedListings[0]?.seller as any)?.acepta_transferencia &&
             !!String((typedListings[0]?.seller as any)?.datos_transferencia ?? "").trim()

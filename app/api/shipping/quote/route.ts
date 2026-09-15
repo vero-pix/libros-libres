@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { DROPOFF_COURIERS, estimateBookPackageSize, getShipitQuotes } from "@/lib/shipit";
+import {
+  DROPOFF_COURIERS,
+  estimateBookPackageSize,
+  getShipitQuotes,
+  type ShipitQuoteResult,
+  type ShippingQuote,
+} from "@/lib/shipit";
+import {
+  COURIER_COORDINADO,
+  SERVICE_CODE_COORDINADO,
+  SERVICIO_COORDINADO,
+  obtenerTarifasCoordinado,
+  precioCoordinado,
+} from "@/lib/shipping/coordinado";
 import { extractCommune } from "@/lib/chilexpress";
 import {
   aplicarColchon,
@@ -61,12 +74,12 @@ export async function POST(req: NextRequest) {
   // `authenticated` (no por anon), y esta ruta exige sesión.
   const { data: listing } = await supabase
     .from("listings")
-    .select("address, seller_id, seller:users(default_address, shipit_origin_commune)")
+    .select("address, seller_id, seller:users(default_address, shipit_origin_commune, mercadopago_user_id)")
     .eq("id", listing_id)
     .single();
 
   const seller = (Array.isArray(listing?.seller) ? listing?.seller[0] : listing?.seller) as
-    | { default_address: string | null; shipit_origin_commune: string | null }
+    | { default_address: string | null; shipit_origin_commune: string | null; mercadopago_user_id: string | null }
     | null
     | undefined;
 
@@ -105,21 +118,46 @@ export async function POST(req: NextRequest) {
   const dispatchMode: "dropoff" | "pickup" = "dropoff";
   const allowedCouriers = dispatchMode === "dropoff" ? DROPOFF_COURIERS : undefined;
 
-  const [{ quotes: cotizadas, unavailable, reason }, bufferPct] = await Promise.all([
-    getShipitQuotes(
-      originCommune,
-      destCommune,
-      sizes.weight,
-      sizes.height,
-      sizes.width,
-      sizes.length,
-      undefined,
-      { allowedCouriers }
-    ),
+  // Despacho coordinado por el vendedor (lib/shipping/coordinado.ts). Con
+  // `apagar_shipit` en la configuración, Shipit ni siquiera se consulta.
+  const tarifasCoordinado = await obtenerTarifasCoordinado(supabase);
+  const sinShipit = tarifasCoordinado?.apagar_shipit === true;
+
+  const shipitApagado: ShipitQuoteResult = { quotes: [], unavailable: true, reason: "Shipit apagado" };
+  const [{ quotes: cotizadas, unavailable: shipitSinServicio, reason }, bufferPct] = await Promise.all([
+    sinShipit
+      ? Promise.resolve(shipitApagado)
+      : getShipitQuotes(
+          originCommune,
+          destCommune,
+          sizes.weight,
+          sizes.height,
+          sizes.width,
+          sizes.length,
+          undefined,
+          { allowedCouriers }
+        ),
     obtenerColchonCotizacionPct(),
   ]);
 
-  const quotes = cotizadas.map((q) => ({ ...q, price: aplicarColchon(q.price, bufferPct) }));
+  const quotes: ShippingQuote[] = cotizadas.map((q) => ({ ...q, price: aplicarColchon(q.price, bufferPct) }));
+
+  // Solo con MercadoPago conectado: el flete coordinado le llega al vendedor
+  // dentro del split. Sin split iría a la cuenta de la plataforma y alguien
+  // tendría que devolverlo a mano, que es justo lo que se quiere evitar.
+  const precioCoord = seller?.mercadopago_user_id
+    ? precioCoordinado(tarifasCoordinado, originCommune, destCommune)
+    : null;
+  if (precioCoord && tarifasCoordinado) {
+    quotes.push({
+      service: SERVICIO_COORDINADO,
+      serviceCode: SERVICE_CODE_COORDINADO,
+      deliveryTime: tarifasCoordinado.dias,
+      price: precioCoord,
+      courier: COURIER_COORDINADO,
+    });
+  }
+  const unavailable = quotes.length === 0 && shipitSinServicio;
 
   // Una línea por cotización: es lo que permite verificar contra el panel de
   // Shipit (criterio de aceptación del PROMPT 0.1) y ver cuánto cuesta el

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { avisarOrigenFaltante, estadoOrigenVendedor } from "@/lib/shipit-origen";
+import { obtenerTarifasCoordinado } from "@/lib/shipping/coordinado";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import type { ListingWithBook } from "@/types";
 
@@ -50,8 +51,16 @@ export default async function CheckoutPage({ params }: Props) {
   // El intento de compra es la señal para que Vero cree el origen (gong,
   // máximo uno al día por vendedor).
   const admin = createServiceRoleClient();
-  const origen = await estadoOrigenVendedor(admin, typedListing.seller_id);
-  if (!origen.courierDisponible) {
+  const [origen, tarifasCoordinado] = await Promise.all([
+    estadoOrigenVendedor(admin, typedListing.seller_id),
+    obtenerTarifasCoordinado(admin),
+  ]);
+  // Con despacho coordinado activo, un vendedor con MercadoPago puede vender
+  // por courier aunque no tenga origen en Shipit (lib/shipping/coordinado.ts).
+  const coordinadoDisponible = !!tarifasCoordinado && !!(typedListing.seller as any)?.mercadopago_user_id;
+  const courierDisponible =
+    (origen.courierDisponible && !tarifasCoordinado?.apagar_shipit) || coordinadoDisponible;
+  if (!origen.courierDisponible && !coordinadoDisponible) {
     avisarOrigenFaltante(admin, typedListing.seller_id, "recibió un intento de compra con courier").catch(() => {});
   }
 
@@ -69,7 +78,7 @@ export default async function CheckoutPage({ params }: Props) {
           buyerAddress={buyerProfile?.default_address ?? ""}
           buyerName={buyerProfile?.full_name ?? ""}
           buyerPhone={buyerProfile?.phone ?? ""}
-          courierDisponible={origen.courierDisponible}
+          courierDisponible={courierDisponible}
           // La opción aparece solo si además cargó los datos: ofrecer
           // transferir y después no tener a qué cuenta es peor que no ofrecerla.
           aceptaTransferencia={

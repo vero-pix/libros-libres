@@ -24,6 +24,7 @@ const STATUS_LABELS: Record<string, string> = {
  * tiene que enterarse por la misma pantalla y no por el silencio.
  */
 const ENVIO_TEXTO: Record<string, string> = {
+  coordinado_pendiente: "Este pedido lo despacha el vendedor por su cuenta. Apenas lo deje en el courier te llega el número de seguimiento por correo.",
   pickup_scheduled: "El courier va a buscar tu paquete donde el vendedor. Cuando lo tenga, el seguimiento empieza a moverse.",
   pickup_failed: "El retiro no se concretó y el vendedor está decidiendo cómo despacharlo. Te aviso apenas el paquete salga; no tienes que hacer nada.",
   canceled: "Esta compra quedó cancelada porque el vendedor no pudo despacharla. Te devuelvo la plata por MercadoPago.",

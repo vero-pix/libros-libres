@@ -10,6 +10,7 @@ import { VERO_INBOX } from "@/lib/veroInbox";
 import { WHATSAPP_SOPORTE_LEGIBLE } from "@/lib/soporte";
 import { correoCompradorCompraConfirmada } from "@/lib/order-emails";
 import { correoVendedorLibrosQueSeSuman } from "@/lib/shipit-emails";
+import { COURIER_COORDINADO, SERVICIO_COORDINADO } from "@/lib/shipping/coordinado";
 
 /**
  * Origen del envío para Shipit. La dirección del listing es más precisa, pero
@@ -348,7 +349,9 @@ export async function POST(req: NextRequest) {
           // Ver lib/envio-pendiente.ts (caso Don Luis, 09-09-2026).
           if (headOrder.merged_into_bundle_id) {
             await avisarLibrosQueSeSuman(supabase, externalRef, headOrder.merged_into_bundle_id);
-          } else if (headOrder.buyer_address && !isInPerson) {
+          } else if (headOrder.buyer_address && !isInPerson && headOrder.courier !== COURIER_COORDINADO) {
+            // Despacho coordinado: lo despacha el vendedor por su cuenta, no hay
+            // envío que crear en Shipit (lib/shipping/coordinado.ts).
             await encolarEnvio(supabase, {
               bundleId: externalRef,
               orderHeadId: headOrder.id,
@@ -415,7 +418,7 @@ export async function POST(req: NextRequest) {
                 itemsRows,
                 itemCount,
                 bundleTotal,
-                deliveryMethod,
+                deliveryMethod: deliveryMethod === COURIER_COORDINADO ? SERVICIO_COORDINADO.toLowerCase() : deliveryMethod,
                 isCourier,
                 trackingCode,
                 siteUrl,
@@ -431,7 +434,26 @@ export async function POST(req: NextRequest) {
 
             if (sellerEmail) {
 
-              const courierBlock = isCourier
+              // Despacho coordinado: el vendedor despacha por su cuenta con la
+              // plata del flete que ya le llegó en el split (lib/shipping/coordinado.ts).
+              const esCoordinado = deliveryMethod === COURIER_COORDINADO;
+              const fleteCoordinado = Number(head.shipping_cost ?? 0);
+              const coordinadoBlock = `
+                    <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:16px;margin:20px 0">
+                      <p style="margin:0 0 8px 0;font-weight:600;color:#92400e">📦 Despacho coordinado — lo despachas tú</p>
+                      <p style="margin:0;font-size:14px;color:#78350f">El comprador pagó <strong>$${fleteCoordinado.toLocaleString("es-CL")}</strong> de envío, y esa plata te llegó junto con la venta en MercadoPago.</p>
+                    </div>
+                    <h3 style="color:#1a1a1a;font-size:16px">Cómo despachar</h3>
+                    <ol style="padding-left:20px;color:#444;font-size:14px;line-height:1.7">
+                      <li>Empaca <strong>${itemCount > 1 ? `los ${itemCount} libros juntos` : "el libro"}</strong> en una caja o sobre resistente.</li>
+                      <li>Llévalo a la sucursal del courier que prefieras (Starken, Chilexpress, Blue Express o Correos de Chile) y paga el envío a domicilio para <strong>${buyerName}</strong>, ${buyerAddress}.</li>
+                      <li>En <a href="${siteUrl}/mis-ventas" style="color:#1a1a1a">Mis Ventas</a> aprieta <strong>Ya lo despaché</strong> y escribe el courier y el número de seguimiento. Con eso le aviso al comprador.</li>
+                    </ol>
+                    <p style="font-size:14px;color:#444;line-height:1.6">Si tienes cualquier duda, avísame al <strong>${WHATSAPP_SOPORTE_LEGIBLE}</strong>.</p>
+                  `;
+              const courierBlock = esCoordinado
+                ? coordinadoBlock
+                : isCourier
                 ? `
                     <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:16px;margin:20px 0">
                       <p style="margin:0 0 8px 0;font-weight:600;color:#92400e">📦 Envío por courier — un solo paquete con los ${itemCount} libros</p>
@@ -561,7 +583,7 @@ export async function POST(req: NextRequest) {
               shipitOrder.bundle_id ?? shipitOrder.id,
               shipitOrder.merged_into_bundle_id
             );
-          } else if (shipitOrder?.buyer_address && !isInPerson) {
+          } else if (shipitOrder?.buyer_address && !isInPerson && shipitOrder?.courier !== COURIER_COORDINADO) {
             await encolarEnvio(supabase, {
               bundleId: shipitOrder.bundle_id ?? shipitOrder.id,
               orderHeadId: shipitOrder.id,

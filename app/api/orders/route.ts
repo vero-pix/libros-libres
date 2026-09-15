@@ -14,6 +14,14 @@ import { sendGong, escapeHtml } from "@/lib/notifications";
 import crypto from "crypto";
 import { calcularEnvioPromo } from "@/lib/shipping-promo";
 import { buscarEnvioAbierto } from "@/lib/envio-pendiente";
+import { resolverOrigenEnvio } from "@/lib/shipping-quote";
+import {
+  COURIER_COORDINADO,
+  ESTADO_COORDINADO_PENDIENTE,
+  SERVICIO_COORDINADO,
+  obtenerTarifasCoordinado,
+  precioCoordinado,
+} from "@/lib/shipping/coordinado";
 
 /**
  * POST /api/orders
@@ -125,7 +133,7 @@ export async function POST(req: NextRequest) {
   const { data: listings, error: listingsError } = await supabase
     .from("listings")
     .select(
-      `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_user_id, on_vacation, acepta_transferencia, datos_transferencia)`
+      `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_user_id, on_vacation, acepta_transferencia, datos_transferencia, default_address, shipit_origin_commune)`
     )
     .in("id", listingIds)
     .eq("status", "active");
@@ -259,10 +267,33 @@ export async function POST(req: NextRequest) {
     shipping_service === "Entrega en persona" ||
     shipping_service === "Punto de retiro";
 
+  // Despacho coordinado por el vendedor (lib/shipping/coordinado.ts). El precio
+  // lo recalcula el servidor con la tabla de tarifas: el que manda el navegador
+  // solo se acepta si coincide. Requiere que la plata le llegue al vendedor
+  // (split de MP o transferencia), porque es él quien paga el courier.
+  const esCoordinado = !isInPerson && shipping_courier === COURIER_COORDINADO;
+  if (esCoordinado) {
+    const origenCoord = resolverOrigenEnvio({
+      listingAddress: (listings[0] as any).address,
+      sellerDefaultAddress: (seller as any).default_address,
+      shipitOriginCommune: (seller as any).shipit_origin_commune,
+    });
+    const precioServidor =
+      useSplit || porTransferencia
+        ? precioCoordinado(await obtenerTarifasCoordinado(supabase), origenCoord?.commune, buyer_commune)
+        : null;
+    if (!precioServidor || precioServidor !== Math.round(Number(shipping_cost_override))) {
+      return NextResponse.json(
+        { error: "La tarifa de despacho cambió. Vuelve a calcular el envío." },
+        { status: 409 }
+      );
+    }
+  }
+
   // Piso de flete: si es despacho por courier, nadie puede mandar un costo
   // menor al fallback. Sin esto, `shipping_cost_override: 0` en un curl daba
   // envío gratis en cualquier compra, de cualquier vendedor.
-  if (!isInPerson && fleteCotizado < SHIPPING_COSTS.standard) {
+  if (!isInPerson && !esCoordinado && fleteCotizado < SHIPPING_COSTS.standard) {
     return NextResponse.json(
       { error: "El costo de despacho no es válido. Vuelve a cotizar el envío." },
       { status: 400 }
@@ -274,7 +305,8 @@ export async function POST(req: NextRequest) {
   // Se resuelve acá y no en el navegador por la misma razón que la promo — un
   // curl no puede reclamar envío gratis inventando un bundle previo.
   // Ver lib/envio-pendiente.ts (caso Don Luis, 09-09-2026).
-  const envioAbierto = isInPerson
+  // El despacho coordinado no vive en `shipments`: no hay paquete abierto al que sumarse.
+  const envioAbierto = isInPerson || esCoordinado
     ? null
     : await buscarEnvioAbierto(
         // Cliente de servicio: `shipments` no es legible por el comprador y
@@ -297,7 +329,9 @@ export async function POST(req: NextRequest) {
     sellerId,
     totalBookPrice,
     fleteCotizado,
-    esCourier: !isInPerson,
+    // El despacho coordinado lo paga el vendedor con el flete que recibe: no
+    // hay subsidio de la promo que aplicar.
+    esCourier: !isInPerson && !esCoordinado,
   });
   // El bulto tiene tope: si lo que se está comprando no cabe, este pedido
   // viaja por su cuenta y paga su flete. Ver MAX_LIBROS_POR_PAQUETE.
@@ -344,6 +378,8 @@ export async function POST(req: NextRequest) {
       status: "pending",
       shipping_speed,
       courier,
+      // Lo lee Mis Ventas para mostrar "Ya lo despaché" en vez de la etiqueta.
+      shipping_status: esCoordinado ? ESTADO_COORDINADO_PENDIENTE : null,
       buyer_address: buyer_address ?? null,
       // Se guarda también cuando el retiro es en persona: es el único dato de
       // dónde está el comprador, porque ahí `buyer_address` dice "in_person".
@@ -423,7 +459,9 @@ export async function POST(req: NextRequest) {
       })),
       {
         id: `shipping-${bundleId}`,
-        title: `Envío ${shipping_speed === "express" ? "rápido" : "estándar"} (${courier})`,
+        title: esCoordinado
+          ? SERVICIO_COORDINADO
+          : `Envío ${shipping_speed === "express" ? "rápido" : "estándar"} (${courier})`,
         quantity: 1,
         unit_price: Math.round(shippingCost),
         currency_id: "CLP",
@@ -495,7 +533,9 @@ export async function POST(req: NextRequest) {
       let sellerToken = sellerCreds.access_token;
       const splitBody = {
         items,
-        marketplace_fee: commission + shippingCost,
+        // En despacho coordinado el flete NO se retiene: le llega al vendedor,
+        // que es quien paga el courier (lib/shipping/coordinado.ts).
+        marketplace_fee: commission + (esCoordinado ? 0 : shippingCost),
         marketplace: collectorId,
         back_urls: backUrls,
         auto_return: "approved" as const,

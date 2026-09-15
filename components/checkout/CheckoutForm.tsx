@@ -46,7 +46,7 @@ const DELIVERY_OPTIONS = [
   { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis — coordina lugar y hora con el vendedor", icon: "🤝", enabled: true },
   // Punto de retiro: reactivar cuando haya convenios con lugares específicos
   // { value: "pickup_point" as const, label: "Punto de retiro", desc: "Retira en un punto convenido", icon: "📍", enabled: true },
-  { value: "courier" as const, label: "Envío courier", desc: "Recibe en tu domicilio vía Shipit", icon: "📦", enabled: true },
+  { value: "courier" as const, label: "Envío courier", desc: "Recibe en tu domicilio por courier", icon: "📦", enabled: true },
 ];
 
 export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPhone, courierDisponible = true, aceptaTransferencia = false }: Props) {

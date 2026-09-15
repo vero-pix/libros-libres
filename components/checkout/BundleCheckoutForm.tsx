@@ -47,7 +47,7 @@ const DELIVERY_OPTIONS = [
   {
     value: "courier" as const,
     label: "Envío courier",
-    desc: "Recibe en tu domicilio vía Shipit (un solo paquete con todos los libros)",
+    desc: "Recibe en tu domicilio por courier (un solo paquete con todos los libros)",
     icon: "📦",
     enabled: true,
   },
