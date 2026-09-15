@@ -40,21 +40,27 @@ export async function buildCategoryTree(
     .select("slug, name, parent_slug, sort_order")
     .order("sort_order", { ascending: true });
 
-  // 2. Traemos las categorías/subcategorías de TODOS los listings activos
-  const { data: activeListings } = await supabase
-    .from("listings")
-    .select("book:books(category, subcategory)")
-    .eq("status", "active");
-
+  // 2. Traemos las categorías/subcategorías de TODOS los listings activos.
+  // Paginado: Supabase corta en 1000 filas, y sin esto las categorías sumaban
+  // 994 con 3.938 libros activos (sept 2026).
   const catCount = new Map<string, number>();
   const subCount = new Map<string, number>();
+  const PAGE = 1000;
 
-  if (activeListings) {
-    for (const l of activeListings) {
+  for (let from = 0; ; from += PAGE) {
+    const { data: page } = await supabase
+      .from("listings")
+      .select("id, book:books(category, subcategory)")
+      .eq("status", "active")
+      .order("id", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (!page?.length) break;
+    for (const l of page) {
       const b = (l as any).book;
       if (b?.category) catCount.set(b.category, (catCount.get(b.category) ?? 0) + 1);
       if (b?.subcategory) subCount.set(b.subcategory, (subCount.get(b.subcategory) ?? 0) + 1);
     }
+    if (page.length < PAGE) break;
   }
 
   return (dbCategories ?? [])

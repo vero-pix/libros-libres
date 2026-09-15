@@ -777,7 +777,7 @@ export default async function HomePage({ searchParams }: Props) {
         />
 
         <div className="flex gap-10">
-          <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalCount} availableTags={availableTags} caluga={<CalugaPieza pieza={piezaDestacada} />} />
+          <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalActiveCount} availableTags={availableTags} caluga={<CalugaPieza pieza={piezaDestacada} />} />
 
           <div className="flex-1 min-w-0">
             {!hasFilters && recentRowListings.length > 0 && (
