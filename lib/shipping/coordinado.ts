@@ -35,12 +35,18 @@ export const COURIERS_COORDINADO = [
   { value: "otro", label: "Otro" },
 ] as const;
 
-export type ZonaEnvio = "misma_region" | "otra_region" | "extremos";
+export type ZonaEnvio = "santiago" | "misma_region" | "otra_region" | "extremos";
 
 export interface TarifasCoordinado {
   activo: boolean;
   /** Deja de cotizar con Shipit: solo queda el despacho coordinado. */
   apagar_shipit?: boolean;
+  /**
+   * Origen y destino en la Región Metropolitana. Va aparte porque es la zona
+   * más barata: con Shipit, Santiago→Ñuñoa costaba $4.475 y Talca→Curicó
+   * (misma región, otra ciudad) $7.165 (14-09-2026). Si falta, se usa misma_region.
+   */
+  santiago: number;
   misma_region: number;
   otra_region: number;
   extremos: number;
@@ -68,6 +74,7 @@ export function zonaEnvio(comunaOrigen: string | null | undefined, comunaDestino
   const rO = getRegionForComuna(origen);
   const rD = getRegionForComuna(destino);
   if (!rO || !rD) return null;
+  if (rO === "Metropolitana" && rD === "Metropolitana") return "santiago";
   if (rO === rD) return "misma_region";
   if (REGIONES_EXTREMAS.has(rO) || REGIONES_EXTREMAS.has(rD)) return "extremos";
   return "otra_region";
@@ -85,6 +92,7 @@ export function leerTarifasCoordinado(valor: unknown): TarifasCoordinado | null 
   return {
     activo: true,
     apagar_shipit: v.apagar_shipit === true,
+    santiago: precio(v.santiago) ?? misma,
     misma_region: misma,
     otra_region: otra,
     extremos,
