@@ -6,6 +6,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { sortListingsForDisplay } from "@/lib/sortListings";
+import { paginar } from "@/lib/supabase/paginar";
 import type { ListingWithBook } from "@/types";
 import { CIUDADES, COORDS, ORDEN } from "../ciudades";
 
@@ -66,26 +67,54 @@ async function getListings(slug: string, label: string): Promise<ListingWithBook
   const { lat, lng, radiusKm } = geo;
 
   const supabase = createPublicClient();
+  const SELECT = `*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`;
   // Bounding box ~radiusKm: 1° lat ≈ 111km, 1° lng ≈ 111km·cos(lat)
   const dLat = radiusKm / 111;
   const dLng = radiusKm / (111 * Math.cos((lat * Math.PI) / 180));
 
-  const { data } = await supabase
-    .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
-    .eq("status", "active")
-    .not("latitude", "is", null)
-    .not("longitude", "is", null)
-    .gte("latitude", lat - dLat)
-    .lte("latitude", lat + dLat)
-    .gte("longitude", lng - dLng)
-    .lte("longitude", lng + dLng)
-    .order("created_at", { ascending: false })
-    // El bounding box de Santiago ya devuelve más de 500 candidatos; con 200 se
-    // descartaban fichas de la comuna exacta antes siquiera de medir distancia.
-    .limit(600);
+  // 1. La comuna exacta, aparte. Antes todo salía de los 600 más nuevos del
+  //    bounding box, y en Providencia eso dejaba fuera los libros más antiguos de
+  //    la comuna: se veían 9 de los 201 de un mismo vendedor (15-09-2026).
+  //    La comuna se busca como componente de la dirección (", Providencia," o
+  //    "Providencia," al inicio) y no como texto suelto: "Santiago" a secas calza
+  //    con "Región Metropolitana de Santiago" en 3.195 fichas.
+  //    Tope de 1.000: Santiago comuna tiene ~1.900 y solo se muestran 48.
+  const [delaComuna, { data: delRadio }] = await Promise.all([
+    paginar<ListingWithBook>(
+      (desde, hasta) =>
+        supabase
+          .from("listings")
+          .select(SELECT)
+          .eq("status", "active")
+          .or(`address.ilike."%, ${label},%",address.ilike."${label},%"`)
+          .order("id", { ascending: true })
+          .range(desde, hasta) as unknown as PromiseLike<{ data: ListingWithBook[] | null; error: { message: string } | null }>,
+      { maxFilas: 1000 }
+    ).catch((e) => {
+      console.error(`[libros-usados/${slug}] comuna exacta:`, e);
+      return [] as ListingWithBook[];
+    }),
+    // 2. Alrededores: el radio, para completar las comunas con poco catálogo propio.
+    supabase
+      .from("listings")
+      .select(SELECT)
+      .eq("status", "active")
+      .not("latitude", "is", null)
+      .not("longitude", "is", null)
+      .gte("latitude", lat - dLat)
+      .lte("latitude", lat + dLat)
+      .gte("longitude", lng - dLng)
+      .lte("longitude", lng + dLng)
+      .order("created_at", { ascending: false })
+      // El bounding box de Santiago ya devuelve más de 500 candidatos; con 200 se
+      // descartaban fichas de la comuna exacta antes siquiera de medir distancia.
+      .limit(600),
+  ]);
 
-  const near = ((data as unknown as ListingWithBook[]) ?? []).filter((l) => {
+  const vistos = new Set<string>();
+  const near = [...delaComuna, ...((delRadio as unknown as ListingWithBook[]) ?? [])].filter((l) => {
+    if (vistos.has(l.id)) return false;
+    vistos.add(l.id);
     const lLat = (l as any).latitude;
     const lLng = (l as any).longitude;
     return lLat != null && lLng != null && haversineKm(lat, lng, lLat, lLng) <= radiusKm;

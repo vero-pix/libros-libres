@@ -95,6 +95,8 @@ export default function Footer() {
               <li><Link href="/comprar-libros-usados" className="hover:text-coral transition-colors">Comprar libros usados</Link></li>
               <li><Link href="/libros-usados-baratos" className="hover:text-coral transition-colors">Libros usados baratos</Link></li>
               <li><Link href="/vender" className="hover:text-coral transition-colors">Vende tu libro</Link></li>
+              {/* Providencia: 590 búsquedas/mes y posición 12 en GSC (12-09-2026), y ningún link interno le llegaba. */}
+              <li><Link href="/libros-usados/providencia" className="hover:text-coral transition-colors">Libros usados en Providencia</Link></li>
               <li><Link href="/mapa" className="hover:text-coral transition-colors">Mapa de librerías</Link></li>
               <li><Link href="/tiendas" className="hover:text-coral transition-colors">Tiendas y librerías</Link></li>
               <li><Link href="/novedades" className="hover:text-coral transition-colors">Novedades</Link></li>
