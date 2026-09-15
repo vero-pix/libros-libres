@@ -190,6 +190,16 @@ export default async function MisVentasPage() {
   // sí se muestran en la tabla, porque si no, el vendedor no tendría dónde
   // confirmarlas.
   const paidOrders = orders.filter((o: any) => o.status !== "pending" && o.status !== "cancelled");
+
+  // Un pedido `pending` de MercadoPago es un intento de compra que no llegó a
+  // pagarse: la orden se crea ANTES de ir a MP. Mostrarlo como "pendiente de
+  // pago" hacía creer al vendedor que tenía una venta (Libro de Ocasión, dos
+  // veces el mismo libro de la misma compradora, 14-09-2026). No se muestra;
+  // si se paga, aparece solo. Las de transferencia sí, porque el vendedor
+  // tiene que confirmarlas. El cron cleanup-bots las cancela a las 48 h.
+  const ordenesVisibles = orders.filter(
+    (o: any) => !(o.status === "pending" && o.payment_method !== "transfer")
+  );
   const totalVentas = paidOrders.reduce((sum: number, o: any) => sum + Number(o.book_price), 0);
   const totalComisiones = commissions.reduce((sum, c) => sum + Number(c.commission_amount), 0);
   const gananciaVentas = totalVentas - commissions.filter(c => c.transaction_type === "sale").reduce((sum, c) => sum + Number(c.commission_amount), 0);
@@ -259,9 +269,9 @@ export default async function MisVentasPage() {
         {/* Recent orders */}
         <section className="mb-10">
           <h2 className="font-display text-lg font-bold text-ink mb-4">
-            Órdenes de venta ({orders.length})
+            Órdenes de venta ({ordenesVisibles.length})
           </h2>
-          {orders.length > 0 ? (
+          {ordenesVisibles.length > 0 ? (
             <div className="bg-white rounded-xl border border-cream-dark/30 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm table-fixed">
@@ -282,7 +292,7 @@ export default async function MisVentasPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-cream-dark/10">
-                    {orders.map((order: any) => {
+                    {ordenesVisibles.map((order: any) => {
                       const isInPerson = order.courier === "Entrega en persona" || order.courier === "Punto de retiro" || !order.courier;
                       const isPaid = order.status === "paid" || order.status === "shipped" || order.status === "delivered";
                       const ageHours = (Date.now() - new Date(order.created_at).getTime()) / 36e5;
