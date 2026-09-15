@@ -10,6 +10,8 @@ type SortMode = "distance" | "author" | "genre";
 
 interface Props {
   listings: ListingWithBook[];
+  /** true mientras el mapa todavía no entrega los libros */
+  loading?: boolean;
   userLocation: { lat: number; lng: number } | null;
   onListingClick: (listing: ListingWithBook) => void;
 }
@@ -29,7 +31,7 @@ function haversineKm(
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-export default function MapSidebar({ listings, userLocation, onListingClick }: Props) {
+export default function MapSidebar({ listings, loading = false, userLocation, onListingClick }: Props) {
   const [sortMode, setSortMode] = useState<SortMode>("distance");
   const [filterGenre, setFilterGenre] = useState<string>("");
 
@@ -109,14 +111,32 @@ export default function MapSidebar({ listings, userLocation, onListingClick }: P
           </select>
         </div>
 
-        <p className="text-xs text-gray-400">
-          {sorted.length} {sorted.length === 1 ? "libro" : "libros"}
+        <p className="text-xs text-gray-400" aria-live="polite">
+          {loading
+            ? "Buscando libros en el mapa…"
+            : `${sorted.length} ${sorted.length === 1 ? "libro" : "libros"}`}
         </p>
       </div>
 
       {/* Listing list */}
       <div className="flex-1 overflow-y-auto">
-        {sorted.length === 0 ? (
+        {loading ? (
+          <ul className="divide-y divide-gray-100" aria-hidden>
+            {Array.from({ length: 7 }).map((_, i) => (
+              <li
+                key={i}
+                className="flex gap-3 p-3 opacity-0 motion-safe:animate-fade-up motion-reduce:opacity-100"
+                style={{ animationDelay: `${i * 70}ms` }}
+              >
+                <div className="w-10 aspect-[148/225] rounded-[2px_3px_3px_2px] bg-cream-dark/40 flex-shrink-0" />
+                <div className="flex-1 space-y-2 py-1">
+                  <div className="h-3 bg-cream-warm rounded animate-pulse" />
+                  <div className="h-2.5 w-2/3 bg-cream-warm/70 rounded animate-pulse" />
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : sorted.length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-8">
             No hay libros con estos filtros.
           </p>

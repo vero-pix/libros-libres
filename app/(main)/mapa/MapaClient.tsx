@@ -13,11 +13,15 @@ const BookMap = dynamic(() => import("@/components/map/BookMap"), {
 
 export default function MapaClient() {
   const [listings, setListings] = useState<ListingWithBook[]>([]);
+  // Hasta que el mapa entrega los libros, la barra lateral no debe decir
+  // "0 libros · No hay libros con estos filtros": eso se veía en cada carga.
+  const [loaded, setLoaded] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [flyTo, setFlyTo] = useState<ListingWithBook | null>(null);
 
   const handleListingsLoaded = useCallback((data: ListingWithBook[]) => {
     setListings(data);
+    setLoaded(true);
   }, []);
 
   const handleUserLocation = useCallback((loc: { lat: number; lng: number }) => {
@@ -33,6 +37,7 @@ export default function MapaClient() {
       <div className="hidden md:block">
         <MapSidebar
           listings={listings}
+          loading={!loaded}
           userLocation={userLocation}
           onListingClick={handleListingClick}
         />

@@ -237,8 +237,13 @@ export default function BookMap({ onListingsLoaded, onUserLocation, flyToListing
       return;
     }
     async function fetchListings() {
-      const res = await fetch("/api/listings");
-      if (!res.ok) return;
+      // Si falla, igual se avisa (con lista vacía): la barra del mapa muestra un
+      // esqueleto hasta recibir este aviso y no puede quedarse cargando para siempre.
+      const res = await fetch("/api/listings").catch(() => null);
+      if (!res?.ok) {
+        onListingsLoaded?.([]);
+        return;
+      }
       const data: ListingWithBook[] = await res.json();
       setListings(data);
       listingsRef.current = data;

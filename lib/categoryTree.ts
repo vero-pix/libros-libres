@@ -93,6 +93,8 @@ export async function buildCategoryTree(
  */
 export const getCachedCategoryTree = unstable_cache(
   async (): Promise<CategoryNode[]> => buildCategoryTree(createPublicClient()),
-  ["category-tree-v1"],
+  // v2 (15-09-2026): la caché de datos de Vercel sobrevive al deploy y seguía
+  // sirviendo los conteos cortados en 1000 filas.
+  ["category-tree-v2"],
   { revalidate: 300 }
 );
