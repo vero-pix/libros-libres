@@ -33,7 +33,9 @@ export async function GET(req: NextRequest) {
 
   const { data: reviews, error } = await supabase
     .from("reviews")
-    .select("id, listing_id, reviewer_id, rating, comment, created_at, reviewer:users(id, full_name)")
+    // Con el FK explícito: desde que reviews tiene seller_id (08-09-2026) hay dos
+    // relaciones con users, y sin él PostgREST devolvía 500 en cada ficha.
+    .select("id, listing_id, reviewer_id, rating, comment, created_at, reviewer:users!reviews_reviewer_id_fkey(id, full_name)")
     .eq("listing_id", listingId)
     .order("created_at", { ascending: false });
 
