@@ -219,9 +219,9 @@ export default async function LibrosAntiguosPage() {
               <div className="bg-cream p-6 rounded-xl border border-brand-100">
                 <h3 className="font-display font-bold text-lg text-ink mb-2">Para el que compra</h3>
                 <p className="text-sm text-ink-muted mb-4">
-                  Con MercadoPago el dinero no se libera al vendedor hasta que recibes el libro y
-                  confirmas que la edición y el estado corresponden a lo publicado. Y si prefieres
-                  verlo antes, coordinas retiro en mano.
+                  Antes de comprar puedes preguntarle al vendedor por la edición y el estado, y
+                  si prefieres verlo con tus propios ojos, coordinas retiro en mano. Si algo no
+                  corresponde a lo publicado, me escribes y lo resolvemos.
                 </p>
                 <Link href="/solicitudes" className="text-sm text-brand-600 font-semibold hover:text-brand-700 transition-colors">
                   ¿Buscas una edición concreta? Pídela →

@@ -30,7 +30,7 @@ const steps = [
     n: 4,
     icon: "✅",
     title: "Guarda el comprobante",
-    body: "En la sucursal te dan un comprobante con el número de seguimiento. Guárdalo hasta que el comprador confirme que recibió el libro: es tu respaldo si algo se pierde en el camino.",
+    body: "Si en la sucursal te dan comprobante, guárdalo hasta que el comprador reciba el libro. Si no te lo dan, no pasa nada: cuando escanean la etiqueta, el envío queda registrado con su número de seguimiento.",
   },
 ];
 

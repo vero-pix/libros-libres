@@ -224,7 +224,7 @@ export default async function LibrosUsadosCiudadPage({ params }: { params: { ciu
                   </div>
                   <h3 className="font-display text-lg font-bold text-ink mb-2">Pago seguro</h3>
                   <p className="text-sm text-ink-muted leading-relaxed">
-                    Pagas vía MercadoPago. El dinero se libera al vendedor solo cuando confirmas que recibiste el libro en buen estado.
+                    Pagas vía MercadoPago. Te llega el seguimiento por correo y, si algo sale mal, lo resolvemos contigo.
                   </p>
                 </div>
               </div>

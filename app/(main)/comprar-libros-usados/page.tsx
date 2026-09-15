@@ -218,7 +218,7 @@ export default async function ComprarLibrosUsadosPage() {
               {[
                 { n: "1", title: "Búscalo", desc: "Por título, autor, género o cercanía en el mapa. Mirar no requiere cuenta." },
                 { n: "2", title: "Compara el precio", desc: "Cada ficha muestra el precio nuevo en Buscalibre y MercadoLibre. Decides con datos." },
-                { n: "3", title: "Paga protegido", desc: "Con MercadoPago. Tu plata queda retenida hasta que confirmes que recibiste el libro." },
+                { n: "3", title: "Paga protegido", desc: "Con MercadoPago. Te llega el seguimiento por correo y, si algo sale mal, lo resolvemos contigo." },
                 { n: "4", title: "Retira o recibe", desc: "Retiro en mano gratis, o despacho por courier a todo Chile. Tú eliges." },
               ].map((s) => (
                 <div key={s.n}>

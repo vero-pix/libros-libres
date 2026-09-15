@@ -46,7 +46,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿El pago se le hace al vendedor en la entrega?",
-        a: "No. Para proteger tu dinero, todas las transacciones se hacen antes vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro y está en buen estado.",
+        a: "No. Todas las compras se pagan antes, por MercadoPago, dentro de la plataforma. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
       {
         q: "¿En qué comunas de Santiago hay más libros disponibles?",
@@ -71,7 +71,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Tengo que pagar en efectivo al juntarnos?",
-        a: "No. Todas las transacciones se hacen antes vía MercadoPago. El dinero queda retenido y solo se le transfiere al vendedor cuando confirmas que recibiste el libro en buen estado.",
+        a: "No. Todas las transacciones se hacen antes vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
       {
         q: "Vivo en Providencia pero no tengo tiempo de juntarme, ¿qué hago?",
@@ -96,7 +96,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo sé que el pago es seguro?",
-        a: "Pagas vía MercadoPago dentro de la plataforma. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro y está correcto.",
+        a: "Pagas vía MercadoPago dentro de la plataforma. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -117,7 +117,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿El pago es seguro?",
-        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
+        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -138,7 +138,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
+        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -159,7 +159,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿El pago es seguro?",
-        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro.",
+        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -180,7 +180,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
+        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -201,7 +201,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿El pago es seguro?",
-        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro.",
+        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -222,7 +222,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
+        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -243,7 +243,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿El pago es seguro?",
-        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro.",
+        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -264,7 +264,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
+        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -285,7 +285,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
+        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -306,7 +306,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
+        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -327,7 +327,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. El dinero queda retenido y solo se libera al vendedor cuando confirmas que recibiste el libro en buen estado.",
+        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },

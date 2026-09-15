@@ -823,7 +823,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
               <div className="space-y-2 pb-1">
                 <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted">Cómo pagas</p>
                 {[
-                  { v: "mercadopago" as const, t: "MercadoPago", d: "Tarjeta, débito o cuotas. Retenemos el pago hasta que confirmes que llegó." },
+                  { v: "mercadopago" as const, t: "MercadoPago", d: "Tarjeta, débito o cuotas. Te llega el seguimiento por correo." },
                   { v: "transfer" as const, t: "Transferencia", d: "Le transfieres directo al vendedor. Te mostramos los datos al confirmar el pedido." },
                 ].map((o) => (
                   <label
@@ -923,8 +923,11 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
             <div className="flex gap-3">
               <span className="text-xl">🛡️</span>
               <div>
-                <p className="text-xs font-bold text-amber-900 uppercase tracking-widest mb-1">Compra protegida</p>
-                <p className="text-[11px] text-amber-800 leading-relaxed">Si pagas por la plataforma, retenemos el dinero hasta que confirmes la recepción. Si hay algún problema, te devolvemos el 100%.</p>
+                {/* Antes decía "retenemos el dinero hasta que confirmes la recepción":
+                    falso, con el split de MercadoPago el vendedor cobra al instante
+                    (auditoría 14-09-2026). */}
+                <p className="text-xs font-bold text-amber-900 uppercase tracking-widest mb-1">Te acompaño en la compra</p>
+                <p className="text-[11px] text-amber-800 leading-relaxed">Pagas con MercadoPago y te llega el seguimiento por correo. Si hay algún problema con tu compra, escríbeme y lo resolvemos.</p>
               </div>
             </div>
           </div>

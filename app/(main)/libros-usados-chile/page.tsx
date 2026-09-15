@@ -193,7 +193,7 @@ export default async function LibrosUsadosChilePage() {
             <div className="grid md:grid-cols-4 gap-6">
               {[
                 { n: "1", title: "Búscalo en el mapa o catálogo", desc: "Filtra por autor, título, género, precio o cercanía." },
-                { n: "2", title: "Paga con MercadoPago", desc: "Tu plata queda protegida hasta que confirmes que recibiste el libro." },
+                { n: "2", title: "Paga con MercadoPago", desc: "Tarjeta, débito o cuotas. Te llega el seguimiento por correo." },
                 { n: "3", title: "Retira en mano o pide despacho", desc: "Courier Starken, Chilexpress, Blue Express o 99 Minutos — a todo Chile." },
                 { n: "4", title: "Confirma la entrega", desc: "El vendedor recibe automáticamente su pago cuando el libro llega." },
               ].map((s) => (

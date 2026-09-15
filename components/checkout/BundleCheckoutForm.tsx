@@ -654,7 +654,7 @@ export default function BundleCheckoutForm({
         <div className="space-y-2">
           <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted">Cómo pagas</p>
           {[
-            { v: "mercadopago" as const, t: "MercadoPago", d: "Tarjeta, débito o cuotas. Retenemos el pago hasta que confirmes que llegó." },
+            { v: "mercadopago" as const, t: "MercadoPago", d: "Tarjeta, débito o cuotas. Te llega el seguimiento por correo." },
             { v: "transfer" as const, t: "Transferencia", d: "Le transfieres directo al vendedor. Te mostramos los datos al confirmar el pedido." },
           ].map((o) => (
             <label
