@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
+import { paginar } from "@/lib/supabase/paginar";
 
 export const getAvailableTags = unstable_cache(
   async (): Promise<string[]> => {
@@ -43,24 +44,27 @@ export async function buildCategoryTree(
   // 2. Traemos las categorías/subcategorías de TODOS los listings activos.
   // Paginado: Supabase corta en 1000 filas, y sin esto las categorías sumaban
   // 994 con 3.938 libros activos (sept 2026).
-  const catCount = new Map<string, number>();
-  const subCount = new Map<string, number>();
-  const PAGE = 1000;
-
-  for (let from = 0; ; from += PAGE) {
-    const { data: page } = await supabase
+  // paginar() lanza si Supabase falla; esto corre dentro del render del home,
+  // así que un tropiezo pasajero deja la barra en cero en vez de botar la portada.
+  const activeListings = await paginar<any>((desde, hasta) =>
+    supabase
       .from("listings")
       .select("id, book:books(category, subcategory)")
       .eq("status", "active")
       .order("id", { ascending: true })
-      .range(from, from + PAGE - 1);
-    if (!page?.length) break;
-    for (const l of page) {
-      const b = (l as any).book;
-      if (b?.category) catCount.set(b.category, (catCount.get(b.category) ?? 0) + 1);
-      if (b?.subcategory) subCount.set(b.subcategory, (subCount.get(b.subcategory) ?? 0) + 1);
-    }
-    if (page.length < PAGE) break;
+      .range(desde, hasta)
+  ).catch((e) => {
+    console.error("[categoryTree] no se pudieron contar los listings:", e);
+    return [] as any[];
+  });
+
+  const catCount = new Map<string, number>();
+  const subCount = new Map<string, number>();
+
+  for (const l of activeListings) {
+    const b = l.book;
+    if (b?.category) catCount.set(b.category, (catCount.get(b.category) ?? 0) + 1);
+    if (b?.subcategory) subCount.set(b.subcategory, (subCount.get(b.subcategory) ?? 0) + 1);
   }
 
   return (dbCategories ?? [])
