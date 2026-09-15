@@ -1,4 +1,4 @@
-# tuslibros.cl — Guía para Claude
+# tuslibros.cl — Guía para Codex
 
 Marketplace de libros usados en Chile. Producto en producción con ventas reales.
 
@@ -11,7 +11,23 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 - **Shipit** para etiquetas de courier
 - Deploy en **Vercel**
 
-> Nota: el global CLAUDE.md menciona Next 16 / Tailwind v4 / AI SDK v6 — eso aplica a otros proyectos de Vero. Este repo sigue en **Next 14 y Tailwind 3** (el resto está en `package.json`).
+> Nota: el global AGENTS.md menciona Next 16 / Tailwind v4 / AI SDK v6 — eso aplica a otros proyectos de Vero. Este repo sigue en **Next 14 y Tailwind 3** (el resto está en `package.json`).
+
+## Comandos
+
+- `npm run dev` — local en :3000
+- `npm run build` — build de producción (verificar antes de decir "listo")
+- `npm run lint`
+- `npm run bulk-upload` — script de carga masiva
+
+## Estructura relevante
+
+- `app/(main)/` — páginas públicas (home, search, listings, checkout, perfil, mis-pedidos, mis-ventas)
+- `app/api/` — endpoints (orders, cart, webhooks/mercadopago, listings)
+- `components/` — UI por dominio (checkout, listings, sales, home, ui)
+- `lib/` — clientes Supabase (server/browser), mercadopago, shipit, notifications, genreNormalizer
+- `scripts/` — carga masiva, enriquecimiento, utilidades de migración
+- `supabase/migrations/` — SQL versionado (aplicar manual en SQL Editor si no hay CLI)
 
 ## Convenciones del código
 
@@ -35,7 +51,7 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 - **Voz en 1ª persona** (yo/nosotros/Vero) en copy orientado al cliente. No marca impersonal.
 - **Humor confesional** en marketing, no frases de agencia.
 - **Probar siempre en local primero** (rama + `npm run dev`) antes de push a main.
-- **`git push` a main: autorizado, sin preguntar** (27-07-2026). El **deploy a producción sí** requiere autorización explícita de Vero. Esto reemplaza la regla del CLAUDE.md global, que sigue vigente para los otros proyectos.
+- **`git push` a main: autorizado, sin preguntar** (27-07-2026). El **deploy a producción sí** requiere autorización explícita de Vero. Esto reemplaza la regla del AGENTS.md global, que sigue vigente para los otros proyectos.
 - **Nunca commitear con `--no-verify`** ni saltarse hooks.
 - Preferir editar archivos existentes sobre crear nuevos.
 - **El botón sale de `components/ui/Button.tsx`** (`Button` / `ButtonLink`), no se escribe inline. Antes existía en ~15 variantes con cuatro radios y cuatro alturas.
@@ -55,7 +71,7 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 
 ## Memoria y contexto histórico
 
-La memoria persistente del asistente vive en `~/.claude/projects/-Users-veronicavelasquez-dev-libros-libres/memory/` (consolidada el 28 may 2026 desde las carpetas previas de iCloud/Desktop; las antiguas quedaron de respaldo). `MEMORY.md` es el índice — arranca por ahí para entender sesiones previas, feedback acumulado y pendientes. No duplicar en este archivo lo que ya está en memoria: este CLAUDE.md es para convenciones estables; la memoria es para contexto evolutivo.
+La memoria persistente del asistente vive en `~/.Codex/projects/-Users-veronicavelasquez-dev-libros-libres/memory/` (consolidada el 28 may 2026 desde las carpetas previas de iCloud/Desktop; las antiguas quedaron de respaldo). `MEMORY.md` es el índice — arranca por ahí para entender sesiones previas, feedback acumulado y pendientes. No duplicar en este archivo lo que ya está en memoria: este AGENTS.md es para convenciones estables; la memoria es para contexto evolutivo.
 
 ## Dónde está cada cosa (fuentes canónicas)
 
@@ -86,12 +102,12 @@ Otras carpetas:
 
 ## Trabajo desde sesiones de chat
 
-Vero trabaja desde chats (Cowork/Claude) que producen prompts, documentos y piezas. **Ese material debe quedar en el repo, no en la carpeta temporal de la sesión** — si no, se pierde y el próximo agente parte a ciegas.
+Vero trabaja desde chats (Cowork/Codex) que producen prompts, documentos y piezas. **Ese material debe quedar en el repo, no en la carpeta temporal de la sesión** — si no, se pierde y el próximo agente parte a ciegas.
 
 Convención:
 
 - Documentos de estrategia y estado → `docs_desde_claude/` — **carpeta PRIVADA**
-- Prompts ejecutables para Claude Code → `docs/prompts/`
+- Prompts ejecutables para Codex → `docs/prompts/`
 - Piezas y material de apoyo → `docs/`
 - Todo lo que se vuelva fuente de verdad → agregarlo a la tabla de arriba
 
