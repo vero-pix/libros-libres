@@ -63,7 +63,7 @@ const NEWSLETTER_TEMPLATES = [
   </p>
 
   <p style="font-size: 16px; color: #333; line-height: 1.7;">
-    Cuando alguien lo compre, el pago llega protegido por MercadoPago y el courier de Shipit retira el libro en tu casa. Sin vueltas.
+    Cuando alguien lo compre, el pago llega por MercadoPago junto con la plata del envío, y tú lo despachas por el courier que prefieras. Sin vueltas.
   </p>
 
   <div style="text-align: center; margin: 32px 0;">

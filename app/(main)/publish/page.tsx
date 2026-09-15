@@ -230,9 +230,9 @@ export default async function PublishPage({ searchParams }: Props) {
             </div>
             <div className="bg-cream-warm border border-cream-dark/40 rounded-xl p-4">
               <p className="text-xl mb-1">📦</p>
-              <p className="font-semibold text-ink text-sm mb-1">Despacho con Shipit</p>
+              <p className="font-semibold text-ink text-sm mb-1">Envío por courier</p>
               <p className="text-xs text-ink-muted leading-relaxed">
-                Imprimes la etiqueta que te genera el sistema y el courier de Shipit pasa a buscar el libro a tu casa. No tienes que ir a ninguna oficina.
+                Con MercadoPago conectado, el comprador paga el envío y esa plata te llega con la venta. Lo dejas en la sucursal que prefieras y registras el seguimiento.
               </p>
             </div>
           </div>

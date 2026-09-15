@@ -48,6 +48,10 @@
     {
       "path": "/api/cron/seller-stats",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/despacho-coordinado",
+      "schedule": "0 13 * * *"
     }
   ]
 }

@@ -154,7 +154,7 @@ export default async function LibrosUsadosChilePage() {
                 </h3>
                 <p className="text-sm text-ink-muted leading-relaxed">
                   MercadoPago divide el pago automáticamente entre vendedor y
-                  plataforma. Shipit genera la etiqueta. Sin conversaciones infinitas
+                  plataforma. El envío llega pagado y con seguimiento. Sin conversaciones infinitas
                   de WhatsApp.
                 </p>
               </div>
@@ -220,7 +220,7 @@ export default async function LibrosUsadosChilePage() {
             <ul className="space-y-2 text-sm text-cream/90 mb-6">
               <li>→ Comisión 8% por venta. Sin mensualidades.</li>
               <li>→ Tú fijas el precio. Nosotros no intervenimos en tus publicaciones.</li>
-              <li>→ Shipit retira el libro en tu casa cuando alguien compra.</li>
+              <li>→ El comprador paga el envío y esa plata te llega con la venta.</li>
             </ul>
             <Link
               href="/publish"

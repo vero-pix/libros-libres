@@ -151,8 +151,7 @@ export default function AyudaVenderPage() {
             <ul className="space-y-3">
               <li>
                 <strong className="text-ink">En la sucursal no reciben el paquete o hay un problema con la
-                etiqueta:</strong> escribe a Shipit (WhatsApp o correo, en Mis Ventas) con tu número de seguimiento, y
-                avísanos.
+                etiqueta:</strong> escríbenos por WhatsApp con tu número de seguimiento y lo resolvemos.
               </li>
               <li>
                 <strong className="text-ink">El comprador no responde para coordinar la entrega en persona:</strong>{" "}

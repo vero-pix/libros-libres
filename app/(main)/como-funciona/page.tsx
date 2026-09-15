@@ -34,7 +34,7 @@ const benefits = [
   { icon: "✅", text: "Publicar siempre es gratis" },
   { icon: "✅", text: "Cero comisión si coordinas por WhatsApp" },
   { icon: "✅", text: "Pago seguro con MercadoPago (opcional)" },
-  { icon: "✅", text: "Despacho a todo Chile con Shipit" },
+  { icon: "✅", text: "Despacho a todo Chile por courier" },
   { icon: "✅", text: "Devolución en 7 días en compras con MercadoPago" },
 ];
 

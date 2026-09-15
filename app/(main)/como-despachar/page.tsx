@@ -16,15 +16,15 @@ const steps = [
   },
   {
     n: 2,
-    icon: "🖨️",
-    title: "Descarga la etiqueta y pégala",
-    body: 'La etiqueta aparece en Mis Ventas con el botón "Descargar etiqueta" y también te llega por correo apenas el courier la emite. Imprímela en hoja tamaño carta y pégala en la parte más plana del paquete con cinta transparente. ¿Sin impresora? En cualquier librería o cyber te la imprimen desde el celular.',
+    icon: "🏪",
+    title: "Llévalo a la sucursal que prefieras",
+    body: "Starken, Chilexpress, Blue Express o Correos de Chile: el que te quede más cómodo. Paga el envío a domicilio con los datos del comprador que aparecen en Mis Ventas. La plata del envío ya te llegó: el comprador la pagó en el checkout y MercadoPago te la depositó junto con el precio del libro.",
   },
   {
     n: 3,
-    icon: "🏪",
-    title: "Déjalo en una sucursal del courier",
-    body: "Lleva el paquete con la etiqueta pegada a una sucursal del courier indicado en la etiqueta: Starken, Bluexpress o Chilexpress. No pagas nada al courier: el envío lo pagó el comprador en el checkout y se cobra a la cuenta de tuslibros.cl. Si prefieres que pasen a buscarlo a tu casa y estás en la Región Metropolitana, usa el botón \"Pedir retiro a domicilio\" en Mis Ventas.",
+    icon: "🔢",
+    title: "Registra el número de seguimiento",
+    body: 'En Mis Ventas aprieta "Ya lo despaché", elige el courier y escribe el número de seguimiento que te dieron. Con eso le aviso al comprador por correo y puede seguir su paquete.',
   },
   {
     n: 4,
@@ -36,14 +36,14 @@ const steps = [
 
 const contactos = [
   {
-    quien: "Shipit (la etiqueta y el courier)",
-    detalle: "WhatsApp +56 9 3230 2514, lunes a viernes de 9:00 a 18:00, o soporte@shipit.cl. Ten a mano el número de seguimiento.",
-    href: "https://wa.me/56932302514",
+    quien: "Vero (tuslibros.cl)",
+    detalle: `WhatsApp ${WHATSAPP_SOPORTE_LEGIBLE}. Para cualquier cosa: un paquete que no reciben, un comprador que no responde, un libro que ya vendiste por fuera.`,
+    href: waSoporte(),
   },
   {
-    quien: "Vero (tuslibros.cl)",
-    detalle: `WhatsApp ${WHATSAPP_SOPORTE_LEGIBLE}. Para cualquier cosa: una etiqueta que no llega, un comprador que no responde, un libro que ya vendiste por fuera.`,
-    href: waSoporte(),
+    quien: "Shipit (solo ventas antiguas con etiqueta)",
+    detalle: "Si tu venta es anterior al 15 de septiembre y trae etiqueta de Shipit: WhatsApp +56 9 3230 2514, lunes a viernes de 9:00 a 18:00, o soporte@shipit.cl.",
+    href: "https://wa.me/56932302514",
   },
 ];
 
@@ -73,14 +73,17 @@ export default function ComoDespacharPage() {
           <div className="flex items-start gap-3 mb-2">
             <span className="text-2xl">🏪</span>
             <h2 className="font-display text-xl sm:text-2xl font-bold text-ink">
-              Dejas el paquete en una sucursal del courier
+              Despachas tú, con el envío ya pagado
             </h2>
           </div>
           <p className="text-sm sm:text-base text-ink-muted leading-relaxed">
-            Cuando se confirma una venta te llega la etiqueta. La descargas desde Mis Ventas o el correo, la
-            pegas en el paquete y lo dejas en una sucursal del courier indicado: Starken, Bluexpress o
-            Chilexpress. No pagas nada al courier. Si prefieres que pasen a buscarlo a tu casa y estás en la
-            Región Metropolitana, usa el botón <strong>&ldquo;Pedir retiro a domicilio&rdquo;</strong> en Mis Ventas.
+            Cuando te compran con envío, el comprador paga una tarifa fija según la zona y esa plata te llega
+            con la venta. Llevas el paquete a la sucursal que prefieras, pagas el envío ahí y registras el
+            número de seguimiento en Mis Ventas con el botón <strong>&ldquo;Ya lo despaché&rdquo;</strong>.
+          </p>
+          <p className="text-xs text-ink-muted leading-relaxed mt-3">
+            ¿Tu venta es anterior al 15 de septiembre y trae etiqueta para descargar? Esa sigue igual: pega la
+            etiqueta y déjala en la sucursal del courier indicado, sin pagar nada.
           </p>
         </section>
 
