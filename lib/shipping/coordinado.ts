@@ -15,6 +15,7 @@
  */
 import { getRegionForComuna, COMUNAS_CHILE } from "@/lib/comunas";
 import { foldAccents } from "@/lib/accentSearch";
+import { ahoraEnChile } from "@/lib/fiestasPatrias";
 
 /** Valor de `orders.courier` mientras el vendedor no despacha. */
 export const COURIER_COORDINADO = "coordinado";
@@ -89,9 +90,14 @@ export function leerTarifasCoordinado(valor: unknown): TarifasCoordinado | null 
   const otra = precio(v.otra_region);
   const extremos = precio(v.extremos);
   if (v.activo !== true || !misma || !otra || !extremos) return null;
+  // `apagar_shipit_desde` ("AAAA-MM-DDTHH:mm", hora de Chile) programa el apagado
+  // sin que nadie tenga que tocar la base a esa hora. Se compara como string,
+  // igual que `since` en lib/siteConfigVigente.ts.
+  const desde = typeof v.apagar_shipit_desde === "string" ? v.apagar_shipit_desde : null;
+  const apagadoProgramado = !!desde && ahoraEnChile() >= desde;
   return {
     activo: true,
-    apagar_shipit: v.apagar_shipit === true,
+    apagar_shipit: v.apagar_shipit === true || apagadoProgramado,
     santiago: precio(v.santiago) ?? misma,
     misma_region: misma,
     otra_region: otra,
