@@ -22,10 +22,13 @@ export default function Footer() {
               <p className="text-[13px] text-ink-muted leading-relaxed">Personas y librerías de viejo con pago protegido por MercadoPago y reseñas. Sabes a quién le compras.</p>
             </Link>
             */}
-            <Link href="/categoria/academico-escolar" className="group p-6 sm:p-7 hover:bg-cream-warm/50 transition-colors">
-              <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-coral font-semibold">De vuelta a clases</p>
-              <h4 className="font-display text-xl text-ink mt-3 mb-2 tracking-[-0.01em]">Libros escolares</h4>
-              <p className="text-[13px] text-ink-muted leading-relaxed">Listas del MINEDUC, textos de estudio y lectura complementaria — usados, a precio honesto.</p>
+            {/* Historia reemplazó a "Libros escolares" (15-09-2026): escolar tenía 9 libros
+                y 1 venta de $4.800 en 60 días; historia es la subcategoría que más vende
+                ($144.000 en 9 ventas, ticket de $16.000) y tiene 495 libros activos. */}
+            <Link href="/categoria/no-ficcion-historia" className="group p-6 sm:p-7 hover:bg-cream-warm/50 transition-colors">
+              <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-coral font-semibold">Lo que más se vende</p>
+              <h4 className="font-display text-xl text-ink mt-3 mb-2 tracking-[-0.01em]">Historia</h4>
+              <p className="text-[13px] text-ink-muted leading-relaxed">¿Y si la historia que no te contaron en el colegio está en el estante de alguien? De Chile y del mundo, muchos agotados.</p>
             </Link>
           </div>
         </div>
