@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { ListingWithBook } from "@/types";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
 import { calcularEnvioPromo } from "@/lib/shipping-promo";
+import { cargoServicio } from "@/lib/cargo-servicio";
 import { comunaDesdeAddress } from "@/lib/comuna";
 import { getRegionForComuna } from "@/lib/comunas";
 import ComunaSelect from "./ComunaSelect";
@@ -155,7 +156,14 @@ export default function BundleCheckoutForm({
   // orden; acá es solo para que la pantalla diga la verdad.
   const seSumaAPaqueteAbierto = isCourier && !!envioAbierto && listings.length <= envioAbierto.cupo;
   const shippingCost = seSumaAPaqueteAbierto ? 0 : promo.cobrarAlComprador;
-  const total = totalBookPrice + shippingCost;
+  // Lo mismo que cobra /api/orders (lib/cargo-servicio.ts, 14-09-2026).
+  const serviceFee = cargoServicio({
+    enPersona: !isCourier,
+    porTransferencia: aceptaTransferencia && formaPago === "transfer",
+    vendedorConMP: !!(seller as any)?.mercadopago_user_id,
+    totalLibros: totalBookPrice,
+  });
+  const total = totalBookPrice + shippingCost + serviceFee;
 
   const firstListingId = listings[0].id;
 
@@ -557,7 +565,7 @@ export default function BundleCheckoutForm({
                     <p className="font-medium text-gray-900 text-sm">{q.service}</p>
                     <p className="text-xs text-gray-500">
                       {q.deliveryTime}
-                      {q.courier ? ` — ${q.courier}` : ""}
+                      {q.courier && q.courier !== "coordinado" ? ` — ${q.courier}` : ""}
                     </p>
                   </div>
                 </div>
@@ -616,6 +624,12 @@ export default function BundleCheckoutForm({
               )}
             </span>
           </div>
+          {serviceFee > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Cargo por servicio</span>
+              <span className="text-gray-900">${serviceFee.toLocaleString("es-CL")}</span>
+            </div>
+          )}
           <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between font-bold">
             <span className="text-gray-900">Total</span>
             <span className="text-gray-900">

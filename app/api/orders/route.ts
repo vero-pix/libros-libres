@@ -15,6 +15,7 @@ import crypto from "crypto";
 import { calcularEnvioPromo } from "@/lib/shipping-promo";
 import { buscarEnvioAbierto } from "@/lib/envio-pendiente";
 import { resolverOrigenEnvio } from "@/lib/shipping-quote";
+import { cargoServicio } from "@/lib/cargo-servicio";
 import {
   COURIER_COORDINADO,
   ESTADO_COORDINADO_PENDIENTE,
@@ -348,7 +349,13 @@ export async function POST(req: NextRequest) {
   // Por transferencia no hay comisión: no existe el split que la retenga, y
   // cobrársela al comprador significaría que el vendedor la recibe y después
   // tendría que devolverla. La venta igual queda registrada en el sitio.
-  const serviceFee = isInPerson || porTransferencia ? 0 : useSplit ? commission : SERVICE_FEE;
+  // Misma función que usa el checkout para mostrar el total (lib/cargo-servicio.ts).
+  const serviceFee = cargoServicio({
+    enPersona: isInPerson,
+    porTransferencia,
+    vendedorConMP: useSplit,
+    totalLibros: totalBookPrice,
+  });
   const bundleGrandTotal = totalBookPrice + shippingCost + serviceFee;
 
   // Generar bundle_id (siempre, también para single-item)

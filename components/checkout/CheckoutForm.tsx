@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { ListingWithBook } from "@/types";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
 import { calcularEnvioPromo } from "@/lib/shipping-promo";
+import { cargoServicio } from "@/lib/cargo-servicio";
 import { comunaDesdeAddress } from "@/lib/comuna";
 import { getRegionForComuna } from "@/lib/comunas";
 import ComunaSelect from "./ComunaSelect";
@@ -167,7 +168,15 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   // Ver lib/envio-pendiente.ts (caso Don Luis, 09-09-2026).
   const seSumaAPaqueteAbierto = isCourier && !!envioAbierto && 1 <= envioAbierto.cupo;
   const shippingCost = seSumaAPaqueteAbierto ? 0 : promo.cobrarAlComprador;
-  const total = discountedBookPrice + shippingCost;
+  // Lo mismo que cobra /api/orders: sin esto la pantalla mostraba libro + envío
+  // y MercadoPago cobraba además el 8%. Ver lib/cargo-servicio.ts (14-09-2026).
+  const serviceFee = cargoServicio({
+    enPersona: !isCourier,
+    porTransferencia: aceptaTransferencia && formaPago === "transfer",
+    vendedorConMP: sellerHasMP,
+    totalLibros: discountedBookPrice,
+  });
+  const total = discountedBookPrice + shippingCost + serviceFee;
 
   const fetchQuotes = useCallback(
     async (addr: string) => {
@@ -650,7 +659,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                       />
                       <div>
                         <p className="font-bold text-ink text-sm">
-                          {q.service} {q.courier ? `(${q.courier})` : ""}
+                          {q.service} {q.courier && q.courier !== "coordinado" ? `(${q.courier})` : ""}
                         </p>
                         <p className="text-[10px] text-ink-muted font-medium uppercase tracking-wider">
                           Entrega: {q.deliveryTime}
@@ -784,6 +793,12 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                 )}
               </span>
             </div>
+            {serviceFee > 0 && (
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-ink-muted font-medium">Cargo por servicio</span>
+                <span className="text-ink font-bold">${serviceFee.toLocaleString("es-CL")}</span>
+              </div>
+            )}
             <div className="pt-3 border-t border-cream-dark flex justify-between items-baseline">
               <span className="text-ink font-bold uppercase tracking-wider">Total</span>
               <div className="text-right">
