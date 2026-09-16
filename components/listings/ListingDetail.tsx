@@ -202,6 +202,19 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
     !MP_NOT_RECEIVING.has((listing.seller as any)?.username) &&
     !!(listing.seller as any)?.mercadopago_user_id;
 
+  // Cobrar por transferencia, sin MercadoPago: el vendedor la tiene encendida y
+  // dejó los datos. El checkout crea la orden igual y le muestra al comprador a
+  // qué cuenta transferir. Sin esto, desconectar MercadoPago dejaba la ficha sin
+  // botón de comprar aunque el cobro sí funcionara. (16-09-2026)
+  const transferenciaDisponible =
+    !(listing.seller as any)?.mercadopago_user_id &&
+    !!(listing.seller as any)?.acepta_transferencia &&
+    !!String((listing.seller as any)?.datos_transferencia ?? "").trim() &&
+    listing.price != null &&
+    listing.modality !== "loan" &&
+    !isSold &&
+    !(listing.seller as any)?.on_vacation;
+
   const paramsFicha: ParamsFicha = useMemo(
     () => ({
       listing_id: listing.id,
@@ -497,7 +510,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
               acá, sobre su propia ficha, porque es donde ve el libro tal como lo
               ve un comprador: publicado, visible y sin botón de comprar. No se
               puede cerrar; desaparece solo cuando conecta. (08-09-2026) */}
-          {isOwner && !listing.seller?.mercadopago_user_id && (
+          {isOwner && !listing.seller?.mercadopago_user_id && !transferenciaDisponible && (
             <MercadoPagoNudge ubicacion="ficha_dueno" nPublicaciones={1} />
           )}
 
@@ -653,6 +666,25 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
                   vendedor por correo. Ver lib/whatsapp-policy.ts (25 ago 2026) */}
               <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
             </>
+          ) : transferenciaDisponible ? (
+            <>
+              <Link
+                href={`/checkout/${listing.id}`}
+                onClick={() => medir("click_comprar_transferencia", paramsFicha)}
+                className="flex items-center justify-center gap-2 w-full bg-coral hover:bg-coral-deep text-white font-bold py-4 rounded-xl transition-all text-base shadow-sm"
+              >
+                Comprar — ${listing.price.toLocaleString("es-CL")}
+              </Link>
+              <div className="flex items-start gap-2 bg-brand-50/60 border border-brand-200 rounded-xl px-3 py-2.5">
+                <span className="text-base leading-none mt-0.5" aria-hidden>🏦</span>
+                <p className="text-xs text-ink leading-snug">
+                  <span className="font-semibold">Se paga por transferencia.</span> Confirmas el
+                  pedido, te muestro los datos de la cuenta y el libro queda reservado a tu nombre.
+                </p>
+              </div>
+              <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
+              <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
+            </>
           ) : (
             /* Vendedor sin MercadoPago. El carrito va PRIMERO y siempre: es el único
                gesto de "me lo llevo" que el comprador puede dejar acá, y el carrito
@@ -701,7 +733,8 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
             <span className="text-xl font-bold text-black leading-none">${listing.price.toLocaleString("es-CL")}</span>
           </div>
           <div className="flex-1">
-            {listing.seller?.mercadopago_user_id && !MP_NOT_RECEIVING.has((listing.seller as any)?.username) ? (
+            {(listing.seller?.mercadopago_user_id && !MP_NOT_RECEIVING.has((listing.seller as any)?.username)) ||
+            transferenciaDisponible ? (
               <Link
                 href={`/checkout/${listing.id}`}
                 onClick={() => medir("click_comprar_mercadopago", paramsFicha)}
