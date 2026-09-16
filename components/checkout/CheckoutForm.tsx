@@ -53,7 +53,11 @@ const DELIVERY_OPTIONS = [
 export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPhone, courierDisponible = true, aceptaTransferencia = false }: Props) {
   // Forma de pago. Solo se pregunta si el vendedor habilitó la transferencia;
   // si no, es MercadoPago y la pregunta no aparece.
-  const [formaPago, setFormaPago] = useState<"mercadopago" | "transfer">("mercadopago");
+  const [formaPago, setFormaPago] = useState<"mercadopago" | "transfer">(
+    // Sin MercadoPago la transferencia es la única forma: partir en ella evita
+    // que el botón diga "Pagar con MercadoPago" cuando no hay MercadoPago.
+    aceptaTransferencia && !(listing.seller as any)?.mercadopago_user_id ? "transfer" : "mercadopago"
+  );
   // Sin preselección: antes venía marcado "in_person", que además es el gratis,
   // así que quien no leía elegía por omisión retirar un libro que podía estar a
   // 500 km. La entrega se elige a conciencia. (08-09-2026)
@@ -148,6 +152,11 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
   const sellerHasMP = !!(listing.seller as any)?.mercadopago_user_id;
   const sellerPhone = listing.seller?.phone ?? null;
   const showWhatsApp = !!sellerPhone && mostrarWhatsAppVendedor(sellerHasMP);
+  // Un vendedor puede cobrar sin MercadoPago si tiene la transferencia
+  // encendida con datos cargados. Sin esto, desconectar MP dejaba la compra
+  // sin salida más que el WhatsApp. (16-09-2026)
+  const soloTransferencia = !sellerHasMP && aceptaTransferencia;
+  const puedeCobrar = sellerHasMP || soloTransferencia;
   // Calle Y número: sin el número Shipit recibe `number: 0` y no hay entrega
   // posible aunque la etiqueta se emita. (5 ago 2026)
   const addressHasNumber = /\d{1,6}(\s|,|$)/.test(address);
@@ -849,13 +858,13 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
               </div>
             )}
 
-            {sellerHasMP && !loading && motivoBloqueo() && (
+            {puedeCobrar && !loading && motivoBloqueo() && (
               <p className="text-xs text-amber-700 text-center">
                 {motivoBloqueo()}
               </p>
             )}
 
-            {sellerHasMP ? (
+            {puedeCobrar ? (
               <button
                 onClick={handleSubmit}
                 disabled={

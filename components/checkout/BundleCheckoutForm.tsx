@@ -62,7 +62,10 @@ export default function BundleCheckoutForm({
   aceptaTransferencia = false,
 }: Props) {
   // Forma de pago. Solo se pregunta si el vendedor habilitó la transferencia.
-  const [formaPago, setFormaPago] = useState<"mercadopago" | "transfer">("mercadopago");
+  const [formaPago, setFormaPago] = useState<"mercadopago" | "transfer">(
+    // Sin MercadoPago la transferencia es la única forma posible.
+    aceptaTransferencia && !(listings[0]?.seller as any)?.mercadopago_user_id ? "transfer" : "mercadopago"
+  );
   // Dónde están los libros. Sin esto el comprador toma la opción gratis que viene
   // marcada por defecto sin saber que el vendedor está en otra región: el
   // 28-08-2026 se pagó un libro de Concepción para retirar "en persona" desde Ñuñoa.
@@ -342,6 +345,10 @@ export default function BundleCheckoutForm({
 
   const sellerHasMP = !!(seller as any)?.mercadopago_user_id;
   const sellerPhone = (seller as any)?.phone as string | undefined;
+  // Sin MercadoPago igual se puede cobrar si el vendedor tiene la transferencia
+  // encendida con datos cargados. (16-09-2026)
+  const soloTransferencia = !sellerHasMP && aceptaTransferencia;
+  const puedeCobrar = sellerHasMP || soloTransferencia;
 
   function waMessage() {
     const lines = listings
@@ -680,11 +687,11 @@ export default function BundleCheckoutForm({
         </div>
       )}
 
-      {sellerHasMP && !loading && motivoBloqueo() && (
+      {puedeCobrar && !loading && motivoBloqueo() && (
         <p className="text-xs text-amber-700 text-center">{motivoBloqueo()}</p>
       )}
 
-      {sellerHasMP && (
+      {puedeCobrar && (
         <>
           <button
             type="submit"
@@ -740,7 +747,7 @@ export default function BundleCheckoutForm({
         </>
       )}
 
-      {!sellerHasMP && !sellerPhone && (
+      {!puedeCobrar && !sellerPhone && (
         <p className="text-sm text-gray-500 text-center bg-gray-50 rounded-lg p-4">
           Este vendedor aún no tiene métodos de pago configurados.
         </p>
