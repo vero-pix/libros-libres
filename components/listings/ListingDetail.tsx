@@ -208,8 +208,9 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
   // botón de comprar aunque el cobro sí funcionara. (16-09-2026)
   const transferenciaDisponible =
     !(listing.seller as any)?.mercadopago_user_id &&
-    !!(listing.seller as any)?.acepta_transferencia &&
-    !!String((listing.seller as any)?.datos_transferencia ?? "").trim() &&
+    // Bandera resuelta en el servidor (lib/cobro-transferencia.ts): las columnas
+    // acepta_transferencia / datos_transferencia no las puede leer el rol anon.
+    !!(listing.seller as any)?.cobra_por_transferencia &&
     listing.price != null &&
     listing.modality !== "loan" &&
     !isSold &&
