@@ -56,8 +56,13 @@ export default function AyudaComprarPage() {
           <Tarjeta>
             <p>
               El pago es en línea, por MercadoPago (tarjeta, débito o saldo). Tu dinero le llega al vendedor solo
-              cuando la compra se confirma, y tienes la protección de MercadoPago si algo sale mal. Por eso no
-              aceptamos transferencias ni pago en efectivo, ni siquiera en entregas en persona.
+              cuando la compra se confirma, y tienes la protección de MercadoPago si algo sale mal.
+            </p>
+            <p className="mt-4">
+              Algunos vendedores cobran por <strong>transferencia</strong> en vez de MercadoPago. Cuando es así, te
+              lo digo en la ficha del libro antes de que compres, y ahí mismo te doy los datos de la cuenta. Es el
+              único otro medio que existe: si alguien te pide pagar por fuera de esos dos caminos, no lo hagas y
+              avísame.
             </p>
             <p className="mt-4">
               Si tu pago es rechazado, la pantalla te dice por qué y qué hacer. Lo más común: límite de la tarjeta,

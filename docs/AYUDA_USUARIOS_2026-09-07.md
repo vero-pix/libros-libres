@@ -79,7 +79,9 @@ Busca por título, autor o tema. Filtra por comuna para encontrar libros cerca d
 
 ### 2. Pagar
 
-El pago es en línea, por MercadoPago (tarjeta, débito o saldo). Tu dinero le llega al vendedor solo cuando la compra se confirma, y tienes la protección de MercadoPago si algo sale mal. Por eso no aceptamos transferencias ni pago en efectivo, ni siquiera en entregas en persona.
+El pago es en línea, por MercadoPago (tarjeta, débito o saldo). Tu dinero le llega al vendedor solo cuando la compra se confirma, y tienes la protección de MercadoPago si algo sale mal.
+
+Algunos vendedores cobran por transferencia en vez de MercadoPago. Cuando es así, te lo digo en la ficha del libro antes de que compres, y ahí mismo te doy los datos de la cuenta. Es el único otro medio que existe: si alguien te pide pagar por fuera de esos dos caminos, no lo hagas y avísame.
 
 Si tu pago es rechazado, la pantalla te dice por qué y qué hacer. Lo más común: límite de la tarjeta, datos mal escritos o un rechazo preventivo del banco. Puedes intentar con otro medio o escribirnos.
 
