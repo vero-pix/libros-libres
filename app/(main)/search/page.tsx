@@ -2,8 +2,6 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createPublicClient } from "@/lib/supabase/public";
 import { accentInsensitiveRegex, foldAccents, limpiarParaFiltro, SEARCH_STOPWORDS } from "@/lib/accentSearch";
-import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
-import { getCachedCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
@@ -327,11 +325,6 @@ export default async function SearchPage({ searchParams }: Props) {
     popularListings = sortListingsForDisplay((data as unknown as ListingWithBook[]) ?? []);
   }
 
-  const [categoryTree, availableTags] = await Promise.all([
-    getCachedCategoryTree(),
-    getAvailableTags(),
-  ]);
-
   return (
     <div className="min-h-screen bg-white">
       <SearchEventTracker query={q} />
@@ -360,13 +353,6 @@ export default async function SearchPage({ searchParams }: Props) {
         )}
 
         <div className="flex gap-8">
-          <CategoriesSidebar
-            categoryTree={categoryTree}
-            activeCategory={category}
-            activeSubcategory={subcategory}
-            activeTag={tag}
-            availableTags={availableTags}
-          />
 
           <div className="flex-1 min-w-0">
             {listings.length > 0 && (

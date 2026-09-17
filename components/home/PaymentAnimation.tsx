@@ -30,7 +30,7 @@ export default function PaymentAnimation() {
             MercadoPago se encarga de todo
           </h2>
           <p className="text-ink-muted text-sm mt-2 max-w-lg mx-auto">
-            Tu dinero está protegido hasta que recibas el libro. El vendedor recibe su pago automáticamente.
+            Pagas con tu tarjeta, no en efectivo a un desconocido, y queda registro de la compra para los dos. Si algo sale mal, tienes 7 días para devolverlo.
           </p>
         </div>
 

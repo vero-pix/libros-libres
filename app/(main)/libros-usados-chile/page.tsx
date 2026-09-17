@@ -44,7 +44,7 @@ const faqs = [
   },
   {
     q: "¿Cómo sé que el libro está en buen estado?",
-    a: "Cada publicación tiene fotos reales, descripción del vendedor y condición declarada (como nuevo, muy bueno, bueno, aceptable). El pago por MercadoPago queda protegido hasta que confirmas que recibiste el libro como esperabas.",
+    a: "Cada publicación tiene fotos reales, descripción del vendedor y condición declarada (como nuevo, muy bueno, bueno, aceptable). Si pagas por MercadoPago queda registro de la compra y tienes 7 días para devolverlo si no corresponde a lo publicado.",
   },
   {
     q: "¿Hay primeras ediciones o libros raros?",

@@ -33,7 +33,7 @@ export default function AddToCartButton({ listingId, price, title }: Props) {
       } else {
         const data = await res.json();
         if (data.error?.includes("No autenticado")) {
-          window.location.href = `/login?next=/listings/${listingId}`;
+          window.location.href = `/login?next=${encodeURIComponent(window.location.pathname)}`;
           return;
         }
         setStatus("idle");

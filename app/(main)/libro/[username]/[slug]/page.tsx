@@ -10,8 +10,6 @@ import LibroNoDisponible from "@/components/listings/LibroNoDisponible";
 import AdSlot from "@/components/ads/AdSlot";
 import ListingViewTracker from "@/components/listings/ListingViewTracker";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
-import { buildCategoryTree } from "@/lib/categoryTree";
 import { resolveAuthorUrl } from "@/lib/authorLink";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
@@ -254,7 +252,7 @@ export default async function LibroPage({ params }: Props) {
     ? ratedReviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
     : 0;
 
-  const [authorResult, categoryResult, allActiveResult, mismoTituloResult] = await Promise.all([
+  const [authorResult, categoryResult, mismoTituloResult] = await Promise.all([
     listing.book?.author
       ? supabase
           .from("listings")
@@ -273,10 +271,6 @@ export default async function LibroPage({ params }: Props) {
           .ilike("book.genre", listing.book.genre)
           .limit(8)
       : Promise.resolve({ data: null }),
-    supabase
-      .from("listings")
-      .select("book:books(genre, category, subcategory)")
-      .eq("status", "active"),
     // ¿Hay otro ejemplar de ESTE mismo título a la venta? Es la ventaja del
     // libro usado sobre el retail y la ficha no la decía en ninguna parte: en
     // un catálogo de 3.870 activos hay 3.729 títulos distintos, así que la
@@ -297,8 +291,6 @@ export default async function LibroPage({ params }: Props) {
   const authorListingIds = new Set(authorListings.map(l => l.id));
   const categoryListingsRaw: ListingWithBook[] = ((categoryResult.data as unknown as ListingWithBook[]) ?? []);
   const categoryListings = categoryListingsRaw.filter(l => !authorListingIds.has(l.id)).slice(0, 4);
-
-  const categoryTree = await buildCategoryTree(supabase, (allActiveResult.data ?? []) as any);
 
   /** Otros ejemplares del mismo título a la venta ahora mismo. 0 = pieza única. */
   const otrosEjemplares = (mismoTituloResult as { count: number | null }).count ?? 0;
@@ -439,7 +431,6 @@ export default async function LibroPage({ params }: Props) {
           ]}
         />
         <div className="flex gap-10">
-          <CategoriesSidebar categoryTree={categoryTree} activeCategory={(listing.book as any).category} activeSubcategory={(listing.book as any).subcategory} />
 
           <div className="flex-1 min-w-0">
             <ListingDetail listing={listing} images={(images ?? []) as any} sellerStats={sellerStats} otrosEjemplares={otrosEjemplares} />

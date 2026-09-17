@@ -583,8 +583,6 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
         </div>
       </div>
 
-      <DescriptionSection listing={listing} />
-
       {/* Sin precio publicado: NUNCA dejar la ficha en blanco (se ve rota y no se puede
           comprar). Es un error de datos, pero acá damos salida: aviso + contacto. */}
       {listing.price == null && listing.modality !== "loan" && !isSold && (
@@ -709,6 +707,12 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
           )}
         </div>
       )}
+
+      {/* La descripción va DESPUÉS del botón: antes se metía entre el precio y
+          la compra, y en el teléfono era lo que dejaba el botón real a dos
+          pantallas y media. Quien quiere leer la sinopsis baja; quien ya
+          decidió, no debería tener que hacerlo. */}
+      <DescriptionSection listing={listing} />
 
       {/* Rental CTA */}
       {(listing as ListingWithRentalFields).rental_price != null && listing.modality !== "sale" && (

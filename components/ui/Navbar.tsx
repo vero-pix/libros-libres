@@ -72,7 +72,11 @@ export default async function Navbar() {
           {/* Cluster derecho: nav + ciudad + auth */}
           <div className="flex items-center gap-1 lg:gap-2 ml-auto">
             <nav className="hidden lg:flex items-center gap-0.5">
-              <NavLink href="/#tienda">Explorar</NavLink>
+              {/* Mismo criterio que el menú del teléfono: las que ordenan el
+                  catálogo primero. "Explorar" apuntaba a la home, igual que el
+                  logo, y ni Tiendas ni Categorías estaban en ninguna barra. */}
+              <NavLink href="/tiendas">Tiendas</NavLink>
+              <NavLink href="/categoria">Categorías</NavLink>
               <NavLink href="/solicitudes">Se busca</NavLink>
               <NavLink href="/publish">Vender</NavLink>
 

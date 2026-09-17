@@ -55,11 +55,17 @@ export default function MobileMenu({ loggedIn }: Props) {
           open ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-1"
         }`}
       >
+        {/* Las cinco cosas que estructuran un marketplace de libros: buscar
+            (que ya está en la barra de arriba), tiendas, categorías, vender y
+            la cuenta. Antes eran doce entradas en tres grupos, sin Tiendas ni
+            Categorías —las dos que ordenan el catálogo— y con "Inicio" y
+            "Explorar" apuntando a la misma página. */}
         <Section>
           <Item href="/" label="Inicio" />
-          <Item href="/#tienda" label="Explorar" />
-          <Item href="/solicitudes" label="Se busca" />
+          <Item href="/tiendas" label="Tiendas" />
+          <Item href="/categoria" label="Categorías" />
           <Item href="/publish" label="Vender" />
+          <Item href="/solicitudes" label="Se busca" />
         </Section>
 
         {loggedIn ? (
@@ -83,13 +89,12 @@ export default function MobileMenu({ loggedIn }: Props) {
           </Section>
         )}
 
+        {/* Novedades (un changelog), Sobre nosotros, Nuestra historia y
+            Alianzas institucionales se van al pie, donde ya estaban todas.
+            Acá quedan las dos que sirven a alguien que se perdió. */}
         <Section>
           <Item href="/como-funciona" label="Cómo funciona" />
-          <Item href="/novedades" label="Novedades" />
           <Item href="/ayuda" label="Centro de ayuda" />
-          <Item href="/sobre-nosotros" label="Sobre nosotros" />
-          <Item href="/alianzas" label="Alianzas institucionales" />
-          <Item href="/historia" label="Nuestra historia" />
         </Section>
       </div>
     </div>

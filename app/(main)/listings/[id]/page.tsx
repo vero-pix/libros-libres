@@ -4,8 +4,6 @@ import { redirect, permanentRedirect } from "next/navigation";
 import ListingDetail from "@/components/listings/ListingDetail";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
-import { buildCategoryTree } from "@/lib/categoryTree";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 
@@ -112,13 +110,6 @@ export default async function ListingByIdPage({ params }: Props) {
     .eq("listing_id", listing.id)
     .order("sort_order", { ascending: true });
 
-  const { data: allActive } = await supabase
-    .from("listings")
-    .select("book:books(genre, category, subcategory)")
-    .eq("status", "active");
-
-  const categoryTree = await buildCategoryTree(supabase, (allActive ?? []) as any);
-
   const relatedResult = listing.book?.genre
     ? await supabase
         .from("listings")
@@ -212,7 +203,6 @@ export default async function ListingByIdPage({ params }: Props) {
           ]}
         />
         <div className="flex gap-10">
-          <CategoriesSidebar categoryTree={categoryTree} activeCategory={(listing.book as any).category} activeSubcategory={(listing.book as any).subcategory} />
           <div className="flex-1 min-w-0">
             <ListingDetail listing={listing} images={(images ?? []) as any} />
             {relatedListings.length > 0 && (
