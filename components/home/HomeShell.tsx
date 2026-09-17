@@ -4,6 +4,7 @@ import { useState, useCallback, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import HeroBar from "./HeroBar";
 import StatsBar from "./StatsBar";
+import ParaQuienVende from "./ParaQuienVende";
 import TiendaToggle from "./TiendaToggle";
 import LeadCaptureBar from "@/components/ui/LeadCaptureBar";
 
@@ -88,6 +89,8 @@ export default function HomeShell({ totalListings, stores, views, hasFilters, he
 
       {/* Los banners de colección salieron el 17-09: repetían lo que ya hacen
           las filas curadas, y cada colección tiene su /coleccion/[slug]. */}
+
+      {!hasFilters && <ParaQuienVende vendedores={stores} />}
 
       {/* Manifiesto compacto al final — antes del footer */}
       {!hasFilters && (
