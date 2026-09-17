@@ -126,7 +126,8 @@ export default function VenderPage() {
 
         <div className="relative max-w-4xl mx-auto px-4 py-20 sm:py-28 text-center">
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight animate-fade-in-up">
-            Vende tus libros usados<br />
+            Vende tus libros usados{" "}
+            <br />
             <span className="text-brand-400">en Chile</span>
           </h1>
           <p className="mt-6 text-lg sm:text-xl text-white/80 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.15s" }}>

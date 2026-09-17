@@ -73,7 +73,7 @@ const faqs = [
   },
   {
     q: "¿Puedo revisar el estado antes de comprar?",
-    a: "Sí. Cada publicación lleva fotos reales del ejemplar y la condición declarada por el vendedor. En las piezas antiguas el estado va descrito sin maquillaje: si el lomo está gastado o el papel tiene manchas de humedad, está dicho. Si pagas con MercadoPago el dinero queda protegido hasta que recibes el libro y confirmas que corresponde a lo publicado.",
+    a: "Sí. Cada publicación lleva fotos reales del ejemplar y la condición declarada por el vendedor. En las piezas antiguas el estado va descrito sin maquillaje: si el lomo está gastado o el papel tiene manchas de humedad, está dicho. Si pagas con MercadoPago queda registro de la compra y tienes 7 días para devolverlo si no corresponde a lo publicado.",
   },
   {
     q: "¿Envían libros antiguos a regiones?",

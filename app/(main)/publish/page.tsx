@@ -4,6 +4,12 @@ import PublishForm from "@/components/listings/PublishForm";
 import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
 import type { BookData } from "@/types";
 
+export const metadata = {
+  // Compartía el title genérico del sitio: con tres pestañas abiertas no se
+  // sabía cuál era cuál.
+  title: "Publica tu libro",
+};
+
 interface Props {
   searchParams: { book_id?: string };
 }

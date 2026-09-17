@@ -159,7 +159,8 @@ export default async function LibrosUsadosCiudadPage({ params }: { params: { ciu
           {/* Hero */}
           <section className="mt-8 mb-16 max-w-3xl">
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-ink leading-[1.05] tracking-tight">
-              Libros usados en {city.label}.<br />
+              Libros usados en {city.label}.{" "}
+              <br />
               <span className="italic text-brand-600">{city.heroSub}</span>
             </h1>
             <p className="mt-6 text-lg text-ink-muted leading-relaxed">{city.intro}</p>

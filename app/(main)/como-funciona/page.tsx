@@ -19,7 +19,7 @@ const directSteps = [
 
 const mpSteps = [
   { number: 1, icon: "🔍", title: "Encuentra tu libro", description: "Busca en el catálogo por categoría, precio o cercanía." },
-  { number: 2, icon: "💳", title: "Paga con MercadoPago", description: "Compra directo desde la publicación. Tu dinero queda protegido." },
+  { number: 2, icon: "💳", title: "Paga con MercadoPago", description: "Compra directo desde la publicación, con tu tarjeta y con registro de los dos lados." },
   { number: 3, icon: "📦", title: "Elige el despacho", description: "Retiro en persona, o envío por courier cuando esté disponible." },
   { number: 4, icon: "✅", title: "Recibe y confirma", description: "El vendedor recibe su pago automáticamente al confirmar la entrega." },
 ];
@@ -62,31 +62,36 @@ export default function ComoFuncionaPage() {
       <div className="bg-cream-warm border-b border-cream-dark">
         <div className="max-w-3xl mx-auto px-4 py-16 sm:py-20 text-center">
           <h1 className="font-display text-4xl sm:text-5xl font-bold text-ink mb-3">Cómo funciona</h1>
-          <p className="text-ink-muted text-lg max-w-xl mx-auto">Tres formas de comprar un libro, y una de publicar el tuyo</p>
+          <p className="text-ink-muted text-lg max-w-xl mx-auto">Cómo se compra acá, cómo se vende, y qué cobro por cada cosa</p>
         </div>
       </div>
 
       {/* Content */}
       <main className="max-w-3xl mx-auto px-4 py-12">
-        {/* Compra directa */}
-        <section className="mb-14">
-          <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
-            Compra directa
-          </h2>
-          <p className="text-ink-muted mb-6"><strong>Ideal si el libro está cerca tuyo.</strong> El modo más simple, y mi favorito. Tú y quien vende se hablan directo por WhatsApp, se ponen de acuerdo, y yo no me meto en el medio. No cobro nada.</p>
-          <div className="space-y-5">
-            {directSteps.map((step) => <StepCard key={step.number} step={step} />)}
-          </div>
-        </section>
-
-        {/* Compra con MercadoPago */}
+        {/* Compra con MercadoPago — primero, porque es la vía principal.
+            Antes abría "Compra directa" y la presentaba como mi favorita,
+            cuando desde el 25 de agosto el sitio esconde el WhatsApp del
+            vendedor que tiene MercadoPago: la página que explica cómo funciona
+            el sitio recomendaba el camino que el sitio había cerrado. */}
         <section className="mb-14">
           <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
             Compra con pago seguro
           </h2>
-          <p className="text-ink-muted mb-6"><strong>Ideal si el libro está en otra ciudad, o si quieres respaldo.</strong> Pagas con <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a> desde la publicación y el libro te llega por courier — así puedes comprarle a alguien de otra región o de una comuna lejana, sin tener que ir a buscarlo. Pagas con tu tarjeta a través de MercadoPago —no en efectivo a un desconocido— y queda registro de la compra para los dos. Si algo sale mal tienes <Link href="/devoluciones" className="text-brand-600 font-semibold hover:underline">7 días para devolverlo</Link>: si llega dañado, si es un libro distinto al publicado, o si viene en peor estado del que decía la ficha. Por esta vía cobro un 8% del precio del libro, y con eso pago la pasarela, el servidor y las horas.</p>
+          <p className="text-ink-muted mb-6"><strong>Es la forma normal de comprar acá.</strong> Pagas con <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a> desde la publicación y el libro te llega por courier — así puedes comprarle a alguien de otra región o de una comuna lejana, sin tener que ir a buscarlo. Pagas con tu tarjeta a través de MercadoPago —no en efectivo a un desconocido— y queda registro de la compra para los dos. Si algo sale mal tienes <Link href="/devoluciones" className="text-brand-600 font-semibold hover:underline">7 días para devolverlo</Link>: si llega dañado, si es un libro distinto al publicado, o si viene en peor estado del que decía la ficha. Por esta vía cobro un 8% del precio del libro, y con eso pago la pasarela, el servidor y las horas.</p>
+          <p className="text-ink-muted mb-6">Algunos vendedores —yo entre ellos— además cobran por <strong>transferencia</strong>. Cuando es el caso, la ficha te muestra los datos de la cuenta al momento de comprar.</p>
           <div className="space-y-5">
             {mpSteps.map((step) => <StepCard key={step.number} step={step} />)}
+          </div>
+        </section>
+
+        {/* Compra directa */}
+        <section className="mb-14">
+          <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
+            Trato directo, cuando aparece
+          </h2>
+          <p className="text-ink-muted mb-6"><strong>Solo en las fichas de vendedores que todavía no conectan MercadoPago.</strong> Ahí verás su WhatsApp: se hablan, se ponen de acuerdo, se juntan, y yo no me meto ni cobro nada. Lo tuve un tiempo en todas las fichas y pasó lo previsible — la conversación se iba a WhatsApp, la venta se cerraba afuera y el sitio se quedaba sin saber si había llegado el libro. Por eso hoy, cuando el vendedor puede cobrar por acá, el botón de comprar va primero.</p>
+          <div className="space-y-5">
+            {directSteps.map((step) => <StepCard key={step.number} step={step} />)}
           </div>
         </section>
 
