@@ -1,8 +1,14 @@
 import Link from "next/link";
+import Logo from "@/components/ui/Logo";
 import { Suspense } from "react";
 import RegisterForm from "@/components/auth/RegisterForm";
 import { getCities } from "@/lib/cities";
 import AuthWantedList from "@/components/auth/AuthWantedList";
+
+export const metadata = {
+  title: "Crea tu cuenta",
+  robots: { index: false },
+};
 
 export default async function RegisterPage({
   searchParams,
@@ -22,14 +28,7 @@ export default async function RegisterPage({
       <div className="hidden lg:flex lg:w-1/2 bg-cream-warm relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=1200&q=75')] bg-cover bg-center opacity-10" />
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
-          <Link href="/" className="group">
-            <span className="font-display text-2xl font-bold text-ink tracking-tight">
-              Libros{" "}
-            </span>
-            <span className="font-display text-2xl font-bold text-brand-600 tracking-tight group-hover:text-brand-500 transition-colors">
-              Libres
-            </span>
-          </Link>
+          <Logo />
 
           <div className="max-w-md">
             <h2 className="font-display text-3xl font-bold text-ink leading-tight">
@@ -62,14 +61,13 @@ export default async function RegisterPage({
 
       {/* Right — form */}
       <div className="flex-1 flex flex-col bg-cream">
-        <div className="lg:hidden py-6 px-6">
-          <Link href="/" className="group">
-            <span className="font-display text-xl font-bold text-ink tracking-tight">
-              Libros{" "}
-            </span>
-            <span className="font-display text-xl font-bold text-brand-600 tracking-tight">
-              Libres
-            </span>
+        <div className="py-6 px-6 flex items-center justify-between gap-4">
+          <Logo className="lg:hidden" />
+          <Link
+            href="/"
+            className="ml-auto text-sm text-ink-muted hover:text-brand-600 transition-colors"
+          >
+            ← Volver al inicio
           </Link>
         </div>
 

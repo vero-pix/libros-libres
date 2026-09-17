@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
+import Logo from "@/components/ui/Logo";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -76,14 +77,7 @@ function ResetPasswordForm() {
     <div className="min-h-screen flex items-center justify-center bg-cream px-6">
       <div className="w-full max-w-sm">
         <div className="mb-8">
-          <Link href="/" className="group">
-            <span className="font-display text-xl font-bold text-ink tracking-tight">
-              Libros{" "}
-            </span>
-            <span className="font-display text-xl font-bold text-brand-600 tracking-tight">
-              Libres
-            </span>
-          </Link>
+          <Logo />
           <h1 className="font-display text-2xl font-bold text-ink mt-6">
             Nueva contraseña
           </h1>

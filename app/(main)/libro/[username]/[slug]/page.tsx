@@ -6,6 +6,7 @@ import ListingDetail from "@/components/listings/ListingDetail";
 import BookReviews from "@/components/listings/BookReviews";
 import ReviewSection from "@/components/listings/ReviewSection";
 import ListingCard from "@/components/listings/ListingCard";
+import LibroNoDisponible from "@/components/listings/LibroNoDisponible";
 import AdSlot from "@/components/ads/AdSlot";
 import ListingViewTracker from "@/components/listings/ListingViewTracker";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -55,7 +56,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const listing = await getListing(params.username, params.slug);
 
   if (!listing) {
-    return { title: "Libro no encontrado" };
+    return {
+      title: "Este libro ya no está disponible",
+      robots: { index: false, follow: true },
+    };
   }
 
   const priceStr = listing.price ? `$${listing.price.toLocaleString("es-CL")}` : "";
@@ -144,9 +148,70 @@ export default async function LibroPage({ params }: Props) {
       permanentRedirect(`/libro/${canonico}/${porSlug!.slug}`);
     }
 
-    // Ver comentario en listings/[id]: listings eliminados → home con 308
-    // en vez de 404 seco. Mejor UX y mejor señal a Google.
-    permanentRedirect("/");
+    // Antes esto era un permanentRedirect("/"): quien llegaba de Google a un
+    // libro vendido aterrizaba en la portada sin explicación, justo cuando ya
+    // sabía qué quería. Ahora se le dice qué pasó y se le ofrecen parecidos.
+    // La página va noindex (ver generateMetadata) para no dejar URLs muertas
+    // indexadas con contenido de aviso.
+    const palabras = params.slug
+      .split("-")
+      .filter((p) => p.length > 3 && !/^\d+$/.test(p));
+    const consulta = palabras.slice(0, 4).join(" ");
+    // Para buscar parecidos sirve la palabra más larga, no la primera: en
+    // "este-libro-no-existe" la primera es "este" y trae cualquier cosa.
+    const termino = [...palabras].sort((a, b) => b.length - a.length)[0];
+
+    const SELECT_PARECIDOS = `*, book:books!inner(*), seller:users(id, username, full_name, avatar_url, on_vacation, vacation_message)`;
+    let parecidos: ListingWithBook[] = [];
+    if (termino) {
+      // Título O autor: "cervantes" no está en ningún título, pero sí en el autor.
+      const { data } = await supabase
+        .from("listings")
+        .select(SELECT_PARECIDOS)
+        .eq("status", "active")
+        .neq("deprioritized", true)
+        .or(`title.ilike.%${termino}%,author.ilike.%${termino}%`, {
+          referencedTable: "book",
+        })
+        .limit(10);
+      parecidos = ((data ?? []) as unknown) as ListingWithBook[];
+    }
+    // Si el término no da nada, antes que una pantalla pelada: lo último que
+    // entró al catálogo. La pantalla lo titula distinto para no prometer
+    // parecidos que no lo son.
+    const sonCoincidencias = parecidos.length > 0;
+    if (!parecidos.length) {
+      const { data } = await supabase
+        .from("listings")
+        .select(SELECT_PARECIDOS)
+        .eq("status", "active")
+        .neq("deprioritized", true)
+        .order("created_at", { ascending: false })
+        .limit(10);
+      parecidos = ((data ?? []) as unknown) as ListingWithBook[];
+    }
+
+    const { data: duenoUrl } = await supabase
+      .from("users")
+      .select("username, full_name")
+      .eq("username", params.username)
+      .maybeSingle();
+
+    return (
+      <LibroNoDisponible
+        consulta={consulta}
+        parecidos={parecidos}
+        sonCoincidencias={sonCoincidencias}
+        vendedor={
+          duenoUrl?.username
+            ? {
+                username: duenoUrl.username,
+                nombre: duenoUrl.full_name || duenoUrl.username,
+              }
+            : null
+        }
+      />
+    );
   }
 
   const { data: images } = await supabase

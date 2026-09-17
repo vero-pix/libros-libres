@@ -38,9 +38,13 @@ export default async function ColeccionPage({ params }: Props) {
 
   const supabase = createPublicClient()
 
-  const { data: listings, error } = await supabase
+  const { data: listings, error, count } = await supabase
     .from('listings')
-    .select(`*, book:books!inner(*), seller:users(id, username, full_name, avatar_url, on_vacation, vacation_message)`)
+    // count exacto: el contador decía books.length, que era el limit(48).
+    .select(
+      `*, book:books!inner(*), seller:users(id, username, full_name, avatar_url, on_vacation, vacation_message)`,
+      { count: 'exact' }
+    )
     .eq('status', 'active')
     .neq('deprioritized', true)
     .contains('book.tags', [collection.tagFilter])
@@ -102,7 +106,8 @@ export default async function ColeccionPage({ params }: Props) {
             {collection.editorial}
           </p>
           <p className="text-xs text-ink-muted/60 mt-3 font-mono">
-            {books.length} libro{books.length !== 1 ? 's' : ''} disponible{books.length !== 1 ? 's' : ''}
+            {(count ?? books.length).toLocaleString('es-CL')} libro{(count ?? books.length) !== 1 ? 's' : ''} disponible{(count ?? books.length) !== 1 ? 's' : ''}
+            {count != null && count > books.length && <> · mostrando los {books.length} primeros</>}
           </p>
         </div>
 

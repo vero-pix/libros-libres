@@ -46,7 +46,11 @@ export default async function CategoriaPage({ params }: Props) {
   let query = supabase
     .from("listings")
     .select(
-      `*, book:books!inner(*), seller:users(id, username, full_name, avatar_url, on_vacation, vacation_message)`
+      `*, book:books!inner(*), seller:users(id, username, full_name, avatar_url, on_vacation, vacation_message)`,
+      // count exacto: el contador de abajo mostraba books.length, o sea el
+      // limit(48), y decía "48 libros disponibles" en la categoría con 1.596.
+      // El count de PostgREST ignora el limit y cuenta todo lo que filtra.
+      { count: "exact" }
     )
     .eq("status", "active")
     .neq("deprioritized", true)
@@ -58,7 +62,7 @@ export default async function CategoriaPage({ params }: Props) {
   // Sin subcategoría la landing cubre la categoría gruesa completa.
   if (cat.dbSubcategory) query = query.eq("book.subcategory", cat.dbSubcategory);
 
-  const { data: listings, error } = await query
+  const { data: listings, error, count } = await query
     .order("featured_rank", { ascending: true, nullsFirst: false })
     .limit(48);
 
@@ -169,8 +173,12 @@ export default async function CategoriaPage({ params }: Props) {
           </h1>
           <p className="text-ink-muted text-base leading-relaxed">{cat.intro}</p>
           <p className="text-xs text-ink-muted/60 mt-3 font-mono">
-            {books.length} libro{books.length !== 1 ? "s" : ""} disponible
-            {books.length !== 1 ? "s" : ""}
+            {(count ?? books.length).toLocaleString("es-CL")} libro
+            {(count ?? books.length) !== 1 ? "s" : ""} disponible
+            {(count ?? books.length) !== 1 ? "s" : ""}
+            {count != null && count > books.length && (
+              <> · mostrando los {books.length} primeros</>
+            )}
           </p>
         </div>
 
