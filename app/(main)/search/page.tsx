@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createPublicClient } from "@/lib/supabase/public";
-import { accentInsensitiveRegex, foldAccents, SEARCH_STOPWORDS } from "@/lib/accentSearch";
+import { accentInsensitiveRegex, foldAccents, limpiarParaFiltro, SEARCH_STOPWORDS } from "@/lib/accentSearch";
 import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import { getCachedCategoryTree, getAvailableTags } from "@/lib/categoryTree";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -104,7 +104,9 @@ export default async function SearchPage({ searchParams }: Props) {
   let matchingBookIds: string[] | null = null;
   if (q) {
     // Normalizar guiones a espacios
-    const clean = q.replace(/[-_]+/g, " ").replace(/[()]/g, "").replace(/\s+/g, " ").trim();
+    // limpiarParaFiltro saca las comas y comillas: con ellas dentro, PostgREST no
+    // logra parsear el .or() y la búsqueda entera devuelve cero. (16-09-2026)
+    const clean = limpiarParaFiltro(q.replace(/[-_]+/g, " "));
     // Las palabras vacías se descartan: como cada término se busca por separado
     // y con OR, un "de" hacía imatch contra medio catálogo y sepultaba el
     // resultado bueno. "algebra de baldor" devolvía Gargantúa y Pantagruel.

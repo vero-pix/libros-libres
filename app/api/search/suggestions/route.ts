@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { accentInsensitiveRegex } from "@/lib/accentSearch";
+import { accentInsensitiveRegex, limpiarParaFiltro } from "@/lib/accentSearch";
 
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim();
@@ -9,8 +9,9 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = await createClient();
-  // Strip parentheses that break PostgREST or() syntax
-  const clean = q.replace(/[()]/g, "").trim();
+  // Fuera los caracteres que rompen el parser del .or() de PostgREST — la coma,
+  // sobre todo: una consulta con lista de autores tumbaba la consulta entera.
+  const clean = limpiarParaFiltro(q);
   if (!clean) return NextResponse.json([]);
   const rx = accentInsensitiveRegex(clean);
 

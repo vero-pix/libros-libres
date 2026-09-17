@@ -53,3 +53,22 @@ export function accentInsensitiveRegex(input: string): string {
   }
   return out;
 }
+
+/**
+ * Limpia de la consulta los caracteres que rompen el parser de filtros de
+ * PostgREST (`.or(...)`), donde la coma separa condiciones.
+ *
+ * Sin esto, buscar por una lista de autores —"Eugenio Ahumada, Javier Luis
+ * Egaña, Augusto Gongora, Carmen Quesney"— hacía fallar la consulta entera con
+ * "failed to parse logic tree" y el sitio devolvía CERO resultados, aunque
+ * tuviera el libro. Alguien lo buscó así cinco veces entre el 29-08 y el
+ * 16-09-2026, y las cinco veces se fue con las manos vacías teniendo el
+ * catálogo cuatro ejemplares. (16-09-2026)
+ *
+ * Se quitan coma, punto y coma, dos puntos, comillas y paréntesis. El punto NO:
+ * es parte de nombres reales ("J. B. Thomas") y no rompe el parser, que solo
+ * mira los dos primeros para separar campo y operador.
+ */
+export function limpiarParaFiltro(input: string): string {
+  return input.replace(/[(),;:"'`´“”‘’]+/g, " ").replace(/\s+/g, " ").trim();
+}
