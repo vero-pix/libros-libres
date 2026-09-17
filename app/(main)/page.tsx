@@ -7,11 +7,9 @@ import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
 import ListingCardList from "@/components/listings/ListingCardList";
 import RecentlyViewed from "@/components/listings/RecentlyViewed";
-import Recommendations from "@/components/listings/Recommendations";
 import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
 import { getCachedCategoryTree, getAvailableTags } from "@/lib/categoryTree";
-import FeaturedRow from "@/components/home/FeaturedRow";
 import VitrinaDemanda from "@/components/home/VitrinaDemanda";
 import CalugaPieza from "@/components/home/CalugaPieza";
 import { leerPiezaDestacada } from "@/lib/piezaDestacada";
@@ -118,7 +116,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   };
 }
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 16;
 
 // Queries cacheadas (datos públicos, no dependen de sesión).
 // Usan createPublicClient porque unstable_cache no permite cookies().
@@ -700,7 +698,6 @@ export default async function HomePage({ searchParams }: Props) {
           !hasFilters ? (
             <>
               <VitrinaDemanda libros={vitrinaDemanda} />
-              {featuredRowListings.length > 0 && <FeaturedRow featuredListings={featuredRowListings} />}
               <TrustedStoresSection
                 casa={trustedStores.casa}
                 semana={trustedStores.semana}
@@ -838,7 +835,6 @@ export default async function HomePage({ searchParams }: Props) {
 
         </div>
 
-        <Recommendations />
         <RecentlyViewed />
       </HomeShell>
     </div>

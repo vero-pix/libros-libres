@@ -8,10 +8,10 @@ export default function Footer() {
     <footer className="mt-auto">
       {/* Footer reforzado — tres destacados */}
       <div className="bg-cream border-t border-line">
-        <div className="max-w-6xl mx-auto px-6 pt-12">
+        <div className="max-w-6xl mx-auto px-6 pt-8">
           {/* Grilla a 2 columnas: "Gente de confianza" guardada por ahora (20 jul 2026). Volver a sm:grid-cols-3 al revivirla. */}
           <div className="grid sm:grid-cols-2 rounded-2xl border border-line overflow-hidden bg-paper-card">
-            <Link href="/solicitudes" className="group p-6 sm:p-7 border-b sm:border-b-0 sm:border-r border-line hover:bg-cream-warm/50 transition-colors">
+            <Link href="/solicitudes" className="group p-5 sm:p-7 border-b sm:border-b-0 sm:border-r border-line hover:bg-cream-warm/50 transition-colors">
               <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-coral font-semibold">Economía inversa</p>
               <h4 className="font-display text-xl text-ink mt-3 mb-2 tracking-[-0.01em]">Se busca</h4>
               <p className="text-[13px] text-ink-muted leading-relaxed">¿No está en el catálogo? Pídelo. Alguien cerca de ti puede tenerlo durmiendo en su estante.</p>
@@ -26,7 +26,7 @@ export default function Footer() {
             {/* Historia reemplazó a "Libros escolares" (15-09-2026): escolar tenía 9 libros
                 y 1 venta de $4.800 en 60 días; historia es la subcategoría que más vende
                 ($144.000 en 9 ventas, ticket de $16.000) y tiene 495 libros activos. */}
-            <Link href="/categoria/no-ficcion-historia" className="group p-6 sm:p-7 hover:bg-cream-warm/50 transition-colors">
+            <Link href="/categoria/no-ficcion-historia" className="group p-5 sm:p-7 hover:bg-cream-warm/50 transition-colors">
               <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-coral font-semibold">Lo que más se vende</p>
               <h4 className="font-display text-xl text-ink mt-3 mb-2 tracking-[-0.01em]">Historia</h4>
               <p className="text-[13px] text-ink-muted leading-relaxed">¿Y si la historia que no te contaron en el colegio está en el estante de alguien? De Chile y del mundo, muchos agotados.</p>
@@ -37,7 +37,7 @@ export default function Footer() {
 
       {/* Newsletter */}
       <div className="bg-cream-warm border-t border-line">
-        <div className="max-w-6xl mx-auto px-6 py-14 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             <h3 className="font-display text-xl text-ink">Newsletter</h3>
             <p className="text-sm text-ink-muted mt-2 max-w-sm">
@@ -50,7 +50,7 @@ export default function Footer() {
 
       {/* Links */}
       <div className="bg-cream border-t border-line">
-        <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+        <div className="max-w-6xl mx-auto px-6 py-9 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-7 text-sm">
           <div>
             <h4 className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink mb-4 font-semibold">Categorías</h4>
             <ul className="space-y-2.5 text-ink-muted">
