@@ -107,27 +107,6 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Otros proyectos de Vero (15-09-2026). Lista en lib/otrosProyectos.ts */}
-      <div className="bg-cream border-t border-line">
-        <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col md:flex-row md:items-baseline gap-3 md:gap-6 text-sm">
-          <h4 className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink font-semibold shrink-0">Otros proyectos de Vero</h4>
-          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-ink-muted">
-            {otrosProyectos.map((p) => (
-              <li key={p.url}>
-                <a href={p.url} target="_blank" rel="noopener" title={p.bajada} className="hover:text-coral transition-colors">
-                  {p.titulo}
-                </a>
-              </li>
-            ))}
-            <li>
-              <a href={TODOS_LOS_PROYECTOS_URL} target="_blank" rel="noopener" className="font-semibold text-coral hover:text-coral-deep transition-colors">
-                Ver todos →
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-
       {/* Bottom */}
       <div className="border-t border-line bg-cream-warm">
         <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-muted">
@@ -201,6 +180,28 @@ export default function Footer() {
             </a>
           </div>
           <a href={waSoporte("Hola Vero, tengo una duda sobre tuslibros.cl")} target="_blank" rel="noopener" className="hover:text-coral transition-colors">¿Dudas? Escríbeme por WhatsApp</a>
+        </div>
+      </div>
+
+      {/* Otros proyectos de Vero (15-09-2026, movido acá abajo el 17-09).
+          Lista en lib/otrosProyectos.ts */}
+      <div className="border-t border-line bg-cream-warm">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-baseline gap-x-4 gap-y-1.5 text-[11px] text-ink-muted/70">
+          <span className="font-mono uppercase tracking-[0.14em] shrink-0">Otros proyectos de Vero</span>
+          <ul className="flex flex-wrap gap-x-4 gap-y-1.5">
+            {otrosProyectos.map((p) => (
+              <li key={p.url}>
+                <a href={p.url} target="_blank" rel="noopener" title={p.bajada} className="hover:text-ink-muted transition-colors">
+                  {p.titulo}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href={TODOS_LOS_PROYECTOS_URL} target="_blank" rel="noopener" className="hover:text-ink-muted transition-colors">
+                ver todos
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
     </footer>
