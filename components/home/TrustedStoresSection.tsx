@@ -37,7 +37,10 @@ export default function TrustedStoresSection({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {semana && <TrustedStoreCard tienda={semana} variante="semana" />}
         {casa && <TrustedStoreCard tienda={casa} variante="casa" />}
-        {tiendas.map((t) => (
+        {/* Tres, no siete: la sección ocupaba casi dos pantallas de teléfono
+            con tarjetas iguales, y /tiendas ya las tiene todas (17-09). Las de
+            la semana y de la casa cuentan dentro de esas tres. */}
+        {tiendas.slice(0, Math.max(0, 3 - (semana ? 1 : 0) - (casa ? 1 : 0))).map((t) => (
           <TrustedStoreCard key={t.seller_id} tienda={t} />
         ))}
 

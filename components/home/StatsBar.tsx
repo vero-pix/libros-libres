@@ -25,36 +25,31 @@ export default function StatsBar({ listings, stores, views }: Props) {
 
   return (
     <section className="bg-cream-warm/60 border-b border-cream-dark">
-      <div className="max-w-6xl mx-auto px-6 py-5">
-        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 sm:gap-x-14">
-          {stats.map((s) => {
-            const inner = (
-              <>
-                <div className="font-display text-2xl sm:text-3xl font-bold text-ink leading-none tabular-nums">
-                  {s.value}
-                </div>
-                <div className="text-[11px] font-mono uppercase tracking-wider text-ink-muted mt-1.5">
+      <div className="max-w-6xl mx-auto px-6 py-3">
+        <p className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-sm text-ink-muted">
+          {stats.map((s, i) => (
+            <span key={s.label} className="flex items-center gap-2.5">
+              {i > 0 && <span className="text-ink-muted/40" aria-hidden>·</span>}
+              {s.href ? (
+                <Link href={s.href} className="hover:text-ink transition-colors">
+                  <strong className="font-semibold text-ink tabular-nums">{s.value}</strong>{" "}
                   {s.label}
-                </div>
-              </>
-            );
-            return s.href ? (
-              <Link key={s.label} href={s.href} className="text-center animate-fade-up group">
-                <div className="group-hover:opacity-80 transition-opacity">{inner}</div>
-              </Link>
-            ) : (
-              <div key={s.label} className="text-center animate-fade-up">
-                {inner}
-              </div>
-            );
-          })}
+                </Link>
+              ) : (
+                <span>
+                  <strong className="font-semibold text-ink tabular-nums">{s.value}</strong>{" "}
+                  {s.label}
+                </span>
+              )}
+            </span>
+          ))}
           <Link
             href="/novedades"
-            className="self-center text-xs font-semibold text-brand-600 hover:text-coral hover:underline transition-colors"
+            className="text-ink-muted hover:text-ink underline underline-offset-2 transition-colors"
           >
-            Mira lo nuevo →
+            mira lo nuevo
           </Link>
-        </div>
+        </p>
       </div>
     </section>
   );

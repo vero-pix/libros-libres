@@ -21,7 +21,6 @@ import TrustedStoresSection from "@/components/home/TrustedStoresSection";
 import CollectibleRow from "@/components/home/CollectibleRow";
 import RecentRow from "@/components/home/RecentRow";
 import ColeccionRow from "@/components/home/ColeccionRow";
-import RequestsRow from "@/components/home/RequestsRow";
 import HeroRequestStrip from "@/components/home/HeroRequestStrip";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import { configVigente } from "@/lib/siteConfigVigente";
@@ -178,19 +177,10 @@ const getPublicStats = unstable_cache(
         .select("id", { count: "exact", head: true });
       views = count;
     }
-    const { data: sold } = await serviceClient
-      .from("listings")
-      .select("updated_at")
-      .eq("status", "completed");
-
-    const soldByMonth: Record<string, number> = {};
-    for (const l of sold ?? []) {
-      const m = (l.updated_at as string).slice(0, 7);
-      soldByMonth[m] = (soldByMonth[m] ?? 0) + 1;
-    }
-
+    // La consulta de vendidos y el conteo por mes salieron con el gráfico
+    // (17-09): traían todos los listings completados en cada carga de la home.
     const stores = new Set(sellers.map((l) => l.seller_id)).size;
-    return { stores, views: views ?? 0, soldByMonth, totalSold: (sold ?? []).length };
+    return { stores, views: views ?? 0 };
   },
   ["home-public-stats-v2"],
   { revalidate: 300 }
@@ -720,8 +710,6 @@ export default async function HomePage({ searchParams }: Props) {
         totalListings={totalActiveCount}
         stores={publicStats.stores}
         views={publicStats.views}
-        totalSold={publicStats.totalSold}
-        soldByMonth={publicStats.soldByMonth}
         hasFilters={hasFilters}
         heroBooks={heroBooks}
         featuredRow={
@@ -738,17 +726,20 @@ export default async function HomePage({ searchParams }: Props) {
           ) : null
         }
         testimonialBanner={null /* testimonios viejos (Z./Camilo, abr) ocultos hasta tener nuevos */}
-        requestsRow={!hasFilters ? <RequestsRow /> : null}
         heroRequestStrip={!hasFilters ? <HeroRequestStrip /> : null}
         liquidacionBanner={null /* campaña liquidación 50% vacaciones terminada (26 jun) — descuento revertido */}
       >
-        <Breadcrumbs items={[
+        {/* El breadcrumb solo aparece cuando hay filtro. En la home pelada decía
+            "Inicio / Tienda" en medio de la propia home: hacía creer que habías
+            navegado a otra página, y era la costura más visible de las tres
+            páginas pegadas. Con categoría o tag sí orienta, y ahí se queda. */}
+        {hasFilters && <Breadcrumbs items={[
           { label: "Inicio", href: "/" },
           { label: "Tienda", href: (category || subcategory || tag) ? "/" : undefined },
           ...(category ? [{ label: categoryTree.find((c) => c.slug === category)?.name ?? category, href: subcategory ? `/?category=${category}` : undefined }] : []),
           ...(subcategory ? [{ label: categoryTree.flatMap((c) => c.children).find((c) => c.slug === subcategory)?.name ?? subcategory }] : []),
           ...(tag ? [{ label: `#${tag}` }] : []),
-        ]} />
+        ]} />}
         {/* El nombre viene de la tabla `categories` (fuente de verdad). Antes solo se
             pasaba el slug y el drawer lo traducía con el mapa viejo de lib/genres,
             que quedó en la taxonomía anterior → mostraba el slug crudo.

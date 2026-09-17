@@ -5,9 +5,7 @@ import dynamic from "next/dynamic";
 import HeroBar from "./HeroBar";
 import StatsBar from "./StatsBar";
 import TiendaToggle from "./TiendaToggle";
-import CollectionBanners from "./CollectionBanners";
 import LeadCaptureBar from "@/components/ui/LeadCaptureBar";
-import SalesTrend from "./SalesTrend";
 
 const ShelfTransformation = dynamic(() => import("./ShelfTransformation"));
 
@@ -22,19 +20,16 @@ interface Props {
   totalListings: number;
   stores: number;
   views: number;
-  totalSold: number;
-  soldByMonth: Record<string, number>;
   hasFilters: boolean;
   heroBooks?: HeroBook[];
   featuredRow?: ReactNode;
   testimonialBanner?: ReactNode;
-  requestsRow?: ReactNode;
   heroRequestStrip?: ReactNode;
   liquidacionBanner?: ReactNode;
   children: ReactNode;
 }
 
-export default function HomeShell({ totalListings, stores, views, totalSold, soldByMonth, hasFilters, heroBooks, featuredRow, testimonialBanner, requestsRow, heroRequestStrip, liquidacionBanner, children }: Props) {
+export default function HomeShell({ totalListings, stores, views, hasFilters, heroBooks, featuredRow, testimonialBanner, heroRequestStrip, liquidacionBanner, children }: Props) {
   const [forceMap, setForceMap] = useState(false);
 
   const handleToggleMap = useCallback(() => {
@@ -67,8 +62,10 @@ export default function HomeShell({ totalListings, stores, views, totalSold, sol
       {/* Caluga liquidación 50% — arriba del fold, alto tráfico */}
       {!hasFilters && liquidacionBanner}
 
-      {/* Economía inversa: se busca (Prioridad Alta para activar el sitio) */}
-      {!hasFilters && requestsRow}
+      {/* El bloque grande de "Se busca" salió de acá el 17-09: eran DOS bloques
+          de lo mismo (este y el ticker del hero) antes del primer libro a la
+          venta. Queda el ticker, que dice lo mismo en una línea, y /solicitudes
+          con la página entera. */}
 
       {/* Above-the-fold: libros destacados + testimonio */}
       {!hasFilters && (featuredRow || testimonialBanner) && (
@@ -86,12 +83,8 @@ export default function HomeShell({ totalListings, stores, views, totalSold, sol
         </TiendaToggle>
       </main>
 
-      {/* Collection banners */}
-      {!hasFilters && (
-        <div className="max-w-7xl mx-auto px-6 pb-10">
-          <CollectionBanners />
-        </div>
-      )}
+      {/* Los banners de colección salieron el 17-09: repetían lo que ya hacen
+          las filas curadas, y cada colección tiene su /coleccion/[slug]. */}
 
       {/* Manifiesto compacto al final — antes del footer */}
       {!hasFilters && (
@@ -123,9 +116,9 @@ export default function HomeShell({ totalListings, stores, views, totalSold, sol
         </section>
       )}
 
-      {!hasFilters && Object.keys(soldByMonth).length > 0 && (
-        <SalesTrend soldByMonth={soldByMonth} totalSold={totalSold} />
-      )}
+      {/* El gráfico de ventas salió de la home el 17-09 (decisión de Vero): es
+          prueba social de verdad, pero no es lo que vino a hacer quien entra a
+          comprar un libro. */}
 
       {!hasFilters && <LeadCaptureBar />}
     </>
