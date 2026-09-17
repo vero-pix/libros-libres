@@ -775,7 +775,13 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                 {isCourier ? "Envío" : "Entrega"}
               </span>
               <span className="text-ink font-bold">
-                {!isCourier ? (
+                {/* Sin método elegido no es "Gratis": es que todavía no se sabe.
+                    Decía Gratis apenas entrabas, con el total completo al lado y
+                    el botón apagado — parecía un sitio roto, no un formulario a
+                    medio llenar. (17-09-2026) */}
+                {!deliveryMethod ? (
+                  <span className="text-ink-muted font-medium">Falta elegir</span>
+                ) : !isCourier ? (
                   "Gratis"
                 ) : seSumaAPaqueteAbierto ? (
                   <>
