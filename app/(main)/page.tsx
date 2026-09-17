@@ -803,19 +803,23 @@ export default async function HomePage({ searchParams }: Props) {
                     : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-5";
 
                   const CardComponent = viewMode === "list" ? ListingCardList : ListingCard;
+                  // Sin orden propio la grilla ya viene por lo último, así que
+                  // el sello "Nuevo aquí" lo llevarían todas (la captura del
+                  // 17-09: 16 de 16). Se apaga solo en ese caso.
+                  const ordenadaPorUltimos = !hasCustomSort;
 
                   return (
                     <>
                       <div className={gridClass}>
                         {firstHalf.map((listing) => (
-                          <CardComponent key={listing.id} listing={listing} />
+                          <CardComponent key={listing.id} listing={listing} ocultarNuevo={ordenadaPorUltimos} />
                         ))}
                       </div>
                       {secondHalf.length > 0 && (
                         <>
                           <div className={gridClass}>
                             {secondHalf.map((listing) => (
-                              <CardComponent key={listing.id} listing={listing} />
+                              <CardComponent key={listing.id} listing={listing} ocultarNuevo={ordenadaPorUltimos} />
                             ))}
                           </div>
                         </>

@@ -23,7 +23,9 @@ const BLUR_PLACEHOLDER =
 
 function isRecent(createdAt: string) {
   const diff = Date.now() - new Date(createdAt).getTime();
-  return diff < 7 * 24 * 60 * 60 * 1000;
+  // 3 días, no 7: con 196 publicaciones en la última semana, una ventana de
+  // siete días le ponía el sello a demasiados a la vez.
+  return diff < 3 * 24 * 60 * 60 * 1000;
 }
 
 function hasDiscount(listing: ListingWithBook) {
@@ -87,11 +89,15 @@ function pickPrimaryBadge(listing: ListingWithBook): Badge | null {
 interface Props {
   listing: ListingWithBook;
   showDistance?: boolean;
+  /** En una lista ya ordenada por lo último, el sello "Nuevo aquí" lo llevan
+   *  todas las tarjetas y deja de significar algo. Ahí se apaga. */
+  ocultarNuevo?: boolean;
 }
 
 const ListingCard = memo(function ListingCard({
   listing,
   showDistance = true,
+  ocultarNuevo = false,
 }: Props) {
   const [showQuickView, setShowQuickView] = useState(false);
   const [cartState, setCartState] = useState<"idle" | "loading" | "added">("idle");
@@ -144,7 +150,8 @@ const ListingCard = memo(function ListingCard({
   const address = (listing as unknown as Record<string, unknown>).address as string | undefined;
   const displayLocation = comunaDesdeAddress(address);
 
-  const badge = pickPrimaryBadge(listing);
+  const badgeBruto = pickPrimaryBadge(listing);
+  const badge = ocultarNuevo && badgeBruto?.label === "Nuevo aquí" ? null : badgeBruto;
 
   /* ---------- Objeto-libro: cubierta dibujada (fallback sin foto) ---------- */
 
