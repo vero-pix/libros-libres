@@ -67,21 +67,24 @@ export default function HomeShell({ totalListings, stores, views, hasFilters, he
           venta. Queda el ticker, que dice lo mismo en una línea, y /solicitudes
           con la página entera. */}
 
-      {/* Above-the-fold: libros destacados + testimonio */}
-      {!hasFilters && (featuredRow || testimonialBanner) && (
-        <section className="bg-white border-b border-cream-dark">
-          <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-            {featuredRow}
-            {testimonialBanner}
-          </div>
-        </section>
-      )}
-
       <main id="tienda" className="max-w-7xl mx-auto px-6 py-10 scroll-mt-32">
         <TiendaToggle forceMap={forceMap} onForceMapConsumed={() => setForceMap(false)} hasFilters={hasFilters}>
           {children}
         </TiendaToggle>
       </main>
+
+      {/* Lo que más se busca, los destacados de la semana y las librerías: de
+          arriba del fold a DEBAJO de la grilla (17-09, tanda 3). Ocupaban las
+          pantallas 1 a 3 del teléfono y empujaban los libros abajo; quien ya
+          bajó por la grilla es justo a quien le sirven. */}
+      {!hasFilters && (featuredRow || testimonialBanner) && (
+        <section className="bg-white border-y border-cream-dark">
+          <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
+            {featuredRow}
+            {testimonialBanner}
+          </div>
+        </section>
+      )}
 
       {/* Los banners de colección salieron el 17-09: repetían lo que ya hacen
           las filas curadas, y cada colección tiene su /coleccion/[slug]. */}
