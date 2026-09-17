@@ -2,37 +2,47 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
+import BookCover from "@/components/listings/BookCover";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { sortListingsForDisplay } from "@/lib/sortListings";
+import { libroUrl } from "@/lib/urls";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
 
 const URL = "https://tuslibros.cl/libros-antiguos";
 
+/** Tag que marca una pieza como impreso chileno antiguo. Se pone desde "Mis libros". */
+const TAG_CHILENO = "impreso-chileno";
+
 export const metadata: Metadata = {
-  title: "Libros antiguos y de colección en Chile: comprar y vender",
+  title: "Libros antiguos en Chile: impresos chilenos y de colección",
   description:
-    "Compra y vende libros antiguos en Chile: primeras ediciones, ediciones del siglo XIX, libros descatalogados y de colección. Fotos reales, pago protegido con MercadoPago y envío a todo el país.",
+    "Impresos chilenos antiguos y libros de colección: ediciones de Santiago del siglo XIX, publicaciones del Centenario, revistas y primeras ediciones. Fotos reales del ejemplar, año y estado declarado, envío a todo Chile.",
   alternates: { canonical: URL },
   keywords: [
+    "impresos chilenos",
+    "impresos chilenos antiguos",
+    "libros chilenos antiguos",
+    "ediciones antiguas chilenas",
     "libros antiguos",
     "libros antiguos chile",
     "comprar libros antiguos",
     "vender libros antiguos",
-    "compra de libros antiguos",
     "quien compra libros antiguos",
     "libros de coleccion chile",
     "primeras ediciones",
     "libros raros",
     "libros descatalogados",
     "libros siglo xix",
+    "imprenta universitaria",
+    "editorial nascimento",
     "libreria anticuaria online chile",
   ],
   openGraph: {
-    title: "Libros antiguos y de colección en Chile",
+    title: "Libros antiguos en Chile: impresos chilenos y de colección",
     description:
-      "Primeras ediciones, ediciones del siglo XIX, rarezas y descatalogados. Comprar y vender con fotos reales y pago protegido.",
+      "Ediciones chilenas del siglo XIX y comienzos del XX, publicaciones del Centenario, revistas y rarezas. Con fotos reales y el estado a la vista.",
     url: URL,
     siteName: "tuslibros.cl",
     locale: "es_CL",
@@ -41,6 +51,14 @@ export const metadata: Metadata = {
 };
 
 const faqs = [
+  {
+    q: "¿Qué es un impreso chileno antiguo?",
+    a: "Un libro, folleto o revista impreso en Chile, normalmente antes de mediados del siglo XX: las ediciones de la Imprenta Universitaria, de Nascimento, de las librerías de Santiago del siglo XIX, las publicaciones del Centenario, las revistas universitarias. Se reconocen por el pie de imprenta con la dirección de la calle y, en los más viejos, por la ortografía de la época: 'rejión' con jota, la i latina en vez de la y. Casi ninguno se reimprimió nunca, así que el ejemplar que existe es el que hay.",
+  },
+  {
+    q: "¿Por qué los impresos chilenos son difíciles de encontrar?",
+    a: "Porque se imprimieron en tiradas cortas, para un país chico, y nadie los reeditó. Un clásico europeo del siglo XIX lo encuentras en cualquier librería de viejo del mundo; un recuento de Temuco impreso en Santiago en 1911 existe en los ejemplares que sobrevivieron. Eso es lo que los hace piezas: no son antiguos nomás, son escasos acá y en todas partes.",
+  },
   {
     q: "¿Quién compra libros antiguos en Chile?",
     a: "Coleccionistas, libreros de viejo, bibliotecas y lectores que buscan una edición concreta. En tuslibros.cl los encuentras a todos en un mismo lugar: publicas tu ejemplar con fotos y precio, y el que lo busca te escribe o lo compra directo. No hay intermediario que te tase a la baja.",
@@ -55,7 +73,7 @@ const faqs = [
   },
   {
     q: "¿Puedo revisar el estado antes de comprar?",
-    a: "Sí. Cada publicación lleva fotos reales del ejemplar y la condición declarada por el vendedor. Si pagas con MercadoPago el dinero queda protegido hasta que recibes el libro y confirmas que corresponde a lo publicado.",
+    a: "Sí. Cada publicación lleva fotos reales del ejemplar y la condición declarada por el vendedor. En las piezas antiguas el estado va descrito sin maquillaje: si el lomo está gastado o el papel tiene manchas de humedad, está dicho. Si pagas con MercadoPago el dinero queda protegido hasta que recibes el libro y confirmas que corresponde a lo publicado.",
   },
   {
     q: "¿Envían libros antiguos a regiones?",
@@ -68,14 +86,45 @@ const faqs = [
 ];
 
 const TIPOS = [
+  { title: "Impresos chilenos", desc: "Ediciones hechas en Chile: la Imprenta Universitaria, Nascimento, las librerías de Santiago del siglo XIX. Tirada corta, sin reimpresión, con el pie de imprenta y la dirección de la calle en la portada." },
   { title: "Ediciones del siglo XIX", desc: "Clásicos traducidos y encuadernados en su época: Plutarco, Séneca, Pascal. Papel de trapo, lomos en piel, tipografía que ya no existe." },
   { title: "Primeras ediciones", desc: "La primera vez que un libro salió a la calle. Las de autores chilenos y del boom latinoamericano (Seix Barral, Zig-Zag, Nascimento) son las más buscadas." },
   { title: "Colecciones cerradas", desc: "Series que ya no se completan: la Biblioteca de Babel de Borges en Siruela, la Biblioteca Clásica Gredos, las primeras Alianza de bolsillo." },
   { title: "Descatalogados", desc: "Títulos que ninguna editorial volvió a imprimir. No son antiguos, pero solo existen usados." },
 ];
 
+/**
+ * El gancho de cada pieza sale de su propia descripción, no de un texto
+ * paralelo en el código: así la landing nunca dice algo distinto de la ficha.
+ */
+function gancho(descripcion: string | null | undefined, max = 190): string {
+  if (!descripcion) return "";
+  const limpia = descripcion.trim();
+  const fin = limpia.search(/\.\s/);
+  const primera = fin > 0 ? limpia.slice(0, fin + 1) : limpia;
+  if (primera.length <= max) return primera;
+  const corte = primera.lastIndexOf(" ", max);
+  return `${primera.slice(0, corte > 0 ? corte : max).trim()}…`;
+}
+
+const clp = (n: number | null | undefined) =>
+  typeof n === "number" ? `$${n.toLocaleString("es-CL")}` : "";
+
 export default async function LibrosAntiguosPage() {
   const supabase = await createClient();
+
+  const SELECT = `*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`;
+
+  // Las piezas chilenas, de la más antigua a la más nueva.
+  const { data: chilenasRaw } = await supabase
+    .from("listings")
+    .select(SELECT)
+    .eq("status", "active")
+    .contains("book.tags", [TAG_CHILENO]);
+
+  const chilenas = ((chilenasRaw as unknown as ListingWithBook[]) ?? []).sort(
+    (a, b) => (a.book?.published_year ?? 9999) - (b.book?.published_year ?? 9999)
+  );
 
   const { data: featuredRaw } = await supabase
     .from("listings")
@@ -85,7 +134,11 @@ export default async function LibrosAntiguosPage() {
     .order("price", { ascending: false })
     .limit(48);
 
-  const featured = sortListingsForDisplay((featuredRaw as unknown as ListingWithBook[]) ?? []).slice(0, 24);
+  // Las chilenas ya tienen su propia sección arriba: no se repiten en la grilla.
+  const idsChilenas = new Set(chilenas.map((l) => l.id));
+  const featured = sortListingsForDisplay(
+    ((featuredRaw as unknown as ListingWithBook[]) ?? []).filter((l) => !idsChilenas.has(l.id))
+  ).slice(0, 24);
 
   const { count: totalCollectible } = await supabase
     .from("listings")
@@ -96,11 +149,26 @@ export default async function LibrosAntiguosPage() {
   const collectionJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Libros antiguos y de colección en Chile",
+    name: "Libros antiguos e impresos chilenos en Chile",
     description:
-      "Libros antiguos, primeras ediciones, ediciones del siglo XIX y descatalogados a la venta en Chile, con fotos reales y pago protegido.",
+      "Impresos chilenos antiguos, primeras ediciones, ediciones del siglo XIX y descatalogados a la venta en Chile, con fotos reales y pago protegido.",
     url: URL,
   };
+
+  const itemListJsonLd = chilenas.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: "Impresos chilenos antiguos disponibles",
+        numberOfItems: chilenas.length,
+        itemListElement: chilenas.map((l, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: l.book?.title,
+          url: `https://tuslibros.cl${libroUrl(l)}`,
+        })),
+      }
+    : null;
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -124,6 +192,9 @@ export default async function LibrosAntiguosPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
+      {itemListJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -139,13 +210,13 @@ export default async function LibrosAntiguosPage() {
           <section className="mt-8 mb-16 max-w-3xl">
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-ink leading-[1.05] tracking-tight">
               Libros antiguos y de colección —{" "}
-              <span className="italic text-brand-600">comprar y vender en Chile.</span>
+              <span className="italic text-brand-600">impresos chilenos y primeras ediciones.</span>
             </h1>
             <p className="mt-6 text-lg text-ink-muted leading-relaxed">
-              Ediciones del siglo XIX, primeras ediciones, colecciones que ya no se completan y
-              libros que ninguna editorial volvió a imprimir. Cada ejemplar con fotos reales, el
-              vendedor a la vista y pago protegido. Y si el que tiene la joya eres tú, acá la
-              ve gente que sabe lo que vale.
+              Ediciones hechas en Chile que nadie volvió a imprimir, clásicos del siglo XIX,
+              colecciones que ya no se completan. Cada ejemplar con fotos reales, el año, el
+              estado dicho sin maquillaje y el vendedor a la vista. Y si el que tiene la joya
+              eres tú, acá la ve gente que sabe lo que vale.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -162,6 +233,72 @@ export default async function LibrosAntiguosPage() {
               </Link>
             </div>
           </section>
+
+          {chilenas.length > 0 && (
+            <section className="mb-16">
+              <h2 className="font-display text-3xl font-bold text-ink mb-3">
+                Impresos chilenos
+              </h2>
+              <p className="text-ink-muted leading-relaxed max-w-3xl mb-8">
+                Libros y revistas impresos en Chile, en tiradas cortas y para un país chico.
+                Un clásico europeo del siglo XIX lo encuentras en cualquier librería de viejo
+                del mundo; estos existen en los ejemplares que sobrevivieron. Van ordenados
+                del más antiguo al más nuevo.
+              </p>
+
+              <ul className="space-y-4">
+                {chilenas.map((l) => (
+                  <li key={l.id}>
+                    <Link
+                      href={libroUrl(l)}
+                      className="group flex gap-5 bg-white rounded-2xl p-5 border border-cream-dark hover:border-brand-300 hover:shadow-sm transition-all"
+                    >
+                      <BookCover
+                        title={l.book?.title ?? "Libro"}
+                        author={l.book?.author}
+                        coverUrl={l.cover_image_url ?? l.book?.cover_url}
+                        sizes="96px"
+                        className="w-20 sm:w-24 shrink-0 rounded-lg border border-cream-dark"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline gap-3 flex-wrap">
+                          {l.book?.published_year && (
+                            <span className="font-mono text-xs font-semibold text-brand-600 tracking-wider">
+                              {l.book.published_year}
+                            </span>
+                          )}
+                          {l.book?.publisher && (
+                            <span className="text-xs text-ink-muted">{l.book.publisher}</span>
+                          )}
+                        </div>
+                        <h3 className="font-display text-lg sm:text-xl font-bold text-ink leading-snug mt-1 group-hover:text-brand-600 transition-colors">
+                          {l.book?.title}
+                        </h3>
+                        {l.book?.author && (
+                          <p className="text-sm text-ink-muted italic mt-0.5">{l.book.author}</p>
+                        )}
+                        <p className="text-sm text-ink-muted leading-relaxed mt-2 line-clamp-3">
+                          {gancho(l.book?.description)}
+                        </p>
+                        {typeof l.price === "number" && (
+                          <p className="text-base font-bold text-ink mt-3">{clp(l.price)}</p>
+                        )}
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-6">
+                <Link
+                  href={`/?tag=${TAG_CHILENO}`}
+                  className="inline-flex items-center text-brand-600 font-semibold hover:text-brand-700 transition-colors"
+                >
+                  Ver todos los impresos chilenos →
+                </Link>
+              </div>
+            </section>
+          )}
 
           {featured.length > 0 && (
             <section className="mb-16">
