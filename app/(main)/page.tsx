@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
-import CategoriesSidebar from "@/components/ui/CategoriesSidebar";
 import CategoriesMobileDrawer from "@/components/ui/CategoriesMobileDrawer";
 import ListingToolbar from "@/components/listings/ListingToolbar";
 import ListingCard from "@/components/listings/ListingCard";
@@ -18,9 +17,6 @@ import CalugaPieza from "@/components/home/CalugaPieza";
 import { leerPiezaDestacada } from "@/lib/piezaDestacada";
 import { librosMasBuscados } from "@/lib/demandaBusqueda";
 import TrustedStoresSection from "@/components/home/TrustedStoresSection";
-import CollectibleRow from "@/components/home/CollectibleRow";
-import RecentRow from "@/components/home/RecentRow";
-import ColeccionRow from "@/components/home/ColeccionRow";
 import HeroRequestStrip from "@/components/home/HeroRequestStrip";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import { configVigente } from "@/lib/siteConfigVigente";
@@ -591,14 +587,10 @@ export default async function HomePage({ searchParams }: Props) {
   const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || city_id || collectibleOnly);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
-  const [featuredListings, trustedStores, collectibleListings, recentListings, collectionsRaw, totalActiveCount, availableTags, publicStats, vitrinaDemanda, piezaDestacada] = await Promise.all([
+  const [featuredListings, trustedStores, totalActiveCount, publicStats, vitrinaDemanda, piezaDestacada] = await Promise.all([
     getFeaturedListings() as unknown as Promise<ListingWithBook[]>,
     getTrustedStores(),
-    getCollectibleListings() as unknown as Promise<ListingWithBook[]>,
-    getRecentListings() as unknown as Promise<ListingWithBook[]>,
-    getCollections() as unknown as Promise<{ tag: string; collectionSlug?: string; title: string; subtitle: string; adorno?: string; listings: ListingWithBook[] }[]>,
     getTotalActiveCount(),
-    getAvailableTags(),
     getPublicStats(),
     getVitrinaDemanda(),
     getPiezaDestacada(),
@@ -627,17 +619,9 @@ export default async function HomePage({ searchParams }: Props) {
       }))
     : [];
   const featuredRowListings = dedupeRow(featuredListings.filter((l) => !heroReserved.has(l.id)));
-  const recentRowListings = dedupeRow(recentListings);
-  const collectibleRowListings = dedupeRow(collectibleListings);
-  // Las colecciones ya vienen deduplicadas entre sí; además les quitamos lo que ya
-  // apareció en las filas de arriba y ocultamos las que queden con <3.
-  const collections = collectionsRaw
-    .map((c) => ({ ...c, listings: c.listings.filter((l) => !usedRowIds.has(l.id)) }))
-    .filter((c) => c.listings.length >= 3);
-  // Todo lo ya visible en filas + colecciones → se excluye de la grilla principal
-  // para que no se repita justo debajo (la grilla rellena con los siguientes reales).
+  // Con las once filas fuera (17-09), lo único que sigue arriba de la grilla es
+  // la fila de destacados: solo eso se excluye para no repetirlo justo debajo.
   const shownAboveIds = new Set<string>(usedRowIds);
-  collections.forEach((c) => c.listings.forEach((l) => shownAboveIds.add(l.id)));
 
   // Listings principales: sin filtros ni sort custom → versión cacheada
   const hasCustomSort = sort === "price_asc" || sort === "price_desc" || sort === "distance";
@@ -767,23 +751,24 @@ export default async function HomePage({ searchParams }: Props) {
           }
         />
 
-        <div className="flex gap-10">
-          <CategoriesSidebar categoryTree={categoryTree} activeCategory={category} activeSubcategory={subcategory} activeTag={tag} totalCount={totalActiveCount} availableTags={availableTags} caluga={<CalugaPieza pieza={piezaDestacada} />} />
+        {/* El árbol de categorías ocupaba la columna izquierda entera de la home
+            y se usa 15 veces menos que el buscador (103 visitas contra 1.629 en
+            30 días). Se entra por "Categorías" en la barra de arriba y por el
+            drawer en el teléfono. La pieza destacada, que vivía en ese sidebar,
+            sube a portada: es lo único curado que queda en la home. */}
+        <div>
+          <div className="min-w-0">
+            {/* Acá vivían ONCE filas curadas con la misma forma —recién
+                subidos, nueve colecciones y coleccionables— entre la pantalla
+                3,2 y la 7,4 del teléfono: cuatro pantallas de carruseles antes
+                del primer libro de la grilla. Las colecciones siguen enteras en
+                /coleccion/[slug] y los coleccionables en /libros-antiguos.
+                En su lugar, arriba, va una sola pieza con su historia. */}
 
-          <div className="flex-1 min-w-0">
-            {!hasFilters && recentRowListings.length > 0 && (
-              <RecentRow listings={recentRowListings} />
-            )}
-
-            {/* Colecciones editoriales curadas por Vero — deduplicadas entre sí y contra las filas */}
-            {!hasFilters &&
-              collections.map((c) => (
-                <ColeccionRow key={c.tag} tag={c.tag} collectionSlug={c.collectionSlug} title={c.title} subtitle={c.subtitle} adorno={c.adorno} listings={c.listings} />
-              ))}
-
-            {!hasFilters && collectibleRowListings.length > 0 && (
-              <CollectibleRow listings={collectibleRowListings} />
-            )}
+            {/* La única cosa curada que queda en la home: un libro, su historia
+                y su precio. Sale de site_config.pieza_destacada, así que se
+                cambia sin deploy (lib/piezaDestacada.ts). */}
+            {!hasFilters && <CalugaPieza pieza={piezaDestacada} variante="portada" />}
 
             <Suspense fallback={<div className="h-10 bg-gray-100 rounded-lg animate-pulse mb-4" />}>
               <ListingToolbar />
