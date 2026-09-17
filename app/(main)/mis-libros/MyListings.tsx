@@ -33,9 +33,11 @@ const MODALITY_LABELS: Record<string, string> = {
 
 interface Props {
   listings: ListingWithBook[];
+  /** Solo algunos vendedores pueden destacar por ahora (ver /api/listings/destacar). */
+  puedeDestacar?: boolean;
 }
 
-export default function MyListings({ listings: initial }: Props) {
+export default function MyListings({ listings: initial, puedeDestacar = false }: Props) {
   const [listings, setListings] = useState(initial);
   const searchParams = useSearchParams();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -106,6 +108,33 @@ export default function MyListings({ listings: initial }: Props) {
       setListings((prev) =>
         prev.map((l) => (l.id === id ? { ...l, status } : l))
       );
+    }
+    setLoading(null);
+  }
+
+  async function toggleDestacado(id: string, featured: boolean) {
+    setLoading(id);
+    try {
+      const res = await fetch("/api/listings/destacar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, featured }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "No se pudo cambiar el destacado.");
+      } else {
+        setListings((prev) =>
+          prev.map((l) => (l.id === id ? ({ ...l, featured: data.featured, featured_rank: data.rank } as any) : l))
+        );
+        // La portada muestra 12: si están tomados, el libro queda destacado pero
+        // no visible. Se dice, en vez de dejar creer que salió en la portada.
+        if (data.featured && !data.visible) {
+          alert("Quedó destacado, pero la portada ya tiene sus 12 lugares ocupados. Va a entrar cuando saques otro.");
+        }
+      }
+    } catch {
+      alert("Error de conexión.");
     }
     setLoading(null);
   }
@@ -245,6 +274,8 @@ export default function MyListings({ listings: initial }: Props) {
           onToggleEdit={() => setEditingId(editingId === listing.id ? null : listing.id)}
           onUpdateStatus={updateStatus}
           onDelete={deleteListing}
+          puedeDestacar={puedeDestacar}
+          onToggleDestacado={toggleDestacado}
           onUpdated={(updated) => {
             setListings((prev) =>
               prev.map((l) => (l.id === updated.id ? updated : l))
@@ -284,6 +315,8 @@ interface RowProps {
   onUpdateStatus: (id: string, status: ListingStatus) => void;
   onDelete: (id: string) => void;
   onUpdated: (listing: ListingWithBook) => void;
+  puedeDestacar: boolean;
+  onToggleDestacado: (id: string, featured: boolean) => void;
 }
 
 function ListingRow({
@@ -295,6 +328,8 @@ function ListingRow({
   onUpdateStatus,
   onDelete,
   onUpdated,
+  puedeDestacar,
+  onToggleDestacado,
 }: RowProps) {
   const { book } = listing;
   const coverUrl = listing.cover_image_url ?? book.cover_url;
@@ -367,6 +402,27 @@ function ListingRow({
 
           {/* Actions */}
           <div className="flex flex-wrap gap-2 mt-3">
+            {puedeDestacar && listing.status === "active" && (
+              (listing as any).featured ? (
+                <button
+                  onClick={() => onToggleDestacado(listing.id, false)}
+                  disabled={isLoading}
+                  className="text-xs font-semibold text-coral bg-coral/10 hover:bg-coral/20 px-2.5 py-1 rounded-lg border border-coral/30 transition-colors"
+                  title="Sacarlo de la portada"
+                >
+                  ★ Destacado
+                </button>
+              ) : (
+                <button
+                  onClick={() => onToggleDestacado(listing.id, true)}
+                  disabled={isLoading}
+                  className="text-xs text-gray-600 hover:bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-200 transition-colors"
+                  title="Mostrarlo en la portada"
+                >
+                  ☆ Destacar
+                </button>
+              )
+            )}
             {listing.status === "active" && (
               <button
                 onClick={() => onUpdateStatus(listing.id, "paused")}

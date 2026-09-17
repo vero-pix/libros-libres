@@ -9,6 +9,10 @@ import type { ListingWithBook } from "@/types";
 
 export const metadata = { title: "Mis Libros — tuslibros.cl", robots: { index: false } };
 
+// Quién ve el botón de destacar. La misma lista vive en /api/listings/destacar,
+// que es quien decide de verdad; esto solo evita mostrar un botón que va a fallar.
+const VENDEDORES_QUE_PUEDEN_DESTACAR = ["vero"];
+
 export default async function MisLibrosPage() {
   const supabase = await createClient();
   const {
@@ -22,7 +26,7 @@ export default async function MisLibrosPage() {
     // mercadopago_user_id y NO el access_token: el token es una credencial y su
     // lectura quedó revocada para anon/authenticated. user_id es además el campo
     // que usa el botón de compra en la ficha, así que aviso y botón coinciden.
-    .select("public_email, instagram, phone, mercadopago_user_id")
+    .select("public_email, instagram, phone, mercadopago_user_id, username")
     .eq("id", user.id)
     .single();
 
@@ -88,7 +92,7 @@ export default async function MisLibrosPage() {
 
         <WantedBounty />
 
-        <MyListings listings={listings} />
+        <MyListings listings={listings} puedeDestacar={VENDEDORES_QUE_PUEDEN_DESTACAR.includes(profile?.username ?? "")} />
       </main>
     </div>
   );
