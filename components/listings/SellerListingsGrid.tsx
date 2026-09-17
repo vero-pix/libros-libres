@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { ListingWithBook } from "@/types";
 import ListingCard from "./ListingCard";
 
@@ -8,8 +8,14 @@ interface Props {
   listings: ListingWithBook[];
 }
 
+/** Cuántas tarjetas se pintan de una. El perfil de libro.de.ocasion tiene
+ *  1.682 libros: pintarlos todos eran 442 pantallas de scroll y otras tantas
+ *  portadas cargando. */
+const TANDA = 48;
+
 export default function SellerListingsGrid({ listings }: Props) {
   const [query, setQuery] = useState("");
+  const [visibles, setVisibles] = useState(TANDA);
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim();
@@ -20,6 +26,13 @@ export default function SellerListingsGrid({ listings }: Props) {
       return title.includes(q) || author.includes(q);
     });
   }, [query, listings]);
+
+  // Al cambiar la búsqueda se vuelve a la primera tanda: si no, una consulta
+  // con pocos resultados heredaba el "ver más" de la anterior.
+  useEffect(() => setVisibles(TANDA), [query]);
+
+  const mostrados = filtered.slice(0, visibles);
+  const restantes = filtered.length - mostrados.length;
 
   return (
     <div>
@@ -58,20 +71,40 @@ export default function SellerListingsGrid({ listings }: Props) {
         )}
       </div>
 
-      {/* Results count when filtering */}
-      {query && (
-        <p className="text-xs text-ink-muted mb-3">
-          {filtered.length} {filtered.length === 1 ? "resultado" : "resultados"} para &ldquo;{query}&rdquo;
-        </p>
-      )}
+      {/* Cuántos hay y cuántos se están viendo */}
+      <p className="text-xs text-ink-muted mb-3">
+        {query ? (
+          <>
+            {filtered.length} {filtered.length === 1 ? "resultado" : "resultados"} para &ldquo;{query}&rdquo;
+          </>
+        ) : (
+          <>
+            {filtered.length.toLocaleString("es-CL")} libros
+            {restantes > 0 && <> · mostrando los primeros {mostrados.length}</>}
+          </>
+        )}
+      </p>
 
       {/* Grid */}
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
-          {filtered.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+            {mostrados.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+          {restantes > 0 && (
+            <div className="text-center mt-8">
+              <button
+                type="button"
+                onClick={() => setVisibles((v) => v + TANDA)}
+                className="px-6 py-3 rounded-xl border border-ink/15 bg-white text-sm font-semibold text-ink hover:border-brand-300 hover:text-brand-600 transition-colors"
+              >
+                Ver más libros ({restantes.toLocaleString("es-CL")} {restantes === 1 ? "restante" : "restantes"})
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <div className="text-center py-10 text-ink-muted">
           <p className="text-sm">No se encontraron libros para &ldquo;{query}&rdquo;</p>

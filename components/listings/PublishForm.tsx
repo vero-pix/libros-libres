@@ -36,8 +36,9 @@ import { trackEvent } from "@/utils/analytics";
 type Modality = "sale" | "loan" | "both";
 type Condition = "new" | "good" | "fair" | "poor";
 
-// El arriendo se descontinuó (jul 2026): solo venta. Se deja el arreglo por si
-// se reactiva; con un solo elemento, el selector de modalidad no se muestra.
+// El arriendo se descontinuó (jul 2026): solo venta. El formulario tenía
+// todavía los campos de arriendo detrás de `modality !== "sale"`, una condición
+// que ya no podía cumplirse: 60 líneas de pantalla que nadie veía. Fuera.
 const MODALITY_OPTIONS: { value: Modality; label: string; icon: string; desc: string }[] = [
   { value: "sale",  label: "Venta",            icon: "🏷️", desc: "Quieres vender el libro" },
 ];
@@ -109,9 +110,6 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
   const [modality, setModality] = useState<Modality>("sale");
   const [originalPrice, setOriginalPrice] = useState("");
   const [price, setPrice] = useState("");
-  const [rentalPrice, setRentalPrice] = useState("");
-  const [rentalDeposit, setRentalDeposit] = useState("");
-  const [rentalPeriod, setRentalPeriod] = useState<7 | 14 | 30>(14);
   const [condition, setCondition] = useState<Condition>("good");
   const [notes, setNotes] = useState("");
   const [phone, setPhone] = useState(existingPhone ?? "");
@@ -409,7 +407,6 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
     if (!bookAuthor.trim()) { setError("El libro necesita un autor. Complétalo antes de publicar."); return; }
     if (!location) { setError("Marca la ubicación del libro en el mapa."); return; }
     if (modality !== "loan" && !price) { setError("Ingresa el precio de venta."); return; }
-    if (modality !== "sale" && !rentalPrice) { setError("Ingresa el precio de arriendo."); return; }
 
     // ── Integridad: mínimo duro de precio (único bloqueo nuevo) ──
     if (modality !== "loan") {
@@ -540,9 +537,6 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         modality,
         price: modality !== "loan" ? parseFloat(price) : null,
         original_price: modality !== "loan" && originalPrice ? parseFloat(originalPrice) : null,
-        rental_price: modality !== "sale" ? parseFloat(rentalPrice) : null,
-        rental_deposit: modality !== "sale" && rentalDeposit ? parseFloat(rentalDeposit) : null,
-        rental_period_days: modality !== "sale" ? rentalPeriod : null,
         condition,
         notes: notes.trim() || null,
         latitude: location.lat,
@@ -951,69 +945,6 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
                 </div>
               </div>
             </>
-          )}
-
-          {/* Arriendo: precio, garantía, período */}
-          {modality !== "sale" && (
-            <div className="space-y-3 p-4 bg-brand-50 border border-brand-100 rounded-xl">
-              <p className="text-xs font-semibold text-brand-700">Datos del arriendo</p>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Precio del arriendo <span className="text-gray-400 font-normal">(CLP por período)</span>
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm font-medium pointer-events-none">$</span>
-                  <input
-                    type="number"
-                    value={rentalPrice}
-                    onChange={(e) => setRentalPrice(e.target.value)}
-                    placeholder="3000"
-                    min="0"
-                    step="1"
-                    className="w-full pl-7 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Período <span className="text-gray-400 font-normal">(días)</span>
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {([7, 14, 30] as const).map((d) => (
-                    <button
-                      key={d}
-                      type="button"
-                      onClick={() => setRentalPeriod(d)}
-                      className={`py-2 rounded-xl border text-sm font-medium transition-all ${
-                        rentalPeriod === d
-                          ? "border-brand-500 bg-white text-brand-700 ring-1 ring-brand-400"
-                          : "border-gray-200 text-gray-600 bg-white hover:border-gray-300"
-                      }`}
-                    >
-                      {d} días
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Garantía <span className="text-gray-400 font-normal">(opcional, reembolsable)</span>
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm font-medium pointer-events-none">$</span>
-                  <input
-                    type="number"
-                    value={rentalDeposit}
-                    onChange={(e) => setRentalDeposit(e.target.value)}
-                    placeholder="5000"
-                    min="0"
-                    step="500"
-                    className="w-full pl-7 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
-                  />
-                </div>
-                <p className="text-xs text-gray-400 mt-1">Se devuelve al arrendatario cuando devuelve el libro en buen estado.</p>
-              </div>
-            </div>
           )}
 
           {/* Estado */}

@@ -127,14 +127,21 @@ export default function ReviewSection({ listingId }: Props) {
     setCanReview(false);
   }
 
-  if (loading) {
-    return <div className="px-6 py-4 text-sm text-gray-400">Cargando reseñas...</div>;
-  }
+  // Casi ninguna ficha tiene reseña de ejemplar, así que el "Cargando..."
+  // parpadeaba para no mostrar nada. Mejor no ocupar espacio hasta saber.
+  if (loading) return null;
+
+  // Sin reseñas y sin nada que ofrecer, este bloque solo repetía el vacío de
+  // "Reseñas del libro", justo abajo: dos títulos y dos frases para cero
+  // contenido. El <div id="resena-vendedor"> de la ficha se queda igual, así
+  // que el enlace del correo "¿Cómo llegó?" sigue funcionando cuando la
+  // persona sí puede reseñar.
+  if (!reviews.length && !canReview && !alreadyReviewed && !formSuccess) return null;
 
   return (
     <div className="border-t border-gray-100 px-5 sm:px-6 py-5">
       <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-        Reseñas
+        Reseñas de este ejemplar
         {reviews.length > 0 && (
           <span className="text-sm font-normal text-gray-500">
             {avgRating.toFixed(1)} / 5 ({reviews.length})

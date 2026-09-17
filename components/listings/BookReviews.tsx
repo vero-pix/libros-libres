@@ -168,8 +168,10 @@ export default function BookReviews({ bookId, bookTitle, initialReviews }: Props
         </div>
       )}
 
-      {/* Estado vacío */}
-      {!editorial && userReviews.length === 0 && (
+      {/* Estado vacío. Con sesión, el formulario va justo abajo y esta línea
+          basta; sin sesión se fusiona con el "Inicia sesión" para no decir dos
+          veces lo mismo, que era lo que pasaba. */}
+      {!editorial && userReviews.length === 0 && userId && (
         <p className="text-ink/50 italic mb-8">
           Sé el primero en reseñar esta obra.
         </p>
@@ -218,10 +220,22 @@ export default function BookReviews({ bookId, bookTitle, initialReviews }: Props
         )
       ) : (
         <p className="text-sm text-ink/60">
-          <a href="/login" className="text-brand-600 font-semibold hover:underline">
-            Inicia sesión
-          </a>{" "}
-          para reseñar esta obra.
+          {userReviews.length === 0 && !editorial ? (
+            <>
+              ¿Lo leíste?{" "}
+              <a href="/login" className="text-brand-600 font-semibold hover:underline">
+                Inicia sesión
+              </a>{" "}
+              y sé el primero en reseñarlo.
+            </>
+          ) : (
+            <>
+              <a href="/login" className="text-brand-600 font-semibold hover:underline">
+                Inicia sesión
+              </a>{" "}
+              para reseñar esta obra.
+            </>
+          )}
         </p>
       )}
     </section>
