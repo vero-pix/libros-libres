@@ -160,6 +160,36 @@ export default async function SearchPage({ searchParams }: Props) {
     }
   }
 
+  // Rescate por descripción y tags. El buscador solo miraba título, autor e
+  // ISBN: "filosofía" devolvía dos libros con cien de filosofía en el catálogo,
+  // porque la palabra está en la sinopsis y en los tags, no en el título. Se
+  // consulta SOLO si lo otro no dio nada, para no ensuciar las búsquedas que ya
+  // funcionan con coincidencias sueltas dentro de una sinopsis larga.
+  if (q && matchingBookIds !== null && matchingBookIds.length === 0) {
+    const clean = limpiarParaFiltro(q.replace(/[-_]+/g, " "));
+    const slug = foldAccents(clean).trim().replace(/\s+/g, "-");
+    // Palabra por palabra además de la frase completa: "antigona y electra" no
+    // aparece textual en ninguna sinopsis, pero "Antígona" sí.
+    const terminos = Array.from(
+      new Set([
+        clean,
+        ...clean.split(" ").filter((w) => w.length > 3 && !SEARCH_STOPWORDS.has(foldAccents(w))),
+      ])
+    );
+    const { data: porTexto } = await supabase
+      .from("books")
+      .select("id")
+      .or(
+        [
+          ...terminos.map((t) => `description.imatch.${accentInsensitiveRegex(t)}`),
+          `tags.cs.{${slug}}`,
+        ].join(",")
+      );
+    if (porTexto?.length) {
+      matchingBookIds = Array.from(new Set(porTexto.map((b) => b.id)));
+    }
+  }
+
   // Si el texto de búsqueda no calzó con ningún libro, forzamos resultado vacío.
   if (matchingBookIds !== null && matchingBookIds.length === 0) {
     matchingBookIds = ["00000000-0000-0000-0000-000000000000"];
@@ -329,10 +359,6 @@ export default async function SearchPage({ searchParams }: Props) {
           </div>
         )}
 
-        <div className="mb-6">
-          <PromoBanner variant="publish" />
-        </div>
-
         <div className="flex gap-8">
           <CategoriesSidebar
             categoryTree={categoryTree}
@@ -343,9 +369,11 @@ export default async function SearchPage({ searchParams }: Props) {
           />
 
           <div className="flex-1 min-w-0">
-            <Suspense fallback={<div className="h-10 bg-gray-100 rounded-lg animate-pulse mb-4" />}>
-              <ListingToolbar />
-            </Suspense>
+            {listings.length > 0 && (
+              <Suspense fallback={<div className="h-10 bg-gray-100 rounded-lg animate-pulse mb-4" />}>
+                <ListingToolbar />
+              </Suspense>
+            )}
 
             {listings.length > 0 ? (
               <>
@@ -360,6 +388,9 @@ export default async function SearchPage({ searchParams }: Props) {
                 {/* Bajo los resultados y bajo la paginacion: quien llega aca
                     ya vio el catalogo entero y no encontro lo suyo. */}
                 <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BUSQUEDA} />
+                <div className="mt-10">
+                  <PromoBanner variant="publish" />
+                </div>
               </>
             ) : (
               <div className="py-8 animate-fade-in-up">

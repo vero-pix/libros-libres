@@ -11,6 +11,17 @@ export default function ListingToolbar() {
   const [cities, setCities] = useState<Array<{ id: string; name: string; region: string }>>([]);
   const isNearMe = !!searchParams.get("lat");
 
+  // Los nueve filtros venían desplegados encima de los resultados: en el
+  // teléfono empujaban el primer libro a la segunda pantalla, y con cero
+  // resultados ofrecían filtrar la nada. Ahora van detrás de un botón, y se
+  // abren solos si la persona llegó con alguno puesto (p. ej. desde un enlace).
+  const AVANZADOS = [
+    "price_min", "price_max", "author", "city", "condition",
+    "modality", "binding", "publisher", "pages_min", "pages_max",
+  ];
+  const activos = AVANZADOS.filter((k) => searchParams.get(k)).length;
+  const [abierto, setAbierto] = useState(activos > 0);
+
   // Fetch cities
   useEffect(() => {
     fetch("/api/cities")
@@ -79,7 +90,8 @@ export default function ListingToolbar() {
     "text-sm border border-gray-200 rounded-md py-2 pl-6 pr-2 w-24 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-400";
 
   return (
-    <div className="flex flex-wrap items-center gap-3 border-b border-gray-200 pb-3 mb-4">
+    <div className="border-b border-gray-200 pb-3 mb-4">
+      <div className="flex flex-wrap items-center gap-3">
       {/* Near me */}
       <button
         onClick={handleNearMe}
@@ -108,6 +120,25 @@ export default function ListingToolbar() {
         <option value="price_desc">Precio: mayor a menor</option>
       </select>
 
+      <button
+        type="button"
+        onClick={() => setAbierto((v) => !v)}
+        aria-expanded={abierto}
+        className={`flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-md border transition-colors ${
+          activos > 0
+            ? "bg-brand-50 text-brand-700 border-brand-300"
+            : "bg-white text-gray-700 border-gray-200 hover:border-brand-400"
+        }`}
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h18M6.75 12h10.5M11.25 19.5h1.5" />
+        </svg>
+        {abierto ? "Ocultar filtros" : "Más filtros"}
+        {activos > 0 && ` (${activos})`}
+      </button>
+      </div>
+
+      <div className={`${abierto ? "flex" : "hidden"} flex-wrap items-center gap-3 mt-3`}>
       {/* Price range */}
       <div className="flex items-center gap-1">
         <div className="relative">
@@ -234,6 +265,7 @@ export default function ListingToolbar() {
           onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
           className="text-sm border border-gray-200 rounded-md py-2 px-2 w-24 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-400"
         />
+      </div>
       </div>
     </div>
   );
