@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
   if (comprador.email) {
     await sendEmail({
       to: comprador.email,
-      from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+      from: "Vero de tuslibros.cl <hola@tuslibros.cl>",
       replyTo: VERO_INBOX,
       subject: `${quien} confirmó tu transferencia — ${que}`,
       html: `

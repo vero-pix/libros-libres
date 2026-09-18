@@ -155,7 +155,7 @@ async function avisarLibrosQueSeSuman(
     const destino = vendedor.email === "vero@tuslibros.cl" ? VERO_INBOX : vendedor.email;
     await sendEmail({
       to: destino,
-      from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+      from: "Vero de tuslibros.cl <hola@tuslibros.cl>",
       replyTo: VERO_INBOX,
       subject: m.subject,
       html: m.html,
@@ -425,7 +425,7 @@ export async function POST(req: NextRequest) {
               });
               await sendEmail({
                 to: buyerEmail,
-                from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+                from: "Vero de tuslibros.cl <hola@tuslibros.cl>",
                 replyTo: VERO_INBOX,
                 subject: m.subject,
                 html: m.html,
@@ -487,7 +487,7 @@ export async function POST(req: NextRequest) {
 
               await sendEmail({
                 to: sellerEmail,
-                from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+                from: "Vero de tuslibros.cl <hola@tuslibros.cl>",
                 replyTo: VERO_INBOX,
                 subject: itemCount > 1 ? `Nueva venta: ${itemCount} libros — tuslibros.cl` : `Vendiste un libro — tuslibros.cl`,
                 html: `

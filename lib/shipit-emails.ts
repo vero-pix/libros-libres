@@ -10,7 +10,7 @@ export { nombreCourier, urlSeguimiento };
  * etiqueta se descarga desde /mis-ventas con sesión y URL firmada (D3).
  */
 
-export const REMITENTE_VERO = "Vero de tuslibros.cl <vero@tuslibros.cl>";
+export const REMITENTE_VERO = "Vero de tuslibros.cl <hola@tuslibros.cl>";
 export const REPLY_TO_VERO = VERO_INBOX;
 
 const SITE = "https://tuslibros.cl";

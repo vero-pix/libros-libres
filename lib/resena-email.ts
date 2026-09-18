@@ -95,7 +95,7 @@ export async function pedirResena(admin: Admin, bundleId: string): Promise<strin
     });
     const r = await sendEmail({
       to: comprador.email,
-      from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+      from: "Vero de tuslibros.cl <hola@tuslibros.cl>",
       replyTo: VERO_INBOX,
       subject: m.subject,
       html: m.html,

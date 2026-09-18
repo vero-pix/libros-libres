@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
       const quien = String(comprador.full_name ?? "").split(" ")[0] || "";
       await sendEmail({
         to: comprador.email,
-        from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+        from: "Vero de tuslibros.cl <hola@tuslibros.cl>",
         replyTo: VERO_INBOX,
         subject: `Ya va en camino: ${libro}`,
         html: `

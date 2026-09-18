@@ -210,7 +210,7 @@ export async function notifyPaymentFailed(
     const { VERO_INBOX } = await import("./veroInbox");
     await sendEmail({
       to: buyerEmail,
-      from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+      from: "Vero de tuslibros.cl <hola@tuslibros.cl>",
       replyTo: VERO_INBOX,
       subject:
         count > 1
