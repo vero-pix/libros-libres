@@ -49,11 +49,11 @@ export default function VitrinaDemanda({ libros }: Props) {
           <div className="flex items-center gap-2.5">
             <span className="w-[6px] h-6 rounded-sm bg-brand-500" aria-hidden="true" />
             <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink tracking-tight">
-              Lo que más se busca acá
+              Lo que vienen a buscar
             </h2>
           </div>
           <p className="text-[11px] font-mono text-ink-muted mt-1.5 ml-[16px]">
-            Los libros que la gente vino a buscar este mes — y que sí tenemos
+            Lo más tecleado del último mes. Estos cuatro los tengo.
           </p>
         </div>
         <Link

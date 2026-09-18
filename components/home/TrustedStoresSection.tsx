@@ -28,10 +28,10 @@ export default function TrustedStoresSection({
     // el navbar fijo no tape el titular al aterrizar desde el ancla.
     <section id="librerias-confianza" className="scroll-mt-24">
       <div className="mb-1 flex items-center gap-2">
-        <h2 className="font-display text-base font-semibold text-ink">Librerías de confianza</h2>
+        <h2 className="font-display text-base font-semibold text-ink">Las librerías que me dejan tranquila</h2>
       </div>
       <p className="mb-4 text-xs text-ink-muted">
-        Venden por la plataforma, despachan y cobran con pago protegido.
+        Venden por acá, despachan y cobran con pago protegido. Eso es lo que miro.
       </p>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
