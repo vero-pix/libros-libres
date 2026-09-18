@@ -4,6 +4,7 @@
  *   node scripts/kpi-libros.mjs                # todo el catálogo
  *   node scripts/kpi-libros.mjs vero           # una tienda
  *   node scripts/kpi-libros.mjs vero 30        # y con un mínimo de días
+ *   node scripts/kpi-libros.mjs "" 7 csv       # CSV crudo a stdout
  *
  * Qué mira: visitas por día desde que se publicó. No el total de visitas, que
  * premia a lo viejo por el solo hecho de llevar meses arriba.
@@ -28,6 +29,7 @@ const sb = createClient(
 
 const vendedor = process.argv[2] ?? null;
 const minDias = Number(process.argv[3] ?? 7);
+const formatoCsv = (process.argv[4] ?? "").toLowerCase() === "csv";
 
 let sellerId = null;
 if (vendedor) {
@@ -40,7 +42,7 @@ if (vendedor) {
 const filas = [];
 for (let desde = 0; ; desde += 1000) {
   let q = sb.from("listings")
-    .select("id, created_at, price, seller_id, book:books(title)")
+    .select("id, created_at, price, seller_id, book:books(title), seller:users(username)")
     .eq("status", "active")
     .range(desde, desde + 999);
   if (sellerId) q = q.eq("seller_id", sellerId);
@@ -64,12 +66,25 @@ const hoy = Date.now();
 const libros = filas.map((l) => {
   const dias = Math.max(1, Math.floor((hoy - new Date(l.created_at).getTime()) / 86400000));
   const v = vistas.get(l.id) ?? 0;
-  return { titulo: l.book?.title ?? "—", dias, visitas: v, ritmo: v / dias, precio: Number(l.price ?? 0) };
+  return {
+    titulo: l.book?.title ?? "—",
+    vendedor: l.seller?.username ?? "—",
+    dias, visitas: v, ritmo: v / dias, precio: Number(l.price ?? 0),
+  };
 }).filter((l) => l.dias >= minDias);
 
 libros.sort((a, b) => b.ritmo - a.ritmo);
 const ritmos = libros.map((l) => l.ritmo).sort((a, b) => a - b);
 const mediana = ritmos[Math.floor(ritmos.length / 2)] ?? 0;
+
+if (formatoCsv) {
+  const esc = (v) => `"${String(v).replace(/"/g, '""')}"`;
+  console.log("titulo,vendedor,precio,dias_publicado,visitas,visitas_por_dia");
+  for (const l of libros) {
+    console.log([esc(l.titulo), esc(l.vendedor), l.precio, l.dias, l.visitas, l.ritmo.toFixed(4)].join(","));
+  }
+  process.exit(0);
+}
 
 const linea = (l) =>
   `  ${l.ritmo.toFixed(2).padStart(5)}/día  ${String(l.visitas).padStart(4)} vis  ${String(l.dias).padStart(4)}d  $${l.precio.toLocaleString("es-CL").padStart(7)}  ${l.titulo.slice(0, 52)}`;
