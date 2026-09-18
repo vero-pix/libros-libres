@@ -233,33 +233,30 @@ export default function VenderPage() {
         <h2 className="font-display text-2xl sm:text-3xl font-bold text-ink text-center mb-10">
           Vendedores que ya circulan sus libros
         </h2>
-        <div className="grid sm:grid-cols-3 gap-6">
+        <div className="max-w-2xl mx-auto">
           {[
+            // 18-09-2026: Carlos de CIMLibros mandó su recomendación por escrito.
+            // Va TAL CUAL la escribió él, signos incluidos.
+            //
+            // Las otras dos citas que había acá —atribuidas a Libros De La
+            // Buhardilla y a María Soledad, con nombre y comuna— nadie las
+            // dijo: estaban escritas por el sitio y puestas en su boca. Fuera.
+            // Además las cifras no eran ciertas: decía 78 libros de CIMLibros
+            // (tiene 201), 37 de Buhardilla (260) y 20 de María Soledad, que
+            // tiene 4 publicados y ninguna venta.
             {
-              name: "CIMLibros",
+              name: "Carlos, CIMLibros",
               location: "La Florida, Santiago",
-              books: "78 libros",
-              quote: "Empecé subiendo 10 libros para probar. En dos semanas ya había vendido cuatro. Ahora tengo todo el catálogo acá.",
-            },
-            {
-              name: "Libros De La Buhardilla",
-              location: "Santiago",
-              books: "37 libros",
-              quote: "Lo que me convenció fue el despacho: el courier pasa a buscar a mi casa. No tengo que salir a ninguna oficina.",
-            },
-            {
-              name: "María Soledad",
-              location: "Santiago",
-              books: "20 libros",
-              quote: "Tenía libros que ya no leía acumulando polvo. En tuslibros.cl llegaron a compradores que los buscaban. Simple y seguro.",
+              books: "201 libros publicados",
+              quote: "Tus Libros ¡Funciona!, se generan contactos con gente que aprecia los libros y ama la lectura, la experiencia es fantástica y recomiendo esta página con un entusiasmo rotundo",
             },
           ].map((t) => (
             <blockquote
               key={t.name}
-              className="relative bg-white border border-cream-dark/30 rounded-2xl px-6 py-6"
+              className="relative bg-white border border-cream-dark/30 rounded-2xl px-7 py-7 sm:px-9 sm:py-8"
             >
               <span aria-hidden className="absolute -top-3 left-6 text-5xl font-serif text-brand-400 leading-none select-none">&ldquo;</span>
-              <p className="font-serif italic text-sm text-ink leading-relaxed mb-4">{t.quote}</p>
+              <p className="font-serif italic text-base sm:text-lg text-ink leading-relaxed mb-4">{t.quote}</p>
               <footer className="text-xs text-ink-muted">
                 <span className="font-semibold text-ink not-italic">{t.name}</span>
                 <span className="mx-1.5">·</span>{t.location}
