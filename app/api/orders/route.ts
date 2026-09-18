@@ -618,13 +618,17 @@ export async function POST(req: NextRequest) {
       .eq("user_id", user.id)
       .in("listing_id", listingIds);
 
-    // GONG: Notificar intento de compra
+    // GONG: alguien abrió el checkout. NO es una venta, y el aviso tiene que
+    // decirlo: con el formato anterior ("🛍️ Nuevo intento de compra", mismos
+    // cuatro campos que el de venta pagada) se leía como si hubiera plata.
+    // Vero lo confundió el 18-09 con una venta de Buhardilla que nunca se pagó.
     sendGong(
-      `🛍️ <b>Nuevo intento de compra</b>\n\n` +
+      `⏳ <b>Alguien está en el checkout</b> — todavía sin pagar\n\n` +
       `Items: ${listings.length}\n` +
-      `Total: <b>$${bundleGrandTotal.toLocaleString("es-CL")}</b>\n` +
+      `Sería: $${bundleGrandTotal.toLocaleString("es-CL")}\n` +
       `Vendedor: ${escapeHtml(seller.full_name)}\n` +
-      `Comprador: ${escapeHtml(user.user_metadata?.full_name || user.email || "Alguien")}`
+      `Comprador: ${escapeHtml(user.user_metadata?.full_name || user.email || "Alguien")}\n\n` +
+      `Si paga, llega otro aviso que dice "Venta pagada". Si no llega, no hubo venta.`
     ).catch(() => {});
 
     return NextResponse.json({
