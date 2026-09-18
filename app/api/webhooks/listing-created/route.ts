@@ -250,6 +250,11 @@ export async function POST(req: Request) {
                 },
                 body: JSON.stringify({
                   from: "tuslibros.cl <hola@tuslibros.cl>",
+                  // El correo invita a responder para darse de baja, así que
+                  // la respuesta tiene que llegar a alguna parte: hola@ no
+                  // recibe nada con Workspace caído. VERO_INBOX es el buzón
+                  // que sí se lee (lib/veroInbox.ts).
+                  reply_to: VERO_INBOX,
                   to: [req.requester_email],
                   subject: `Entró algo de ${req.title}`,
                   html: `<p>Pediste que te avisara cuando llegara algo de <strong>${escape(req.title)}</strong>. Acaba de entrar esto:</p>
