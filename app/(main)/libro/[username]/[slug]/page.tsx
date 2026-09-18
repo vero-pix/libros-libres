@@ -221,6 +221,14 @@ export default async function LibroPage({ params }: Props) {
   // Prueba del vendedor para la ficha (paso e). Sale de `seller_stats`, que es
   // público: nada de la superficie pública puede depender de una tabla con RLS
   // restrictiva, como pasó con el courier y `shipments`.
+  // Libros vendidos de verdad, no solo los pagados por MercadoPago: el mismo
+  // criterio que el perfil del vendedor (18-09-2026).
+  const { count: librosVendidos } = await supabase
+    .from("listings")
+    .select("id", { count: "exact", head: true })
+    .eq("seller_id", listing.seller_id)
+    .eq("status", "completed");
+
   const { data: statsVendedor } = await supabase
     .from("seller_stats")
     .select("paid_total, reviews_count, reviews_avg")
@@ -228,7 +236,7 @@ export default async function LibroPage({ params }: Props) {
     .maybeSingle();
   const sellerStats = statsVendedor
     ? {
-        ventas: statsVendedor.paid_total ?? 0,
+        ventas: librosVendidos ?? 0,
         reviews_count: statsVendedor.reviews_count ?? 0,
         reviews_avg: statsVendedor.reviews_avg != null ? Number(statsVendedor.reviews_avg) : null,
       }

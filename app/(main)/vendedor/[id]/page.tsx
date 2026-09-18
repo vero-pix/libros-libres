@@ -133,7 +133,27 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
     .eq("seller_id", seller.id)
     .maybeSingle();
 
-  const ventasPlataforma = stats?.paid_total ?? 0;
+  // Antes decía "N ventas por la plataforma" con stats.paid_total, o sea solo
+  // las que se pagaron por MercadoPago dentro del sitio. A Vero le mostraba 7
+  // teniendo 22 libros vendidos: las otras 15 fueron por transferencia, por
+  // WhatsApp o en mano, y no por eso dejaron de venderse. Lo que le importa a
+  // quien mira el perfil es si a esta persona le compran, no por qué caja pasó
+  // la plata. Así que el número es ahora el de libros vendidos de verdad.
+  // Los nombres de las mesas salen de la tabla `categories`, que es la fuente
+  // de verdad (translateGenre no conoce las subcategorías nuevas y devolvía el
+  // slug crudo: "no-ficcion-ensayo" en vez de "Ensayo").
+  const { data: categoriasBD } = await supabase.from("categories").select("slug, name");
+  const nombresCategoria: Record<string, string> = {};
+  for (const c of categoriasBD ?? []) {
+    if (c.slug && c.name) nombresCategoria[c.slug as string] = c.name as string;
+  }
+
+  const { count: librosVendidos } = await supabase
+    .from("listings")
+    .select("id", { count: "exact", head: true })
+    .eq("seller_id", seller.id)
+    .eq("status", "completed");
+  const ventasPlataforma = librosVendidos ?? 0;
   const totalReviews = stats?.reviews_count ?? 0;
   const avgRating = stats?.reviews_avg != null ? Number(stats.reviews_avg) : 0;
   // Bajo 3 reseñas no se publica promedio (decisión C5): con una o dos, una
@@ -215,7 +235,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 text-sm text-gray-600">
               {ventasPlataforma > 0 && (
                 <span className="font-medium text-gray-900">
-                  {ventasPlataforma} {ventasPlataforma === 1 ? "venta" : "ventas"} por la plataforma
+                  {ventasPlataforma} {ventasPlataforma === 1 ? "libro vendido" : "libros vendidos"}
                 </span>
               )}
               {courierHabitual && (
@@ -372,7 +392,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
                 ))}
               </div>
             </div>
-            <SellerListingsGrid listings={listings} />
+            <SellerListingsGrid listings={listings} nombresCategoria={nombresCategoria} />
           </>
         ) : (
           <div className="text-center py-16 text-gray-400">
