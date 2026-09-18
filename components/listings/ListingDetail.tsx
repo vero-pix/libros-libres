@@ -164,6 +164,11 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
   const authorHub = authorLanding(book.author); // landing de autor (SEO: concentra autoridad en el hub)
   const [isOwner, setIsOwner] = useState(false);
+  // Panel de seguimiento del libro, solo para su dueño (18-09-2026). Se pide
+  // aparte para no cobrarle tres consultas al visitante que nunca lo ve.
+  const [kpi, setKpi] = useState<{
+    dias: number; visitas: number; enCarrito: number; ritmo: number; ritmoMediano: number;
+  } | null>(null);
   const router = useRouter();
   // "Marcar como vendido" desde la ficha (07-09-2026): el vendedor llega a su
   // libro desde Google o el catálogo y lo cierra ahí mismo, sin buscarlo entre
@@ -240,6 +245,16 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
       if (data.user?.id === listing.seller_id) setIsOwner(true);
     });
   }, [listing.seller_id]);
+
+  useEffect(() => {
+    if (!isOwner) return;
+    let vivo = true;
+    fetch(`/api/listings/${listing.id}/kpi`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (vivo && d && !d.error) setKpi(d); })
+      .catch(() => {});
+    return () => { vivo = false; };
+  }, [isOwner, listing.id]);
 
   useEffect(() => {
     trackEvent("view_listing", {
@@ -513,6 +528,48 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
               puede cerrar; desaparece solo cuando conecta. (08-09-2026) */}
           {isOwner && !listing.seller?.mercadopago_user_id && !transferenciaDisponible && (
             <MercadoPagoNudge ubicacion="ficha_dueno" nPublicaciones={1} />
+          )}
+
+          {/* El seguimiento del libro, solo para su dueño. La cifra que importa
+              no es el total de visitas —un libro de hace cinco meses siempre
+              tendrá más que uno de ayer— sino el RITMO, y comparado con el de
+              su propia tienda: sin esa referencia, "0,3 visitas al día" no
+              dice si va bien o mal. */}
+          {isOwner && kpi && (
+            <div className="mt-5 rounded-xl border border-cream-dark/50 bg-cream-warm/40 px-4 py-3.5">
+              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-muted mb-2.5">
+                Solo tú ves esto
+              </p>
+              <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1.5 text-sm text-ink">
+                <span>
+                  <strong className="tabular-nums">{kpi.visitas}</strong>{" "}
+                  {kpi.visitas === 1 ? "visita" : "visitas"}
+                </span>
+                <span className="text-ink-muted">
+                  en <strong className="text-ink tabular-nums">{kpi.dias}</strong>{" "}
+                  {kpi.dias === 1 ? "día" : "días"} publicado
+                </span>
+                {kpi.enCarrito > 0 && (
+                  <span className="text-ink-muted">
+                    · <strong className="text-ink tabular-nums">{kpi.enCarrito}</strong> al carrito
+                  </span>
+                )}
+              </div>
+              <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
+                {kpi.ritmo.toFixed(2).replace(".", ",")} visitas al día
+                {kpi.ritmoMediano > 0 && (
+                  <>
+                    {" — "}
+                    {kpi.ritmo >= kpi.ritmoMediano * 1.3
+                      ? "va mejor que la mitad de tu tienda"
+                      : kpi.ritmo <= kpi.ritmoMediano * 0.7
+                        ? "va por debajo de tu mediana, que es " +
+                          kpi.ritmoMediano.toFixed(2).replace(".", ",")
+                        : "va en la mediana de tu tienda"}
+                  </>
+                )}
+              </p>
+            </div>
           )}
 
           {/* Comparador de precios — solo para el dueño (referencia de precio).

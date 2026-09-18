@@ -26,6 +26,18 @@ export const VENDEDORES_CON_LIBROS_VENDIDOS = new Set<string>([
   "2201d163-4423-4971-91f0-f6cebd00d1bd",
 ]);
 
+/**
+ * Quién ve el panel de seguimiento en su propia ficha (visitas, días
+ * publicado, ritmo). Es información de su propio libro y nadie más la ve, pero
+ * arranca solo para Vero porque el KPI todavía se está probando: pedido suyo
+ * del 18-09-2026. Abrirlo a todos los vendedores es agregar ids acá.
+ */
+export const VENDEDORES_CON_PANEL = VENDEDORES_CON_LIBROS_VENDIDOS;
+
+export function muestraPanelLibro(sellerId: string | null | undefined): boolean {
+  return !!sellerId && VENDEDORES_CON_PANEL.has(sellerId);
+}
+
 export function muestraLibrosVendidos(sellerId: string | null | undefined): boolean {
   return !!sellerId && VENDEDORES_CON_LIBROS_VENDIDOS.has(sellerId);
 }
