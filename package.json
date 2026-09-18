@@ -26,7 +26,8 @@
     "demanda": "npx tsx scripts/demanda-no-servida.mjs",
     "demanda:interna": "node scripts/demanda-interna.mjs",
     "prebuild": "node scripts/check-env.mjs",
-    "seo:indexadas": "tsx scripts/seo/gsc-indexadas.ts"
+    "seo:indexadas": "tsx scripts/seo/gsc-indexadas.ts",
+    "kpi:libros": "node scripts/kpi-libros.mjs"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
