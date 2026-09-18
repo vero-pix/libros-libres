@@ -25,7 +25,8 @@
     "feed:validar": "node scripts/feed-validar.mjs",
     "demanda": "npx tsx scripts/demanda-no-servida.mjs",
     "demanda:interna": "node scripts/demanda-interna.mjs",
-    "prebuild": "node scripts/check-env.mjs"
+    "prebuild": "node scripts/check-env.mjs",
+    "seo:indexadas": "tsx scripts/seo/gsc-indexadas.ts"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
