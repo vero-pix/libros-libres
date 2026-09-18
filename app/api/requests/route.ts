@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
  * Crea una solicitud. No requiere login (mejor UX), pero si hay sesión la vinculamos.
  */
 export async function POST(req: NextRequest) {
-  const { title, author, isbn, notes, requester_name, requester_email, requester_whatsapp, requester_location } =
+  const { title, author, isbn, notes, requester_name, requester_email, requester_whatsapp, requester_location, tema } =
     (await req.json()) as {
       title?: string;
       author?: string;
@@ -52,7 +52,29 @@ export async function POST(req: NextRequest) {
       requester_email?: string;
       requester_whatsapp?: string;
       requester_location?: string;
+      /** Slug de `categories` cuando el pedido es por tema y no por título. */
+      tema?: string;
     };
+
+  // El tema se valida contra la tabla `categories`: nada de texto libre, o el
+  // match no tendría con qué comparar.
+  let temaLimpio: string | null = null;
+  if (tema && tema.trim()) {
+    const sbTema = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { cookies: { getAll: () => [], setAll: () => {} } }
+    );
+    const { data: cat } = await sbTema
+      .from("categories")
+      .select("slug")
+      .eq("slug", tema.trim())
+      .maybeSingle();
+    if (!cat) {
+      return NextResponse.json({ error: "Ese tema no existe" }, { status: 400 });
+    }
+    temaLimpio = cat.slug as string;
+  }
 
   if (!title || title.trim().length < 2) {
     return NextResponse.json({ error: "Falta el título del libro" }, { status: 400 });
@@ -151,6 +173,10 @@ export async function POST(req: NextRequest) {
       requester_whatsapp: requester_whatsapp?.trim() || null,
       requester_location: requester_location?.trim() || null,
       requester_user_id: user?.id ?? null,
+      // Pedido por tema: se guarda el slug y el pedido NO se cierra con el
+      // primer libro que llegue — quien pide un tema quiere que le avisen cada
+      // vez (18-09-2026).
+      tema: temaLimpio,
     })
     .select("id, title, author")
     .single();

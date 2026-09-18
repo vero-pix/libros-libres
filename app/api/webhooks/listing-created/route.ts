@@ -225,8 +225,50 @@ export async function POST(req: Request) {
         .select("*")
         .eq("fulfilled", false);
 
+      const libroCat = (book as Record<string, string | null>)?.category ?? null;
+      const libroSubcat = (book as Record<string, string | null>)?.subcategory ?? null;
+
       if (requests && requests.length > 0) {
         for (const req of requests) {
+          // PEDIDOS POR TEMA (18-09-2026). Quien pide "ensayo" no quiere UN
+          // libro: quiere que le avisen cuando entre algo de lo suyo. Así que
+          // el pedido no se cierra nunca, y para que no se vuelva spam se avisa
+          // como mucho una vez cada 24 horas por pedido.
+          if (req.tema) {
+            const calzaTema = req.tema === libroSubcat || req.tema === libroCat;
+            if (!calzaTema) continue;
+
+            const ultimo = req.last_notified_at ? new Date(req.last_notified_at).getTime() : 0;
+            if (Date.now() - ultimo < 24 * 60 * 60 * 1000) continue;
+
+            if (req.requester_email && resendKey) {
+              await fetch("https://api.resend.com/emails", {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${resendKey}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  from: "tuslibros.cl <hola@tuslibros.cl>",
+                  to: [req.requester_email],
+                  subject: `Entró algo de ${req.title}`,
+                  html: `<p>Pediste que te avisara cuando llegara algo de <strong>${escape(req.title)}</strong>. Acaba de entrar esto:</p>
+<p><strong>${escape(title)}</strong>${author ? ` — ${escape(author)}` : ""}</p>
+<p><a href="${url}">Verlo en tuslibros.cl</a></p>
+<p style="color:#666;font-size:13px">Te aviso como mucho una vez al día, aunque entren varios. Si ya no quieres estos avisos, respóndeme y lo saco.</p>`,
+                }),
+              }).catch((e) => console.error("Error enviando aviso de tema:", e));
+            }
+
+            await supabase
+              .from("book_requests")
+              .update({ last_notified_at: new Date().toISOString() })
+              .eq("id", req.id);
+
+            console.log(`[listing-created] 🔔 Aviso de tema ${req.tema} → ${req.requester_email}`);
+            continue;
+          }
+
           const reqTitle = normalizar(req.title);
           const pubTitle = normalizar(title);
           const { hay: titleMatch, fuerte } = compararLibro(

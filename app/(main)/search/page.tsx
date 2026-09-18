@@ -325,6 +325,17 @@ export default async function SearchPage({ searchParams }: Props) {
     popularListings = sortListingsForDisplay((data as unknown as ListingWithBook[]) ?? []);
   }
 
+  // Para el "Se busca" por tema: la lista sale de `categories`, la fuente de
+  // verdad, y solo las que tienen libros (pedir un tema vacío no sirve).
+  const { data: temasBD } = await supabase
+    .from("categories")
+    .select("slug, name")
+    .order("name");
+  const temasDisponibles = (temasBD ?? []).map((c) => ({
+    slug: c.slug as string,
+    nombre: c.name as string,
+  }));
+
   return (
     <div className="min-h-screen bg-white">
       <SearchEventTracker query={q} />
@@ -396,7 +407,7 @@ export default async function SearchPage({ searchParams }: Props) {
                   </p>
                   
                   <div className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-sm border border-cream-dark text-left relative z-10">
-                    <BookRequestForm initialTitle={q} />
+                    <BookRequestForm initialTitle={q} temas={temasDisponibles} />
                   </div>
                 </div>
 

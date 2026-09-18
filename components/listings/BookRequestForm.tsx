@@ -5,9 +5,17 @@ import { createClient } from "@/lib/supabase/client";
 
 interface BookRequestFormProps {
   initialTitle?: string;
+  /** Temas disponibles (slug + nombre de `categories`). Sin esto, el
+   *  formulario funciona igual pero solo acepta pedidos por título. */
+  temas?: { slug: string; nombre: string }[];
 }
 
-export default function BookRequestForm({ initialTitle = "" }: BookRequestFormProps) {
+export default function BookRequestForm({ initialTitle = "", temas = [] }: BookRequestFormProps) {
+  // Dos formas de pedir: un libro concreto, o un tema para que te avisen cada
+  // vez que entre algo (18-09-2026). El tema es la idea de Vero de "perfil
+  // lector", sin pedirle nada a nadie en el registro.
+  const [modo, setModo] = useState<"libro" | "tema">("libro");
+  const [tema, setTema] = useState("");
   const [title, setTitle] = useState(initialTitle);
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -23,8 +31,16 @@ export default function BookRequestForm({ initialTitle = "" }: BookRequestFormPr
     e.preventDefault();
     setErrorMsg("");
     
-    if (!title || !email) {
+    if (modo === "tema" && !tema) {
+      setErrorMsg("Elige un tema");
+      return;
+    }
+    if (modo === "libro" && !title) {
       setErrorMsg("Por favor completa el título y tu email");
+      return;
+    }
+    if (!email) {
+      setErrorMsg("Necesito tu email para poder avisarte");
       return;
     }
 
@@ -36,7 +52,10 @@ export default function BookRequestForm({ initialTitle = "" }: BookRequestFormPr
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title,
+          // En modo tema el título es el nombre del tema: `title` es NOT NULL
+          // en la tabla y además es lo que se muestra en la lista pública.
+          title: modo === "tema" ? (temas.find((t) => t.slug === tema)?.nombre ?? tema) : title,
+          tema: modo === "tema" ? tema : undefined,
           requester_email: email,
           requester_whatsapp: whatsapp,
           notes,
@@ -127,17 +146,61 @@ export default function BookRequestForm({ initialTitle = "" }: BookRequestFormPr
           </div>
         )}
 
-        <div className="space-y-2">
-          <label htmlFor="req-title" className="text-sm font-medium text-ink-muted block">¿Qué libro buscas? (Título / Autor)</label>
-          <input
-            id="req-title"
-            placeholder="Ej: Rayuela de Julio Cortázar"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 rounded-xl outline-none transition-all"
-            required
-          />
-        </div>
+        {temas.length > 0 && (
+          <div className="flex gap-2">
+            {([
+              { id: "libro", etiqueta: "Un libro" },
+              { id: "tema", etiqueta: "Un tema" },
+            ] as const).map((op) => (
+              <button
+                key={op.id}
+                type="button"
+                onClick={() => { setModo(op.id); setErrorMsg(""); }}
+                aria-pressed={modo === op.id}
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                  modo === op.id
+                    ? "border-brand-500 bg-brand-50 text-brand-700"
+                    : "border-gray-200 text-ink-muted hover:border-gray-300"
+                }`}
+              >
+                {op.etiqueta}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {modo === "libro" ? (
+          <div className="space-y-2">
+            <label htmlFor="req-title" className="text-sm font-medium text-ink-muted block">¿Qué libro buscas? (Título / Autor)</label>
+            <input
+              id="req-title"
+              placeholder="Ej: Rayuela de Julio Cortázar"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 rounded-xl outline-none transition-all"
+              required
+            />
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <label htmlFor="req-tema" className="text-sm font-medium text-ink-muted block">¿De qué te aviso cuando llegue?</label>
+            <select
+              id="req-tema"
+              value={tema}
+              onChange={(e) => setTema(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 rounded-xl outline-none transition-all bg-white"
+            >
+              <option value="">Elige un tema…</option>
+              {temas.map((t) => (
+                <option key={t.slug} value={t.slug}>{t.nombre}</option>
+              ))}
+            </select>
+            <p className="text-xs text-ink-muted">
+              Te escribo cuando entre algo de ese tema, como mucho una vez al día. No es una
+              suscripción al newsletter: es solo eso.
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
