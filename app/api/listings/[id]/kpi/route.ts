@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { muestraPanelLibro } from "@/lib/contadorVentas";
+import { veTodoElCatalogo } from "@/lib/contadorVentas";
 
 /**
- * El KPI de un libro, para su dueño: cuánta gente lo miró, hace cuántos días
- * está publicado, y a qué ritmo va comparado con el resto de su propia tienda.
+ * El KPI de un libro: cuánta gente lo miró, hace cuántos días está publicado, y
+ * a qué ritmo va comparado con el resto de esa misma tienda.
+ *
+ * Lo ve el dueño del libro. Vero, además, sobre cualquier libro del catálogo.
  *
  * Es una llamada aparte y no datos de la ficha a propósito: así el visitante
  * normal no paga tres consultas que no va a ver (pedido de Vero, 18-09-2026).
@@ -21,8 +23,9 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     .single();
 
   if (!listing) return NextResponse.json({ error: "No existe" }, { status: 404 });
-  // Solo el dueño, y solo si tiene el panel habilitado.
-  if (listing.seller_id !== user.id || !muestraPanelLibro(listing.seller_id)) {
+  // Cada vendedor ve lo suyo; Vero ve el catálogo completo (18-09-2026).
+  const esDueno = listing.seller_id === user.id;
+  if (!esDueno && !veTodoElCatalogo(user.id)) {
     return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
   }
 

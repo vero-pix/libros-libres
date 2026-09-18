@@ -13,6 +13,7 @@ import ImageGallery from "./ImageGallery";
 import ShareButtons from "./ShareButtons";
 import ContactSellerButton from "@/components/messages/ContactSellerButton";
 import PriceCompare from "@/components/listings/PriceCompare";
+import { VERO } from "@/lib/contadorVentas";
 import MercadoPagoNudge from "@/components/listings/MercadoPagoNudge";
 import SellerOtherListings from "./SellerOtherListings";
 import { libroUrl } from "@/lib/urls";
@@ -240,21 +241,28 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
     medir("ver_publicacion", paramsFicha);
   }, [paramsFicha]);
 
+  // Además del dueño, Vero ve el panel sobre cualquier libro del catálogo: el
+  // endpoint es el que decide, acá solo se pide (18-09-2026).
+  const [puedeVerKpi, setPuedeVerKpi] = useState(false);
+
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => {
-      if (data.user?.id === listing.seller_id) setIsOwner(true);
+      const uid = data.user?.id;
+      if (!uid) return;
+      if (uid === listing.seller_id) setIsOwner(true);
+      if (uid === listing.seller_id || uid === VERO) setPuedeVerKpi(true);
     });
   }, [listing.seller_id]);
 
   useEffect(() => {
-    if (!isOwner) return;
+    if (!puedeVerKpi) return;
     let vivo = true;
     fetch(`/api/listings/${listing.id}/kpi`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (vivo && d && !d.error) setKpi(d); })
       .catch(() => {});
     return () => { vivo = false; };
-  }, [isOwner, listing.id]);
+  }, [puedeVerKpi, listing.id]);
 
   useEffect(() => {
     trackEvent("view_listing", {
@@ -535,10 +543,10 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
               tendrá más que uno de ayer— sino el RITMO, y comparado con el de
               su propia tienda: sin esa referencia, "0,3 visitas al día" no
               dice si va bien o mal. */}
-          {isOwner && kpi && (
+          {puedeVerKpi && kpi && (
             <div className="mt-5 rounded-xl border border-cream-dark/50 bg-cream-warm/40 px-4 py-3.5">
               <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-muted mb-2.5">
-                Solo tú ves esto
+                {isOwner ? "Solo tú ves esto" : "Vista de dueña del sitio"}
               </p>
               <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1.5 text-sm text-ink">
                 <span>

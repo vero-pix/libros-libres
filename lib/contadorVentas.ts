@@ -27,15 +27,18 @@ export const VENDEDORES_CON_LIBROS_VENDIDOS = new Set<string>([
 ]);
 
 /**
- * Quién ve el panel de seguimiento en su propia ficha (visitas, días
- * publicado, ritmo). Es información de su propio libro y nadie más la ve, pero
- * arranca solo para Vero porque el KPI todavía se está probando: pedido suyo
- * del 18-09-2026. Abrirlo a todos los vendedores es agregar ids acá.
+ * El panel de seguimiento de la ficha (visitas, días publicado, ritmo) lo ve
+ * CUALQUIER vendedor sobre sus propios libros — se abrió a todos el 18-09-2026,
+ * después de probarlo. No expone nada a terceros: el endpoint exige ser el
+ * dueño del listing.
+ *
+ * `VERO` además puede mirar el catálogo completo, no solo lo suyo: es la dueña
+ * del sitio y necesita comparar entre tiendas para encontrar hallazgos.
  */
-export const VENDEDORES_CON_PANEL = VENDEDORES_CON_LIBROS_VENDIDOS;
+export const VERO = "2201d163-4423-4971-91f0-f6cebd00d1bd";
 
-export function muestraPanelLibro(sellerId: string | null | undefined): boolean {
-  return !!sellerId && VENDEDORES_CON_PANEL.has(sellerId);
+export function veTodoElCatalogo(userId: string | null | undefined): boolean {
+  return userId === VERO;
 }
 
 export function muestraLibrosVendidos(sellerId: string | null | undefined): boolean {
