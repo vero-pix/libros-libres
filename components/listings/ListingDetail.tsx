@@ -552,7 +552,14 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
                   es donde el comprador decide. */}
               {sellerStats && sellerStats.ventas > 0 && (
                 <p className="text-[11px] text-ink-muted mt-0.5">
-                  {sellerStats.ventas} {sellerStats.ventas === 1 ? "libro vendido" : "libros vendidos"}
+                  {sellerStats.ventas}{" "}
+                  {(sellerStats as { cuentaLibrosVendidos?: boolean }).cuentaLibrosVendidos
+                    ? sellerStats.ventas === 1
+                      ? "libro vendido"
+                      : "libros vendidos"
+                    : sellerStats.ventas === 1
+                      ? "venta por la plataforma"
+                      : "ventas por la plataforma"}
                   {sellerStats.reviews_count >= 3 && sellerStats.reviews_avg != null && (
                     <>
                       {" · "}

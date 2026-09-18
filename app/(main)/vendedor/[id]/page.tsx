@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
+import { muestraLibrosVendidos } from "@/lib/contadorVentas";
 import SellerListingsGrid from "@/components/listings/SellerListingsGrid";
 import Avatar from "@/components/ui/Avatar";
 import { sortListingsForDisplay } from "@/lib/sortListings";
@@ -133,12 +134,6 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
     .eq("seller_id", seller.id)
     .maybeSingle();
 
-  // Antes decía "N ventas por la plataforma" con stats.paid_total, o sea solo
-  // las que se pagaron por MercadoPago dentro del sitio. A Vero le mostraba 7
-  // teniendo 22 libros vendidos: las otras 15 fueron por transferencia, por
-  // WhatsApp o en mano, y no por eso dejaron de venderse. Lo que le importa a
-  // quien mira el perfil es si a esta persona le compran, no por qué caja pasó
-  // la plata. Así que el número es ahora el de libros vendidos de verdad.
   // Los nombres de las mesas salen de la tabla `categories`, que es la fuente
   // de verdad (translateGenre no conoce las subcategorías nuevas y devolvía el
   // slug crudo: "no-ficcion-ensayo" en vez de "Ensayo").
@@ -148,12 +143,21 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
     if (c.slug && c.name) nombresCategoria[c.slug as string] = c.name as string;
   }
 
-  const { count: librosVendidos } = await supabase
-    .from("listings")
-    .select("id", { count: "exact", head: true })
-    .eq("seller_id", seller.id)
-    .eq("status", "completed");
-  const ventasPlataforma = librosVendidos ?? 0;
+  // Dos cifras posibles y NO miden lo mismo — ver lib/contadorVentas.ts. Para
+  // casi todos manda `paid_total` (lo vendido POR la plataforma, que es lo que
+  // les importa). Solo para Vero, que confirmó los suyos uno por uno, se
+  // muestra el total de libros vendidos.
+  const contarVendidos = muestraLibrosVendidos(seller.id);
+  let librosVendidos = 0;
+  if (contarVendidos) {
+    const { count } = await supabase
+      .from("listings")
+      .select("id", { count: "exact", head: true })
+      .eq("seller_id", seller.id)
+      .eq("status", "completed");
+    librosVendidos = count ?? 0;
+  }
+  const ventasPlataforma = contarVendidos ? librosVendidos : (stats?.paid_total ?? 0);
   const totalReviews = stats?.reviews_count ?? 0;
   const avgRating = stats?.reviews_avg != null ? Number(stats.reviews_avg) : 0;
   // Bajo 3 reseñas no se publica promedio (decisión C5): con una o dos, una
@@ -235,7 +239,14 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 text-sm text-gray-600">
               {ventasPlataforma > 0 && (
                 <span className="font-medium text-gray-900">
-                  {ventasPlataforma} {ventasPlataforma === 1 ? "libro vendido" : "libros vendidos"}
+                  {ventasPlataforma}{" "}
+                  {contarVendidos
+                    ? ventasPlataforma === 1
+                      ? "libro vendido"
+                      : "libros vendidos"
+                    : ventasPlataforma === 1
+                      ? "venta por la plataforma"
+                      : "ventas por la plataforma"}
                 </span>
               )}
               {courierHabitual && (

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { cobraPorTransferencia } from "@/lib/cobro-transferencia";
+import { muestraLibrosVendidos } from "@/lib/contadorVentas";
 import { permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import ListingDetail from "@/components/listings/ListingDetail";
@@ -221,13 +222,18 @@ export default async function LibroPage({ params }: Props) {
   // Prueba del vendedor para la ficha (paso e). Sale de `seller_stats`, que es
   // público: nada de la superficie pública puede depender de una tabla con RLS
   // restrictiva, como pasó con el courier y `shipments`.
-  // Libros vendidos de verdad, no solo los pagados por MercadoPago: el mismo
-  // criterio que el perfil del vendedor (18-09-2026).
-  const { count: librosVendidos } = await supabase
-    .from("listings")
-    .select("id", { count: "exact", head: true })
-    .eq("seller_id", listing.seller_id)
-    .eq("status", "completed");
+  // Solo para quien confirmó qué significa su `completed` — hoy, Vero.
+  // Para el resto sigue mandando paid_total. Ver lib/contadorVentas.ts.
+  const cuentaLibrosVendidos = muestraLibrosVendidos(listing.seller_id);
+  let librosVendidos = 0;
+  if (cuentaLibrosVendidos) {
+    const { count } = await supabase
+      .from("listings")
+      .select("id", { count: "exact", head: true })
+      .eq("seller_id", listing.seller_id)
+      .eq("status", "completed");
+    librosVendidos = count ?? 0;
+  }
 
   const { data: statsVendedor } = await supabase
     .from("seller_stats")
@@ -236,7 +242,8 @@ export default async function LibroPage({ params }: Props) {
     .maybeSingle();
   const sellerStats = statsVendedor
     ? {
-        ventas: librosVendidos ?? 0,
+        ventas: cuentaLibrosVendidos ? librosVendidos : (statsVendedor.paid_total ?? 0),
+        cuentaLibrosVendidos,
         reviews_count: statsVendedor.reviews_count ?? 0,
         reviews_avg: statsVendedor.reviews_avg != null ? Number(statsVendedor.reviews_avg) : null,
       }
