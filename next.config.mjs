@@ -11,6 +11,23 @@ const withMDX = createMDX({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  // Cabeceras de seguridad (19 sept 2026). Permissions-Policy deja cámara y
+  // ubicación en `self`, NO en `()`: el escáner de ISBN (BarcodeScanner) usa la
+  // cámara y el selector del mapa / "cerca de mí" usan la ubicación. Con `()`
+  // los dos dejan de funcionar sin ningún error visible.
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=(self)' },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       // www → apex (301 permanente para consolidar link equity)
