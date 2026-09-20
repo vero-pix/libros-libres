@@ -1,6 +1,10 @@
 /**
  * Ventana de Fiestas Patrias para adornos estacionales (la chupalla del logo).
  *
+ * Cierra el 19 y no el 20: el 20 el sitio ya tiene que verse de primavera
+ * (19-09-2026). Con la caluga del 18 retirada, la chupalla era lo último que
+ * quedaba de la semana dieciochera.
+ *
  * La fecha se calcula SIEMPRE en hora de Chile: el servidor corre en UTC y un
  * `new Date().getMonth()` a secas adelanta el cambio de día en la noche chilena.
  * Se resuelve en el servidor y baja como prop para que no haya mismatch de
@@ -16,7 +20,7 @@ export function esSemanaDel18(now: Date = new Date()): boolean {
     .split("-")
     .map(Number);
 
-  return mes === 9 && dia >= 8 && dia <= 20;
+  return mes === 9 && dia >= 8 && dia <= 19;
 }
 
 /**
