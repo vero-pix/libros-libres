@@ -12,7 +12,21 @@ interface CatalogoMatch {
   nivel: "exacto" | "probable";
 }
 
-export default function RequestForm({ hasSession = false }: { hasSession?: boolean }) {
+export default function RequestForm({
+  hasSession = false,
+  temas = [],
+}: {
+  hasSession?: boolean;
+  /** Temas de `categories`. Vacío = solo se puede pedir por título. */
+  temas?: { slug: string; nombre: string }[];
+}) {
+  // Dos formas de pedir: un libro concreto, o un tema para que te avisen cada
+  // vez que entre algo. El modo tema existía desde el 18-09-2026 pero solo en
+  // el formulario de /search, que aparece cuando una búsqueda no encuentra
+  // nada: en dos días no entró ni un pedido por tema. Acá está la entrada
+  // propia (20-09-2026).
+  const [modo, setModo] = useState<"libro" | "tema">("libro");
+  const [tema, setTema] = useState("");
   const [matches, setMatches] = useState<CatalogoMatch[]>([]);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -29,7 +43,7 @@ export default function RequestForm({ hasSession = false }: { hasSession?: boole
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (modo === "tema" ? !tema : !title.trim()) return;
     setStatus("loading");
     setErrorMsg(null);
 
@@ -40,9 +54,13 @@ export default function RequestForm({ hasSession = false }: { hasSession?: boole
       return;
     }
 
+    // En modo tema el título es el NOMBRE del tema: `title` es NOT NULL en la
+    // tabla y es lo que se muestra en la lista pública.
+    const nombreTema = temas.find((t) => t.slug === tema)?.nombre ?? tema;
     const body = {
-      title: title.trim(),
-      author: author.trim() || undefined,
+      title: modo === "tema" ? nombreTema : title.trim(),
+      tema: modo === "tema" ? tema : undefined,
+      author: modo === "tema" ? undefined : author.trim() || undefined,
       notes: notes.trim() || undefined,
       requester_email: correo || undefined,
       requester_whatsapp: whatsapp.trim() || undefined,
@@ -65,6 +83,7 @@ export default function RequestForm({ hasSession = false }: { hasSession?: boole
       setMatches(Array.isArray(data.matches) ? data.matches : []);
       setStatus("ok");
       setTitle("");
+      setTema("");
       setAuthor("");
       setNotes("");
       setContact("");
@@ -140,8 +159,9 @@ export default function RequestForm({ hasSession = false }: { hasSession?: boole
       <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
         <p className="font-display text-lg text-green-900 mb-2">¡Solicitud recibida!</p>
         <p className="text-sm text-green-800 mb-4">
-          Si un vendedor publica este libro, te contactamos. Mientras tanto tu
-          pedido queda visible en la lista para que los vendedores lo vean.
+          {modo === "tema"
+            ? "Te escribo cada vez que entre un libro de ese tema, como mucho una vez al día. Tu pedido queda abierto y visible en la lista, para que los vendedores sepan que hay alguien esperando."
+            : "Si un vendedor publica este libro, te contactamos. Mientras tanto tu pedido queda visible en la lista para que los vendedores lo vean."}
         </p>
         <button
           type="button"
@@ -156,33 +176,81 @@ export default function RequestForm({ hasSession = false }: { hasSession?: boole
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {temas.length > 0 && (
+        <div className="inline-flex rounded-lg border border-cream-dark bg-cream-warm/50 p-1">
+          {(["libro", "tema"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => {
+                setModo(m);
+                setErrorMsg(null);
+              }}
+              aria-pressed={modo === m}
+              className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-md transition-colors ${
+                modo === m
+                  ? "bg-white text-ink shadow-sm"
+                  : "text-ink-muted hover:text-ink"
+              }`}
+            >
+              {m === "libro" ? "Un libro" : "Un tema"}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {modo === "tema" ? (
         <label className="block">
           <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-            Título *
+            Tema *
           </span>
-          <input
-            type="text"
+          <select
             required
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="El fin de la historia y el último hombre"
-            className="mt-1.5 w-full px-3 py-2.5 border border-cream-dark rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
-        </label>
-        <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-            Autor (opcional)
+            value={tema}
+            onChange={(e) => setTema(e.target.value)}
+            className="mt-1.5 w-full px-3 py-2.5 border border-cream-dark rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+          >
+            <option value="">Elige un tema…</option>
+            {temas.map((t) => (
+              <option key={t.slug} value={t.slug}>
+                {t.nombre}
+              </option>
+            ))}
+          </select>
+          <span className="text-[11px] text-ink-muted mt-1 block">
+            Te aviso cada vez que entre algo de este tema, como mucho una vez al
+            día. El pedido no se cierra: queda abierto mientras lo quieras.
           </span>
-          <input
-            type="text"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            placeholder="Francis Fukuyama"
-            className="mt-1.5 w-full px-3 py-2.5 border border-cream-dark rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
         </label>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <label className="block">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+              Título *
+            </span>
+            <input
+              type="text"
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="El fin de la historia y el último hombre"
+              className="mt-1.5 w-full px-3 py-2.5 border border-cream-dark rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+          </label>
+          <label className="block">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+              Autor (opcional)
+            </span>
+            <input
+              type="text"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              placeholder="Francis Fukuyama"
+              className="mt-1.5 w-full px-3 py-2.5 border border-cream-dark rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+          </label>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-4">
         <label className="block">
@@ -259,10 +327,14 @@ export default function RequestForm({ hasSession = false }: { hasSession?: boole
 
       <button
         type="submit"
-        disabled={status === "loading" || !title.trim()}
+        disabled={status === "loading" || (modo === "tema" ? !tema : !title.trim())}
         className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 bg-amber-700 text-white text-sm font-semibold uppercase tracking-wider rounded-md hover:bg-amber-800 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
       >
-        {status === "loading" ? "Enviando..." : "Pedir este libro"}
+        {status === "loading"
+          ? "Enviando..."
+          : modo === "tema"
+            ? "Avísame de este tema"
+            : "Pedir este libro"}
       </button>
     </form>
   );

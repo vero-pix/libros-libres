@@ -19,6 +19,7 @@ interface BookRequest {
   requester_location: string | null;
   fulfilled: boolean;
   created_at: string;
+  tema: string | null;
 }
 
 export default async function SolicitudesPage() {
@@ -26,7 +27,7 @@ export default async function SolicitudesPage() {
   // Dos queries separadas: una sola con .limit(100) traía las 100 más recientes
   // mezclando abiertas y cumplidas, así que las abiertas más viejas se caían de
   // la lista y el contador no coincidía con el del home. (15 ago 2026)
-  const COLS = "id, title, author, notes, requester_location, fulfilled, created_at";
+  const COLS = "id, title, author, notes, requester_location, fulfilled, created_at, tema";
   const [{ data: openRaw }, { data: fulfilledRaw }] = await Promise.all([
     supabase
       .from("book_requests")
@@ -74,6 +75,13 @@ export default async function SolicitudesPage() {
   const open = rankByProximity((openRaw ?? []) as BookRequest[]);
   const fulfilled = (fulfilledRaw ?? []) as BookRequest[];
 
+  // Los temas salen de `categories`, la fuente de verdad — nunca una lista a
+  // mano. Es la misma que usa el formulario de /search (18-09-2026); hasta el
+  // 20-09 el modo tema vivía SOLO ahí, y ahí solo aparece cuando una búsqueda
+  // no encuentra nada: para pedir un tema había que fracasar buscando primero.
+  const { data: temasBD } = await supabase.from("categories").select("slug, name").order("name");
+  const temas = (temasBD ?? []).map((c) => ({ slug: c.slug as string, nombre: c.name as string }));
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-cream-warm to-cream">
       <header className="max-w-5xl mx-auto px-6 pt-14 pb-8">
@@ -96,20 +104,21 @@ export default async function SolicitudesPage() {
         {/* FORM */}
         <section className="bg-white rounded-2xl border border-amber-200 shadow-sm p-6 sm:p-8">
           <h2 className="font-display text-2xl text-ink mb-2">
-            ¿Buscas un libro?
+            ¿Buscas un libro, o un tema?
           </h2>
           <p className="text-sm text-ink-muted mb-6">
-            Déjanos el título. Si un vendedor lo tiene, lo va a publicar y te
-            avisamos. Tus datos de contacto son privados.
+            Un título concreto, y te aviso cuando alguien lo publique. O un tema
+            —poesía, historia, filosofía— y te aviso cada vez que entre algo de
+            esos. Tus datos de contacto son privados.
           </p>
-          <RequestForm hasSession={!!user} />
+          <RequestForm hasSession={!!user} temas={temas} />
         </section>
 
         {/* OPEN LIST */}
         <section>
           <div className="flex items-baseline justify-between mb-5">
             <h2 className="font-display text-2xl text-ink">
-              Libros que se están buscando
+              Lo que se está buscando
             </h2>
             <span className="text-xs text-ink-muted">
               {open.length} {open.length === 1 ? "solicitud" : "solicitudes"}
@@ -130,8 +139,12 @@ export default async function SolicitudesPage() {
                   className="bg-white rounded-xl border border-amber-200 hover:border-amber-500 hover:shadow-md transition-all p-5"
                 >
                   <div className="flex items-start gap-3 mb-3">
-                    <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full whitespace-nowrap mt-0.5">
-                      Se busca
+                    <span className={`text-[10px] uppercase tracking-[0.2em] font-bold px-2 py-0.5 rounded-full whitespace-nowrap mt-0.5 ${
+                      r.tema
+                        ? "text-emerald-800 bg-emerald-100"
+                        : "text-amber-700 bg-amber-100"
+                    }`}>
+                      {r.tema ? "Tema" : "Se busca"}
                     </span>
                   </div>
                   <h3 className="font-display font-bold text-lg text-ink leading-snug mb-1">
@@ -150,11 +163,19 @@ export default async function SolicitudesPage() {
                       {r.notes}
                     </p>
                   )}
+                  {/* Un pedido por tema no tiene título de libro: mandar
+                      "Poesía" como title a /publish llenaba el formulario con
+                      una categoría en el campo del nombre del libro. */}
                   <Link
-                    href={`/publish?title=${encodeURIComponent(r.title)}${r.author ? `&author=${encodeURIComponent(r.author)}` : ""}`}
+                    href={
+                      r.tema
+                        ? "/publish"
+                        : `/publish?title=${encodeURIComponent(r.title)}${r.author ? `&author=${encodeURIComponent(r.author)}` : ""}`
+                    }
                     className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-amber-800 hover:text-amber-900 mt-2"
                   >
-                    ¿Lo tienes? Publícalo <span aria-hidden>→</span>
+                    {r.tema ? "¿Tienes de esto? Publica" : "¿Lo tienes? Publícalo"}{" "}
+                    <span aria-hidden>→</span>
                   </Link>
                 </article>
               ))}
