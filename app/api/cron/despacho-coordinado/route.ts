@@ -22,6 +22,11 @@ export const maxDuration = 60;
  *
  * Nace del caso de Ana Gabriela (Álgebra de Baldor, 14-09-2026): trece días
  * esperando un libro sin que nadie le avisara nada.
+ *
+ * Sale desde hola@ y no desde vero@: vero@ NO recibe (probado el 18-09-2026), y
+ * estos dos correos son justamente los que invitan a responder — uno ofrece la
+ * devolución de la plata. Quien conteste al remitente en vez de al reply-to no
+ * puede caer en un buzón muerto.
  */
 const HORA = 3600_000;
 
@@ -76,7 +81,7 @@ export async function GET(request: Request) {
           const quien = String(vendedor.full_name ?? "").split(" ")[0] || "";
           await sendEmail({
             to: vendedor.email,
-            from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+            from: "Vero de tuslibros.cl <hola@tuslibros.cl>",
             replyTo: VERO_INBOX,
             subject: `¿Ya despachaste ${libro}?`,
             html: `
@@ -97,7 +102,7 @@ export async function GET(request: Request) {
             const quien = String(comprador.full_name ?? "").split(" ")[0] || "";
             await sendEmail({
               to: comprador.email,
-              from: "Vero de tuslibros.cl <vero@tuslibros.cl>",
+              from: "Vero de tuslibros.cl <hola@tuslibros.cl>",
               replyTo: VERO_INBOX,
               subject: `Tu pedido todavía no sale: ${libro}`,
               html: `

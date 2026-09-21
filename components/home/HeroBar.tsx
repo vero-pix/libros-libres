@@ -184,17 +184,22 @@ export default function HeroBar({ heroBooks, primavera = false }: Props) {
                 protegido y la gente real son lo que sube valor y ataca la desconfianza
                 (nuestro cuello de conversión). Los números viven en el contador de abajo. */}
             <div className="mt-9 flex flex-wrap items-center gap-x-3 gap-y-2 pt-6 border-t border-hero-line">
+              {/* Cada sello lleva a donde se comprueba: eran texto muerto y la
+                  portada prometía tres cosas sin dónde leerlas. (21-09-2026) */}
               {[
-                { icon: "📍", label: "Cerca de ti" },
-                { icon: "🛡️", label: "Pago protegido" },
-                { icon: "👤", label: "Gente real" },
+                { icon: "📍", label: "Cerca de ti", href: "/mapa" },
+                { icon: "🛡️", label: "Pago protegido", href: "/como-funciona#pago-protegido" },
+                { icon: "👤", label: "Gente real", href: "/gente-de-confianza" },
               ].map((b, i) => (
                 <span key={b.label} className="flex items-center gap-3">
                   {i > 0 && <span className="text-ink-muted/40" aria-hidden>·</span>}
-                  <span className="flex items-center gap-1.5 text-sm text-ink">
+                  <Link
+                    href={b.href}
+                    className="flex items-center gap-1.5 text-sm text-ink underline-offset-4 decoration-line-strong hover:underline hover:text-ink-deep transition-colors"
+                  >
                     <span aria-hidden>{b.icon}</span>
                     <span className="font-medium">{b.label}</span>
-                  </span>
+                  </Link>
                 </span>
               ))}
             </div>

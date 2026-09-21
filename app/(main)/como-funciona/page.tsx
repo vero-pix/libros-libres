@@ -73,7 +73,9 @@ export default function ComoFuncionaPage() {
             cuando desde el 25 de agosto el sitio esconde el WhatsApp del
             vendedor que tiene MercadoPago: la página que explica cómo funciona
             el sitio recomendaba el camino que el sitio había cerrado. */}
-        <section className="mb-14">
+        {/* El id es el destino del sello "Pago protegido" del hero: la promesa de
+            la portada tiene que poder comprobarse en una página del sitio. */}
+        <section id="pago-protegido" className="mb-14 scroll-mt-32">
           <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
             Compra con pago seguro
           </h2>
