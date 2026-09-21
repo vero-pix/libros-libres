@@ -85,3 +85,68 @@ export function sortListingsForDisplay<T extends ListingWithBook>(listings: T[])
     return turnoDelDia(a.id, semilla) - turnoDelDia(b.id, semilla);
   });
 }
+
+/**
+ * Reparto por vendedor: que ningún vendedor se tome la pantalla entero.
+ *
+ * El orden por defecto trae lo último publicado, así que quien sube doce libros
+ * de madrugada se lleva la portada completa. Pasó el 20-09-2026: de los 16
+ * libros de la primera página, 9 eran de la misma vendedora —todos a $20.000,
+ * todos romance juvenil, todos con portada parecida—. La home es de lejos lo
+ * que más rankea del sitio; quien llega desde Google veía el estante de una
+ * persona, no un catálogo de 4.000 títulos.
+ *
+ * Reparte en rondas: primero un libro de cada vendedor, después el segundo de
+ * cada uno, y así. NO cambia qué libros salen en la página, solo en qué orden
+ * —la paginación y el `count` quedan exactamente igual—, y respeta los tramos
+ * que ya armó `sortListingsForDisplay` (destacados arriba, sin portada abajo):
+ * el reparto ocurre dentro de cada tramo, nunca entre tramos.
+ *
+ * Aplícalo SIEMPRE después de `sortListingsForDisplay`, y nunca en una página
+ * de un solo vendedor (`/vendedor/[id]`), donde no tiene nada que repartir.
+ */
+export function repartirPorVendedor<T extends ListingWithBook>(listings: T[]): T[] {
+  // Misma jerarquía de tramos que usa el sort de arriba. Si dos libros caen en
+  // tramos distintos no se pueden intercambiar sin deshacer aquel orden.
+  const tramo = (l: T) =>
+    [
+      isPolitical(l),
+      !!(l as any).deprioritized,
+      !(l as any)._featured,
+      !hasCover(l),
+      looksNonSpanish(l),
+    ]
+      .map((b) => (b ? "1" : "0"))
+      .join("");
+
+  const salida: T[] = [];
+
+  for (const grupo of agruparEnOrden(listings, tramo)) {
+    // Dentro del tramo, una fila por vendedor conservando el orden que traían.
+    const porVendedor = agruparEnOrden(grupo, (l) => (l as any).seller_id ?? l.id);
+    let quedan = true;
+    for (let ronda = 0; quedan; ronda++) {
+      quedan = false;
+      for (const fila of porVendedor) {
+        if (ronda < fila.length) {
+          salida.push(fila[ronda]);
+          quedan = true;
+        }
+      }
+    }
+  }
+
+  return salida;
+}
+
+/** Agrupa preservando el orden de aparición de cada clave. */
+function agruparEnOrden<T>(items: T[], clave: (item: T) => string): T[][] {
+  const mapa = new Map<string, T[]>();
+  for (const item of items) {
+    const k = clave(item);
+    const fila = mapa.get(k);
+    if (fila) fila.push(item);
+    else mapa.set(k, [item]);
+  }
+  return Array.from(mapa.values());
+}
