@@ -1216,7 +1216,7 @@ function BookCard({ book, onClear }: { book: BookData; onClear: () => void }) {
               {book.genre}
             </span>
           )}
-          {book.published_year && (
+          {!!book.published_year && (
             <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
               {book.published_year}
             </span>

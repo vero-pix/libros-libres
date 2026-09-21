@@ -373,7 +373,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
           >
             {book.author}
             {(book as any).publisher && <span className="not-italic"> · {(book as any).publisher}</span>}
-            {book.published_year && <span className="not-italic"> · {book.published_year}</span>}
+            {!!book.published_year && <span className="not-italic"> · {book.published_year}</span>}
           </Link>
           {authorHub && (
             <Link
@@ -466,13 +466,16 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
                 <p className="text-sm font-medium text-ink mt-0.5">{(book as any).publisher}</p>
               </div>
             )}
-            {(book as any).pages && (
+            {/* `!!` y no `pages &&` a secas: con `pages` en 0 —hay 9 libros
+                así— React no oculta el bloque, imprime el 0. Salía un "0"
+                suelto debajo de ESTADO en la ficha. (21-09-2026) */}
+            {!!(book as any).pages && (
               <div>
                 <p className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">Páginas</p>
                 <p className="text-sm font-medium text-ink mt-0.5">{(book as any).pages}</p>
               </div>
             )}
-            {book.published_year && (
+            {!!book.published_year && (
               <div>
                 <p className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">Año</p>
                 <p className="text-sm font-medium text-ink mt-0.5">{book.published_year}</p>
