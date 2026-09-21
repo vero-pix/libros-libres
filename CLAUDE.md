@@ -35,7 +35,7 @@ Marketplace de libros usados en Chile. Producto en producción con ventas reales
 - **Voz en 1ª persona** (yo/nosotros/Vero) en copy orientado al cliente. No marca impersonal.
 - **Humor confesional** en marketing, no frases de agencia.
 - **Probar siempre en local primero** (rama + `npm run dev`) antes de push a main.
-- **`git push` a main: autorizado, sin preguntar** (27-07-2026). El **deploy a producción sí** requiere autorización explícita de Vero. Esto reemplaza la regla del CLAUDE.md global, que sigue vigente para los otros proyectos.
+- **`git push` a main: autorizado, sin preguntar** (27-07-2026). **Y el deploy a producción también, desde el 21-09-2026** ("pasa a producción todo sin preguntarme"): ya no hace falta pedir autorización para publicar. Esto reemplaza la regla del CLAUDE.md global, que sigue vigente para los otros proyectos. Lo que no cubre: migraciones de Supabase, borrados irreversibles y acciones hacia afuera (correos, redes, mensajes a usuarios).
 - **Nunca commitear con `--no-verify`** ni saltarse hooks.
 - Preferir editar archivos existentes sobre crear nuevos.
 - **El botón sale de `components/ui/Button.tsx`** (`Button` / `ButtonLink`), no se escribe inline. Antes existía en ~15 variantes con cuatro radios y cuatro alturas.
