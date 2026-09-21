@@ -81,45 +81,13 @@
     --foreground: 222 47% 11%;
   }
 
-  /* Primavera en todo el sitio (20-09 a 20-12). La clase la pone el layout raíz
-     con `esPrimavera()`, para que el cambio de estación no dependa del reloj del
-     navegador. Solo se mueven los NEUTROS —los cremas, los papeles y las líneas,
-     corridos del rosado hacia el verde—: la tinta, el coral, el oro y el verde de
-     marca quedan intactos, que son los que sostienen el contraste de los botones,
-     los precios y los estados. El 21-12 la clase deja de ponerse y el sitio vuelve
-     solo al crema de siempre.
-
-     Van los hex Y los canales RGB: hay CSS que usa `var(--cream)` directo y
-     Tailwind que usa `rgb(var(--cream-rgb) / <alpha>)`. Cambiar uno solo deja
-     media portada en la estación vieja. */
-  html.primavera {
-    /* Segunda pasada, 21-09: la primera era tan sutil que había que comparar
-       capturas para verla. Los neutros se van más al verde y el hero toma un
-       verde de hoja nueva de verdad, no un beige con insinuación. */
-    --cream: #eef2e0;
-    --cream-warm: #dfe7c9;
-    --cream-dark: #c2d0a4;
-    --paper: #eef2e0;
-    --paper-2: #e3ebd0;
-    --paper-card: #f7faee;
-    --paper-edge: #d3e0b8;
-    --line: #cddcae;
-    --line-strong: #a9bd86;
-    --hero: #e2ecc9;
-    --hero-line: #c2d0a4;
-
-    --cream-rgb: 238 242 224;
-    --cream-warm-rgb: 223 231 201;
-    --cream-dark-rgb: 194 208 164;
-    --paper-rgb: 238 242 224;
-    --paper-2-rgb: 227 235 208;
-    --paper-card-rgb: 247 250 238;
-    --paper-edge-rgb: 211 224 184;
-    --line-rgb: 205 220 174;
-    --line-strong-rgb: 169 189 134;
-    --hero-rgb: 226 236 201;
-    --hero-line-rgb: 194 208 164;
-  }
+  /* La clase `primavera` la sigue poniendo el layout raíz con `esPrimavera()`,
+     pero HOY NO PINTA NADA a propósito. El 21-09 se probó tiñendo los neutros
+     del sitio entero de verde y el resultado abarataba el beige editorial en
+     vez de celebrar nada: el verde lechuga se comía la marca. La maquinaria
+     queda lista —la clase baja desde el servidor, sin mismatch— para colgar de
+     ella la primavera que sí valga, que va por acentos y piezas y no por teñir
+     el fondo. */
 
   body {
     @apply text-ink antialiased bg-cream;
