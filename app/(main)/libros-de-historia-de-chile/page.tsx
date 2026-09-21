@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { sortListingsForDisplay } from "@/lib/sortListings";
+import { ordenarParaGrilla } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -86,7 +86,7 @@ export default async function LibrosHistoriaChilePage() {
     return CHILE_NEEDLES.some((n) => hay.includes(n.normalize("NFD").replace(/[̀-ͯ]/g, "")));
   }) as unknown as ListingWithBook[];
 
-  const listings = sortListingsForDisplay(matched).slice(0, 8);
+  const listings = ordenarParaGrilla(matched).slice(0, 8);
 
   const collectionJsonLd = {
     "@context": "https://schema.org",

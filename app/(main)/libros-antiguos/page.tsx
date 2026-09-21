@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import BookCover from "@/components/listings/BookCover";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { sortListingsForDisplay } from "@/lib/sortListings";
+import { ordenarParaGrilla } from "@/lib/sortListings";
 import { libroUrl } from "@/lib/urls";
 import type { ListingWithBook } from "@/types";
 
@@ -136,7 +136,7 @@ export default async function LibrosAntiguosPage() {
 
   // Las chilenas ya tienen su propia sección arriba: no se repiten en la grilla.
   const idsChilenas = new Set(chilenas.map((l) => l.id));
-  const featured = sortListingsForDisplay(
+  const featured = ordenarParaGrilla(
     ((featuredRaw as unknown as ListingWithBook[]) ?? []).filter((l) => !idsChilenas.has(l.id))
   ).slice(0, 24);
 

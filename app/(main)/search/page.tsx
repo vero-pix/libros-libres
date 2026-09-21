@@ -11,7 +11,7 @@ import BookRequestForm from "@/components/listings/BookRequestForm";
 import Pagination from "@/components/ui/Pagination";
 import AdSlot from "@/components/ads/AdSlot";
 import SearchEventTracker from "@/components/analytics/SearchEventTracker";
-import { sortListingsForDisplay } from "@/lib/sortListings";
+import { ordenarParaGrilla } from "@/lib/sortListings";
 import { translateGenre } from "@/lib/genres";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
@@ -311,7 +311,7 @@ export default async function SearchPage({ searchParams }: Props) {
   // Si no hay sort custom por precio, aplicar el orden de presentación
   // (español arriba, con portada arriba, deprioritized al final).
   if (sort !== "price_asc" && sort !== "price_desc") {
-    listings = sortListingsForDisplay(listings);
+    listings = ordenarParaGrilla(listings);
   }
 
   let popularListings: ListingWithBook[] = [];
@@ -322,7 +322,7 @@ export default async function SearchPage({ searchParams }: Props) {
       .eq("status", "active")
       .eq("featured", true)
       .limit(5);
-    popularListings = sortListingsForDisplay((data as unknown as ListingWithBook[]) ?? []);
+    popularListings = ordenarParaGrilla((data as unknown as ListingWithBook[]) ?? []);
   }
 
   // Para el "Se busca" por tema: la lista sale de `categories`, la fuente de

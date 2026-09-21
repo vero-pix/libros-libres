@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { sortListingsForDisplay } from "@/lib/sortListings";
+import { ordenarParaGrilla } from "@/lib/sortListings";
 import { authorItemListJsonLd, AUTHOR_LANDING_LIMIT } from "@/lib/authorLandings";
 import AuthorProfile from "@/components/landings/AuthorProfile";
 import type { ListingWithBook } from "@/types";
@@ -86,7 +86,7 @@ export default async function MarioVargasLlosaPage() {
     .order("created_at", { ascending: false })
     .limit(AUTHOR_LANDING_LIMIT);
 
-  const listings = sortListingsForDisplay(
+  const listings = ordenarParaGrilla(
     ((raw ?? []).filter((item: any) => item.book !== null) as unknown as ListingWithBook[])
   ).slice(0, AUTHOR_LANDING_LIMIT);
 

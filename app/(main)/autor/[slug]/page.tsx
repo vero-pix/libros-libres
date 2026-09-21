@@ -4,7 +4,7 @@ import Link from "next/link";
 import { createPublicClient } from "@/lib/supabase/public";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { sortListingsForDisplay } from "@/lib/sortListings";
+import { ordenarParaGrilla } from "@/lib/sortListings";
 import { AUTHORS } from "./authors.config";
 import type { ListingWithBook } from "@/types";
 
@@ -55,7 +55,7 @@ export default async function AutorPage({ params }: Props) {
 
   if (error) console.error("[autor] Error fetching listings:", error);
 
-  const books = sortListingsForDisplay(
+  const books = ordenarParaGrilla(
     ((listings ?? []).filter((l: any) => l.book) as unknown) as ListingWithBook[]
   );
 

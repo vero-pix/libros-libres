@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { sortListingsForDisplay } from "@/lib/sortListings";
+import { ordenarParaGrilla } from "@/lib/sortListings";
 import { authorItemListJsonLd, AUTHOR_LANDING_LIMIT } from "@/lib/authorLandings";
 import type { ListingWithBook } from "@/types";
 
@@ -79,7 +79,7 @@ export default async function AlgebraDeBaldorPage() {
     .order("created_at", { ascending: false })
     .limit(AUTHOR_LANDING_LIMIT);
 
-  const baldorListings = sortListingsForDisplay(
+  const baldorListings = ordenarParaGrilla(
     ((baldorRaw ?? []).filter((item: any) => item.book !== null) as unknown as ListingWithBook[])
   ).slice(0, AUTHOR_LANDING_LIMIT);
 

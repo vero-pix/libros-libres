@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { sortListingsForDisplay } from "@/lib/sortListings";
+import { ordenarParaGrilla } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
 import { CIUDADES, ORDEN } from "../libros-usados/ciudades";
 
@@ -101,7 +101,7 @@ export default async function ComprarLibrosUsadosPage() {
     .order("created_at", { ascending: false })
     .limit(12);
 
-  const featured = sortListingsForDisplay((featuredRaw as unknown as ListingWithBook[]) ?? []).slice(0, 8);
+  const featured = ordenarParaGrilla((featuredRaw as unknown as ListingWithBook[]) ?? []).slice(0, 8);
 
   const { count: totalActive } = await supabase
     .from("listings")

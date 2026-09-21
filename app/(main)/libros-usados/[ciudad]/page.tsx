@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { createPublicClient } from "@/lib/supabase/public";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { sortListingsForDisplay } from "@/lib/sortListings";
+import { ordenarParaGrilla } from "@/lib/sortListings";
 import { paginar } from "@/lib/supabase/paginar";
 import type { ListingWithBook } from "@/types";
 import { CIUDADES, COORDS, ORDEN } from "../ciudades";
@@ -132,7 +132,7 @@ async function getListings(slug: string, label: string): Promise<ListingWithBook
   // 18 dejaba fuera casi todo: La Florida tiene 193 libros dentro del radio y
   // mostraba 18. El tope alto es justamente el argumento de la página — que
   // haya catálogo real de esa comuna, no una muestra. (4 ago 2026)
-  return [...sortListingsForDisplay(exactas), ...sortListingsForDisplay(resto)].slice(0, 48);
+  return [...ordenarParaGrilla(exactas), ...ordenarParaGrilla(resto)].slice(0, 48);
 }
 
 export default async function LibrosUsadosCiudadPage({ params }: { params: { ciudad: string } }) {

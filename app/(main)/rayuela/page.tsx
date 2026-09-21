@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { sortListingsForDisplay } from "@/lib/sortListings";
+import { ordenarParaGrilla } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -71,7 +71,7 @@ export default async function RayuelaPage() {
     .order("created_at", { ascending: false })
     .limit(20);
 
-  const listings = sortListingsForDisplay(
+  const listings = ordenarParaGrilla(
     ((raw ?? []).filter((item: any) => item.book !== null) as unknown as ListingWithBook[])
   ).slice(0, 8);
 

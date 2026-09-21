@@ -16,7 +16,7 @@ import { leerPiezaDestacada } from "@/lib/piezaDestacada";
 import { librosMasBuscados } from "@/lib/demandaBusqueda";
 import TrustedStoresSection from "@/components/home/TrustedStoresSection";
 import HeroRequestStrip from "@/components/home/HeroRequestStrip";
-import { sortListingsForDisplay, repartirPorVendedor } from "@/lib/sortListings";
+import { ordenarParaGrilla } from "@/lib/sortListings";
 import { configVigente } from "@/lib/siteConfigVigente";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
@@ -678,11 +678,10 @@ export default async function HomePage({ searchParams }: Props) {
       _featured: l.seller?.plan === "librero" || l.seller?.plan === "libreria",
     };
   });
-  listings = sortListingsForDisplay(listings);
-  // Que un vendedor con doce libros nuevos no se lleve la portada entera.
-  // Solo reordena lo que ya venía en esta página: el count y las páginas no
-  // cambian. Ver repartirPorVendedor() en lib/sortListings.ts.
-  listings = repartirPorVendedor(listings);
+  // Tramos de siempre + reparto por vendedor, para que un vendedor con doce
+  // libros nuevos no se lleve la portada entera. Solo reordena lo que ya venía
+  // en esta página: el count y las páginas no cambian. Ver lib/sortListings.ts.
+  listings = ordenarParaGrilla(listings);
 
   // For the sidebar category tree, we use the current page's listings as a sample 
   // or we could fetch a slightly larger set if needed, but let's keep it lean.

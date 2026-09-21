@@ -150,3 +150,19 @@ function agruparEnOrden<T>(items: T[], clave: (item: T) => string): T[][] {
   }
   return Array.from(mapa.values());
 }
+
+/**
+ * El orden de cualquier grilla con varios vendedores: los tramos de siempre y
+ * después el reparto. Es lo que hay que usar por defecto — `sortListingsForDisplay`
+ * a secas deja que un vendedor con muchas publicaciones nuevas se lleve la
+ * pantalla entera.
+ *
+ * La excepción es `/vendedor/[id]`, donde todo es del mismo vendedor y no hay
+ * nada que repartir: esa página sigue llamando a `sortListingsForDisplay`.
+ *
+ * Si vas a cortar con `.slice(n)`, corta DESPUÉS de esto: así los primeros n
+ * se llevan la variedad y no los primeros n del mismo vendedor.
+ */
+export function ordenarParaGrilla<T extends ListingWithBook>(listings: T[]): T[] {
+  return repartirPorVendedor(sortListingsForDisplay(listings));
+}

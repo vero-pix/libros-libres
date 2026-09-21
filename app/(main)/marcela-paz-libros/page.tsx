@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { createPublicClient } from "@/lib/supabase/public";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { sortListingsForDisplay } from "@/lib/sortListings";
+import { ordenarParaGrilla } from "@/lib/sortListings";
 import { authorItemListJsonLd, AUTHOR_LANDING_LIMIT } from "@/lib/authorLandings";
 import AuthorProfile from "@/components/landings/AuthorProfile";
 import type { ListingWithBook } from "@/types";
@@ -85,7 +85,7 @@ export default async function MarcelaPazPage() {
     .ilike("book.author", "%marcela paz%")
     .limit(AUTHOR_LANDING_LIMIT);
 
-  const listings = sortListingsForDisplay(
+  const listings = ordenarParaGrilla(
     ((raw ?? []).filter((l: any) => l.book) as unknown) as ListingWithBook[]
   ).slice(0, AUTHOR_LANDING_LIMIT);
 

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { sortListingsForDisplay } from "@/lib/sortListings";
+import { ordenarParaGrilla } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -80,7 +80,7 @@ export default async function CienAnosDeSoledadPage() {
 
   const combined = [...(raw ?? []), ...(rawByAuthor ?? [])];
   const unique = combined.filter((item, idx, arr) => arr.findIndex((i: any) => i.id === (item as any).id) === idx);
-  const listings = sortListingsForDisplay(
+  const listings = ordenarParaGrilla(
     (unique.filter((item: any) => item.book !== null) as unknown as ListingWithBook[])
   ).slice(0, 8);
 
