@@ -93,29 +93,32 @@
      Tailwind que usa `rgb(var(--cream-rgb) / <alpha>)`. Cambiar uno solo deja
      media portada en la estación vieja. */
   html.primavera {
-    --cream: #f2f4e9;
-    --cream-warm: #e8ebdb;
-    --cream-dark: #cfd6c0;
-    --paper: #f2f4e9;
-    --paper-2: #e9ede0;
-    --paper-card: #fafbf2;
-    --paper-edge: #dfe6d2;
-    --line: #d9e0c8;
-    --line-strong: #bcc7a6;
-    --hero: #eef0e2;
-    --hero-line: #d9e0c8;
+    /* Segunda pasada, 21-09: la primera era tan sutil que había que comparar
+       capturas para verla. Los neutros se van más al verde y el hero toma un
+       verde de hoja nueva de verdad, no un beige con insinuación. */
+    --cream: #eef2e0;
+    --cream-warm: #dfe7c9;
+    --cream-dark: #c2d0a4;
+    --paper: #eef2e0;
+    --paper-2: #e3ebd0;
+    --paper-card: #f7faee;
+    --paper-edge: #d3e0b8;
+    --line: #cddcae;
+    --line-strong: #a9bd86;
+    --hero: #e2ecc9;
+    --hero-line: #c2d0a4;
 
-    --cream-rgb: 242 244 233;
-    --cream-warm-rgb: 232 235 219;
-    --cream-dark-rgb: 207 214 192;
-    --paper-rgb: 242 244 233;
-    --paper-2-rgb: 233 237 224;
-    --paper-card-rgb: 250 251 242;
-    --paper-edge-rgb: 223 230 210;
-    --line-rgb: 217 224 200;
-    --line-strong-rgb: 188 199 166;
-    --hero-rgb: 238 240 226;
-    --hero-line-rgb: 217 224 200;
+    --cream-rgb: 238 242 224;
+    --cream-warm-rgb: 223 231 201;
+    --cream-dark-rgb: 194 208 164;
+    --paper-rgb: 238 242 224;
+    --paper-2-rgb: 227 235 208;
+    --paper-card-rgb: 247 250 238;
+    --paper-edge-rgb: 211 224 184;
+    --line-rgb: 205 220 174;
+    --line-strong-rgb: 169 189 134;
+    --hero-rgb: 226 236 201;
+    --hero-line-rgb: 194 208 164;
   }
 
   body {
