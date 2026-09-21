@@ -1,27 +1,14 @@
 /**
- * Ventana de Fiestas Patrias para adornos estacionales (la chupalla del logo).
+ * Fechas en hora de Chile.
  *
- * Cierra el 19 y no el 20: el 20 el sitio ya tiene que verse de primavera
- * (19-09-2026). Con la caluga del 18 retirada, la chupalla era lo último que
- * quedaba de la semana dieciochera.
- *
- * La fecha se calcula SIEMPRE en hora de Chile: el servidor corre en UTC y un
- * `new Date().getMonth()` a secas adelanta el cambio de día en la noche chilena.
- * Se resuelve en el servidor y baja como prop para que no haya mismatch de
+ * El servidor corre en UTC: un `new Date().getMonth()` a secas adelanta el
+ * cambio de día en la noche chilena. Todo lo que dependa del calendario pasa
+ * por acá y se resuelve en el servidor, para que no haya mismatch de
  * hidratación con el reloj del navegador.
+ *
+ * El archivo se llamaba `fiestasPatrias.ts` por la chupalla del logo, que se
+ * retiró del sitio el 21-09-2026. Lo que queda es calendario, no adorno.
  */
-export function esSemanaDel18(now: Date = new Date()): boolean {
-  const [mes, dia] = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Santiago",
-    month: "2-digit",
-    day: "2-digit",
-  })
-    .format(now)
-    .split("-")
-    .map(Number);
-
-  return mes === 9 && dia >= 8 && dia <= 19;
-}
 
 /**
  * La fecha de hoy en Chile, como "AAAA-MM-DD".
@@ -60,4 +47,30 @@ export function ahoraEnChile(now: Date = new Date()): string {
   }).format(now);
 
   return `${hoyEnChile(now)}T${hora}`;
+}
+
+/**
+ * Ventana de primavera para el color estacional de la portada.
+ *
+ * Arranca el 20-09 y cierra el 20-12, cuando entra el verano. Fuera de esa
+ * ventana el hero vuelve solo a la paleta de siempre: no hay que acordarse de
+ * nada en diciembre.
+ *
+ * Se resuelve en el servidor y baja como prop hasta el hero, que es un
+ * componente de cliente: si lo calculara el navegador habría mismatch de
+ * hidratación en el cambio de estación.
+ */
+export function esPrimavera(now: Date = new Date()): boolean {
+  const [mes, dia] = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Santiago",
+    month: "2-digit",
+    day: "2-digit",
+  })
+    .format(now)
+    .split("-")
+    .map(Number);
+
+  if (mes === 9) return dia >= 20;
+  if (mes === 12) return dia <= 20;
+  return mes === 10 || mes === 11;
 }

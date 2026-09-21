@@ -39,6 +39,12 @@
     --line: #e0d6c2;
     --line-strong: #cbbd9f;
 
+    /* Primavera (20-09 a 20-12, ver lib/fechasChile.ts). El mismo crema de
+       siempre corrido hacia el verde: no es un color nuevo en el sitio, es la
+       estación entrando por el hero. Solo se aplica en la portada. */
+    --primavera: #eef0e2;
+    --primavera-line: #d9e0c8;
+
 
     /* Los mismos colores en canales RGB. Existen porque Tailwind no puede
        aplicar opacidad sobre un hex guardado en una variable: `text-cream/80`
@@ -68,6 +74,8 @@
     --cream-dark-rgb: 208 201 188;
     --line-rgb: 224 214 194;
     --line-strong-rgb: 203 189 159;
+    --primavera-rgb: 238 240 226;
+    --primavera-line-rgb: 217 224 200;
 
     --background: 40 33% 97%;
     --foreground: 222 47% 11%;
@@ -91,22 +99,6 @@
 
 .mapboxgl-ctrl-logo {
   display: none !important;
-}
-
-/* Chupalla del 18: cuelga sobre el título de la fila destacada y se mece apenas.
-   El giro base va acá (no en una clase de Tailwind) para no pelear con el
-   transform de la animación. */
-@keyframes chupalla-float {
-  0%, 100% { transform: rotate(-14deg) translateY(0); }
-  50%      { transform: rotate(-9deg) translateY(-2px); }
-}
-.chupalla-float {
-  transform: rotate(-14deg);
-  transform-origin: 55% 85%;
-  animation: chupalla-float 4.5s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .chupalla-float { animation: none; }
 }
 
 /* Marquee libros destacados.

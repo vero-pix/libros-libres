@@ -11,7 +11,7 @@
  * mismo patrón que `destacado_home`. Sin fila configurada no se muestra nada.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { hoyEnChile } from "@/lib/fiestasPatrias";
+import { hoyEnChile } from "@/lib/fechasChile";
 
 export interface PiezaDestacada {
   titulo: string;

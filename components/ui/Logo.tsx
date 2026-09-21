@@ -2,16 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import Chupalla from "./Chupalla";
 
 interface LogoProps {
   className?: string;
   withTagline?: boolean;
-  /** Le pone la chupalla al isotipo en la semana del 18. Lo decide el servidor. */
-  festivo?: boolean;
 }
 
-export default function Logo({ className = "", withTagline = false, festivo = false }: LogoProps) {
+export default function Logo({ className = "", withTagline = false }: LogoProps) {
   return (
     <Link href="/" className={`flex items-center gap-2.5 group ${className}`}>
       {/* Isotipo compacto */}
@@ -23,9 +20,6 @@ export default function Logo({ className = "", withTagline = false, festivo = fa
           className="object-contain group-hover:scale-105 transition-transform duration-300"
           priority
         />
-        {festivo && (
-          <Chupalla id="chupalla-logo" className="chupalla-float absolute -top-1.5 left-0 w-7 h-auto pointer-events-none drop-shadow-sm" />
-        )}
       </div>
 
       {/* Logotipo */}

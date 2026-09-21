@@ -8,6 +8,9 @@ interface Props {
   totalListings: number;
   heroBooks?: HeroBook[];
   onToggleMap?: () => void;
+  /** Del 20-09 al 20-12 el hero se viste de primavera. Lo decide el servidor
+      (lib/fechasChile.ts): calcularlo acá daría mismatch de hidratación. */
+  primavera?: boolean;
 }
 
 const CATEGORY_CHIPS = [
@@ -128,15 +131,19 @@ function RealFanBook({ book, pos, prioridad }: { book: HeroBook; pos: string; pr
   );
 }
 
-export default function HeroBar({ heroBooks }: Props) {
+export default function HeroBar({ heroBooks, primavera = false }: Props) {
   const useReal = (heroBooks?.length ?? 0) >= 6;
+  // El crema tostado se corre hacia el verde y las líneas lo acompañan. El
+  // coral no se toca: sobre el fondo primaveral queda haciendo de flor.
+  const fondo = primavera ? "bg-primavera border-primavera-line" : "bg-cream-warm border-line";
+  const linea = primavera ? "border-primavera-line" : "border-line";
   return (
-    <section className="bg-cream-warm border-b border-line overflow-hidden">
+    <section className={`border-b overflow-hidden ${fondo}`}>
       <div className="max-w-7xl mx-auto px-6 pt-12 pb-10 sm:pt-16 sm:pb-12">
         <div className="grid lg:grid-cols-[1.02fr_0.98fr] gap-10 items-center">
           {/* Texto */}
           <div className="max-w-2xl">
-            <p className="inline-flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.22em] text-coral mb-5 before:content-[''] before:w-6 before:h-px before:bg-current">
+            <p className={`inline-flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.22em] mb-5 before:content-[''] before:w-6 before:h-px before:bg-current ${primavera ? "text-green" : "text-coral"}`}>
               Libros libres · Chile
             </p>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-[64px] font-normal text-ink leading-[1.05] tracking-[-0.02em]">
@@ -164,7 +171,7 @@ export default function HeroBar({ heroBooks }: Props) {
                 "$3.000 · más baratos", que cheapeaba la marca. La cercanía, el pago
                 protegido y la gente real son lo que sube valor y ataca la desconfianza
                 (nuestro cuello de conversión). Los números viven en el contador de abajo. */}
-            <div className="mt-9 flex flex-wrap items-center gap-x-3 gap-y-2 pt-6 border-t border-line">
+            <div className={`mt-9 flex flex-wrap items-center gap-x-3 gap-y-2 pt-6 border-t ${linea}`}>
               {[
                 { icon: "📍", label: "Cerca de ti" },
                 { icon: "🛡️", label: "Pago protegido" },
@@ -190,7 +197,7 @@ export default function HeroBar({ heroBooks }: Props) {
                   <RealFanBook key={b.href} book={b} pos={HERO_SLOTS[i].pos} prioridad={i < 3} />
                 ))
               : weeklyHeroBooks().map((b) => <FanBook key={b.t} b={b} />)}
-            <div className="absolute z-[6] left-[40%] top-[188px] rotate-[2deg] bg-white border border-line rounded-full px-3.5 py-2 shadow-card flex items-center gap-2.5 font-mono text-[11px] font-semibold text-ink whitespace-nowrap">
+            <div className={`absolute z-[6] left-[40%] top-[188px] rotate-[2deg] bg-white border rounded-full ${linea} px-3.5 py-2 shadow-card flex items-center gap-2.5 font-mono text-[11px] font-semibold text-ink whitespace-nowrap`}>
               <span className="w-2 h-2 rounded-full bg-coral shadow-[0_0_0_4px_rgba(223,82,57,0.18)]" />
               A 800 m · retiro en mano
             </div>

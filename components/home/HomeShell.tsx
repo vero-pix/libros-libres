@@ -23,6 +23,8 @@ interface Props {
   views: number;
   hasFilters: boolean;
   heroBooks?: HeroBook[];
+  /** Estación vigente, resuelta en el servidor (lib/fechasChile.ts). */
+  primavera?: boolean;
   featuredRow?: ReactNode;
   testimonialBanner?: ReactNode;
   heroRequestStrip?: ReactNode;
@@ -30,7 +32,7 @@ interface Props {
   children: ReactNode;
 }
 
-export default function HomeShell({ totalListings, stores, views, hasFilters, heroBooks, featuredRow, testimonialBanner, heroRequestStrip, liquidacionBanner, children }: Props) {
+export default function HomeShell({ totalListings, stores, views, hasFilters, heroBooks, primavera = false, featuredRow, testimonialBanner, heroRequestStrip, liquidacionBanner, children }: Props) {
   const [forceMap, setForceMap] = useState(false);
 
   const handleToggleMap = useCallback(() => {
@@ -43,7 +45,7 @@ export default function HomeShell({ totalListings, stores, views, hasFilters, he
 
       {!hasFilters ? (
         <>
-          <HeroBar totalListings={totalListings} heroBooks={heroBooks} onToggleMap={handleToggleMap} />
+          <HeroBar totalListings={totalListings} heroBooks={heroBooks} primavera={primavera} onToggleMap={handleToggleMap} />
           {/* SEO: keywords naturales del mercado, invisibles al usuario */}
           <p className="sr-only">
             tuslibros.cl es el marketplace chileno de libros usados.

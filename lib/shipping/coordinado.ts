@@ -15,7 +15,7 @@
  */
 import { getRegionForComuna, COMUNAS_CHILE } from "@/lib/comunas";
 import { foldAccents } from "@/lib/accentSearch";
-import { ahoraEnChile } from "@/lib/fiestasPatrias";
+import { ahoraEnChile } from "@/lib/fechasChile";
 
 /** Valor de `orders.courier` mientras el vendedor no despacha. */
 export const COURIER_COORDINADO = "coordinado";

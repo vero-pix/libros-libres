@@ -1,4 +1,4 @@
-import { ahoraEnChile, hoyEnChile } from "@/lib/fiestasPatrias";
+import { ahoraEnChile, hoyEnChile } from "@/lib/fechasChile";
 
 /**
  * Resolución de las configuraciones editoriales del home (`site_config`), que

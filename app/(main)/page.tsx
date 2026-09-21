@@ -18,6 +18,7 @@ import TrustedStoresSection from "@/components/home/TrustedStoresSection";
 import HeroRequestStrip from "@/components/home/HeroRequestStrip";
 import { ordenarParaGrilla } from "@/lib/sortListings";
 import { configVigente } from "@/lib/siteConfigVigente";
+import { esPrimavera } from "@/lib/fechasChile";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
@@ -290,7 +291,7 @@ async function configDeColecciones(supabase: ReturnType<typeof createPublicClien
   const { data } = await supabase.from("site_config").select("value").eq("key", "destacado_home").maybeSingle();
   const d = configVigente(
     data?.value as
-      | { tag?: string; collectionSlug?: string; title?: string; subtitle?: string; since?: string; until?: string; adorno?: string; programados?: unknown }
+      | { tag?: string; collectionSlug?: string; title?: string; subtitle?: string; since?: string; until?: string; programados?: unknown }
       | undefined
   );
 
@@ -301,7 +302,6 @@ async function configDeColecciones(supabase: ReturnType<typeof createPublicClien
     collectionSlug: d.collectionSlug || undefined,
     title: d.title,
     subtitle: d.subtitle ?? "",
-    adorno: d.adorno,
   };
   return [destacada, ...COLLECTION_CONFIGS.slice(1).filter((c) => c.tag !== destacada.tag)];
 }
@@ -335,7 +335,7 @@ const getCollections = unstable_cache(
         used.add(l.id);
         listings.push(l);
       }
-      return { tag: c.tag, collectionSlug: c.collectionSlug, title: c.title, subtitle: c.subtitle, adorno: (c as { adorno?: string }).adorno, listings };
+      return { tag: c.tag, collectionSlug: c.collectionSlug, title: c.title, subtitle: c.subtitle, listings };
     });
   },
   ["home-collections-v1"],
@@ -697,6 +697,7 @@ export default async function HomePage({ searchParams }: Props) {
         views={publicStats.views}
         hasFilters={hasFilters}
         heroBooks={heroBooks}
+        primavera={esPrimavera()}
         featuredRow={
           !hasFilters ? (
             <>
