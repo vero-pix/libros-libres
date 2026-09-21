@@ -8,6 +8,7 @@ import Footer from "@/components/ui/Footer";
 import BackToTop from "@/components/ui/BackToTop";
 import PageTracker from "@/components/ui/PageTracker";
 import AuthErrorNotice from "@/components/auth/AuthErrorNotice";
+import { esPrimavera } from "@/lib/fechasChile";
 
 const newsreader = Newsreader({
   variable: "--font-newsreader",
@@ -77,8 +78,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // La estación se decide en el servidor y viaja como clase en el <html>: los
+  // neutros del sitio entero (cremas, papeles, líneas) cambian con ella en
+  // app/globals.css. Calcularla en el cliente daría mismatch de hidratación.
   return (
-    <html lang="es-CL">
+    <html lang="es-CL" className={esPrimavera() ? "primavera" : undefined}>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

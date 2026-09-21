@@ -67,10 +67,10 @@ const config: Config = {
           DEFAULT: "rgb(var(--line-rgb) / <alpha-value>)",
           strong: "rgb(var(--line-strong-rgb) / <alpha-value>)",
         },
-        // Estacional: solo el hero de la portada, entre el 20-09 y el 20-12.
-        primavera: {
-          DEFAULT: "rgb(var(--primavera-rgb) / <alpha-value>)",
-          line: "rgb(var(--primavera-line-rgb) / <alpha-value>)",
+        // El fondo del hero de la portada. Cambia con la estación desde el CSS.
+        hero: {
+          DEFAULT: "rgb(var(--hero-rgb) / <alpha-value>)",
+          line: "rgb(var(--hero-line-rgb) / <alpha-value>)",
         },
         link: "#8b5e3c",
         "black-soft": "#33302b",

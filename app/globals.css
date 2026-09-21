@@ -39,11 +39,11 @@
     --line: #e0d6c2;
     --line-strong: #cbbd9f;
 
-    /* Primavera (20-09 a 20-12, ver lib/fechasChile.ts). El mismo crema de
-       siempre corrido hacia el verde: no es un color nuevo en el sitio, es la
-       estación entrando por el hero. Solo se aplica en la portada. */
-    --primavera: #eef0e2;
-    --primavera-line: #d9e0c8;
+    /* El hero de la portada lleva su propio crema, un punto más marcado que el
+       fondo general. Es un token aparte —y no `cream-warm` a secas— porque la
+       estación lo mueve con más amplitud que al resto (ver `html.primavera`). */
+    --hero: #e4ddd1;
+    --hero-line: #e0d6c2;
 
 
     /* Los mismos colores en canales RGB. Existen porque Tailwind no puede
@@ -74,11 +74,48 @@
     --cream-dark-rgb: 208 201 188;
     --line-rgb: 224 214 194;
     --line-strong-rgb: 203 189 159;
-    --primavera-rgb: 238 240 226;
-    --primavera-line-rgb: 217 224 200;
+    --hero-rgb: 228 221 209;
+    --hero-line-rgb: 224 214 194;
 
     --background: 40 33% 97%;
     --foreground: 222 47% 11%;
+  }
+
+  /* Primavera en todo el sitio (20-09 a 20-12). La clase la pone el layout raíz
+     con `esPrimavera()`, para que el cambio de estación no dependa del reloj del
+     navegador. Solo se mueven los NEUTROS —los cremas, los papeles y las líneas,
+     corridos del rosado hacia el verde—: la tinta, el coral, el oro y el verde de
+     marca quedan intactos, que son los que sostienen el contraste de los botones,
+     los precios y los estados. El 21-12 la clase deja de ponerse y el sitio vuelve
+     solo al crema de siempre.
+
+     Van los hex Y los canales RGB: hay CSS que usa `var(--cream)` directo y
+     Tailwind que usa `rgb(var(--cream-rgb) / <alpha>)`. Cambiar uno solo deja
+     media portada en la estación vieja. */
+  html.primavera {
+    --cream: #f2f4e9;
+    --cream-warm: #e8ebdb;
+    --cream-dark: #cfd6c0;
+    --paper: #f2f4e9;
+    --paper-2: #e9ede0;
+    --paper-card: #fafbf2;
+    --paper-edge: #dfe6d2;
+    --line: #d9e0c8;
+    --line-strong: #bcc7a6;
+    --hero: #eef0e2;
+    --hero-line: #d9e0c8;
+
+    --cream-rgb: 242 244 233;
+    --cream-warm-rgb: 232 235 219;
+    --cream-dark-rgb: 207 214 192;
+    --paper-rgb: 242 244 233;
+    --paper-2-rgb: 233 237 224;
+    --paper-card-rgb: 250 251 242;
+    --paper-edge-rgb: 223 230 210;
+    --line-rgb: 217 224 200;
+    --line-strong-rgb: 188 199 166;
+    --hero-rgb: 238 240 226;
+    --hero-line-rgb: 217 224 200;
   }
 
   body {
