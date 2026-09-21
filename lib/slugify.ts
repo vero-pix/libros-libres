@@ -67,7 +67,18 @@ export async function slugUnicoParaVendedor(
     .select("slug")
     .like("slug", `${base}%`);
 
-  const tomados = new Set<string>((data ?? []).map((l: { slug: string | null }) => l.slug ?? ""));
+  // Los slugs retirados siguen ocupados: cada uno redirige 301 a la ficha que
+  // lo tenía (listing_slug_history, 21-09-2026). Si otro libro se lo llevara,
+  // la redirección apuntaría al libro equivocado. La tabla puede no existir en
+  // una base vieja: si la consulta falla, se sigue con los de `listings`.
+  const { data: retirados } = await supabase
+    .from("listing_slug_history")
+    .select("slug")
+    .like("slug", `${base}%`);
+
+  const tomados = new Set<string>(
+    [...(data ?? []), ...(retirados ?? [])].map((l: { slug: string | null }) => l.slug ?? "")
+  );
   if (!tomados.has(base)) return base;
   for (let n = 2; n < 100; n++) {
     const intento = `${base}-${n}`;

@@ -147,6 +147,25 @@ export default async function LibroPage({ params }: Props) {
       permanentRedirect(`/libro/${canonico}/${porSlug!.slug}`);
     }
 
+    // El slug también cambia cuando el vendedor corrige el título (21-09-2026).
+    // El anterior queda en listing_slug_history: un enlace ya compartido o
+    // indexado llega igual al libro, con 301 a la URL nueva.
+    if (!porSlug) {
+      const { data: retirado } = await supabase
+        .from("listing_slug_history")
+        .select("listing:listings(slug, seller:users(username))")
+        .eq("slug", params.slug)
+        .maybeSingle();
+
+      const actual: any = Array.isArray((retirado as any)?.listing)
+        ? (retirado as any).listing[0]
+        : (retirado as any)?.listing;
+      const duenoActual = Array.isArray(actual?.seller) ? actual.seller[0] : actual?.seller;
+      if (actual?.slug && duenoActual?.username) {
+        permanentRedirect(`/libro/${duenoActual.username}/${actual.slug}`);
+      }
+    }
+
     // Antes esto era un permanentRedirect("/"): quien llegaba de Google a un
     // libro vendido aterrizaba en la portada sin explicación, justo cuando ya
     // sabía qué quería. Ahora se le dice qué pasó y se le ofrecen parecidos.

@@ -29,7 +29,7 @@ export async function PATCH(
   const admin = createServiceRoleClient();
   const { data: listing, error: listingError } = await admin
     .from("listings")
-    .select("id, book_id, seller_id, slug")
+    .select("id, book_id, seller_id, slug, book:books(title, author)")
     .eq("id", params.id)
     .single();
 
@@ -94,23 +94,69 @@ export async function PATCH(
     listingUpdates.cover_image_url = cleanText(listingInput.cover_image_url);
   }
 
-  const { error: bookError } = await admin
-    .from("books")
-    .update(bookUpdates)
-    .eq("id", listing.book_id);
+  // La ficha de `books` se comparte entre vendedores cuando coinciden ISBN,
+  // título y autor (ver fichaCoincide() en PublishForm). Editar acá el título
+  // se lo cambiaba también al libro del otro, sin que se enterara. Si la ficha
+  // es compartida, este vendedor se lleva una copia propia y el otro queda con
+  // la suya intacta. (21-09-2026)
+  const { data: otrosDuenos } = await admin
+    .from("listings")
+    .select("id")
+    .eq("book_id", listing.book_id)
+    .neq("seller_id", listing.seller_id)
+    .limit(1);
 
-  if (bookError) {
-    return NextResponse.json({ error: bookError.message }, { status: 500 });
+  if (otrosDuenos?.length) {
+    const { data: original } = await admin
+      .from("books")
+      .select("*")
+      .eq("id", listing.book_id)
+      .single();
+
+    const { id: _descartado, created_at: _tambien, ...resto } = (original ?? {}) as any;
+    const { data: copia, error: copiaError } = await admin
+      .from("books")
+      .insert({ ...resto, ...bookUpdates, created_by: listing.seller_id })
+      .select("id")
+      .single();
+
+    if (copiaError) {
+      return NextResponse.json({ error: copiaError.message }, { status: 500 });
+    }
+    listingUpdates.book_id = copia.id;
+  } else {
+    const { error: bookError } = await admin
+      .from("books")
+      .update(bookUpdates)
+      .eq("id", listing.book_id);
+
+    if (bookError) {
+      return NextResponse.json({ error: bookError.message }, { status: 500 });
+    }
   }
 
-  // Asegurar que tenga slug si no existe (retrocompatibilidad)
-  if (!listing.slug) {
-    const { slugListing, slugUnicoParaVendedor } = await import("@/lib/slugify");
-    listingUpdates.slug = await slugUnicoParaVendedor(
-      admin,
-      listing.seller_id,
-      slugListing(bookUpdates.title || "libro", bookUpdates.author)
-    );
+  // El slug sale del título, así que si el título cambia la URL tiene que
+  // seguirlo: hasta el 21-09-2026 se regeneraba SOLO cuando faltaba, y quien
+  // corregía un título quedaba con una URL que nombraba otro libro. El slug
+  // anterior se guarda para redirigir 301 desde los enlaces ya compartidos
+  // (ver la ficha en app/(main)/libro/[username]/[slug]/page.tsx).
+  const { slugListing, slugUnicoParaVendedor } = await import("@/lib/slugify");
+  const base = slugListing(bookUpdates.title || "libro", bookUpdates.author);
+  // `slug-2`, `slug-3`… son el mismo slug con desempate: no hay que tocarlos.
+  const yaEsEseSlug = !!listing.slug && new RegExp(`^${base}(-\\d+)?$`).test(listing.slug);
+
+  if (!yaEsEseSlug) {
+    const nuevoSlug = await slugUnicoParaVendedor(admin, listing.seller_id, base);
+    if (nuevoSlug !== listing.slug) {
+      listingUpdates.slug = nuevoSlug;
+      if (listing.slug) {
+        // Si el insert falla (slug ya archivado) no se cae la edición: lo peor
+        // que pasa es que ese enlace viejo no redirija.
+        await admin
+          .from("listing_slug_history")
+          .insert({ listing_id: listing.id, slug: listing.slug });
+      }
+    }
   }
 
   const { error: updateListingError } = await admin
