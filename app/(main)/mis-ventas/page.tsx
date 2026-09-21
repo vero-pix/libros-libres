@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { Fragment } from "react";
 import Image from "next/image";
 import type { Order, OrderStatus } from "@/types";
 import BuyerCartsSection from "@/components/sales/BuyerCartsSection";
@@ -278,19 +279,22 @@ export default async function MisVentasPage() {
             <div className="bg-white rounded-xl border border-cream-dark/30 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm table-fixed">
+                  {/* En md+ son cinco columnas. En celular la de "Envío" se
+                      oculta y su contenido baja a una fila propia, así que el
+                      resto se reparte el ancho. */}
                   <colgroup>
-                    <col className="w-[30%]" />
-                    <col className="w-[24%]" />
-                    <col className="w-[11%]" />
-                    <col className="w-[25%]" />
-                    <col className="w-[10%]" />
+                    <col className="w-[40%] md:w-[30%]" />
+                    <col className="w-[28%] md:w-[24%]" />
+                    <col className="w-[16%] md:w-[11%]" />
+                    <col className="w-0 md:w-[25%]" />
+                    <col className="w-[16%] md:w-[10%]" />
                   </colgroup>
                   <thead>
                     <tr className="border-b border-cream-dark/20 text-left text-xs text-ink-muted uppercase tracking-wider">
                       <th className="px-3 py-3">Libro</th>
                       <th className="px-3 py-3">Comprador</th>
                       <th className="px-3 py-3">Precio</th>
-                      <th className="px-3 py-3">Envío</th>
+                      <th className="px-3 py-3 hidden md:table-cell">Envío</th>
                       <th className="px-3 py-3">Fecha</th>
                     </tr>
                   </thead>
@@ -314,8 +318,134 @@ export default async function MisVentasPage() {
                             `Hola equipo de Shipit,\n\nMi envío no logra emitir la etiqueta. Necesito que me ayuden a regenerarla.\n\nDetalles:\n- Referencia: TL-${order.id.slice(0, 12)}\n- Courier: ${order.courier ?? "Starken"}\n- Comprador: ${order.buyer?.full_name ?? ""}\n- Dirección: ${order.buyer_address ?? ""}\n- Fecha pedido: ${new Date(order.created_at).toLocaleString("es-CL")}\n\nGracias.`
                           )}`
                         : null;
+                      // El registro del despacho vivía solo dentro de la celda
+                      // "Envío". Con `table-fixed` esa columna mide 25% del ancho:
+                      // en un celular son ~90px, y el formulario quedaba aplastado
+                      // hasta ser invisible. Rodrigo Cumsille despachó su primera
+                      // venta y no encontró dónde registrarla (21-09-2026). Ahora el
+                      // mismo bloque se repite a ancho completo bajo la fila en móvil.
+                      const bloqueEnvio =
+                            order.payment_method === "transfer" && order.status === "pending" ? (
+                              <div className="space-y-1.5">
+                                <span className="text-xs font-medium text-ink block">
+                                  💸 Esperando transferencia
+                                </span>
+                                <ConfirmarTransferencia
+                                  bundleId={order.bundle_id ?? order.id}
+                                  monto={Number(order.total)}
+                                />
+                              </div>
+                            ) : order.status === "delivered" ? (
+                              <div className="space-y-0.5">
+                                <span className="text-xs font-medium text-green-700">
+                                  ✅ Entregado el {new Date(order.shipping_updated_at ?? order.updated_at ?? order.created_at).toLocaleDateString("es-CL")}
+                                </span>
+                                <span className="text-[11px] text-ink-muted block">{isInPerson ? "En persona" : order.courier}</span>
+                              </div>
+                            ) : order.status === "cancelled" ? (
+                              <span className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_LABELS.cancelled?.class ?? ""}`}>Cancelado</span>
+                            ) : isInPerson ? (
+                              <div className="space-y-1.5">
+                                <span className="text-xs text-ink-muted block">🤝 En persona</span>
+                                {isPaid && (
+                                  <EntregadoButton
+                                    bundleId={order.bundle_id ?? order.id}
+                                    label="Marcar entregado"
+                                    pregunta="¿Ya se lo entregaste?"
+                                    compact
+                                  />
+                                )}
+                              </div>
+                            ) : isPaid && esCoordinado ? (
+                              <div className="space-y-1.5">
+                                <div className="text-xs font-medium text-ink">📦 Despacho coordinado</div>
+                                {order.shipping_status === ESTADO_COORDINADO_PENDIENTE ? (
+                                  <>
+                                    <span className="text-[11px] text-ink-muted block">
+                                      Lo despachas tú{Number(order.shipping_cost) > 0
+                                        ? `: los $${Number(order.shipping_cost).toLocaleString("es-CL")} del envío te llegaron con la venta`
+                                        : ""}. Llévalo a cualquier sucursal y registra el seguimiento.
+                                    </span>
+                                    <DespachoCoordinadoForm bundleId={order.bundle_id ?? order.id} />
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="text-[11px] text-ink-muted block">{nombreCourier(order.courier)}</span>
+                                    {order.tracking_code && (
+                                      <span className="text-[11px] font-mono text-ink-muted block">{order.tracking_code}</span>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            ) : isPaid ? (
+                              <div className="space-y-1.5 ">
+                                <div className="text-xs font-medium text-ink">
+                                  📦 {order.courier ?? "Courier"}
+                                </div>
+                                {(shipment?.tracking_number ?? order.tracking_code) && (
+                                  <div className="text-[11px] font-mono text-ink-muted">
+                                    {shipment?.tracking_number ?? order.tracking_code}
+                                  </div>
+                                )}
+                                {shipment && shipment.status !== "canceled" ? (
+                                  <EstadoEnvio shipment={shipment} enRM={vendedorEnRM} />
+                                ) : order.shipping_label_url ? (
+                                  <a
+                                    href={order.shipping_label_url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-block text-[11px] bg-ink text-cream px-2 py-1 rounded-md hover:bg-ink/90"
+                                  >
+                                    📄 Descargar etiqueta
+                                  </a>
+                                ) : labelStuck ? (
+                                  <div className="space-y-1">
+                                    {/* Antes decía "el courier trae el manifiesto al
+                                        retiro", que en el caso de Melipeuco era falso:
+                                        no había courier asignado ni retiro agendado, y
+                                        el vendedor esperaba a alguien que nunca iba a
+                                        llegar. Mejor decir que está trabado. (5 ago 2026) */}
+                                    <span className="text-[11px] text-amber-700 block font-medium">
+                                      Este envío no logró emitir etiqueta.
+                                    </span>
+                                    <span className="text-[11px] text-ink-muted block">
+                                      A veces el courier igual retira con su propio
+                                      manifiesto, pero no lo des por hecho: escríbenos y
+                                      lo resolvemos contigo.
+                                    </span>
+                                    <a
+                                      href={`mailto:vero@economics.cl?subject=${encodeURIComponent(
+                                        `Envío trabado — orden ${order.id.slice(0, 8)}`
+                                      )}`}
+                                      className="inline-block text-[11px] bg-ink text-cream px-2 py-1 rounded-md hover:bg-ink/90"
+                                    >
+                                      Avisarle a Vero
+                                    </a>
+                                    <a
+                                      href={supportMailto!}
+                                      className="inline-block text-[11px] bg-cream-warm text-ink px-2 py-1 rounded-md border border-cream-dark/40 hover:bg-cream-dark/20"
+                                    >
+                                      ¿Algo raro? Escribir a Shipit
+                                    </a>
+                                  </div>
+                                ) : (
+                                  <span className="text-[11px] text-amber-700">Etiqueta en preparación…</span>
+                                )}
+                                <div className="pt-0.5">
+                                  <a href="/como-despachar" className="text-[11px] text-brand-600 hover:underline">
+                                    ¿Cómo despacho?
+                                  </a>
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-ink-muted">
+                                📦 {order.courier ?? "Courier"} — pendiente de pago
+                              </span>
+                            );
+
                       return (
-                      <tr key={order.id} className="hover:bg-cream-warm/30 align-top">
+                      <Fragment key={order.id}>
+                      <tr className="hover:bg-cream-warm/30 align-top">
                         <td className="px-3 py-3">
                           <div className="flex items-center gap-3">
                             {(order.listing?.cover_image_url ?? order.listing?.book?.cover_url) && (
@@ -361,129 +491,19 @@ export default async function MisVentasPage() {
                         <td className="px-3 py-3 font-medium">
                           ${Number(order.book_price).toLocaleString("es-CL")}
                         </td>
-                        <td className="px-3 py-3">
-                          {order.payment_method === "transfer" && order.status === "pending" ? (
-                            <div className="space-y-1.5">
-                              <span className="text-xs font-medium text-ink block">
-                                💸 Esperando transferencia
-                              </span>
-                              <ConfirmarTransferencia
-                                bundleId={order.bundle_id ?? order.id}
-                                monto={Number(order.total)}
-                              />
-                            </div>
-                          ) : order.status === "delivered" ? (
-                            <div className="space-y-0.5">
-                              <span className="text-xs font-medium text-green-700">
-                                ✅ Entregado el {new Date(order.shipping_updated_at ?? order.updated_at ?? order.created_at).toLocaleDateString("es-CL")}
-                              </span>
-                              <span className="text-[11px] text-ink-muted block">{isInPerson ? "En persona" : order.courier}</span>
-                            </div>
-                          ) : order.status === "cancelled" ? (
-                            <span className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_LABELS.cancelled?.class ?? ""}`}>Cancelado</span>
-                          ) : isInPerson ? (
-                            <div className="space-y-1.5">
-                              <span className="text-xs text-ink-muted block">🤝 En persona</span>
-                              {isPaid && (
-                                <EntregadoButton
-                                  bundleId={order.bundle_id ?? order.id}
-                                  label="Marcar entregado"
-                                  pregunta="¿Ya se lo entregaste?"
-                                  compact
-                                />
-                              )}
-                            </div>
-                          ) : isPaid && esCoordinado ? (
-                            <div className="space-y-1.5">
-                              <div className="text-xs font-medium text-ink">📦 Despacho coordinado</div>
-                              {order.shipping_status === ESTADO_COORDINADO_PENDIENTE ? (
-                                <>
-                                  <span className="text-[11px] text-ink-muted block">
-                                    Lo despachas tú{Number(order.shipping_cost) > 0
-                                      ? `: los $${Number(order.shipping_cost).toLocaleString("es-CL")} del envío te llegaron con la venta`
-                                      : ""}. Llévalo a cualquier sucursal y registra el seguimiento.
-                                  </span>
-                                  <DespachoCoordinadoForm bundleId={order.bundle_id ?? order.id} />
-                                </>
-                              ) : (
-                                <>
-                                  <span className="text-[11px] text-ink-muted block">{nombreCourier(order.courier)}</span>
-                                  {order.tracking_code && (
-                                    <span className="text-[11px] font-mono text-ink-muted block">{order.tracking_code}</span>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          ) : isPaid ? (
-                            <div className="space-y-1.5 ">
-                              <div className="text-xs font-medium text-ink">
-                                📦 {order.courier ?? "Courier"}
-                              </div>
-                              {(shipment?.tracking_number ?? order.tracking_code) && (
-                                <div className="text-[11px] font-mono text-ink-muted">
-                                  {shipment?.tracking_number ?? order.tracking_code}
-                                </div>
-                              )}
-                              {shipment && shipment.status !== "canceled" ? (
-                                <EstadoEnvio shipment={shipment} enRM={vendedorEnRM} />
-                              ) : order.shipping_label_url ? (
-                                <a
-                                  href={order.shipping_label_url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="inline-block text-[11px] bg-ink text-cream px-2 py-1 rounded-md hover:bg-ink/90"
-                                >
-                                  📄 Descargar etiqueta
-                                </a>
-                              ) : labelStuck ? (
-                                <div className="space-y-1">
-                                  {/* Antes decía "el courier trae el manifiesto al
-                                      retiro", que en el caso de Melipeuco era falso:
-                                      no había courier asignado ni retiro agendado, y
-                                      el vendedor esperaba a alguien que nunca iba a
-                                      llegar. Mejor decir que está trabado. (5 ago 2026) */}
-                                  <span className="text-[11px] text-amber-700 block font-medium">
-                                    Este envío no logró emitir etiqueta.
-                                  </span>
-                                  <span className="text-[11px] text-ink-muted block">
-                                    A veces el courier igual retira con su propio
-                                    manifiesto, pero no lo des por hecho: escríbenos y
-                                    lo resolvemos contigo.
-                                  </span>
-                                  <a
-                                    href={`mailto:vero@economics.cl?subject=${encodeURIComponent(
-                                      `Envío trabado — orden ${order.id.slice(0, 8)}`
-                                    )}`}
-                                    className="inline-block text-[11px] bg-ink text-cream px-2 py-1 rounded-md hover:bg-ink/90"
-                                  >
-                                    Avisarle a Vero
-                                  </a>
-                                  <a
-                                    href={supportMailto!}
-                                    className="inline-block text-[11px] bg-cream-warm text-ink px-2 py-1 rounded-md border border-cream-dark/40 hover:bg-cream-dark/20"
-                                  >
-                                    ¿Algo raro? Escribir a Shipit
-                                  </a>
-                                </div>
-                              ) : (
-                                <span className="text-[11px] text-amber-700">Etiqueta en preparación…</span>
-                              )}
-                              <div className="pt-0.5">
-                                <a href="/como-despachar" className="text-[11px] text-brand-600 hover:underline">
-                                  ¿Cómo despacho?
-                                </a>
-                              </div>
-                            </div>
-                          ) : (
-                            <span className="text-xs text-ink-muted">
-                              📦 {order.courier ?? "Courier"} — pendiente de pago
-                            </span>
-                          )}
-                        </td>
+                        <td className="px-3 py-3 hidden md:table-cell">{bloqueEnvio}</td>
                         <td className="px-3 py-3 text-ink-muted text-xs">
                           {new Date(order.created_at).toLocaleDateString("es-CL")}
                         </td>
                       </tr>
+                      {/* En celular la columna "Envío" no cabe: el bloque va acá,
+                          a ancho completo, pegado a su propia fila. */}
+                      <tr className="md:hidden !border-t-0">
+                        <td colSpan={4} className="px-3 pb-3">
+                          {bloqueEnvio}
+                        </td>
+                      </tr>
+                      </Fragment>
                       );
                     })}
                   </tbody>
