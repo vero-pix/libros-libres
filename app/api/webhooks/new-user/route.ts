@@ -118,8 +118,8 @@ export async function POST(req: NextRequest) {
 
               <div style="background:#f5f0e8;padding:16px;border-radius:12px;margin-bottom:12px">
                 <p style="margin:0;font-weight:600;color:#1a1a1a">2. Conecta tu MercadoPago</p>
-                <p style="margin:4px 0 8px;color:#666;font-size:14px">Es lo que falta para que te puedan pagar. Sin eso, solo te compra quien coordine contigo en persona. Con MercadoPago te compran desde cualquier región y la plata te llega directa a ti.<br><br>En la misma página puedes activar el despacho con Shipit: imprimes la etiqueta y un courier pasa a buscar el libro a tu casa. No tienes que ir a ninguna oficina.<br><br>Con MercadoPago conectado, las ventas de tus libros van por la plataforma: así el pago queda protegido para ti y para quien te compra. <a href="https://tuslibros.cl/ayuda/vender#cobrar" style="color:#d4a017">Cómo funciona el cobro →</a></p>
-                <a href="https://tuslibros.cl/perfil" style="color:#d4a017;font-size:14px;font-weight:600;text-decoration:none">Conectar MercadoPago y Shipit →</a>
+                <p style="margin:4px 0 8px;color:#666;font-size:14px">Es lo que falta para que te puedan pagar. Sin eso, solo te compra quien coordine contigo en persona. Con MercadoPago te compran desde cualquier región y la plata te llega directa a ti.<br><br>El envío tampoco lo pones tú: el comprador paga una tarifa fija al comprar y esa plata te llega junto con la venta. Tú llevas el paquete a la sucursal que te acomode y pagas ahí con esa misma plata.<br><br>Con MercadoPago conectado, las ventas de tus libros van por la plataforma: así el pago queda protegido para ti y para quien te compra. <a href="https://tuslibros.cl/ayuda/vender#cobrar" style="color:#d4a017">Cómo funciona el cobro →</a></p>
+                <a href="https://tuslibros.cl/perfil" style="color:#d4a017;font-size:14px;font-weight:600;text-decoration:none">Conectar MercadoPago →</a>
                 <span style="color:#bbb">&nbsp;·&nbsp;</span>
                 <a href="https://tuslibros.cl/ayuda/vender" style="color:#d4a017;font-size:14px;text-decoration:none">guía del vendedor</a>
               </div>

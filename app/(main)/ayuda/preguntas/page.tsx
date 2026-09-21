@@ -37,12 +37,11 @@ const preguntas: Pregunta[] = [
   },
   {
     q: "¿Quién paga el envío?",
-    a: "El comprador, al momento de pagar. El vendedor no paga nada al courier.",
+    a: "El comprador, al momento de pagar. Esa plata le llega al vendedor junto con el precio del libro, y con ella paga el envío en la sucursal.",
   },
   {
     q: "¿El courier pasa a buscar el libro o tengo que llevarlo?",
-    a: "Lo llevas tú: descargas la etiqueta desde Mis Ventas o el correo, la pegas en el paquete y lo dejas en una sucursal del courier indicado (Starken, Bluexpress o Chilexpress). No pagas nada al courier.",
-    d7: "Si prefieres que pasen a buscarlo a tu casa (solo Región Metropolitana), usa el botón Pedir retiro a domicilio en Mis Ventas.",
+    a: "Lo llevas tú, a la sucursal del courier que prefieras (Starken, Chilexpress, Blue Express o Correos de Chile). El envío lo pagas ahí con la plata que el comprador ya te depositó, y registras el número de seguimiento en Mis Ventas.",
     link: { href: "/ayuda/vender", label: "Ver la guía del vendedor" },
   },
   {

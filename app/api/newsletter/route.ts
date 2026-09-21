@@ -79,8 +79,8 @@ export async function POST(req: NextRequest) {
 
   <p style="font-size:15px;line-height:1.65;color:#3a2f24;margin:0 0 16px;">
     tuslibros.cl es un marketplace de libros usados chilenos con pago seguro por
-    MercadoPago y despacho puerta a puerta con Shipit: imprimes la etiqueta y el
-    courier pasa a buscarlo a tu casa. Hoy hay <strong>${miles(activos)} libros
+    MercadoPago: el comprador paga el libro y el envío, y esa plata te llega a ti.
+    Tú despachas por el courier que prefieras. Hoy hay <strong>${miles(activos)} libros
     publicados por ${vendedores} vendedores</strong>, y van ${miles(vendidos)} vendidos.
   </p>
 

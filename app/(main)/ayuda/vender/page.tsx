@@ -116,14 +116,15 @@ export default function AyudaVenderPage() {
                 seguimiento.
               </li>
               <li>
-                Deja el paquete en una <strong className="text-ink">sucursal del courier indicado</strong> (Starken,
-                Bluexpress o Chilexpress). No pagas nada al courier: el envío ya lo pagó el comprador.
+                Deja el paquete en la <strong className="text-ink">sucursal del courier que prefieras</strong> (Starken,
+                Chilexpress, Blue Express o Correos de Chile) y paga el envío ahí: esa plata ya te la depositó el
+                comprador junto con el precio del libro.
               </li>
               <li>Guarda el comprobante que te dan en la sucursal hasta que el comprador reciba el libro.</li>
             </ol>
             <p className="mt-4">
-              Si prefieres que pasen a buscarlo a tu casa (solo Región Metropolitana), usa el botón{" "}
-              <strong className="text-ink">Pedir retiro a domicilio</strong> en Mis Ventas.
+              Cuando lo despaches, registra el courier y el número de seguimiento en{" "}
+              <strong className="text-ink">Mis Ventas</strong>: con eso le aviso al comprador por correo.
             </p>
             <p className="mt-4 text-sm">
               Paso a paso con más detalle:{" "}

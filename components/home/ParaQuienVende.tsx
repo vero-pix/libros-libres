@@ -22,7 +22,7 @@ export default function ParaQuienVende({ vendedores }: { vendedores: number }) {
     },
     {
       titulo: "Cobras como prefieras",
-      texto: "Con MercadoPago o por transferencia. El courier pasa a buscar el paquete a tu casa y no le pagas nada.",
+      texto: "Con MercadoPago o por transferencia. El comprador paga el envío al comprar y esa plata te llega a ti.",
     },
   ];
 

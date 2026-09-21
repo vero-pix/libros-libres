@@ -102,7 +102,7 @@ export default function ComoFuncionaPage() {
           <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
             Para vendedores
           </h2>
-          <p className="text-ink-muted mb-6">Publicar es gratis y no tiene vuelta. Y si la venta se paga con MercadoPago, no tienes que ir a ninguna parte: <strong>el courier pasa a buscar el paquete a tu casa</strong> y <strong>no le pagas nada</strong> — el envío se factura a tuslibros.cl a fin de mes. Solo necesitas tener el paquete listo dentro de los 2 días hábiles siguientes a la venta. <Link href="/como-despachar" className="text-brand-600 font-semibold hover:underline">Te explico el despacho paso a paso</Link>.</p>
+          <p className="text-ink-muted mb-6">Publicar es gratis y no tiene vuelta. Y el envío no lo pones tú: <strong>el comprador paga una tarifa fija al comprar</strong> y <strong>esa plata te llega a ti</strong> junto con el precio del libro. Tú llevas el paquete a la sucursal que te acomode, dentro de los 2 días hábiles siguientes a la venta, y pagas ahí con esa misma plata. <Link href="/como-despachar" className="text-brand-600 font-semibold hover:underline">Te explico el despacho paso a paso</Link>.</p>
           <div className="space-y-5">
             {sellerSteps.map((step) => <StepCard key={step.number} step={step} />)}
           </div>
