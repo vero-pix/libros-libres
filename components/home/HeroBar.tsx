@@ -143,21 +143,33 @@ export default function HeroBar({ heroBooks, primavera = false }: Props) {
         <div className="grid lg:grid-cols-[1.02fr_0.98fr] gap-10 items-center">
           {/* Texto */}
           <div className="max-w-2xl">
-            <p className={`inline-flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.22em] mb-5 before:content-[''] before:w-6 before:h-px before:bg-current ${primavera ? "text-green" : "text-coral"}`}>
-              Libros libres · Chile
+            <p className="inline-flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.22em] text-coral mb-5 before:content-[''] before:w-6 before:h-px before:bg-current">
+              {primavera ? "Primavera 2026 · Chile" : "Libros libres · Chile"}
             </p>
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-[64px] font-normal text-ink leading-[1.05] tracking-[-0.02em]">
-              Cada estantería{" "}
-              <em className="italic">es una librería.</em>
-            </h1>
+            {/* En primavera cambia lo que la portada DICE, no el color del papel:
+                teñir el fondo de verde se probó el 21-09 y abarataba la marca.
+                El titular de siempre vuelve solo el 21-12. */}
+            {primavera ? (
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-[64px] font-normal text-ink leading-[1.05] tracking-[-0.02em]">
+                Se acabó el invierno{" "}
+                <em className="italic">de releer lo mismo.</em>
+              </h1>
+            ) : (
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-[64px] font-normal text-ink leading-[1.05] tracking-[-0.02em]">
+                Cada estantería{" "}
+                <em className="italic">es una librería.</em>
+              </h1>
+            )}
             <p className="mt-6 font-display italic text-lg sm:text-xl text-ink-muted/90 leading-snug max-w-xl">
-              Los que ya leíste, los que te faltan. Compra y vende con personas reales — cerca de ti, con pago protegido.
+              {primavera
+                ? "Fantasía, poesía y lo que recién llegó a las estanterías de otros. Cerca de ti, con pago protegido."
+                : "Los que ya leíste, los que te faltan. Compra y vende con personas reales — cerca de ti, con pago protegido."}
             </p>
 
             {/* CTAs */}
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="#tienda" className="inline-flex items-center gap-2 px-6 py-3.5 bg-ink text-white rounded-full font-semibold text-sm hover:bg-ink-deep transition-colors">
-                Explorar libros
+              <Link href={primavera ? "/primavera" : "#tienda"} className="inline-flex items-center gap-2 px-6 py-3.5 bg-ink text-white rounded-full font-semibold text-sm hover:bg-ink-deep transition-colors">
+                {primavera ? "Ver la selección de primavera" : "Explorar libros"}
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
                 </svg>

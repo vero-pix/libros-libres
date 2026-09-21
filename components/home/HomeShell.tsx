@@ -25,6 +25,8 @@ interface Props {
   heroBooks?: HeroBook[];
   /** Estación vigente, resuelta en el servidor (lib/fechasChile.ts). */
   primavera?: boolean;
+  /** Franja de temporada, justo bajo el hero. Solo en primavera. */
+  franjaPrimavera?: ReactNode;
   featuredRow?: ReactNode;
   testimonialBanner?: ReactNode;
   heroRequestStrip?: ReactNode;
@@ -32,7 +34,7 @@ interface Props {
   children: ReactNode;
 }
 
-export default function HomeShell({ totalListings, stores, views, hasFilters, heroBooks, primavera = false, featuredRow, testimonialBanner, heroRequestStrip, liquidacionBanner, children }: Props) {
+export default function HomeShell({ totalListings, stores, views, hasFilters, heroBooks, primavera = false, franjaPrimavera, featuredRow, testimonialBanner, heroRequestStrip, liquidacionBanner, children }: Props) {
   const [forceMap, setForceMap] = useState(false);
 
   const handleToggleMap = useCallback(() => {
@@ -64,6 +66,14 @@ export default function HomeShell({ totalListings, stores, views, hasFilters, he
 
       {/* Caluga liquidación 50% — arriba del fold, alto tráfico */}
       {!hasFilters && liquidacionBanner}
+
+      {/* Franja de primavera. Va arriba del fold a propósito, que es justo de
+          donde el 17-09 se sacaron once filas curadas por empujar la grilla:
+          por eso es UNA sola fila y desaparece el 21-12. Si hunde el primer
+          libro más de la cuenta, esto es lo primero que se saca. */}
+      {!hasFilters && franjaPrimavera && (
+        <section className="max-w-7xl mx-auto px-6 pt-8">{franjaPrimavera}</section>
+      )}
 
       {/* El bloque grande de "Se busca" salió de acá el 17-09: eran DOS bloques
           de lo mismo (este y el ticker del hero) antes del primer libro a la

@@ -19,6 +19,8 @@ import HeroRequestStrip from "@/components/home/HeroRequestStrip";
 import { ordenarParaGrilla } from "@/lib/sortListings";
 import { configVigente } from "@/lib/siteConfigVigente";
 import { esPrimavera } from "@/lib/fechasChile";
+import { getListingsPrimavera } from "@/lib/primavera";
+import ColeccionRow from "@/components/home/ColeccionRow";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
 import type { Metadata } from "next";
@@ -605,11 +607,21 @@ export default async function HomePage({ searchParams }: Props) {
   // Reservo estos 6 y los EXCLUYO de la fila "Destacados" para no repetir el
   // mismo libro en el abanico y justo debajo. Solo si hay margen (≥9 con portada:
   // 6 para el hero + 3 para la fila); si no, cae a los mockups semanales.
+  // Primavera: el abanico del hero y la franja salen de la selección de
+  // temporada, no de los destacados de siempre (lib/primavera.ts).
+  const esPrima = esPrimavera();
+  const listingsPrimavera = esPrima && !hasFilters
+    ? await getListingsPrimavera(createPublicClient(), 24)
+    : [];
+
   const heroPool = featuredListings.filter((l) => l.book && (l.cover_image_url || l.book.cover_url));
   const useHeroReal = heroPool.length >= 9;
   const heroReserved = new Set(useHeroReal ? heroPool.slice(0, 6).map((l) => l.id) : []);
-  const heroBooks = useHeroReal
-    ? heroPool.slice(0, 6).map((l) => ({
+  // En primavera manda la selección de temporada; si no alcanzan seis con foto,
+  // cae al abanico de siempre en vez de dejar huecos.
+  const heroSource = listingsPrimavera.length >= 6 ? listingsPrimavera : heroPool;
+  const heroBooks = (useHeroReal || listingsPrimavera.length >= 6)
+    ? heroSource.slice(0, 6).map((l: any) => ({
         cover: (l.cover_image_url || l.book.cover_url) as string,
         title: l.book.title as string,
         author: (l.book.author as string) || "",
@@ -697,7 +709,18 @@ export default async function HomePage({ searchParams }: Props) {
         views={publicStats.views}
         hasFilters={hasFilters}
         heroBooks={heroBooks}
-        primavera={esPrimavera()}
+        primavera={esPrima}
+        franjaPrimavera={
+          listingsPrimavera.length >= 3 ? (
+            <ColeccionRow
+              tag="Fantasia"
+              href="/primavera"
+              title="Primavera en tuslibros"
+              subtitle="Fantasía, poesía y lo que recién llegó"
+              listings={listingsPrimavera.slice(6, 14)}
+            />
+          ) : null
+        }
         featuredRow={
           !hasFilters ? (
             <>

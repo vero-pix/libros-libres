@@ -9,10 +9,13 @@ interface Props {
   title: string;
   subtitle: string;
   listings: ListingWithBook[];
+  /** Destino de "Ver todos". Por defecto la colección o el tag; la franja de
+      primavera lo usa para mandar a su propia landing. */
+  href?: string;
 }
 
 // Presentacional: los listings (ya deduplicados entre colecciones y filas) llegan por prop.
-export default function ColeccionRow({ tag, collectionSlug, title, subtitle, listings }: Props) {
+export default function ColeccionRow({ tag, collectionSlug, title, subtitle, listings, href }: Props) {
   if (!listings || listings.length < 3) return null;
 
   return (
@@ -25,7 +28,7 @@ export default function ColeccionRow({ tag, collectionSlug, title, subtitle, lis
           <p className="text-[11px] font-mono text-ink-muted mt-0.5">{subtitle}</p>
         </div>
         <Link
-          href={collectionSlug ? `/coleccion/${collectionSlug}` : `/?tag=${tag}`}
+          href={href ?? (collectionSlug ? `/coleccion/${collectionSlug}` : `/?tag=${tag}`)}
           className="text-xs font-medium text-brand-600 hover:underline flex-shrink-0"
         >
           Ver todos →
