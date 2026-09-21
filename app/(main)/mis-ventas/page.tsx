@@ -6,13 +6,11 @@ import Image from "next/image";
 import type { Order, OrderStatus } from "@/types";
 import BuyerCartsSection from "@/components/sales/BuyerCartsSection";
 import EntregadoButton from "@/components/sales/EntregadoButton";
-import PedirRetiroButton from "@/components/sales/PedirRetiroButton";
 import ConfirmarTransferencia from "@/components/sales/ConfirmarTransferencia";
 import RetiroFallidoAcciones from "@/components/sales/RetiroFallidoAcciones";
 import DespachoCoordinadoForm from "@/components/sales/DespachoCoordinadoForm";
 import { nombreCourier } from "@/lib/courier-tracking";
 import { ESTADO_COORDINADO_DESPACHADO, ESTADO_COORDINADO_PENDIENTE } from "@/lib/shipping/coordinado";
-import { findCommune, SHIPIT_REGION_RM } from "@/lib/shipit";
 import { extractCommune } from "@/lib/chilexpress";
 
 export const metadata = {
@@ -49,8 +47,6 @@ export default async function MisVentasPage() {
 
   const mpConnected = !!profile?.mercadopago_user_id;
   // ¿Está en la Región Metropolitana? Solo ahí existe el Retiro Héroe (D7).
-  const comunaVendedor = profile?.default_address ? await findCommune(extractCommune(profile.default_address)) : null;
-  const vendedorEnRM = comunaVendedor?.region_id === SHIPIT_REGION_RM;
 
   // Orders where I'm the seller
   const { data: rawOrders } = await supabase
@@ -388,7 +384,7 @@ export default async function MisVentasPage() {
                                   </div>
                                 )}
                                 {shipment && shipment.status !== "canceled" ? (
-                                  <EstadoEnvio shipment={shipment} enRM={vendedorEnRM} />
+                                  <EstadoEnvio shipment={shipment} />
                                 ) : order.shipping_label_url ? (
                                   <a
                                     href={order.shipping_label_url}
@@ -627,7 +623,6 @@ function ventanaRetiro(w: string): string {
 
 function EstadoEnvio({
   shipment,
-  enRM,
 }: {
   shipment: {
     id: string;
@@ -639,7 +634,6 @@ function EstadoEnvio({
     pickup_date: string | null;
     pickup_window: string | null;
   };
-  enRM: boolean;
 }) {
   const courier = shipment.courier
     ? shipment.courier.charAt(0).toUpperCase() + shipment.courier.slice(1)
@@ -679,9 +673,6 @@ function EstadoEnvio({
               ? `Retiro pedido el ${new Date(shipment.pickup_requested_at).toLocaleDateString("es-CL")}. Vero lo coordina con Shipit y te avisa la ventana.`
               : `Imprímela, pégala al paquete y déjalo en la sucursal de ${courier} más cercana.`}
           </span>
-        )}
-        {enRM && !retiro && !shipment.pickup_requested_at && ["label_ready", "notified"].includes(shipment.status) && (
-          <PedirRetiroButton shipmentId={shipment.id} />
         )}
       </div>
     );
