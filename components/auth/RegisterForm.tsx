@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import SocialLoginButtons from "./SocialLoginButtons";
 import { nombreSospechoso } from "@/lib/nombreSospechoso";
+import { mensajeErrorClave } from "@/lib/authErrors";
 
 type Ciudad = { id: string; name: string; region: string };
 
@@ -74,11 +75,7 @@ export default function RegisterForm({ ciudades = [] }: { ciudades?: Ciudad[] })
     });
 
     if (signUpError) {
-      const msg =
-        signUpError.message === "User already registered"
-          ? "Ya existe una cuenta con ese correo."
-          : signUpError.message;
-      setError(msg);
+      setError(mensajeErrorClave(signUpError.message));
       setLoading(false);
       return;
     }
