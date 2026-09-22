@@ -3,6 +3,8 @@ import { detectarDelimitador, parseCsvLine, parseCsvLineTolerante, quitarBom } f
 import { normalizeGenre } from "@/lib/genreNormalizer";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { resolverCityId } from "@/lib/cities";
+import { slugListing, slugUnicoParaVendedor } from "@/lib/slugify";
 
 const CONDITION_MAP: Record<string, string> = {
   como_nuevo: "new",
@@ -37,12 +39,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  // Get user profile for location
-  const { data: profile } = await supabase
+  // Ubicación del vendedor. OJO: la columna es `city`, NO `comuna`/`region`
+  // — pedirlas hacía fallar el select entero y `profile` quedaba null, así que
+  // TODO se publicaba con address "Chile", sin coordenadas y sin city_id. Es el
+  // mismo bug que ya se arregló en los dos scripts de carga (ago-2026); el
+  // importador web se quedó fuera de ese arreglo hasta el 22-09-2026.
+  const { data: profile, error: profileErr } = await supabase
     .from("users")
-    .select("full_name, comuna, region, default_latitude, default_longitude, default_address")
+    .select("full_name, city, default_latitude, default_longitude, default_address")
     .eq("id", user.id)
     .single();
+  if (profileErr) console.error("[import] perfil no leído:", profileErr.message);
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
@@ -257,7 +264,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create listing
-    const address = profile?.default_address || [profile?.comuna, profile?.region].filter(Boolean).join(", ") || "Chile";
+    const address = profile?.default_address || profile?.city || "Chile";
     // Foto propia del vendedor si la mapeó en el CSV; si no, portada de Google.
     const { cover: ownCover, gallery } = resolveRowPhotos(row);
     const coverUrl = ownCover || buildCoverUrl(isbn);
@@ -270,6 +277,19 @@ export async function POST(req: NextRequest) {
     }
     if (ownCover) coversFromOwnPhotos++;
 
+    // Sin city_id el libro no aparece al filtrar por comuna; sin slug la ficha
+    // cae a /listings/[uuid] y pierde el título en la URL, que es lo que rankea.
+    // El importador web no escribía ninguno de los dos.
+    const cityId = await resolverCityId(supabase, address, {
+      lat: profile?.default_latitude,
+      lng: profile?.default_longitude,
+    });
+    const slug = await slugUnicoParaVendedor(
+      supabase,
+      user.id,
+      slugListing(title || "libro", author)
+    );
+
     const { data: inserted, error: listErr } = await supabase
       .from("listings")
       .insert({
@@ -280,6 +300,8 @@ export async function POST(req: NextRequest) {
         modality,
         cover_image_url: coverUrl,
         address,
+        city_id: cityId,
+        slug,
         latitude: profile?.default_latitude || null,
         longitude: profile?.default_longitude || null,
         status: "active",
