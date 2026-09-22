@@ -9,6 +9,7 @@ import EntregadoButton from "@/components/sales/EntregadoButton";
 import ConfirmarTransferencia from "@/components/sales/ConfirmarTransferencia";
 import RetiroFallidoAcciones from "@/components/sales/RetiroFallidoAcciones";
 import DespachoCoordinadoForm from "@/components/sales/DespachoCoordinadoForm";
+import DatosDespacho from "@/components/sales/DatosDespacho";
 import { nombreCourier } from "@/lib/courier-tracking";
 import { ESTADO_COORDINADO_DESPACHADO, ESTADO_COORDINADO_PENDIENTE } from "@/lib/shipping/coordinado";
 import { extractCommune } from "@/lib/chilexpress";
@@ -53,9 +54,9 @@ export default async function MisVentasPage() {
     .from("orders")
     .select(`
       id, buyer_id, bundle_id, book_price, shipping_cost, service_fee, total, status, payment_method,
-      courier, tracking_code, shipping_label_url, shipping_status, buyer_address, created_at, updated_at, shipping_updated_at,
+      courier, tracking_code, shipping_label_url, shipping_status, buyer_address, buyer_commune, created_at, updated_at, shipping_updated_at,
       listing:listings(id, cover_image_url, book:books(title, author, cover_url)),
-      buyer:users!orders_buyer_id_fkey(full_name, email)
+      buyer:users!orders_buyer_id_fkey(full_name, email, phone)
     `)
     .eq("seller_id", user.id)
     .order("created_at", { ascending: false });
@@ -362,6 +363,18 @@ export default async function MisVentasPage() {
                                         ? `: los $${Number(order.shipping_cost).toLocaleString("es-CL")} del envío te llegaron con la venta`
                                         : ""}. Llévalo a cualquier sucursal y registra el seguimiento.
                                     </span>
+                                    {/* Los datos que pide el mesón del courier, acá y completos.
+                                        Estaban solo en una columna de la tabla, truncados, y el
+                                        teléfono en ninguna parte: una vendedora de Antofagasta
+                                        escribió a las 3 AM preguntando a quién le enviaba
+                                        (21-09-2026). */}
+                                    <DatosDespacho
+                                      nombre={order.buyer?.full_name ?? null}
+                                      direccion={order.buyer_address ?? null}
+                                      comuna={order.buyer_commune ?? null}
+                                      telefono={order.buyer?.phone ?? null}
+                                      buyerId={order.buyer_id}
+                                    />
                                     <DespachoCoordinadoForm bundleId={order.bundle_id ?? order.id} />
                                   </>
                                 ) : (
