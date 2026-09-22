@@ -38,7 +38,21 @@ export default async function ColeccionPage({ params }: Props) {
 
   const supabase = createPublicClient()
 
-  const { data: listings, error, count } = await supabase
+  // Colección de una sola tienda: resolvemos el vendedor antes de consultar.
+  let sellerId: string | null = null
+  if (collection.sellerUsername) {
+    const { data: seller } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', collection.sellerUsername)
+      .maybeSingle()
+    sellerId = seller?.id ?? null
+    // Si la colección es de una tienda y no logramos resolverla, la página
+    // queda vacía a propósito: mostrar el catálogo de todos sería peor.
+    if (!sellerId) console.error('[coleccion] vendedor no resuelto:', collection.sellerUsername)
+  }
+
+  let q = supabase
     .from('listings')
     // count exacto: el contador decía books.length, que era el limit(48).
     .select(
@@ -50,6 +64,13 @@ export default async function ColeccionPage({ params }: Props) {
     .contains('book.tags', [collection.tagFilter])
     .order('featured_rank', { ascending: true, nullsFirst: false })
     .limit(48)
+
+  if (collection.sellerUsername) {
+    // Sin id resuelto, filtramos por un uuid imposible en vez de no filtrar.
+    q = q.eq('seller_id', sellerId ?? '00000000-0000-0000-0000-000000000000')
+  }
+
+  const { data: listings, error, count } = await q
 
   if (error) console.error('[coleccion] Error fetching listings:', error)
   const books = ((listings ?? []).filter((l: any) => l.book) as unknown) as ListingWithBook[]

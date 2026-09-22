@@ -5,6 +5,13 @@ export interface CollectionConfig {
   tagFilter: string
   subtitle: string
   editorial: string
+  /**
+   * Username del vendedor al que se limita la colección. Sin esto, la colección
+   * muestra los libros de TODOS los vendedores que tengan el tag: `books` es una
+   * tabla compartida, así que el mismo título publicado por otra persona también
+   * entraba. Con esto, la colección es la vitrina de una sola tienda.
+   */
+  sellerUsername?: string
 }
 
 export const COLLECTIONS: Record<string, CollectionConfig> = {
@@ -60,6 +67,16 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     tagFilter: 'latinoamerica-contemp',
     subtitle: 'Lo que se está escribiendo ahora mismo',
     editorial: `El boom latinoamericano nunca terminó, solo mutó. Después de García Márquez y Cortázar vino Bolaño, después de Bolaño vienen decenas de escritoras y escritores que están redefiniendo qué significa narrar desde este continente. Acá hay Vargas Llosa y Fuentes porque siguen siendo necesarios, y hay títulos más recientes de autores que todavía no llenan estadios pero que los críticos están mirando. Todos usados, todos disponibles, todos esperando al siguiente lector.`,
+  },
+
+  'narrativa-siglo-xx': {
+    title: 'Narrativa del Siglo XX',
+    seoTitle: 'Narrativa del Siglo XX Usada — Selección de Vero',
+    seoDescription: 'Una selección de narrativa del siglo XX: Nabokov, Gombrowicz, Frisch, Woolf, Juan Emar, Borges y Vargas Llosa. Libros usados en Chile, con fotos reales del ejemplar.',
+    tagFilter: 'narrativa-siglo-xx',
+    subtitle: 'Lo que el siglo pasado dejó escrito',
+    sellerUsername: 'vero',
+    editorial: `Esta la armé yo, con mis propios libros y a mano. No es un filtro automático: son los que fui sacando de mis estantes cuando pensé qué le daría a alguien que me dice "soy de narrativa, siglo XX". Están Nabokov y Gombrowicz, están los dos Max Frisch, está la Virginia Woolf que casi nadie lee. Y están Juan Emar y Mauricio Wacquez, que son chilenos y que en ninguna parte vas a encontrar así de fácil. Cada ejemplar con sus fotos y su estado dicho sin maquillaje. Si se vende alguno, entra otro.`,
   },
 
 }
