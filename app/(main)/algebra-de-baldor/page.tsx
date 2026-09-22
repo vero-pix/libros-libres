@@ -83,6 +83,25 @@ export default async function AlgebraDeBaldorPage() {
     ((baldorRaw ?? []).filter((item: any) => item.book !== null) as unknown as ListingWithBook[])
   ).slice(0, AUTHOR_LANDING_LIMIT);
 
+  // Sin Baldor en catálogo, la landing seguía recibiendo visitas de Google y
+  // solo mostraba un cartel. Quien busca el Baldor busca ejercicios de álgebra:
+  // se le ofrece lo que sí hay antes de mandarlo a "avísame cuando llegue".
+  let alternativas: ListingWithBook[] = [];
+  if (baldorListings.length === 0) {
+    const { data: altRaw } = await supabase
+      .from("listings")
+      .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
+      .eq("status", "active")
+      .or("title.ilike.%álgebra%,title.ilike.%algebra%,title.ilike.%matemática%,title.ilike.%matematica%", {
+        referencedTable: "book",
+      })
+      .order("created_at", { ascending: false })
+      .limit(AUTHOR_LANDING_LIMIT);
+    alternativas = ordenarParaGrilla(
+      ((altRaw ?? []).filter((item: any) => item.book !== null) as unknown as ListingWithBook[])
+    ).slice(0, 8);
+  }
+
   // Schema del libro (Book + Offer agregado)
   const bookJsonLd = {
     "@context": "https://schema.org",
@@ -193,17 +212,37 @@ export default async function AlgebraDeBaldorPage() {
               </div>
             </section>
           ) : (
-            <section className="mb-16 bg-white border border-cream-dark rounded-2xl p-8 text-center">
-              <p className="font-display text-xl text-ink mb-2">No hay ejemplares disponibles hoy</p>
-              <p className="text-sm text-ink-muted mb-6">
-                Crea una solicitud y te avisamos cuando un vendedor publique uno.
-              </p>
-              <Link
-                href="/solicitudes"
-                className="inline-flex items-center px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition-colors"
-              >
-                Solicitar Álgebra de Baldor
-              </Link>
+            <section className="mb-16">
+              <div className="bg-white border border-cream-dark rounded-2xl p-8 text-center">
+                <p className="font-display text-xl text-ink mb-2">Hoy no tengo ningún Baldor</p>
+                <p className="text-sm text-ink-muted mb-6">
+                  Se vende apenas aparece. Déjame tu solicitud y te aviso el día que un vendedor
+                  publique uno — o mira más abajo, que de álgebra sí tengo.
+                </p>
+                <Link
+                  href="/solicitudes"
+                  className="inline-flex items-center px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition-colors"
+                >
+                  Avísame cuando llegue uno
+                </Link>
+              </div>
+
+              {alternativas.length > 0 && (
+                <div className="mt-10">
+                  <h2 className="font-display text-2xl font-bold text-ink mb-2">
+                    De álgebra y matemáticas sí tengo
+                  </h2>
+                  <p className="text-sm text-ink-muted mb-5">
+                    Si lo que buscas son ejercicios resueltos para estudiar, estos cumplen el mismo
+                    papel que el Baldor.
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {alternativas.map((l) => (
+                      <ListingCard key={l.id} listing={l} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </section>
           )}
 
