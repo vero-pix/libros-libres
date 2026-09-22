@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: cat.seoTitle,
     description: cat.seoDescription,
     keywords: cat.keywords,
-    alternates: { canonical: url },
+    alternates: { canonical: cat.canonical ?? url },
     openGraph: {
       title: cat.seoTitle,
       description: cat.seoDescription,

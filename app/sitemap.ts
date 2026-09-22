@@ -39,6 +39,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/marcela-paz-libros`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
     // Landing temática (sept 2026): antroposofía / Steiner. Los /autor/* entran solos desde AUTHORS.
     { url: `${baseUrl}/antroposofia`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
+    // Landing temática (sept 2026): infantil y juvenil. 168 libros activos y la
+    // categoría equivalente rankeaba en la posición 25,8 — su canonical apunta acá.
+    { url: `${baseUrl}/libros-infantiles`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
+    // Escolar: 383 impresiones en 28 días para "educación ciudadana 3 medio" y
+    // variantes, en posición ~9. Stock fino y estacional (marzo).
+    { url: `${baseUrl}/libros-escolares`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
     // Estacional: vive todo el año para no perder la indexación, pero la
     // portada solo la enlaza entre el 20-09 y el 20-12 (lib/fechasChile.ts).
     { url: `${baseUrl}/primavera`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.8 },

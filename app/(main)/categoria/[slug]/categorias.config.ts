@@ -32,6 +32,12 @@ export interface CategoriaConfig {
   faqs: { q: string; a: string }[];
   /** Slugs hermanos para enlazado interno. */
   relacionadas: string[];
+  /**
+   * URL canónica distinta de esta ruta. Se usa cuando existe una landing
+   * curada que compite por las mismas búsquedas: en vez de repartir la señal
+   * entre las dos, esta apunta a aquella.
+   */
+  canonical?: string;
   /** Colecciones o autores existentes con los que conversa. */
   enlaces?: { label: string; href: string }[];
 }
@@ -245,6 +251,10 @@ export const CATEGORIAS: Record<string, CategoriaConfig> = {
       { q: "¿Cuánto cuestan?", a: "Es la categoría más económica del sitio: muchos títulos están entre $2.000 y $6.000." },
     ],
     relacionadas: ["ficcion-novela", "academico-escolar"],
+    // La landing curada /libros-infantiles cubre las mismas búsquedas y tiene
+    // el contenido: esta rankeaba en la posición 25,8 con 243 impresiones y
+    // 6 clics en 28 días (GSC, 22-ago a 19-sep). Toda la señal a una sola URL.
+    canonical: "https://tuslibros.cl/libros-infantiles",
   },
 
   // ─────────────────────────── ACADÉMICO ───────────────────────────
