@@ -53,7 +53,11 @@ const DELIVERY_OPTIONS = [
   { value: "in_person" as const, label: "Encuentro en persona", desc: "Gratis — coordina lugar y hora con el vendedor", icon: "🤝", enabled: true },
   // Punto de retiro: reactivar cuando haya convenios con lugares específicos
   // { value: "pickup_point" as const, label: "Punto de retiro", desc: "Retira en un punto convenido", icon: "📍", enabled: true },
-  { value: "courier" as const, label: "Envío courier", desc: "Recibe en tu domicilio por courier", icon: "📦", enabled: true },
+  // Sin Shipit (15-09) el despacho lo hace el vendedor: lleva el paquete a la
+  // sucursal y paga el envío a tu dirección con el flete que le llega en la
+  // venta. El texto dice quién lo mueve y cuánto tarda, en vez de sonar a un
+  // courier que lo gestiona todo solo. (23-09-2026)
+  { value: "courier" as const, label: "Envío a tu casa", desc: "El vendedor lo manda por Starken, Chilexpress, Blue o Correos y te pasa el seguimiento. Llega en 2 a 5 días hábiles desde que lo despacha.", icon: "📦", enabled: true },
 ];
 
 export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPhone, courierDisponible = true, aceptaTransferencia = false, precioPublicado = null }: Props) {

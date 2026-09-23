@@ -75,7 +75,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "Vivo en Providencia pero no tengo tiempo de juntarme, ¿qué hago?",
-        a: "Puedes elegir envío por courier al pagar. El vendedor deja el paquete en Starken o Chilexpress y llega a tu casa o trabajo al día hábil siguiente por un costo reducido.",
+        a: "Puedes elegir envío por courier al pagar. El vendedor lleva el paquete a Starken, Chilexpress, Blue o Correos y te pasa el número de seguimiento. Llega a tu casa en 2 a 5 días hábiles desde que lo despacha.",
       },
     ],
   },
@@ -92,7 +92,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Hay envío a domicilio dentro de Las Condes?",
-        a: "Sí. Si prefieres no moverte, eliges envío por courier al pagar y recibes el libro en tu casa u oficina, normalmente al día hábil siguiente.",
+        a: "Sí. Si prefieres no moverte, eliges envío por courier al pagar y el vendedor te lo manda a tu casa u oficina: llega en 2 a 5 días hábiles desde que lo despacha.",
       },
       {
         q: "¿Cómo sé que el pago es seguro?",
@@ -113,7 +113,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Puedo pedir envío en vez de retirar?",
-        a: "Sí. Al pagar eliges envío por courier y el libro llega a tu dirección, normalmente al día hábil siguiente, por un costo reducido.",
+        a: "Sí. Al pagar eliges envío por courier y el vendedor te lo manda a tu dirección: llega en 2 a 5 días hábiles desde que lo despacha.",
       },
       {
         q: "¿El pago es seguro?",
@@ -134,7 +134,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Puedo pedir envío en vez de retirar?",
-        a: "Sí. Al pagar eliges envío por courier y el libro llega a tu dirección, normalmente al día hábil siguiente, por un costo reducido.",
+        a: "Sí. Al pagar eliges envío por courier y el vendedor te lo manda a tu dirección: llega en 2 a 5 días hábiles desde que lo despacha.",
       },
       {
         q: "¿Cómo protegen mi pago?",
@@ -176,7 +176,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Llega a domicilio dentro de Viña?",
-        a: "Sí. Eliges envío por courier al pagar y el libro llega a tu dirección, normalmente al día hábil siguiente.",
+        a: "Sí. Eliges envío por courier al pagar y el vendedor te lo manda a tu dirección: llega en 2 a 5 días hábiles desde que lo despacha.",
       },
       {
         q: "¿Cómo protegen mi pago?",
