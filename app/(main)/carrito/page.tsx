@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import CartView from "./CartView";
+import { preciosAcordados } from "@/lib/offers";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import ListingCard from "@/components/listings/ListingCard";
 import { ButtonLink } from "@/components/ui/Button";
 import type { ListingWithBook } from "@/types";
@@ -71,6 +73,18 @@ export default async function CarritoPage() {
     .order("added_at", { ascending: false });
 
   const items = (data ?? []) as any[];
+
+  // Ofertas aceptadas y vigentes: el carrito muestra el precio acordado, el
+  // mismo que va a cobrar /api/orders (lib/offers.ts).
+  const acordados = await preciosAcordados(
+    createServiceRoleClient(),
+    user.id,
+    items.map((i) => i.listing?.id).filter(Boolean)
+  );
+  for (const i of items) {
+    const a = i.listing && acordados[i.listing.id];
+    if (a && i.listing.price != null && a.amount < i.listing.price) i.listing.price = a.amount;
+  }
   const isEmpty = items.length === 0;
 
   // Only fetch featured books when cart is empty — avoid unnecessary query otherwise

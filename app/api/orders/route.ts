@@ -23,6 +23,8 @@ import {
   obtenerTarifasCoordinado,
   precioCoordinado,
 } from "@/lib/shipping/coordinado";
+import { preciosAcordados } from "@/lib/offers";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 /**
  * POST /api/orders
@@ -205,6 +207,22 @@ export async function POST(req: NextRequest) {
     !!seller.acepta_transferencia &&
     !!seller.datos_transferencia?.trim();
 
+  // Ofertas aceptadas y vigentes de este comprador (lib/offers.ts). El precio
+  // acordado sale de la base, nunca del navegador, y alimenta los TRES lugares
+  // que suman plata más abajo —rawBookPrice, orderRows y los items de MP— para
+  // que el cuadre de "precio exhibido = precio cobrado" no se rompa. Si el
+  // vendedor bajó el precio por debajo de lo acordado, gana el más bajo.
+  const acordados = await preciosAcordados(
+    createServiceRoleClient(),
+    user.id,
+    listings.map((l: any) => l.id)
+  );
+  const precioDe = (l: any): number => {
+    const publicado = l.price ?? 0;
+    const acordado = acordados[l.id]?.amount;
+    return acordado !== undefined && acordado < publicado ? acordado : publicado;
+  };
+
   // Validar y aplicar código de descuento
   let discountPct = 0;
   let discountAmount = 0;
@@ -236,7 +254,7 @@ export async function POST(req: NextRequest) {
 
   // Cálculos
   const rawBookPrice = listings.reduce(
-    (sum: number, l: any) => sum + (l.price ?? 0),
+    (sum: number, l: any) => sum + precioDe(l),
     0
   );
   discountAmount = Math.round(rawBookPrice * discountPct / 100);
@@ -364,7 +382,7 @@ export async function POST(req: NextRequest) {
   // Crear N orders, shipping/fee solo en la primera (prorrateo "cabeza del bundle")
   const orderRows = listings.map((l: any, idx: number) => {
     const isFirst = idx === 0;
-    const rawItemPrice = l.price ?? 0;
+    const rawItemPrice = precioDe(l);
     const itemDiscount = isFirst ? discountAmount : 0;
     const discountedItemPrice = rawItemPrice - itemDiscount;
     const itemShipping = isFirst ? shippingCost : 0;
@@ -399,6 +417,8 @@ export async function POST(req: NextRequest) {
       // Lo lee /mis-ventas y el correo del despacho para decirle que NO haga
       // una etiqueta nueva. Ver lib/envio-pendiente.ts.
       merged_into_bundle_id: cabeEnElPaquete ? envioAbierto!.bundleId : null,
+      // De qué oferta salió el precio, si hubo una (lib/offers.ts).
+      ...(acordados[l.id] && precioDe(l) < (l.price ?? 0) ? { offer_id: acordados[l.id].offerId } : {}),
     };
   });
 
@@ -461,7 +481,7 @@ export async function POST(req: NextRequest) {
         id: l.id,
         title: `${l.book.title} — ${l.book.author}`,
         quantity: 1,
-        unit_price: Math.round((l.price ?? 0) - (idx === 0 ? discountAmount : 0)),
+        unit_price: Math.round(precioDe(l) - (idx === 0 ? discountAmount : 0)),
         currency_id: "CLP",
       })),
       {

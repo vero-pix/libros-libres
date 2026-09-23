@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { vendedorPuedeRecibirOfertas } from "@/lib/offers";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 const CONDITIONS = new Set(["new", "good", "fair", "poor"]);
@@ -89,6 +90,22 @@ export async function PATCH(
     rental_price: modality !== "sale" ? cleanNumber(listingInput.rental_price) : null,
     rental_deposit: modality !== "sale" ? cleanNumber(listingInput.rental_deposit) : null,
   };
+
+  // Solo si viene: el formulario de edición lo manda siempre, pero otros
+  // clientes de esta ruta (admin, API v1) no lo conocen y no deben apagarlo.
+  if (typeof listingInput.acepta_ofertas === "boolean") {
+    let acepta = listingInput.acepta_ofertas;
+    if (acepta) {
+      const { data: vendedor } = await admin
+        .from("users")
+        .select("mercadopago_user_id")
+        .eq("id", listing.seller_id)
+        .maybeSingle();
+      // Desde el 1 de octubre, sin MercadoPago no se puede encender (lib/offers.ts).
+      acepta = vendedorPuedeRecibirOfertas(!!vendedor?.mercadopago_user_id);
+    }
+    listingUpdates.acepta_ofertas = acepta;
+  }
 
   if (listingInput.cover_image_url !== undefined) {
     listingUpdates.cover_image_url = cleanText(listingInput.cover_image_url);

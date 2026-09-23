@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { avisarOrigenFaltante, estadoOrigenVendedor } from "@/lib/shipit-origen";
 import { obtenerTarifasCoordinado } from "@/lib/shipping/coordinado";
+import { preciosAcordados } from "@/lib/offers";
 import BundleCheckoutForm from "@/components/checkout/BundleCheckoutForm";
 import type { ListingWithBook } from "@/types";
 
@@ -59,6 +60,14 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
   }
 
   const typedListings = listings as unknown as ListingWithBook[];
+
+  // Ofertas aceptadas y vigentes: el resumen muestra el precio acordado, el
+  // mismo que va a cobrar /api/orders (los dos leen preciosAcordados()).
+  const acordados = await preciosAcordados(createServiceRoleClient(), user.id, typedListings.map((l) => l.id));
+  for (const l of typedListings) {
+    const a = acordados[l.id];
+    if (a && l.price != null && a.amount < l.price) l.price = a.amount;
+  }
 
   // D1 revisada: fuera de la RM sin origen en Shipit no se ofrece courier.
   const admin = createServiceRoleClient();

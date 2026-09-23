@@ -1,3 +1,4 @@
+import { marcarOfertasUsadas } from "@/lib/offers";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
@@ -67,6 +68,8 @@ export async function POST(req: NextRequest) {
   if (!actualizadas?.length) {
     return NextResponse.json({ ok: true, already: true });
   }
+
+  await marcarOfertasUsadas(admin, bundle_id);
 
   const titulos = orders
     .map((o: any) => (Array.isArray(o.listing) ? o.listing[0] : o.listing)?.book?.title)

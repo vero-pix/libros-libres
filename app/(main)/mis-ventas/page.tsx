@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import OfertasRecibidas, { type OfertaRecibida } from "@/components/offers/OfertasRecibidas";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Fragment } from "react";
@@ -48,6 +49,21 @@ export default async function MisVentasPage() {
 
   const mpConnected = !!profile?.mercadopago_user_id;
   // ¿Está en la Región Metropolitana? Solo ahí existe el Retiro Héroe (D7).
+
+  // Ofertas de precio que esperan respuesta o que acepté y siguen vigentes (lib/offers.ts).
+  // Tolerante: si la tabla no existe todavía, la sección simplemente no aparece.
+  const { data: rawOfertas } = await supabase
+    .from("offers")
+    .select("id, listing_id, buyer_id, seller_id, amount, listing_price, status, expires_at, conversation_id, created_at, responded_at, listing:listings(book:books(title)), buyer:users!offers_buyer_id_fkey(full_name)")
+    .eq("seller_id", user.id)
+    .in("status", ["pending", "accepted"])
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false });
+  const ofertasRecibidas: OfertaRecibida[] = ((rawOfertas ?? []) as any[]).map((o) => ({
+    ...o,
+    titulo: o.listing?.book?.title ?? "Libro",
+    compradorNombre: o.buyer?.full_name ?? null,
+  }));
 
   // Orders where I'm the seller
   const { data: rawOrders } = await supabase
@@ -266,6 +282,8 @@ export default async function MisVentasPage() {
             </div>
           </div>
         </div>
+
+        <OfertasRecibidas ofertas={ofertasRecibidas} currentUserId={user.id} />
 
         {/* Recent orders */}
         <section className="mb-10">

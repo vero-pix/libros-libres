@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Avatar from "@/components/ui/Avatar";
 import { detectarPagoFuera } from "@/lib/pagoFueraDetector";
+import OfertaCard from "@/components/offers/OfertaCard";
+import type { Oferta } from "@/lib/offers";
 
 interface Message {
   id: string;
@@ -11,6 +13,7 @@ interface Message {
   body: string;
   read_at: string | null;
   created_at: string;
+  offer_id?: string | null;
 }
 
 interface ConversationInfo {
@@ -27,6 +30,8 @@ interface Props {
 export default function MessageThread({ conversationId, currentUserId }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [conv, setConv] = useState<ConversationInfo | null>(null);
+  const [ofertas, setOfertas] = useState<Record<string, Oferta>>({});
+  const [puedePagarEnSitio, setPuedePagarEnSitio] = useState(true);
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -43,6 +48,8 @@ export default function MessageThread({ conversationId, currentUserId }: Props) 
         const data = await res.json();
         setMessages(data.messages);
         setConv(data.conversation);
+        setOfertas(Object.fromEntries(((data.offers ?? []) as Oferta[]).map((o) => [o.id, o])));
+        setPuedePagarEnSitio(data.puede_pagar_en_sitio !== false);
       }
     } catch {
       // silently fail
@@ -111,6 +118,25 @@ export default function MessageThread({ conversationId, currentUserId }: Props) 
         )}
         {messages.map((msg) => {
           const isMine = msg.sender_id === currentUserId;
+          const oferta = msg.offer_id ? ofertas[msg.offer_id] : undefined;
+          if (oferta) {
+            return (
+              <div key={msg.id} className={`flex flex-col gap-1.5 ${isMine ? "items-end" : "items-start"}`}>
+                <OfertaCard
+                  oferta={oferta}
+                  currentUserId={currentUserId}
+                  onRespondida={fetchMessages}
+                  puedePagarEnSitio={puedePagarEnSitio}
+                />
+                {/* La nota que el comprador escribió con la oferta, si la hay. */}
+                {msg.body.includes("\n\n") && (
+                  <p className="max-w-[75%] whitespace-pre-wrap break-words rounded-2xl bg-white px-3.5 py-2 text-sm text-ink border border-cream-dark/30">
+                    {msg.body.split("\n\n").slice(1).join("\n\n")}
+                  </p>
+                )}
+              </div>
+            );
+          }
           return (
             <div key={msg.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
               <div

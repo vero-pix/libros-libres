@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
 import { detectarPagoFuera } from "@/lib/pagoFueraDetector";
-
-function orderParticipants(a: string, b: string): [string, string] {
-  return a < b ? [a, b] : [b, a];
-}
+import { buscarOCrearConversacion } from "@/lib/conversations";
 
 /** GET /api/messages — list conversations for current user */
 export async function GET() {
@@ -88,33 +85,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No puedes enviarte mensajes a ti mismo" }, { status: 400 });
     }
 
-    const [p1, p2] = orderParticipants(user.id, recipient_id);
-
-    // Try to find existing conversation for this pair + listing
-    const { data: existing } = await supabase
-      .from("conversations")
-      .select("id")
-      .eq("participant_1", p1)
-      .eq("participant_2", p2)
-      .eq("listing_id", listing_id ?? null)
-      .maybeSingle();
-
-    if (existing) {
-      convId = existing.id;
-    } else {
-      const { data: newConv, error: convErr } = await supabase
-        .from("conversations")
-        .insert({
-          participant_1: p1,
-          participant_2: p2,
-          listing_id: listing_id ?? null,
-        })
-        .select("id")
-        .single();
-
-      if (convErr) return NextResponse.json({ error: convErr.message }, { status: 500 });
-      convId = newConv.id;
-    }
+    const conv = await buscarOCrearConversacion(supabase, user.id, recipient_id, listing_id ?? null);
+    if ("error" in conv) return NextResponse.json({ error: conv.error }, { status: 500 });
+    convId = conv.id;
   }
 
   // Insert message. flagged_reason deja constancia si el texto trae teléfono,

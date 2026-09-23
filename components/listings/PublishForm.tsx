@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import AceptaOfertasToggle from "@/components/offers/AceptaOfertasToggle";
+import { vendedorPuedeRecibirOfertas } from "@/lib/offers";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { slugListing, slugUnicoParaVendedor } from "@/lib/slugify";
@@ -110,6 +112,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
   const [modality, setModality] = useState<Modality>("sale");
   const [originalPrice, setOriginalPrice] = useState("");
   const [price, setPrice] = useState("");
+  const [aceptaOfertas, setAceptaOfertas] = useState(false);
   const [condition, setCondition] = useState<Condition>("good");
   const [notes, setNotes] = useState("");
   const [phone, setPhone] = useState(existingPhone ?? "");
@@ -537,6 +540,9 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         modality,
         price: modality !== "loan" ? parseFloat(price) : null,
         original_price: modality !== "loan" && originalPrice ? parseFloat(originalPrice) : null,
+        // Solo se manda si es true: si la migración 20260923 no está aplicada,
+        // un `false` explícito haría fallar TODAS las publicaciones.
+        ...(aceptaOfertas && vendedorPuedeRecibirOfertas(mpConnected) ? { acepta_ofertas: true } : {}),
         condition,
         notes: notes.trim() || null,
         latitude: location.lat,
@@ -944,6 +950,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
                   />
                 </div>
               </div>
+              <AceptaOfertasToggle checked={aceptaOfertas} onChange={setAceptaOfertas} mpConnected={mpConnected} />
             </>
           )}
 

@@ -1,3 +1,4 @@
+import { marcarOfertasUsadas } from "@/lib/offers";
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { paymentClient } from "@/lib/mercadopago";
@@ -291,6 +292,8 @@ export async function POST(req: NextRequest) {
           .from("listings")
           .update({ status: "completed" })
           .in("id", listingIds);
+
+        await marcarOfertasUsadas(supabase, externalRef);
 
         // Notificación única para el bundle
         const firstOrderId = bundleOrders[0].id;

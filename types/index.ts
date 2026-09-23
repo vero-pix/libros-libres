@@ -68,6 +68,8 @@ export interface Listing {
   address: string | null;
   cover_image_url: string | null;
   status: ListingStatus;
+  /** "Se aceptan ofertas" (lib/offers.ts). Opcional: falta en consultas que no lo piden. */
+  acepta_ofertas?: boolean;
   created_at: string;
   updated_at: string;
 }

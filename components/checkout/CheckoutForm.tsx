@@ -34,6 +34,12 @@ interface Props {
   buyerPhone: string;
   /** El vendedor habilitó cobrar por transferencia además de MercadoPago. */
   aceptaTransferencia?: boolean;
+  /**
+   * Precio publicado cuando el comprador tiene una oferta aceptada (lib/offers.ts).
+   * `listing.price` ya viene con el acordado —el mismo que cobra /api/orders—;
+   * esto solo sirve para mostrarlo tachado.
+   */
+  precioPublicado?: number | null;
 }
 
 type DeliveryMethod = "courier" | "in_person" | "pickup_point";
@@ -50,7 +56,7 @@ const DELIVERY_OPTIONS = [
   { value: "courier" as const, label: "Envío courier", desc: "Recibe en tu domicilio por courier", icon: "📦", enabled: true },
 ];
 
-export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPhone, courierDisponible = true, aceptaTransferencia = false }: Props) {
+export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPhone, courierDisponible = true, aceptaTransferencia = false, precioPublicado = null }: Props) {
   // Forma de pago. Solo se pregunta si el vendedor habilitó la transferencia;
   // si no, es MercadoPago y la pregunta no aparece.
   const [formaPago, setFormaPago] = useState<"mercadopago" | "transfer">(
@@ -756,8 +762,14 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
             </div>
 
             <div className="flex justify-between text-sm">
-              <span className="text-ink-muted font-medium">Libro</span>
+              <span className="text-ink-muted font-medium">
+                Libro
+                {precioPublicado && <span className="ml-1.5 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-800">🤝 precio acordado</span>}
+              </span>
               <div className="text-right">
+                {precioPublicado && discountAmount === 0 && (
+                  <span className="text-xs text-ink-muted line-through mr-1">${precioPublicado.toLocaleString("es-CL")}</span>
+                )}
                 {discountAmount > 0 && (
                   <span className="text-xs text-ink-muted line-through mr-1">${bookPrice.toLocaleString("es-CL")}</span>
                 )}

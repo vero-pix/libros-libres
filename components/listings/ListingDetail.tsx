@@ -20,6 +20,8 @@ import { libroUrl } from "@/lib/urls";
 import { trackEvent } from "@/utils/analytics";
 import { translateGenre } from "@/lib/genres";
 import { authorLanding } from "@/lib/authorLandings";
+import HacerOfertaButton from "@/components/offers/HacerOfertaButton";
+import { vendedorPuedeRecibirOfertas } from "@/lib/offers";
 
 /**
  * Atributos de la ficha que viajan con los eventos de elección de vía.
@@ -221,6 +223,16 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
     listing.modality !== "loan" &&
     !isSold &&
     !(listing.seller as any)?.on_vacation;
+
+  // "Hacer oferta" (lib/offers.ts): el vendedor lo marcó en este libro y todavía
+  // puede recibir ofertas (desde el 1-10-2026, solo con MercadoPago).
+  const ofertaHtml =
+    listing.acepta_ofertas &&
+    vendedorPuedeRecibirOfertas(!!(listing.seller as any)?.mercadopago_user_id) &&
+    listing.price != null &&
+    !isOwner ? (
+      <HacerOfertaButton listingId={listing.id} price={listing.price} sellerName={sellerName} bookTitle={book.title} />
+    ) : null;
 
   const paramsFicha: ParamsFicha = useMemo(
     () => ({
@@ -734,6 +746,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
                 </p>
               </div>
               <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
+              {ofertaHtml}
               {/* Antes había un WhatsApp secundario acá. Con MercadoPago conectado
                   competía con el botón de comprar y la venta se cerraba fuera del
                   sitio. Las dudas van por la mensajería interna, que le avisa al
@@ -765,6 +778,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
                 <WhatsAppButton phone={listing.seller.phone} title={book.title} listingId={listing.id} paramsFicha={paramsFicha} />
               )}
               <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
+              {ofertaHtml}
               <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
             </>
           ) : (
@@ -776,6 +790,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
                compra: solo WhatsApp, que se lleva la venta fuera del sitio. */
             <div className="space-y-2">
               <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
+              {ofertaHtml}
               <WhatsAppButton phone={listing.seller?.phone ?? null} title={book.title} listingId={listing.id} paramsFicha={paramsFicha} />
               <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
             </div>

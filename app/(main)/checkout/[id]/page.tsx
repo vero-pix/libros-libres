@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { avisarOrigenFaltante, estadoOrigenVendedor } from "@/lib/shipit-origen";
 import { obtenerTarifasCoordinado } from "@/lib/shipping/coordinado";
+import { preciosAcordados } from "@/lib/offers";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import type { ListingWithBook } from "@/types";
 
@@ -33,6 +34,17 @@ export default async function CheckoutPage({ params }: Props) {
   }
 
   const typedListing = listing as unknown as ListingWithBook;
+
+  // Oferta aceptada y vigente: el checkout muestra el precio acordado, el
+  // mismo que va a cobrar /api/orders (los dos leen preciosAcordados()).
+  let precioPublicado: number | null = null;
+  if (user) {
+    const acordado = (await preciosAcordados(createServiceRoleClient(), user.id, [typedListing.id]))[typedListing.id];
+    if (acordado && typedListing.price != null && acordado.amount < typedListing.price) {
+      precioPublicado = typedListing.price;
+      typedListing.price = acordado.amount;
+    }
+  }
 
   if (user && typedListing.seller_id === user.id) {
     redirect(`/listings/${params.id}`);
@@ -79,6 +91,7 @@ export default async function CheckoutPage({ params }: Props) {
           buyerName={buyerProfile?.full_name ?? ""}
           buyerPhone={buyerProfile?.phone ?? ""}
           courierDisponible={courierDisponible}
+          precioPublicado={precioPublicado}
           // La opción aparece solo si además cargó los datos: ofrecer
           // transferir y después no tener a qué cuenta es peor que no ofrecerla.
           aceptaTransferencia={

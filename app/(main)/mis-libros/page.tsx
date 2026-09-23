@@ -92,7 +92,11 @@ export default async function MisLibrosPage() {
 
         <WantedBounty />
 
-        <MyListings listings={listings} puedeDestacar={VENDEDORES_QUE_PUEDEN_DESTACAR.includes(profile?.username ?? "")} />
+        <MyListings
+          listings={listings}
+          puedeDestacar={VENDEDORES_QUE_PUEDEN_DESTACAR.includes(profile?.username ?? "")}
+          mpConnected={!!profile?.mercadopago_user_id}
+        />
       </main>
     </div>
   );

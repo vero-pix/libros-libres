@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
 import Link from "next/link";
+import AceptaOfertasToggle from "@/components/offers/AceptaOfertasToggle";
+import OfertasEnTodos from "@/components/offers/OfertasEnTodos";
 import type { ListingWithBook, ListingStatus } from "@/types";
 import CategoryPicker from "@/components/listings/CategoryPicker";
 import CoverUpload from "@/components/books/CoverUpload";
@@ -35,9 +37,11 @@ interface Props {
   listings: ListingWithBook[];
   /** Solo algunos vendedores pueden destacar por ahora (ver /api/listings/destacar). */
   puedeDestacar?: boolean;
+  /** `users.mercadopago_user_id` presente: decide si puede recibir ofertas (lib/offers.ts). */
+  mpConnected?: boolean;
 }
 
-export default function MyListings({ listings: initial, puedeDestacar = false }: Props) {
+export default function MyListings({ listings: initial, puedeDestacar = false, mpConnected = false }: Props) {
   const [listings, setListings] = useState(initial);
   const searchParams = useSearchParams();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -204,6 +208,15 @@ export default function MyListings({ listings: initial, puedeDestacar = false }:
         </div>
       )}
 
+      <OfertasEnTodos
+        mpConnected={mpConnected}
+        activas={counts.active}
+        conOfertas={listings.filter((l) => l.status === "active" && l.acepta_ofertas).length}
+        onCambio={(acepta) =>
+          setListings((prev) => prev.map((l) => (l.status === "active" ? { ...l, acepta_ofertas: acepta } : l)))
+        }
+      />
+
       {/* Filter tabs */}
       <div className="flex gap-1 bg-white rounded-xl border border-gray-200 p-1">
         {(["all", "active", "paused", "completed"] as const).map((f) => (
@@ -275,6 +288,7 @@ export default function MyListings({ listings: initial, puedeDestacar = false }:
           onUpdateStatus={updateStatus}
           onDelete={deleteListing}
           puedeDestacar={puedeDestacar}
+          mpConnected={mpConnected}
           onToggleDestacado={toggleDestacado}
           onUpdated={(updated) => {
             setListings((prev) =>
@@ -316,6 +330,7 @@ interface RowProps {
   onDelete: (id: string) => void;
   onUpdated: (listing: ListingWithBook) => void;
   puedeDestacar: boolean;
+  mpConnected: boolean;
   onToggleDestacado: (id: string, featured: boolean) => void;
 }
 
@@ -329,6 +344,7 @@ function ListingRow({
   onDelete,
   onUpdated,
   puedeDestacar,
+  mpConnected,
   onToggleDestacado,
 }: RowProps) {
   const { book } = listing;
@@ -478,7 +494,7 @@ function ListingRow({
 
       {/* Edit form */}
       {isEditing && (
-        <EditForm listing={listing} onUpdated={onUpdated} onCancel={onToggleEdit} />
+        <EditForm listing={listing} mpConnected={mpConnected} onUpdated={onUpdated} onCancel={onToggleEdit} />
       )}
     </div>
   );
@@ -488,10 +504,12 @@ function ListingRow({
 
 function EditForm({
   listing,
+  mpConnected,
   onUpdated,
   onCancel,
 }: {
   listing: ListingWithBook;
+  mpConnected: boolean;
   onUpdated: (l: ListingWithBook) => void;
   onCancel: () => void;
 }) {
@@ -506,6 +524,7 @@ function EditForm({
   const [condition, setCondition] = useState(listing.condition);
   const [modality, setModality] = useState(listing.modality);
   const [notes, setNotes] = useState(listing.notes ?? "");
+  const [aceptaOfertas, setAceptaOfertas] = useState(!!listing.acepta_ofertas);
 
   // Book fields
   const [title, setTitle] = useState(book.title);
@@ -601,6 +620,7 @@ function EditForm({
       original_price: originalPrice ? parseFloat(originalPrice) : null,
       rental_price: (modality === "loan" || modality === "both") && rentalPrice ? parseFloat(rentalPrice) : null,
       rental_deposit: (modality === "loan" || modality === "both") && rentalDeposit ? parseFloat(rentalDeposit) : null,
+      acepta_ofertas: aceptaOfertas,
     };
     if (coverUrl) {
       listingUpdates.cover_image_url = coverUrl;
@@ -767,6 +787,9 @@ function EditForm({
                   <span className="absolute inset-y-0 left-2.5 flex items-center text-gray-400 text-sm pointer-events-none">$</span>
                   <input type="number" value={originalPrice} onChange={(e) => setOriginalPrice(e.target.value)} min="0" step="100" placeholder="Si es mayor, se muestra tachado" className={`${inputClass} pl-6`} />
                 </div>
+              </div>
+              <div className="col-span-2">
+                <AceptaOfertasToggle checked={aceptaOfertas} onChange={setAceptaOfertas} mpConnected={mpConnected} />
               </div>
             </>
           )}
