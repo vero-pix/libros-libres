@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { paginar } from "@/lib/supabase/paginar";
 import MyListings from "./MyListings";
+import { cobraDentroDelSitio } from "@/lib/cobro-transferencia";
 import MercadoPagoNudge from "@/components/listings/MercadoPagoNudge";
 import WantedBounty from "@/components/listings/WantedBounty";
 import type { ListingWithBook } from "@/types";
@@ -95,7 +96,7 @@ export default async function MisLibrosPage() {
         <MyListings
           listings={listings}
           puedeDestacar={VENDEDORES_QUE_PUEDEN_DESTACAR.includes(profile?.username ?? "")}
-          mpConnected={!!profile?.mercadopago_user_id}
+          cobraEnSitio={await cobraDentroDelSitio(user.id, !!profile?.mercadopago_user_id)}
         />
       </main>
     </div>

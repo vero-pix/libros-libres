@@ -38,10 +38,11 @@ interface Props {
   /** Solo algunos vendedores pueden destacar por ahora (ver /api/listings/destacar). */
   puedeDestacar?: boolean;
   /** `users.mercadopago_user_id` presente: decide si puede recibir ofertas (lib/offers.ts). */
-  mpConnected?: boolean;
+  /** Cobra con MercadoPago o transferencia: habilita las ofertas desde el 1-10. */
+  cobraEnSitio?: boolean;
 }
 
-export default function MyListings({ listings: initial, puedeDestacar = false, mpConnected = false }: Props) {
+export default function MyListings({ listings: initial, puedeDestacar = false, cobraEnSitio = false }: Props) {
   const [listings, setListings] = useState(initial);
   const searchParams = useSearchParams();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -209,7 +210,7 @@ export default function MyListings({ listings: initial, puedeDestacar = false, m
       )}
 
       <OfertasEnTodos
-        mpConnected={mpConnected}
+        cobraEnSitio={cobraEnSitio}
         activas={counts.active}
         conOfertas={listings.filter((l) => l.status === "active" && l.acepta_ofertas).length}
         onCambio={(acepta) =>
@@ -288,7 +289,7 @@ export default function MyListings({ listings: initial, puedeDestacar = false, m
           onUpdateStatus={updateStatus}
           onDelete={deleteListing}
           puedeDestacar={puedeDestacar}
-          mpConnected={mpConnected}
+          cobraEnSitio={cobraEnSitio}
           onToggleDestacado={toggleDestacado}
           onUpdated={(updated) => {
             setListings((prev) =>
@@ -330,7 +331,7 @@ interface RowProps {
   onDelete: (id: string) => void;
   onUpdated: (listing: ListingWithBook) => void;
   puedeDestacar: boolean;
-  mpConnected: boolean;
+  cobraEnSitio: boolean;
   onToggleDestacado: (id: string, featured: boolean) => void;
 }
 
@@ -344,7 +345,7 @@ function ListingRow({
   onDelete,
   onUpdated,
   puedeDestacar,
-  mpConnected,
+  cobraEnSitio,
   onToggleDestacado,
 }: RowProps) {
   const { book } = listing;
@@ -494,7 +495,7 @@ function ListingRow({
 
       {/* Edit form */}
       {isEditing && (
-        <EditForm listing={listing} mpConnected={mpConnected} onUpdated={onUpdated} onCancel={onToggleEdit} />
+        <EditForm listing={listing} cobraEnSitio={cobraEnSitio} onUpdated={onUpdated} onCancel={onToggleEdit} />
       )}
     </div>
   );
@@ -504,12 +505,12 @@ function ListingRow({
 
 function EditForm({
   listing,
-  mpConnected,
+  cobraEnSitio,
   onUpdated,
   onCancel,
 }: {
   listing: ListingWithBook;
-  mpConnected: boolean;
+  cobraEnSitio: boolean;
   onUpdated: (l: ListingWithBook) => void;
   onCancel: () => void;
 }) {
@@ -789,7 +790,7 @@ function EditForm({
                 </div>
               </div>
               <div className="col-span-2">
-                <AceptaOfertasToggle checked={aceptaOfertas} onChange={setAceptaOfertas} mpConnected={mpConnected} />
+                <AceptaOfertasToggle checked={aceptaOfertas} onChange={setAceptaOfertas} cobraEnSitio={cobraEnSitio} />
               </div>
             </>
           )}

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import PublishForm from "@/components/listings/PublishForm";
+import { cobraDentroDelSitio } from "@/lib/cobro-transferencia";
 import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
 import type { BookData } from "@/types";
 
@@ -214,6 +215,7 @@ export default async function PublishPage({ searchParams }: Props) {
           defaultLocation={defaultLocation}
           initialBook={initialBook}
           mpConnected={mpConnected}
+          cobraEnSitio={await cobraDentroDelSitio(user.id, mpConnected)}
           publicacionesActivas={publicacionesActivas ?? 0}
         />
       </main>

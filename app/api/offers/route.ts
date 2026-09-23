@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { cobraDentroDelSitio } from "@/lib/cobro-transferencia";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { sendEmail } from "@/lib/email";
 import { sendGong, escapeHtml } from "@/lib/notifications";
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
   if (!listing || listing.status !== "active" || !listing.price) {
     return NextResponse.json({ error: "Este libro ya no está disponible." }, { status: 409 });
   }
-  if (!listing.acepta_ofertas || !vendedorPuedeRecibirOfertas(!!seller?.mercadopago_user_id)) {
+  if (!listing.acepta_ofertas || !vendedorPuedeRecibirOfertas(await cobraDentroDelSitio(listing.seller_id, !!seller?.mercadopago_user_id))) {
     return NextResponse.json({ error: "Este libro no está recibiendo ofertas." }, { status: 409 });
   }
   if (seller?.on_vacation) {

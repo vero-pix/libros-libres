@@ -5,7 +5,8 @@ import { vendedorPuedeRecibirOfertas } from "@/lib/offers";
 import { Button } from "@/components/ui/Button";
 
 interface Props {
-  mpConnected: boolean;
+  /** MercadoPago o transferencia (cobraDentroDelSitio, resuelto en el servidor). */
+  cobraEnSitio: boolean;
   /** Cuántas activas ya aceptan ofertas / cuántas activas hay. */
   activas: number;
   conOfertas: number;
@@ -17,10 +18,10 @@ interface Props {
  * una vez. Un vendedor con 200 libros no lo va a hacer de a uno (pedido pensando
  * en cimlibros, 23-09-2026).
  */
-export default function OfertasEnTodos({ mpConnected, activas, conOfertas, onCambio }: Props) {
+export default function OfertasEnTodos({ cobraEnSitio, activas, conOfertas, onCambio }: Props) {
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const habilitado = vendedorPuedeRecibirOfertas(mpConnected);
+  const habilitado = vendedorPuedeRecibirOfertas(cobraEnSitio);
   const todas = activas > 0 && conOfertas >= activas;
 
   if (activas === 0) return null;
@@ -54,7 +55,7 @@ export default function OfertasEnTodos({ mpConnected, activas, conOfertas, onCam
           🤝 Ofertas de precio
           {!habilitado && (
             <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
-              Solo con MercadoPago
+              Solo con MercadoPago o transferencia
             </span>
           )}
         </p>
@@ -64,7 +65,7 @@ export default function OfertasEnTodos({ mpConnected, activas, conOfertas, onCam
             : conOfertas === 0
               ? "Deja que los compradores te propongan un precio. Tú aceptas o rechazas cada oferta."
               : `${conOfertas} de ${activas} libros activos aceptan ofertas.`}
-          {habilitado && !mpConnected && " Gratis para todos hasta el 30 de septiembre; después, solo con MercadoPago."}
+          {habilitado && !cobraEnSitio && " Gratis para todos hasta el 30 de septiembre; después, solo con MercadoPago o transferencia."}
         </p>
         {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
       </div>

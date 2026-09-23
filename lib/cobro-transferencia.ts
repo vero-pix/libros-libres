@@ -22,3 +22,12 @@ export async function cobraPorTransferencia(sellerId: string): Promise<boolean> 
     return false;
   }
 }
+
+/**
+ * ¿El vendedor cobra dentro del sitio? MercadoPago o transferencia. Es lo que
+ * pide "Hacer oferta" desde el 1-10-2026 (lib/offers.ts). Si ya se sabe que
+ * tiene MP, no consulta la base.
+ */
+export async function cobraDentroDelSitio(sellerId: string, tieneMP: boolean): Promise<boolean> {
+  return tieneMP || (await cobraPorTransferencia(sellerId));
+}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { vendedorPuedeRecibirOfertas } from "@/lib/offers";
+import { cobraDentroDelSitio } from "@/lib/cobro-transferencia";
 
 /**
  * POST /api/listings/acepta-ofertas  { acepta: boolean }
@@ -25,9 +26,9 @@ export async function POST(req: NextRequest) {
       .select("mercadopago_user_id")
       .eq("id", user.id)
       .maybeSingle();
-    if (!vendedorPuedeRecibirOfertas(!!perfil?.mercadopago_user_id)) {
+    if (!vendedorPuedeRecibirOfertas(await cobraDentroDelSitio(user.id, !!perfil?.mercadopago_user_id))) {
       return NextResponse.json(
-        { error: "Las ofertas quedaron solo para quienes cobran con MercadoPago. Conéctalo y vuelve a intentar." },
+        { error: "Las ofertas quedaron solo para quienes cobran con MercadoPago o transferencia. Conecta MercadoPago y vuelve a intentar." },
         { status: 403 }
       );
     }

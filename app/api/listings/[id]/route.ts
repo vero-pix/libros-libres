@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { vendedorPuedeRecibirOfertas } from "@/lib/offers";
+import { cobraDentroDelSitio } from "@/lib/cobro-transferencia";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 const CONDITIONS = new Set(["new", "good", "fair", "poor"]);
@@ -101,8 +102,10 @@ export async function PATCH(
         .select("mercadopago_user_id")
         .eq("id", listing.seller_id)
         .maybeSingle();
-      // Desde el 1 de octubre, sin MercadoPago no se puede encender (lib/offers.ts).
-      acepta = vendedorPuedeRecibirOfertas(!!vendedor?.mercadopago_user_id);
+      // Desde el 1 de octubre, sin MercadoPago ni transferencia no se puede encender (lib/offers.ts).
+      acepta = vendedorPuedeRecibirOfertas(
+        await cobraDentroDelSitio(listing.seller_id, !!vendedor?.mercadopago_user_id)
+      );
     }
     listingUpdates.acepta_ofertas = acepta;
   }

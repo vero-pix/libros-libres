@@ -24,14 +24,19 @@ export const MAX_CONTRAOFERTAS = 3;
 
 /**
  * Hasta el 30-09-2026 (hora de Chile) cualquier vendedor puede recibir ofertas.
- * Desde el 1 de octubre, solo los que tienen MercadoPago: la oferta aceptada se
- * paga dentro del sitio, y sin MP el acuerdo se cierra por fuera (decisión de
- * Vero del 23-09, "por un tema de operatividad").
+ * Desde el 1 de octubre, solo los que cobran dentro del sitio: MercadoPago o
+ * transferencia (`acepta_transferencia` + `datos_transferencia`). La oferta
+ * aceptada se paga en el sitio; sin ninguno de los dos, el acuerdo se cierra por
+ * fuera (decisión de Vero del 23-09, "por un tema de operatividad"; la
+ * transferencia se sumó el mismo día).
+ *
+ * `cobraEnSitio` se resuelve en el servidor con `cobraDentroDelSitio()` de
+ * lib/cobro-transferencia.ts: las columnas de transferencia no las lee `anon`.
  */
 export const OFERTAS_PARA_TODOS_HASTA = new Date("2026-10-01T00:00:00-03:00");
 
-export function vendedorPuedeRecibirOfertas(sellerHasMP: boolean, ahora = new Date()): boolean {
-  return sellerHasMP || ahora < OFERTAS_PARA_TODOS_HASTA;
+export function vendedorPuedeRecibirOfertas(cobraEnSitio: boolean, ahora = new Date()): boolean {
+  return cobraEnSitio || ahora < OFERTAS_PARA_TODOS_HASTA;
 }
 
 /** Valida un monto ofrecido contra el precio publicado. `null` = válido. */

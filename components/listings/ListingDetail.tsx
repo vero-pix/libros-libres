@@ -225,10 +225,13 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
     !(listing.seller as any)?.on_vacation;
 
   // "Hacer oferta" (lib/offers.ts): el vendedor lo marcó en este libro y todavía
-  // puede recibir ofertas (desde el 1-10-2026, solo con MercadoPago).
+  // puede recibir ofertas (desde el 1-10-2026, solo con MercadoPago o transferencia;
+  // `cobra_por_transferencia` lo resuelve la página en el servidor).
   const ofertaHtml =
     listing.acepta_ofertas &&
-    vendedorPuedeRecibirOfertas(!!(listing.seller as any)?.mercadopago_user_id) &&
+    vendedorPuedeRecibirOfertas(
+      !!(listing.seller as any)?.mercadopago_user_id || !!(listing.seller as any)?.cobra_por_transferencia
+    ) &&
     listing.price != null &&
     !isOwner ? (
       <HacerOfertaButton listingId={listing.id} price={listing.price} sellerName={sellerName} bookTitle={book.title} />

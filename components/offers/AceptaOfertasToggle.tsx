@@ -5,20 +5,20 @@ import { vendedorPuedeRecibirOfertas } from "@/lib/offers";
 interface Props {
   checked: boolean;
   onChange: (v: boolean) => void;
-  /** `users.mercadopago_user_id` presente. */
-  mpConnected: boolean;
+  /** MercadoPago o transferencia (cobraDentroDelSitio, resuelto en el servidor). */
+  cobraEnSitio: boolean;
 }
 
 /**
  * "Se aceptan ofertas" (lib/offers.ts). Hasta el 30-09-2026 lo puede activar
- * cualquiera; desde el 1 de octubre, sin MercadoPago aparece apagado y con el
- * aviso de que es solo con MP: queda a la vista a propósito, para que se note
+ * cualquiera; desde el 1 de octubre, sin MercadoPago ni transferencia aparece
+ * apagado y con el aviso de que es solo con MP o transferencia: queda a la vista a propósito, para que se note
  * lo que se pierde sin conectarlo.
  */
-export default function AceptaOfertasToggle({ checked, onChange, mpConnected }: Props) {
-  const habilitado = vendedorPuedeRecibirOfertas(mpConnected);
+export default function AceptaOfertasToggle({ checked, onChange, cobraEnSitio }: Props) {
+  const habilitado = vendedorPuedeRecibirOfertas(cobraEnSitio);
   const activo = habilitado && checked;
-  const temporal = habilitado && !mpConnected;
+  const temporal = habilitado && !cobraEnSitio;
 
   return (
     <div
@@ -43,7 +43,7 @@ export default function AceptaOfertasToggle({ checked, onChange, mpConnected }: 
             Se aceptan ofertas
             {!habilitado && (
               <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
-                Solo con MercadoPago
+                Solo con MercadoPago o transferencia
               </span>
             )}
           </span>
@@ -54,7 +54,7 @@ export default function AceptaOfertasToggle({ checked, onChange, mpConnected }: 
           </span>
           {temporal && (
             <span className="mt-1.5 block text-xs font-medium text-amber-700">
-              Gratis para todos hasta el 30 de septiembre. Después queda solo para quienes cobran con MercadoPago.
+              Gratis para todos hasta el 30 de septiembre. Después queda solo para quienes cobran con MercadoPago o transferencia.
             </span>
           )}
           {!habilitado && (

@@ -85,11 +85,13 @@ interface Props {
   initialBook?: BookData | null;
   /** Si el vendedor ya tiene MercadoPago conectado, el éxito no cambia. */
   mpConnected?: boolean;
+  /** MercadoPago o transferencia: habilita "Se aceptan ofertas" desde el 1-10. */
+  cobraEnSitio?: boolean;
   /** Publicaciones activas ANTES de esta; el éxito suma la recién creada. */
   publicacionesActivas?: number;
 }
 
-export default function PublishForm({ userId, username, existingPhone, defaultLocation, initialBook, mpConnected = true, publicacionesActivas = 0 }: Props) {
+export default function PublishForm({ userId, username, existingPhone, defaultLocation, initialBook, mpConnected = true, cobraEnSitio = mpConnected, publicacionesActivas = 0 }: Props) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -542,7 +544,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
         original_price: modality !== "loan" && originalPrice ? parseFloat(originalPrice) : null,
         // Solo se manda si es true: si la migración 20260923 no está aplicada,
         // un `false` explícito haría fallar TODAS las publicaciones.
-        ...(aceptaOfertas && vendedorPuedeRecibirOfertas(mpConnected) ? { acepta_ofertas: true } : {}),
+        ...(aceptaOfertas && vendedorPuedeRecibirOfertas(cobraEnSitio) ? { acepta_ofertas: true } : {}),
         condition,
         notes: notes.trim() || null,
         latitude: location.lat,
@@ -950,7 +952,7 @@ export default function PublishForm({ userId, username, existingPhone, defaultLo
                   />
                 </div>
               </div>
-              <AceptaOfertasToggle checked={aceptaOfertas} onChange={setAceptaOfertas} mpConnected={mpConnected} />
+              <AceptaOfertasToggle checked={aceptaOfertas} onChange={setAceptaOfertas} cobraEnSitio={cobraEnSitio} />
             </>
           )}
 
