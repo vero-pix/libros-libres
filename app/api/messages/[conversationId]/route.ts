@@ -54,7 +54,7 @@ export async function GET(
   // Las ofertas de esta conversación, para pintar su tarjeta con el estado al día.
   const { data: offers } = await supabase
     .from("offers")
-    .select("id, listing_id, buyer_id, seller_id, amount, listing_price, status, expires_at, created_at")
+    .select("id, listing_id, buyer_id, seller_id, amount, listing_price, status, expires_at, created_at, made_by, parent_id, ronda")
     .eq("conversation_id", conversationId);
 
   // Si el vendedor no cobra en el sitio, la oferta aceptada no lleva botón de

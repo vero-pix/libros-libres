@@ -125,6 +125,7 @@ export default function MessageThread({ conversationId, currentUserId }: Props) 
                 <OfertaCard
                   oferta={oferta}
                   currentUserId={currentUserId}
+                  montoMadre={oferta.parent_id ? ofertas[oferta.parent_id]?.amount ?? null : null}
                   onRespondida={fetchMessages}
                   puedePagarEnSitio={puedePagarEnSitio}
                 />

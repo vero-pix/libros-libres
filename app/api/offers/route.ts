@@ -72,16 +72,17 @@ export async function POST(req: NextRequest) {
 
   const { data: pendiente } = await admin
     .from("offers")
-    .select("id, amount")
+    .select("id, amount, made_by")
     .eq("buyer_id", user.id)
     .eq("listing_id", listing.id)
     .eq("status", "pending")
     .maybeSingle();
   if (pendiente) {
-    return NextResponse.json(
-      { error: `Ya tienes una oferta de ${clp(pendiente.amount)} esperando respuesta por este libro.` },
-      { status: 409 }
-    );
+    const error =
+      pendiente.made_by === "seller"
+        ? `El vendedor te propuso ${clp(pendiente.amount)} por este libro: respóndele en la conversación.`
+        : `Ya tienes una oferta de ${clp(pendiente.amount)} esperando respuesta por este libro.`;
+    return NextResponse.json({ error }, { status: 409 });
   }
 
   const haceUnDia = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
@@ -89,6 +90,7 @@ export async function POST(req: NextRequest) {
     .from("offers")
     .select("id", { count: "exact", head: true })
     .eq("buyer_id", user.id)
+    .eq("made_by", "buyer")
     .gte("created_at", haceUnDia);
   if ((ofertasHoy ?? 0) >= MAX_OFERTAS_DIA) {
     return NextResponse.json({ error: "Llegaste al máximo de ofertas por hoy. Mañana puedes seguir." }, { status: 429 });
@@ -164,7 +166,7 @@ export async function GET(req: NextRequest) {
 
   const { data } = await supabase
     .from("offers")
-    .select("id, listing_id, buyer_id, seller_id, amount, listing_price, status, expires_at, conversation_id, created_at")
+    .select("id, listing_id, buyer_id, seller_id, amount, listing_price, status, expires_at, conversation_id, created_at, made_by, parent_id, ronda")
     .eq("listing_id", listingId)
     .eq("buyer_id", user.id)
     .order("created_at", { ascending: false })

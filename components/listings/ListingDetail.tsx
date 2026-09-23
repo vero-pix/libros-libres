@@ -20,7 +20,7 @@ import { libroUrl } from "@/lib/urls";
 import { trackEvent } from "@/utils/analytics";
 import { translateGenre } from "@/lib/genres";
 import { authorLanding } from "@/lib/authorLandings";
-import HacerOfertaButton from "@/components/offers/HacerOfertaButton";
+import HacerOfertaButton, { EVENTO_ABRIR_OFERTA } from "@/components/offers/HacerOfertaButton";
 import { vendedorPuedeRecibirOfertas } from "@/lib/offers";
 
 /**
@@ -233,6 +233,13 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
     !isOwner ? (
       <HacerOfertaButton listingId={listing.id} price={listing.price} sellerName={sellerName} bookTitle={book.title} />
     ) : null;
+
+  // La barra fija del celular solo ofrece la oferta si el botón se está
+  // mostrando: las ramas de vacaciones y de MP en mantención no lo pintan.
+  const ofertaEnBarra =
+    !!ofertaHtml &&
+    !(listing.seller as any)?.on_vacation &&
+    !MP_NOT_RECEIVING.has((listing.seller as any)?.username);
 
   const paramsFicha: ParamsFicha = useMemo(
     () => ({
@@ -834,6 +841,17 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
           <div className="flex flex-col">
             <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Precio</span>
             <span className="text-xl font-bold text-black leading-none">${listing.price.toLocaleString("es-CL")}</span>
+            {/* Un enlace chico y no un segundo botón: el espacio de la barra es
+                del botón de comprar. Abre el formulario de la ficha. */}
+            {ofertaEnBarra && (
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new Event(EVENTO_ABRIR_OFERTA))}
+                className="mt-1 text-left text-xs font-semibold text-brand-600 underline underline-offset-2"
+              >
+                o haz una oferta
+              </button>
+            )}
           </div>
           <div className="flex-1">
             {(listing.seller?.mercadopago_user_id && !MP_NOT_RECEIVING.has((listing.seller as any)?.username)) ||

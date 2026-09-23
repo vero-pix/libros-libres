@@ -50,7 +50,7 @@ export function correoOfertaRecibida(d: DatosOferta): { subject: string; html: s
       <h2 style="margin:0 0 8px 0">Te hicieron una oferta 🤝</h2>
       <p style="color:#444;line-height:1.6">Hola${vendedor ? ` ${vendedor}` : ""}, soy Vero de tuslibros.cl. ${comprador} te ofrece <strong>${clp(d.monto)}</strong> por <em>${titulo}</em>, que tienes publicado a ${clp(d.precioPublicado)}.</p>
       ${nota}
-      <p style="color:#444;line-height:1.6">Tú decides: la aceptas, la rechazas o le contestas por mensaje. Si no respondes en ${PLAZO_RESPUESTA_DIAS} días, la oferta vence sola y el libro sigue a su precio.</p>
+      <p style="color:#444;line-height:1.6">Tú decides: la aceptas, la rechazas o le propones otro precio. Si no respondes en ${PLAZO_RESPUESTA_DIAS} días, la oferta vence sola y el libro sigue a su precio.</p>
       ${boton(`${SITE}/mensajes/${d.conversationId}`, "Ver la oferta")}
     `),
   };
@@ -88,6 +88,58 @@ export function correoOfertaRechazada(d: DatosOferta): { subject: string; html: 
       <p style="color:#444;line-height:1.6">Hola${comprador ? ` ${comprador}` : ""}, ${vendedor} no aceptó los ${clp(d.monto)} por <em>${titulo}</em>. El libro sigue disponible a ${clp(d.precioPublicado)}.</p>
       <p style="color:#444;line-height:1.6">¿Quedaste con ganas? Puedes escribirle: a veces un precio intermedio sí calza.</p>
       ${boton(`${SITE}/mensajes/${d.conversationId}`, `Escribirle a ${vendedor}`)}
+    `),
+  };
+}
+
+/** A la otra parte: le hicieron una contraoferta. */
+export function correoContraoferta(
+  d: DatosOferta & { montoAnterior: number; deVendedor: boolean }
+): { subject: string; html: string } {
+  const titulo = escapeHtml(d.titulo);
+  const de = d.deVendedor ? primerNombre(d.vendedorNombre, "El vendedor") : primerNombre(d.compradorNombre, "El comprador");
+  const para = d.deVendedor ? primerNombre(d.compradorNombre, "") : primerNombre(d.vendedorNombre, "");
+  const contexto = d.deVendedor
+    ? `Ofreciste ${clp(d.montoAnterior)} por <em>${titulo}</em> y ${de} te propone <strong>${clp(d.monto)}</strong> (estaba a ${clp(d.precioPublicado)}).`
+    : `Le propusiste ${clp(d.montoAnterior)} por <em>${titulo}</em> y ${de} te contesta con <strong>${clp(d.monto)}</strong>.`;
+  return {
+    subject: `${de} te propone ${clp(d.monto)} por "${d.titulo}"`,
+    html: marco(`
+      <h2 style="margin:0 0 8px 0">Te hicieron una contraoferta ↔️</h2>
+      <p style="color:#444;line-height:1.6">Hola${para ? ` ${para}` : ""}, soy Vero de tuslibros.cl. ${contexto}</p>
+      <p style="color:#444;line-height:1.6">La puedes aceptar, rechazar o proponer otro número. Si no respondes en ${PLAZO_RESPUESTA_DIAS} días, vence sola.</p>
+      ${boton(`${SITE}/mensajes/${d.conversationId}`, "Ver la contraoferta")}
+    `),
+  };
+}
+
+/** Al vendedor: el comprador respondió su contraoferta. */
+export function correoRespuestaDelComprador(
+  d: DatosOferta & { aceptada: boolean; puedePagarEnSitio: boolean }
+): { subject: string; html: string } {
+  const comprador = primerNombre(d.compradorNombre, "El comprador");
+  const vendedor = primerNombre(d.vendedorNombre, "");
+  const titulo = escapeHtml(d.titulo);
+  if (!d.aceptada) {
+    return {
+      subject: `${comprador} no aceptó tu contraoferta por "${d.titulo}"`,
+      html: marco(`
+        <h2 style="margin:0 0 8px 0">Esta vez no calzó</h2>
+        <p style="color:#444;line-height:1.6">Hola${vendedor ? ` ${vendedor}` : ""}, ${comprador} no aceptó los ${clp(d.monto)} por <em>${titulo}</em>. El libro sigue publicado a ${clp(d.precioPublicado)}.</p>
+        ${boton(`${SITE}/mensajes/${d.conversationId}`, "Ver la conversación")}
+      `),
+    };
+  }
+  const cierre = d.puedePagarEnSitio
+    ? `Tiene ${PLAZO_PAGO_ACEPTADA_HORAS} horas para pagar ese precio. Cuando pague, la venta te llega como siempre a Mis Ventas.`
+    : `Coordinen el pago y la entrega por la mensajería.`;
+  return {
+    subject: `¡${comprador} aceptó tu contraoferta por "${d.titulo}"!`,
+    html: marco(`
+      <h2 style="margin:0 0 8px 0">¡Aceptaron tu contraoferta! 🎉</h2>
+      <p style="color:#444;line-height:1.6">Hola${vendedor ? ` ${vendedor}` : ""}, ${comprador} aceptó <strong>${clp(d.monto)}</strong> por <em>${titulo}</em>.</p>
+      <p style="color:#444;line-height:1.6">${cierre}</p>
+      ${boton(`${SITE}/mensajes/${d.conversationId}`, "Ver la conversación")}
     `),
   };
 }

@@ -2,20 +2,28 @@
 
 import { useRouter } from "next/navigation";
 import OfertaCard from "@/components/offers/OfertaCard";
-import type { Oferta } from "@/lib/offers";
+import type { NegociacionVigente } from "@/lib/offers";
 
-export interface OfertaRecibida extends Oferta {
-  titulo: string;
-  compradorNombre: string | null;
-}
+export type OfertaRecibida = NegociacionVigente;
 
-/** "Ofertas recibidas" en /mis-ventas: las que esperan respuesta y las aceptadas vigentes. */
-export default function OfertasRecibidas({ ofertas, currentUserId }: { ofertas: OfertaRecibida[]; currentUserId: string }) {
+/**
+ * Lista de negociaciones vigentes: "Ofertas recibidas" en /mis-ventas y
+ * "Mis ofertas" en /mis-pedidos. Solo la última oferta de cada cadena.
+ */
+export default function OfertasRecibidas({
+  ofertas,
+  currentUserId,
+  titulo = "Ofertas recibidas",
+}: {
+  ofertas: OfertaRecibida[];
+  currentUserId: string;
+  titulo?: string;
+}) {
   const router = useRouter();
   if (ofertas.length === 0) return null;
   return (
     <section className="mb-10">
-      <h2 className="font-display text-lg font-bold text-ink mb-4">Ofertas recibidas ({ofertas.length})</h2>
+      <h2 className="font-display text-lg font-bold text-ink mb-4">{titulo} ({ofertas.length})</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         {ofertas.map((o) => (
           <OfertaCard
@@ -23,7 +31,9 @@ export default function OfertasRecibidas({ ofertas, currentUserId }: { ofertas: 
             oferta={o}
             currentUserId={currentUserId}
             titulo={o.titulo}
-            compradorNombre={o.compradorNombre}
+            contraparte={o.contraparte}
+            montoMadre={o.montoMadre}
+            puedePagarEnSitio={o.puedePagarEnSitio ?? true}
             conversationId={o.conversation_id}
             onRespondida={() => router.refresh()}
           />

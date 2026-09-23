@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -13,6 +13,9 @@ interface Props {
   sellerName: string;
   bookTitle: string;
 }
+
+/** Lo dispara el enlace de la barra fija del celular para abrir el formulario. */
+export const EVENTO_ABRIR_OFERTA = "abrir-oferta";
 
 /**
  * "Hacer oferta" en la ficha (lib/offers.ts). Solo se monta si el vendedor
@@ -27,6 +30,19 @@ export default function HacerOfertaButton({ listingId, price, sellerName, bookTi
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previa, setPrevia] = useState<(Oferta & { conversation_id: string | null }) | null>(null);
+  const caja = useRef<HTMLDivElement>(null);
+
+  // El enlace "o haz una oferta" de la barra fija del celular (ListingDetail)
+  // abre el formulario y baja hasta acá. Un evento y no un prop: la barra y este
+  // botón viven en ramas distintas de la ficha.
+  useEffect(() => {
+    function abrir() {
+      setAbierto(true);
+      requestAnimationFrame(() => caja.current?.scrollIntoView({ behavior: "smooth", block: "center" }));
+    }
+    window.addEventListener(EVENTO_ABRIR_OFERTA, abrir);
+    return () => window.removeEventListener(EVENTO_ABRIR_OFERTA, abrir);
+  }, []);
 
   useEffect(() => {
     fetch(`/api/offers?listing_id=${listingId}`)
@@ -39,9 +55,19 @@ export default function HacerOfertaButton({ listingId, price, sellerName, bookTi
   const minimo = montoMinimo(price);
   const estadoPrevia = previa ? estadoVigente(previa) : null;
 
+  if (previa && estadoPrevia === "pending" && previa.made_by === "seller") {
+    return (
+      <div ref={caja} className="rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-ink animate-fade-up">
+        ↔️ {sellerName} te propone <strong>{clp(previa.amount)}</strong>.{" "}
+        {previa.conversation_id && (
+          <Link href={`/mensajes/${previa.conversation_id}`} className="font-semibold text-brand-700 underline">Responder</Link>
+        )}
+      </div>
+    );
+  }
   if (previa && estadoPrevia === "pending") {
     return (
-      <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 animate-fade-up">
+      <div ref={caja} className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 animate-fade-up">
         🤝 Le ofreciste <strong>{clp(previa.amount)}</strong> a {sellerName}. Te aviso por correo apenas responda.
         {previa.conversation_id && (
           <Link href={`/mensajes/${previa.conversation_id}`} className="ml-1 font-semibold underline">Ver conversación</Link>
@@ -51,7 +77,7 @@ export default function HacerOfertaButton({ listingId, price, sellerName, bookTi
   }
   if (previa && estadoPrevia === "accepted") {
     return (
-      <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900 animate-fade-up">
+      <div ref={caja} className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900 animate-fade-up">
         🎉 {sellerName} aceptó tu oferta: <strong>{clp(Math.min(previa.amount, price))}</strong>. Al comprar
         se te cobra ese precio, hasta el{" "}
         {new Date(previa.expires_at).toLocaleString("es-CL", { weekday: "long", hour: "2-digit", minute: "2-digit" })}
@@ -92,6 +118,7 @@ export default function HacerOfertaButton({ listingId, price, sellerName, bookTi
 
   if (!abierto) {
     return (
+      <div ref={caja}>
       <Button
         variant="outline"
         fullWidth
@@ -102,10 +129,12 @@ export default function HacerOfertaButton({ listingId, price, sellerName, bookTi
       >
         🤝 Hacer una oferta
       </Button>
+      </div>
     );
   }
 
   return (
+    <div ref={caja}>
     <form onSubmit={enviar} className="space-y-3 rounded-xl border border-brand-200 bg-brand-50/50 p-4 animate-fade-up">
       <div>
         <p className="font-display text-base font-bold text-ink">¿Cuánto ofreces?</p>
@@ -145,5 +174,6 @@ export default function HacerOfertaButton({ listingId, price, sellerName, bookTi
         </Button>
       </div>
     </form>
+    </div>
   );
 }
