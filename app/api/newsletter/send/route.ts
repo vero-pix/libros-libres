@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { sendEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
@@ -11,13 +12,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+  const { data: esAdmin } = await supabase.rpc("is_admin");
 
-  if (profile?.role !== "admin") {
+  if (esAdmin !== true) {
     return NextResponse.json({ error: "Solo admin puede enviar newsletters" }, { status: 403 });
   }
 
@@ -32,7 +29,8 @@ export async function POST(req: NextRequest) {
   // a quien está en ambas listas.
   const [{ data: subscribers }, { data: registered }] = await Promise.all([
     supabase.from("newsletter_subscribers").select("email"),
-    supabase.from("users").select("email"),
+    // `users.email` solo con service role (20260923e); ya se comprobó que es admin.
+    createServiceRoleClient().from("users").select("email"),
   ]);
 
   const recipients = new Map<string, string>(); // key normalizada → email original

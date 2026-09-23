@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { cobraPorTransferencia } from "@/lib/cobro-transferencia";
+import { telefonoDe } from "@/lib/telefonoVendedor";
 import { redirect, permanentRedirect } from "next/navigation";
 import ListingDetail from "@/components/listings/ListingDetail";
 import ListingCard from "@/components/listings/ListingCard";
@@ -14,15 +15,17 @@ interface Props {
 
 /** Adjunta la bandera de cobro por transferencia al vendedor de la ficha. */
 async function conTransferencia<T extends { seller_id: string; seller?: unknown }>(listing: T): Promise<T> {
-  const ok = await cobraPorTransferencia(listing.seller_id);
-  return { ...listing, seller: { ...(listing.seller as object), cobra_por_transferencia: ok } };
+  // El teléfono tampoco viaja en la consulta: `users.phone` no se concede a
+  // anon ni a authenticated desde 20260923e (lib/telefonoVendedor.ts).
+  const [ok, phone] = await Promise.all([cobraPorTransferencia(listing.seller_id), telefonoDe(listing.seller_id)]);
+  return { ...listing, seller: { ...(listing.seller as object), cobra_por_transferencia: ok, phone } };
 }
 
 async function getListing(id: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram, username, mercadopago_user_id, on_vacation, vacation_message, pickup_points)`)
+    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, public_email, instagram, username, mercadopago_user_id, on_vacation, vacation_message, pickup_points)`)
     .eq("id", id)
     .single();
   return data ? await conTransferencia(data) : data;

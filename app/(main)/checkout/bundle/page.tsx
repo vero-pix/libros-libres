@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { telefonoDe } from "@/lib/telefonoVendedor";
 import { avisarOrigenFaltante, estadoOrigenVendedor } from "@/lib/shipit-origen";
 import { obtenerTarifasCoordinado } from "@/lib/shipping/coordinado";
 import { preciosAcordados } from "@/lib/offers";
@@ -39,7 +40,7 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
   const { data: listings } = await supabase
     .from("listings")
     .select(
-      `*, book:books(*), seller:users(id, full_name, avatar_url, phone, mercadopago_user_id, acepta_transferencia)`
+      `*, book:books(*), seller:users(id, full_name, avatar_url, mercadopago_user_id, acepta_transferencia)`
     )
     .in("id", ids)
     .eq("status", "active");
@@ -60,6 +61,10 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
   }
 
   const typedListings = listings as unknown as ListingWithBook[];
+  // El teléfono del vendedor, para el WhatsApp del checkout (BundleCheckoutForm).
+  // `users.phone` no se concede a authenticated desde 20260923e.
+  const telBundle = typedListings[0] ? await telefonoDe(typedListings[0].seller_id) : null;
+  for (const l of typedListings) if (l.seller) (l.seller as any).phone = telBundle;
 
   // Ofertas aceptadas y vigentes: el resumen muestra el precio acordado, el
   // mismo que va a cobrar /api/orders (los dos leen preciosAcordados()).
@@ -83,7 +88,9 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
     avisarOrigenFaltante(admin, listings[0].seller_id, "recibió un intento de compra con courier").catch(() => {});
   }
 
-  const { data: buyerProfile } = await supabase
+  // Con service role y acotado a user.id: la dirección no se concede a
+  // authenticated (20260923e).
+  const { data: buyerProfile } = await createServiceRoleClient()
     .from("users")
     .select("full_name, default_address, phone")
     .eq("id", user.id)

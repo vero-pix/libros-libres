@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { telefonoDe } from "@/lib/telefonoVendedor";
 import { avisarOrigenFaltante, estadoOrigenVendedor } from "@/lib/shipit-origen";
 import { obtenerTarifasCoordinado } from "@/lib/shipping/coordinado";
 import { preciosAcordados } from "@/lib/offers";
@@ -23,7 +24,7 @@ export default async function CheckoutPage({ params }: Props) {
   const { data: listing } = await supabase
     .from("listings")
     .select(
-      `*, book:books(*), seller:users(id, full_name, avatar_url, phone, mercadopago_user_id, acepta_transferencia)`
+      `*, book:books(*), seller:users(id, full_name, avatar_url, mercadopago_user_id, acepta_transferencia)`
     )
     .eq("id", params.id)
     .eq("status", "active")
@@ -34,6 +35,9 @@ export default async function CheckoutPage({ params }: Props) {
   }
 
   const typedListing = listing as unknown as ListingWithBook;
+  // El teléfono del vendedor, para el WhatsApp del checkout (CheckoutForm).
+  // `users.phone` no se concede a authenticated desde 20260923e.
+  if (typedListing.seller) (typedListing.seller as any).phone = await telefonoDe(typedListing.seller_id);
 
   // Oferta aceptada y vigente: el checkout muestra el precio acordado, el
   // mismo que va a cobrar /api/orders (los dos leen preciosAcordados()).
@@ -50,9 +54,10 @@ export default async function CheckoutPage({ params }: Props) {
     redirect(`/listings/${params.id}`);
   }
 
-  // Get buyer profile for default address
+  // Get buyer profile for default address. Con service role y acotado a
+  // user.id: la dirección no se concede a authenticated (20260923e).
   const { data: buyerProfile } = user 
-    ? await supabase
+    ? await createServiceRoleClient()
         .from("users")
         .select("full_name, default_address, phone")
         .eq("id", user.id)

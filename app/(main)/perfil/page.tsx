@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { redirect } from "next/navigation";
 import ProfileForm from "@/components/ui/ProfileForm";
 import MercadoPagoConnect from "@/components/ui/MercadoPagoConnect";
@@ -19,7 +20,9 @@ export default async function PerfilPage() {
     redirect("/login?next=/perfil");
   }
 
-  const { data: profile } = await supabase
+  // El perfil propio se lee con service role y acotado a user.id: correo,
+  // dirección y coordenadas no se conceden a authenticated (20260923e).
+  const { data: profile } = await createServiceRoleClient()
     .from("users")
     .select("full_name, username, email, phone, bio, avatar_url, public_email, instagram, default_latitude, default_longitude, default_address, pickup_points, mercadopago_user_id, mercadopago_connected_at, shipit_dispatch_mode")
     .eq("id", user.id)

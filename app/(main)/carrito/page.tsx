@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import CartView from "./CartView";
 import { preciosAcordados } from "@/lib/offers";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { telefonosDe } from "@/lib/telefonoVendedor";
 import ListingCard from "@/components/listings/ListingCard";
 import { ButtonLink } from "@/components/ui/Button";
 import type { ListingWithBook } from "@/types";
@@ -66,13 +67,20 @@ export default async function CarritoPage() {
       id, listing_id, added_at,
       listing:listings(id, slug, price, status, cover_image_url,
         book:books(title, author, cover_url),
-        seller:users(id, full_name, username, mercadopago_user_id, phone)
+        seller:users(id, full_name, username, mercadopago_user_id)
       )
     `)
     .eq("user_id", user.id)
     .order("added_at", { ascending: false });
 
   const items = (data ?? []) as any[];
+
+  // El teléfono de los vendedores de este carrito, para el WhatsApp de
+  // coordinación (CartView). `users.phone` no se concede desde 20260923e.
+  const telefonos = await telefonosDe(items.map((i) => i.listing?.seller?.id).filter(Boolean));
+  for (const i of items) {
+    if (i.listing?.seller) i.listing.seller.phone = telefonos.get(i.listing.seller.id) ?? null;
+  }
 
   // Ofertas aceptadas y vigentes: el carrito muestra el precio acordado, el
   // mismo que va a cobrar /api/orders (lib/offers.ts).

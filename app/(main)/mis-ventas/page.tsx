@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import OfertasRecibidas from "@/components/offers/OfertasRecibidas";
 import { negociacionesVigentes } from "@/lib/offers";
 import { redirect } from "next/navigation";
@@ -41,8 +42,13 @@ export default async function MisVentasPage() {
 
   if (!user) redirect("/login?next=/mis-ventas");
 
+  // Correo, teléfono y dirección no se conceden a authenticated (20260923e):
+  // lo que los trae se lee con service role, siempre acotado a este vendedor
+  // (su perfil, sus pedidos, los carritos con sus libros).
+  const db = createServiceRoleClient();
+
   // Profile
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from("users")
     .select("full_name, mercadopago_user_id, default_address")
     .eq("id", user.id)
@@ -55,7 +61,7 @@ export default async function MisVentasPage() {
   const ofertasRecibidas = await negociacionesVigentes(supabase, user.id, "seller");
 
   // Orders where I'm the seller
-  const { data: rawOrders } = await supabase
+  const { data: rawOrders } = await db
     .from("orders")
     .select(`
       id, buyer_id, bundle_id, book_price, shipping_cost, service_fee, total, status, payment_method,
@@ -117,7 +123,7 @@ export default async function MisVentasPage() {
   }> = [];
 
   if (myListingIds.length > 0) {
-    const { data: cartRows } = await supabase
+    const { data: cartRows } = await db
       .from("cart_items")
       .select(
         `

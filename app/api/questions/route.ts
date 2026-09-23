@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { sendEmail } from "@/lib/email";
 
 /** GET /api/questions?listing_id=xxx */
@@ -42,8 +43,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "La pregunta es muy larga (máx 500 caracteres)" }, { status: 400 });
   }
 
-  // Get listing + seller info
-  const { data: listing } = await supabase
+  // Get listing + seller info. El correo del vendedor lo lee el servidor
+  // (20260923e: `users.email` no se concede a authenticated).
+  const { data: listing } = await createServiceRoleClient()
     .from("listings")
     .select("id, seller_id, book:books(title), seller:users!listings_seller_id_fkey(email, full_name)")
     .eq("id", listing_id)
@@ -119,8 +121,9 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Faltan datos" }, { status: 400 });
   }
 
-  // Verify user is the seller
-  const { data: q } = await supabase
+  // Verify user is the seller. Con service role por el correo de quien
+  // preguntó; la verificación de vendedor va justo abajo.
+  const { data: q } = await createServiceRoleClient()
     .from("questions")
     .select("id, listing_id, asker:users!questions_asker_id_fkey(email, full_name), listing:listings(seller_id, book:books(title))")
     .eq("id", question_id)

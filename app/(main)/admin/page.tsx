@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import AdminDashboard from "./AdminDashboard";
 
 export const metadata = { title: "Admin — tuslibros.cl" };
@@ -13,20 +14,21 @@ export default async function AdminPage() {
   if (!user) redirect("/login");
 
   // Verify admin role (middleware also checks, but double-check)
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+  const { data: esAdmin } = await supabase.rpc("is_admin");
 
-  if (profile?.role !== "admin") redirect("/");
+  if (esAdmin !== true) redirect("/");
 
   // Load all data for admin
   // Supabase corta en 1.000 filas: el panel contaba las publicaciones activas
   // sobre esa primera página y mostraba 906 cuando el catálogo tenía 2.115.
   // Un número inventado en el panel es peor que no tenerlo: se toman decisiones
   // con él. Ver [[reference_supabase_techo_1000_filas]]. (28-08-2026)
-  async function listingsTodos(db: typeof supabase) {
+  // Correos, teléfonos y direcciones de otros ya no se leen con la sesión
+  // (20260923e): lo que trae datos de `users` va con service role, después de
+  // comprobar arriba que quien entra es admin.
+  const db = createServiceRoleClient();
+
+  async function listingsTodos(db: ReturnType<typeof createServiceRoleClient>) {
     const filas: any[] = [];
     for (let desde = 0; ; desde += 1000) {
       const { data, error } = await db
@@ -42,7 +44,7 @@ export default async function AdminPage() {
   }
 
   const [ordersRes, listingsRes, usersRes, messagesRes, subscribersRes, categoriesRes, requestsRes] = await Promise.all([
-    supabase
+    db
       .from("orders")
       .select(`
         *,
@@ -50,8 +52,8 @@ export default async function AdminPage() {
         buyer:users!orders_buyer_id_fkey(id, full_name, email, phone)
       `)
       .order("created_at", { ascending: false }),
-    listingsTodos(supabase),
-    supabase
+    listingsTodos(db),
+    db
       // Columnas explícitas, NO select("*"): el permiso sobre users es por
       // columna desde 20260727_fix_revoke_tokens_mp.sql. Ver /vendedor/[id].
       .from("users")

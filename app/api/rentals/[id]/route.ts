@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { sendEmail } from "@/lib/email";
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
@@ -22,7 +23,9 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (!newStatus) return NextResponse.json({ error: "Falta status" }, { status: 400 });
 
   // Get rental with participants
-  const { data: rental } = await supabase
+  // Con service role porque trae los correos de ambos (no concedidos a
+  // authenticated). La verificación de participante va justo abajo.
+  const { data: rental } = await createServiceRoleClient()
     .from("rentals")
     .select("*, listing:listings(id, book:books(title)), renter:users!rentals_renter_id_fkey(id, full_name, email), owner:users!rentals_owner_id_fkey(id, full_name, email)")
     .eq("id", params.id)

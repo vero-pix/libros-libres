@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   }
 
   const userName = user
-    ? (await supabase.from("users").select("full_name, email").eq("id", user.id).single()).data?.full_name ?? "usuario logueado"
+    ? (await supabase.from("users").select("full_name").eq("id", user.id).single()).data?.full_name ?? "usuario logueado"
     : "anónimo";
 
   sendGong(

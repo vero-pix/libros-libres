@@ -135,8 +135,10 @@ export async function POST(req: NextRequest) {
   // Deduplicar
   const listingIds = Array.from(new Set(rawListingIds));
 
-  // Fetch todos los listings del bundle
-  const { data: listings, error: listingsError } = await supabase
+  // Fetch todos los listings del bundle. Con service role: trae correo,
+  // teléfono y dirección del vendedor, que no se conceden a authenticated
+  // (20260923e) y no salen de esta ruta.
+  const { data: listings, error: listingsError } = await createServiceRoleClient()
     .from("listings")
     .select(
       `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_user_id, on_vacation, acepta_transferencia, default_address, shipit_origin_commune)`

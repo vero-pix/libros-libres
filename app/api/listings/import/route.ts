@@ -3,6 +3,7 @@ import { detectarDelimitador, parseCsvLine, parseCsvLineTolerante, quitarBom } f
 import { normalizeGenre } from "@/lib/genreNormalizer";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { resolverCityId } from "@/lib/cities";
 import { slugListing, slugUnicoParaVendedor } from "@/lib/slugify";
 
@@ -44,7 +45,9 @@ export async function POST(req: NextRequest) {
   // TODO se publicaba con address "Chile", sin coordenadas y sin city_id. Es el
   // mismo bug que ya se arregló en los dos scripts de carga (ago-2026); el
   // importador web se quedó fuera de ese arreglo hasta el 22-09-2026.
-  const { data: profile, error: profileErr } = await supabase
+  // Con service role y acotado a user.id: la dirección y las coordenadas no
+  // se conceden a authenticated (20260923e).
+  const { data: profile, error: profileErr } = await createServiceRoleClient()
     .from("users")
     .select("full_name, city, default_latitude, default_longitude, default_address")
     .eq("id", user.id)

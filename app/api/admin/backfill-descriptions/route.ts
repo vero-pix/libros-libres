@@ -24,8 +24,8 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
-  if (profile?.role !== "admin") return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  const { data: esAdmin } = await supabase.rpc("is_admin");
+  if (esAdmin !== true) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
   const sellerId = req.nextUrl.searchParams.get("seller_id");
 

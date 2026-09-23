@@ -24,13 +24,9 @@ export async function PATCH(
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+  const { data: esAdmin } = await supabase.rpc("is_admin");
 
-  if (profile?.role !== "admin") {
+  if (esAdmin !== true) {
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   }
 

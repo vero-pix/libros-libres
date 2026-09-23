@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { paginar } from "@/lib/supabase/paginar";
 
 // Cache in-memory del resultado. El tab Negocio es admin, baja frecuencia,
@@ -12,8 +13,8 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
-  if (profile?.role !== "admin") return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  const { data: esAdmin } = await supabase.rpc("is_admin");
+  if (esAdmin !== true) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
   if (cachedResponse && cachedResponse.expiresAt > Date.now()) {
     return NextResponse.json(cachedResponse.payload);
@@ -35,8 +36,10 @@ export async function GET() {
       supabase.from("page_views").select("session_id").gte("created_at", since30).range(desde, hasta)
     ),
     supabase.from("users").select("id", { count: "exact", head: true }),
-    supabase.from("orders").select("id, status, total, buyer_id, created_at, buyer:users!buyer_id(full_name, email)").order("created_at", { ascending: false }),
-    supabase.from("cart_items").select("id, added_at, listing:listings(price, book:books(title)), user:users(full_name, email)").order("added_at", { ascending: false }),
+    // Los correos de compradores van con service role (20260923e); ya se
+    // comprobó arriba que quien pide es admin.
+    createServiceRoleClient().from("orders").select("id, status, total, buyer_id, created_at, buyer:users!buyer_id(full_name, email)").order("created_at", { ascending: false }),
+    createServiceRoleClient().from("cart_items").select("id, added_at, listing:listings(price, book:books(title)), user:users(full_name, email)").order("added_at", { ascending: false }),
     supabase.from("listings").select("seller_id, status, seller:users(full_name, username)"),
   ]);
 

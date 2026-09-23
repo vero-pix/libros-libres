@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import {
   DROPOFF_COURIERS,
   estimateBookPackageSize,
@@ -70,9 +71,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Origen: listing + vendedor. `users.default_address` es legible por
-  // `authenticated` (no por anon), y esta ruta exige sesión.
-  const { data: listing } = await supabase
+  // Origen: listing + vendedor. La dirección del vendedor no se lee con la
+  // sesión del comprador (20260923e): la lee el servidor y no sale de acá.
+  const { data: listing } = await createServiceRoleClient()
     .from("listings")
     .select("address, seller_id, seller:users(default_address, shipit_origin_commune, mercadopago_user_id)")
     .eq("id", listing_id)

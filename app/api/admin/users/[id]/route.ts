@@ -23,8 +23,8 @@ export async function DELETE(
   const ssr = await createClient();
   const { data: { user } } = await ssr.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  const { data: profile } = await ssr.from("users").select("role").eq("id", user.id).single();
-  if (profile?.role !== "admin") {
+  const { data: esAdmin } = await ssr.rpc("is_admin");
+  if (esAdmin !== true) {
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   }
 

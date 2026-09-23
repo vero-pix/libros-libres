@@ -9,6 +9,7 @@ import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { telefonoDe } from "@/lib/telefonoVendedor";
 import { ButtonLink } from "@/components/ui/Button";
 
 interface Props {
@@ -23,10 +24,11 @@ async function resolveSeller(supabase: Awaited<ReturnType<typeof createClient>>,
   // Columnas explícitas, NO select("*"): desde 20260727_fix_revoke_tokens_mp.sql
   // el permiso sobre users es por columna, y "*" pide la tabla entera —incluidas
   // las credenciales de MercadoPago— así que falla con "permission denied".
+  // El teléfono tampoco va acá: desde 20260923e se pide aparte (telefonoDe).
   return supabase
     .from("users")
     .select(
-      "id, username, full_name, avatar_url, bio, city, phone, public_email, instagram, featured, plan, created_at, on_vacation, vacation_message, pickup_points, mercadopago_user_id",
+      "id, username, full_name, avatar_url, bio, city, public_email, instagram, featured, plan, created_at, on_vacation, vacation_message, pickup_points, mercadopago_user_id",
     )
     .eq(col, idOrUsername)
     .single();
@@ -95,6 +97,9 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
 
   if (!seller) notFound();
 
+  // Solo el teléfono de este vendedor, para su botón de WhatsApp.
+  const phone = await telefonoDe(seller.id);
+
   if (await estaSuspendida(seller.id)) {
     return (
       <div className="min-h-screen bg-white">
@@ -121,7 +126,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
   for (let desde = 0; ; desde += 1000) {
     const { data: pagina } = await supabase
       .from("listings")
-      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, public_email, instagram, username, mercadopago_user_id)`)
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, public_email, instagram, username, mercadopago_user_id)`)
       .eq("seller_id", seller.id)
       .eq("status", "active")
       // Por defecto: más vistos primero (trending_score = proxy de visitas),
@@ -370,8 +375,8 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
         <div className="mb-8 flex flex-wrap gap-3">
             {/* El WhatsApp de la tienda solo aparece si el vendedor NO puede
                 cobrar por la plataforma. Ver lib/whatsapp-policy.ts (25 ago 2026) */}
-            {seller.phone && mostrarWhatsAppVendedor(!!seller.mercadopago_user_id) && (() => {
-              const cleanPhone = seller.phone.replace(/\D/g, "");
+            {phone && mostrarWhatsAppVendedor(!!seller.mercadopago_user_id) && (() => {
+              const cleanPhone = phone.replace(/\D/g, "");
               return (
                 <a
                   href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hola, vi tu tienda en tuslibros.cl y me interesa contactarte.`)}`}

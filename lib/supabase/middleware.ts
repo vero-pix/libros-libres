@@ -71,13 +71,11 @@ export async function updateSession(request: NextRequest) {
   // Protect admin routes — check role in users table
   if (user && request.nextUrl.pathname.startsWith("/admin")) {
     try {
-      const { data: profile } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", user.id)
-        .single();
+      // is_admin() es SECURITY DEFINER: `users.role` ya no se concede a
+      // authenticated (20260923e).
+      const { data: esAdmin } = await supabase.rpc("is_admin");
 
-      if (profile?.role !== "admin") {
+      if (esAdmin !== true) {
         const url = request.nextUrl.clone();
         url.pathname = "/";
         return NextResponse.redirect(url);

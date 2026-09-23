@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import Link from "next/link";
 import PublishForm from "@/components/listings/PublishForm";
 import { cobraDentroDelSitio } from "@/lib/cobro-transferencia";
@@ -124,7 +125,9 @@ export default async function PublishPage({ searchParams }: Props) {
     );
   }
 
-  const { data: profile } = await supabase
+  // El perfil propio se lee con service role y acotado a user.id: correo,
+  // dirección y coordenadas no se conceden a authenticated (20260923e).
+  const { data: profile } = await createServiceRoleClient()
     .from("users")
     .select("phone, username, default_latitude, default_longitude, default_address, mercadopago_user_id")
     .eq("id", user.id)

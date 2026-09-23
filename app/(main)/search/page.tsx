@@ -204,7 +204,7 @@ export default async function SearchPage({ searchParams }: Props) {
         `
         *,
         book:books!inner(*),
-        seller:users(id, full_name, avatar_url, phone, username, mercadopago_user_id)
+        seller:users(id, full_name, avatar_url, username, mercadopago_user_id)
       `,
         { count: "exact", head: opts?.head ?? false }
       )

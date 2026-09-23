@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 function generateCode(name: string): string {
   const base = name
@@ -17,9 +18,12 @@ export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  // `users` se lee con service role: referral_code y referred_by no están
+  // concedidas a authenticated (20260923e). Todo va acotado a user.id o a un código.
+  const db = createServiceRoleClient();
 
   // Get or create referral code
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from("users")
     .select("full_name, referral_code")
     .eq("id", user.id)
@@ -31,7 +35,7 @@ export async function GET() {
     code = generateCode(profile?.full_name ?? "");
     // Try to set it, regenerate if collision
     for (let i = 0; i < 3; i++) {
-      const { error } = await supabase
+      const { error } = await db
         .from("users")
         .update({ referral_code: code })
         .eq("id", user.id);
@@ -62,12 +66,15 @@ export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  // `users` se lee con service role: referral_code y referred_by no están
+  // concedidas a authenticated (20260923e). Todo va acotado a user.id o a un código.
+  const db = createServiceRoleClient();
 
   const { referral_code } = await req.json();
   if (!referral_code) return NextResponse.json({ error: "Código requerido" }, { status: 400 });
 
   // Find referrer by code
-  const { data: referrer } = await supabase
+  const { data: referrer } = await db
     .from("users")
     .select("id")
     .eq("referral_code", referral_code)
@@ -77,7 +84,7 @@ export async function POST(req: NextRequest) {
   if (referrer.id === user.id) return NextResponse.json({ error: "No puedes usar tu propio código" }, { status: 400 });
 
   // Check if already referred
-  const { data: existingRef } = await supabase
+  const { data: existingRef } = await db
     .from("users")
     .select("referred_by")
     .eq("id", user.id)
@@ -88,7 +95,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Mark user as referred
-  await supabase
+  await db
     .from("users")
     .update({ referred_by: referrer.id })
     .eq("id", user.id);

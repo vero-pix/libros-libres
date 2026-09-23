@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { notifySeller } from "@/lib/notifications";
 
 /**
@@ -43,7 +44,9 @@ export async function POST(
     );
   }
 
-  const notification = await notifySeller(orderId, supabase);
+  // notifySeller lee los correos de ambas partes, que no se conceden a
+  // authenticated (20260923e). Ya se verificó arriba que es parte del pedido.
+  const notification = await notifySeller(orderId, createServiceRoleClient());
 
   if (!notification) {
     return NextResponse.json(

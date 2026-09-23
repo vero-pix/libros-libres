@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { redirect } from "next/navigation";
 import RentalsList from "./RentalsList";
 
@@ -14,8 +15,12 @@ export default async function MisArriendosPage() {
     redirect("/login?next=/mis-arriendos");
   }
 
+  // Los teléfonos de la contraparte no se conceden a authenticated
+  // (20260923e): se leen con service role, siempre filtrando por mí.
+  const db = createServiceRoleClient();
+
   // Arriendos donde soy arrendatario
-  const { data: asRenter } = await supabase
+  const { data: asRenter } = await db
     .from("rentals")
     .select(`
       *,
@@ -26,7 +31,7 @@ export default async function MisArriendosPage() {
     .order("created_at", { ascending: false });
 
   // Arriendos donde soy dueño
-  const { data: asOwner } = await supabase
+  const { data: asOwner } = await db
     .from("rentals")
     .select(`
       *,

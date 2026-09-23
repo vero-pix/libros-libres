@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { paginar } from "@/lib/supabase/paginar";
 import MyListings from "./MyListings";
 import { cobraDentroDelSitio } from "@/lib/cobro-transferencia";
@@ -22,7 +23,9 @@ export default async function MisLibrosPage() {
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
+  // Service role y acotado a user.id: `users.phone` no se concede a
+  // authenticated desde 20260923e.
+  const { data: profile } = await createServiceRoleClient()
     .from("users")
     // mercadopago_user_id y NO el access_token: el token es una credencial y su
     // lectura quedó revocada para anon/authenticated. user_id es además el campo
@@ -37,7 +40,7 @@ export default async function MisLibrosPage() {
   const data = await paginar<ListingWithBook>((desde, hasta) =>
     supabase
       .from("listings")
-      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, phone, username)`)
+      .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username)`)
       .eq("seller_id", user.id)
       .order("created_at", { ascending: false })
       .range(desde, hasta) as any

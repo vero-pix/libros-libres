@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { sendEmail } from "@/lib/email";
 import { detectarPagoFuera } from "@/lib/pagoFueraDetector";
 import { buscarOCrearConversacion } from "@/lib/conversations";
@@ -124,7 +125,9 @@ export async function POST(req: NextRequest) {
   try {
     const actualRecipientId = recipient_id || await getOtherParticipant(supabase, convId, user.id);
     if (actualRecipientId) {
-      const { data: recipient } = await supabase
+      // El correo del otro no se lee con la sesión: `users.email` no está
+      // concedido a authenticated (20260923e). Lo lee el servidor.
+      const { data: recipient } = await createServiceRoleClient()
         .from("users")
         .select("email, full_name")
         .eq("id", actualRecipientId)
