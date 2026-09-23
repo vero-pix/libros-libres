@@ -114,6 +114,11 @@ const config: Config = {
           "0%": { opacity: "1" },
           "100%": { opacity: "0" },
         },
+        // Los halos de color del hero: se mueven lento, casi no se nota que se mueven.
+        drift: {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "50%": { transform: "translate(18px, -14px) scale(1.06)" },
+        },
         shake: {
           "0%, 100%": { transform: "translateX(0)" },
           "20%, 60%": { transform: "translateX(-4px)" },
@@ -131,6 +136,8 @@ const config: Config = {
         // el destello del escaner: se apaga solo, no se queda blanco
         "fade-out": "fade-out 0.3s ease-out forwards",
         shake: "shake 0.4s ease-in-out",
+        drift: "drift 14s ease-in-out infinite",
+        "drift-slow": "drift 19s ease-in-out infinite reverse",
       },
     },
   },

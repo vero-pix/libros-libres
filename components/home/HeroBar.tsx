@@ -14,14 +14,17 @@ interface Props {
   primavera?: boolean;
 }
 
+/* Cada chip lleva su punto de color (23-09): la fila era siete pastillas
+   iguales en gris sobre beige. Las clases van escritas enteras para que
+   Tailwind las encuentre. */
 const CATEGORY_CHIPS = [
-  { label: "Novela", href: "/?subcategory=ficcion-novela" },
-  { label: "Poesía", href: "/?subcategory=ficcion-poesia" },
-  { label: "Historia", href: "/?subcategory=no-ficcion-historia" },
-  { label: "Policial", href: "/?subcategory=ficcion-policial" },
-  { label: "Ensayo", href: "/?subcategory=no-ficcion-ensayo" },
-  { label: "Colección", href: "/?collectible=1" },
-  { label: "Ofertas", href: "/?sort=price_asc" },
+  { label: "Novela", href: "/?subcategory=ficcion-novela", dot: "bg-ink", hover: "hover:border-ink/50 hover:bg-ink/[0.06]" },
+  { label: "Poesía", href: "/?subcategory=ficcion-poesia", dot: "bg-coral", hover: "hover:border-coral/50 hover:bg-coral/[0.07]" },
+  { label: "Historia", href: "/?subcategory=no-ficcion-historia", dot: "bg-gold-deep", hover: "hover:border-gold-deep/50 hover:bg-gold/[0.08]" },
+  { label: "Policial", href: "/?subcategory=ficcion-policial", dot: "bg-ink-night", hover: "hover:border-ink-night/50 hover:bg-ink-night/[0.06]" },
+  { label: "Ensayo", href: "/?subcategory=no-ficcion-ensayo", dot: "bg-green", hover: "hover:border-green/50 hover:bg-green/[0.07]" },
+  { label: "Colección", href: "/?collectible=1", dot: "bg-coral-deep", hover: "hover:border-coral-deep/50 hover:bg-coral-deep/[0.07]" },
+  { label: "Ofertas", href: "/?sort=price_asc", dot: "bg-gold", hover: "hover:border-gold/60 hover:bg-gold/[0.08]" },
 ];
 
 /* Abanico decorativo (puro CSS). Los colores son los mismos de las cubiertas
@@ -138,8 +141,13 @@ export default function HeroBar({ heroBooks, primavera = false }: Props) {
   // para que la primera pantalla tenga jerarquía. En primavera ese token se
   // corre al verde igual que los demás (ver `html.primavera` en globals.css).
   return (
-    <section className="bg-hero border-b border-hero-line overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 pt-12 pb-10 sm:pt-16 sm:pb-12">
+    <section className="relative bg-hero border-b border-hero-line overflow-hidden">
+      {/* El color de la primera pantalla (23-09): tres halos detrás del abanico
+          y del titular. Ver .hero-glow en globals.css. */}
+      <div aria-hidden className="hero-glow hero-glow-coral right-[4%] top-[6%] w-[460px] h-[460px]" />
+      <div aria-hidden className="hero-glow hero-glow-gold right-[28%] bottom-[-18%] w-[380px] h-[380px]" />
+      <div aria-hidden className="hero-glow hero-glow-ink left-[-8%] top-[-20%] w-[420px] h-[420px]" />
+      <div className="relative max-w-7xl mx-auto px-6 pt-12 pb-10 sm:pt-16 sm:pb-12">
         <div className="grid lg:grid-cols-[1.02fr_0.98fr] gap-10 items-center">
           {/* Texto */}
           <div className="max-w-2xl">
@@ -226,12 +234,21 @@ export default function HeroBar({ heroBooks, primavera = false }: Props) {
           <span className="flex-shrink-0 text-[11px] font-mono uppercase tracking-wider text-ink-muted self-center mr-1">
             Explorar:
           </span>
+          {/* Los destacados no tenían dónde verse desde el 17-09: primer chip,
+              el único relleno, para que se lea como la puerta y no como un tema. */}
+          <Link
+            href="/destacados"
+            className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-ink-night border border-gold rounded-full text-[13px] font-semibold shadow-[0_6px_16px_-8px_rgb(var(--gold-deep-rgb)/0.8)] hover:bg-gold-deep hover:border-gold-deep hover:text-white hover:-translate-y-0.5 transition-all whitespace-nowrap"
+          >
+            <span aria-hidden>★</span> Destacados
+          </Link>
           {CATEGORY_CHIPS.map((chip) => (
             <Link
               key={chip.label}
               href={chip.href}
-              className="flex-shrink-0 px-4 py-2 bg-paper-card border border-line-strong rounded-full text-[13px] font-medium text-ink-muted hover:bg-ink hover:border-ink hover:text-white transition-all whitespace-nowrap"
+              className={`flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-paper-card/80 border border-line-strong rounded-full text-[13px] font-medium text-ink hover:-translate-y-0.5 transition-all whitespace-nowrap ${chip.hover}`}
             >
+              <span aria-hidden className={`w-1.5 h-1.5 rounded-full ${chip.dot}`} />
               {chip.label}
             </Link>
           ))}

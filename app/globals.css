@@ -42,8 +42,10 @@
     /* El hero de la portada lleva su propio crema, un punto más marcado que el
        fondo general. Es un token aparte —y no `cream-warm` a secas— porque la
        estación lo mueve con más amplitud que al resto (ver `html.primavera`). */
-    --hero: #e4ddd1;
-    --hero-line: #e0d6c2;
+    /* 23-09: de #e4ddd1 (un gris beige que Vero veía "opaco") a un crema con
+       luz. El color no va en el fondo sino en los halos (.hero-glow). */
+    --hero: #f3ebdc;
+    --hero-line: #e6dac3;
 
 
     /* Los mismos colores en canales RGB. Existen porque Tailwind no puede
@@ -74,8 +76,8 @@
     --cream-dark-rgb: 208 201 188;
     --line-rgb: 224 214 194;
     --line-strong-rgb: 203 189 159;
-    --hero-rgb: 228 221 209;
-    --hero-line-rgb: 224 214 194;
+    --hero-rgb: 243 235 220;
+    --hero-line-rgb: 230 218 195;
 
     --background: 40 33% 97%;
     --foreground: 222 47% 11%;
@@ -97,6 +99,28 @@
   ::selection {
     background-color: #d4a017;
     color: white;
+  }
+}
+
+/* Halos de color detrás del hero (23-09-2026). Es el color que la home no
+   tenía: coral, oro y tinta difuminados, sin teñir el fondo del sitio —el verde
+   sobre los neutros se probó el 21-09 y se revirtió—. Van con `aria-hidden` y
+   se quedan quietos si el sistema pide menos movimiento. */
+@layer components {
+  .hero-glow {
+    @apply absolute rounded-full pointer-events-none animate-drift;
+    filter: blur(60px);
+  }
+  .hero-glow-coral { background: rgb(var(--coral-rgb) / 0.30); }
+  .hero-glow-gold { background: rgb(var(--gold-rgb) / 0.30); animation-name: drift; animation-duration: 19s; animation-direction: reverse; }
+  .hero-glow-ink { background: rgb(var(--ink-rgb) / 0.14); }
+  /* En el celular el texto ocupa todo el ancho y los halos le quedan encima:
+     la mitad de intensidad y más chicos. */
+  @media (max-width: 1023px) {
+    .hero-glow { opacity: 0.5; transform: scale(0.7); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-glow { animation: none; }
   }
 }
 

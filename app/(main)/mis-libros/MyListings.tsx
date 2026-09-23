@@ -132,11 +132,8 @@ export default function MyListings({ listings: initial, puedeDestacar = false, c
         setListings((prev) =>
           prev.map((l) => (l.id === id ? ({ ...l, featured: data.featured, featured_rank: data.rank } as any) : l))
         );
-        // La portada muestra 12: si están tomados, el libro queda destacado pero
-        // no visible. Se dice, en vez de dejar creer que salió en la portada.
-        if (data.featured && !data.visible) {
-          alert("Quedó destacado, pero la portada ya tiene sus 12 lugares ocupados. Va a entrar cuando saques otro.");
-        }
+        // Desde el 23-09 todos los destacados salen en /destacados (hasta 60),
+        // así que ya no hay "destacado pero invisible" que avisar.
       }
     } catch {
       alert("Error de conexión.");
@@ -425,7 +422,7 @@ function ListingRow({
                   onClick={() => onToggleDestacado(listing.id, false)}
                   disabled={isLoading}
                   className="text-xs font-semibold text-coral bg-coral/10 hover:bg-coral/20 px-2.5 py-1 rounded-lg border border-coral/30 transition-colors"
-                  title="Sacarlo de la portada"
+                  title="Sacarlo de /destacados"
                 >
                   ★ Destacado
                 </button>
@@ -434,7 +431,7 @@ function ListingRow({
                   onClick={() => onToggleDestacado(listing.id, true)}
                   disabled={isLoading}
                   className="text-xs text-gray-600 hover:bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-200 transition-colors"
-                  title="Mostrarlo en la portada"
+                  title="Mostrarlo en /destacados"
                 >
                   ☆ Destacar
                 </button>

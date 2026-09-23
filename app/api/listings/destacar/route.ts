@@ -10,9 +10,8 @@ import { createServiceRoleClient } from "@/lib/supabase/service-role";
  * vitrina sirve — al 16-09-2026, de 46 ventas en 90 días ninguna fue de un
  * libro destacado. Para habilitar a alguien más, basta agregar su username.
  *
- * La portada muestra los 12 primeros `featured_rank`. Si están ocupados, el
- * libro queda destacado igual pero fuera de la vitrina, y la respuesta lo dice
- * para poder avisarlo en pantalla en vez de mentir con un "listo".
+ * Se ven todos en /destacados (hasta 60), ordenados por `featured_rank`: el
+ * primer cupo libre entre 1 y 12 lo deja arriba; si no hay, va detrás.
  */
 const VENDEDORES_HABILITADOS = ["vero"];
 const CUPOS_VISIBLES = 12;
