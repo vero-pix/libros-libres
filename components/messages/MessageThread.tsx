@@ -32,6 +32,7 @@ export default function MessageThread({ conversationId, currentUserId }: Props) 
   const [conv, setConv] = useState<ConversationInfo | null>(null);
   const [ofertas, setOfertas] = useState<Record<string, Oferta>>({});
   const [puedePagarEnSitio, setPuedePagarEnSitio] = useState(true);
+  const [pagoPorTransferencia, setPagoPorTransferencia] = useState(false);
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -39,7 +40,9 @@ export default function MessageThread({ conversationId, currentUserId }: Props) 
 
   // Aviso, no bloqueo: si el texto trae un teléfono, "transferencia" o
   // "efectivo", recordamos que el pago va por la plataforma. Se envía igual.
-  const avisoPagoFuera = detectarPagoFuera(body) !== null;
+  // En la conversación de un pedido por transferencia no aplica: ahí el
+  // vendedor tiene que mandar sus datos por mensaje.
+  const avisoPagoFuera = !pagoPorTransferencia && detectarPagoFuera(body) !== null;
 
   async function fetchMessages() {
     try {
@@ -50,6 +53,7 @@ export default function MessageThread({ conversationId, currentUserId }: Props) 
         setConv(data.conversation);
         setOfertas(Object.fromEntries(((data.offers ?? []) as Oferta[]).map((o) => [o.id, o])));
         setPuedePagarEnSitio(data.puede_pagar_en_sitio !== false);
+        setPagoPorTransferencia(data.pago_por_transferencia === true);
       }
     } catch {
       // silently fail

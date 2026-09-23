@@ -23,7 +23,7 @@ export default async function CheckoutPage({ params }: Props) {
   const { data: listing } = await supabase
     .from("listings")
     .select(
-      `*, book:books(*), seller:users(id, full_name, avatar_url, phone, mercadopago_user_id, acepta_transferencia, datos_transferencia)`
+      `*, book:books(*), seller:users(id, full_name, avatar_url, phone, mercadopago_user_id, acepta_transferencia)`
     )
     .eq("id", params.id)
     .eq("status", "active")
@@ -95,8 +95,7 @@ export default async function CheckoutPage({ params }: Props) {
           // La opción aparece solo si además cargó los datos: ofrecer
           // transferir y después no tener a qué cuenta es peor que no ofrecerla.
           aceptaTransferencia={
-            !!(typedListing.seller as any)?.acepta_transferencia &&
-            !!String((typedListing.seller as any)?.datos_transferencia ?? "").trim()
+            !!(typedListing.seller as any)?.acepta_transferencia
           }
         />
       </main>

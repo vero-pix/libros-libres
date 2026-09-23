@@ -320,7 +320,7 @@ export default function BundleCheckoutForm({
         return;
       }
 
-      // Por transferencia no hay pasarela: la página del pedido muestra los datos.
+      // Por transferencia no hay pasarela: el vendedor manda sus datos por mensaje.
       if (data.redirect_to) {
         window.location.href = data.redirect_to;
         return;
@@ -662,7 +662,7 @@ export default function BundleCheckoutForm({
           <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted">Cómo pagas</p>
           {[
             { v: "mercadopago" as const, t: "MercadoPago", d: "Tarjeta, débito o cuotas. Te llega el seguimiento por correo." },
-            { v: "transfer" as const, t: "Transferencia", d: "Le transfieres directo al vendedor. Te mostramos los datos al confirmar el pedido." },
+            { v: "transfer" as const, t: "Transferencia", d: "Le transfieres directo al vendedor. Apenas confirmes, te manda sus datos por mensaje." },
           ].map((o) => (
             <label
               key={o.v}
@@ -712,7 +712,7 @@ export default function BundleCheckoutForm({
           </button>
           <p className="text-xs text-gray-400 text-center">
             {aceptaTransferencia && formaPago === "transfer"
-              ? `Al confirmar te mostramos los datos para transferir. Los ${listings.length} libros quedan reservados a tu nombre.`
+              ? `Al confirmar, el vendedor te manda sus datos por mensaje. Los ${listings.length} libros quedan reservados a tu nombre.`
               : `Serás redirigido a MercadoPago para completar el pago de forma segura, en una sola transacción por los ${listings.length} libros.`}
           </p>
         </>

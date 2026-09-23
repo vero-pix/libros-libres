@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import PurchaseTracker from "@/components/analytics/PurchaseTracker";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { waSoporte } from "@/lib/soporte";
+import { orderParticipants } from "@/lib/conversations";
 
 interface Props {
   params: { id: string };
@@ -33,7 +34,7 @@ const STATUS_CONFIG: Record<
   transferencia: {
     title: "Pedido confirmado",
     description:
-      "El libro queda reservado a tu nombre. Transfiere con los datos de abajo y el vendedor confirma cuando le llegue.",
+      "El libro queda reservado a tu nombre. El vendedor te manda sus datos por mensaje y confirma cuando le llegue la transferencia.",
     color: "text-ink",
   },
 };
@@ -64,7 +65,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
   const { data: order } = await supabase
     .from("orders")
     .select(
-      `*, listing:listings(*, book:books(title, author, cover_url)), seller:users!orders_seller_id_fkey(id, username, full_name, datos_transferencia)`
+      `*, listing:listings(*, book:books(title, author, cover_url)), seller:users!orders_seller_id_fkey(id, username, full_name)`
     )
     .eq("id", params.id)
     .single();
@@ -91,10 +92,25 @@ export default async function OrderPage({ params, searchParams }: Props) {
   }
 
   // Pedido por transferencia: no hay pasarela que haya devuelto un estado, así
-  // que esta pantalla ES el comprobante. Muestra los datos para transferir
-  // mientras el vendedor no confirme que la plata llegó.
+  // que esta pantalla ES el comprobante. El sitio no guarda datos bancarios
+  // (23-09-2026): el vendedor se los manda al comprador por mensaje, y acá va
+  // el enlace a esa conversación (la abre /api/orders al crear el pedido).
   const esTransferencia = order.payment_method === "transfer";
   const transferenciaPendiente = esTransferencia && order.status === "pending";
+  let conversacionTransferencia: string | null = null;
+  if (transferenciaPendiente) {
+    const [p1, p2] = orderParticipants(order.buyer_id, order.seller_id);
+    const { data: conv } = await supabase
+      .from("conversations")
+      .select("id")
+      .eq("participant_1", p1)
+      .eq("participant_2", p2)
+      .in("listing_id", bundleOrders.map((o: any) => o.listing_id))
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    conversacionTransferencia = conv?.id ?? null;
+  }
 
   const rawStatus = esTransferencia
     ? (order.status === "pending" ? "transferencia" : order.status)
@@ -162,32 +178,33 @@ export default async function OrderPage({ params, searchParams }: Props) {
               : config.description}
           </p>
 
-          {/* Datos para transferir. Se muestran acá y en el correo, nunca antes
-              de confirmar el pedido, y solo a quien compró. */}
+          {/* Pago por transferencia: el sitio no guarda ni muestra datos
+              bancarios. El vendedor se los manda al comprador por mensaje. */}
           {transferenciaPendiente && isBuyer && (
             <div className="mb-6 rounded-xl border-2 border-ink/15 bg-cream/60 p-5">
               <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-1">
-                Transfiere a
+                Pago por transferencia
               </p>
               <p className="text-2xl font-bold text-ink tabular-nums mb-3">
                 ${bundleTotal.toLocaleString("es-CL")}
               </p>
-              {(seller as any)?.datos_transferencia ? (
-                <pre className="whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-ink bg-white border border-gray-200 rounded-lg p-3.5 overflow-x-auto">
-{(seller as any).datos_transferencia}
-                </pre>
-              ) : (
-                <p className="text-sm text-amber-800">
-                  {quienVende} todavía no cargó sus datos de transferencia. Escríbenos por{" "}
-                  <a href={waSoporte("Compré por transferencia y no veo los datos")} className="font-semibold underline" target="_blank" rel="noopener noreferrer">
-                    WhatsApp
-                  </a>{" "}
-                  y te los damos al tiro.
-                </p>
-              )}
-              <p className="mt-3 text-xs text-gray-600 leading-relaxed">
+              <p className="text-sm text-ink leading-relaxed">
+                {quienVende} te manda sus datos por mensaje. Ya le escribí de tu parte y le avisé por correo.
+              </p>
+              <a
+                href={conversacionTransferencia ? `/mensajes/${conversacionTransferencia}` : "/mensajes"}
+                className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-ink text-white rounded-full font-semibold text-sm hover:bg-ink-deep transition-colors"
+              >
+                Ver la conversación con {quienVende}
+              </a>
+              <p className="mt-4 text-xs text-gray-600 leading-relaxed">
                 Pon el número de pedido <strong className="font-mono">{order.id.slice(0, 8)}</strong> en el mensaje
                 de la transferencia. Cuando {quienVende} confirme que llegó, te avisamos por correo y empieza el despacho.
+                Si en un día no te responde, escríbeme por{" "}
+                <a href={waSoporte("Compré por transferencia y el vendedor no me manda los datos")} className="font-semibold underline" target="_blank" rel="noopener noreferrer">
+                  WhatsApp
+                </a>
+                .
               </p>
             </div>
           )}

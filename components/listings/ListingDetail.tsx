@@ -210,14 +210,14 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
     !MP_NOT_RECEIVING.has((listing.seller as any)?.username) &&
     !!(listing.seller as any)?.mercadopago_user_id;
 
-  // Cobrar por transferencia, sin MercadoPago: el vendedor la tiene encendida y
-  // dejó los datos. El checkout crea la orden igual y le muestra al comprador a
-  // qué cuenta transferir. Sin esto, desconectar MercadoPago dejaba la ficha sin
+  // Cobrar por transferencia, sin MercadoPago: el vendedor la tiene encendida.
+  // El checkout crea la orden igual y el vendedor le manda sus datos al
+  // comprador por mensaje (el sitio no guarda datos bancarios, 23-09-2026). Sin esto, desconectar MercadoPago dejaba la ficha sin
   // botón de comprar aunque el cobro sí funcionara. (16-09-2026)
   const transferenciaDisponible =
     !(listing.seller as any)?.mercadopago_user_id &&
     // Bandera resuelta en el servidor (lib/cobro-transferencia.ts): las columnas
-    // acepta_transferencia / datos_transferencia no las puede leer el rol anon.
+    // acepta_transferencia no la puede leer el rol anon.
     !!(listing.seller as any)?.cobra_por_transferencia &&
     listing.price != null &&
     listing.modality !== "loan" &&
@@ -779,7 +779,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
                 <span className="text-base leading-none mt-0.5" aria-hidden>🏦</span>
                 <p className="text-xs text-ink leading-snug">
                   <span className="font-semibold">Se paga por transferencia.</span> Confirmas el
-                  pedido, te muestro los datos de la cuenta y el libro queda reservado a tu nombre.
+                  pedido, el libro queda reservado a tu nombre y te mando los datos por mensaje.
                   {comunaDesdeAddress(listing.address) ? ` También puedes pagar en efectivo al retirar en ${comunaDesdeAddress(listing.address)}.` : " También puedes pagar en efectivo al retirar."}
                   {" "}¿Prefieres MercadoPago? Escríbeme por WhatsApp y lo coordinamos.
                 </p>

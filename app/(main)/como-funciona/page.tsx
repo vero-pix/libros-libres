@@ -80,7 +80,7 @@ export default function ComoFuncionaPage() {
             Compra con pago seguro
           </h2>
           <p className="text-ink-muted mb-6"><strong>Es la forma normal de comprar acá.</strong> Pagas con <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a> desde la publicación y el libro te llega por courier — así puedes comprarle a alguien de otra región o de una comuna lejana, sin tener que ir a buscarlo. Pagas con tu tarjeta a través de MercadoPago —no en efectivo a un desconocido— y queda registro de la compra para los dos. Si algo sale mal tienes <Link href="/devoluciones" className="text-brand-600 font-semibold hover:underline">7 días para devolverlo</Link>: si llega dañado, si es un libro distinto al publicado, o si viene en peor estado del que decía la ficha. Por esta vía cobro un 8% del precio del libro, y con eso pago la pasarela, el servidor y las horas.</p>
-          <p className="text-ink-muted mb-6">Algunos vendedores —yo entre ellos— además cobran por <strong>transferencia</strong>. Cuando es el caso, la ficha te muestra los datos de la cuenta al momento de comprar.</p>
+          <p className="text-ink-muted mb-6">Algunos vendedores —yo entre ellos— además cobran por <strong>transferencia</strong>. Cuando es el caso, confirmas el pedido y el vendedor te manda sus datos por mensaje. Yo no guardo datos bancarios de nadie.</p>
           <div className="space-y-5">
             {mpSteps.map((step) => <StepCard key={step.number} step={step} />)}
           </div>

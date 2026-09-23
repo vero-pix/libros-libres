@@ -379,8 +379,8 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
         return;
       }
 
-      // Por transferencia no hay pasarela: la orden queda creada y la página
-      // del pedido muestra los datos para transferir.
+      // Por transferencia no hay pasarela: la orden queda creada y el vendedor
+      // le manda sus datos al comprador por mensaje (el sitio no los guarda).
       if (data.redirect_to) {
         window.location.href = data.redirect_to;
         return;
@@ -851,7 +851,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                 <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted">Cómo pagas</p>
                 {[
                   { v: "mercadopago" as const, t: "MercadoPago", d: "Tarjeta, débito o cuotas. Te llega el seguimiento por correo." },
-                  { v: "transfer" as const, t: "Transferencia", d: "Le transfieres directo al vendedor. Te mostramos los datos al confirmar el pedido." },
+                  { v: "transfer" as const, t: "Transferencia", d: "Le transfieres directo al vendedor. Apenas confirmes, te manda sus datos por mensaje." },
                 ].map((o) => (
                   <label
                     key={o.v}
@@ -901,7 +901,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                     Procesando...
                   </div>
                 ) : aceptaTransferencia && formaPago === "transfer" ? (
-                  "Confirmar pedido y ver los datos"
+                  "Confirmar pedido"
                 ) : (
                   `Pagar con MercadoPago`
                 )}

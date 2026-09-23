@@ -70,6 +70,23 @@ export async function GET(
     puedePagarEnSitio = !!vendedor?.mercadopago_user_id || (await cobraPorTransferencia(sellerId));
   }
 
+  // Conversación de un pedido por transferencia: acá el vendedor TIENE que
+  // mandar sus datos (el sitio no los guarda, 23-09-2026), así que el aviso de
+  // "el pago va por la plataforma" no corresponde.
+  let pagoPorTransferencia = false;
+  if (conv.listing_id) {
+    const { data: ordenTransfer } = await supabase
+      .from("orders")
+      .select("id")
+      .eq("listing_id", conv.listing_id)
+      .eq("payment_method", "transfer")
+      .in("buyer_id", [conv.participant_1, conv.participant_2])
+      .in("seller_id", [conv.participant_1, conv.participant_2])
+      .limit(1)
+      .maybeSingle();
+    pagoPorTransferencia = !!ordenTransfer;
+  }
+
   // Mark unread messages from other user as read
   await supabase
     .from("messages")
@@ -87,5 +104,6 @@ export async function GET(
     messages: messages ?? [],
     offers: offers ?? [],
     puede_pagar_en_sitio: puedePagarEnSitio,
+    pago_por_transferencia: pagoPorTransferencia,
   });
 }

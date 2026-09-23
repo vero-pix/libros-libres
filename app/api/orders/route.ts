@@ -25,6 +25,9 @@ import {
 } from "@/lib/shipping/coordinado";
 import { preciosAcordados } from "@/lib/offers";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { buscarOCrearConversacion } from "@/lib/conversations";
+import { sendEmail } from "@/lib/email";
+import { VERO_INBOX } from "@/lib/veroInbox";
 
 /**
  * POST /api/orders
@@ -136,7 +139,7 @@ export async function POST(req: NextRequest) {
   const { data: listings, error: listingsError } = await supabase
     .from("listings")
     .select(
-      `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_user_id, on_vacation, acepta_transferencia, datos_transferencia, default_address, shipit_origin_commune)`
+      `*, book:books(*), seller:users(id, full_name, email, phone, mercadopago_user_id, on_vacation, acepta_transferencia, default_address, shipit_origin_commune)`
     )
     .in("id", listingIds)
     .eq("status", "active");
@@ -195,17 +198,14 @@ export async function POST(req: NextRequest) {
     phone: string;
     mercadopago_user_id: string | null;
     acepta_transferencia?: boolean | null;
-    datos_transferencia?: string | null;
   };
 
-  // Transferencia directa al vendedor. Solo si ESE vendedor la tiene activada y
-  // dejó sus datos: el método lo propone el cliente, pero acá se vuelve a
-  // comprobar contra la base — si no, cualquiera podría saltarse el cobro
-  // mandando `payment_method: "transfer"` con un curl.
-  const porTransferencia =
-    payment_method === "transfer" &&
-    !!seller.acepta_transferencia &&
-    !!seller.datos_transferencia?.trim();
+  // Transferencia directa al vendedor. Solo si ESE vendedor la tiene activada:
+  // el método lo propone el cliente, pero acá se vuelve a comprobar contra la
+  // base — si no, cualquiera podría saltarse el cobro mandando
+  // `payment_method: "transfer"` con un curl. El sitio no guarda datos
+  // bancarios (23-09-2026): el vendedor se los manda al comprador por mensaje.
+  const porTransferencia = payment_method === "transfer" && !!seller.acepta_transferencia;
 
   // Ofertas aceptadas y vigentes de este comprador (lib/offers.ts). El precio
   // acordado sale de la base, nunca del navegador, y alimenta los TRES lugares
@@ -445,9 +445,51 @@ export async function POST(req: NextRequest) {
 
   // Transferencia: no hay pasarela que abrir. La orden ya está creada y queda
   // esperando que el vendedor confirme que la plata llegó, desde Mis Ventas.
-  // Se devuelve la URL de la orden en vez de `init_point`; los datos bancarios
-  // se muestran ahí y en el correo, nunca antes de confirmar el pedido.
+  // El sitio NO guarda datos bancarios (regla de Vero, 23-09-2026): con la
+  // compra ya en firme, se abre la conversación del libro con un mensaje del
+  // comprador pidiendo los datos, y el vendedor recibe UN correo con el enlace.
   if (porTransferencia) {
+    const titulos = listings.map((l: any) => l.book?.title).filter(Boolean) as string[];
+    const que = titulos.length > 1 ? `${titulos.length} libros (${titulos.map((t) => `«${t}»`).join(", ")})` : `«${titulos[0] ?? "tu libro"}»`;
+    const monto = `$${bundleGrandTotal.toLocaleString("es-CL")}`;
+    let conversationId: string | null = null;
+    try {
+      const conv = await buscarOCrearConversacion(supabase, user.id, seller.id, listings[0].id);
+      if ("id" in conv) {
+        conversationId = conv.id;
+        const { error: msgErr } = await supabase.from("messages").insert({
+          conversation_id: conv.id,
+          sender_id: user.id,
+          body: `💸 Compré ${que} por ${monto} y elegí pagar por transferencia. ¿Me pasas tus datos para transferirte?`.slice(0, 2000),
+        });
+        if (msgErr) console.error("[orders] mensaje de transferencia:", msgErr.message);
+        await supabase.from("conversations").update({ updated_at: new Date().toISOString() }).eq("id", conv.id);
+      } else {
+        console.error("[orders] conversación de transferencia:", conv.error);
+      }
+    } catch (e) {
+      console.error("[orders] conversación de transferencia:", e);
+    }
+
+    if (seller.email) {
+      const enlace = conversationId ? `https://tuslibros.cl/mensajes/${conversationId}` : "https://tuslibros.cl/mensajes";
+      const comprador = escapeHtml(user.user_metadata?.full_name || "Alguien");
+      await sendEmail({
+        to: seller.email,
+        from: "Vero de tuslibros.cl <hola@tuslibros.cl>",
+        replyTo: VERO_INBOX,
+        subject: `Te compraron ${titulos.length > 1 ? `${titulos.length} libros` : titulos[0] ?? "un libro"} por transferencia`,
+        html: `
+        <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1a1a1a;line-height:1.6">
+          <p><strong>${comprador} te compró ${escapeHtml(que)} por ${monto}</strong> y eligió pagarte por transferencia.</p>
+          <p>Yo no guardo datos bancarios de nadie, así que te toca a ti: <strong>mándale tus datos de transferencia por mensaje.</strong></p>
+          <p><a href="${enlace}" style="display:inline-block;background:#1a3da0;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:600">Responderle con tus datos</a></p>
+          <p>Cuando te llegue la plata, confírmalo en <a href="https://tuslibros.cl/mis-ventas">Mis Ventas</a> con "Me llegó la transferencia" y ahí despachas.</p>
+          <p style="margin-top:28px">Vero<br/><span style="color:#777">tuslibros.cl</span></p>
+        </div>`,
+      }).catch(() => {});
+    }
+
     sendGong(
       `\u{1F4B8} Pedido por TRANSFERENCIA — $${bundleGrandTotal.toLocaleString("es-CL")}\n` +
         `Vendedor: ${escapeHtml(seller.full_name ?? "—")}\n` +
@@ -460,6 +502,7 @@ export async function POST(req: NextRequest) {
       order_ids: createdOrders.map((o: any) => o.id),
       order_id: firstOrderId,
       payment_method: "transfer",
+      conversation_id: conversationId,
       redirect_to: `/orders/${firstOrderId}?pago=transferencia`,
       total: bundleGrandTotal,
     });

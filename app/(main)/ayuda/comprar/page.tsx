@@ -60,9 +60,10 @@ export default function AyudaComprarPage() {
             </p>
             <p className="mt-4">
               Algunos vendedores cobran por <strong>transferencia</strong> en vez de MercadoPago. Cuando es así, te
-              lo digo en la ficha del libro antes de que compres, y ahí mismo te doy los datos de la cuenta. Es el
-              único otro medio que existe: si alguien te pide pagar por fuera de esos dos caminos, no lo hagas y
-              avísame.
+              lo digo en la ficha del libro antes de que compres. Confirmas el pedido, el libro queda reservado a tu
+              nombre y el vendedor te manda sus datos por la mensajería del sitio. Yo no guardo datos bancarios de
+              nadie. Es el único otro medio que existe: si alguien te pide pagar por fuera de esos dos caminos, no lo
+              hagas y avísame.
             </p>
             <p className="mt-4">
               Si tu pago es rechazado, la pantalla te dice por qué y qué hacer. Lo más común: límite de la tarjeta,

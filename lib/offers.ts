@@ -25,7 +25,7 @@ export const MAX_CONTRAOFERTAS = 3;
 /**
  * Hasta el 30-09-2026 (hora de Chile) cualquier vendedor puede recibir ofertas.
  * Desde el 1 de octubre, solo los que cobran dentro del sitio: MercadoPago o
- * transferencia (`acepta_transferencia` + `datos_transferencia`). La oferta
+ * transferencia (`acepta_transferencia`). La oferta
  * aceptada se paga en el sitio; sin ninguno de los dos, el acuerdo se cierra por
  * fuera (decisión de Vero del 23-09, "por un tema de operatividad"; la
  * transferencia se sumó el mismo día).
