@@ -108,6 +108,10 @@ export default function AyudaComprarPage() {
                 Pedidos; si lleva más de 7 días hábiles sin movimiento, escríbenos.
               </li>
               <li>
+                <strong className="text-ink">El vendedor nunca despacha:</strong> si pagaste en el sitio, te devuelvo
+                tu plata completa y su cuenta queda suspendida. Ya me tocó hacerlo.
+              </li>
+              <li>
                 <strong className="text-ink">El libro llegó dañado o no es lo descrito:</strong> escríbenos dentro de
                 3 días con fotos. Ver la <Link href="/devoluciones" className={linkClass}>política de devoluciones</Link>.
               </li>

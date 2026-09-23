@@ -53,6 +53,11 @@ const preguntas: Pregunta[] = [
     a: "Por ahora no.",
   },
   {
+    q: "¿Y si pago y el vendedor nunca despacha?",
+    a: "Te devuelvo tu plata completa y la cuenta del vendedor queda suspendida. Ya me tocó hacerlo. Vale para lo que pagaste en el sitio, no para lo que se acordó por fuera.",
+    link: { href: "https://wa.me/56994583067", label: "Escribirme por WhatsApp" },
+  },
+  {
     q: "¿Qué pasa si el mismo libro se vende dos veces?",
     a: "No debería ocurrir: al pagarse, el libro sale del catálogo. Si pasa, te devolvemos el dinero completo y te avisamos.",
   },

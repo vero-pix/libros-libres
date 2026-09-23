@@ -8,6 +8,8 @@ import Avatar from "@/components/ui/Avatar";
 import { sortListingsForDisplay } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { ButtonLink } from "@/components/ui/Button";
 
 interface Props {
   params: { id: string };
@@ -30,9 +32,28 @@ async function resolveSeller(supabase: Awaited<ReturnType<typeof createClient>>,
     .single();
 }
 
+// Una cuenta suspendida se marca con `banned_until` en auth.users: no puede
+// entrar ni reactivar sus libros. Se suspende en vez de borrar cuando hay una
+// venta con plata pendiente — el borrado en cascada se lleva la orden, que es
+// la prueba (Nicole Sepúlveda, 23-09-2026). La vitrina muestra solo el aviso,
+// sin razones ni adjetivos.
+async function estaSuspendida(sellerId: string) {
+  try {
+    const { data } = await createServiceRoleClient().auth.admin.getUserById(sellerId);
+    const hasta = (data?.user as { banned_until?: string | null } | undefined)?.banned_until;
+    return !!hasta && new Date(hasta) > new Date();
+  } catch {
+    return false;
+  }
+}
+
 export async function generateMetadata({ params }: Props) {
   const supabase = await createClient();
   const { data: seller } = await resolveSeller(supabase, params.id);
+
+  if (seller && (await estaSuspendida(seller.id))) {
+    return { title: "Cuenta suspendida", robots: { index: false, follow: false } };
+  }
 
   const name = seller?.full_name ?? "Vendedor";
   // `comuna` no existe en users: la columna es `city`. Con select("*") el tipo
@@ -73,6 +94,25 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
   const { data: seller } = await resolveSeller(supabase, params.id);
 
   if (!seller) notFound();
+
+  if (await estaSuspendida(seller.id)) {
+    return (
+      <div className="min-h-screen bg-white">
+        <main className="max-w-xl mx-auto px-4 py-24 text-center animate-fade-up">
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-gray-900">
+            Esta cuenta está suspendida
+          </h1>
+          <p className="mt-4 text-gray-600">
+            Si le compraste a esta tienda y tienes algo pendiente, escríbeme y lo resolvemos.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <ButtonLink href="https://wa.me/56994583067">Escribirme por WhatsApp</ButtonLink>
+            <ButtonLink href="/" variant="secondary">Ver otros libros</ButtonLink>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   // Seller's active listings. Paginado: Supabase corta en 1.000 filas y una
   // librería con 1.729 libros mostraba "1000 libros publicados" en su vitrina.
