@@ -16,6 +16,8 @@ interface Props {
 
 /** Lo dispara el enlace de la barra fija del celular para abrir el formulario. */
 export const EVENTO_ABRIR_OFERTA = "abrir-oferta";
+/** La oferta que se escribió sin sesión, para recuperarla al volver de /login. */
+const CLAVE_PENDIENTE = "oferta-pendiente";
 
 /**
  * "Hacer oferta" en la ficha (lib/offers.ts). Solo se monta si el vendedor
@@ -43,6 +45,22 @@ export default function HacerOfertaButton({ listingId, price, sellerName, bookTi
     window.addEventListener(EVENTO_ABRIR_OFERTA, abrir);
     return () => window.removeEventListener(EVENTO_ABRIR_OFERTA, abrir);
   }, []);
+
+  // Quien ofrece sin sesión va a /login y vuelve a la ficha: el monto y la nota
+  // lo esperan acá, con el formulario abierto. Antes volvía a una ficha en
+  // blanco y creía que la oferta no había salido (le pasó a Vero el 23-09).
+  useEffect(() => {
+    try {
+      const guardada = JSON.parse(sessionStorage.getItem(CLAVE_PENDIENTE) ?? "null");
+      if (guardada?.listingId === listingId) {
+        sessionStorage.removeItem(CLAVE_PENDIENTE);
+        setMonto(guardada.monto ?? "");
+        setNota(guardada.nota ?? "");
+        setAbierto(true);
+        requestAnimationFrame(() => caja.current?.scrollIntoView({ behavior: "smooth", block: "center" }));
+      }
+    } catch {}
+  }, [listingId]);
 
   useEffect(() => {
     fetch(`/api/offers?listing_id=${listingId}`)
@@ -101,6 +119,9 @@ export default function HacerOfertaButton({ listingId, price, sellerName, bookTi
       });
       const data = await res.json();
       if (res.status === 401) {
+        try {
+          sessionStorage.setItem(CLAVE_PENDIENTE, JSON.stringify({ listingId, monto, nota }));
+        } catch {}
         router.push(`/login?next=${encodeURIComponent(window.location.pathname)}`);
         return;
       }
