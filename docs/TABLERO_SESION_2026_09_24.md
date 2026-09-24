@@ -98,6 +98,8 @@ Base: **plan de prospección del 10-09** (Instagram primero, Facebook después, 
 | 3g | Eco Lectura (Patronato, 100 mil+) | Visita | media, verificar catálogo digital | pendiente |
 | 3h | AveLibros (Paine, sale de Mercado Libre) | Su sitio / correo | media | pendiente |
 
+**Mercado Libre, mirado a mano por Vero (24-09):** en libros físicos usados hay **119.850 publicaciones**, y con el filtro "Mejores vendedores" (MercadoLíderes) quedan **3.784, el 3,2%**. El usado en Mercado Libre está repartido entre muchos vendedores chicos: los profesionales son pocos y se pueden recorrer a mano. Anotar los que se repitan con "libros", "librería" o "tienda" en el nombre.
+
 **El Cid, antes de ir:**
 - [ ] Arreglo de venta doble ya en producción (punto 1)
 - [ ] Tu tienda abierta en el teléfono para mostrar
