@@ -75,12 +75,12 @@ export async function POST(req: NextRequest) {
   // sesión del comprador (20260923e): la lee el servidor y no sale de acá.
   const { data: listing } = await createServiceRoleClient()
     .from("listings")
-    .select("address, seller_id, seller:users(default_address, shipit_origin_commune, mercadopago_user_id)")
+    .select("address, seller_id, seller:users(default_address, shipit_origin_commune, mercadopago_user_id, acepta_transferencia)")
     .eq("id", listing_id)
     .single();
 
   const seller = (Array.isArray(listing?.seller) ? listing?.seller[0] : listing?.seller) as
-    | { default_address: string | null; shipit_origin_commune: string | null; mercadopago_user_id: string | null }
+    | { default_address: string | null; shipit_origin_commune: string | null; mercadopago_user_id: string | null; acepta_transferencia: boolean | null }
     | null
     | undefined;
 
@@ -143,10 +143,14 @@ export async function POST(req: NextRequest) {
 
   const quotes: ShippingQuote[] = cotizadas.map((q) => ({ ...q, price: aplicarColchon(q.price, bufferPct) }));
 
-  // Solo con MercadoPago conectado: el flete coordinado le llega al vendedor
-  // dentro del split. Sin split iría a la cuenta de la plataforma y alguien
-  // tendría que devolverlo a mano, que es justo lo que se quiere evitar.
-  const precioCoord = seller?.mercadopago_user_id
+  // Solo si la plata le llega al vendedor, porque él paga el courier: con el
+  // split de MercadoPago o por transferencia directa. Sin ninguno de los dos el
+  // flete iría a la cuenta de la plataforma y alguien tendría que devolverlo a
+  // mano. Es la misma regla que valida POST /api/orders (`useSplit ||
+  // porTransferencia`). Hasta el 24-09-2026 acá se pedía solo MercadoPago, y
+  // los vendedores que cobran por transferencia (@vero desde el 16-09) quedaban
+  // sin ninguna opción de despacho en el checkout.
+  const precioCoord = seller?.mercadopago_user_id || seller?.acepta_transferencia
     ? precioCoordinado(tarifasCoordinado, originCommune, destCommune)
     : null;
   if (precioCoord && tarifasCoordinado) {

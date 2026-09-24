@@ -624,7 +624,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                     Este libro va en el paquete que ya tienes en camino
                   </p>
                   <p className="text-xs text-green-800">
-                    {listing.seller?.full_name?.split(" ")[0] ?? "El vendedor"} todavía
+                    {listing.seller?.full_name?.trim() || "El vendedor"} todavía
                     no despacha tu compra anterior
                     {envioAbierto!.titulos.length > 0 && (
                       <> (<strong>{envioAbierto!.titulos.slice(0, 2).join(", ")}</strong>
@@ -718,7 +718,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                 <h3 className="font-bold text-ink text-sm leading-tight line-clamp-2 mb-1">{book.title}</h3>
                 <p className="text-xs text-ink-muted italic mb-2">{book.author}</p>
                 <p className="text-[10px] font-bold text-brand-600 uppercase tracking-widest">
-                  Vendido por {listing.seller?.full_name?.split(" ")[0] || "Vendedor"}
+                  Vendido por {listing.seller?.full_name?.trim() || "el vendedor"}
                 </p>
               </div>
             </div>

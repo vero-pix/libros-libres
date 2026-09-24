@@ -81,7 +81,12 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
     obtenerTarifasCoordinado(admin),
   ]);
   // Ver checkout/[id]: con despacho coordinado, el origen en Shipit deja de ser requisito.
-  const coordinadoDisponible = !!tarifasCoordinado && !!(listings[0] as any).seller?.mercadopago_user_id;
+  // Con MercadoPago o con transferencia: en los dos casos la plata le llega al
+  // vendedor, que es quien paga el courier. Misma regla que /api/shipping/quote y
+  // POST /api/orders. Hasta el 24-09-2026 acá se pedía solo MercadoPago y los
+  // que cobran por transferencia veían "todavía no despacha por courier".
+  const coordinadoDisponible =
+    !!tarifasCoordinado && (!!(listings[0] as any).seller?.mercadopago_user_id || !!(listings[0] as any).seller?.acepta_transferencia);
   const courierDisponible =
     (origen.courierDisponible && !tarifasCoordinado?.apagar_shipit) || coordinadoDisponible;
   if (!origen.courierDisponible && !coordinadoDisponible) {
