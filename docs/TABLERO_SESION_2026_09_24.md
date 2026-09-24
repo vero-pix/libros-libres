@@ -13,14 +13,17 @@ Sin este arreglo no se puede recibir a ninguna librería con libros únicos.
 |---|---|---|
 | 1a | Claude Code entregó el plan (reserva atómica + webhook condicional) | ✅ recibido |
 | 1b | Enviarle la respuesta con los 4 ajustes (ver abajo) | ✅ cerrado |
-| 1c | Revisar la migración ajustada antes de dar el OK | ⏳ **en curso — falta tu OK** |
-| 1d | Prueba con libro de @vero + comprador de prueba | pendiente |
-| 1e | Deploy y verificación en producción | pendiente |
+| 1c | Revisar la migración ajustada antes de dar el OK | ✅ cerrado |
+| 1d | Prueba con libro de @vero + comprador de prueba | ✅ cerrado |
+| 1e | Deploy y verificación en producción | ⏳ en curso |
 | 1f | Mostrar "reservado" en la ficha (segundo paso, después del fix) | pendiente |
 
 **Bitácora:**
 - 24-09 — 1b: respuesta con los 4 ajustes recibida. Duraciones: MercadoPago 60 min, transferencia 24 h, máximo 3 compras por transferencia pendientes por comprador.
 - 24-09 — 1c: migración escrita en `supabase/migrations/20260924_reservas_venta_doble.sql`, **sin aplicar**. Un cambio respecto del ajuste 1: la reserva va en una tabla aparte (`listing_reservations`) y no en columnas de `listings`, porque `listings` se lee sin sesión (dejaba a la vista quién compra qué) y el vendedor puede editar su fila (podía borrar una reserva ajena). Lo demás, como se pidió.
+- 24-09 — 1c: OK de Vero; migración `reservas_venta_doble` aplicada en Supabase. Solo `service_role` puede ejecutar las tres funciones (verificado).
+- 24-09 — 1d: prueba contra la base, 16/16 OK: dos compradores simultáneos → gana uno; reintento del mismo comprador pasa; carrito parcial se revierte entero; duplicados; tope de 3 transferencias; cobro doble registra el incidente una sola vez y no marca vendido. Prueba del endpoint en local con sesión real, 4/4 OK: 200 + 409, reserva de 24 h, reintento sin 409. Sin correos ni Telegram (claves vacías, confirmado en el log). Todo borrado: 0 usuarios, 0 órdenes, 0 reservas, libros activos.
+- 24-09 — hallazgo aparte, no tocado: la compra como invitado (`guest_info` sin sesión) falla por RLS al insertar la orden. Hoy no se usa porque el checkout exige login; es código muerto desde el 24-04.
 
 **Respuesta para pegarle:**
 

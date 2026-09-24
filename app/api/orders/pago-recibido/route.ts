@@ -5,6 +5,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { sendEmail } from "@/lib/email";
 import { VERO_INBOX } from "@/lib/veroInbox";
 import { sendGong, escapeHtml } from "@/lib/notifications";
+import { marcarVendidos } from "@/lib/reservas";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
   const { data: orders, error } = await admin
     .from("orders")
     .select(
-      "id, buyer_id, seller_id, status, payment_method, total, buyer:users!orders_buyer_id_fkey(email, full_name), seller:users!orders_seller_id_fkey(full_name), listing:listings(book:books(title))"
+      "id, listing_id, buyer_id, seller_id, status, payment_method, total, buyer:users!orders_buyer_id_fkey(email, full_name), seller:users!orders_seller_id_fkey(full_name), listing:listings(book:books(title))"
     )
     .eq("bundle_id", bundle_id)
     .order("created_at");
@@ -68,6 +69,15 @@ export async function POST(req: NextRequest) {
   if (!actualizadas?.length) {
     return NextResponse.json({ ok: true, already: true });
   }
+
+  // Hasta el 24-09-2026 la transferencia confirmada dejaba el libro a la venta:
+  // la orden pasaba a pagada, pero nadie marcaba el ejemplar como vendido.
+  await marcarVendidos(admin, {
+    bundleId: bundle_id,
+    listingIds: orders.map((o: any) => o.listing_id).filter(Boolean),
+    clave: `transfer:${bundle_id}`,
+    origen: "transfer",
+  });
 
   await marcarOfertasUsadas(admin, bundle_id);
 

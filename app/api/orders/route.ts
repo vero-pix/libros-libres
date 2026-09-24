@@ -28,6 +28,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { buscarOCrearConversacion } from "@/lib/conversations";
 import { sendEmail } from "@/lib/email";
 import { VERO_INBOX } from "@/lib/veroInbox";
+import { reservarEjemplares, liberarReserva, RESERVA_MP_MINUTOS } from "@/lib/reservas";
 
 /**
  * POST /api/orders
@@ -381,6 +382,20 @@ export async function POST(req: NextRequest) {
   // Generar bundle_id (siempre, también para single-item)
   const bundleId = crypto.randomUUID();
 
+  // Reserva de los ejemplares, todo el carrito o nada (lib/reservas.ts). Hasta
+  // el 24-09-2026 no había reserva: dos compradores podían pagar el mismo libro.
+  // Una reserva vigente del mismo comprador no bloquea, así que reintentar el
+  // checkout nunca le da 409 a quien ya lo tenía reservado.
+  const reserva = await reservarEjemplares(createServiceRoleClient(), {
+    listingIds,
+    bundleId,
+    buyerId: user.id,
+    metodo: porTransferencia ? "transfer" : "mercadopago",
+  });
+  if (!reserva.ok) {
+    return NextResponse.json({ error: reserva.error }, { status: reserva.status });
+  }
+
   // Crear N orders, shipping/fee solo en la primera (prorrateo "cabeza del bundle")
   const orderRows = listings.map((l: any, idx: number) => {
     const isFirst = idx === 0;
@@ -430,6 +445,7 @@ export async function POST(req: NextRequest) {
     .select("id, listing_id");
 
   if (orderError || !createdOrders || createdOrders.length === 0) {
+    await liberarReserva(createServiceRoleClient(), bundleId);
     return NextResponse.json(
       {
         error:
@@ -558,6 +574,7 @@ export async function POST(req: NextRequest) {
           `items=${sumaItems} orden=${bundleGrandTotal} (descuento ${discountAmount}, código ${discount_code ?? "—"})`
       );
       await supabase.from("orders").delete().eq("bundle_id", bundleId);
+      await liberarReserva(createServiceRoleClient(), bundleId);
       return NextResponse.json(
         { error: "No pudimos generar el cobro con el precio correcto. Escríbenos y lo resolvemos." },
         { status: 500 }
@@ -570,12 +587,20 @@ export async function POST(req: NextRequest) {
       pending: `${siteUrl}/orders/${firstOrderId}?status=pending`,
     };
 
+    // El link de pago vence junto con la reserva: si no, alguien podía pagar un
+    // link viejo cuando el libro ya estaba reservado o vendido a otra persona.
+    const vencimiento = {
+      expires: true,
+      expiration_date_to: new Date(Date.now() + RESERVA_MP_MINUTOS * 60_000).toISOString(),
+    };
+
     let preference;
 
     if (useSplit) {
       const collectorId = process.env.MERCADOPAGO_COLLECTOR_ID;
       if (!collectorId) {
         await supabase.from("orders").delete().eq("bundle_id", bundleId);
+        await liberarReserva(createServiceRoleClient(), bundleId);
         return NextResponse.json(
           { error: "Configuración de marketplace incompleta" },
           { status: 500 }
@@ -597,6 +622,7 @@ export async function POST(req: NextRequest) {
 
       if (!sellerCreds?.access_token) {
         await supabase.from("orders").delete().eq("bundle_id", bundleId);
+        await liberarReserva(createServiceRoleClient(), bundleId);
         return NextResponse.json(
           { error: "El vendedor no tiene MercadoPago conectado" },
           { status: 409 }
@@ -613,6 +639,7 @@ export async function POST(req: NextRequest) {
         auto_return: "approved" as const,
         external_reference: bundleId,
         notification_url: `${siteUrl}/api/webhooks/mercadopago`,
+        ...vencimiento,
       };
 
       const refreshToken = sellerCreds.refresh_token ?? "";
@@ -636,6 +663,7 @@ export async function POST(req: NextRequest) {
           auto_return: "approved",
           external_reference: bundleId,
           notification_url: `${siteUrl}/api/webhooks/mercadopago`,
+          ...vencimiento,
         },
       });
     }
@@ -706,6 +734,7 @@ export async function POST(req: NextRequest) {
   } catch (err: unknown) {
     // Rollback: borrar orders del bundle si MP falla
     await supabase.from("orders").delete().eq("bundle_id", bundleId);
+    await liberarReserva(createServiceRoleClient(), bundleId);
     const message = err instanceof Error ? err.message : "Error de MercadoPago";
     console.error(
       "MercadoPago error:",

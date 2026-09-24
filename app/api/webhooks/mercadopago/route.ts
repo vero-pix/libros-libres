@@ -7,6 +7,7 @@ import { sendEmail } from "@/lib/email";
 import { encolarEnvio } from "@/lib/shipments";
 import crypto from "crypto";
 import { registrarComisionVenta } from "@/lib/commissions";
+import { marcarVendidos } from "@/lib/reservas";
 import { VERO_INBOX } from "@/lib/veroInbox";
 import { WHATSAPP_SOPORTE_LEGIBLE } from "@/lib/soporte";
 import { correoCompradorCompraConfirmada } from "@/lib/order-emails";
@@ -287,11 +288,16 @@ export async function POST(req: NextRequest) {
       if (!cambiadas?.length) return responderReplay("bundle");
 
       if (status === "paid") {
-        const listingIds = bundleOrders.map((o: any) => o.listing_id);
-        await supabase
-          .from("listings")
-          .update({ status: "completed" })
-          .in("id", listingIds);
+        // Solo se marca vendido lo que era de este pedido (reserva propia o sin
+        // reserva vigente de otro). Si el ejemplar ya era de otro comprador, queda
+        // en incidentes_cobro_doble y avisa una sola vez (lib/reservas.ts).
+        const listingIds = bundleOrders.map((o: any) => o.listing_id).filter(Boolean);
+        await marcarVendidos(supabase, {
+          bundleId: externalRef,
+          listingIds,
+          clave: `mp:${paymentId}`,
+          origen: "mercadopago",
+        });
 
         await marcarOfertasUsadas(supabase, externalRef);
 
@@ -559,10 +565,14 @@ export async function POST(req: NextRequest) {
       if (!cambiadas?.length) return responderReplay("order");
 
       if (status === "paid") {
-        await supabase
-          .from("listings")
-          .update({ status: "completed" })
-          .eq("id", order.listing_id);
+        if (order.listing_id) {
+          await marcarVendidos(supabase, {
+            bundleId: order.id,
+            listingIds: [order.listing_id],
+            clave: `mp:${paymentId}`,
+            origen: "mercadopago",
+          });
+        }
 
         notifySeller(order.id, supabase).catch((err) =>
           console.error("[webhook] notifySeller error:", err)
