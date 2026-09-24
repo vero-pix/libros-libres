@@ -159,9 +159,14 @@ interface Props {
    * sobre una librería, que la ficha no estaba diciendo.
    */
   otrosEjemplares?: number;
+  /**
+   * Despacho vigente para este vendedor (lib/shipping/coordinado.ts):
+   * tarifa más barata y plazo. null = no hay despacho que ofrecer.
+   */
+  despacho?: { desde: number; dias: string } | null;
 }
 
-export default function ListingDetail({ listing, images = [], sellerStats = null , otrosEjemplares = 0 }: Props) {
+export default function ListingDetail({ listing, images = [], sellerStats = null , otrosEjemplares = 0, despacho = null }: Props) {
   const { book } = listing;
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
@@ -530,7 +535,10 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
           {listing.notes && (
             <blockquote className="mt-5 pl-4 border-l-2 border-brand-200">
               <p className="font-display italic text-sm text-ink-muted leading-relaxed">{listing.notes}</p>
-              <footer className="text-[11px] font-mono text-ink-muted mt-1">— {sellerName}, dueño del libro</footer>
+              {/* Nombre completo y no `sellerName`: la primera palabra de "La
+                  Biblioteca de Vero" es "La", y la ficha firmaba "— La, dueño del
+                  libro" (24-09-2026). */}
+              <footer className="text-[11px] font-mono text-ink-muted mt-1">— {listing.seller?.full_name?.trim() || "Quien lo vende"}</footer>
             </blockquote>
           )}
 
@@ -557,16 +565,21 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
                 </div>
                 <span className="text-xs font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Gratis</span>
               </div>
-              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-line">
-                <span className="text-base">📦</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-ink">Despacho courier</p>
-                  <p className="text-[11px] text-ink-muted">Starken · Chilexpress · 24-48h</p>
+              {/* Despacho: solo si el vendedor puede cobrar en el sitio (el despacho
+                  coordinado necesita que la plata le llegue a él) y con la tarifa
+                  vigente. Hasta el 24-09-2026 decía "Starken · Chilexpress · 24-48h ·
+                  desde $2.900", la tarifa de Shipit, apagado desde el 15-09. Sin
+                  cobro en el sitio queda solo el encuentro en persona (P16, 08-09). */}
+              {despacho && (!!listing.seller?.mercadopago_user_id || transferenciaDisponible) && (
+                <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-line">
+                  <span className="text-base">📦</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-ink">Despacho a todo Chile</p>
+                    <p className="text-[11px] text-ink-muted">{despacho.dias.charAt(0).toUpperCase() + despacho.dias.slice(1)}</p>
+                  </div>
+                  <span className="text-[11px] font-semibold text-ink whitespace-nowrap">desde ${despacho.desde.toLocaleString("es-CL")}</span>
                 </div>
-                {/* Antes decía "cotiza al comprar" → el costo aparecía recién en el checkout
-                    (shock de precio). Mostramos el piso real ($2.900 estándar) desde la ficha. */}
-                <span className="text-[11px] font-semibold text-ink whitespace-nowrap">desde $2.900</span>
-              </div>
+              )}
             </div>
           </div>
 

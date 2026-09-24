@@ -106,6 +106,25 @@ export function leerTarifasCoordinado(valor: unknown): TarifasCoordinado | null 
   };
 }
 
+/**
+ * Lo que la ficha dice del despacho (24-09-2026). Hasta esta fecha decía
+ * "Starken · Chilexpress · 24-48h · desde $2.900", que era la tarifa de Shipit:
+ * Shipit se apagó el 15-09 y lo que queda es el despacho coordinado.
+ *
+ * `desde` es la tarifa más barata que puede pagar un comprador de ESTE
+ * vendedor: Santiago si despacha desde la RM, misma región si no. Si no se
+ * reconoce su comuna, la más baja de las dos.
+ */
+export function despachoParaFicha(
+  tarifas: TarifasCoordinado | null,
+  comunaOrigen: string | null | undefined
+): { desde: number; dias: string } | null {
+  if (!tarifas) return null;
+  const zona = zonaEnvio(comunaOrigen, comunaOrigen);
+  const desde = zona ? tarifas[zona] : Math.min(tarifas.santiago, tarifas.misma_region);
+  return { desde, dias: tarifas.dias };
+}
+
 /** Precio del despacho coordinado entre dos comunas, o null si no aplica. */
 export function precioCoordinado(
   tarifas: TarifasCoordinado | null,

@@ -27,9 +27,9 @@ Sin este arreglo no se puede recibir a ninguna librería con libros únicos.
 - 24-09 — 1e: commit `6bec57a` en producción (deploy Ready 15:54, creado 5 s después del commit). Home, /libros-antiguos y /vendedor/vero responden 200; /api/orders sin sesión sigue en 401. MercadoPago acepta `expires` + `expiration_date_to` (preferencia de prueba creada con vencimiento de 1 minuto, sin notification_url). Falta ver una compra real con el arreglo puesto.
 - 24-09 — 1f: la ficha consulta `/api/listings/[id]/reserva` (sin caché; la ficha se cachea 60 s) y, si otra persona tiene el libro reservado, cambia el botón de comprar por el aviso "Reservado: alguien lo está comprando" + "Enviar mensaje", y esconde la barra fija del celular. La API responde solo sí/no, sin decir quién ni hasta cuándo. Probado en local con Playwright, escritorio y iPhone, 11/11 OK, con las métricas bloqueadas (0 visitas registradas) y todo borrado.
 
-**Hallazgos de las capturas (pendientes, no tocados):**
-- La ficha firma la nota del vendedor con la primera palabra de su nombre: en la tienda "La Biblioteca de Vero" sale "— La, dueño del libro". Afecta a toda tienda cuyo nombre empiece con artículo. El aviso nuevo no nombra al vendedor para no repetirlo.
-- La ficha ofrece "Despacho courier · Starken · Chilexpress · 24-48h · desde $2.900". Shipit está apagado desde el 15-09 y el despacho coordinado parte en $5.490: **por verificar** si ese bloque quedó con el texto viejo.
+**Hallazgos de las capturas:** ✅ cerrados el 24-09 (ver abajo).
+- ✅ La ficha firmaba la nota con la primera palabra del nombre ("— La, dueño del libro"). Ahora firma con el nombre completo: "— La Biblioteca de Vero".
+- ✅ La ficha ofrecía "Despacho courier · Starken · Chilexpress · 24-48h · desde $2.900" (tarifa de Shipit, apagado desde el 15-09). Ahora dice "Despacho a todo Chile · 2 a 5 días hábiles desde que el vendedor despacha · desde $5.490", con la tarifa leída de `site_config` según la región del vendedor, y **solo si el vendedor cobra en el sitio** (MP o transferencia). Sin cobro, queda solo "Encuentro en persona" (decisión P16 del 08-09). Probado en local con un libro de @vero (despacho visible) y uno de juan.adrian (oculto).
 
 **Respuesta para pegarle:**
 
@@ -76,6 +76,7 @@ El 08-09 congelaste la captación hasta probar que los libreros actuales venden.
 
 **Bitácora:**
 - 24-09 — medición cerrada con la base (SQL de solo lectura). De las tres condiciones, solo las ventas se movieron, y casi todo por un vendedor. La decisión de descongelar es tuya.
+- 24-09 — **Decisión de Vero: se descongela la captación.** Sale ella misma a buscar librerías: primero mirando Mercado Libre como compradora, después por Instagram (punto 3).
 
 - Si los números se movieron → **se descongela la captación** (punto 3).
 - Si no se movieron → captar más solo suma catálogo que no vende. Se sigue activando.

@@ -7,6 +7,8 @@ import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
+import { obtenerTarifasCoordinado, despachoParaFicha } from "@/lib/shipping/coordinado";
+import { comunaDesdeAddress } from "@/lib/comuna";
 
 interface Props {
   params: { id: string };
@@ -183,6 +185,8 @@ export default async function ListingByIdPage({ params }: Props) {
     },
   };
 
+  const despacho = despachoParaFicha(await obtenerTarifasCoordinado(supabase), comunaDesdeAddress(listing.address));
+
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -207,7 +211,7 @@ export default async function ListingByIdPage({ params }: Props) {
         />
         <div className="flex gap-10">
           <div className="flex-1 min-w-0">
-            <ListingDetail listing={listing} images={(images ?? []) as any} />
+            <ListingDetail listing={listing} images={(images ?? []) as any} despacho={despacho} />
             {relatedListings.length > 0 && (
               <section className="mt-10">
                 <h2 className="font-display text-xl font-bold text-ink mb-4">Libros similares</h2>
