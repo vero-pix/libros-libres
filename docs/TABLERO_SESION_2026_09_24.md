@@ -154,8 +154,10 @@ Precios y pisos en `docs_desde_claude/PISOS_LIBROS_VERO_2026-09.md` (privado: el
 | 6c | "Sagas completas": una publicación que junta los tomos de una colección | El equivalente usado de "estuches y packs" |
 | 6d | "La librería de la semana" con su historia y su logo | La fila de tiendas de ML, pero con historia: lo que Buscalibre le quita a El Cid |
 | 6e | "Lo que ML vende nuevo a $X, acá usado a $Y" (un título por semana) | Comparación honesta de precio; verificar cada precio antes de publicar |
+| 6f | **Página `/ofertas`** con los libros rebajados | Hoy hay **577 libros activos con precio rebajado, de 94 vendedores** (`original_price > price`, 24-09), y no existe una página que los junte. Top10Books tiene una con 70 y la promociona con Google Ads (el enlace de la captura trae `gad_source`). Mercado Libre pone "Outlets" en "lo más buscado". |
 
 - 24-09 — sección creada a pedido de Vero, a partir de su captura de Mercado Libre.
+- 24-09 — captura de **Top10Books** (`/ofertas`): menú por uso (literatura complementaria, técnico y universitario, textos escolares, ofertas), filtro por tramos de precio con conteo ("Hasta $9.900 (17)"), filtro por autor con conteo, etiqueta de % de descuento y "Entrega mañana" en cada libro. Nuestro listado ya filtra por precio (mínimo y máximo) y autor, pero a mano, sin tramos ni conteos. Lo que más sirve es la idea 6f.
 
 ---
 
