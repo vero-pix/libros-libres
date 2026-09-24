@@ -129,6 +129,36 @@ Precios y pisos en `docs_desde_claude/PISOS_LIBROS_VERO_2026-09.md` (privado: el
 
 ---
 
+## 6. IDEAS DE CONTENIDO (anotadas mientras Vero busca librerías)
+
+**Cómo ordena Mercado Libre su página de libros** (captura de Vero, 24-09; no se abrió con herramientas automáticas):
+1. Banner de promesa logística: "Envíos en 48 horas · Envío gratis desde $19.990".
+2. Fila de **tiendas con logo** (Contrapunto, Librenta, Antártica, Zig-Zag, Santillana…): las librerías como marca, arriba de todo.
+3. "Todos los libros que buscas": 4 géneros grandes con foto (novela y ciencia ficción, infantil, negocios, autoayuda) y después 8 chicos (escolares, cómics, romance, terror, cocina, **autores chilenos**, religión, manualidades).
+4. "Lo más buscado": novedades, outlets, **estuches y packs**, **escolares y lecturas complementarias**.
+5. Libros importados, y abajo el programa de afiliados.
+
+**Qué sirve y qué no, con nuestros datos:**
+- ⚠️ No copiar la portada de filas. Acá la gente **busca, no navega**: buscador 1.629 clics contra categorías 103 (medido el 17-09). La portada bajó de 19,6 a 10,7 pantallas a propósito. Las filas de Mercado Libre funcionan para catálogo nuevo con stock repetido; lo nuestro es ejemplar único.
+- ✅ La **fila de tiendas con logo arriba** es lo mismo que "Librerías de confianza", pero ML la pone antes que los libros. Cuando entren El Cid y las de Instagram, esa fila vale más con logos reales que con avatares.
+- ✅ **"Autores chilenos"** tiene casilla propia en ML. Nosotros tenemos la etiqueta `impreso-chileno` y `/libros-antiguos`, pero no una entrada de "autores chilenos" (usados, no solo antiguos).
+- ✅ **"Escolares y lecturas complementarias"**: ya existe `/libros-escolares`. ML confirma que es de lo más buscado; conecta con la demanda de "educación ciudadana 3º medio" (71% de la demanda temática, 22-09).
+- ✅ **"Estuches y packs"**: en usados son las **sagas completas** (la colección de fantasía de Cata, tomos I y II como el Plutarco). No tenemos cómo mostrarlas juntas.
+- ❌ "Envío en 48 horas": no lo podemos prometer (despacho coordinado, 2 a 5 días hábiles).
+
+**Ideas de contenido** (para redes, newsletter o landing; ninguna hecha):
+| # | Idea | Por qué |
+|---|---|---|
+| 6a | "Lecturas complementarias usadas: la lista del colegio a mitad de precio" | ML lo pone en "lo más buscado"; ya hay `/libros-escolares` |
+| 6b | "Autores chilenos que ya no se imprimen" (Alcalde, Nascimento, Zig-Zag) | Lo que ML vende nuevo, nosotros lo tenemos agotado |
+| 6c | "Sagas completas": una publicación que junta los tomos de una colección | El equivalente usado de "estuches y packs" |
+| 6d | "La librería de la semana" con su historia y su logo | La fila de tiendas de ML, pero con historia: lo que Buscalibre le quita a El Cid |
+| 6e | "Lo que ML vende nuevo a $X, acá usado a $Y" (un título por semana) | Comparación honesta de precio; verificar cada precio antes de publicar |
+
+- 24-09 — sección creada a pedido de Vero, a partir de su captura de Mercado Libre.
+
+---
+
 ## DESCARTADO ✅
 
 - **Ranking de vendedores de Mercado Libre por API:** viola los términos de uso (cláusula 7.4, prohíbe usar datos para servicios que compitan con Mercado Libre) y la búsqueda responde 403 desde abril de 2025. No se retoma.
