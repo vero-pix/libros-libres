@@ -179,6 +179,21 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
   const [marcando, setMarcando] = useState<"idle" | "confirm" | "saving" | "done">("idle");
   const isSold = listing.status === "completed" || marcando === "done";
 
+  // Reservado por otra persona que está pagando (lib/reservas.ts, 24-09-2026).
+  // Se pregunta desde el navegador porque la ficha se cachea 60 s. Mientras no
+  // llega la respuesta se muestra el botón normal: si justo estaba reservado,
+  // el checkout igual lo frena con el aviso.
+  const [reservado, setReservado] = useState(false);
+  useEffect(() => {
+    if (isSold) return;
+    let vivo = true;
+    fetch(`/api/listings/${listing.id}/reserva`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (vivo && d) setReservado(!!d.reservado); })
+      .catch(() => {});
+    return () => { vivo = false; };
+  }, [listing.id, isSold]);
+
   async function marcarVendido() {
     setMarcando("saving");
     const { error } = await createClient()
@@ -705,6 +720,21 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
               <p className="font-display text-xl font-bold text-[--coral]">Este libro ya fue vendido</p>
               <p className="text-sm text-ink-muted mt-1">Busca otros similares o contacta al vendedor por si tiene más.</p>
             </div>
+          ) : reservado && !isOwner ? (
+            <div className="space-y-3">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3 animate-fade-in">
+                <span className="text-2xl leading-none mt-0.5" aria-hidden>⏳</span>
+                <div>
+                  <p className="font-display text-base font-bold text-amber-900">Reservado: alguien lo está comprando</p>
+                  <p className="text-sm text-amber-800 mt-1 leading-relaxed">
+                    Queda apartado mientras esa persona termina de pagar. Si no completa la compra,
+                    vuelve a quedar disponible acá mismo. Si te interesa, escríbele al vendedor: a
+                    veces tiene otro ejemplar.
+                  </p>
+                </div>
+              </div>
+              <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
+            </div>
           ) : (listing.seller as any)?.on_vacation ? (
             <div className="space-y-3">
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
@@ -839,7 +869,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
       </div>
 
       {/* Mobile Sticky Buy Bar */}
-      {listing.price != null && listing.modality !== "loan" && !isSold && (
+      {listing.price != null && listing.modality !== "loan" && !isSold && !(reservado && !isOwner) && (
         <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-paper-card border-t border-line shadow-[0_-8px_16px_rgba(0,0,0,0.05)] z-50 flex items-center justify-between gap-4 animate-slide-up-full">
           <div className="flex flex-col">
             <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Precio</span>

@@ -15,8 +15,8 @@ Sin este arreglo no se puede recibir a ninguna librería con libros únicos.
 | 1b | Enviarle la respuesta con los 4 ajustes (ver abajo) | ✅ cerrado |
 | 1c | Revisar la migración ajustada antes de dar el OK | ✅ cerrado |
 | 1d | Prueba con libro de @vero + comprador de prueba | ✅ cerrado |
-| 1e | Deploy y verificación en producción | ⏳ en curso |
-| 1f | Mostrar "reservado" en la ficha (segundo paso, después del fix) | pendiente |
+| 1e | Deploy y verificación en producción | ✅ cerrado |
+| 1f | Mostrar "reservado" en la ficha (segundo paso, después del fix) | ✅ cerrado |
 
 **Bitácora:**
 - 24-09 — 1b: respuesta con los 4 ajustes recibida. Duraciones: MercadoPago 60 min, transferencia 24 h, máximo 3 compras por transferencia pendientes por comprador.
@@ -24,6 +24,12 @@ Sin este arreglo no se puede recibir a ninguna librería con libros únicos.
 - 24-09 — 1c: OK de Vero; migración `reservas_venta_doble` aplicada en Supabase. Solo `service_role` puede ejecutar las tres funciones (verificado).
 - 24-09 — 1d: prueba contra la base, 16/16 OK: dos compradores simultáneos → gana uno; reintento del mismo comprador pasa; carrito parcial se revierte entero; duplicados; tope de 3 transferencias; cobro doble registra el incidente una sola vez y no marca vendido. Prueba del endpoint en local con sesión real, 4/4 OK: 200 + 409, reserva de 24 h, reintento sin 409. Sin correos ni Telegram (claves vacías, confirmado en el log). Todo borrado: 0 usuarios, 0 órdenes, 0 reservas, libros activos.
 - 24-09 — hallazgo aparte, no tocado: la compra como invitado (`guest_info` sin sesión) falla por RLS al insertar la orden. Hoy no se usa porque el checkout exige login; es código muerto desde el 24-04.
+- 24-09 — 1e: commit `6bec57a` en producción (deploy Ready 15:54, creado 5 s después del commit). Home, /libros-antiguos y /vendedor/vero responden 200; /api/orders sin sesión sigue en 401. MercadoPago acepta `expires` + `expiration_date_to` (preferencia de prueba creada con vencimiento de 1 minuto, sin notification_url). Falta ver una compra real con el arreglo puesto.
+- 24-09 — 1f: la ficha consulta `/api/listings/[id]/reserva` (sin caché; la ficha se cachea 60 s) y, si otra persona tiene el libro reservado, cambia el botón de comprar por el aviso "Reservado: alguien lo está comprando" + "Enviar mensaje", y esconde la barra fija del celular. La API responde solo sí/no, sin decir quién ni hasta cuándo. Probado en local con Playwright, escritorio y iPhone, 11/11 OK, con las métricas bloqueadas (0 visitas registradas) y todo borrado.
+
+**Hallazgos de las capturas (pendientes, no tocados):**
+- La ficha firma la nota del vendedor con la primera palabra de su nombre: en la tienda "La Biblioteca de Vero" sale "— La, dueño del libro". Afecta a toda tienda cuyo nombre empiece con artículo. El aviso nuevo no nombra al vendedor para no repetirlo.
+- La ficha ofrece "Despacho courier · Starken · Chilexpress · 24-48h · desde $2.900". Shipit está apagado desde el 15-09 y el despacho coordinado parte en $5.490: **por verificar** si ese bloque quedó con el texto viejo.
 
 **Respuesta para pegarle:**
 
