@@ -77,6 +77,7 @@ El 08-09 congelaste la captación hasta probar que los libreros actuales venden.
 **Bitácora:**
 - 24-09 — medición cerrada con la base (SQL de solo lectura). De las tres condiciones, solo las ventas se movieron, y casi todo por un vendedor. La decisión de descongelar es tuya.
 - 24-09 — **Decisión de Vero: se descongela la captación.** Sale ella misma a buscar librerías: primero mirando Mercado Libre como compradora, después por Instagram (punto 3).
+- 24-09 — **Por qué subieron las ventas en el lanzamiento de libro.de.ocasion (y por qué bajaron):** 16 de las 20 compras del pico (31-08 al 13-09) fueron **con despacho por courier**; en persona se mantuvo en ~2 por semana. Desde el 15-09, día en que se apagó Shipit, las compras con despacho bajaron de 8 por semana a 1 o 2, y el checkout pasó de convertir ~32% a ~14%. Coinciden también los anuncios que tapaban el botón (15-17) y el MP de @vero desconectado (16-09): es correlación. La promo de envío gratis no se usó nunca (descartada). La mitad de lo vendido por libro.de.ocasion es de un solo comprador. **Pendiente: revisar el despacho coordinado en el checkout antes de captar más librerías.**
 
 - Si los números se movieron → **se descongela la captación** (punto 3).
 - Si no se movieron → captar más solo suma catálogo que no vende. Se sigue activando.
