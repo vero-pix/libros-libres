@@ -19,6 +19,18 @@ import { FEED_SHIPPING_CLP } from "@/lib/product-feed";
 
 export const revalidate = 60;
 
+/**
+ * Fichas que son el MISMO libro físico publicado desde dos cuentas: ahí el
+ * aviso de "otros ejemplares" mentiría en cualquiera de sus dos formas.
+ * El Losada de Neruda de 1957 lo publicó su dueña (barbara.saavedra) en
+ * agosto y Vero lo vende también desde la suya (24-09-2026). Sacar de acá
+ * cuando se retire uno de los dos.
+ */
+const MISMO_LIBRO_FISICO = new Set([
+  "obras-completas-pablo-neruda",
+  "obras-completas-neruda-losada-1957",
+]);
+
 interface Props {
   params: { username: string; slug: string };
 }
@@ -338,7 +350,9 @@ export default async function LibroPage({ params }: Props) {
   const categoryListings = categoryListingsRaw.filter(l => !authorListingIds.has(l.id)).slice(0, 4);
 
   /** Otros ejemplares del mismo título a la venta ahora mismo. 0 = pieza única. */
-  const otrosEjemplares = (mismoTituloResult as { count: number | null }).count ?? 0;
+  const otrosEjemplares = MISMO_LIBRO_FISICO.has(listing.slug)
+    ? -1 // no decir nada: ni "único" ni "hay otro"
+    : (mismoTituloResult as { count: number | null }).count ?? 0;
 
   const canonicalUrl = `https://tuslibros.cl/libro/${params.username}/${params.slug}`;
 

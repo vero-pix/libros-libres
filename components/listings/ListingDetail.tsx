@@ -451,7 +451,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
 
           {/* Pieza única. Solo cuando es verdad: si hay otro ejemplar del mismo
               título se dice eso, que también sirve (hay dónde elegir). */}
-          {!isSold && listing.modality !== "loan" && (
+          {!isSold && listing.modality !== "loan" && otrosEjemplares >= 0 && (
             <div className="mt-3">
               {otrosEjemplares === 0 ? (
                 <span className="inline-flex items-center gap-2 text-[13px] font-medium text-[--coral] bg-[--coral]/8 border border-[--coral]/20 rounded-full px-3 py-1.5">
