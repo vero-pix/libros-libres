@@ -313,13 +313,21 @@ export default async function LibroPage({ params }: Props) {
     // un catálogo de 3.870 activos hay 3.729 títulos distintos, así que la
     // enorme mayoría es pieza única de verdad. `head: true` trae solo el
     // conteo, no las filas.
+    //
+    // Título Y autor: con el título solo, las "Obras completas" de Neruda
+    // contaban las de Shakespeare como otro ejemplar (24-09-2026). Sin autor
+    // en la ficha se compara solo el título, como antes.
     listing.book?.title
-      ? supabase
-          .from("listings")
-          .select("id, book:books!inner(title)", { count: "exact", head: true })
-          .eq("status", "active")
-          .neq("id", listing.id)
-          .ilike("book.title", listing.book.title.trim())
+      ? (() => {
+          let q = supabase
+            .from("listings")
+            .select("id, book:books!inner(title, author)", { count: "exact", head: true })
+            .eq("status", "active")
+            .neq("id", listing.id)
+            .ilike("book.title", listing.book.title.trim());
+          if (listing.book.author?.trim()) q = q.ilike("book.author", listing.book.author.trim());
+          return q;
+        })()
       : Promise.resolve({ count: 0 }),
   ]);
 
