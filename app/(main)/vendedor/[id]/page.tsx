@@ -240,6 +240,16 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, MAX_ETIQUETAS)
     .map(([g]) => g);
+  // Logo de la tienda (site_config.logo_tienda, por username). Se muestra solo
+  // acá, en la cabecera de su tienda: en el resto del sitio sigue su foto, que
+  // es la cara de una persona real (decisión de Vero, 24-09-2026: el ex libris
+  // "LBV" de La Biblioteca de Vero). Cuando existan las tiendas con marca pasa a
+  // una columna propia (docs_desde_claude/PLAN_IMPORTADOR_LIBRERIAS.md §E).
+  const { data: cfgLogo } = await supabase.from("site_config").select("value").eq("key", "logo_tienda").maybeSingle();
+  const logos = (cfgLogo?.value ?? {}) as Record<string, unknown>;
+  const logoTienda =
+    seller.username && typeof logos[seller.username] === "string" ? (logos[seller.username] as string) : null;
+
   const memberSince = new Date(seller.created_at).toLocaleDateString("es-CL", {
     month: "long",
     year: "numeric",
@@ -251,10 +261,11 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
         {/* Seller header */}
         <div className="flex items-start gap-5 mb-8 pb-8 border-b border-gray-100">
           <Avatar
-            src={seller.avatar_url}
-            alt={seller.full_name ?? "Vendedor"}
+            src={logoTienda ?? seller.avatar_url}
+            alt={logoTienda ? `Logo de ${seller.full_name ?? "la tienda"}` : seller.full_name ?? "Vendedor"}
             fallbackLetter={(seller.full_name ?? "?")[0]}
-            size="md"
+            size={logoTienda ? "lg" : "md"}
+            className={logoTienda ? "shadow-md transition-transform duration-300 hover:rotate-[-4deg] hover:scale-105" : ""}
           />
           <div className="flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -505,7 +516,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
             "@type": "Organization",
             name: seller.full_name,
             url: `https://tuslibros.cl/vendedor/${seller.username ?? seller.id}`,
-            ...(seller.avatar_url ? { logo: seller.avatar_url } : {}),
+            ...(logoTienda || seller.avatar_url ? { logo: logoTienda ?? seller.avatar_url } : {}),
             ...(seller.city
               ? { address: { "@type": "PostalAddress", addressLocality: seller.city, addressCountry: "CL" } }
               : {}),
