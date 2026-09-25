@@ -166,6 +166,23 @@ Precios y pisos en `docs_desde_claude/PISOS_LIBROS_VERO_2026-09.md` (privado: el
 
 ---
 
+## 7. MAÑANA 25-09 — revisar en detalle (le preocupa a Vero)
+
+**¿Por qué libro.de.ocasion pasó de 17 intentos de compra a 2 desde el 15-09, si tiene MercadoPago y el despacho coordinado sí se le ofrece?**
+
+| # | Qué revisar | Cómo |
+|---|---|---|
+| 7a | ¿Los compradores llegan al checkout de libro.de.ocasion y no crean la orden? | `page_views` de `/checkout/<id>` de sus libros, antes y después del 15-09, contra órdenes creadas |
+| 7b | Precio: $5.490 coordinado contra ~$4.900 promedio de Starken antes | Comparar el flete que pagaron en el pico con lo que cotiza hoy, por zona |
+| 7c | Los anuncios que tapaban el botón (15-17 sep) | Separar esos días del resto |
+| 7d | El texto del despacho coordinado ("el vendedor lo manda…, 2 a 5 días desde que lo despacha") ¿asusta frente a "Starken 24-48h"? | Leerlo en el checkout como comprador |
+| 7e | ¿Cambió algo en libro.de.ocasion? (pausas, precios, catálogo, vacaciones) | `listings` y `users` de libro.de.ocasion desde el 15-09 |
+| 7f | Verificar en producción que tus libros ya ofrecen despacho en el checkout (no se pudo con la sesión de prueba) | Vero con otra cuenta, o alguien de confianza |
+
+- 24-09 — anotado a pedido de Vero para verlo en detalle el 25-09.
+
+---
+
 ## DESCARTADO ✅
 
 - **Ranking de vendedores de Mercado Libre por API:** viola los términos de uso (cláusula 7.4, prohíbe usar datos para servicios que compitan con Mercado Libre) y la búsqueda responde 403 desde abril de 2025. No se retoma.
