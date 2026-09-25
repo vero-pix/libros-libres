@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { COVER_GRADIENTS, LIGHT_COVERS, coverVariant } from "./BookCover";
 
@@ -34,8 +34,29 @@ export default function ImageGallery({ mainImage, images, alt, author }: Props) 
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [errorIds, setErrorIds] = useState<Set<string>>(new Set());
+  // Foto a pantalla completa (25-09-2026). En la ficha la foto va recortada
+  // dentro del "libro" dibujado y no se podía ampliar: justo lo que quiere ver
+  // quien compra un antiguo (manchas, lomo, páginas de adentro).
+  const [grande, setGrande] = useState(false);
+  const [ampliada, setAmpliada] = useState<{ x: number; y: number } | null>(null);
 
   const visibleImages = allImages.filter((img) => !errorIds.has(img.id));
+
+  // Con la foto grande abierta: Esc cierra, las flechas cambian de foto y la
+  // página de atrás no se mueve.
+  useEffect(() => {
+    if (!grande) return;
+    const n = visibleImages.length;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setGrande(false); setAmpliada(null); }
+      if (e.key === "ArrowLeft" && n > 1) { setAmpliada(null); setActiveIdx((i) => (i > 0 ? i - 1 : n - 1)); }
+      if (e.key === "ArrowRight" && n > 1) { setAmpliada(null); setActiveIdx((i) => (i < n - 1 ? i + 1 : 0)); }
+    };
+    const overflowAntes = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = overflowAntes; };
+  }, [grande, visibleImages.length]);
 
   /* ---------- Sin foto → cubierta dibujada sobre stage de papel ---------- */
   if (visibleImages.length === 0) {
@@ -64,6 +85,10 @@ export default function ImageGallery({ mainImage, images, alt, author }: Props) 
 
   const safeIdx = activeIdx < visibleImages.length ? activeIdx : 0;
   const current = visibleImages[safeIdx];
+  const total = visibleImages.length;
+  const anterior = () => { setAmpliada(null); setActiveIdx((i) => (i > 0 ? i - 1 : total - 1)); };
+  const siguiente = () => { setAmpliada(null); setActiveIdx((i) => (i < total - 1 ? i + 1 : 0)); };
+  const cerrar = () => { setGrande(false); setAmpliada(null); };
 
   const baseAlt = `${alt}${author ? ` — ${author}` : ""}, libro usado`;
   const imgAlt = (i: number) =>
@@ -93,7 +118,24 @@ export default function ImageGallery({ mainImage, images, alt, author }: Props) 
             }}
           />
           <span aria-hidden className={SPINE} />
+          <button
+            type="button"
+            onClick={() => setGrande(true)}
+            aria-label="Ver la foto en grande"
+            className="absolute inset-0 z-[3] cursor-zoom-in"
+          />
         </div>
+
+        <button
+          type="button"
+          onClick={() => setGrande(true)}
+          aria-label="Ver la foto en grande"
+          className="absolute top-3 right-3 z-10 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-card hover:bg-white hover:scale-110 transition-all"
+        >
+          <svg className="w-4 h-4 text-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2} aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M10.5 7.5v6m-3-3h6M18 10.5a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
+          </svg>
+        </button>
 
         {/* flechas + contador sobre el stage (sin rotar) */}
         {visibleImages.length > 1 && (
@@ -140,6 +182,78 @@ export default function ImageGallery({ mainImage, images, alt, author }: Props) 
               <Image src={img.image_url} alt={`${baseAlt} — miniatura ${i + 1}`} fill className="object-cover" sizes="48px" />
             </button>
           ))}
+        </div>
+      )}
+
+      {grande && current && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={imgAlt(safeIdx)}
+          className="fixed inset-0 z-[100] bg-[#0b1433]/[0.98] flex items-center justify-center animate-fade-in"
+          onClick={cerrar}
+        >
+          <div
+            className="relative w-full h-full max-w-5xl mx-auto overflow-hidden"
+            onClick={(e) => {
+              e.stopPropagation();
+              // Escritorio: un clic amplía al doble donde apuntaste; otro vuelve.
+              // En el celular sirve el zoom con los dedos del navegador.
+              if (ampliada) { setAmpliada(null); return; }
+              const r = e.currentTarget.getBoundingClientRect();
+              setAmpliada({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+            }}
+          >
+            <Image
+              key={`grande-${current.id}`}
+              src={current.image_url}
+              alt={imgAlt(safeIdx)}
+              fill
+              sizes="100vw"
+              quality={90}
+              className={`object-contain transition-transform duration-300 ${ampliada ? "cursor-zoom-out" : "cursor-zoom-in"}`}
+              style={ampliada ? { transform: "scale(2)", transformOrigin: `${ampliada.x}% ${ampliada.y}%` } : undefined}
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={cerrar}
+            aria-label="Cerrar"
+            className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {total > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); anterior(); }}
+                aria-label="Foto anterior"
+                className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); siguiente(); }}
+                aria-label="Foto siguiente"
+                className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </button>
+              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-white/15 text-white text-xs font-mono px-3 py-1 rounded-full">
+                {safeIdx + 1}/{total}
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
