@@ -22,6 +22,7 @@ import { translateGenre } from "@/lib/genres";
 import { authorLanding } from "@/lib/authorLandings";
 import HacerOfertaButton, { EVENTO_ABRIR_OFERTA } from "@/components/offers/HacerOfertaButton";
 import { vendedorPuedeRecibirOfertas } from "@/lib/offers";
+import { nombreCortoVendedor } from "@/lib/nombreVendedor";
 
 /**
  * Atributos de la ficha que viajan con los eventos de elección de vía.
@@ -169,7 +170,7 @@ interface Props {
 export default function ListingDetail({ listing, images = [], sellerStats = null , otrosEjemplares = 0, despacho = null }: Props) {
   const { book } = listing;
   const coverUrl = listing.cover_image_url ?? book.cover_url;
-  const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
+  const sellerName = nombreCortoVendedor(listing.seller?.full_name);
   const authorHub = authorLanding(book.author); // landing de autor (SEO: concentra autoridad en el hub)
   const [isOwner, setIsOwner] = useState(false);
   // Panel de seguimiento del libro, solo para su dueño (18-09-2026). Se pide

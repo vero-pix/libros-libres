@@ -6,6 +6,7 @@ import { memo, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
 import type { ListingWithBook } from "@/types";
 import { libroUrl } from "@/lib/urls";
+import { nombreCortoVendedor } from "@/lib/nombreVendedor";
 
 const QuickViewModal = dynamic(() => import("./QuickViewModal"), {
   ssr: false,
@@ -27,7 +28,7 @@ const ListingCardList = memo(function ListingCardList({ listing }: Props) {
   const [, startTransition] = useTransition();
   const { book } = listing;
   const coverUrl = listing.cover_image_url ?? book.cover_url;
-  const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
+  const sellerName = nombreCortoVendedor(listing.seller?.full_name);
 
   return (
     <>

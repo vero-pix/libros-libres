@@ -1,4 +1,5 @@
 import { WHATSAPP_SOPORTE_LEGIBLE } from "./soporte";
+import { nombreCortoVendedor } from "@/lib/nombreVendedor";
 
 /**
  * Correo de compra confirmada al COMPRADOR. Vive acá y no dentro del webhook
@@ -27,7 +28,7 @@ export interface DatosCompraConfirmada {
 }
 
 export function correoCompradorCompraConfirmada(d: DatosCompraConfirmada): { subject: string; html: string } {
-  const sellerFirstName = d.sellerName.split(" ")[0];
+  const sellerFirstName = nombreCortoVendedor(d.sellerName, "el vendedor");
   const buyerFirstName = d.buyerName.split(" ")[0];
   const queCompro = d.itemCount > 1 ? `${d.itemCount} libros` : "un libro";
   const esteEstos = d.itemCount > 1 ? "estos libros" : "este libro";

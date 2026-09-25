@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import type { ListingWithBook } from "@/types";
 import { libroUrl } from "@/lib/urls";
 import { resolveAuthorUrl } from "@/lib/authorLink";
+import { nombreCortoVendedor } from "@/lib/nombreVendedor";
 
 const QuickViewModal = dynamic(() => import("./QuickViewModal"), {
   ssr: false,
@@ -138,7 +139,7 @@ const ListingCard = memo(function ListingCard({
   /* ---------- Datos derivados ---------- */
 
   const coverUrl = listing.cover_image_url ?? book.cover_url;
-  const sellerName = listing.seller?.full_name?.split(" ")[0] ?? "Vendedor";
+  const sellerName = nombreCortoVendedor(listing.seller?.full_name);
   const sellerHref = `/vendedor/${listing.seller?.username ?? listing.seller_id}`;
 
   const distanceKm = (listing as unknown as Record<string, unknown>).distance_km as number | undefined;

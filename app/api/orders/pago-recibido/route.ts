@@ -6,6 +6,7 @@ import { sendEmail } from "@/lib/email";
 import { VERO_INBOX } from "@/lib/veroInbox";
 import { sendGong, escapeHtml } from "@/lib/notifications";
 import { marcarVendidos } from "@/lib/reservas";
+import { nombreCortoVendedor } from "@/lib/nombreVendedor";
 
 export const dynamic = "force-dynamic";
 
@@ -86,7 +87,7 @@ export async function POST(req: NextRequest) {
     .filter(Boolean) as string[];
   const comprador = (Array.isArray(cabeza.buyer) ? cabeza.buyer[0] : cabeza.buyer) ?? {};
   const vendedor = (Array.isArray(cabeza.seller) ? cabeza.seller[0] : cabeza.seller) ?? {};
-  const quien = String(vendedor.full_name ?? "El vendedor").split(" ")[0];
+  const quien = nombreCortoVendedor(vendedor.full_name, "El vendedor");
   const que = titulos.length > 1 ? `tus ${titulos.length} libros` : titulos[0] ?? "tu libro";
 
   if (comprador.email) {

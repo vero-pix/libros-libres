@@ -5,6 +5,7 @@ import PurchaseTracker from "@/components/analytics/PurchaseTracker";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { waSoporte } from "@/lib/soporte";
 import { orderParticipants } from "@/lib/conversations";
+import { nombreCortoVendedor } from "@/lib/nombreVendedor";
 
 interface Props {
   params: { id: string };
@@ -140,7 +141,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
   }
   const rejectText = explicarRechazo(rejectReason);
   const seller = order.seller as { id: string; username: string | null; full_name: string | null } | null;
-  const sellerFirstName = seller?.full_name?.split(" ")[0] ?? "el vendedor";
+  const sellerFirstName = nombreCortoVendedor(seller?.full_name, "el vendedor");
   const isBuyer = order.buyer_id === user.id;
   const config = STATUS_CONFIG[paymentStatus] ?? STATUS_CONFIG.pending;
   const isBundle = bundleOrders.length > 1;
@@ -155,7 +156,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
   // WhatsApp de Vero.
   const esEnPersona = EN_PERSONA.includes(headOrder.courier ?? "") || !headOrder.courier;
   const mostrarCoordinacion = paymentStatus === "success" && isBuyer && esEnPersona;
-  const quienVende = seller?.full_name?.split(" ")[0] ?? "quien te vendió el libro";
+  const quienVende = nombreCortoVendedor(seller?.full_name, "quien te vendió el libro");
   const queCompro = isBundle ? `${bundleOrders.length} libros` : bundleOrders[0]?.listing?.book?.title ?? "un libro";
 
   return (
