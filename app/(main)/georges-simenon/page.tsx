@@ -1,3 +1,4 @@
+import PortadasEncabezado from "@/components/landings/PortadasEncabezado";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/Button";
 import type { Metadata } from "next";
@@ -137,7 +138,8 @@ export default async function SimenonPage() {
         <main className="max-w-5xl mx-auto px-6 py-10">
           <Breadcrumbs items={[{ label: "Inicio", href: "/" }, { label: "Georges Simenon" }]} />
 
-          <section className="mt-8 mb-12 max-w-3xl">
+          <section className="mt-8 mb-12 grid lg:grid-cols-[minmax(0,1fr)_auto] gap-6 lg:gap-10 items-center">
+            <div className="max-w-3xl">
             <h1 className="font-display text-4xl sm:text-5xl font-bold text-ink leading-[1.05] tracking-tight">
               Libros de Georges Simenon —{" "}
               <span className="italic text-brand-600">usados, en Chile.</span>
@@ -154,6 +156,8 @@ export default async function SimenonPage() {
                 Avisar cuando llegue uno →
               </ButtonLink>
             </div>
+            </div>
+            <PortadasEncabezado listings={listings} />
           </section>
 
           {listings.length > 0 ? (

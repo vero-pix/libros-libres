@@ -1,3 +1,4 @@
+import PortadasEncabezado from "@/components/landings/PortadasEncabezado";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
@@ -186,7 +187,8 @@ export default async function LibrosInfantilesPage() {
             items={[{ label: "Inicio", href: "/" }, { label: "Libros infantiles y juveniles" }]}
           />
 
-          <section className="mt-8 mb-16 max-w-3xl animate-fade-up">
+          <section className="mt-8 mb-16 grid lg:grid-cols-[minmax(0,1fr)_auto] gap-6 lg:gap-10 items-center animate-fade-up">
+            <div className="max-w-3xl">
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-ink leading-[1.05] tracking-tight">
               Libros infantiles y juveniles usados —{" "}
               <span className="italic text-brand-600">los que se leen rápido y se pasan.</span>
@@ -219,6 +221,8 @@ export default async function LibrosInfantilesPage() {
                 <strong className="text-ink">{clp(precioMinimo)}</strong>.
               </p>
             )}
+            </div>
+            <PortadasEncabezado listings={infantiles} />
           </section>
 
           {infantiles.length > 0 && (

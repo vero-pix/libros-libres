@@ -1,3 +1,4 @@
+import PortadasEncabezado from "@/components/landings/PortadasEncabezado";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -93,7 +94,8 @@ export default async function LibrosUsadosChilePage() {
           />
 
           {/* Hero */}
-          <section className="mt-8 mb-16 max-w-3xl">
+          <section className="mt-8 mb-16 grid lg:grid-cols-[minmax(0,1fr)_auto] gap-6 lg:gap-10 items-center">
+            <div className="max-w-3xl">
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-ink leading-[1.05] tracking-tight">
               Libros usados en Chile —<br />
               <span className="italic text-brand-600">comprar y vender.</span>
@@ -120,6 +122,8 @@ export default async function LibrosUsadosChilePage() {
                 Publicar mis libros gratis
               </Link>
             </div>
+            </div>
+            <PortadasEncabezado listings={featured} />
           </section>
 
           {/* Por qué distinto */}

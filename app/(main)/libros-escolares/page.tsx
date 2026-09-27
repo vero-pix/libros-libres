@@ -1,3 +1,4 @@
+import PortadasEncabezado from "@/components/landings/PortadasEncabezado";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
@@ -170,7 +171,8 @@ export default async function LibrosEscolaresPage() {
         <main className="max-w-6xl mx-auto px-6 py-10">
           <Breadcrumbs items={[{ label: "Inicio", href: "/" }, { label: "Libros escolares" }]} />
 
-          <section className="mt-8 mb-16 max-w-3xl animate-fade-up">
+          <section className="mt-8 mb-16 grid lg:grid-cols-[minmax(0,1fr)_auto] gap-6 lg:gap-10 items-center animate-fade-up">
+            <div className="max-w-3xl">
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-ink leading-[1.05] tracking-tight">
               Libros escolares usados —{" "}
               <span className="italic text-brand-600">los que pide el colegio, de segunda mano.</span>
@@ -196,6 +198,8 @@ export default async function LibrosEscolaresPage() {
                 Vender los del año pasado
               </Link>
             </div>
+            </div>
+            <PortadasEncabezado listings={[...textos, ...complementaria]} />
           </section>
 
           {textos.length > 0 && (

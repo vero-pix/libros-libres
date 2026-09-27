@@ -1,3 +1,4 @@
+import PortadasEncabezado from "@/components/landings/PortadasEncabezado";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
@@ -197,7 +198,8 @@ export default async function LibrosUsadosBaratosPage() {
         <main className="max-w-6xl mx-auto px-6 py-10">
           <Breadcrumbs items={[{ label: "Inicio", href: "/" }, { label: "Libros baratos" }]} />
 
-          <section className="mt-8 mb-10 max-w-3xl animate-fade-in-up">
+          <section className="mt-8 mb-10 grid lg:grid-cols-[minmax(0,1fr)_auto] gap-6 lg:gap-10 items-center animate-fade-in-up">
+            <div className="max-w-3xl">
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-ink leading-[1.05] tracking-tight">
               Libros baratos —{" "}
               <span className="italic text-brand-600">usados, y cientos bajo $5.000.</span>
@@ -207,6 +209,8 @@ export default async function LibrosUsadosBaratosPage() {
               veces menos que un café con torta. Junto los libros usados que publican personas y
               librerías de viejo de todo Chile, y en esta página te dejo solo los más baratos.
             </p>
+            </div>
+            <PortadasEncabezado listings={grilla} />
           </section>
 
           {/* Tramos de precio */}

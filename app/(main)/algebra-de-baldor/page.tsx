@@ -1,3 +1,4 @@
+import PortadasEncabezado from "@/components/landings/PortadasEncabezado";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
@@ -165,7 +166,8 @@ export default async function AlgebraDeBaldorPage() {
           />
 
           {/* Hero */}
-          <section className="mt-8 mb-12 max-w-3xl">
+          <section className="mt-8 mb-12 grid lg:grid-cols-[minmax(0,1fr)_auto] gap-6 lg:gap-10 items-center">
+            <div className="max-w-3xl">
             <h1 className="font-display text-4xl sm:text-5xl font-bold text-ink leading-[1.05] tracking-tight">
               Álgebra de Baldor —{" "}
               <span className="italic text-brand-600">usado, en Chile.</span>
@@ -189,6 +191,8 @@ export default async function AlgebraDeBaldorPage() {
                 Avisar cuando haya uno →
               </Link>
             </div>
+            </div>
+            <PortadasEncabezado listings={baldorListings} />
           </section>
 
           {/* Grid de listings */}
