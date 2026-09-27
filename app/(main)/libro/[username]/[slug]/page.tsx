@@ -16,6 +16,7 @@ import { resolveAuthorUrl } from "@/lib/authorLink";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 import { FEED_SHIPPING_CLP } from "@/lib/product-feed";
+import { obtenerComprasMinimas } from "@/lib/compraMinima";
 import { obtenerTarifasCoordinado, despachoParaFicha } from "@/lib/shipping/coordinado";
 import { comunaDesdeAddress } from "@/lib/comuna";
 
@@ -359,6 +360,7 @@ export default async function LibroPage({ params }: Props) {
   // Lo que la ficha promete del despacho sale de las tarifas vigentes, no de
   // un número escrito a mano (lib/shipping/coordinado.ts, 24-09-2026).
   const despacho = despachoParaFicha(await obtenerTarifasCoordinado(supabase), comunaDesdeAddress(listing.address));
+  const compraMinima = (await obtenerComprasMinimas(supabase))[listing.seller_id] ?? null;
 
   const canonicalUrl = `https://tuslibros.cl/libro/${params.username}/${params.slug}`;
 
@@ -498,7 +500,7 @@ export default async function LibroPage({ params }: Props) {
         <div className="flex gap-10">
 
           <div className="flex-1 min-w-0">
-            <ListingDetail listing={listing} images={(images ?? []) as any} sellerStats={sellerStats} otrosEjemplares={otrosEjemplares} despacho={despacho} />
+            <ListingDetail listing={listing} images={(images ?? []) as any} sellerStats={sellerStats} otrosEjemplares={otrosEjemplares} despacho={despacho} compraMinima={compraMinima} />
 
             {/* Reseña del vendedor/ejemplar. El componente existía desde abril
                 pero no estaba montado en ninguna página: el correo "¿Cómo

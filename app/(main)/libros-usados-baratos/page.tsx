@@ -102,6 +102,26 @@ export default async function LibrosUsadosBaratosPage() {
     obtenerTarifasCoordinado(supabase),
   ]);
 
+  // La caluga de LBV (27-09-2026): las repisas de Vero enteras a $15.000 y sus
+  // libros a $1.000 y $5.000, con compra mínima de $15.000 (lib/compraMinima.ts).
+  // Las repisas son lotes cuya composición vive en site_config.repisas_lbv.
+  const [{ data: repisasCfg }, { data: lbvRaw }] = await Promise.all([
+    supabase.from("site_config").select("value").eq("key", "repisas_lbv").maybeSingle(),
+    supabase
+      .from("listings")
+      .select(`*, book:books(*), seller:users!inner(id, full_name, avatar_url, username)`)
+      .eq("seller.username", "vero")
+      .eq("status", "active")
+      .lte("price", 15000)
+      .limit(300),
+  ]);
+  const repisaIds = new Set(Object.keys((repisasCfg?.value as Record<string, string[]>) ?? {}));
+  const lbv = ((lbvRaw ?? []) as unknown as ListingWithBook[]).filter((l) => l.book);
+  const repisas = lbv.filter((l) => repisaIds.has(l.id));
+  const aLuka = lbv.filter((l) => (l.price ?? 0) <= 1000);
+  const lbvCinco = lbv.filter((l) => l.price === 5000).length;
+  const enCaluga = new Set([...repisas, ...aLuka].map((l) => l.id));
+
   const todos = ((raw ?? []) as unknown as ListingWithBook[]).filter((l) => l.book);
   const bajo5k = todos.length;
   const bajo3k = todos.filter((l) => (l.price ?? 0) <= 3000).length;
@@ -115,7 +135,7 @@ export default async function LibrosUsadosBaratosPage() {
 
   // Repartida por vendedor y con rotación diaria: sin esto, la grilla eran
   // siempre los mismos 12 libros, casi todos de un solo vendedor.
-  const grilla = ordenarParaGrilla(todos).slice(0, EN_GRILLA);
+  const grilla = ordenarParaGrilla(todos.filter((l) => !enCaluga.has(l.id))).slice(0, EN_GRILLA);
 
   const faqs = [
     {
@@ -208,6 +228,40 @@ export default async function LibrosUsadosBaratosPage() {
               ))}
             </div>
           </section>
+
+          {repisas.length > 0 && (
+            <section className="mb-14 -mx-6 sm:mx-0 px-6 sm:px-8 py-8 sm:rounded-2xl bg-ink text-cream animate-fade-in-up" id="repisa-lbv">
+              <p className="text-xs uppercase tracking-widest font-semibold text-gold mb-2">La repisa de LBV</p>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-balance">
+                Repisas enteras a $15.000, y libros a luka y a 5 lucas
+              </h2>
+              <p className="mt-3 text-cream/80 max-w-2xl leading-relaxed text-sm sm:text-base">
+                Son libros de mi biblioteca que llevan meses esperando. Los vendo por repisa, como están en
+                mi estante: la serie completa, a $15.000. Y el resto, a $1.000 y a $5.000. En mis libros se
+                compra desde $15.000: una repisa ya llega, y los de luka sirven para completar.
+              </p>
+              <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {repisas.map((l) => (
+                  <ListingCard key={l.id} listing={l} />
+                ))}
+              </div>
+              {aLuka.length > 0 && (
+                <>
+                  <h3 className="mt-8 font-display text-xl font-bold">A luka</h3>
+                  <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {aLuka.map((l) => (
+                      <ListingCard key={l.id} listing={l} />
+                    ))}
+                  </div>
+                </>
+              )}
+              <div className="mt-8 flex flex-wrap gap-3">
+                <ButtonLink href="/vendedor/vero">
+                  Ver toda la biblioteca de LBV{lbvCinco > 0 ? ` (${lbvCinco} a $5.000)` : ""} →
+                </ButtonLink>
+              </div>
+            </section>
+          )}
 
           {grilla.length > 0 && (
             <section className="mb-12">

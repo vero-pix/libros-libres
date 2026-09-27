@@ -4,6 +4,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { telefonoDe } from "@/lib/telefonoVendedor";
 import { avisarOrigenFaltante, estadoOrigenVendedor } from "@/lib/shipit-origen";
 import { obtenerTarifasCoordinado } from "@/lib/shipping/coordinado";
+import { obtenerComprasMinimas, faltaParaMinimo } from "@/lib/compraMinima";
 import { preciosAcordados } from "@/lib/offers";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import type { ListingWithBook } from "@/types";
@@ -52,6 +53,15 @@ export default async function CheckoutPage({ params }: Props) {
 
   if (user && typedListing.seller_id === user.id) {
     redirect(`/listings/${params.id}`);
+  }
+
+  // Compra mínima del vendedor (lib/compraMinima.ts): un libro solo no llega,
+  // así que va al carrito, que dice cuánto falta y lleva a sus otros libros.
+  const minimas = await obtenerComprasMinimas(createServiceRoleClient());
+  if (faltaParaMinimo(minimas, typedListing.seller_id, typedListing.price ?? 0) > 0) {
+    if (!user) redirect(`/login?next=${encodeURIComponent(`/checkout/${params.id}`)}`);
+    await supabase.from("cart_items").upsert({ user_id: user.id, listing_id: typedListing.id }, { onConflict: "user_id,listing_id" });
+    redirect("/carrito");
   }
 
   // Get buyer profile for default address. Con service role y acotado a

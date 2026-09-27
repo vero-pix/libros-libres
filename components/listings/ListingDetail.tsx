@@ -165,9 +165,11 @@ interface Props {
    * tarifa más barata y plazo. null = no hay despacho que ofrecer.
    */
   despacho?: { desde: number; dias: string } | null;
+  /** Compra mínima del vendedor en pesos (lib/compraMinima.ts), o null. */
+  compraMinima?: number | null;
 }
 
-export default function ListingDetail({ listing, images = [], sellerStats = null , otrosEjemplares = 0, despacho = null }: Props) {
+export default function ListingDetail({ listing, images = [], sellerStats = null , otrosEjemplares = 0, despacho = null, compraMinima = null }: Props) {
   const { book } = listing;
   const coverUrl = listing.cover_image_url ?? book.cover_url;
   const sellerName = nombreCortoVendedor(listing.seller?.full_name);
@@ -469,6 +471,14 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
               </div>
             );
           })()}
+
+          {/* Compra mínima del vendedor: se avisa acá, antes del botón, para que
+              el carrito no sea una sorpresa (lib/compraMinima.ts). */}
+          {!isSold && compraMinima != null && (listing.price ?? 0) < compraMinima && (
+            <p className="mt-2 text-[13px] text-ink-muted">
+              En los libros de {sellerName} se compra desde ${compraMinima.toLocaleString("es-CL")}: súmale otros suyos al carrito.
+            </p>
+          )}
 
           {/* Pieza única. Solo cuando es verdad: si hay otro ejemplar del mismo
               título se dice eso, que también sirve (hay dónde elegir). */}

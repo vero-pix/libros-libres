@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { obtenerComprasMinimas } from "@/lib/compraMinima";
 import CartView from "./CartView";
 import { preciosAcordados } from "@/lib/offers";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
@@ -67,7 +68,7 @@ export default async function CarritoPage() {
       id, listing_id, added_at,
       listing:listings(id, slug, price, status, cover_image_url,
         book:books(title, author, cover_url),
-        seller:users(id, full_name, username, mercadopago_user_id)
+        seller:users(id, full_name, username, mercadopago_user_id, acepta_transferencia)
       )
     `)
     .eq("user_id", user.id)
@@ -94,6 +95,8 @@ export default async function CarritoPage() {
     if (a && i.listing.price != null && a.amount < i.listing.price) i.listing.price = a.amount;
   }
   const isEmpty = items.length === 0;
+  // Compra mínima por vendedor (lib/compraMinima.ts): el carrito avisa cuánto falta.
+  const minimas = await obtenerComprasMinimas(createServiceRoleClient());
 
   // Only fetch featured books when cart is empty — avoid unnecessary query otherwise
   let featured: ListingWithBook[] = [];
@@ -111,7 +114,7 @@ export default async function CarritoPage() {
     <div className="min-h-screen bg-cream">
       <main className="max-w-3xl mx-auto px-4 py-8">
         <h1 className="font-display text-2xl font-bold text-ink mb-6">Mi Carrito</h1>
-        <CartView items={items} featured={featured as any} />
+        <CartView items={items} featured={featured as any} minimas={minimas} />
       </main>
     </div>
   );

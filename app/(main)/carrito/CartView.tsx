@@ -7,6 +7,7 @@ import { libroUrl } from "@/lib/urls";
 import { trackEvent } from "@/utils/analytics";
 import { mostrarWhatsAppVendedor } from "@/lib/whatsapp-policy";
 import ContactSellerButton from "@/components/messages/ContactSellerButton";
+import { faltaParaMinimo, type ComprasMinimas } from "@/lib/compraMinima";
 import { PROMO_UMBRAL, promoVigente, sellerParticipa } from "@/lib/shipping-promo";
 
 interface CartItem {
@@ -25,6 +26,7 @@ interface CartItem {
       full_name: string | null;
       username: string | null;
       mercadopago_user_id?: string | null;
+      acepta_transferencia?: boolean | null;
       phone?: string | null;
     } | null;
   };
@@ -44,6 +46,8 @@ interface SellerGroup {
   sellerName: string;
   sellerUsername: string | null;
   sellerHasMP: boolean;
+  /** Cobra por transferencia (con o sin MercadoPago): también puede ir al checkout. */
+  sellerTransfer: boolean;
   sellerPhone: string | null;
   items: CartItem[];
   subtotal: number;
@@ -52,9 +56,11 @@ interface SellerGroup {
 export default function CartView({
   items: initialItems,
   featured = [],
+  minimas = {},
 }: {
   items: CartItem[];
   featured?: FeaturedListing[];
+  minimas?: ComprasMinimas;
 }) {
   const [items, setItems] = useState(initialItems);
   const [removing, setRemoving] = useState<string | null>(null);
@@ -75,6 +81,7 @@ export default function CartView({
           sellerName: s.full_name ?? "Vendedor",
           sellerUsername: s.username ?? null,
           sellerHasMP: !!s.mercadopago_user_id,
+          sellerTransfer: !!s.acepta_transferencia,
           sellerPhone: s.phone ?? null,
           items: [],
           subtotal: 0,
@@ -240,6 +247,7 @@ export default function CartView({
       {sellerGroups.map((group) => {
         const listingIds = group.items.map((i) => i.listing.id).join(",");
         const checkoutHref = `/checkout/bundle?listings=${listingIds}`;
+        const faltaMinimo = faltaParaMinimo(minimas, group.sellerId, group.subtotal);
 
         function waMessage() {
           const lines = group.items
@@ -380,14 +388,38 @@ export default function CartView({
                 );
               })()}
 
-              {group.sellerHasMP && (
+              {/* Compra mínima del vendedor (lib/compraMinima.ts). No es un
+                  muro: dice cuánto falta y lleva a sus otros libros. */}
+              {faltaMinimo > 0 && (
+                <div className="mb-3">
+                  <p className="text-xs font-medium text-ink mb-1.5">
+                    En los libros de {group.sellerName} se compra desde{" "}
+                    ${minimas[group.sellerId].toLocaleString("es-CL")}. Te faltan{" "}
+                    <strong className="text-coral">${faltaMinimo.toLocaleString("es-CL")}</strong>.
+                  </p>
+                  <div className="h-2 w-full bg-cream-dark/40 rounded-full overflow-hidden mb-3">
+                    <div
+                      className="h-full rounded-full bg-coral transition-all duration-500"
+                      style={{ width: `${Math.min(100, Math.round((group.subtotal / minimas[group.sellerId]) * 100))}%` }}
+                    />
+                  </div>
+                  <Link
+                    href={group.sellerUsername ? `/vendedor/${group.sellerUsername}` : `/vendedor/${group.sellerId}`}
+                    className="block w-full text-center border-2 border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white font-semibold py-2.5 rounded-xl transition-colors text-sm"
+                  >
+                    Ver más libros de {group.sellerName} →
+                  </Link>
+                </div>
+              )}
+
+              {(group.sellerHasMP || group.sellerTransfer) && faltaMinimo === 0 && (
                 <Link
                   href={checkoutHref}
                   onClick={() => trackEvent("begin_checkout", {
                     currency: "CLP",
                     value: group.subtotal,
                     items: group.items.length,
-                    method: "mercadopago",
+                    method: group.sellerHasMP ? "mercadopago" : "transfer",
                   })}
                   className="block w-full text-center bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold py-3 rounded-xl transition-all text-sm shadow-md"
                 >
@@ -415,7 +447,7 @@ export default function CartView({
               {/* Sin pago en línea NI teléfono, la mensajería interna es la única
                   salida: un carrito que solo informa el bloqueo es una pantalla de
                   compra sin salida. Le llega correo al vendedor. */}
-              {!group.sellerHasMP && !group.sellerPhone && (
+              {!group.sellerHasMP && !group.sellerTransfer && !group.sellerPhone && (
                 <div className="space-y-2">
                   <ContactSellerButton
                     sellerId={group.sellerId}

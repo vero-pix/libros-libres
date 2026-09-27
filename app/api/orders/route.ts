@@ -23,6 +23,7 @@ import {
   obtenerTarifasCoordinado,
   precioCoordinado,
 } from "@/lib/shipping/coordinado";
+import { obtenerComprasMinimas, faltaParaMinimo } from "@/lib/compraMinima";
 import { preciosAcordados } from "@/lib/offers";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { buscarOCrearConversacion } from "@/lib/conversations";
@@ -225,6 +226,19 @@ export async function POST(req: NextRequest) {
     const acordado = acordados[l.id]?.amount;
     return acordado !== undefined && acordado < publicado ? acordado : publicado;
   };
+
+  // Compra mínima del vendedor (lib/compraMinima.ts). Se cuenta sobre el precio
+  // de los libros, sin despacho. El carrito ya avisa; esto es la regla.
+  const minimas = await obtenerComprasMinimas(createServiceRoleClient());
+  const falta = faltaParaMinimo(minimas, sellerId, listings.reduce((sum: number, l: any) => sum + precioDe(l), 0));
+  if (falta > 0) {
+    return NextResponse.json(
+      {
+        error: `En los libros de ${seller.full_name ?? "este vendedor"} la compra mínima es de $${minimas[sellerId].toLocaleString("es-CL")} y a este pedido le faltan $${falta.toLocaleString("es-CL")}. Agrega más libros suyos al carrito.`,
+      },
+      { status: 409 }
+    );
+  }
 
   // Validar y aplicar código de descuento
   let discountPct = 0;
