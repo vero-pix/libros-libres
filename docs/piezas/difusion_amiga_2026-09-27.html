@@ -3,7 +3,8 @@
   Kit para que una amiga de Vero difunda tuslibros.cl por WhatsApp (27-09-2026).
   Objetivo: que quien nunca oyó del sitio entienda en 3 segundos QUÉ es y CÓMO funciona.
   Dos formatos con el mismo contenido: estado 9:16 y grupos 4:5.
-  Cifras de la base el 27-09-2026: 4.186 libros activos, 165 vendedores, 74 ciudades.
+  Categorías con más libros activos el 27-09-2026: Novela 1.068, Ensayo 671, Historia 519,
+  Poesía 186, Infantil y juvenil 168, Académico/Universitario 184. (Vero cambió las cifras por «fácil» + categorías.)
   "Te llega o lo retiras": despacho coordinado o encuentro en persona, según el vendedor.
 -->
 <html lang="es"><head><meta charset="utf-8">
@@ -19,7 +20,9 @@
   .titulo{text-align:center;font-family:Newsreader,serif;font-weight:600;line-height:1.02;letter-spacing:-1px}
   .titulo i{color:#DF5239;font-weight:500}
   .cifra{text-align:center;font-size:34px;color:#5a5f70;font-weight:500}
-  .cifra b{color:#102A73}
+  .cifra .facil{font-weight:700;color:#DF5239;margin-bottom:14px}
+  .chips{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
+  .chips span{border:2px solid #1A3DA0;color:#1A3DA0;border-radius:999px;padding:6px 20px;font-weight:600;font-size:.82em;background:#fff}
   .tapas{display:flex;justify-content:center;gap:22px}
   .tapas img{width:190px;aspect-ratio:2/3;object-fit:cover;border-radius:3px 8px 8px 3px;box-shadow:0 12px 22px rgba(20,30,60,.25),inset 5px 0 0 rgba(0,0,0,.18)}
   .tapas img:nth-child(odd){transform:rotate(-2deg)} .tapas img:nth-child(even){transform:rotate(2deg)}
@@ -37,10 +40,10 @@
 
   /* estado 9:16 */
   .estado .titulo{position:absolute;top:150px;left:50px;right:50px;font-size:132px}
-  .estado .cifra{position:absolute;top:470px;left:50px;right:50px;font-size:38px}
-  .estado .tapas{position:absolute;top:580px;left:0;right:0}
-  .estado .tapas img{width:210px}
-  .estado .cols{position:absolute;top:1010px;left:50px;right:50px;gap:30px}
+  .estado .cifra{position:absolute;top:450px;left:40px;right:40px;font-size:38px}
+  .estado .tapas{position:absolute;top:640px;left:0;right:0}
+  .estado .tapas img{width:190px}
+  .estado .cols{position:absolute;top:1070px;left:50px;right:50px;gap:30px}
   .estado .col{padding:44px 38px 48px}
   .estado .col h3{font-size:84px;margin-bottom:30px}
   .estado .col ol{gap:24px}
@@ -51,10 +54,11 @@
 
   /* grupo 4:5 */
   .grupo .titulo{position:absolute;top:70px;left:60px;right:60px;font-size:92px}
-  .grupo .cifra{position:absolute;top:300px;left:60px;right:60px;font-size:30px}
-  .grupo .tapas{position:absolute;top:370px;left:0;right:0}
-  .grupo .tapas img{width:150px}
-  .grupo .cols{position:absolute;top:640px;left:60px;right:60px}
+  .grupo .cifra{position:absolute;top:285px;left:40px;right:40px;font-size:30px}
+  .grupo .cifra .facil{margin-bottom:10px}
+  .grupo .tapas{position:absolute;top:420px;left:0;right:0}
+  .grupo .tapas img{width:128px}
+  .grupo .cols{position:absolute;top:660px;left:60px;right:60px}
   .grupo .col{padding:28px 30px 30px}
   .grupo .col h3{font-size:58px;margin-bottom:16px}
   .grupo .col li{font-size:32px}
@@ -64,7 +68,7 @@
 
 <template id="contenido">
   <h1 class="titulo">Libros usados<br><i>en todo Chile</i></h1>
-  <p class="cifra"><b>4.000+ libros</b> · 165 vendedores · 74 ciudades</p>
+  <div class="cifra"><p class="facil">Fácil de comprar y vender</p><div class="chips"><span>Novela</span><span>Historia</span><span>Poesía</span><span>Infantil</span><span>Universitarios</span></div></div>
   <div class="tapas">
     <img src="https://tfaqvnsdasaegkcahaal.supabase.co/storage/v1/object/public/covers/57283db7-3465-427d-a849-15adedf6ce65/c391932a-74f3-4054-aae2-c6081ac4a7ad/1783739386181-fhdm61meybl.jpg" alt="El Señor de los Anillos">
     <img src="https://api.tuslibros.cl/storage/v1/object/public/covers/ab2de6fc-ce4f-49a8-b70a-bccba9d201bd/1789325524768.jpg" alt="Isabel Allende">
