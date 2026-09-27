@@ -1,0 +1,109 @@
+<!doctype html>
+<!--
+  Piezas de psicología (27-09-2026) — una para compradores y otra para vendedores.
+  Formato 4:5 (1080×1350). Render: scripts/_render_piezas_psicologia.mjs → PNG en esta carpeta.
+  Todas las cifras salen de la base el 27-09-2026:
+    · 40 libros de psicología a la venta, de 11 vendedores (mediana $12.000)
+    · 330 búsquedas de psicología en el sitio en 90 días (Piaget 23, Maturana 22, Freud 19, Jung 11, Goleman 11)
+    · Lo más buscado: Piaget, Maturana, Freud, Jung, Goleman; en clínica, «psicoterapeutas» (12) y «psiquiatría» (8, sumando con y sin tilde)
+    · OJO: los 10 libros de psicología/psiquiatría en estado «vendido» los marcó el vendedor a mano; ninguno
+      tiene orden pagada en el sitio. Por eso la pieza NO dice «se vendieron acá».
+  Las portadas son de libros activos ese día.
+-->
+<html lang="es"><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500;1,6..72,600&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{--crema:#F6F0E8;--papel:#EDE4D3;--tinta:#1A3DA0;--tinta-hondo:#102A73;--coral:#DF5239;--coral-hondo:#B53D28;--oro:#C78800;--texto:#2B2F3A}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#ccc;display:flex;flex-direction:column;gap:40px;padding:40px;font-family:"Hanken Grotesk",system-ui,sans-serif}
+  .pieza{width:1080px;height:1350px;position:relative;overflow:hidden;background:var(--crema);color:var(--texto)}
+  .mono{font-family:"JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase}
+  .serif{font-family:Newsreader,Georgia,serif}
+  .marca{position:absolute;left:96px;bottom:72px;display:flex;align-items:baseline;gap:18px}
+  .marca b{font-family:Newsreader,serif;font-weight:600;font-size:40px;color:var(--tinta)}
+  .marca b i{color:var(--coral);font-style:italic}
+  .marca span{font-size:22px;color:#6b6457}
+
+  /* ---------- Compradores ---------- */
+  #compradores .kicker{position:absolute;top:92px;left:96px;font-size:22px;color:var(--coral-hondo)}
+  #compradores h1{position:absolute;top:140px;left:96px;right:96px;font-family:Newsreader,serif;font-weight:600;font-size:92px;line-height:1.02;color:var(--tinta-hondo);letter-spacing:-1px}
+  #compradores h1 i{color:var(--coral);font-weight:500}
+  .estante{position:absolute;top:470px;left:0;right:0;height:520px;display:flex;justify-content:center;align-items:flex-end;gap:34px;padding:0 70px}
+  .estante::after{content:"";position:absolute;left:60px;right:60px;bottom:-14px;height:18px;border-radius:4px;background:linear-gradient(#b89a6e,#8f7450);box-shadow:0 14px 26px rgba(60,40,10,.25)}
+  .libro{width:200px;display:flex;flex-direction:column;align-items:center;gap:0;transform-origin:bottom center}
+  .libro:nth-child(1){transform:rotate(-2deg)} .libro:nth-child(2){transform:rotate(1.5deg)} .libro:nth-child(3){transform:rotate(-1deg)} .libro:nth-child(4){transform:rotate(2deg)}
+  .tapa{width:200px;height:300px;border-radius:3px 7px 7px 3px;overflow:hidden;box-shadow:0 18px 30px rgba(20,30,60,.28),inset 6px 0 0 rgba(0,0,0,.18);background:#ddd}
+  .tapa img{width:100%;height:100%;object-fit:cover;display:block}
+  .quien{position:absolute;top:1010px;left:70px;right:70px;display:flex;justify-content:center;gap:34px}
+  .quien div{width:200px;text-align:center;font-family:Newsreader,serif;font-style:italic;font-size:30px;color:var(--tinta)}
+  #compradores .bajada{position:absolute;top:1090px;left:96px;right:96px;font-size:31px;line-height:1.4;color:var(--texto)}
+  #compradores .bajada strong{color:var(--tinta-hondo)}
+  #compradores .cta{position:absolute;right:96px;bottom:64px;background:var(--coral);color:#fff;font-weight:600;font-size:26px;padding:18px 28px;border-radius:999px}
+
+  /* ---------- Vendedores ---------- */
+  #vendedores{background:var(--tinta-hondo);color:var(--crema)}
+  #vendedores .kicker{position:absolute;top:92px;left:96px;font-size:22px;color:#E9C46A}
+  #vendedores h1{position:absolute;top:140px;left:96px;right:110px;font-family:Newsreader,serif;font-weight:600;font-size:80px;line-height:1.05;letter-spacing:-.5px}
+  #vendedores h1 i{color:#F2A08F;font-weight:500}
+  .cifras{position:absolute;top:560px;left:96px;right:96px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:30px}
+  .cifra .n{font-family:Newsreader,serif;font-weight:600;font-size:150px;line-height:1;color:#fff}
+  .cifra .t{font-size:27px;line-height:1.3;color:#CFD6EE;margin-top:10px}
+  .contra{font-family:Newsreader,serif;font-style:italic;font-size:44px;color:#E9C46A}
+  .vendidos{position:absolute;top:850px;left:96px;right:96px;border-top:2px solid rgba(233,196,106,.45);padding-top:30px}
+  .vendidos .mono{font-size:20px;color:#E9C46A;margin-bottom:18px}
+  .vendidos ul{list-style:none;display:grid;gap:12px}
+  .vendidos li{font-family:Newsreader,serif;font-size:33px;color:var(--crema);display:flex;justify-content:space-between;gap:20px}
+  .vendidos li span{font-family:"Hanken Grotesk",sans-serif;font-size:27px;color:#CFD6EE;white-space:nowrap}
+  #vendedores .reglas{position:absolute;top:1120px;left:96px;right:96px;font-size:29px;line-height:1.4;color:#fff}
+  #vendedores .reglas b{color:#E9C46A;font-weight:600}
+  #vendedores .marca b{color:#fff} #vendedores .marca span{color:#AEB8DA}
+  #vendedores .cta{position:absolute;right:96px;bottom:64px;background:var(--coral);color:#fff;font-weight:600;font-size:26px;padding:18px 28px;border-radius:999px}
+</style></head><body>
+
+<!-- ====================== COMPRADORES ====================== -->
+<section class="pieza" id="compradores">
+  <p class="kicker mono">Psicología usada · Chile</p>
+  <h1>¿Cuánto cuesta<br>entender a Freud?<br><i>Menos de lo que crees.</i></h1>
+
+  <div class="estante">
+    <div class="libro"><div class="tapa"><img src="https://tfaqvnsdasaegkcahaal.supabase.co/storage/v1/object/public/covers/00e32156-2c74-4aed-a00f-fa63fdbf94ef/1779070062436.jpg" alt="La interpretación de los sueños, Freud"></div></div>
+    <div class="libro"><div class="tapa"><img src="https://tfaqvnsdasaegkcahaal.supabase.co/storage/v1/object/public/covers/e64beac7-914f-4ce3-8a49-91aa9edc8547/db7069da-0992-4576-a936-b4424ded7b00/0-c39-qui-n-es-ulises.jpg" alt="¿Quién es Ulises?, Jung"></div></div>
+    <div class="libro"><div class="tapa"><img src="https://api.tuslibros.cl/storage/v1/object/public/covers/7ffb65d4-2d58-4ef2-b068-f2169ccd4b2d/1790124207796.jpg" alt="La formación del símbolo en el niño, Piaget"></div></div>
+    <div class="libro"><div class="tapa"><img src="https://tfaqvnsdasaegkcahaal.supabase.co/storage/v1/object/public/covers/f527e314-666c-49fe-831a-2cbd570308f8/1776556912739.webp" alt="Transformación en la convivencia, Maturana"></div></div>
+  </div>
+  <div class="quien"><div>Freud</div><div>Jung</div><div>Piaget</div><div>Maturana</div></div>
+
+  <p class="bajada">Son los cuatro que más me buscan en psicología. <strong>Los tengo, usados y de verdad</strong>, junto a otros 36: de la carrera, del diván y de la biblioteca de alguien que ya los leyó.</p>
+
+  <div class="marca"><b>tuslibros<i>.cl</i></b><span>busca «psicología»</span></div>
+  <div class="cta">Ver los 40 →</div>
+</section>
+
+<!-- ====================== VENDEDORES ====================== -->
+<section class="pieza" id="vendedores">
+  <p class="kicker mono">Se buscan · Psicología</p>
+  <h1>¿Tus libros de la U<br>siguen en la repisa?<br><i>Alguien los está buscando.</i></h1>
+
+  <div class="cifras">
+    <div class="cifra"><div class="n">330</div><div class="t">búsquedas de psicología en tuslibros en tres meses</div></div>
+    <div class="contra">y hay</div>
+    <div class="cifra"><div class="n">40</div><div class="t">libros de psicología a la venta. Faltan.</div></div>
+  </div>
+
+  <div class="vendidos">
+    <p class="mono">Lo que más me buscan</p>
+    <ul>
+      <li>Piaget · Maturana · Freud <span>de la carrera</span></li>
+      <li>Jung · Goleman <span>de la mesa de noche</span></li>
+      <li>Psiquiatría · psicopatología · psicoterapia <span>de la consulta</span></li>
+    </ul>
+  </div>
+
+  <p class="reglas">Publicar es gratis. <b>Cobro 8% solo si se vende.</b> Tú pones el precio.</p>
+
+  <div class="marca"><b>tuslibros<i>.cl</i></b><span>/vender</span></div>
+  <div class="cta">Publica los tuyos →</div>
+</section>
+
+</body></html>
