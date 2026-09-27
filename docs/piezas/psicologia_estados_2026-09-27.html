@@ -1,0 +1,69 @@
+<!doctype html>
+<!--
+  Estados de WhatsApp (9:16, 1080×1920) — psicología, compra y venta. 27-09-2026.
+  Versión simple de docs/piezas/psicologia_2026-09-27.html: solo libros y una frase.
+  Portadas de libros activos ese día. Render: scripts/_render_piezas_psicologia.mjs estados
+-->
+<html lang="es"><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,600;1,6..72,500&family=Hanken+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#999;display:flex;gap:40px;padding:40px;font-family:"Hanken Grotesk",sans-serif}
+  .estado{width:1080px;height:1920px;position:relative;overflow:hidden}
+  .marca{position:absolute;left:0;right:0;bottom:150px;text-align:center;font-family:Newsreader,serif;font-weight:600;font-size:64px}
+  .marca i{color:#DF5239;font-style:italic;font-weight:500}
+  .boton{position:absolute;left:50%;transform:translateX(-50%);bottom:170px;background:#DF5239;color:#fff;font-weight:600;font-size:44px;padding:26px 56px;border-radius:999px;white-space:nowrap}
+  h1{position:absolute;left:80px;right:80px;text-align:center;font-family:Newsreader,serif;font-weight:600;line-height:1.02}
+  h1 i{font-weight:500}
+
+  /* Compra: crema, cuatro portadas grandes */
+  #compra{background:#F6F0E8;color:#102A73}
+  #compra h1{top:200px;font-size:124px}
+  #compra h1 i{color:#DF5239}
+  .grilla{position:absolute;top:560px;left:190px;right:190px;display:grid;grid-template-columns:1fr 1fr;gap:44px 50px}
+  .tapa{aspect-ratio:2/3;border-radius:4px 10px 10px 4px;overflow:hidden;box-shadow:0 22px 40px rgba(20,30,60,.3),inset 8px 0 0 rgba(0,0,0,.18)}
+  .tapa:nth-child(1){transform:rotate(-2.5deg)} .tapa:nth-child(2){transform:rotate(2deg)} .tapa:nth-child(3){transform:rotate(1.5deg)} .tapa:nth-child(4){transform:rotate(-2deg)}
+  .tapa img{width:100%;height:100%;object-fit:cover;display:block}
+  #compra .marca{color:#1A3DA0}
+
+  /* Venta: azul tinta, lomos de libros */
+  #venta{background:#102A73;color:#F6F0E8}
+  #venta h1{top:300px;font-size:120px}
+  #venta h1 i{color:#F2A08F}
+  .repisa{position:absolute;top:960px;left:120px;right:120px;height:520px;display:flex;align-items:flex-end;justify-content:center;gap:14px}
+  .repisa::after{content:"";position:absolute;left:-20px;right:-20px;bottom:-18px;height:22px;border-radius:5px;background:linear-gradient(#caa66a,#98773f)}
+  .lomo{width:70px;border-radius:5px 5px 2px 2px;position:relative;display:flex;align-items:center;justify-content:center}
+  .lomo span{writing-mode:vertical-rl;transform:rotate(180deg);font-family:Newsreader,serif;font-size:30px;color:rgba(255,255,255,.9);letter-spacing:.04em}
+  .lomo::before,.lomo::after{content:"";position:absolute;left:10px;right:10px;height:3px;background:rgba(255,255,255,.35)}
+  .lomo::before{top:26px} .lomo::after{bottom:26px}
+  .inclinado{transform:rotate(-9deg);transform-origin:bottom right;margin-left:24px}
+  #venta .sub{position:absolute;top:1500px;left:80px;right:80px;text-align:center;font-size:46px;color:#E9C46A;font-weight:600}
+  #venta .marca{color:#fff}
+</style></head><body>
+
+<section class="estado" id="compra">
+  <h1>Psicología<br><i>usada</i></h1>
+  <div class="grilla">
+    <div class="tapa"><img src="https://tfaqvnsdasaegkcahaal.supabase.co/storage/v1/object/public/covers/00e32156-2c74-4aed-a00f-fa63fdbf94ef/1779070062436.jpg" alt="Freud"></div>
+    <div class="tapa"><img src="https://tfaqvnsdasaegkcahaal.supabase.co/storage/v1/object/public/covers/e64beac7-914f-4ce3-8a49-91aa9edc8547/db7069da-0992-4576-a936-b4424ded7b00/0-c39-qui-n-es-ulises.jpg" alt="Jung"></div>
+    <div class="tapa"><img src="https://api.tuslibros.cl/storage/v1/object/public/covers/7ffb65d4-2d58-4ef2-b068-f2169ccd4b2d/1790124207796.jpg" alt="Piaget"></div>
+    <div class="tapa"><img src="https://tfaqvnsdasaegkcahaal.supabase.co/storage/v1/object/public/covers/f527e314-666c-49fe-831a-2cbd570308f8/1776556912739.webp" alt="Maturana"></div>
+  </div>
+  <div class="boton">Cómpralos en tuslibros.cl</div>
+</section>
+
+<section class="estado" id="venta">
+  <h1>¿Tienes libros<br>de psicología?<br><i>Véndelos.</i></h1>
+  <div class="repisa">
+    <div class="lomo" style="height:430px;background:#8C2F24"><span>Freud</span></div>
+    <div class="lomo" style="height:380px;background:#2F5D50"><span>Piaget</span></div>
+    <div class="lomo" style="height:460px;background:#5B3A6B"><span>Jung</span></div>
+    <div class="lomo" style="height:400px;background:#B07A1E"><span>Maturana</span></div>
+    <div class="lomo" style="height:350px;background:#3A4F7A"><span>Frankl</span></div>
+    <div class="lomo inclinado" style="height:410px;background:#DF5239"><span>Los tuyos</span></div>
+  </div>
+  <div class="boton">tuslibros.cl/vender</div>
+</section>
+
+</body></html>
