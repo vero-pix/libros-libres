@@ -18,7 +18,7 @@
   .grupo{width:1080px;height:1350px}
   .serif{font-family:Newsreader,serif}
   .titulo{text-align:center;font-family:Newsreader,serif;font-weight:600;line-height:1.02;letter-spacing:-1px}
-  .titulo i{color:#DF5239;font-weight:500}
+  .titulo i{color:#DF5239;font-weight:500;font-size:.62em;display:block;margin-top:14px;letter-spacing:0}
   .cifra{text-align:center;font-size:34px;color:#5a5f70;font-weight:500}
   .cifra .facil{font-weight:700;color:#DF5239;margin-bottom:14px}
   .chips{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
@@ -67,8 +67,8 @@
 </style></head><body>
 
 <template id="contenido">
-  <h1 class="titulo">Libros usados<br><i>en todo Chile</i></h1>
-  <div class="cifra"><p class="facil">Fácil de comprar y vender</p><div class="chips"><span>Novela</span><span>Historia</span><span>Poesía</span><span>Infantil</span><span>Universitarios</span></div></div>
+  <h1 class="titulo">Libros usados<br><i>fácil de comprar y vender</i></h1>
+  <div class="cifra"><div class="chips"><span>Novela</span><span>Historia</span><span>Poesía</span><span>Infantil</span><span>Universitarios</span></div></div>
   <div class="tapas">
     <img src="https://tfaqvnsdasaegkcahaal.supabase.co/storage/v1/object/public/covers/57283db7-3465-427d-a849-15adedf6ce65/c391932a-74f3-4054-aae2-c6081ac4a7ad/1783739386181-fhdm61meybl.jpg" alt="El Señor de los Anillos">
     <img src="https://api.tuslibros.cl/storage/v1/object/public/covers/ab2de6fc-ce4f-49a8-b70a-bccba9d201bd/1789325524768.jpg" alt="Isabel Allende">
@@ -91,6 +91,14 @@
 
 <section class="pieza estado" id="estado"></section>
 <section class="pieza grupo" id="grupo"></section>
+<!-- SEGUNDA: la que invita a tocar el link (va justo después en el estado) -->
+<section class="pieza estado" id="clic" style="background:#DF5239;color:#fff">
+  <h1 class="titulo" style="position:absolute;top:380px;left:50px;right:50px;font-size:118px;color:#fff">¿Buscas<br>un libro<br>o vendes<br>los tuyos?</h1>
+  <p style="position:absolute;top:960px;left:0;right:0;text-align:center;font-family:Newsreader,serif;font-style:italic;font-size:110px">Entra aquí</p>
+  <svg viewBox="0 0 100 160" style="position:absolute;left:50%;transform:translateX(-50%);top:1130px;width:170px;height:270px" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><path d="M50 8v136M12 106l38 40 38-40"/></svg>
+  <div style="position:absolute;left:120px;right:120px;bottom:210px;background:#fff;color:#102A73;border-radius:999px;padding:34px 0;text-align:center;font-family:Newsreader,serif;font-weight:600;font-size:92px;box-shadow:0 16px 34px rgba(0,0,0,.2)">tuslibros<i style="color:#DF5239;font-weight:500">.cl</i></div>
+</section>
+
 <script>
   const t = document.getElementById("contenido");
   for (const id of ["estado", "grupo"]) document.getElementById(id).appendChild(t.content.cloneNode(true));
