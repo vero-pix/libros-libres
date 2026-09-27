@@ -3,7 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
 import { construirPerfil, evaluar, type SolicitudMatch } from "@/lib/requestMatching";
 
-export const maxDuration = 60;
+// 300 s: el envío va en fila a 8 por segundo (hasta ~2.400 correos).
+export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
 /**
@@ -248,15 +249,23 @@ export async function GET(request: Request) {
     });
   }
 
-  const results = await Promise.allSettled(
-    paquetes.map((p) =>
-      sendEmail({
-        to: p.u.email!,
-        subject: asuntoDe(p),
-        html: construirCorreo(p.personal, p.nuevas),
-      })
-    )
-  );
+  // En fila, a 8 por segundo: Resend acepta 10 y con Promise.allSettled salían
+  // todos juntos — 9 rechazos 429 en 7 días, avisos del Se busca que no
+  // llegaban (27-09-2026). Mismo formato de resultados que antes.
+  const results: PromiseSettledResult<{ id: string } | null>[] = [];
+  for (const p of paquetes) {
+    const t0 = Date.now();
+    try {
+      results.push({
+        status: "fulfilled",
+        value: await sendEmail({ to: p.u.email!, subject: asuntoDe(p), html: construirCorreo(p.personal, p.nuevas) }),
+      });
+    } catch (reason) {
+      results.push({ status: "rejected", reason });
+    }
+    const espera = 125 - (Date.now() - t0);
+    if (espera > 0) await new Promise((r) => setTimeout(r, espera));
+  }
   const ok = results.filter((r) => r.status === "fulfilled" && r.value).length;
   const conMatch = paquetes.filter((p) => p.personal.length).length;
 
