@@ -5,7 +5,8 @@
   Dos formatos con el mismo contenido: estado 9:16 y grupos 4:5.
   Categorías con más libros activos el 27-09-2026: Novela 1.068, Ensayo 671, Historia 519,
   Poesía 186, Infantil y juvenil 168, Académico/Universitario 184. (Vero cambió las cifras por «fácil» + categorías.)
-  Pasos de compra según Vero (27-09): Agrégalo al carrito · Habla con el vendedor · Paga y listo.
+  Pasos según Vero (27-09). Compra: Agrégalo al carrito · Habla con el vendedor · Paga y listo.
+  Vende: Regístrate · Escanea el código o sácale foto · Ponle precio (el sitio completa el resto: ISBN + lectura de portada).
 -->
 <html lang="es"><head><meta charset="utf-8">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,16 +42,16 @@
   /* estado 9:16 */
   .estado .titulo{position:absolute;top:150px;left:50px;right:50px;font-size:132px}
   .estado .cifra{position:absolute;top:450px;left:40px;right:40px;font-size:38px}
-  .estado .tapas{position:absolute;top:640px;left:0;right:0}
-  .estado .tapas img{width:190px}
-  .estado .cols{position:absolute;top:1070px;left:50px;right:50px;gap:30px}
+  .estado .tapas{position:absolute;top:590px;left:0;right:0}
+  .estado .tapas img{width:170px}
+  .estado .cols{position:absolute;top:930px;left:50px;right:50px;gap:30px}
   .estado .col{padding:44px 38px 48px}
   .estado .col h3{font-size:84px;margin-bottom:30px}
   .estado .col ol{gap:24px}
-  .estado .col li{font-size:42px}
+  .estado .col li{font-size:39px}
   .estado .col li span{width:60px;height:60px;font-size:32px}
   .estado .col .nota{font-size:30px;margin-top:26px}
-  .estado .url{position:absolute;left:0;right:0;bottom:130px;font-size:110px}
+  .estado .url{position:absolute;left:0;right:0;bottom:110px;font-size:104px}
 
   /* grupo 4:5 */
   .grupo .titulo{position:absolute;top:70px;left:60px;right:60px;font-size:92px}
@@ -82,8 +83,8 @@
     </div>
     <div class="col vende">
       <h3>Vende</h3>
-      <ol><li><span>1</span>Sácale foto</li><li><span>2</span>Ponle precio</li><li><span>3</span>Listo, publicado</li></ol>
-      <p class="nota">Publicar es gratis</p>
+      <ol><li><span>1</span>Regístrate</li><li><span>2</span>Escanea el código o sácale foto</li><li><span>3</span>Ponle precio</li></ol>
+      <p class="nota">tuslibros completa el resto por ti · Publicar es gratis</p>
     </div>
   </div>
   <p class="url">tuslibros<i>.cl</i></p>
@@ -92,6 +93,19 @@
 <section class="pieza estado" id="estado"></section>
 <section class="pieza grupo" id="grupo"></section>
 <!-- SEGUNDA: la que invita a tocar el link (va justo después en el estado) -->
+<!-- TERCERA: el "Se busca" (búsqueda inversa). Títulos de pedidos reales abiertos el 27-09, sin datos de quien pidió. -->
+<section class="pieza estado" id="sebusca" style="background:#102A73;color:#fff">
+  <h1 class="titulo" style="position:absolute;top:220px;left:50px;right:50px;font-size:120px;color:#fff">¿No está el libro<br>que buscas?</h1>
+  <p style="position:absolute;top:520px;left:0;right:0;text-align:center;font-family:Newsreader,serif;font-style:italic;font-size:120px;color:#F2A08F">Pídelo</p>
+  <div style="position:absolute;top:760px;left:110px;right:110px;display:grid;gap:26px">
+    <div style="background:#F6F0E8;color:#102A73;border-radius:24px;padding:28px 34px;transform:rotate(-1.5deg)"><span style="font-size:24px;letter-spacing:.2em;font-weight:700;color:#B45309;background:#FDE9C4;padding:6px 14px;border-radius:999px">SE BUSCA</span><p style="font-family:Newsreader,serif;font-weight:600;font-size:54px;margin-top:14px">Opus nigrum</p></div>
+    <div style="background:#F6F0E8;color:#102A73;border-radius:24px;padding:28px 34px;transform:rotate(1deg)"><span style="font-size:24px;letter-spacing:.2em;font-weight:700;color:#B45309;background:#FDE9C4;padding:6px 14px;border-radius:999px">SE BUSCA</span><p style="font-family:Newsreader,serif;font-weight:600;font-size:54px;margin-top:14px">El retorno de los brujos</p></div>
+    <div style="background:#F6F0E8;color:#102A73;border-radius:24px;padding:28px 34px;transform:rotate(-.8deg)"><span style="font-size:24px;letter-spacing:.2em;font-weight:700;color:#B45309;background:#FDE9C4;padding:6px 14px;border-radius:999px">SE BUSCA</span><p style="font-family:Newsreader,serif;font-weight:600;font-size:54px;margin-top:14px">Los hermanos Karamazov</p></div>
+  </div>
+  <p style="position:absolute;top:1420px;left:80px;right:80px;text-align:center;font-size:46px;font-weight:600;line-height:1.3">Te aviso cuando alguien lo publique</p>
+  <div style="position:absolute;left:120px;right:120px;bottom:170px;background:#DF5239;color:#fff;border-radius:999px;padding:30px 0;text-align:center;font-weight:700;font-size:54px;box-shadow:0 16px 34px rgba(0,0,0,.25)">tuslibros.cl/solicitudes</div>
+</section>
+
 <section class="pieza estado" id="clic" style="background:#DF5239;color:#fff">
   <h1 class="titulo" style="position:absolute;top:380px;left:50px;right:50px;font-size:118px;color:#fff">¿Buscas<br>un libro<br>o vendes<br>los tuyos?</h1>
   <p style="position:absolute;top:960px;left:0;right:0;text-align:center;font-family:Newsreader,serif;font-style:italic;font-size:110px">Entra aquí</p>
