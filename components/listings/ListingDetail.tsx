@@ -12,6 +12,7 @@ import AddToCartButton from "@/components/ui/AddToCartButton";
 import ImageGallery from "./ImageGallery";
 import ShareButtons from "./ShareButtons";
 import ContactSellerButton from "@/components/messages/ContactSellerButton";
+import { cerrarRepisas } from "@/lib/repisas";
 import PriceCompare from "@/components/listings/PriceCompare";
 import { VERO } from "@/lib/contadorVentas";
 import MercadoPagoNudge from "@/components/listings/MercadoPagoNudge";
@@ -213,6 +214,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
       setMarcando("idle");
       return;
     }
+    await cerrarRepisas(createClient(), [listing.id]); // lib/repisas.ts
     setMarcando("done");
     router.refresh();
   }

@@ -1,5 +1,6 @@
 "use client";
 
+import { cerrarRepisas } from "@/lib/repisas";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -110,8 +111,12 @@ export default function MyListings({ listings: initial, puedeDestacar = false, c
       .eq("id", id);
 
     if (!error) {
+      // Una repisa de LBV vendida cierra también sus libros sueltos (lib/repisas.ts).
+      const cerrados = status === "completed" ? await cerrarRepisas(supabase, [id]) : [];
       setListings((prev) =>
-        prev.map((l) => (l.id === id ? { ...l, status } : l))
+        prev.map((l) =>
+          l.id === id ? { ...l, status } : cerrados.includes(l.id) ? { ...l, status: "completed" as ListingStatus } : l
+        )
       );
     }
     setLoading(null);

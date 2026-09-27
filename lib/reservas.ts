@@ -10,6 +10,7 @@
  * Las funciones solo las puede ejecutar service_role: siempre pasar un cliente
  * de servicio.
  */
+import { cerrarRepisas } from "@/lib/repisas";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { sendGong, escapeHtml } from "@/lib/notifications";
 
@@ -89,6 +90,9 @@ export async function marcarVendidos(
   }
 
   const fila = Array.isArray(data) ? data[0] : data;
+  // Si lo vendido es una repisa de LBV, sus libros sueltos también (lib/repisas.ts).
+  const conflictosRepisa: string[] = fila?.conflictos ?? [];
+  await cerrarRepisas(admin, args.listingIds.filter((id) => !conflictosRepisa.includes(id)));
   if (fila?.incidente_nuevo) {
     const conflictos: string[] = fila.conflictos ?? [];
     sendGong(
