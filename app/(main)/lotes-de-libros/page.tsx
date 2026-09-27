@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import { getLotes } from "@/lib/lotes";
 import { ordenarParaGrilla } from "@/lib/sortListings";
 import type { ListingWithBook } from "@/types";
 
@@ -44,12 +45,6 @@ export const metadata: Metadata = {
   },
 };
 
-/** Lo que cuenta como lote. */
-// "saga" sola no: *30 Sunsets (Saga Bali)* o *Outlander 9* son un tomo suelto de una saga.
-const ES_LOTE = /\blotes?\b|\bpacks?\b|colecci[oó]n completa|saga completa|trilog[ií]a|tomos? (1|i) (y|al|a) /i;
-/** Primer filtro, en la base: amplio a propósito; ES_LOTE afina después. */
-const PATRONES = ["%lote%", "%pack%", "%saga%", "%trilog%", "%colecci%n completa%", "%tomo%"];
-
 const faqs = [
   {
     q: "¿Qué es un lote de libros?",
@@ -72,14 +67,7 @@ const faqs = [
 export default async function LotesPage() {
   const supabase = await createClient();
 
-  const { data: raw } = await supabase
-    .from("listings")
-    .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
-    .eq("status", "active")
-    .or(PATRONES.map((p) => `title.ilike.${p}`).join(","), { foreignTable: "book" })
-    .limit(500);
-
-  const lotes = ((raw ?? []) as any[]).filter((item) => item.book && ES_LOTE.test(item.book.title ?? "")) as unknown as ListingWithBook[];
+  const lotes = await getLotes(supabase);
   const listings = ordenarParaGrilla(lotes);
 
   const collectionJsonLd = {

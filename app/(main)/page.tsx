@@ -18,8 +18,7 @@ import TrustedStoresSection from "@/components/home/TrustedStoresSection";
 import HeroRequestStrip from "@/components/home/HeroRequestStrip";
 import { ordenarParaGrilla } from "@/lib/sortListings";
 import { configVigente } from "@/lib/siteConfigVigente";
-import { esPrimavera } from "@/lib/fechasChile";
-import { getListingsPrimavera } from "@/lib/primavera";
+import { getLotes } from "@/lib/lotes";
 import ColeccionRow from "@/components/home/ColeccionRow";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { ListingWithBook } from "@/types";
@@ -609,9 +608,13 @@ export default async function HomePage({ searchParams }: Props) {
   // 6 para el hero + 3 para la fila); si no, cae a los mockups semanales.
   // Primavera: el abanico del hero y la franja salen de la selección de
   // temporada, no de los destacados de siempre (lib/primavera.ts).
-  const esPrima = esPrimavera();
-  const listingsPrimavera = esPrima && !hasFilters
-    ? await getListingsPrimavera(createPublicClient(), 24)
+  // 27-09-2026: la primavera salió de la portada a pedido de Vero (la selección
+  // abría con «Balada del suicida cotidiano»). /primavera sigue existiendo; acá
+  // la franja pasa a los lotes: series y repisas enteras en una sola compra.
+  const esPrima = false;
+  const listingsPrimavera: ListingWithBook[] = [];
+  const lotesFranja = !hasFilters
+    ? ordenarParaGrilla((await getLotes(createPublicClient())).filter((l) => l.cover_image_url || l.book?.cover_url)).slice(0, 10)
     : [];
 
   const heroPool = featuredListings.filter((l) => l.book && (l.cover_image_url || l.book.cover_url));
@@ -711,13 +714,13 @@ export default async function HomePage({ searchParams }: Props) {
         heroBooks={heroBooks}
         primavera={esPrima}
         franjaPrimavera={
-          listingsPrimavera.length >= 3 ? (
+          lotesFranja.length >= 3 ? (
             <ColeccionRow
-              tag="Fantasia"
-              href="/primavera"
-              title="Primavera en tuslibros"
-              subtitle="Fantasía, poesía y lo que recién llegó"
-              listings={listingsPrimavera.slice(6, 14)}
+              tag="Lote"
+              href="/lotes-de-libros"
+              title="Series completas, en una sola compra"
+              subtitle="Sagas, repisas y colecciones enteras, por un solo precio"
+              listings={lotesFranja}
             />
           ) : null
         }
