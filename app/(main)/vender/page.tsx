@@ -3,9 +3,13 @@ import RequestsRow from "@/components/home/RequestsRow";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Vender libros usados en Chile — publicar es gratis",
+  // 27-09-2026: título y descripción apuntan a las búsquedas de quien quiere
+  // vender y hoy nos encuentra en la página 2 de Google (Search Console, 28
+  // días): "donde vender libros usados" (107 impresiones, pos. 14,7), "vender
+  // libros usados" (79, pos. 14,6), "quiero vender libros usados" (57, pos. 14,8).
+  title: "Dónde vender libros usados en Chile — publica gratis",
   description:
-    "Vende tus libros usados en Chile: publica gratis escaneando el código de barras, pon tu precio y cobra por MercadoPago. Comisión 8%, solo si vendes.",
+    "¿Dónde vender libros usados en Chile? Publica gratis: escanea el código o sácale una foto, pon tu precio y cobra por MercadoPago o transferencia. 8% solo si vendes acá.",
   alternates: { canonical: "https://tuslibros.cl/vender" },
   keywords: [
     "venta de libros",
@@ -14,15 +18,18 @@ export const metadata: Metadata = {
     "vender libros usados",
     "vender libros usados Chile",
     "vender libros",
+    "donde vender libros usados",
+    "quiero vender libros usados",
+    "compro libros usados",
   ],
 };
 
 const steps = [
   {
     emoji: "📱",
-    title: "Escanea el código de barras",
+    title: "Escanea el código o sácale foto",
     description:
-      "Apunta la cámara al código de barras del libro. Título, autor y portada se completan solos.",
+      "Apunta la cámara al código de barras. Si el libro no tiene, sácale una foto a la portada: título, autor y editorial se completan solos.",
   },
   {
     emoji: "💰",
@@ -41,15 +48,16 @@ const steps = [
 const benefits = [
   {
     emoji: "🔒",
-    title: "Pago seguro",
+    title: "Cobras como prefieras",
     description:
-      "MercadoPago divide el pago: el dinero llega directo a tu cuenta, sin intermediarios.",
+      "Por MercadoPago, directo a tu cuenta, o por transferencia: el comprador te paga a ti.",
   },
   {
     emoji: "📦",
+    // Sin Shipit desde el 15-09-2026: despacha el vendedor (lib/shipping/coordinado.ts).
     title: "Envío a todo Chile",
     description:
-      "Cotiza entre Starken, Chilexpress, Blue Express y más. El comprador elige y paga el envío.",
+      "Tú despachas por el courier que quieras. El comprador paga una tarifa fija por zona, que te llega junto con el pago.",
   },
   {
     emoji: "🏪",
@@ -71,9 +79,11 @@ const benefits = [
   },
   {
     emoji: "🤝",
-    title: "Entrega presencial",
+    // Hasta el 27-09 decía "coordina por WhatsApp sin pagar comisión": es la
+    // frase que se retiró del sitio el 25-08 porque enseñaba a vender por fuera.
+    title: "Entrega en persona",
     description:
-      "Para compradores cerca de ti, coordina por WhatsApp sin pagar comisión de envío.",
+      "Si el comprador está cerca, coordinan el retiro y no hay envío que pagar.",
   },
 ];
 
@@ -83,12 +93,18 @@ const faqItems = [
     a: "En tuslibros.cl puedes publicar tus libros usados gratis y llegar a compradores en todo Chile. Escaneas el código de barras, pones el precio y tu libro aparece en el catálogo al instante con portada, descripción y tu tienda personal.",
   },
   {
+    // Para quien busca "compro libros usados" o "compro libros usados a domicilio"
+    // (119 impresiones en 28 días): quiere que alguien le compre la biblioteca.
+    q: "¿Ustedes compran libros usados?",
+    a: "No los compro yo: los vendes tú, directo a quien los está buscando y al precio que tú pones. Suele rendir más que venderle la biblioteca a una librería de usados, que tiene que comprar barato para poder revender. Tampoco hay retiro a domicilio: tú decides si entregas en persona o despachas.",
+  },
+  {
     q: "¿Cuánto cuesta publicar?",
     a: "Cero. Siempre. Publica uno o mil, da igual — es gratis y va a seguir siendo gratis.",
   },
   {
     q: "¿Cuándo se aplican comisiones?",
-    a: "Publicar es gratis y no hay mensualidad. Cobro 8% del precio del libro cuando la venta se cierra acá, con el pago por MercadoPago y el despacho resuelto (Starken, Chilexpress, Blue Express). Con eso pago la pasarela, el servidor y las horas.",
+    a: "Publicar es gratis y no hay mensualidad. Cobro 8% del precio del libro, igual para todos, y solo cuando la venta se cierra acá. Con eso pago la pasarela, el servidor y las horas.",
   },
   {
     q: "¿Qué libros se venden mejor?",
@@ -131,7 +147,7 @@ export default function VenderPage() {
             <span className="text-brand-400">en Chile</span>
           </h1>
           <p className="mt-6 text-lg sm:text-xl text-white/80 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
-            Publica en 10 segundos. Solo escanea el código de barras, ponle precio y listo.
+            Publica en 10 segundos. Escanea el código o sácale una foto, ponle precio y listo.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
             <Link

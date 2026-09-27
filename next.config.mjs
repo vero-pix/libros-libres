@@ -71,6 +71,10 @@ const nextConfig = {
       { source: '/product-tag/:slug', destination: '/search?q=:slug', permanent: true },
       { source: '/product-tag/:slug/page/:page', destination: '/search?q=:slug', permanent: true },
       { source: '/categoria-producto/:slug', destination: '/?genre=:slug', permanent: true },
+      // Lotes tiene landing propia (27-09-2026): Google traía búsquedas de lotes a
+      // esta dirección vieja y caían en el home sin un solo lote. Va ANTES de la
+      // regla genérica de /product-category, que ganaría si estuviera primero.
+      { source: '/product-category/lotes-de-libros', destination: '/lotes-de-libros', permanent: true },
       { source: '/product-category/:slug', destination: '/?genre=:slug', permanent: true },
       { source: '/product-category/:slug/:sub', destination: '/?genre=:sub', permanent: true },
       // Rutas internas vigentes (no legacy SEO)
