@@ -32,6 +32,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const record = body.record ?? body;
 
+    // Usuarios de prueba de los scripts (…@example.com): ni aviso a Vero ni
+    // bienvenida, que Resend rechaza con 422 (30 errores en el log, 27-09-2026).
+    if (/@example\.(com|org|net)$/i.test(String(record.email ?? ""))) {
+      return NextResponse.json({ ok: true, omitido: "usuario de prueba" });
+    }
+
     const name = record.full_name || "Sin nombre";
     const email = record.email || "Sin email";
     const city = record.city || record.comuna || "No especificada";

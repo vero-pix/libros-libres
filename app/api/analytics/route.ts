@@ -30,7 +30,10 @@ function parseUserAgent(ua: string): { browser: string; os: string; device: stri
 
 /** POST /api/analytics — log a page view */
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  // Un beacon cortado al cerrar la pestaña llega sin cuerpo: era el error más
+  // repetido del log de producción (78 en 7 días al 27-09-2026). No es falla.
+  const body = await req.json().catch(() => null);
+  if (!body || typeof body !== "object") return new NextResponse(null, { status: 204 });
   const { path, referrer, listing_id, session_id, visitor_id } = body;
 
   if (!path) {
