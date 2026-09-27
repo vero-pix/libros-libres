@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import ListingCard from "@/components/listings/ListingCard";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { ordenarParaGrilla } from "@/lib/sortListings";
+import { activosParaFiltrar, completarListings } from "@/lib/activosParaFiltrar";
 import type { ListingWithBook } from "@/types";
 
 export const revalidate = 300;
@@ -65,13 +66,10 @@ const faqs = [
 export default async function NovelaNegraPage() {
   const supabase = await createClient();
 
-  const { data: raw } = await supabase
-    .from("listings")
-    .select(`*, book:books(*), seller:users(id, full_name, avatar_url, username, mercadopago_user_id)`)
-    .eq("status", "active")
-    .limit(1000);
+  // Todos los activos, no solo 1.000 (lib/activosParaFiltrar.ts).
+  const raw = await activosParaFiltrar(supabase);
 
-  const matched = ((raw ?? []) as any[]).filter((item) => {
+  const matched = (await completarListings(supabase, ((raw ?? []) as any[]).filter((item) => {
     if (!item.book) return false;
     const hay = `${item.book.title ?? ""} ${item.book.author ?? ""}`
       .toLowerCase()
@@ -79,7 +77,7 @@ export default async function NovelaNegraPage() {
       .replace(/[̀-ͯ]/g, "");
     const tag = (item.book.tags ?? []).some((t: string) => /negra|policial|suspenso/i.test(t));
     return tag || NEGRA_NEEDLES.some((n) => hay.includes(n.normalize("NFD").replace(/[̀-ͯ]/g, "")));
-  }) as unknown as ListingWithBook[];
+  }).map((i) => i.id))) as unknown as ListingWithBook[];
 
   const listings = ordenarParaGrilla(matched).slice(0, 8);
 
