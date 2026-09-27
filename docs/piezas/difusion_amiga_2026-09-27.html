@@ -1,0 +1,94 @@
+<!doctype html>
+<!--
+  Kit para que una amiga de Vero difunda tuslibros.cl por WhatsApp (27-09-2026).
+  Objetivo: que quien nunca oyó del sitio entienda en 3 segundos QUÉ es y CÓMO funciona.
+  Dos formatos con el mismo contenido: estado 9:16 y grupos 4:5.
+  Cifras de la base el 27-09-2026: 4.186 libros activos, 165 vendedores, 74 ciudades.
+  "Te llega o lo retiras": despacho coordinado o encuentro en persona, según el vendedor.
+-->
+<html lang="es"><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,600;1,6..72,500&family=Hanken+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#999;display:flex;gap:40px;padding:40px;align-items:flex-start;font-family:"Hanken Grotesk",sans-serif}
+  .pieza{position:relative;overflow:hidden;background:#F6F0E8;color:#102A73}
+  .estado{width:1080px;height:1920px}
+  .grupo{width:1080px;height:1350px}
+  .serif{font-family:Newsreader,serif}
+  .titulo{text-align:center;font-family:Newsreader,serif;font-weight:600;line-height:1.02;letter-spacing:-1px}
+  .titulo i{color:#DF5239;font-weight:500}
+  .cifra{text-align:center;font-size:34px;color:#5a5f70;font-weight:500}
+  .cifra b{color:#102A73}
+  .tapas{display:flex;justify-content:center;gap:22px}
+  .tapas img{width:190px;aspect-ratio:2/3;object-fit:cover;border-radius:3px 8px 8px 3px;box-shadow:0 12px 22px rgba(20,30,60,.25),inset 5px 0 0 rgba(0,0,0,.18)}
+  .tapas img:nth-child(odd){transform:rotate(-2deg)} .tapas img:nth-child(even){transform:rotate(2deg)}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  .col{border-radius:32px;padding:34px 34px 38px}
+  .col.compra{background:#DF5239;color:#fff}
+  .col.vende{background:#102A73;color:#fff}
+  .col h3{font-family:Newsreader,serif;font-weight:600;font-size:66px;line-height:1;margin-bottom:22px}
+  .col ol{list-style:none;display:grid;gap:16px}
+  .col li{display:flex;align-items:center;gap:16px;font-size:36px;font-weight:600;line-height:1.1}
+  .col li span{flex-shrink:0;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700}
+  .col .nota{margin-top:20px;font-size:26px;opacity:.85;font-weight:500}
+  .url{text-align:center;font-family:Newsreader,serif;font-weight:600;color:#1A3DA0}
+  .url i{color:#DF5239;font-weight:500}
+
+  /* estado 9:16 */
+  .estado .titulo{position:absolute;top:150px;left:50px;right:50px;font-size:132px}
+  .estado .cifra{position:absolute;top:470px;left:50px;right:50px;font-size:38px}
+  .estado .tapas{position:absolute;top:580px;left:0;right:0}
+  .estado .tapas img{width:210px}
+  .estado .cols{position:absolute;top:1010px;left:50px;right:50px;gap:30px}
+  .estado .col{padding:44px 38px 48px}
+  .estado .col h3{font-size:84px;margin-bottom:30px}
+  .estado .col ol{gap:24px}
+  .estado .col li{font-size:42px}
+  .estado .col li span{width:60px;height:60px;font-size:32px}
+  .estado .col .nota{font-size:30px;margin-top:26px}
+  .estado .url{position:absolute;left:0;right:0;bottom:130px;font-size:110px}
+
+  /* grupo 4:5 */
+  .grupo .titulo{position:absolute;top:70px;left:60px;right:60px;font-size:92px}
+  .grupo .cifra{position:absolute;top:300px;left:60px;right:60px;font-size:30px}
+  .grupo .tapas{position:absolute;top:370px;left:0;right:0}
+  .grupo .tapas img{width:150px}
+  .grupo .cols{position:absolute;top:640px;left:60px;right:60px}
+  .grupo .col{padding:28px 30px 30px}
+  .grupo .col h3{font-size:58px;margin-bottom:16px}
+  .grupo .col li{font-size:32px}
+  .grupo .col .nota{font-size:24px;margin-top:14px}
+  .grupo .url{position:absolute;left:0;right:0;bottom:56px;font-size:80px}
+</style></head><body>
+
+<template id="contenido">
+  <h1 class="titulo">Libros usados<br><i>en todo Chile</i></h1>
+  <p class="cifra"><b>4.000+ libros</b> · 165 vendedores · 74 ciudades</p>
+  <div class="tapas">
+    <img src="https://tfaqvnsdasaegkcahaal.supabase.co/storage/v1/object/public/covers/57283db7-3465-427d-a849-15adedf6ce65/c391932a-74f3-4054-aae2-c6081ac4a7ad/1783739386181-fhdm61meybl.jpg" alt="El Señor de los Anillos">
+    <img src="https://api.tuslibros.cl/storage/v1/object/public/covers/ab2de6fc-ce4f-49a8-b70a-bccba9d201bd/1789325524768.jpg" alt="Isabel Allende">
+    <img src="https://api.tuslibros.cl/storage/v1/object/public/covers/c478956c-b6d5-4662-9e3e-21e46dbc3086/1787836736717.jpg" alt="Ciudades de papel">
+    <img src="https://api.tuslibros.cl/storage/v1/object/public/covers/9e389ba3-d2a9-4984-a2b3-79b9451f6a4a/1790212279940.jpg" alt="After 2">
+  </div>
+  <div class="cols">
+    <div class="col compra">
+      <h3>Compra</h3>
+      <ol><li><span>1</span>Busca el libro</li><li><span>2</span>Pídelo</li><li><span>3</span>Te llega o lo retiras</li></ol>
+    </div>
+    <div class="col vende">
+      <h3>Vende</h3>
+      <ol><li><span>1</span>Sácale foto</li><li><span>2</span>Ponle precio</li><li><span>3</span>Listo, publicado</li></ol>
+      <p class="nota">Publicar es gratis</p>
+    </div>
+  </div>
+  <p class="url">tuslibros<i>.cl</i></p>
+</template>
+
+<section class="pieza estado" id="estado"></section>
+<section class="pieza grupo" id="grupo"></section>
+<script>
+  const t = document.getElementById("contenido");
+  for (const id of ["estado", "grupo"]) document.getElementById(id).appendChild(t.content.cloneNode(true));
+</script>
+</body></html>
