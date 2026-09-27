@@ -33,6 +33,8 @@ interface Props {
   /** El vendedor habilitó cobrar por transferencia además de MercadoPago. */
   aceptaTransferencia?: boolean;
   buyerName: string;
+  /** Teléfono guardado del comprador; si no hay, se pide acá mismo. */
+  buyerPhone?: string;
 }
 
 type DeliveryMethod = "courier" | "in_person" | "pickup_point";
@@ -47,8 +49,9 @@ const DELIVERY_OPTIONS = [
   },
   {
     value: "courier" as const,
-    label: "Envío courier",
-    desc: "Recibe en tu domicilio por courier (un solo paquete con todos los libros)",
+    // Mismo texto que CheckoutForm (23-09-2026): sin Shipit lo despacha el vendedor.
+    label: "Envío a tu casa",
+    desc: "Van todos en un paquete. El vendedor lo manda por Starken, Chilexpress, Blue o Correos y te pasa el seguimiento. Llega en 2 a 5 días hábiles desde que lo despacha.",
     icon: "📦",
     enabled: true,
   },
@@ -60,7 +63,12 @@ export default function BundleCheckoutForm({
   buyerName,
   courierDisponible = true,
   aceptaTransferencia = false,
+  buyerPhone = "",
 }: Props) {
+  // El teléfono se pide acá, como en el checkout de un libro. Hasta el
+  // 27-09-2026 la página ponía un muro ("Completa tu perfil para comprar") y
+  // mandaba al comprador a /perfil: salía del checkout y no volvía.
+  const [phone, setPhone] = useState(buyerPhone);
   // Forma de pago. Solo se pregunta si el vendedor habilitó la transferencia.
   const [formaPago, setFormaPago] = useState<"mercadopago" | "transfer">(
     // Sin MercadoPago la transferencia es la única forma posible.
@@ -113,6 +121,7 @@ export default function BundleCheckoutForm({
 
   const motivoBloqueo = (): string | null => {
     if (!comuna) return "Elige tu comuna: con eso sabemos si los libros te pueden llegar.";
+    if (!phone.trim()) return "Escribe tu teléfono de WhatsApp para coordinar la entrega.";
     if (!isCourier) return null;
     if (!address) return "Escribe la dirección donde quieres recibir los libros.";
     if (!addressHasNumber) return "Falta el número de la calle en tu dirección.";
@@ -250,7 +259,8 @@ export default function BundleCheckoutForm({
         setQuoting(false);
       }
     },
-    [firstListingId, listings.length]
+    // `comuna` en las dependencias: ver el mismo arreglo en CheckoutForm (27-09-2026).
+    [firstListingId, listings.length, comuna]
   );
 
   useEffect(() => {
@@ -258,6 +268,17 @@ export default function BundleCheckoutForm({
       fetchQuotes(buyerAddress);
     }
   }, [buyerAddress, fetchQuotes]);
+
+  // Con "Envío a tu casa" elegido y la comuna puesta, la tarifa aparece sola.
+  // El despacho coordinado cobra por comuna, así que no hace falta esperar la
+  // dirección ni que el comprador descubra el botón "Calcular envío" (27-09-2026).
+  // La dirección se sigue pidiendo antes de pagar: el vendedor la necesita.
+  useEffect(() => {
+    if (deliveryMethod !== "courier" || !comuna) return;
+    fetchQuotes(address.trim().length >= 5 ? address : `${comuna}, Chile`);
+    // Solo al cambiar la forma de entrega o la comuna, no con cada tecla de la dirección.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deliveryMethod, comuna]);
 
   // ¿Hay un paquete de este vendedor todavía sin salir, a esta misma
   // dirección? Se pregunta con la dirección escrita, porque sumarse solo tiene
@@ -290,10 +311,23 @@ export default function BundleCheckoutForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (isCourier && (!selectedQuote || shippingUnavailable || !addressHasNumber)) return;
+    if (!phone.trim()) { setError("Necesitamos un teléfono de contacto para el vendedor."); return; }
     setLoading(true);
     setError(null);
 
     try {
+      // Igual que CheckoutForm: el teléfono (y la dirección, si hay envío)
+      // quedan en el perfil para la próxima compra y para que el vendedor coordine.
+      const { createClient } = await import("@/lib/supabase/client");
+      const sbCliente = createClient();
+      const uid = (await sbCliente.auth.getUser()).data.user?.id;
+      if (uid) {
+        await sbCliente.from("users").update({
+          phone: phone.trim(),
+          ...(isCourier && address.trim() ? { default_address: address.trim() } : {}),
+        }).eq("id", uid);
+      }
+
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -400,6 +434,22 @@ export default function BundleCheckoutForm({
             ${totalBookPrice.toLocaleString("es-CL")}
           </span>
         </div>
+      </div>
+
+      {/* Teléfono */}
+      <div className="bg-white rounded-lg border border-gray-200 p-5">
+        <label htmlFor="telefono-bundle" className="block font-semibold text-gray-900 mb-2">Tu teléfono WhatsApp</label>
+        <input
+          id="telefono-bundle"
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="+56912345678"
+          autoComplete="tel"
+          required
+          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+        />
+        <p className="text-xs text-gray-500 mt-1.5">Usado solo para coordinar la entrega de tus libros.</p>
       </div>
 
       {/* Forma de entrega */}
@@ -697,6 +747,7 @@ export default function BundleCheckoutForm({
             type="submit"
             disabled={
               loading ||
+              !phone.trim() ||
               (isCourier &&
                 (!address || !selectedQuote || shippingUnavailable || !addressHasNumber))
             }

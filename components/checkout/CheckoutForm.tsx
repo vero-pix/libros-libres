@@ -274,7 +274,12 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
         setQuoting(false);
       }
     },
-    [listing.id]
+    // `comuna` va en las dependencias: sin ella la función se quedaba con la
+    // comuna vacía del primer render y la cotización viajaba sin comuna. El
+    // destino salía entonces de la dirección escrita, y si el comprador no
+    // repetía ahí la comuna que ya había elegido arriba, el checkout decía "No
+    // hay courier que llegue a tu dirección" (bug del 12-09 al 27-09-2026).
+    [listing.id, comuna]
   );
 
   // Cotizar al cargar si ya tenemos dirección guardada
@@ -283,6 +288,17 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
       fetchQuotes(buyerAddress);
     }
   }, [buyerAddress, fetchQuotes]);
+
+  // Con "Envío a tu casa" elegido y la comuna puesta, la tarifa aparece sola.
+  // El despacho coordinado cobra por comuna, así que no hace falta esperar la
+  // dirección ni que el comprador descubra el botón "Calcular envío" (27-09-2026).
+  // La dirección se sigue pidiendo antes de pagar: el vendedor la necesita.
+  useEffect(() => {
+    if (deliveryMethod !== "courier" || !comuna) return;
+    fetchQuotes(address.trim().length >= 5 ? address : `${comuna}, Chile`);
+    // Solo al cambiar la forma de entrega o la comuna, no con cada tecla de la dirección.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deliveryMethod, comuna]);
 
   // ¿Hay un paquete de este vendedor sin despachar, a esta misma dirección?
   // Un fallo acá deja el flete normal, que es el comportamiento de siempre.

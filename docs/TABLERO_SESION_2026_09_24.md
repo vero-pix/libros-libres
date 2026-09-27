@@ -169,7 +169,7 @@ Precios y pisos en `docs_desde_claude/PISOS_LIBROS_VERO_2026-09.md` (privado: el
 
 ---
 
-## 7. MAÑANA 25-09 — revisar en detalle (le preocupa a Vero)
+## 7. ✅ REVISADO 27-09 — la caída de compras (le preocupaba a Vero)
 
 **¿Por qué libro.de.ocasion pasó de 17 intentos de compra a 2 desde el 15-09, si tiene MercadoPago y el despacho coordinado sí se le ofrece?**
 
@@ -183,6 +183,12 @@ Precios y pisos en `docs_desde_claude/PISOS_LIBROS_VERO_2026-09.md` (privado: el
 | 7f | Verificar en producción que tus libros ya ofrecen despacho en el checkout (no se pudo con la sesión de prueba) | Vero con otra cuenta, o alguien de confianza |
 
 - 24-09 — anotado a pedido de Vero para verlo en detalle el 25-09.
+- **27-09 (domingo) — REVISADO. Causa encontrada: el checkout no dejaba comprar con despacho.**
+  - **Desde el martes 22-09 a las 10:15 nadie apretó "Confirmar pedido"** (registros de Vercel: ningún POST a `/api/orders` de compradores). 12 sesiones entraron al checkout esa semana y todas se fueron. No era el arreglo de reservas: nunca se llegó a ese código.
+  - **Bug 1 (desde el 12-09):** la función que pide la tarifa se quedaba con la comuna vacía del primer render (`useCallback` sin `comuna` en las dependencias, en los dos checkouts). La cotización viajaba sin comuna y el destino salía del texto de la dirección: si el comprador no repetía ahí la comuna que ya había elegido arriba, el checkout decía **"No hay courier que llegue a tu dirección. Cambia a encuentro en persona."** Con Shipit se notaba menos; con el despacho coordinado (que cobra solo por comuna) pasó a ser un callejón sin salida para casi todos. Reproducido en local con el libro de Lorena (Concepción → Santiago).
+  - **Bug 2:** el checkout del carrito ponía un muro a quien no tenía teléfono guardado ("Completa tu perfil para comprar" → /perfil). Es el caso del 25-09: una compradora de *La ladrona de libros* (Lorena) anduvo 10 minutos entre carrito y checkout sin poder pagar.
+  - **Arreglado:** la comuna viaja siempre; la tarifa aparece sola al elegir "Envío a tu casa" (ya no hay que descubrir "Calcular envío"); el carrito pide el teléfono en el mismo formulario; y el carrito dice "Envío a tu casa" con el mismo texto que el checkout simple. Probado en local en celular: checkout simple ($18.790) y carrito de 2 libros ($26.350), con el botón de pagar habilitado.
+  - Queda sin medir: si el precio ($5.490/$7.990 + 8%) también espanta. Primero ver si con esto vuelven las compras.
 
 ---
 
