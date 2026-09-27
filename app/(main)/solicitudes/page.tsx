@@ -43,36 +43,23 @@ export default async function SolicitudesPage() {
       .limit(20),
   ]);
 
-  // Si hay usuario logueado con ciudad, ordenar primero las solicitudes
-  // cuyo requester_location matchee (proximidad = venta probable).
-  const sessionClient = await createClient();
+  // Lo más nuevo primero, siempre (27-09-2026). Antes, con sesión y comuna,
+  // los pedidos de la zona del visitante subían arriba sin importar la fecha:
+  // a Vero, en Providencia, le salía primero un pedido de abril.
+  //
+  // Los de más de SEMANAS_VIGENTES semanas se archivan: salen de la lista
+  // principal y quedan en una sección plegada. No se borran, y el aviso al
+  // comprador cuando alguien publica ese libro sigue funcionando igual
+  // (webhooks/listing-created y cron/requests-digest no miran esto).
+  const SEMANAS_VIGENTES = 2; // decisión de Vero, 27-09-2026
+  const corte = Date.now() - SEMANAS_VIGENTES * 7 * 24 * 3600_000;
+  const todosAbiertos = (openRaw ?? []) as BookRequest[];
+  // La sesión solo decide qué muestra el formulario, ya no el orden.
   const {
     data: { user },
-  } = await sessionClient.auth.getUser();
-  let viewerCity: string | null = null;
-  if (user) {
-    const { data: profile } = await sessionClient
-      .from("users")
-      .select("city")
-      .eq("id", user.id)
-      .maybeSingle();
-    viewerCity = (profile?.city ?? "").trim().toLowerCase() || null;
-  }
-
-  const rankByProximity = (list: BookRequest[]) => {
-    if (!viewerCity) return list;
-    const tokens = viewerCity.split(/[\s,]+/).filter((t) => t.length >= 3);
-    const score = (r: BookRequest) => {
-      const loc = (r.requester_location ?? "").toLowerCase();
-      if (!loc) return 0;
-      if (loc.includes(viewerCity)) return 2;
-      if (tokens.some((t) => loc.includes(t))) return 1;
-      return 0;
-    };
-    return [...list].sort((a, b) => score(b) - score(a));
-  };
-
-  const open = rankByProximity((openRaw ?? []) as BookRequest[]);
+  } = await (await createClient()).auth.getUser();
+  const open = todosAbiertos.filter((r) => new Date(r.created_at).getTime() >= corte);
+  const archivados = todosAbiertos.filter((r) => new Date(r.created_at).getTime() < corte);
   const fulfilled = (fulfilledRaw ?? []) as BookRequest[];
 
   // Los temas salen de `categories`, la fuente de verdad — nunca una lista a
@@ -182,6 +169,38 @@ export default async function SolicitudesPage() {
             </div>
           )}
         </section>
+
+        {/* ARCHIVADOS: pedidos de más de SEMANAS_VIGENTES semanas */}
+        {archivados.length > 0 && (
+          <details className="group bg-white/60 rounded-xl border border-cream-dark/40 px-5 py-4">
+            <summary className="cursor-pointer list-none flex items-baseline justify-between gap-3">
+              <span className="font-display text-lg text-ink">
+                Pedidos más antiguos
+                <span className="text-ink-muted font-normal text-sm"> · más de {SEMANAS_VIGENTES} semanas</span>
+              </span>
+              <span className="text-xs text-ink-muted whitespace-nowrap">
+                {archivados.length} · <span className="group-open:hidden">ver</span><span className="hidden group-open:inline">ocultar</span>
+              </span>
+            </summary>
+            <div className="flex flex-wrap gap-2 mt-4">
+              {archivados.map((r) => (
+                <Link
+                  key={r.id}
+                  href={
+                    r.tema
+                      ? "/publish"
+                      : `/publish?title=${encodeURIComponent(r.title)}${r.author ? `&author=${encodeURIComponent(r.author)}` : ""}`
+                  }
+                  className="inline-flex items-center gap-1 bg-cream-warm/60 hover:bg-amber-100 border border-cream-dark/40 text-ink text-xs px-3 py-1.5 rounded-full transition-colors"
+                  title="¿Lo tienes? Publícalo"
+                >
+                  {r.title}
+                  {r.author && <span className="text-ink-muted italic">· {r.author}</span>}
+                </Link>
+              ))}
+            </div>
+          </details>
+        )}
 
         {/* FULFILLED LIST */}
         {fulfilled.length > 0 && (
