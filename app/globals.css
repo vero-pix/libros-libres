@@ -172,3 +172,11 @@
     transform: none;
   }
 }
+
+/* Filas que se deslizan de lado sin mostrar la barra (franja de secciones,
+   filas de la portada). Se usaba desde antes en ColeccionRow sin estar
+   definida: no hay plugin que la traiga. (27-09-2026) */
+@layer utilities {
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+}
