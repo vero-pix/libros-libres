@@ -37,5 +37,28 @@ export async function getListingsPrimavera(
     (l) => l.book && (l.cover_image_url || l.book.cover_url)
   ) as unknown as ListingWithBook[];
 
-  return ordenarParaGrilla(conFoto).slice(0, limite);
+  return ordenPrimavera(ordenarParaGrilla(conFoto)).slice(0, limite);
+}
+
+/**
+ * El orden de la selección (27-09-2026). Repartir por vendedor dejaba el
+ * arranque al azar: ese día /primavera abría con *Paisaje cultural de Chiloé*,
+ * un documental político y, enseguida, *Balada del suicida cotidiano* y *Las
+ * flores del mal*. Vero: «empieza con puros suicidios».
+ *
+ * Primero la fantasía, después la poesía, y lo de título oscuro al final (no
+ * se saca: es poesía real y alguien la busca). Cada grupo mantiene el reparto
+ * por vendedor que ya traía.
+ */
+const TITULO_OSCURO = /suicid|muert|morir|tumba|cad[aá]ver|asesin|flores del mal|guerra|dictadura|tortur|desaparec|luto|infierno|agon[ií]a/i;
+
+function ordenPrimavera(listings: ListingWithBook[]): ListingWithBook[] {
+  const tags = (l: ListingWithBook) => ((l.book as any).tags ?? []) as string[];
+  const grupo = (l: ListingWithBook) => {
+    if (TITULO_OSCURO.test(l.book.title ?? "")) return 3;
+    if (tags(l).includes("Fantasia")) return 0;
+    if (tags(l).includes("Poesia")) return 1;
+    return 2;
+  };
+  return [0, 1, 2, 3].flatMap((g) => listings.filter((l) => grupo(l) === g));
 }
