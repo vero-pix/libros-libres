@@ -1,0 +1,66 @@
+<!doctype html>
+<!--
+  Estados de WhatsApp (9:16, 1080×1920) — el sitio en general: comprar y vender. 27-09-2026.
+  Mínimo texto, para que cualquiera sepa que existe. Cifras de la base ese día:
+  4.186 libros activos, 165 vendedores, 74 ciudades. Portadas de libros activos.
+-->
+<html lang="es"><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,600;1,6..72,500&family=Hanken+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#999;display:flex;gap:40px;padding:40px;font-family:"Hanken Grotesk",sans-serif}
+  .estado{width:1080px;height:1920px;position:relative;overflow:hidden}
+  .boton{position:absolute;left:50%;transform:translateX(-50%);bottom:190px;background:#DF5239;color:#fff;font-weight:700;font-size:54px;padding:30px 70px;border-radius:999px;white-space:nowrap;box-shadow:0 14px 30px rgba(0,0,0,.25)}
+  .url{position:absolute;left:0;right:0;bottom:110px;text-align:center;font-size:36px;font-weight:600}
+  h1{position:absolute;left:60px;right:60px;text-align:center;font-family:Newsreader,serif;font-weight:600;line-height:1}
+
+  /* COMPRA */
+  #compra{background:#F6F0E8;color:#102A73}
+  #compra h1{top:150px;font-size:210px;letter-spacing:-4px}
+  #compra .bajo{position:absolute;top:385px;left:0;right:0;text-align:center;font-family:Newsreader,serif;font-style:italic;font-size:84px;color:#DF5239}
+  .mosaico{position:absolute;top:580px;left:80px;right:80px;display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+  .mosaico img{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:4px 9px 9px 4px;box-shadow:0 14px 26px rgba(20,30,60,.28),inset 6px 0 0 rgba(0,0,0,.18);display:block}
+  .mosaico img:nth-child(odd){transform:rotate(-1.5deg)} .mosaico img:nth-child(even){transform:rotate(1.5deg)}
+  #compra .url{color:#1A3DA0}
+
+  /* VENDE */
+  #vende{background:#102A73;color:#fff}
+  #vende h1{top:220px;font-size:150px}
+  #vende h1 i{color:#F2A08F;font-weight:500}
+  .pasos{position:absolute;top:760px;left:90px;right:90px;display:grid;gap:56px}
+  .paso{display:flex;align-items:center;gap:44px}
+  .ico{width:190px;height:190px;border-radius:50%;background:#F6F0E8;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .ico svg{width:100px;height:100px}
+  .paso span{font-family:Newsreader,serif;font-size:96px;font-weight:600}
+  .paso:nth-child(3) span{color:#E9C46A}
+  #vende .url{color:#CFD6EE}
+</style></head><body>
+
+<section class="estado" id="compra">
+  <h1>4.000+</h1>
+  <p class="bajo">libros usados</p>
+  <div class="mosaico">
+    <img src="https://tfaqvnsdasaegkcahaal.supabase.co/storage/v1/object/public/covers/57283db7-3465-427d-a849-15adedf6ce65/c391932a-74f3-4054-aae2-c6081ac4a7ad/1783739386181-fhdm61meybl.jpg" alt="El Señor de los Anillos">
+    <img src="https://api.tuslibros.cl/storage/v1/object/public/covers/ac48eb0b-cbe6-4ba9-a85c-ec1e17dfbbf0/1786662877240.jpg" alt="Fahrenheit 451">
+    <img src="https://api.tuslibros.cl/storage/v1/object/public/covers/ab2de6fc-ce4f-49a8-b70a-bccba9d201bd/1789325524768.jpg" alt="El viento conoce mi nombre">
+    <img src="https://api.tuslibros.cl/storage/v1/object/public/covers/c478956c-b6d5-4662-9e3e-21e46dbc3086/1787836736717.jpg" alt="Ciudades de papel">
+    <img src="https://tfaqvnsdasaegkcahaal.supabase.co/storage/v1/object/public/covers/fbeedb59-210a-4639-a4ee-6884368058cd/1778600958517.jpg" alt="El gato negro">
+    <img src="https://api.tuslibros.cl/storage/v1/object/public/covers/9e389ba3-d2a9-4984-a2b3-79b9451f6a4a/1790212279940.jpg" alt="After 2">
+  </div>
+  <div class="boton">Compra aquí</div>
+  <div class="url">tuslibros.cl</div>
+</section>
+
+<section class="estado" id="vende">
+  <h1>Vende tus<br><i>libros</i></h1>
+  <div class="pasos">
+    <div class="paso"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#102A73" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg></div><span>Foto</span></div>
+    <div class="paso"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#102A73" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg></div><span>Precio</span></div>
+    <div class="paso"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#102A73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><span>Listo</span></div>
+  </div>
+  <div class="boton">Vende aquí</div>
+  <div class="url">tuslibros.cl/vender</div>
+</section>
+
+</body></html>
