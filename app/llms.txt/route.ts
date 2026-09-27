@@ -159,6 +159,7 @@ Por ejemplo: /libros-usados/santiago, /libros-usados/concepcion,
 - https://tuslibros.cl/libros-antiguos (impresos chilenos antiguos, libros antiguos, primeras ediciones y de colección)
 - https://tuslibros.cl/antroposofia (Rudolf Steiner y antroposofía)
 - https://tuslibros.cl/lotes-de-libros (lotes, packs, sagas y colecciones completas)
+- https://tuslibros.cl/educacion-ciudadana-3-medio (texto de Educación Ciudadana 3° medio, usado)
 - https://tuslibros.cl/libros-infantiles (libros infantiles y juveniles usados: Papelucho, cuentos, lectura complementaria y novela juvenil)
 - https://tuslibros.cl/libros-escolares (textos escolares usados y lectura complementaria del colegio)
 - https://tuslibros.cl/primavera (selección de primavera: fantasía, romantasy, poesía y juvenil)

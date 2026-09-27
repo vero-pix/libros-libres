@@ -329,6 +329,8 @@ export default async function LibrosEscolaresPage() {
               También puede interesarte
             </p>
             <div className="flex flex-wrap gap-3">
+              <Link href="/educacion-ciudadana-3-medio" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Educación Ciudadana 3° medio</Link>
+              <span className="text-ink-muted">·</span>
               <Link href="/libros-infantiles" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Infantil y juvenil</Link>
               <span className="text-ink-muted">·</span>
               <Link href="/algebra-de-baldor" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Álgebra de Baldor</Link>
