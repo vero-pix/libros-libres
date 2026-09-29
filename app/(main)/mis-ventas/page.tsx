@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Fragment } from "react";
 import Image from "next/image";
+import { libroUrl } from "@/lib/urls";
 import type { Order, OrderStatus } from "@/types";
 import BuyerCartsSection from "@/components/sales/BuyerCartsSection";
 import EntregadoButton from "@/components/sales/EntregadoButton";
@@ -66,7 +67,7 @@ export default async function MisVentasPage() {
     .select(`
       id, buyer_id, bundle_id, book_price, shipping_cost, service_fee, total, status, payment_method,
       courier, tracking_code, shipping_label_url, shipping_status, buyer_address, buyer_commune, created_at, updated_at, shipping_updated_at,
-      listing:listings(id, cover_image_url, book:books(title, author, cover_url)),
+      listing:listings(id, slug, cover_image_url, seller:users(username), book:books(title, author, cover_url)),
       buyer:users!orders_buyer_id_fkey(full_name, email, phone)
     `)
     .eq("seller_id", user.id)
@@ -482,9 +483,16 @@ export default async function MisVentasPage() {
                               </div>
                             )}
                             <div className="min-w-0">
-                              <p className="font-medium text-ink truncate">
-                                {order.listing?.book?.title ?? "—"}
-                              </p>
+                              {order.listing ? (
+                                <Link
+                                  href={libroUrl(order.listing)}
+                                  className="block font-medium text-ink truncate hover:text-brand-600 hover:underline"
+                                >
+                                  {order.listing.book?.title ?? "—"}
+                                </Link>
+                              ) : (
+                                <p className="font-medium text-ink truncate">—</p>
+                              )}
                               <p className="text-xs text-ink-muted truncate">
                                 {order.listing?.book?.author ?? ""}
                               </p>
