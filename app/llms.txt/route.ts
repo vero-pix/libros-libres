@@ -164,6 +164,7 @@ Por ejemplo: /libros-usados/santiago, /libros-usados/concepcion,
 - https://tuslibros.cl/libros-escolares (textos escolares usados y lectura complementaria del colegio)
 - https://tuslibros.cl/primavera (selección de primavera: fantasía, romantasy, poesía y juvenil)
 - https://tuslibros.cl/filosofia (libros de filosofía usados)
+- https://tuslibros.cl/psicologia (psicología, psicoanálisis y psiquiatría: Freud, Jung, Lacan, Piaget, Sacks)
 - https://tuslibros.cl/espiritualidad (espiritualidad, budismo, esoterismo)
 - https://tuslibros.cl/autor/[slug] — páginas de autor, por ejemplo /autor/ken-wilber, /autor/rudolf-steiner, /autor/pedro-prado
 - https://tuslibros.cl/categoria/[slug] — páginas por categoría, por ejemplo /categoria/no-ficcion-ensayo

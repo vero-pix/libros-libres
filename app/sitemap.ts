@@ -53,6 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // portada solo la enlaza entre el 20-09 y el 20-12 (lib/fechasChile.ts).
     { url: `${baseUrl}/primavera`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.8 },
     { url: `${baseUrl}/filosofia`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
+    { url: `${baseUrl}/psicologia`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
     { url: `${baseUrl}/espiritualidad`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
     { url: `${baseUrl}/solicitudes`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.7 },
     { url: `${baseUrl}/alianzas`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },

@@ -209,6 +209,8 @@ export default async function FilosofiaPage() {
           <section className="mb-12 border-t border-cream-dark pt-10">
             <p className="text-xs text-ink-muted uppercase tracking-widest font-semibold mb-4">También puede interesarte</p>
             <div className="flex flex-wrap gap-3">
+              <Link href="/psicologia" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Psicología y psicoanálisis</Link>
+              <span className="text-ink-muted">·</span>
               <Link href="/espiritualidad" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Espiritualidad y esoterismo</Link>
               <span className="text-ink-muted">·</span>
               <Link href="/antroposofia" className="text-sm text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2 transition-colors">Antroposofía</Link>
