@@ -22,7 +22,7 @@ import { trackEvent } from "@/utils/analytics";
 import { translateGenre } from "@/lib/genres";
 import { authorLanding } from "@/lib/authorLandings";
 import HacerOfertaButton, { EVENTO_ABRIR_OFERTA } from "@/components/offers/HacerOfertaButton";
-import { vendedorPuedeRecibirOfertas } from "@/lib/offers";
+import { vendedorPuedeRecibirOfertas, TAG_OFERTA_DESTACADA } from "@/lib/offers";
 import { nombreCortoVendedor } from "@/lib/nombreVendedor";
 
 /**
@@ -432,9 +432,11 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
           )}
 
           {/* Tags */}
-          {((book as any).tags ?? []).length > 0 && (
+          {/* Los tags de uso interno (como el que marca "Haz una oferta" en la
+              grilla) no se muestran: son una señal para el sitio, no un tema. */}
+          {((book as any).tags ?? []).filter((t: string) => t !== TAG_OFERTA_DESTACADA).length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3">
-              {((book as any).tags as string[]).map((tag: string) => (
+              {((book as any).tags as string[]).filter((t) => t !== TAG_OFERTA_DESTACADA).map((tag: string) => (
                 <Link
                   key={tag}
                   href={`/?tag=${tag}`}
