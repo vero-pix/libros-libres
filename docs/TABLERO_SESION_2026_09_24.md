@@ -222,7 +222,7 @@ Las cifras del mes (compras, montos, comisión, captura, semana a semana) están
 - Sellos para vendedores (rapidez, ventas…), que no sean solo métricas frías.
 - Correos del sitio: Resend gratis corta en 100 al día. Opción propuesta: Resend primero y respaldo por el relay SMTP de Google Workspace.
 - Sinopsis: quedan ~150 fichas ajenas con MercadoPago bajo $25.000. Medir las visitas de las hechas hacia el 14-10.
-- Aclarar las devoluciones del 30-09 (ver el archivo privado) antes de tocar estados de pedidos.
+
 
 ---
 
