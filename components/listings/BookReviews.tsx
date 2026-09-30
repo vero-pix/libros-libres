@@ -55,6 +55,14 @@ function StarPicker({ value, onChange }: { value: number; onChange: (v: number) 
 }
 
 export default function BookReviews({ bookId, bookTitle, initialReviews }: Props) {
+  const [vieneAResenar, setVieneAResenar] = useState(false);
+  useEffect(() => {
+    if (window.location.hash === "#resenas-libro") {
+      setVieneAResenar(true);
+      requestAnimationFrame(() => document.getElementById("resenas-libro")?.scrollIntoView({ block: "start" }));
+    }
+  }, []);
+
   const [reviews, setReviews] = useState<BookReview[]>(initialReviews);
   const [userId, setUserId] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
@@ -114,6 +122,11 @@ export default function BookReviews({ bookId, bookTitle, initialReviews }: Props
     }
     setSubmitting(false);
   }
+
+  // Vacío, el bloque salía en las 4.000 fichas con "sé el primero" y nadie
+  // escribió nunca una reseña (30-09-2026). Se muestra si ya hay alguna, o si
+  // la visita viene del enlace del correo post-compra (#resenas-libro).
+  if (!initialReviews.length && !vieneAResenar) return null;
 
   return (
     <section id="resenas-libro" className="mt-12 border-t border-ink/10 pt-10">
