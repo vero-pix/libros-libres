@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type React from "react";
 import { COVER_GRADIENTS } from "@/components/listings/BookCover";
 import type { HeroBook } from "./HomeShell";
 
@@ -32,6 +33,17 @@ const CATEGORY_CHIPS = [
    cambie la paleta el abanico cambie con ella.
    Los 6 espacios (posición + color) son fijos;
    los títulos rotan semanalmente desde HERO_POOL para que el hero se sienta vivo. */
+/* Cada libro flota con su propio ritmo (30-09-2026): si todos suben a la vez
+   parece un bloque, no una pila de libros. */
+const FLOTE = [
+  { "--flota-dur": "7.5s", "--flota-delay": "-1s" },
+  { "--flota-dur": "8.5s", "--flota-delay": "-4s" },
+  { "--flota-dur": "7s", "--flota-delay": "-2.5s" },
+  { "--flota-dur": "9s", "--flota-delay": "-6s" },
+  { "--flota-dur": "8s", "--flota-delay": "-3.5s" },
+  { "--flota-dur": "7.8s", "--flota-delay": "-5s" },
+] as unknown as React.CSSProperties[];
+
 const HERO_SLOTS = [
   { bg: COVER_GRADIENTS.ox, light: false, pos: "left-0 top-7 w-[150px] rotate-[-7deg] z-[2]" },
   { bg: COVER_GRADIENTS.cream, light: true, pos: "left-[25%] top-0 w-[162px] rotate-[-2deg] z-[4]" },
@@ -85,9 +97,9 @@ function weeklyHeroBooks() {
   return HERO_SLOTS.map((slot, i) => ({ ...slot, ...HERO_POOL[(offset + i) % HERO_POOL.length] }));
 }
 
-function FanBook({ b }: { b: ReturnType<typeof weeklyHeroBooks>[number] }) {
+function FanBook({ b, flote }: { b: ReturnType<typeof weeklyHeroBooks>[number]; flote?: React.CSSProperties }) {
   return (
-    <div className={`absolute aspect-[148/225] rounded-[2px_4px_4px_2px] shadow-book overflow-hidden flex flex-col justify-between p-3.5 ${b.pos}`} style={{ background: b.bg }}>
+    <div className={`flota absolute aspect-[148/225] rounded-[2px_4px_4px_2px] shadow-book overflow-hidden flex flex-col justify-between p-3.5 ${b.pos}`} style={{ background: b.bg, ...flote }}>
       <span aria-hidden className="absolute inset-y-0 left-0 w-2 z-[2] bg-gradient-to-r from-black/30 via-white/10 to-black/10" />
       <span className={`relative font-mono text-[8px] uppercase tracking-[0.16em] font-semibold ${b.light ? "text-black/55" : "text-white/70"}`}>{b.pub}</span>
       <div className="relative">
@@ -114,12 +126,13 @@ function FanBook({ b }: { b: ReturnType<typeof weeklyHeroBooks>[number] }) {
    Siguen siendo `<img>` y no `next/image` a propósito: la optimización de imágenes
    es lo que más factura del plan de Vercel y ya se acotó por costo el 17-08-2026
    (ver `next.config.mjs`). Esto arregla el LCP sin agregar ni una transformación. */
-function RealFanBook({ book, pos, prioridad }: { book: HeroBook; pos: string; prioridad: boolean }) {
+function RealFanBook({ book, pos, prioridad, flote }: { book: HeroBook; pos: string; prioridad: boolean; flote?: React.CSSProperties }) {
   return (
     <Link
       href={book.href}
       title={book.title}
-      className={`group absolute aspect-[148/225] rounded-[2px_4px_4px_2px] shadow-book overflow-hidden bg-ink/5 ${pos} transition-transform duration-300 hover:!rotate-0 hover:z-[7] hover:scale-[1.04]`}
+      style={flote}
+      className={`flota group absolute aspect-[148/225] rounded-[2px_4px_4px_2px] shadow-book overflow-hidden bg-ink/5 ${pos} transition-transform duration-300 hover:!rotate-0 hover:z-[7] hover:scale-[1.04]`}
     >
       <span aria-hidden className="absolute inset-y-0 left-0 w-2 z-[2] bg-gradient-to-r from-black/30 via-white/10 to-black/10" />
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -150,7 +163,9 @@ export default function HeroBar({ heroBooks, primavera = false }: Props) {
       <div className="relative max-w-7xl mx-auto px-6 pt-12 pb-10 sm:pt-16 sm:pb-12">
         <div className="grid lg:grid-cols-[1.02fr_0.98fr] gap-10 items-center">
           {/* Texto */}
-          <div className="max-w-2xl">
+          {/* min-w-0: sin esto la repisa móvil (w-max) ensanchaba la columna de la
+              grilla y la página se corría de lado en el celular. */}
+          <div className="max-w-2xl min-w-0">
             <p className="inline-flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.22em] text-coral mb-5 before:content-[''] before:w-6 before:h-px before:bg-current">
               {primavera ? "Primavera 2026 · Chile" : "Libros libres · Chile"}
             </p>
@@ -187,6 +202,32 @@ export default function HeroBar({ heroBooks, primavera = false }: Props) {
               </Link>
             </div>
 
+            {/* En el celular el abanico no cabe y la primera pantalla era solo
+                texto (30-09-2026). Acá va una repisa de portadas reales que se
+                desliza lento; se detiene al tocarla y queda quieta con "reducir
+                movimiento". Duplicada para que el loop no tenga salto. */}
+            {useReal && (
+              <div className="lg:hidden mt-8 -mx-6 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]">
+                <div className="marquee-track flex gap-3 w-max px-6" style={{ "--marquee-duration": "36s" } as React.CSSProperties}>
+                  {[...heroBooks!.slice(0, 6), ...heroBooks!.slice(0, 6)].map((b, i) => (
+                    <Link
+                      key={`${b.href}-${i}`}
+                      href={b.href}
+                      title={b.title}
+                      aria-hidden={i >= 6 ? true : undefined}
+                      tabIndex={i >= 6 ? -1 : undefined}
+                      className="relative block w-[74px] aspect-[148/225] shrink-0 rounded-[2px_4px_4px_2px] shadow-book overflow-hidden bg-ink/5"
+                      style={{ rotate: `${[-3, 2, -1, 3, -2, 1][i % 6]}deg` }}
+                    >
+                      <span aria-hidden className="absolute inset-y-0 left-0 w-1.5 z-[2] bg-gradient-to-r from-black/30 via-white/10 to-black/10" />
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={b.cover} alt={i < 6 ? b.title : ""} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Diferenciadores de confianza — antes acá lideraba el ancla de precio
                 "$3.000 · más baratos", que cheapeaba la marca. La cercanía, el pago
                 protegido y la gente real son lo que sube valor y ataca la desconfianza
@@ -219,9 +260,9 @@ export default function HeroBar({ heroBooks, primavera = false }: Props) {
           <div className="relative h-[460px] hidden lg:block">
             {useReal
               ? heroBooks!.slice(0, 6).map((b, i) => (
-                  <RealFanBook key={b.href} book={b} pos={HERO_SLOTS[i].pos} prioridad={i < 3} />
+                  <RealFanBook key={b.href} book={b} pos={HERO_SLOTS[i].pos} prioridad={i < 3} flote={FLOTE[i]} />
                 ))
-              : weeklyHeroBooks().map((b) => <FanBook key={b.t} b={b} />)}
+              : weeklyHeroBooks().map((b, i) => <FanBook key={b.t} b={b} flote={FLOTE[i]} />)}
             <div className="absolute z-[6] left-[40%] top-[188px] rotate-[2deg] bg-white border border-hero-line rounded-full px-3.5 py-2 shadow-card flex items-center gap-2.5 font-mono text-[11px] font-semibold text-ink whitespace-nowrap">
               <span className="w-2 h-2 rounded-full bg-coral shadow-[0_0_0_4px_rgba(223,82,57,0.18)]" />
               A 800 m · retiro en mano

@@ -102,6 +102,9 @@ const ListingCard = memo(function ListingCard({
   ocultarNuevo = false,
 }: Props) {
   const [showQuickView, setShowQuickView] = useState(false);
+  // Hay fotos de perfil de Google que ya no existen: sin esto se veía el ícono de
+  // imagen rota con el alt al lado. Si falla, cae a la inicial.
+  const [avatarRoto, setAvatarRoto] = useState(false);
   const [cartState, setCartState] = useState<"idle" | "loading" | "added">("idle");
   const [, startTransition] = useTransition();
   const { book } = listing;
@@ -168,7 +171,7 @@ const ListingCard = memo(function ListingCard({
 
   return (
     <>
-      <article className="group relative bg-paper-card rounded-[3px] border border-line overflow-hidden transition-all duration-200 hover:shadow-card hover:-translate-y-0.5 hover:border-line-strong">
+      <article className="aparece group relative bg-paper-card rounded-[3px] border border-line overflow-hidden transition-all duration-200 hover:shadow-card hover:-translate-y-0.5 hover:border-line-strong">
         <Link
           href={libroUrl(listing)}
           className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-coral/60 focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-[3px]"
@@ -176,7 +179,7 @@ const ListingCard = memo(function ListingCard({
           {/* PORTADA = OBJETO-LIBRO sobre fondo papel */}
           <div className="relative px-5 pt-5 pb-3.5 bg-gradient-to-b from-[#f6f0e4] to-[#efe7d6] flex justify-center overflow-hidden">
             {/* el libro */}
-            <div className="relative w-[64%] rounded-[2px_4px_4px_2px] shadow-book overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+            <div className="libro-3d relative w-[64%] rounded-[2px_4px_4px_2px] shadow-book overflow-hidden">
               <BookCover
                 title={book.title}
                 author={book.author}
@@ -318,8 +321,9 @@ const ListingCard = memo(function ListingCard({
               href={sellerHref}
               className="flex items-center gap-1.5 min-w-0 text-[12px] text-ink-muted hover:text-ink transition-colors"
             >
-              {listing.seller?.avatar_url ? (
+              {listing.seller?.avatar_url && !avatarRoto ? (
                 <Image
+                  onError={() => setAvatarRoto(true)}
                   src={listing.seller.avatar_url}
                   alt={`Foto de ${sellerName}`}
                   width={20}

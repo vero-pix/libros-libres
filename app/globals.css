@@ -180,3 +180,43 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
 }
+
+/* Movimiento de la portada (30-09-2026). Vero: "la página se ve muy estática".
+   Todo es CSS, sin JS, y nada deja contenido escondido: si el navegador no
+   soporta la animación, el contenido simplemente está quieto y visible. */
+
+/* Los libros del abanico flotan, cada uno a su ritmo. Usa la propiedad
+   `translate` y no `transform`, para no pisar la rotación de cada libro. */
+@keyframes flotar {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -9px; }
+}
+.flota { animation: flotar var(--flota-dur, 7s) ease-in-out infinite; animation-delay: var(--flota-delay, 0s); }
+
+/* Las tarjetas de la grilla suben y aparecen al entrar en pantalla. Solo en
+   navegadores con animaciones ligadas al scroll; en los demás, quietas. Las que
+   ya están en pantalla al cargar aparecen completas (quedan fuera del rango). */
+@supports (animation-timeline: view()) {
+  @keyframes aparecer {
+    from { opacity: 0.2; translate: 0 22px; }
+    to   { opacity: 1;   translate: 0 0; }
+  }
+  .aparece {
+    animation: aparecer linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 55%;
+  }
+}
+
+/* La portada de la tarjeta se inclina como un libro que se saca de la repisa.
+   Solo con mouse: en el celular no hay hover y el tap no debe mover nada. */
+@media (hover: hover) {
+  .libro-3d { transition: transform 0.35s cubic-bezier(.2,.7,.3,1); transform-origin: left center; }
+  .group:hover .libro-3d { transform: perspective(700px) translateY(-4px) rotateY(-14deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flota, .aparece { animation: none; opacity: 1; translate: none; }
+  .libro-3d { transition: none; }
+  .group:hover .libro-3d { transform: none; }
+}
