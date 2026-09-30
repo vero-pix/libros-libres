@@ -46,7 +46,7 @@ export default async function PublishPage({ searchParams }: Props) {
             </p>
 
             {/* Mini steps */}
-            <div className="flex items-center justify-center gap-6 mt-8">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3 max-w-sm mx-auto sm:max-w-none sm:flex sm:items-center sm:justify-center sm:gap-6 mt-8">
               {[
                 { num: "1", text: "Busca el libro" },
                 { num: "2", text: "Ponle precio" },
@@ -56,11 +56,11 @@ export default async function PublishPage({ searchParams }: Props) {
               ].map((step, i) => (
                 <div key={step.num} className="flex items-center gap-2">
                   {i > 0 && (
-                    <svg className="w-4 h-4 text-cream-dark -ml-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <svg className="hidden sm:block w-4 h-4 text-cream-dark -ml-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                     </svg>
                   )}
-                  <span className="w-6 h-6 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">
+                  <span className="shrink-0 w-6 h-6 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">
                     {step.num}
                   </span>
                   <span className="text-xs font-medium text-ink">{step.text}</span>
@@ -187,7 +187,7 @@ export default async function PublishPage({ searchParams }: Props) {
           </p>
 
           {/* Mini steps */}
-          <div className="flex items-center justify-center gap-6 mt-5">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3 max-w-sm mx-auto sm:max-w-none sm:flex sm:items-center sm:justify-center sm:gap-6 mt-5">
             {[
               { num: "1", text: "Busca el libro (o ingreso manual)" },
               { num: "2", text: "Ponle precio" },
@@ -196,11 +196,11 @@ export default async function PublishPage({ searchParams }: Props) {
             ].map((step, i) => (
               <div key={step.num} className="flex items-center gap-2">
                 {i > 0 && (
-                  <svg className="w-4 h-4 text-cream-dark -ml-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <svg className="hidden sm:block w-4 h-4 text-cream-dark -ml-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                   </svg>
                 )}
-                <span className="w-6 h-6 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">
+                <span className="shrink-0 w-6 h-6 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">
                   {step.num}
                 </span>
                 <span className="text-xs font-medium text-ink">{step.text}</span>

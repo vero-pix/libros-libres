@@ -171,8 +171,10 @@ export default function HacerOfertaButton({ listingId, price, sellerName, bookTi
           type="text"
           inputMode="numeric"
           autoFocus
-          value={monto}
-          onChange={(e) => setMonto(e.target.value.replace(/\D/g, ""))}
+          // Se guarda solo con dígitos y se muestra con punto de miles:
+          // "120000" costaba leerlo mientras se escribía (30-09-2026).
+          value={monto ? Number(monto).toLocaleString("es-CL") : ""}
+          onChange={(e) => setMonto(e.target.value.replace(/\D/g, "").slice(0, 9))}
           placeholder={sugerida.toLocaleString("es-CL")}
           className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-7 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
           aria-label="Monto de tu oferta en pesos"

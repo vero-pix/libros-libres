@@ -117,6 +117,23 @@ export default function ImageGallery({ mainImage, images, alt, author }: Props) 
               setActiveIdx(0);
             }}
           />
+          {/* La siguiente foto se pide por adelantado, invisible y del mismo
+              tamaño (30-09-2026): al pasar de foto, la primera vez se veían
+              segundos de portada vacía mientras Vercel generaba la imagen.
+              Solo la siguiente, no todas, para no sumar transformaciones que
+              nadie mira (ver el control de costo en next.config.mjs). */}
+          {visibleImages.length > 1 && (
+            <Image
+              key={`pre-${visibleImages[(safeIdx + 1) % visibleImages.length].id}`}
+              src={visibleImages[(safeIdx + 1) % visibleImages.length].image_url}
+              alt=""
+              aria-hidden
+              fill
+              sizes="220px"
+              loading="eager"
+              className="object-cover opacity-0 pointer-events-none"
+            />
+          )}
           <span aria-hidden className={SPINE} />
           <button
             type="button"

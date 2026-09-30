@@ -233,7 +233,12 @@ export default async function SearchPage({ searchParams }: Props) {
     return qb;
   };
 
-  let dataQuery = buildFiltered().order("deprioritized", { ascending: true });
+  // Primero lo que se puede comprar (30-09-2026): buscando "neruda", los dos
+  // primeros resultados eran libros ya vendidos. `status` es un enum y
+  // `active` va antes que `completed` en su orden, así que ascendente basta.
+  let dataQuery = buildFiltered()
+    .order("status", { ascending: true })
+    .order("deprioritized", { ascending: true });
   if (sort === "price_asc") {
     dataQuery = dataQuery.order("price", { ascending: true });
   } else if (sort === "price_desc") {
