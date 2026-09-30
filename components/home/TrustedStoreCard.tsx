@@ -82,7 +82,7 @@ function Portadas({ portadas, alto }: { portadas: TiendaConfianza["portadas"]; a
           style={{ width: ancho, height: alto, marginLeft: i === 0 ? 0 : -8, zIndex: portadas.length - i }}
         >
           {p.url ? (
-            <Image src={p.url} alt="" fill className="object-cover" sizes={`${ancho}px`} />
+            <Image src={p.url} alt={`Portada de ${p.titulo}`} fill className="object-cover" sizes={`${ancho}px`} />
           ) : (
             <span className="flex h-full w-full items-center justify-center text-[9px] leading-tight text-ink-muted px-1 text-center">
               {p.titulo.slice(0, 18)}

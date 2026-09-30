@@ -241,7 +241,7 @@ export default async function LibrosAntiguosPage() {
           {chilenas.length > 0 && (
             <section className="mb-16">
               <h2 className="font-display text-3xl font-bold text-ink mb-3">
-                Impresos chilenos
+                Impresos chilenos a la venta
               </h2>
               <p className="text-ink-muted leading-relaxed max-w-3xl mb-8">
                 Libros y revistas impresos en Chile, en tiradas cortas y para un país chico.

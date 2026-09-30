@@ -76,7 +76,7 @@ export default async function LiquidacionBanner() {
                   <img
                     key={i}
                     src={src}
-                    alt=""
+                    alt="Portada de un libro en liquidación"
                     loading="lazy"
                     className="h-24 w-16 sm:h-28 sm:w-20 rounded-md object-cover border-2 border-cream/90 shadow-xl transition-transform duration-300 group-hover:-translate-y-1"
                     style={{ transform: `rotate(${(i - 2) * 5}deg)` }}

@@ -58,7 +58,7 @@ export default function CategoriesMobileDrawer({ categories, activeCategory, act
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-cream-dark/20">
-          <h2 className="font-display font-bold text-base text-ink">Categorías</h2>
+          <h2 className="font-display font-bold text-base text-ink">Todas las categorías</h2>
           <button
             onClick={() => setOpen(false)}
             className="text-ink-muted text-sm hover:text-ink"

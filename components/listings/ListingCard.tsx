@@ -321,7 +321,7 @@ const ListingCard = memo(function ListingCard({
               {listing.seller?.avatar_url ? (
                 <Image
                   src={listing.seller.avatar_url}
-                  alt=""
+                  alt={`Foto de ${sellerName}`}
                   width={20}
                   height={20}
                   className="rounded-full object-cover flex-shrink-0"
