@@ -208,3 +208,6 @@ export async function negociacionesVigentes(
     montoMadre: o.parent_id ? montoMadre[o.parent_id] ?? null : null,
   }));
 }
+
+/** Tag de `books.tags` que muestra "Haz una oferta" en la tarjeta de la grilla. */
+export const TAG_OFERTA_DESTACADA = "haz-una-oferta";

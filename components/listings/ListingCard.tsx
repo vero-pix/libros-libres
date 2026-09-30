@@ -10,6 +10,7 @@ import type { ListingWithBook } from "@/types";
 import { libroUrl } from "@/lib/urls";
 import { resolveAuthorUrl } from "@/lib/authorLink";
 import { nombreCortoVendedor } from "@/lib/nombreVendedor";
+import { TAG_OFERTA_DESTACADA } from "@/lib/offers";
 
 const QuickViewModal = dynamic(() => import("./QuickViewModal"), {
   ssr: false,
@@ -154,6 +155,13 @@ const ListingCard = memo(function ListingCard({
   const badgeBruto = pickPrimaryBadge(listing);
   const badge = ocultarNuevo && badgeBruto?.label === "Nuevo aquí" ? null : badgeBruto;
 
+  // "Haz una oferta" a la vista en la grilla: solo los libros que llevan el tag
+  // (lo pone Vero por script; hoy, sus libros de $20.000 o más) y aceptan ofertas.
+  const conOfertaDestacada =
+    listing.status === "active" &&
+    !!listing.acepta_ofertas &&
+    (book.tags ?? []).includes(TAG_OFERTA_DESTACADA);
+
   /* ---------- Objeto-libro: cubierta dibujada (fallback sin foto) ---------- */
 
   /* ---------- Render ---------- */
@@ -292,6 +300,14 @@ const ListingCard = memo(function ListingCard({
                 <span className="font-mono text-[11px] text-ink-muted line-through tabular-nums">
                   {formatCLP(originalPrice)}
                 </span>
+              )}
+              {conOfertaDestacada && (
+                <Link
+                  href={`${libroUrl(listing)}#oferta`}
+                  className="inline-flex items-center text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border border-coral/40 bg-coral/10 text-coral-deep hover:bg-coral hover:text-white transition-colors animate-fade-in"
+                >
+                  Haz una oferta
+                </Link>
               )}
             </div>
           )}

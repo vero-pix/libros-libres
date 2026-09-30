@@ -43,6 +43,8 @@ export default function HacerOfertaButton({ listingId, price, sellerName, bookTi
       requestAnimationFrame(() => caja.current?.scrollIntoView({ behavior: "smooth", block: "center" }));
     }
     window.addEventListener(EVENTO_ABRIR_OFERTA, abrir);
+    // La etiqueta "Haz una oferta" de la tarjeta llega con #oferta: abre directo.
+    if (window.location.hash === "#oferta") abrir();
     return () => window.removeEventListener(EVENTO_ABRIR_OFERTA, abrir);
   }, []);
 
