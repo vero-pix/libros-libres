@@ -105,7 +105,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const sellerName = listing.seller?.full_name || "un vendedor de tuslibros.cl";
   // Sufijo único por listing: precio + vendedor. Garantiza que libros con la
   // misma descripción editorial no generen meta descriptions duplicadas.
-  const suffix = `${priceStr ? `Disponible por ${priceStr}` : "Disponible"}. Vendido por ${sellerName} en tuslibros.cl. Envío a todo Chile.`;
+  // Corto a propósito: el largo (~95 caracteres) dejaba ~60 para la sinopsis y
+  // Google mostraba "…que llegó a…" (30-09-2026).
+  const suffix = `${priceStr ? `${priceStr} · ` : ""}${sellerName} · Envío a todo Chile.`;
   const description = (() => {
     if (!rawDesc) {
       // Sin descripción: construir desde cero con datos únicos del listing.
@@ -113,12 +115,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
     // Con descripción: usar como intro truncada y añadir sufijo único.
     // El total debe caber en ≤160 chars.
+    // Una sola línea: los saltos de párrafo de la descripción no van a Google.
+    const plano = rawDesc.replace(/\s+/g, " ").trim().replace(/[.…\s]+$/, "");
     const maxIntroLen = 160 - suffix.length - 2; // 2 = ". "
-    const intro =
-      rawDesc.length <= maxIntroLen
-        ? rawDesc
-        : rawDesc.slice(0, rawDesc.lastIndexOf(" ", maxIntroLen - 1)).trimEnd() + "…";
-    return `${intro}. ${suffix}`;
+    let intro = plano;
+    if (plano.length > maxIntroLen) {
+      const corte = plano.slice(0, maxIntroLen);
+      // Mejor cerrar en una frase completa si queda al menos la mitad del espacio.
+      const finFrase = corte.lastIndexOf(". ");
+      intro =
+        finFrase >= maxIntroLen / 2
+          ? corte.slice(0, finFrase)
+          : corte.slice(0, corte.lastIndexOf(" ", maxIntroLen - 1)).replace(/[,;:\s]+$/, "") + "…";
+    }
+    return `${intro}${intro.endsWith("…") ? " " : ". "}${suffix}`;
   })();
 
   const image = listing.cover_image_url || listing.book.cover_url || "/og-image.png";
