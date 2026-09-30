@@ -201,6 +201,31 @@ Precios y pisos en `docs_desde_claude/PISOS_LIBROS_VERO_2026-09.md` (privado: el
 
 ---
 
+## 8. ✅ CIERRE DE SEPTIEMBRE (30-09)
+
+Las cifras del mes (compras, montos, comisión, captura, semana a semana) están en `docs_desde_claude/CIERRE_SEPTIEMBRE_2026.md`, que es privado porque el repo es público. En corto: **septiembre es el mejor mes desde abril**, las compras en el sitio se multiplicaron frente a agosto y la captura del experimento del WhatsApp siguió subiendo. Las semanas con Shipit tuvieron unas 3 veces más compras que las de después.
+
+**Bitácora del 30-09:**
+- ✅ **"Haz una oferta" a la vista en la grilla** para los libros caros de @vero (≥ $20.000, tag interno `haz-una-oferta`). El enlace abre la ficha con el formulario desplegado. El tag no se muestra en la ficha.
+- ✅ **SEO:** meta description de la ficha con espacio para la sinopsis (el sufijo se acortó); alt en la foto del vendedor y en las portadas; títulos repetidos fuera. Viene de la auditoría de Ahrefs (51/100, 250 páginas).
+- ✅ **Sinopsis nuevas:** 54 fichas caras sin visitas de vendedores con MercadoPago (tanda 1: 20, tanda 2: 34) y 51 de @vero con la plantilla "Descubre…". En las ajenas se agregó la sinopsis antes del texto del vendedor, sin tocar nada suyo. Los 26 Simenon, verificados contra fuentes (16 corregidos).
+- ✅ **Movimiento en la portada:** repisa de portadas que se desliza en el celular, abanico que flota en escritorio, tarjetas que aparecen al bajar, portada que se inclina con el mouse. Todo se apaga con "reducir movimiento".
+- ✅ **Arreglos que salieron de grabar el sitio en el celular:** el botón de volver arriba tapaba "Comprar ahora"; la búsqueda mostraba primero libros vendidos; los pasos de /publish se cortaban; el monto de la oferta sin punto de miles; la galería tardaba en la foto siguiente; la foto de perfil rota mostraba el ícono de imagen rota.
+- ✅ **Reseñas del libro:** el bloque vacío ("sé el primero") ya no sale en las fichas. Nadie escribió una nunca. Aparece si hay alguna o si se llega desde el correo post-compra. Las reseñas del vendedor siguen igual.
+- ✅ **Destacados:** entra un vendedor nuevo (revistas y música vintage) en el puesto 2, con bienvenida enviada. Sale un libro ajeno que llevaba 14 días sin visitas. "La pieza" pasa del Neruda Losada al Plutarco de 1821, hasta el 31-10.
+- ✅ **Despacho propio:** arquitectura en el repo privado `vero-pix/despacho` (PR #1, v0.3). Principio: libertad para elegir; varios couriers desde el día uno; regiones desde el comienzo. Se descartó Enviame (mínimo de 200 envíos al mes). Borradores de correo a Envia.com y Chilexpress enviados a hola@ para que salgan desde ahí.
+- ✅ **Reporte "Ritmo por libro"** regenerado (`npm run kpi:libros`): 43% del catálogo sin visitas, contra 47% el 18-09.
+
+**Para abrir octubre:**
+- Pack Maigret "elige 5 por $15.000" (falta la foto de los 26 juntos).
+- Decidir si se abre la categoría de música (casetes y discos): lo preguntó un vendedor nuevo. Idea: una encuesta de sugerencias.
+- Sellos para vendedores (rapidez, ventas…), que no sean solo métricas frías.
+- Correos del sitio: Resend gratis corta en 100 al día. Opción propuesta: Resend primero y respaldo por el relay SMTP de Google Workspace.
+- Sinopsis: quedan ~150 fichas ajenas con MercadoPago bajo $25.000. Medir las visitas de las hechas hacia el 14-10.
+- Aclarar las devoluciones del 30-09 (ver el archivo privado) antes de tocar estados de pedidos.
+
+---
+
 ## DESCARTADO ✅
 
 - **Ranking de vendedores de Mercado Libre por API:** viola los términos de uso (cláusula 7.4, prohíbe usar datos para servicios que compitan con Mercado Libre) y la búsqueda responde 403 desde abril de 2025. No se retoma.
