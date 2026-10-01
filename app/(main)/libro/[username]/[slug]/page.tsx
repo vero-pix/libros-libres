@@ -80,25 +80,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const priceStr = listing.price ? `$${listing.price.toLocaleString("es-CL")}` : "";
-  const bookTitle = listing.book.title || "";
-  const author = listing.book.author || "";
-  // Truncamiento inteligente para mantener title ≤60 chars (recomendación Google).
-  // Prioridad: título > autor > precio. Si el título es muy largo, se trunca con … y se mantiene el autor.
+  const limpio = (s: string | null | undefined) => (s || "").replace(/\s+/g, " ").trim();
+  const bookTitle = limpio(listing.book.title);
+  const author = limpio(listing.book.author);
+  // Title ≤60 chars (recomendación Google). Prioridad: título > precio > autor.
+  // Antes se preservaba el autor y se cortaba el título: «Los Compas y el
+  // Diamant… — Mikecrack, El Trollino y Timba VK» juntó 101 impresiones y 0
+  // clics en septiembre buscando justo el título completo (30-09-2026). Ahora
+  // se acorta primero el autor (al primero de la lista) y después se suelta.
   const buildTitle = () => {
-    const full = priceStr
-      ? `${bookTitle} — ${author} (${priceStr}, usado)`
-      : `${bookTitle} — ${author}`;
-    if (full.length <= 60) return full;
-    // Sin precio
-    const noPrice = `${bookTitle} — ${author}`;
-    if (noPrice.length <= 60) return noPrice;
-    // Trunca el título pero preserva el autor
-    const maxBookLen = 60 - author.length - 3 - 1; // " — " + "…"
-    if (maxBookLen >= 15) {
-      return `${bookTitle.slice(0, maxBookLen).trimEnd()}… — ${author}`;
-    }
-    // Autor y título largos: corte duro
-    return full.slice(0, 59).trimEnd() + "…";
+    const primerAutor = limpio(author.split(/,|;| y | & /)[0]);
+    const usado = priceStr ? ` (${priceStr}, usado)` : "";
+    const candidatos = [
+      author && `${bookTitle} — ${author}${usado}`,
+      author && `${bookTitle} — ${author}`,
+      primerAutor && primerAutor !== author && `${bookTitle} — ${primerAutor}${usado}`,
+      primerAutor && primerAutor !== author && `${bookTitle} — ${primerAutor}`,
+      `${bookTitle}${usado}`,
+      bookTitle,
+    ];
+    const cabe = candidatos.find((c): c is string => !!c && c.length <= 60);
+    if (cabe) return cabe;
+    // Solo el título ya pasa de 60: se corta en una palabra.
+    const corte = bookTitle.lastIndexOf(" ", 58);
+    return bookTitle.slice(0, corte > 20 ? corte : 58).replace(/[,;:\s]+$/, "") + "…";
   };
   const title = buildTitle();
   const rawDesc = listing.book.description;
@@ -111,7 +116,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = (() => {
     if (!rawDesc) {
       // Sin descripción: construir desde cero con datos únicos del listing.
-      return `${listing.book.title} de ${listing.book.author} — libro usado${priceStr ? ` a ${priceStr}` : ""}. Vendido por ${sellerName} en tuslibros.cl. Envío por courier o retiro en persona.`;
+      return `${bookTitle} de ${author} — libro usado${priceStr ? ` a ${priceStr}` : ""}. Vendido por ${sellerName} en tuslibros.cl. Envío a todo Chile o retiro en persona.`;
     }
     // Con descripción: usar como intro truncada y añadir sufijo único.
     // El total debe caber en ≤160 chars.
