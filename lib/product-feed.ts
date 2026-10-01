@@ -18,6 +18,19 @@ import { conUtm } from "@/lib/utm";
 export const SITE = "https://tuslibros.cl";
 
 /**
+ * Merchant Center no procesa las tapas de books.google.com: el 30-09-2026 las
+ * 395 fichas rechazadas ("Image not processed") eran TODAS de ese dominio, y
+ * ninguna de los otros (Supabase, Open Library) falló. La URL responde 200 y
+ * robots.txt la permite, así que se sirve por el optimizador de imágenes del
+ * sitio, que ya tiene books.google.com en `remotePatterns`.
+ */
+function viaDominioPropio(url: string | null | undefined): string | null {
+  if (!url) return null;
+  if (!/^https?:\/\/books\.google\./.test(url)) return url;
+  return `${SITE}/_next/image?url=${encodeURIComponent(url)}&w=384&q=85`;
+}
+
+/**
  * Costo de despacho declarado en el feed y en el JSON-LD de la ficha.
  *
  * El JSON-LD declaraba $3.500 fijos, que nunca fue cierto: la mediana real de
@@ -108,7 +121,7 @@ export function construirItems(
       continue;
     }
     // La tapa de catálogo primero; la foto del vendedor como respaldo.
-    const imagen = l.book?.cover_url || l.cover_image_url;
+    const imagen = viaDominioPropio(l.book?.cover_url || l.cover_image_url);
     if (!imagen) {
       registrar("sin imagen usable");
       continue;
