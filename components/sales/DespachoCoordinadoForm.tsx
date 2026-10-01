@@ -12,7 +12,7 @@ import { COURIERS_COORDINADO } from "@/lib/shipping/coordinado";
 export default function DespachoCoordinadoForm({ bundleId }: { bundleId: string }) {
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);
-  const [courier, setCourier] = useState<string>("starken");
+  const [courier, setCourier] = useState<string>("bluexpress");
   const [tracking, setTracking] = useState("");
   const [estado, setEstado] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -75,6 +75,11 @@ export default function DespachoCoordinadoForm({ bundleId }: { bundleId: string 
           </option>
         ))}
       </select>
+      {/* 01-10-2026: un vendedor pagó $4.300 por Blue a Osorno y $8.000 por
+          Starken, que además le exigió el RUT del destinatario. */}
+      <p className="text-[10px] text-ink-muted leading-snug">
+        Te recomiendo Blue Express: suele ser el más barato y no pide el RUT de quien recibe.
+      </p>
       <input
         type="text"
         value={tracking}

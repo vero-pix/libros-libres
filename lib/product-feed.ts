@@ -37,10 +37,12 @@ function viaDominioPropio(url: string | null | undefined): string | null {
  * las órdenes con despacho es $5.433 y el máximo histórico $9.508. Declarar
  * menos de lo que se cobra es exactamente lo que Merchant Center penaliza.
  *
- * Se declara la mediana redondeada. Si Google reclama discrepancia en comunas
- * caras, el siguiente paso es `g:shipping` por región en vez de un valor único.
+ * Desde el 01-10-2026 se declara la tarifa de despacho coordinado a regiones
+ * ($5.990; Santiago $4.490, extremos $9.990 en `site_config.envio_coordinado`):
+ * así nunca se declara menos de lo que se cobra, salvo en zonas extremas. Si
+ * Google reclama discrepancia ahí, el siguiente paso es `g:shipping` por región.
  */
-export const FEED_SHIPPING_CLP = 5490;
+export const FEED_SHIPPING_CLP = 5990;
 
 export type CanalFeed = "merchant" | "meta";
 
