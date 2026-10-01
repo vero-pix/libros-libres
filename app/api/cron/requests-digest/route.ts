@@ -60,7 +60,7 @@ export async function GET(request: Request) {
   // tenga ese libro. Las del día se marcan aparte para la sección "nuevos".
   const { data: abiertas, error } = await supabase
     .from("book_requests")
-    .select("id, title, author, notes, requester_location, created_at")
+    .select("id, title, author, notes, requester_location, created_at, requester_user_id, requester_email")
     .eq("fulfilled", false)
     .order("created_at", { ascending: false })
     .limit(300);
@@ -195,14 +195,20 @@ export async function GET(request: Request) {
   const MAX_PERSONAL = 6;
   const paquetes = destinatarios.map((u) => {
     const perfil = construirPerfil(u.city ?? null, catalogo[u.id] ?? []);
+    // Nunca ofrecerle a alguien su propio pedido: a Cumsille le llegó "Buscan
+    // La obsolescencia del hombre en tu ciudad" y era él quien lo buscaba
+    // (01-10-2026). El matching por ciudad lo cruzaba consigo mismo.
+    const esSuyo = (r: { requester_user_id?: string | null; requester_email?: string | null }) =>
+      r.requester_user_id === u.id ||
+      (!!r.requester_email && r.requester_email.toLowerCase() === u.email!.toLowerCase());
     const yaEnNuevas = new Set(requests.map((r) => r.id));
     const personal = abiertas
-      .filter((r) => !yaEnNuevas.has(r.id))
+      .filter((r) => !yaEnNuevas.has(r.id) && !esSuyo(r))
       .map((r) => ({ r, m: evaluar(r, perfil)! }))
       .filter((x) => x.m)
       .sort((a, b) => b.m.peso - a.m.peso)
       .slice(0, MAX_PERSONAL);
-    return { u, personal, nuevas: requests };
+    return { u, personal, nuevas: requests.filter((r) => !esSuyo(r)) };
   }).filter((p) => p.personal.length > 0 || p.nuevas.length > 0);
 
   if (!paquetes.length) {
