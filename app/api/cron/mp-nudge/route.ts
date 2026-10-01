@@ -1,3 +1,4 @@
+import { sendEmail } from "@/lib/email";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { VERO_INBOX } from "@/lib/veroInbox";
@@ -82,42 +83,35 @@ export async function GET(request: Request) {
 
     if (dry) { sent.push({ email: u.email, name: firstName, listings: count }); continue; }
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const res = await sendEmail({
         from: FROM,
-        to: [u.email],
-        reply_to: REPLY_TO,
+        to: u.email,
+        replyTo: REPLY_TO,
         // El asunto anterior ("te falta un paso para vender") leía como que sin
         // MercadoPago no se puede vender, y no es así. Un vendedor dejó de subir
         // libros por eso (31-07-2026): "quiero agregar otra cuenta que no sea
         // mercado pago, por eso no he subido libros".
         subject: firstName ? `${firstName}, así te pueden comprar de todo Chile 📚` : "Así te pueden comprar de todo Chile 📚",
         html,
-      }),
-    });
-    if (res.ok) sent.push({ email: u.email, name: firstName, listings: count });
-    else { const t = await res.text(); console.error(`[cron/mp-nudge] resend ${res.status}: ${t}`); skipped.push({ email: u.email, reason: `resend ${res.status}` }); }
+      });
+    // El detalle del error queda en email_log.
+    if (res) sent.push({ email: u.email, name: firstName, listings: count });
+    else skipped.push({ email: u.email, reason: "no salió (ver email_log)" });
   }
 
   // Recap a Vero solo si hubo envíos (o en dry para inspección)
   if ((sent.length || dry) && !dry) {
-    await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
+    await sendEmail({
         from: FROM,
-        to: [VERO],
-        reply_to: REPLY_TO,
+        to: VERO,
+        replyTo: REPLY_TO,
         subject: `MP nudge: ${sent.length} vendedor(es) contactado(s)`,
         html: `<div style="font-family:-apple-system,sans-serif;font-size:14px;color:#1a1a2e">
           <p>Recordatorio de MercadoPago enviado a:</p>
           ${sent.map((s) => `<div>• ${s.name || "(sin nombre)"} — ${s.email} (${s.listings} libros)</div>`).join("")}
           ${skipped.length ? `<p style="color:#837c70;margin-top:14px">Omitidos: ${skipped.map((s) => `${s.email} (${s.reason})`).join(", ")}</p>` : ""}
         </div>`,
-      }),
-    });
+      });
   }
 
   console.log(`[cron/mp-nudge] ${dry ? "DRY " : ""}enviados=${sent.length} omitidos=${skipped.length}`);

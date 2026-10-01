@@ -1,3 +1,4 @@
+import { sendEmail } from "@/lib/email";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { VERO_INBOX } from "@/lib/veroInbox";
@@ -205,19 +206,12 @@ export async function POST() {
   <p style="text-align:center;color:#c0b89a;font-size:11px;margin-top:20px">tuslibros.cl · resumen automático 8:00 AM</p>
 </div>`;
 
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+  await sendEmail({
       from: "tuslibros.cl <noreply@tuslibros.cl>",
-      to: [ADMIN_EMAIL],
+      to: ADMIN_EMAIL,
       subject: `📊 tuslibros.cl · ${fechaDisplay}`,
       html,
-    }),
-  });
+    });
 
   // Contador de visitas de la home: un count(*) de page_views al día, guardado
   // en site_stats, en vez de uno cada 5 minutos desde la home (migración

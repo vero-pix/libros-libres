@@ -1,3 +1,4 @@
+import { sendEmail } from "@/lib/email";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { google } from "googleapis";
@@ -221,17 +222,13 @@ export async function GET(request: Request) {
   <p style="color:#837c70;font-size:12px;margin-top:24px">Reporte automático diario · tuslibros.cl</p>
 </div>`;
 
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
+  await sendEmail({
       from: "tuslibros.cl <noreply@tuslibros.cl>",
-      to: [TO],
-      reply_to: REPLY_TO,
+      to: TO,
+      replyTo: REPLY_TO,
       subject: `Hallazgos SEO — ${fecha} 📈`,
       html,
-    }),
-  });
+    });
 
   return NextResponse.json({ ok: true, pvToday, sessToday, pv7, sess7, pv30, bounceRate });
 }

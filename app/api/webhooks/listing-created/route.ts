@@ -1,3 +1,4 @@
+import { sendEmail } from "@/lib/email";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { compararLibro, normalizar } from "@/lib/bookRequestMatch";
@@ -199,20 +200,13 @@ export async function POST(req: Request) {
   </table>
   <a href="${url}" style="display:inline-block;padding:10px 20px;background:#1a1a2e;color:#faf7f1;text-decoration:none;border-radius:6px;font-size:14px;font-weight:600">Ver publicación →</a>
 </div>`;
-        await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${resendKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
+        await sendEmail({
             from: "tuslibros.cl <noreply@tuslibros.cl>",
-            to: [adminEmail],
-            reply_to: adminEmail,
+            to: adminEmail,
+            replyTo: adminEmail,
             subject: `📖 Nueva publicación: ${title}`,
             html: emailHtml,
-          }),
-        });
+          });
       } catch (emailErr) {
         console.error("Resend email failed:", emailErr);
       }
@@ -242,27 +236,20 @@ export async function POST(req: Request) {
             if (Date.now() - ultimo < 24 * 60 * 60 * 1000) continue;
 
             if (req.requester_email && resendKey) {
-              await fetch("https://api.resend.com/emails", {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${resendKey}`,
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
+              await sendEmail({
                   from: "tuslibros.cl <hola@tuslibros.cl>",
                   // El correo invita a responder para darse de baja, así que
                   // la respuesta tiene que llegar a alguna parte: hola@ no
                   // recibe nada con Workspace caído. VERO_INBOX es el buzón
                   // que sí se lee (lib/veroInbox.ts).
-                  reply_to: VERO_INBOX,
-                  to: [req.requester_email],
+                  replyTo: VERO_INBOX,
+                  to: req.requester_email,
                   subject: `Entró algo de ${req.title}`,
                   html: `<p>Pediste que te avisara cuando llegara algo de <strong>${escape(req.title)}</strong>. Acaba de entrar esto:</p>
 <p><strong>${escape(title)}</strong>${author ? ` — ${escape(author)}` : ""}</p>
 <p><a href="${url}">Verlo en tuslibros.cl</a></p>
 <p style="color:#666;font-size:13px">Te aviso como mucho una vez al día, aunque entren varios. Si ya no quieres estos avisos, respóndeme y lo saco.</p>`,
-                }),
-              }).catch((e) => console.error("Error enviando aviso de tema:", e));
+                }).catch((e) => console.error("Error enviando aviso de tema:", e));
             }
 
             await supabase
@@ -318,19 +305,12 @@ export async function POST(req: Request) {
   </p>
 </div>`;
 
-              await fetch("https://api.resend.com/emails", {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${resendKey}`,
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
+              await sendEmail({
                   from: "tuslibros.cl <noreply@tuslibros.cl>",
-                  to: [req.requester_email],
+                  to: req.requester_email,
                   subject: `📖 ¡Lo encontramos! ${title} ya está disponible`,
                   html: customerEmailHtml,
-                }),
-              }).catch((e) => console.error("Error sending match email:", e));
+                }).catch((e) => console.error("Error sending match email:", e));
             }
 
             // Cerrar la solicitud SOLO con match fuerte (título calcado, o título
@@ -378,20 +358,13 @@ export async function POST(req: Request) {
     Si tienes más libros parecidos, este es buen momento para publicarlos. — Vero
   </p>
 </div>`;
-                await fetch("https://api.resend.com/emails", {
-                  method: "POST",
-                  headers: {
-                    Authorization: `Bearer ${resendKey}`,
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
+                await sendEmail({
                     from: "Vero de tuslibros.cl <noreply@tuslibros.cl>",
-                    to: [sellerEmail],
-                    reply_to: VERO_INBOX,
+                    to: sellerEmail,
+                    replyTo: VERO_INBOX,
                     subject: `Tu ${title} lo estaba buscando alguien`,
                     html: sellerMatchHtml,
-                  }),
-                }).catch((e) => console.error("Error sending seller match email:", e));
+                  }).catch((e) => console.error("Error sending seller match email:", e));
               }
             } else {
               console.log(`[listing-created] match flojo para ${req.id}: aviso enviado, solicitud sigue abierta`);
