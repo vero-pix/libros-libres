@@ -21,7 +21,7 @@ const SEL = `*, book:books!inner(*), seller:users(id, full_name, avatar_url, use
 export const metadata: Metadata = {
   title: "Libros destacados: lo que elegí del catálogo",
   description:
-    "Los libros usados que elegí del catálogo de tuslibros.cl: piezas raras, primeras ediciones y buenos hallazgos de personas reales en todo Chile.",
+    "Los libros usados que elegí del catálogo de tuslibros.cl: piezas raras, primeras ediciones y buenos hallazgos de lectores y librerías de todo Chile.",
   alternates: { canonical: URL },
   openGraph: {
     title: "Libros destacados en tuslibros.cl",

@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     template: "%s | tuslibros.cl",
   },
   description:
-    "Compra y vende libros usados con personas reales: clásicos, rarezas y escolares. Retiro en mano o envío a todo Chile, con pago protegido por MercadoPago.",
+    "Compra y vende libros usados entre lectores y librerías: clásicos, rarezas y escolares. Retiro en mano o envío a todo Chile, con pago protegido por MercadoPago.",
   // Sin canonical global: forzaba a TODA página sin canonical propio (ej. /mapa,
   // /historia) a apuntar a la home → "URL no canónica" en el sitemap. Cada página
   // define el suyo; las que no, quedan auto-canónicas (Google usa su propia URL).

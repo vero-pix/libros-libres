@@ -186,7 +186,7 @@ export default function HeroBar({ heroBooks, primavera = false }: Props) {
             <p className="mt-6 font-display italic text-lg sm:text-xl text-ink-muted/90 leading-snug max-w-xl">
               {primavera
                 ? "Fantasía, poesía y lo que recién llegó a las estanterías de otros. Cerca de ti, con pago protegido."
-                : "Los que ya leíste, los que te faltan. Compra y vende con personas reales — cerca de ti, con pago protegido."}
+                : "Los que ya leíste, los que te faltan. Compra y vende de estantería a estantería, cerca de ti, con pago protegido."}
             </p>
 
             {/* CTAs */}

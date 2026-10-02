@@ -84,7 +84,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     ? `${cuantos} libros usados en Chile — compra y vende`
     : "Libros usados en Chile — compra y vende cerca de ti";
   let description =
-    "Vende los libros que ya leíste y encuentra los que te faltan, entre personas reales: clásicos, rarezas y escolares. Retiro en mano o envío a todo Chile, con pago protegido.";
+    "Vende los libros que ya leíste y encuentra los que te faltan, entre lectores y librerías: clásicos, rarezas y escolares. Retiro en mano o envío a todo Chile, con pago protegido.";
   let canonical = base;
 
   if (subcategory) {

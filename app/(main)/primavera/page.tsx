@@ -13,7 +13,7 @@ const URL = "https://tuslibros.cl/primavera";
 export const metadata: Metadata = {
   title: "Libros de primavera: fantasía, poesía y novedades usadas en Chile",
   description:
-    "La selección de primavera de tuslibros.cl: fantasía, romantasy y poesía usadas, de personas reales en todo Chile. Retiro en mano o despacho por courier.",
+    "La selección de primavera de tuslibros.cl: fantasía, romantasy y poesía usadas, de lectores y librerías de todo Chile. Retiro en mano o despacho por courier.",
   alternates: { canonical: URL },
   keywords: [
     "libros de fantasia usados",
