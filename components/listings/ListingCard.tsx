@@ -159,7 +159,9 @@ const ListingCard = memo(function ListingCard({
   const badge = ocultarNuevo && badgeBruto?.label === "Nuevo aquí" ? null : badgeBruto;
 
   // "Haz una oferta" a la vista en la grilla: solo los libros que llevan el tag
-  // (lo pone Vero por script; hoy, sus libros de $20.000 o más) y aceptan ofertas.
+  // y aceptan ofertas. El tag lo pone Vero por script: desde el 02-10-2026, todo
+  // su catálogo (se la juega por las ofertas); los demás vendedores tienen el
+  // botón en la ficha, sin destacado.
   const conOfertaDestacada =
     listing.status === "active" &&
     !!listing.acepta_ofertas &&
@@ -216,6 +218,16 @@ const ListingCard = memo(function ListingCard({
             {badge && (
               <span className={`absolute top-3 left-3 z-[4] inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm ${badge.className}`}>
                 {badge.label}
+              </span>
+            )}
+
+            {/* CINTA "OFRECE TU PRECIO" — esquina superior derecha */}
+            {conOfertaDestacada && (
+              <span aria-hidden className="pointer-events-none absolute top-0 right-0 z-[4] w-[120px] h-[120px] overflow-hidden">
+                <span className="absolute top-[30px] -right-[50px] w-[200px] rotate-45 overflow-hidden bg-coral py-1 text-center text-[9px] font-bold uppercase tracking-wide text-white shadow-md">
+                  Ofrece tu precio
+                  <span className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/45 to-transparent animate-brillo-oferta motion-reduce:animate-none" />
+                </span>
               </span>
             )}
 
@@ -307,9 +319,9 @@ const ListingCard = memo(function ListingCard({
               {conOfertaDestacada && (
                 <Link
                   href={`${libroUrl(listing)}#oferta`}
-                  className="inline-flex items-center text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border border-coral/40 bg-coral/10 text-coral-deep hover:bg-coral hover:text-white transition-colors animate-fade-in"
+                  className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-coral text-white hover:bg-coral-deep transition-colors animate-pulso-oferta motion-reduce:animate-none"
                 >
-                  Haz una oferta
+                  🤝 Haz tu oferta
                 </Link>
               )}
             </div>

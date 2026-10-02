@@ -249,6 +249,10 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
     !isSold &&
     !(listing.seller as any)?.on_vacation;
 
+  // Con el tag haz-una-oferta la oferta se destaca: bloque coral justo bajo el
+  // botón de comprar, en vez de un botón más entre el carrito y "Preguntar".
+  const ofertaDestacada = ((book as any).tags ?? []).includes(TAG_OFERTA_DESTACADA);
+
   // "Hacer oferta" (lib/offers.ts): el vendedor lo marcó en este libro y todavía
   // puede recibir ofertas (desde el 1-10-2026, solo con MercadoPago o transferencia;
   // `cobra_por_transferencia` lo resuelve la página en el servidor).
@@ -259,7 +263,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
     ) &&
     listing.price != null &&
     !isOwner ? (
-      <HacerOfertaButton listingId={listing.id} price={listing.price} sellerName={sellerName} bookTitle={book.title} />
+      <HacerOfertaButton listingId={listing.id} price={listing.price} sellerName={sellerName} bookTitle={book.title} destacado={ofertaDestacada} />
     ) : null;
 
   // La barra fija del celular solo ofrece la oferta si el botón se está
@@ -803,6 +807,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
               >
                 Comprar con MercadoPago — ${listing.price.toLocaleString("es-CL")}
               </Link>
+              {ofertaDestacada && ofertaHtml}
               {/* Confianza (honesto — NO prometemos escrow, no existe en el flujo): pagar
                   vía MercadoPago vs efectivo a un desconocido es el diferenciador real. */}
               <div className="flex items-start gap-2 bg-[#009EE3]/5 border border-[#009EE3]/20 rounded-xl px-3 py-2.5">
@@ -814,7 +819,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
                 </p>
               </div>
               <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
-              {ofertaHtml}
+              {!ofertaDestacada && ofertaHtml}
               {/* Antes había un WhatsApp secundario acá. Con MercadoPago conectado
                   competía con el botón de comprar y la venta se cerraba fuera del
                   sitio. Las dudas van por la mensajería interna, que le avisa al
@@ -830,6 +835,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
               >
                 Comprar — ${listing.price.toLocaleString("es-CL")}
               </Link>
+              {ofertaDestacada && ofertaHtml}
               {/* Las tres formas de pagar, dichas en la ficha y no en el checkout:
                   transferencia, efectivo al retirar, y MercadoPago coordinado por
                   WhatsApp para quien lo prefiera. (16-09-2026, pedido de Vero) */}
@@ -846,7 +852,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
                 <WhatsAppButton phone={listing.seller.phone} title={book.title} listingId={listing.id} paramsFicha={paramsFicha} />
               )}
               <AddToCartButton listingId={listing.id} price={listing.price ?? 0} title={book.title} />
-              {ofertaHtml}
+              {!ofertaDestacada && ofertaHtml}
               <ContactSellerButton sellerId={listing.seller_id} listingId={listing.id} sellerName={sellerName} bookTitle={book.title} />
             </>
           ) : (
@@ -908,9 +914,13 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
               <button
                 type="button"
                 onClick={() => window.dispatchEvent(new Event(EVENTO_ABRIR_OFERTA))}
-                className="mt-1 text-left text-xs font-semibold text-brand-600 underline underline-offset-2"
+                className={
+                  ofertaDestacada
+                    ? "mt-1.5 self-start rounded-full bg-gold px-2.5 py-1 text-xs font-bold text-ink animate-pulso-oro motion-reduce:animate-none"
+                    : "mt-1 text-left text-xs font-semibold text-brand-600 underline underline-offset-2"
+                }
               >
-                o haz una oferta
+                {ofertaDestacada ? "🤝 Haz tu oferta" : "o haz una oferta"}
               </button>
             )}
           </div>

@@ -12,6 +12,9 @@ interface Props {
   price: number;
   sellerName: string;
   bookTitle: string;
+  /** Libros con el tag haz-una-oferta: en vez del botón con borde, un bloque
+   *  dorado (no coral: competiría con "Comprar") que no se puede no ver (catálogo de Vero, 02-10-2026). */
+  destacado?: boolean;
 }
 
 /** Lo dispara el enlace de la barra fija del celular para abrir el formulario. */
@@ -24,7 +27,7 @@ const CLAVE_PENDIENTE = "oferta-pendiente";
  * marcó "Se aceptan ofertas". Si el comprador ya ofertó por este libro, en vez
  * del formulario muestra en qué va su oferta.
  */
-export default function HacerOfertaButton({ listingId, price, sellerName, bookTitle }: Props) {
+export default function HacerOfertaButton({ listingId, price, sellerName, bookTitle, destacado = false }: Props) {
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);
   const [monto, setMonto] = useState("");
@@ -137,6 +140,28 @@ export default function HacerOfertaButton({ listingId, price, sellerName, bookTi
       setError("Error de conexión. Intenta de nuevo.");
     }
     setEnviando(false);
+  }
+
+  if (!abierto && destacado) {
+    return (
+      <div ref={caja} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gold to-gold-deep p-4 text-ink shadow-card animate-pulso-oro motion-reduce:animate-none">
+        <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-brillo-oferta motion-reduce:animate-none" />
+        <p className="relative font-display text-xl font-bold leading-tight">¿Cuánto pagarías tú?</p>
+        <p className="relative mt-1 text-sm leading-snug text-ink/80">
+          Este libro acepta ofertas. Ofrécele a {sellerName} tu precio: si dice que sí, te lo llevas a ese precio.
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setAbierto(true);
+            trackEvent("offer_open", { listing_id: listingId, book_title: bookTitle, destacado: true });
+          }}
+          className="relative mt-3 w-full rounded-xl bg-ink py-3.5 text-base font-bold text-white shadow-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
+        >
+          🤝 Hacer mi oferta
+        </button>
+      </div>
+    );
   }
 
   if (!abierto) {

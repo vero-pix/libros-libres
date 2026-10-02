@@ -124,6 +124,22 @@ const config: Config = {
           "20%, 60%": { transform: "translateX(-4px)" },
           "40%, 80%": { transform: "translateX(4px)" },
         },
+        // "Haz una oferta" destacado (libros con el tag haz-una-oferta): un anillo
+        // coral que late para que el ojo vaya ahí, y un brillo que cruza la cinta.
+        "pulso-oferta": {
+          "0%": { boxShadow: "0 0 0 0 rgb(var(--coral-rgb) / .55)" },
+          "70%": { boxShadow: "0 0 0 12px rgb(var(--coral-rgb) / 0)" },
+          "100%": { boxShadow: "0 0 0 0 rgb(var(--coral-rgb) / 0)" },
+        },
+        "pulso-oro": {
+          "0%": { boxShadow: "0 0 0 0 rgb(var(--gold-rgb) / .6)" },
+          "70%": { boxShadow: "0 0 0 12px rgb(var(--gold-rgb) / 0)" },
+          "100%": { boxShadow: "0 0 0 0 rgb(var(--gold-rgb) / 0)" },
+        },
+        "brillo-oferta": {
+          "0%, 60%": { transform: "translateX(-120%) skewX(-20deg)" },
+          "100%": { transform: "translateX(220%) skewX(-20deg)" },
+        },
       },
       animation: {
         scan: "scan 2s ease-in-out infinite",
@@ -138,6 +154,9 @@ const config: Config = {
         shake: "shake 0.4s ease-in-out",
         drift: "drift 14s ease-in-out infinite",
         "drift-slow": "drift 19s ease-in-out infinite reverse",
+        "pulso-oferta": "pulso-oferta 2s ease-out infinite",
+        "pulso-oro": "pulso-oro 2s ease-out infinite",
+        "brillo-oferta": "brillo-oferta 3.5s ease-in-out infinite",
       },
     },
   },
