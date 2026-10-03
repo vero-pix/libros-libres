@@ -60,6 +60,27 @@ export async function GET() {
   return NextResponse.json({ conversations: results });
 }
 
+// Phishing del 03-10-2026: una cuenta nueva con nombre "Tuslibros" mandó 48
+// mensajes con un link falso de "verificar tu identidad", y el aviso legítimo
+// por correo (hola@tuslibros.cl) los hizo creíbles. Tres frenos: sin links
+// externos en el chat, tope para cuentas nuevas y sin firmar como la marca.
+const LINK_EXTERNO =
+  /(?:https?:\/\/|www\.|\b[a-z0-9-]+\.(?:com|net|org|info|ink|io|co|us|ly|me|xyz|top|site|online|app|link|click|cc|tk|ru|cn)\b(?:\/|\b))/i;
+const NOMBRE_DE_LA_MARCA = /tus\s*libros|soporte|support|admin|verificaci[oó]n/i;
+
+function tieneLinkExterno(texto: string): boolean {
+  const sinPropios = texto.replace(/(?:https?:\/\/)?(?:www\.)?tuslibros\.cl\S*/gi, "");
+  return LINK_EXTERNO.test(sinPropios);
+}
+
+function escaparHtml(texto: string): string {
+  return texto
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 /** POST /api/messages — send a message (find-or-create conversation) */
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -73,6 +94,29 @@ export async function POST(req: NextRequest) {
   }
   if (body.length > 2000) {
     return NextResponse.json({ error: "Mensaje muy largo (máx 2000 caracteres)" }, { status: 400 });
+  }
+  if (tieneLinkExterno(body)) {
+    return NextResponse.json(
+      { error: "Por seguridad no se pueden enviar links en los mensajes. Cuéntale con palabras o por WhatsApp." },
+      { status: 400 },
+    );
+  }
+
+  // Cuentas de menos de 7 días: máximo 10 mensajes por hora. Un comprador
+  // real escribe a dos o tres vendedores, no a cuarenta y ocho en media hora.
+  const diasDeCuenta = (Date.now() - new Date(user.created_at).getTime()) / 86_400_000;
+  if (diasDeCuenta < 7) {
+    const { count: enviados } = await supabase
+      .from("messages")
+      .select("id", { count: "exact", head: true })
+      .eq("sender_id", user.id)
+      .gte("created_at", new Date(Date.now() - 3_600_000).toISOString());
+    if ((enviados ?? 0) >= 10) {
+      return NextResponse.json(
+        { error: "Escribiste muchos mensajes seguidos. Espera un rato y sigue." },
+        { status: 429 },
+      );
+    }
   }
 
   let convId = conversation_id;
@@ -139,20 +183,29 @@ export async function POST(req: NextRequest) {
         .eq("id", user.id)
         .single();
 
+      // Nadie firma como la marca: un nombre que imita a tuslibros sale como
+      // "un usuario" en el aviso, y el correo avisa que tuslibros nunca pide
+      // verificar la identidad por mensaje.
+      const nombreSeguro =
+        sender?.full_name && !NOMBRE_DE_LA_MARCA.test(sender.full_name)
+          ? escaparHtml(sender.full_name)
+          : "Un usuario";
+
       if (recipient?.email) {
         await sendEmail({
           to: recipient.email,
-          subject: `Nuevo mensaje de ${sender?.full_name ?? "un usuario"} — tuslibros.cl`,
+          subject: `Nuevo mensaje de ${nombreSeguro.replace(/&[a-z]+;/g, "")} — tuslibros.cl`,
           html: `
             <div style="font-family:sans-serif;max-width:480px;margin:0 auto">
               <h2 style="color:#1a1a1a">Tienes un nuevo mensaje</h2>
-              <p><strong>${sender?.full_name ?? "Un usuario"}</strong> te escribió:</p>
+              <p><strong>${nombreSeguro}</strong> te escribió:</p>
               <div style="background:#f5f5f4;padding:16px;border-radius:8px;margin:16px 0">
-                <p style="margin:0;color:#374151">${body.trim().substring(0, 300)}</p>
+                <p style="margin:0;color:#374151">${escaparHtml(body.trim().substring(0, 300))}</p>
               </div>
               <a href="https://tuslibros.cl/mensajes/${convId}" style="display:inline-block;background:#8B5CF6;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">
                 Responder
               </a>
+              <p style="color:#6b7280;font-size:12px;margin-top:20px">Tuslibros nunca te pide verificar tu identidad, tu clave ni tus datos por mensaje. Si un mensaje te lo pide, es un engaño: no hagas clic.</p>
             </div>
           `,
         });
