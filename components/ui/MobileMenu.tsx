@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import UnreadBadge from "@/components/messages/UnreadBadge";
 
 interface Props {
@@ -13,6 +15,16 @@ interface Props {
 export default function MobileMenu({ loggedIn }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  // El "Salir" de NavbarClient está oculto bajo sm: en el celular no había
+  // cómo cerrar sesión (lo reportó un vendedor el 03-10-2026).
+  async function cerrarSesion() {
+    setOpen(false);
+    await createClient().auth.signOut();
+    router.push("/");
+    router.refresh();
+  }
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -81,6 +93,13 @@ export default function MobileMenu({ loggedIn }: Props) {
             <Item href="/mis-ventas" label="Mis ventas" />
             <Item href="/carrito" label="Carrito" />
             <Item href="/perfil" label="Perfil" />
+            <button
+              type="button"
+              onClick={cerrarSesion}
+              className="flex w-full items-center px-4 py-2.5 text-sm text-ink-muted hover:bg-cream-warm/50 hover:text-coral transition-colors"
+            >
+              Cerrar sesión
+            </button>
           </Section>
         ) : (
           <Section>

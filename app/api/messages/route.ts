@@ -4,6 +4,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { sendEmail } from "@/lib/email";
 import { detectarPagoFuera } from "@/lib/pagoFueraDetector";
 import { buscarOCrearConversacion } from "@/lib/conversations";
+import { sendGong, escapeHtml } from "@/lib/notifications";
 
 /** GET /api/messages — list conversations for current user */
 export async function GET() {
@@ -64,8 +65,19 @@ export async function GET() {
 // mensajes con un link falso de "verificar tu identidad", y el aviso legítimo
 // por correo (hola@tuslibros.cl) los hizo creíbles. Tres frenos: sin links
 // externos en el chat, tope para cuentas nuevas y sin firmar como la marca.
-const LINK_EXTERNO =
-  /(?:https?:\/\/|www\.|\b[a-z0-9-]+\.(?:com|net|org|info|ink|io|co|us|ly|me|xyz|top|site|online|app|link|click|cc|tk|ru|cn)\b(?:\/|\b))/i;
+// Una hora después llegó el segundo intento con un dominio cirílico
+// (ъыъ.рф/tuslibros), que la lista de terminaciones latinas no veía: por eso
+// también cuenta cualquier "algo.algo/" y cualquier terminación no latina.
+const LINK_EXTERNO = new RegExp(
+  [
+    "https?://",
+    "www\\.",
+    "[\\p{L}\\p{N}-]+\\.[\\p{L}]{2,}\\s*/",
+    "[\\p{L}\\p{N}-]+\\.(?:com|net|org|info|ink|io|co|us|ly|me|xyz|top|site|online|app|link|click|cc|tk|ru|cn|su|ws|to|gl|gd|sh)(?![\\p{L}\\p{N}])",
+    "[\\p{L}\\p{N}-]+\\.[^\\x00-\\x7F\\s.,;:!?)]{2,}",
+  ].join("|"),
+  "iu",
+);
 const NOMBRE_DE_LA_MARCA = /tus\s*libros|soporte|support|admin|verificaci[oó]n/i;
 
 function tieneLinkExterno(texto: string): boolean {
@@ -95,7 +107,13 @@ export async function POST(req: NextRequest) {
   if (body.length > 2000) {
     return NextResponse.json({ error: "Mensaje muy largo (máx 2000 caracteres)" }, { status: 400 });
   }
+  const diasDeCuenta = (Date.now() - new Date(user.created_at).getTime()) / 86_400_000;
+  const cuentaNueva = diasDeCuenta < 7;
+
   if (tieneLinkExterno(body)) {
+    if (cuentaNueva) {
+      await alertarVero(supabase, user.id, diasDeCuenta, "intentó mandar un link (bloqueado)", body);
+    }
     return NextResponse.json(
       { error: "Por seguridad no se pueden enviar links en los mensajes. Cuéntale con palabras o por WhatsApp." },
       { status: 400 },
@@ -104,14 +122,15 @@ export async function POST(req: NextRequest) {
 
   // Cuentas de menos de 7 días: máximo 10 mensajes por hora. Un comprador
   // real escribe a dos o tres vendedores, no a cuarenta y ocho en media hora.
-  const diasDeCuenta = (Date.now() - new Date(user.created_at).getTime()) / 86_400_000;
-  if (diasDeCuenta < 7) {
+  let enviadosUltimaHora = 0;
+  if (cuentaNueva) {
     const { count: enviados } = await supabase
       .from("messages")
       .select("id", { count: "exact", head: true })
       .eq("sender_id", user.id)
       .gte("created_at", new Date(Date.now() - 3_600_000).toISOString());
-    if ((enviados ?? 0) >= 10) {
+    enviadosUltimaHora = enviados ?? 0;
+    if (enviadosUltimaHora >= 10) {
       return NextResponse.json(
         { error: "Escribiste muchos mensajes seguidos. Espera un rato y sigue." },
         { status: 429 },
@@ -159,6 +178,12 @@ export async function POST(req: NextRequest) {
 
   if (msgErr || !message) return NextResponse.json({ error: msgErr?.message ?? "No se pudo guardar" }, { status: 500 });
 
+  // Alerta temprana: una cuenta nueva que llega a 5 mensajes en una hora.
+  // El 03-10-2026 Vero se enteró del phishing por WhatsApp de los vendedores.
+  if (cuentaNueva && enviadosUltimaHora === 4) {
+    await alertarVero(supabase, user.id, diasDeCuenta, "lleva 5 mensajes en la última hora", body);
+  }
+
   // Update conversation timestamp
   await supabase
     .from("conversations")
@@ -200,7 +225,11 @@ export async function POST(req: NextRequest) {
               <h2 style="color:#1a1a1a">Tienes un nuevo mensaje</h2>
               <p><strong>${nombreSeguro}</strong> te escribió:</p>
               <div style="background:#f5f5f4;padding:16px;border-radius:8px;margin:16px 0">
-                <p style="margin:0;color:#374151">${escaparHtml(body.trim().substring(0, 300))}</p>
+                <p style="margin:0;color:#374151">${
+                  cuentaNueva
+                    ? "Es una cuenta nueva: por seguridad, el mensaje se lee solo en el sitio."
+                    : escaparHtml(body.trim().substring(0, 300))
+                }</p>
               </div>
               <a href="https://tuslibros.cl/mensajes/${convId}" style="display:inline-block;background:#8B5CF6;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">
                 Responder
@@ -216,6 +245,27 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ conversation_id: convId, message_id: message.id });
+}
+
+async function alertarVero(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  dias: number,
+  que: string,
+  texto: string,
+) {
+  try {
+    const { data: u } = await supabase.from("users").select("username, full_name").eq("id", userId).single();
+    const quien = u?.username ? `@${u.username}` : userId;
+    await sendGong(
+      `🎣 <b>Cuenta nueva ${escapeHtml(que)}</b>\n` +
+        `${escapeHtml(quien)} (${escapeHtml(u?.full_name ?? "sin nombre")}), creada hace ${dias < 1 ? "menos de un día" : `${Math.floor(dias)} días`}\n` +
+        `«${escapeHtml(texto.trim().slice(0, 200))}»\n` +
+        `Si es phishing: banned_until en auth.users.`,
+    );
+  } catch {
+    // Una alerta caída nunca frena el mensaje.
+  }
 }
 
 async function getOtherParticipant(supabase: Awaited<ReturnType<typeof createClient>>, convId: string, userId: string): Promise<string | null> {
