@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import SocialLoginButtons from "./SocialLoginButtons";
+import Turnstile, { TURNSTILE_SITE_KEY, esErrorDeCaptcha, MENSAJE_CAPTCHA } from "./Turnstile";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -14,16 +15,23 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [reinicioCaptcha, setReinicioCaptcha] = useState(0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: { captchaToken: captchaToken ?? undefined },
+    });
 
     if (error) {
-      setError("Correo o contraseña incorrectos. Verifica tus datos.");
+      setError(esErrorDeCaptcha(error.message) ? MENSAJE_CAPTCHA : "Correo o contraseña incorrectos. Verifica tus datos.");
+      setReinicioCaptcha((n) => n + 1);
       setLoading(false);
       return;
     }
@@ -80,9 +88,11 @@ export default function LoginForm() {
         </p>
       )}
 
+      <Turnstile onToken={setCaptchaToken} reinicio={reinicioCaptcha} />
+
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || (!!TURNSTILE_SITE_KEY && !captchaToken)}
         className="w-full bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-semibold py-2.5 rounded-xl transition-colors"
       >
         {loading ? "Ingresando..." : "Ingresar"}

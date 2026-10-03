@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import SocialLoginButtons from "./SocialLoginButtons";
 import { nombreSospechoso } from "@/lib/nombreSospechoso";
 import { mensajeErrorClave } from "@/lib/authErrors";
+import Turnstile, { TURNSTILE_SITE_KEY, esErrorDeCaptcha, MENSAJE_CAPTCHA } from "./Turnstile";
 
 type Ciudad = { id: string; name: string; region: string };
 
@@ -25,6 +26,8 @@ export default function RegisterForm({ ciudades = [] }: { ciudades?: Ciudad[] })
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [reinicioCaptcha, setReinicioCaptcha] = useState(0);
 
   useEffect(() => {
     const ref = searchParams.get("ref");
@@ -56,6 +59,13 @@ export default function RegisterForm({ ciudades = [] }: { ciudades?: Ciudad[] })
       return;
     }
 
+    // Las dos cuentas del phishing del 03-10-2026 se llamaban "Tuslibros" y
+    // "Tuslibros Admin". La base también lo frena; esto da el aviso a tiempo.
+    if (/tus\s*libros|soporte|support|admin|verificaci/i.test(fullName)) {
+      setError("Ese nombre no está disponible. Usa tu nombre, por ejemplo María García.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -71,11 +81,13 @@ export default function RegisterForm({ ciudades = [] }: { ciudades?: Ciudad[] })
       options: {
         data: { full_name: fullName },
         emailRedirectTo: callbackUrl,
+        captchaToken: captchaToken ?? undefined,
       },
     });
 
     if (signUpError) {
-      setError(mensajeErrorClave(signUpError.message));
+      setError(esErrorDeCaptcha(signUpError.message) ? MENSAJE_CAPTCHA : mensajeErrorClave(signUpError.message));
+      setReinicioCaptcha((n) => n + 1);
       setLoading(false);
       return;
     }
@@ -275,9 +287,11 @@ export default function RegisterForm({ ciudades = [] }: { ciudades?: Ciudad[] })
           </p>
         )}
 
+        <Turnstile onToken={setCaptchaToken} reinicio={reinicioCaptcha} />
+
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || (!!TURNSTILE_SITE_KEY && !captchaToken)}
           className="w-full bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-semibold py-2.5 rounded-xl transition-colors"
         >
           {loading ? "Creando cuenta..." : "Crear cuenta"}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Turnstile, { TURNSTILE_SITE_KEY, esErrorDeCaptcha, MENSAJE_CAPTCHA } from "@/components/auth/Turnstile";
 
 export default function ForgotPasswordPage() {
   const supabase = createClient();
@@ -13,6 +14,8 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [reinicioCaptcha, setReinicioCaptcha] = useState(0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -22,10 +25,13 @@ export default function ForgotPasswordPage() {
     // Enviamos un código de 6 dígitos (OTP), no un link. Un link de un solo
     // uso lo consume el escáner antivirus de Gmail antes de que la persona lo
     // abra ("el link expiró"). Un código que se escribe a mano es inmune a eso.
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      captchaToken: captchaToken ?? undefined,
+    });
 
     if (error) {
-      setError("No pudimos enviar el correo. Revisa que el email sea correcto.");
+      setError(esErrorDeCaptcha(error.message) ? MENSAJE_CAPTCHA : "No pudimos enviar el correo. Revisa que el email sea correcto.");
+      setReinicioCaptcha((n) => n + 1);
       setLoading(false);
     } else {
       setSent(true);
@@ -83,9 +89,11 @@ export default function ForgotPasswordPage() {
                 </p>
               )}
 
+              <Turnstile onToken={setCaptchaToken} reinicio={reinicioCaptcha} />
+
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || (!!TURNSTILE_SITE_KEY && !captchaToken)}
                 className="w-full bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-semibold py-2.5 rounded-xl transition-colors"
               >
                 {loading ? "Enviando..." : "Enviarme el código"}
