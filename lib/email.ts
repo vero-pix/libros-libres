@@ -50,6 +50,10 @@ type Proveedor = "gmail" | "resend" | "ninguno";
 
 /** `{ id }` si salió por alguno de los dos; `null` si no salió. */
 export async function sendEmail(params: SendEmailParams): Promise<{ id: string } | null> {
+  if (estaSuprimido(params.to)) {
+    await registrar("ninguno", params, null, "suprimido: rebota (CORREOS_SUPRIMIDOS)");
+    return null;
+  }
   const gmail = await enviarPorGmail(params);
   if (gmail.ok) {
     await registrar("gmail", params, gmail.id, null);
@@ -67,6 +71,21 @@ export async function sendEmail(params: SendEmailParams): Promise<{ id: string }
   }
   await registrar(resend.error === SIN_RESEND ? "ninguno" : "resend", params, null, resend.error);
   return null;
+}
+
+/**
+ * Direcciones que rebotan y a las que no se les escribe más (04-10-2026: una
+ * bandeja llena devolvía cada resumen diario y el aviso de rebote le llegaba a
+ * Vero a hola@). Van en la variable `CORREOS_SUPRIMIDOS` de Vercel, separadas
+ * por coma, y NO en `site_config`, que se lee con la clave pública, ni en el
+ * código, porque el repo es público.
+ */
+function estaSuprimido(to: string): boolean {
+  const lista = (process.env.CORREOS_SUPRIMIDOS ?? "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+  return lista.includes(to.trim().toLowerCase());
 }
 
 type Resultado = { ok: true; id: string } | { ok: false; error: string | null };
