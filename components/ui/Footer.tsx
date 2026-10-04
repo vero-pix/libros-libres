@@ -1,5 +1,6 @@
 import Link from "next/link";
 import NewsletterForm from "./NewsletterForm";
+import { PreferenciasCookies } from "@/components/legal/AvisoCookies";
 import { waSoporte } from "@/lib/soporte";
 import { otrosProyectos, TODOS_LOS_PROYECTOS_URL } from "@/lib/otrosProyectos";
 
@@ -86,6 +87,7 @@ export default function Footer() {
             <ul className="space-y-2.5 text-ink-muted">
               <li><Link href="/terminos" className="hover:text-coral transition-colors">Términos y condiciones</Link></li>
               <li><Link href="/privacidad" className="hover:text-coral transition-colors">Privacidad</Link></li>
+              <li><PreferenciasCookies className="hover:text-coral transition-colors text-left" /></li>
               <li><Link href="/devoluciones" className="hover:text-coral transition-colors">Devoluciones</Link></li>
             </ul>
           </div>

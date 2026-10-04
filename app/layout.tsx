@@ -4,6 +4,8 @@ import { Newsreader, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
+import AvisoCookies from "@/components/legal/AvisoCookies";
+import { SCRIPT_CONSENT_DEFAULT } from "@/lib/consentimiento";
 import Footer from "@/components/ui/Footer";
 import BackToTop from "@/components/ui/BackToTop";
 import PageTracker from "@/components/ui/PageTracker";
@@ -88,6 +90,10 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="tuslibros.cl" />
+        {/* Consent Mode (Ley 21.719): el valor por defecto va antes que gtag/config
+            y que AdSense. Sin permiso, Analytics no guarda cookies y los anuncios
+            no se personalizan (lib/consentimiento.ts). */}
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_CONSENT_DEFAULT }} />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-N243GH70EQ"
           strategy="lazyOnload"
@@ -149,6 +155,7 @@ export default function RootLayout({
         <BackToTop />
         <Analytics />
         <PageTracker />
+        <AvisoCookies />
         <Suspense fallback={null}>
           <AuthErrorNotice />
         </Suspense>
