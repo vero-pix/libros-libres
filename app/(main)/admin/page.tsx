@@ -71,6 +71,8 @@ export default async function AdminPage() {
     supabase
       .from("newsletter_subscribers")
       .select("*")
+      // Las bajas quedan en la tabla como lista de supresión; acá solo los activos.
+      .is("unsubscribed_at", null)
       .order("subscribed_at", { ascending: false })
       .limit(100),
     supabase

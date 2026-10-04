@@ -29,10 +29,19 @@ export async function POST(req: NextRequest) {
     { cookies: { getAll: () => [], setAll: () => {} } }
   );
 
-  // Upsert to avoid duplicates
+  // Upsert to avoid duplicates.
+  // Suscribirse en el formulario es volver a dar el consentimiento, así que
+  // borra una baja anterior (lib/bajaCorreos.ts). El registro NO: ahí la
+  // suscripción va sola, sin que la persona la pida, y no puede pasar por
+  // encima de una baja.
   const { error } = await supabase
     .from("newsletter_subscribers")
-    .upsert({ email: email.toLowerCase() }, { onConflict: "email" });
+    .upsert(
+      origen === "registro"
+        ? { email: email.toLowerCase() }
+        : { email: email.toLowerCase(), unsubscribed_at: null },
+      { onConflict: "email" }
+    );
 
   if (error) {
     console.error("Newsletter subscribe error:", error.message);

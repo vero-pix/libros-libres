@@ -5,6 +5,7 @@ import { compararLibro, normalizar } from "@/lib/bookRequestMatch";
 import { fijarComunaVendedorSiFalta, resolverCityId } from "@/lib/cities";
 import { direccionExactaListing } from "@/lib/listing-ubicacion";
 import { VERO_INBOX } from "@/lib/veroInbox";
+import { correosDadosDeBaja, encabezadosBaja, pieBajaHtml } from "@/lib/bajaCorreos";
 
 export const runtime = "nodejs";
 
@@ -226,6 +227,11 @@ export async function POST(req: Request) {
       const libroCat = (book as Record<string, string | null>)?.category ?? null;
       const libroSubcat = (book as Record<string, string | null>)?.subcategory ?? null;
 
+      // Los avisos por tema son recurrentes: se respetan las bajas del link del
+      // pie (lib/bajaCorreos.ts). Se lee una vez y solo si hay pedidos por tema.
+      // Si la lectura falla, `null`: esta vez no sale ningún aviso de tema.
+      const bajas = requests?.some((r) => r.tema) ? await correosDadosDeBaja(supabase) : new Set<string>();
+
       if (requests && requests.length > 0) {
         for (const req of requests) {
           // PEDIDOS POR TEMA (18-09-2026). Quien pide "ensayo" no quiere UN
@@ -239,20 +245,23 @@ export async function POST(req: Request) {
             const ultimo = req.last_notified_at ? new Date(req.last_notified_at).getTime() : 0;
             if (Date.now() - ultimo < 24 * 60 * 60 * 1000) continue;
 
+            const dadoDeBaja = !bajas || (!!req.requester_email && bajas.has(req.requester_email.trim().toLowerCase()));
+            if (dadoDeBaja) continue;
+
             if (req.requester_email && resendKey) {
               await sendEmail({
                   from: "tuslibros.cl <hola@tuslibros.cl>",
-                  // El correo invita a responder para darse de baja, así que
-                  // la respuesta tiene que llegar a alguna parte: hola@ no
-                  // recibe nada con Workspace caído. VERO_INBOX es el buzón
-                  // que sí se lee (lib/veroInbox.ts).
+                  // Las respuestas van al buzón que se lee (lib/veroInbox.ts).
+                  // La baja ya no depende de responder: va con el link del pie.
                   replyTo: VERO_INBOX,
+                  headers: encabezadosBaja(req.requester_email),
                   to: req.requester_email,
                   subject: `Entró algo de ${req.title}`,
                   html: `<p>Pediste que te avisara cuando llegara algo de <strong>${escape(req.title)}</strong>. Acaba de entrar esto:</p>
 <p><strong>${escape(title)}</strong>${author ? ` — ${escape(author)}` : ""}</p>
 <p><a href="${url}">Verlo en tuslibros.cl</a></p>
-<p style="color:#666;font-size:13px">Te aviso como mucho una vez al día, aunque entren varios. Si ya no quieres estos avisos, respóndeme y lo saco.</p>`,
+<p style="color:#666;font-size:13px">Te aviso como mucho una vez al día, aunque entren varios.</p>
+${pieBajaHtml(req.requester_email)}`,
                 }).catch((e) => console.error("Error enviando aviso de tema:", e));
             }
 

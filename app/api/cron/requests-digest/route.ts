@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
+import { correosDadosDeBaja, encabezadosBaja, pieBajaHtml } from "@/lib/bajaCorreos";
 import { construirPerfil, evaluar, type SolicitudMatch } from "@/lib/requestMatching";
 
 // 300 s: el envío va en fila a 8 por segundo (hasta ~2.400 correos).
@@ -98,8 +99,16 @@ export async function GET(request: Request) {
     .select("id, email, city, on_vacation")
     .in("id", sellerIds);
 
+  // Quien se dio de baja con el link del pie no recibe más el resumen
+  // (lib/bajaCorreos.ts). Si la lista no se puede leer, no se manda: mañana
+  // hay otro resumen, y escribirle a quien pidió que no, no tiene vuelta.
+  const bajas = await correosDadosDeBaja(supabase);
+  if (!bajas) {
+    return NextResponse.json({ error: "no se pudo leer la lista de bajas" }, { status: 500 });
+  }
+
   const destinatarios = (users ?? []).filter(
-    (u) => u.email && u.email !== "vero@tuslibros.cl" && !u.on_vacation
+    (u) => u.email && u.email !== "vero@tuslibros.cl" && !u.on_vacation && !bajas.has(u.email.trim().toLowerCase())
   );
 
   // Catálogo completo (paginado) para saber qué vende cada uno.
@@ -134,7 +143,7 @@ export async function GET(request: Request) {
   };
 
   /** Arma el correo de un vendedor: primero lo suyo, después las novedades. */
-  const construirCorreo = (personal: Array<{ r: any; m: SolicitudMatch }>, nuevas: any[]) => {
+  const construirCorreo = (email: string, personal: Array<{ r: any; m: SolicitudMatch }>, nuevas: any[]) => {
     const bloquePersonal = personal.length
       ? `
     <p style="color:#9a8a6e; font-size:11px; text-transform:uppercase; letter-spacing:0.3em; font-weight:600; margin:22px 0 4px;">Para ti</p>
@@ -186,6 +195,7 @@ export async function GET(request: Request) {
     <p style="color:#b5b5b5; font-size:11px; margin:10px 0 0;">
       — Vero, tuslibros.cl
     </p>
+    ${pieBajaHtml(email)}
   </div>
 </body>
 </html>`;
@@ -230,7 +240,7 @@ export async function GET(request: Request) {
   // con más matches, que es el caso interesante.
   if (params.get("preview") === "1") {
     const p = [...paquetes].sort((a, b) => b.personal.length - a.personal.length)[0];
-    return new NextResponse(construirCorreo(p.personal, p.nuevas), {
+    return new NextResponse(construirCorreo(p.u.email!, p.personal, p.nuevas), {
       headers: { "Content-Type": "text/html; charset=utf-8" },
     });
   }
@@ -264,7 +274,12 @@ export async function GET(request: Request) {
     try {
       results.push({
         status: "fulfilled",
-        value: await sendEmail({ to: p.u.email!, subject: asuntoDe(p), html: construirCorreo(p.personal, p.nuevas) }),
+        value: await sendEmail({
+          to: p.u.email!,
+          subject: asuntoDe(p),
+          html: construirCorreo(p.u.email!, p.personal, p.nuevas),
+          headers: encabezadosBaja(p.u.email!),
+        }),
       });
     } catch (reason) {
       results.push({ status: "rejected", reason });

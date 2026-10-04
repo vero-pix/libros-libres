@@ -44,6 +44,12 @@ interface SendEmailParams {
    * escrito a mano.
    */
   bcc?: string | string[];
+  /**
+   * Encabezados extra, como `List-Unsubscribe` (ver `encabezadosBaja` en
+   * lib/bajaCorreos.ts). Opt-in por llamada: van en los masivos y recurrentes
+   * (newsletter, digests), NO en los transaccionales de cada venta. Solo ASCII.
+   */
+  headers?: Record<string, string>;
 }
 
 type Proveedor = "gmail" | "resend" | "ninguno";
@@ -139,6 +145,8 @@ function armarMime(p: SendEmailParams, sender: string): string {
     `To: ${p.to}`,
     ...(bcc.length ? [`Bcc: ${bcc.join(", ")}`] : []),
     ...(p.replyTo ? [`Reply-To: ${p.replyTo}`] : []),
+    // Sin saltos de línea: un valor con \r\n inyectaría encabezados.
+    ...Object.entries(p.headers ?? {}).map(([k, v]) => `${k}: ${v.replace(/[\r\n]+/g, " ")}`),
     `Subject: ${encabezado(p.subject)}`,
     "MIME-Version: 1.0",
     'Content-Type: text/html; charset="UTF-8"',
@@ -158,7 +166,7 @@ function encabezado(s: string): string {
 
 const SIN_RESEND = "RESEND_API_KEY no configurada";
 
-async function enviarPorResend({ to, from = "noreply@tuslibros.cl", subject, html, replyTo, bcc }: SendEmailParams): Promise<Resultado> {
+async function enviarPorResend({ to, from = "noreply@tuslibros.cl", subject, html, replyTo, bcc, headers }: SendEmailParams): Promise<Resultado> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.warn("[email] RESEND_API_KEY not set — skipping email");
@@ -180,6 +188,7 @@ async function enviarPorResend({ to, from = "noreply@tuslibros.cl", subject, htm
       // Una lista vacía haría que Resend rechace el envío entero, así que se
       // omite el campo salvo que venga algo de verdad.
       ...(bcc && (!Array.isArray(bcc) || bcc.length > 0) ? { bcc } : {}),
+      ...(headers && Object.keys(headers).length ? { headers } : {}),
     }),
   });
 

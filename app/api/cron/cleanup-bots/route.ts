@@ -85,7 +85,10 @@ export async function GET(request: Request) {
   );
   const { data: subs, error: subsErr } = await supabase
     .from("newsletter_subscribers")
-    .select("email");
+    .select("email")
+    // Una fila dada de baja es la lista de supresión (lib/bajaCorreos.ts):
+    // borrarla haría que esa persona vuelva a recibir correos.
+    .is("unsubscribed_at", null);
   if (subsErr) {
     console.error("[cron/cleanup-bots] subs fetch error:", subsErr.message);
   } else {
