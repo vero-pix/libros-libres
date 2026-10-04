@@ -19,10 +19,10 @@ export const OFERTA_MINIMA_PCT = 50;
 export const OFERTA_MINIMA_CLP = 1000;
 /**
  * Bajo este precio no se ofrece "Hacer oferta". A $1.000 era imposible (el piso
- * de la oferta es $1.000 y tiene que ser menor que el precio) y a $1.500-$2.500
- * el regateo es de monedas: el botón prometía algo que no tenía sentido (03-10-2026).
+ * de la oferta es $1.000 y tiene que ser menor que el precio). Primero se puso en
+ * $3.000 (03-10-2026); Vero lo subió a $10.000 el 04-10: bajo eso no vale el regateo.
  */
-export const PRECIO_MINIMO_PARA_OFERTAR = 3000;
+export const PRECIO_MINIMO_PARA_OFERTAR = 10000;
 
 export function precioAdmiteOferta(precio: number | null | undefined): boolean {
   return precio != null && Number(precio) >= PRECIO_MINIMO_PARA_OFERTAR;
