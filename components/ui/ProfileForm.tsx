@@ -560,6 +560,13 @@ export default function ProfileForm({
             </p>
           </div>
           <div className="px-6 py-5 space-y-3">
+            {/* Los puntos salen en la ficha de cada libro ("Retira en: …"), a la
+                vista de cualquiera. Hay que decirlo antes de que alguien escriba
+                la dirección de su casa. */}
+            <p className="text-xs text-brand-700 bg-brand-50 border border-brand-100 rounded-xl px-3 py-2 leading-relaxed">
+              Esto lo ve cualquiera que abra tus libros. Te recomiendo un punto público (una
+              estación de metro, una librería, un café) en vez de la dirección de tu casa.
+            </p>
             {pickupPoints.map((p, i) => (
               <div key={i} className="flex items-center gap-2">
                 <input

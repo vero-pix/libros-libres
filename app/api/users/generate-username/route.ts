@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createClient as createSessionClient } from "@/lib/supabase/server";
 
 function slugifyName(name: string): string {
   return name
@@ -16,6 +17,15 @@ export async function POST(req: NextRequest) {
     const { userId, fullName } = await req.json();
     if (!userId || !fullName) {
       return NextResponse.json({ error: "missing userId or fullName" }, { status: 400 });
+    }
+
+    // Solo la propia persona, con su sesión (04-10-2026). Antes cualquiera podía
+    // ponerle username a un userId ajeno que todavía no tuviera. El registro
+    // llama acá recién creado y con sesión (la confirmación de correo está
+    // apagada); igual el trigger auto_username_on_insert ya lo genera en la base.
+    const { data: { user } } = await (await createSessionClient()).auth.getUser();
+    if (!user || user.id !== userId) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     const supabase = createClient(

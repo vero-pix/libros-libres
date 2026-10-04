@@ -79,7 +79,7 @@ export default function RegisterForm({ ciudades = [] }: { ciudades?: Ciudad[] })
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, ...(ciudad ? { city: ciudad } : {}) },
         emailRedirectTo: callbackUrl,
         captchaToken: captchaToken ?? undefined,
       },
@@ -98,12 +98,22 @@ export default function RegisterForm({ ciudades = [] }: { ciudades?: Ciudad[] })
       // mapa los ubica en el centro de Santiago por defecto y el comprador no
       // sabe si el libro está a diez cuadras o en Punta Arenas. Va OPCIONAL:
       // el registro ya pierde gente y un campo obligatorio más pesa.
-      await supabase.from("users").upsert({
-        id: data.user.id,
-        email,
-        full_name: fullName,
-        ...(ciudad ? { city: ciudad } : {}),
-      });
+      //
+      // Ojo (04-10-2026): antes esto era un upsert de id/email/full_name/city y
+      // fallaba siempre en silencio — `users` no tiene policy de INSERT y el
+      // upsert pasa por el chequeo de INSERT aunque la fila ya exista. La fila
+      // (con email y nombre) la crea el trigger `handle_new_user`, así que acá
+      // basta un UPDATE de la comuna, que la policy deja hacer sobre la fila
+      // propia. Funciona porque la confirmación de correo está apagada y signUp
+      // devuelve sesión; por si eso cambia, la comuna también va en
+      // `options.data.city` (ver migración 20261004_handle_new_user_city.sql).
+      if (ciudad && data.session) {
+        const { error: cityError } = await supabase
+          .from("users")
+          .update({ city: ciudad })
+          .eq("id", data.user.id);
+        if (cityError) console.error("[registro] no se guardó la comuna", cityError.message);
+      }
 
       try {
         await fetch("/api/users/generate-username", {
