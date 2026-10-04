@@ -208,19 +208,6 @@ export default function ListingToolbar() {
         <option value="poor">Con detalles</option>
       </select>
 
-      {/* Modality — oculto 20 jul 2026: el arriendo está en pausa (revivir con bibliotecas).
-      <select
-        aria-label="Filtrar por modalidad"
-        onChange={handleChange("modality")}
-        defaultValue={searchParams.get("modality") ?? ""}
-        className={selectClass}
-      >
-        <option value="">Modalidad: Todos</option>
-        <option value="sale">Venta</option>
-        <option value="loan">Arriendo</option>
-      </select>
-      */}
-
       {/* Binding */}
       <select
         aria-label="Filtrar por encuadernación"

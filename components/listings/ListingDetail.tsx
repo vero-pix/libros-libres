@@ -131,12 +131,6 @@ const CONDITION_LABELS: Record<string, string> = {
   poor: "Con detalles",
 };
 
-interface ListingWithRentalFields extends ListingWithBook {
-  rental_price?: number | null;
-  rental_deposit?: number | null;
-  rental_period_days?: number | null;
-}
-
 // Vendedores cuya cuenta MercadoPago temporalmente NO puede recibir pagos (en
 // recuperación, ej. rejected_by_regulations). En vez de mandar al comprador a la página
 // muerta de MP, mostramos un aviso suave + contacto. Agregar el username acá si a algún
@@ -879,11 +873,6 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
           decidió, no debería tener que hacerlo. */}
       <DescriptionSection listing={listing} />
 
-      {/* Rental CTA */}
-      {(listing as ListingWithRentalFields).rental_price != null && listing.modality !== "sale" && (
-        <RentalSection listing={listing as ListingWithRentalFields} />
-      )}
-
       {/* Publicar uno igual — solo visible para quien NO es el dueño */}
       {!isOwner && (
         <div className="border-t border-line px-6 py-4 bg-cream-warm/30">
@@ -969,143 +958,3 @@ function DescriptionSection({ listing }: { listing: ListingWithBook }) {
   );
 }
 
-function RentalSection({ listing }: { listing: ListingWithRentalFields }) {
-  const [periodDays, setPeriodDays] = useState<7 | 14 | 30>(
-    (listing.rental_period_days as 7 | 14 | 30) ?? 14
-  );
-  const [deliveryMethod, setDeliveryMethod] = useState<"in_person" | "pickup_point" | "courier">("in_person");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const basePrice = Number(listing.rental_price);
-  const basePeriod = listing.rental_period_days ?? 14;
-  // Precio proporcional al período seleccionado
-  const rentalPrice = Math.round((basePrice / basePeriod) * periodDays);
-  const deposit = Number(listing.rental_deposit ?? 0);
-
-  const deliveryOptions = [
-    { value: "in_person" as const, label: "Encuentro en persona", desc: "Coordina lugar y hora con el vendedor — gratis", icon: "🤝", disabled: false },
-    // Punto de retiro: reactivar cuando haya convenios con lugares específicos
-    // { value: "pickup_point" as const, label: "Punto de retiro", desc: "Retira en un punto convenido", icon: "📍", disabled: false },
-    { value: "courier" as const, label: "Envío courier", desc: "Próximamente", icon: "📦", disabled: true },
-  ];
-
-  async function handleRent() {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/rentals", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          listing_id: listing.id,
-          period_days: periodDays,
-          delivery_method: deliveryMethod,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "Error al crear arriendo");
-        return;
-      }
-      if (data.init_point) {
-        window.location.href = data.init_point;
-      }
-    } catch {
-      setError("Error de conexión");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div className="border-t border-line px-6 py-5 bg-brand-50/50">
-      <h3 className="font-semibold text-gray-900 mb-3">Arrendar este libro</h3>
-
-      {/* Período */}
-      <div className="mb-3">
-        <p className="text-xs font-medium text-gray-500 mb-2">Período</p>
-        <div className="grid grid-cols-3 gap-2">
-          {([7, 14, 30] as const).map((d) => (
-            <button
-              key={d}
-              type="button"
-              onClick={() => setPeriodDays(d)}
-              className={`py-2 rounded-lg border text-sm font-medium transition-all ${
-                periodDays === d
-                  ? "border-brand-500 bg-white text-brand-700 ring-1 ring-brand-400"
-                  : "border-gray-200 text-gray-600 bg-white hover:border-gray-300"
-              }`}
-            >
-              {d} días
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Entrega */}
-      <div className="mb-4">
-        <p className="text-xs font-medium text-gray-500 mb-2">Forma de entrega</p>
-        <div className="space-y-2">
-          {deliveryOptions.map((opt) => (
-            <label
-              key={opt.value}
-              className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                opt.disabled
-                  ? "border-gray-100 bg-gray-50 cursor-not-allowed opacity-60"
-                  : deliveryMethod === opt.value
-                    ? "border-brand-500 bg-white cursor-pointer"
-                    : "border-gray-200 bg-white hover:border-gray-300 cursor-pointer"
-              }`}
-            >
-              <input
-                type="radio"
-                name="delivery"
-                value={opt.value}
-                checked={deliveryMethod === opt.value}
-                onChange={() => !opt.disabled && setDeliveryMethod(opt.value)}
-                disabled={opt.disabled}
-                className="accent-brand-500"
-              />
-              <span className="text-lg">{opt.icon}</span>
-              <div>
-                <p className={`text-sm font-medium ${opt.disabled ? "text-gray-400" : "text-gray-800"}`}>{opt.label}</p>
-                <p className="text-xs text-gray-400">{opt.desc}</p>
-              </div>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {/* Desglose */}
-      <div className="bg-white rounded-lg border border-gray-200 p-3 mb-4 text-sm space-y-1">
-        <div className="flex justify-between">
-          <span className="text-gray-500">Arriendo ({periodDays} días)</span>
-          <span className="text-gray-900">${rentalPrice.toLocaleString("es-CL")}</span>
-        </div>
-        {deposit > 0 && (
-          <div className="flex justify-between">
-            <span className="text-gray-500">Garantía (reembolsable)</span>
-            <span className="text-gray-900">${deposit.toLocaleString("es-CL")}</span>
-          </div>
-        )}
-        <div className="flex justify-between font-bold border-t border-line pt-1">
-          <span>Total</span>
-          <span>${(rentalPrice + deposit).toLocaleString("es-CL")}</span>
-        </div>
-      </div>
-
-      {error && (
-        <p className="text-sm text-red-600 mb-3">{error}</p>
-      )}
-
-      <button
-        onClick={handleRent}
-        disabled={loading}
-        className="w-full bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors"
-      >
-        {loading ? "Procesando..." : `Arrendar — $${(rentalPrice + deposit).toLocaleString("es-CL")}`}
-      </button>
-    </div>
-  );
-}

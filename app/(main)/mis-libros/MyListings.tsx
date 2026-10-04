@@ -522,10 +522,8 @@ function EditForm({
   // Listing fields
   const [price, setPrice] = useState(listing.price?.toString() ?? "");
   const [originalPrice, setOriginalPrice] = useState(((listing as any).original_price ?? "").toString());
-  const [rentalPrice, setRentalPrice] = useState(((listing as any).rental_price ?? "").toString());
-  const [rentalDeposit, setRentalDeposit] = useState(((listing as any).rental_deposit ?? "").toString());
   const [condition, setCondition] = useState(listing.condition);
-  const [modality, setModality] = useState(listing.modality);
+  const [modality] = useState(listing.modality);
   const [notes, setNotes] = useState(listing.notes ?? "");
   const [aceptaOfertas, setAceptaOfertas] = useState(!!listing.acepta_ofertas);
 
@@ -621,8 +619,6 @@ function EditForm({
       notes: notes.trim() || null,
       price: modality !== "loan" ? parseFloat(price) || null : null,
       original_price: originalPrice ? parseFloat(originalPrice) : null,
-      rental_price: (modality === "loan" || modality === "both") && rentalPrice ? parseFloat(rentalPrice) : null,
-      rental_deposit: (modality === "loan" || modality === "both") && rentalDeposit ? parseFloat(rentalDeposit) : null,
       acepta_ofertas: aceptaOfertas,
     };
     if (coverUrl) {
@@ -769,12 +765,6 @@ function EditForm({
       <div>
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Datos de la publicación</p>
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">Modalidad</label>
-            <select value={modality} onChange={(e) => setModality(e.target.value as typeof modality)} className={inputClass}>
-              <option value="sale">Venta</option>
-            </select>
-          </div>
           {modality !== "loan" && (
             <>
               <div>
@@ -793,24 +783,6 @@ function EditForm({
               </div>
               <div className="col-span-2">
                 <AceptaOfertasToggle checked={aceptaOfertas} onChange={setAceptaOfertas} cobraEnSitio={cobraEnSitio} />
-              </div>
-            </>
-          )}
-          {(modality === "loan" || modality === "both") && (
-            <>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Precio arriendo (14 días)</label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-2.5 flex items-center text-gray-400 text-sm pointer-events-none">$</span>
-                  <input type="number" value={rentalPrice} onChange={(e) => setRentalPrice(e.target.value)} min="0" step="100" className={`${inputClass} pl-6`} />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Garantía arriendo</label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-2.5 flex items-center text-gray-400 text-sm pointer-events-none">$</span>
-                  <input type="number" value={rentalDeposit} onChange={(e) => setRentalDeposit(e.target.value)} min="0" step="100" className={`${inputClass} pl-6`} />
-                </div>
               </div>
             </>
           )}
