@@ -15,6 +15,7 @@ import crypto from "crypto";
 import { calcularEnvioPromo } from "@/lib/shipping-promo";
 import { buscarEnvioAbierto } from "@/lib/envio-pendiente";
 import { resolverOrigenEnvio } from "@/lib/shipping-quote";
+import { direccionExactaListing } from "@/lib/listing-ubicacion";
 import { cargoServicio } from "@/lib/cargo-servicio";
 import {
   COURIER_COORDINADO,
@@ -310,7 +311,11 @@ export async function POST(req: NextRequest) {
   const esCoordinado = !isInPerson && shipping_courier === COURIER_COORDINADO;
   if (esCoordinado) {
     const origenCoord = resolverOrigenEnvio({
-      listingAddress: (listings[0] as any).address,
+      // La calle y número viven en listing_locations; listings.address es la
+      // comuna. Mismo origen que usó la cotización.
+      listingAddress:
+        (await direccionExactaListing(createServiceRoleClient(), (listings[0] as any).id)) ??
+        (listings[0] as any).address,
       sellerDefaultAddress: (seller as any).default_address,
       shipitOriginCommune: (seller as any).shipit_origin_commune,
     });

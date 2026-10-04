@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { sendGong, escapeHtml } from "./notifications";
 import { extractCommune } from "./chilexpress";
 import { findCommune, SHIPIT_REGION_RM, crearOrigenShipit } from "./shipit";
+import { direccionesExactasListings } from "./listing-ubicacion";
 
 /**
  * D1 revisada (07-09-2026): quién puede vender con courier y qué pasa si no.
@@ -134,13 +135,17 @@ export async function crearOrigenSiSePuede(admin: Admin, sellerId: string): Prom
     if (!calleYNumero(dir)) {
       const { data: ls } = await admin
         .from("listings")
-        .select("address")
+        .select("id, address")
         .eq("seller_id", sellerId)
         .eq("status", "active")
         .not("address", "is", null)
         .limit(5);
+      // listings.address es solo la comuna; la calle y número están en
+      // listing_locations (antes de la migración 20261004c, en listings).
+      const exactas = await direccionesExactasListings(admin, (ls ?? []).map((l) => l.id as string));
       for (const l of ls ?? []) {
-        if (calleYNumero(l.address)) { dir = l.address; break; }
+        const d = exactas.get(l.id as string) ?? l.address;
+        if (calleYNumero(d)) { dir = d; break; }
       }
     }
 

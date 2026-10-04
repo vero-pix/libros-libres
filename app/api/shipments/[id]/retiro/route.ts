@@ -8,6 +8,7 @@ import { anularRetiroShipit, deleteShipitShipment } from "@/lib/shipit";
 import { correoCompradorVentaCancelada, REMITENTE_VERO, REPLY_TO_VERO } from "@/lib/shipit-emails";
 import { estadoOrigenVendedor } from "@/lib/shipit-origen";
 import { resolverOrigenEnvio } from "@/lib/shipping-quote";
+import { direccionExactaListing } from "@/lib/listing-ubicacion";
 
 export const dynamic = "force-dynamic";
 
@@ -124,10 +125,15 @@ async function reagendar(admin: Admin, s: Envio, quien: string, modo: ReturnType
   const origen = await estadoOrigenVendedor(admin, s.seller_id);
   const { data: head } = await admin
     .from("orders")
-    .select("listing:listings(address)")
+    .select("listing_id, listing:listings(address)")
     .eq("id", s.order_head_id)
     .maybeSingle();
-  const listingAddress = (Array.isArray(head?.listing) ? head?.listing[0] : head?.listing)?.address ?? null;
+  // La calle y número del libro viven en listing_locations; listings.address
+  // es solo la comuna (lib/listing-ubicacion.ts).
+  const listingAddress =
+    (await direccionExactaListing(admin, head?.listing_id)) ??
+    (Array.isArray(head?.listing) ? head?.listing[0] : head?.listing)?.address ??
+    null;
   const dir = resolverOrigenEnvio({ listingAddress, sellerDefaultAddress: origen.vendedor?.default_address });
 
   await sendGong(

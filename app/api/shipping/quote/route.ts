@@ -21,6 +21,7 @@ import {
   obtenerColchonCotizacionPct,
   resolverOrigenEnvio,
 } from "@/lib/shipping-quote";
+import { direccionExactaListing } from "@/lib/listing-ubicacion";
 
 /**
  * POST /api/shipping/quote
@@ -73,7 +74,8 @@ export async function POST(req: NextRequest) {
 
   // Origen: listing + vendedor. La dirección del vendedor no se lee con la
   // sesión del comprador (20260923e): la lee el servidor y no sale de acá.
-  const { data: listing } = await createServiceRoleClient()
+  const admin = createServiceRoleClient();
+  const { data: listing } = await admin
     .from("listings")
     .select("address, seller_id, seller:users(default_address, shipit_origin_commune, mercadopago_user_id, acepta_transferencia)")
     .eq("id", listing_id)
@@ -90,8 +92,11 @@ export async function POST(req: NextRequest) {
   // retira, y ella deja los paquetes en San Antonio. El checkout ofrecía
   // courier —porque ya tenía shipit_origin_id— y después Shipit respondía que
   // no hay servicio, dejando la compra trabada. (09-09-2026)
+  // listings.address es solo la comuna: la calle y número del libro (que
+  // decide desde dónde sale el paquete) vive en listing_locations.
+  const listingAddressExacta = (await direccionExactaListing(admin, listing_id)) ?? listing?.address;
   const origen = resolverOrigenEnvio({
-    listingAddress: listing?.address,
+    listingAddress: listingAddressExacta,
     sellerDefaultAddress: seller?.default_address,
     shipitOriginCommune: seller?.shipit_origin_commune,
   });

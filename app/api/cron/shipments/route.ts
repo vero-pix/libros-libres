@@ -17,6 +17,7 @@ import { extractCommune } from "@/lib/chilexpress";
 import { nombreCourier } from "@/lib/courier-tracking";
 import { foldAccents } from "@/lib/accentSearch";
 import { resolverOrigenEnvio } from "@/lib/shipping-quote";
+import { direccionExactaListing } from "@/lib/listing-ubicacion";
 import { sendEmail } from "@/lib/email";
 import { VERO_INBOX } from "@/lib/veroInbox";
 import { pedirResena } from "@/lib/resena-email";
@@ -208,7 +209,12 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
   const items = qItems.count;
 
   if (!head?.buyer_address) throw new Error("la orden cabeza no tiene buyer_address");
-  const listingAddress = (Array.isArray(head.listing) ? head.listing[0] : head.listing)?.address ?? null;
+  // La calle y número del libro viven en listing_locations; listings.address
+  // es solo la comuna (lib/listing-ubicacion.ts).
+  const listingAddress =
+    (await direccionExactaListing(admin, head.listing_id)) ??
+    (Array.isArray(head.listing) ? head.listing[0] : head.listing)?.address ??
+    null;
 
   const origen = resolverOrigenEnvio({
     listingAddress,
@@ -510,7 +516,7 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
   if (!fila.tracking_number) throw new Error("label_ready sin tracking_number");
 
   const [qHead, qBundle, qVendedor, qComprador, qEnviados] = await Promise.all([
-    admin.from("orders").select("buyer_address, listing:listings(address)").eq("id", fila.order_head_id).single(),
+    admin.from("orders").select("listing_id, buyer_address, listing:listings(address)").eq("id", fila.order_head_id).single(),
     admin
       .from("orders")
       .select("listing:listings(book:books(title))")
@@ -532,7 +538,10 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
     .map((o: any) => (Array.isArray(o.listing) ? o.listing[0] : o.listing)?.book)
     .map((b: any) => (Array.isArray(b) ? b[0] : b)?.title)
     .filter((t: unknown): t is string => typeof t === "string" && t.length > 0);
-  const listingAddress = (Array.isArray(head.listing) ? head.listing[0] : head.listing)?.address ?? null;
+  const listingAddress =
+    (await direccionExactaListing(admin, head.listing_id)) ??
+    (Array.isArray(head.listing) ? head.listing[0] : head.listing)?.address ??
+    null;
   const origen = resolverOrigenEnvio({ listingAddress, sellerDefaultAddress: vendedor.default_address });
   const comunaDestino = (await findCommune(extractCommune(head.buyer_address ?? "")))?.name ?? extractCommune(head.buyer_address ?? "");
   const comunaOrigenShipit = origen ? await findCommune(origen.commune) : null;

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { compararLibro, normalizar } from "@/lib/bookRequestMatch";
 import { fijarComunaVendedorSiFalta, resolverCityId } from "@/lib/cities";
+import { direccionExactaListing } from "@/lib/listing-ubicacion";
 import { VERO_INBOX } from "@/lib/veroInbox";
 
 export const runtime = "nodejs";
@@ -59,10 +60,13 @@ export async function POST(req: Request) {
     // Fijar la comuna del vendedor si todavía no la tiene: publicar ya dice dónde
     // está, y el registro nunca se la pregunta. La lógica vive en lib/cities.ts
     // porque los scripts de carga masiva la necesitan igual y no pasan por acá.
+    // Con la dirección exacta (listing_locations): la pública es solo la
+    // comuna y la comparten cientos de fichas, así que el chequeo de
+    // "otro vendedor publicó desde el mismo punto" siempre daría positivo.
     const comunaFijada = await fijarComunaVendedorSiFalta(
       supabase,
       (listing as any).seller_id,
-      (listing as any).address
+      (await direccionExactaListing(supabase, listingId)) ?? (listing as any).address
     );
     if (comunaFijada) {
       console.log(`[listing-created] comuna del vendedor fijada: ${comunaFijada}`);

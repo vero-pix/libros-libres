@@ -158,12 +158,23 @@ export async function fijarComunaVendedorSiFalta(
     // quedó con la MISMA dirección exacta que otros vendedores (14 compartían una
     // sola). Esa dirección no dice dónde vive nadie: si otro vendedor ya publicó
     // desde ese punto, no se deduce nada.
-    const { data: otros } = await supabase
-      .from("listings")
+    // La dirección exacta vive en `listing_locations` (migración 20261004c);
+    // `listings.address` quedó con la comuna sola. Si la tabla todavía no
+    // existe o el cliente no la puede leer, se mira `listings` como antes.
+    let { data: otros, error: errOtros } = await supabase
+      .from("listing_locations")
       .select("seller_id")
       .eq("address", address)
       .neq("seller_id", sellerId)
       .limit(1);
+    if (errOtros) {
+      ({ data: otros } = await supabase
+        .from("listings")
+        .select("seller_id")
+        .eq("address", address)
+        .neq("seller_id", sellerId)
+        .limit(1));
+    }
     if (otros && otros.length > 0) return null;
 
     const { error } = await supabase.from("users").update({ city: comuna }).eq("id", sellerId);
