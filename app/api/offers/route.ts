@@ -11,6 +11,7 @@ import {
   PLAZO_RESPUESTA_DIAS,
   clp,
   errorMontoOferta,
+  precioAdmiteOferta,
   vendedorPuedeRecibirOfertas,
 } from "@/lib/offers";
 
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
   if (!listing || listing.status !== "active" || !listing.price) {
     return NextResponse.json({ error: "Este libro ya no está disponible." }, { status: 409 });
   }
-  if (!listing.acepta_ofertas || !vendedorPuedeRecibirOfertas(await cobraDentroDelSitio(listing.seller_id, !!seller?.mercadopago_user_id))) {
+  if (!listing.acepta_ofertas || !precioAdmiteOferta(listing.price) || !vendedorPuedeRecibirOfertas(await cobraDentroDelSitio(listing.seller_id, !!seller?.mercadopago_user_id))) {
     return NextResponse.json({ error: "Este libro no está recibiendo ofertas." }, { status: 409 });
   }
   if (seller?.on_vacation) {

@@ -22,7 +22,7 @@ import { trackEvent } from "@/utils/analytics";
 import { translateGenre } from "@/lib/genres";
 import { authorLanding } from "@/lib/authorLandings";
 import HacerOfertaButton, { EVENTO_ABRIR_OFERTA } from "@/components/offers/HacerOfertaButton";
-import { vendedorPuedeRecibirOfertas, TAG_OFERTA_DESTACADA } from "@/lib/offers";
+import { vendedorPuedeRecibirOfertas, precioAdmiteOferta, TAG_OFERTA_DESTACADA } from "@/lib/offers";
 import { nombreCortoVendedor } from "@/lib/nombreVendedor";
 
 /**
@@ -262,6 +262,7 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
       !!(listing.seller as any)?.mercadopago_user_id || !!(listing.seller as any)?.cobra_por_transferencia
     ) &&
     listing.price != null &&
+    precioAdmiteOferta(listing.price) &&
     !isOwner ? (
       <HacerOfertaButton listingId={listing.id} price={listing.price} sellerName={sellerName} bookTitle={book.title} destacado={ofertaDestacada} />
     ) : null;

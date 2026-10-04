@@ -10,7 +10,7 @@ import type { ListingWithBook } from "@/types";
 import { libroUrl } from "@/lib/urls";
 import { resolveAuthorUrl } from "@/lib/authorLink";
 import { nombreCortoVendedor } from "@/lib/nombreVendedor";
-import { TAG_OFERTA_DESTACADA } from "@/lib/offers";
+import { TAG_OFERTA_DESTACADA, precioAdmiteOferta } from "@/lib/offers";
 
 const QuickViewModal = dynamic(() => import("./QuickViewModal"), {
   ssr: false,
@@ -165,6 +165,7 @@ const ListingCard = memo(function ListingCard({
   const conOfertaDestacada =
     listing.status === "active" &&
     !!listing.acepta_ofertas &&
+    precioAdmiteOferta(listing.price) &&
     (book.tags ?? []).includes(TAG_OFERTA_DESTACADA);
 
   /* ---------- Objeto-libro: cubierta dibujada (fallback sin foto) ---------- */

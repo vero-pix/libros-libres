@@ -17,6 +17,17 @@ export const PLAZO_PAGO_ACEPTADA_HORAS = 48;
 export const OFERTA_MINIMA_PCT = 50;
 /** Mismo piso que `listings.price` (20260725_precio_minimo_listings.sql). */
 export const OFERTA_MINIMA_CLP = 1000;
+/**
+ * Bajo este precio no se ofrece "Hacer oferta". A $1.000 era imposible (el piso
+ * de la oferta es $1.000 y tiene que ser menor que el precio) y a $1.500-$2.500
+ * el regateo es de monedas: el botón prometía algo que no tenía sentido (03-10-2026).
+ */
+export const PRECIO_MINIMO_PARA_OFERTAR = 3000;
+
+export function precioAdmiteOferta(precio: number | null | undefined): boolean {
+  return precio != null && Number(precio) >= PRECIO_MINIMO_PARA_OFERTAR;
+}
+
 /** Tope por comprador para que nadie le llene la bandeja a un vendedor. */
 export const MAX_OFERTAS_DIA = 10;
 /** Contraofertas por cadena: después de esta, solo queda aceptar o rechazar. */
