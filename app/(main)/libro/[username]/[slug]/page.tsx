@@ -329,15 +329,43 @@ export default async function LibroPage({ params }: Props) {
           .ilike("book.author", listing.book.author)
           .limit(4)
       : Promise.resolve({ data: null }),
-    listing.book?.genre
-      ? supabase
+    // "Otros libros de…": hasta el 04-10-2026 se agrupaba por `genre`, texto
+    // libre con 571 valores distintos y VACÍO en el 53% del catálogo activo:
+    // la mitad de las fichas no tenía este bloque, así que ni daban ni
+    // recibían enlaces. Ahora va por subcategoría (26 grupos, 75% lleno), luego
+    // categoría (6, 99,5%) y recién al final el género.
+    //
+    // Y en ronda: se muestran los que siguen a esta ficha por id dentro del
+    // grupo, dando la vuelta al final. Antes salían siempre los mismos 8 del
+    // grupo, que se llevaban todos los enlaces; así cada ficha recibe enlaces
+    // de las 8 que la preceden. Google encuentra y sube las fichas que tienen
+    // enlaces de otras: 291 fichas activas estaban en la página 2.
+    (async () => {
+      const b = listing.book as any;
+      const grupo: { col: string; valor: string; exacto: boolean } | null = b?.subcategory
+        ? { col: "book.subcategory", valor: b.subcategory, exacto: true }
+        : b?.category
+          ? { col: "book.category", valor: b.category, exacto: true }
+          : b?.genre
+            ? { col: "book.genre", valor: b.genre, exacto: false }
+            : null;
+      if (!grupo) return { data: null };
+      const base = () => {
+        const q = supabase
           .from("listings")
           .select(`*, book:books!inner(*), seller:users(id, full_name, avatar_url, username)`)
           .eq("status", "active")
-          .neq("id", listing.id)
-          .ilike("book.genre", listing.book.genre)
-          .limit(8)
-      : Promise.resolve({ data: null }),
+          .neq("id", listing.id);
+        return grupo.exacto ? q.eq(grupo.col, grupo.valor) : q.ilike(grupo.col, grupo.valor);
+      };
+      const { data: siguientes } = await base().gt("id", listing.id).order("id").limit(12);
+      let filas = (siguientes ?? []) as any[];
+      if (filas.length < 12) {
+        const { data: desdeElInicio } = await base().lt("id", listing.id).order("id").limit(12 - filas.length);
+        filas = filas.concat(desdeElInicio ?? []);
+      }
+      return { data: filas };
+    })(),
     // ¿Hay otro ejemplar de ESTE mismo título a la venta? Es la ventaja del
     // libro usado sobre el retail y la ficha no la decía en ninguna parte: en
     // un catálogo de 3.870 activos hay 3.729 títulos distintos, así que la
@@ -365,7 +393,20 @@ export default async function LibroPage({ params }: Props) {
   
   const authorListingIds = new Set(authorListings.map(l => l.id));
   const categoryListingsRaw: ListingWithBook[] = ((categoryResult.data as unknown as ListingWithBook[]) ?? []);
-  const categoryListings = categoryListingsRaw.filter(l => !authorListingIds.has(l.id)).slice(0, 4);
+  const categoryListings = categoryListingsRaw.filter(l => !authorListingIds.has(l.id)).slice(0, 8);
+
+  // Título del bloque: el nombre de la subcategoría o categoría con que se
+  // agrupó (el género venía vacío en la mitad de las fichas).
+  const slugGrupo: string | null = (listing.book as any)?.subcategory ?? (listing.book as any)?.category ?? null;
+  const { data: catGrupo } = slugGrupo && categoryListings.length > 0
+    ? await supabase.from("categories").select("name").eq("slug", slugGrupo).maybeSingle()
+    : { data: null };
+  const tituloGrupo =
+    catGrupo?.name && slugGrupo !== "otros"
+      ? `Más de ${catGrupo.name}`
+      : listing.book?.genre
+        ? `Otros libros de ${listing.book.genre}`
+        : "Más libros como este";
 
   /** Otros ejemplares del mismo título a la venta ahora mismo. 0 = pieza única. */
   const otrosEjemplares = MISMO_LIBRO_FISICO.has(listing.slug)
@@ -547,7 +588,7 @@ export default async function LibroPage({ params }: Props) {
             {categoryListings.length > 0 && (
               <section className="mt-12">
                 <div className="flex justify-between items-end mb-6">
-                  <h2 className="font-display text-2xl font-bold text-ink">Otros libros de {listing.book.genre}</h2>
+                  <h2 className="font-display text-2xl font-bold text-ink">{tituloGrupo}</h2>
                   {/* Filtro real, no búsqueda de texto. Este "Ver todos" mandaba
                       a /search?q=<género>, que busca el término en título y autor
                       — ningún libro se llama "Juvenil". La gente hacía clic y
@@ -561,7 +602,7 @@ export default async function LibroPage({ params }: Props) {
                         ? `/?subcategory=${encodeURIComponent((listing.book as any).subcategory)}`
                         : (listing.book as any).category
                           ? `/?category=${encodeURIComponent((listing.book as any).category)}`
-                          : `/search?q=${encodeURIComponent(listing.book.genre)}`
+                          : `/search?q=${encodeURIComponent(listing.book.genre ?? "")}`
                     }
                     className="text-sm font-semibold text-brand-600 hover:text-brand-700"
                   >
