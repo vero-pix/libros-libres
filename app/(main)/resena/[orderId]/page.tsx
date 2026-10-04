@@ -95,11 +95,11 @@ export default async function ResenaPage({
       <Marco>
         <h1 className="font-display text-xl font-bold text-ink">Todavía no puedes reseñar este pedido</h1>
         <p className="mt-2 text-sm text-ink-muted">
-          La reseña se abre cuando confirmas que recibiste el libro. Puedes hacerlo desde Mis Pedidos con el
+          La reseña se abre cuando confirmas que recibiste el libro. Puedes hacerlo desde Mis compras con el
           botón <strong className="text-ink">Lo recibí</strong>, y después vuelves acá.
         </p>
         <Link href="/mis-pedidos" className="mt-4 inline-block text-sm font-semibold text-brand-600 hover:underline">
-          Ir a Mis Pedidos →
+          Ir a Mis compras →
         </Link>
       </Marco>
     );

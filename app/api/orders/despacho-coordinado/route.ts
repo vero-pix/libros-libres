@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
  * El vendedor registra que despachó por su cuenta (ver lib/shipping/coordinado.ts).
  * Solo el vendedor del bundle, solo si el bundle es de despacho coordinado y
  * está pagado. Deja el courier real en `orders.courier` para que el enlace de
- * seguimiento funcione en Mis Pedidos, y le avisa al comprador.
+ * seguimiento funcione en Mis compras, y le avisa al comprador.
  */
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
             <p>${escapeHtml(String(vendedor?.full_name ?? "Quien te vendió"))} ya despachó <strong>${escapeHtml(libro)}</strong> por ${escapeHtml(nombre)}.</p>
             <p>Número de seguimiento: <strong>${escapeHtml(numero)}</strong></p>
             ${link ? `<p style="margin:20px 0"><a href="${link}" style="display:inline-block;background:#1a1a1a;color:#fbf7ef;text-decoration:none;padding:11px 18px;border-radius:8px;font-weight:600">Seguir mi envío</a></p>` : ""}
-            <p>Cuando te llegue, márcalo como recibido en <a href="https://tuslibros.cl/mis-pedidos">Mis Pedidos</a>. Si pasan varios días sin novedad, respóndeme este correo y lo reviso.</p>
+            <p>Cuando te llegue, márcalo como recibido en <a href="https://tuslibros.cl/mis-pedidos">Mis compras</a>. Si pasan varios días sin novedad, respóndeme este correo y lo reviso.</p>
             <p style="margin-top:28px">Vero<br/><span style="color:#777">tuslibros.cl</span></p>
           </div>`,
       });

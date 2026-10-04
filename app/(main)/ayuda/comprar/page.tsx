@@ -78,7 +78,7 @@ export default function AyudaComprarPage() {
             <p>
               El vendedor prepara el paquete y el courier (Starken, Bluexpress, Chilexpress, según tu zona) lo lleva a
               tu dirección. Verás el número de seguimiento en{" "}
-              <Link href="/mis-pedidos" className={linkClass}>Mis Pedidos</Link> y por correo en cuanto exista. Plazo
+              <Link href="/mis-pedidos" className={linkClass}>Mis compras</Link> y por correo en cuanto exista. Plazo
               habitual: 2 a 5 días hábiles desde el retiro.
             </p>
           </Tarjeta>
@@ -94,7 +94,7 @@ export default function AyudaComprarPage() {
           <Tarjeta>
             <h3 className="font-semibold text-ink text-lg mb-2">Entrega en persona</h3>
             <p>
-              Coordinas con el vendedor desde <Link href="/mis-pedidos" className={linkClass}>Mis Pedidos → Escribir</Link>.
+              Coordinas con el vendedor desde <Link href="/mis-pedidos" className={linkClass}>Mis compras → Escribir</Link>.
               Sugiere un lugar público (metro, café). El pago ya está hecho: no pagues nada al recibir.
             </p>
           </Tarjeta>

@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
         <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1a1a1a;line-height:1.6">
           <p>Hola ${escapeHtml(String(comprador.full_name ?? "").split(" ")[0] || "")}!</p>
           <p><strong>${escapeHtml(quien)} confirmó que le llegó tu transferencia.</strong> Tu pedido de ${escapeHtml(que)} queda pagado y ya puede salir.</p>
-          <p>Lo sigues en <a href="https://tuslibros.cl/mis-pedidos">Mis Pedidos</a>. Cuando tenga número de seguimiento te escribo de nuevo.</p>
+          <p>Lo sigues en <a href="https://tuslibros.cl/mis-pedidos">Mis compras</a>. Cuando tenga número de seguimiento te escribo de nuevo.</p>
           <p>Cualquier cosa, respóndeme a este correo.</p>
           <p style="margin-top:28px">Vero<br/><span style="color:#777">tuslibros.cl</span></p>
         </div>`,

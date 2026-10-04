@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { urlSeguimiento } from "@/lib/courier-tracking";
 import Link from "next/link";
 import Image from "next/image";
 import { OrderWithDetails } from "@/types";
 import EntregadoButton from "@/components/sales/EntregadoButton";
 import { libroUrl } from "@/lib/urls";
+import { ButtonLink } from "@/components/ui/Button";
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Pendiente",
@@ -216,62 +217,31 @@ function BundleCard({ group, esComprador }: { group: OrderGroup; esComprador: bo
   );
 }
 
-function EmptyState({ message }: { message: string }) {
+function EmptyState() {
   return (
-    <div className="text-center py-12 text-gray-400">
-      <p>{message}</p>
+    <div className="text-center py-12">
+      <p className="text-gray-500">Todavía no has comprado nada por acá.</p>
+      <p className="mt-1 text-sm text-gray-400">Cuando compres un libro, aquí vas a ver su estado y el seguimiento del envío.</p>
+      <div className="mt-5 flex flex-wrap justify-center gap-3">
+        <ButtonLink href="/search">Buscar un libro</ButtonLink>
+        <ButtonLink href="/solicitudes" variant="outline">Pedir uno que no está</ButtonLink>
+      </div>
     </div>
   );
 }
 
-export default function OrderTabs({
-  purchases,
-  sales,
-}: {
-  purchases: OrderWithDetails[];
-  sales: OrderWithDetails[];
-}) {
-  const [tab, setTab] = useState<"purchases" | "sales">("purchases");
-
-  const purchaseGroups = useMemo(() => groupByBundle(purchases), [purchases]);
-  const saleGroups = useMemo(() => groupByBundle(sales), [sales]);
-
-  const tabs = [
-    { key: "purchases" as const, label: "Mis Compras", count: purchaseGroups.length },
-    { key: "sales" as const, label: "Mis Ventas", count: saleGroups.length },
-  ];
-
-  const groups = tab === "purchases" ? purchaseGroups : saleGroups;
+// "Mis pedidos" muestra solo lo comprado. Hasta el 04-10-2026 tenía también una
+// pestaña "Mis Ventas" que repetía, más pobre, lo que ya está en /mis-ventas.
+export default function OrderTabs({ purchases }: { purchases: OrderWithDetails[] }) {
+  const groups = useMemo(() => groupByBundle(purchases), [purchases]);
 
   return (
-    <div>
-      <div className="flex border-b border-gray-200 mb-6">
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`px-6 py-3 text-sm font-semibold transition-colors ${
-              tab === t.key
-                ? "border-b-2 border-brand-500 text-brand-500"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            {t.label} ({t.count})
-          </button>
-        ))}
-      </div>
-
-      <div className="space-y-3">
-        {groups.length === 0 ? (
-          <EmptyState
-            message={
-              tab === "purchases" ? "Aun no tienes compras" : "Aun no tienes ventas"
-            }
-          />
-        ) : (
-          groups.map((g) => <BundleCard key={g.key} group={g} esComprador={tab === "purchases"} />)
-        )}
-      </div>
+    <div className="space-y-3">
+      {groups.length === 0 ? (
+        <EmptyState />
+      ) : (
+        groups.map((g) => <BundleCard key={g.key} group={g} esComprador />)
+      )}
     </div>
   );
 }

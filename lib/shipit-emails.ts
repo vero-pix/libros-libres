@@ -119,7 +119,7 @@ export function correoCompradorTracking(d: DatosCorreoEtiqueta): { subject: stri
     <p>${libros.corto.replace(/^<strong>tus/, "<strong>Tus")} ${d.titulos.length > 1 ? "salen" : "sale"} por <strong>${esc(courier)}</strong> desde ${esc(d.comunaOrigen)} y ${d.titulos.length > 1 ? "llegan" : "llega"} a ${esc(d.direccionEntrega)}. Una vez que ${d.retiro ? "el courier pasa a buscarlo" : "el vendedor lo entrega en la sucursal"}, ${esc(courier)} demora entre 1 y 3 días hábiles.${libros.lista}</p>
     <p>Número de seguimiento: <strong>${esc(d.tracking)}</strong></p>
     ${seguimiento ? boton(seguimiento, `Seguir el envío en ${courier}`) : ""}
-    <p>También lo ves en Mis Pedidos: <a href="${SITE}/mis-pedidos">${SITE}/mis-pedidos</a></p>
+    <p>También lo ves en Mis compras: <a href="${SITE}/mis-pedidos">${SITE}/mis-pedidos</a></p>
     <p>${d.retiro ? `${esc(courier)} pasa a buscar el paquete donde el vendedor ${esc(cuandoPasan(d.retiro))}` : "El vendedor deja el paquete en la sucursal del courier en los próximos dos días hábiles"}, así que el seguimiento puede tardar un poco en mostrar movimiento. Si pasan tres días hábiles sin novedad, me escribes y lo reviso con Shipit.</p>
     <p>El pago ya está hecho: no tienes que pagar nada al recibir.</p>
     <p>Cualquier cosa, respóndeme a este correo.</p>

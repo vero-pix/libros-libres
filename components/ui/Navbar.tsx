@@ -93,7 +93,7 @@ export default async function Navbar() {
                     label="Mi cuenta"
                     items={[
                       { href: "/mis-libros", label: "Mis libros" },
-                      { href: "/mis-pedidos", label: "Mis pedidos" },
+                      { href: "/mis-pedidos", label: "Mis compras" },
                       { href: "/mis-ventas", label: "Mis ventas" },
                       // { href: "/mis-arriendos", label: "Mis arriendos" }, // arriendo a la banca (revivir con bibliotecas)
                       { href: "/carrito", label: "Carrito" },

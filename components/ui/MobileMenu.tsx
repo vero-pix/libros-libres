@@ -89,7 +89,7 @@ export default function MobileMenu({ loggedIn }: Props) {
             <Item href="/mis-arriendos" label="Mis arriendos" />
             <Item href="/referidos" label="Invita y gana" /> */}
             <Item href="/mis-libros" label="Mis libros" />
-            <Item href="/mis-pedidos" label="Mis pedidos" />
+            <Item href="/mis-pedidos" label="Mis compras" />
             <Item href="/mis-ventas" label="Mis ventas" />
             <Item href="/carrito" label="Carrito" />
             <Item href="/perfil" label="Perfil" />

@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
 
     if (enCurso) {
       return NextResponse.json(
-        { error: "Puedes reseñar cuando marques el pedido como recibido en Mis Pedidos." },
+        { error: "Puedes reseñar cuando marques el pedido como recibido en Mis compras." },
         { status: 403 }
       );
     }

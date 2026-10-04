@@ -37,7 +37,7 @@ export default function ToolsTab({ users }: { users: AdminUser[] }) {
     { label: "Publicar libro", href: "/publish", desc: "Crear una nueva publicación" },
     { label: "Buscar libros", href: "/search", desc: "Buscador público con filtros" },
     { label: "Mis ventas", href: "/mis-ventas", desc: "Ventas, carritos de compradores" },
-    { label: "Mis pedidos", href: "/mis-pedidos", desc: "Pedidos como comprador" },
+    { label: "Mis compras", href: "/mis-pedidos", desc: "Pedidos como comprador" },
     { label: "Mis libros", href: "/mis-libros", desc: "Gestionar publicaciones propias" },
     { label: "Mensajes", href: "/mensajes", desc: "Bandeja de mensajería interna" },
     { label: "Perfil", href: "/perfil", desc: "Editar perfil, teléfono, dirección" },
