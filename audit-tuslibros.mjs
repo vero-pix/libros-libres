@@ -2,8 +2,11 @@ import { chromium } from "playwright";
 import { mkdirSync } from "fs";
 
 const BASE = "https://tuslibros.cl";
-const EMAIL = "vero@tuslibros.cl";
-const PASS = "Ale234de";
+// Credenciales por variable de entorno: este repo es público. Hasta el
+// 03-10-2026 la clave estuvo escrita acá (y quedó en el historial de git).
+const EMAIL = process.env.AUDIT_EMAIL;
+const PASS = process.env.AUDIT_PASS;
+if (!EMAIL || !PASS) throw new Error("Faltan AUDIT_EMAIL y AUDIT_PASS");
 const OUT = "/tmp/audit-screenshots";
 const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 mkdirSync(OUT, { recursive: true });
