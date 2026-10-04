@@ -77,7 +77,9 @@ export default async function AdminPage() {
       .from("categories")
       .select("slug, name, parent_slug, sort_order")
       .order("sort_order", { ascending: true }),
-    supabase
+    // Con service role: el correo y el WhatsApp de quien pide ya no se
+    // conceden a anon ni a authenticated (20261004b_se_busca_sin_contacto_publico.sql).
+    db
       .from("book_requests")
       .select("*")
       .order("created_at", { ascending: false }),
