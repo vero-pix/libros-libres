@@ -85,8 +85,7 @@ export default function MobileMenu({ loggedIn }: Props) {
             {/* El badge también acá: este menú es el único nav bajo lg, así que sin
                 él en el celular nadie se entera de que le escribieron. */}
             <Item href="/mensajes" label="Mensajes" badge={<UnreadBadge />} />
-            {/* Ocultos 20 jul 2026 (nadie los usa): Mis arriendos, Invita y gana. Revivir cuando aplique.
-            <Item href="/mis-arriendos" label="Mis arriendos" />
+            {/* Oculto 20 jul 2026 (nadie lo usa): Invita y gana. Revivir cuando aplique.
             <Item href="/referidos" label="Invita y gana" /> */}
             <Item href="/mis-libros" label="Mis libros" />
             <Item href="/mis-pedidos" label="Mis compras" />

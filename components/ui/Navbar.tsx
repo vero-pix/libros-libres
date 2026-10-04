@@ -95,7 +95,6 @@ export default async function Navbar() {
                       { href: "/mis-libros", label: "Mis libros" },
                       { href: "/mis-pedidos", label: "Mis compras" },
                       { href: "/mis-ventas", label: "Mis ventas" },
-                      // { href: "/mis-arriendos", label: "Mis arriendos" }, // arriendo a la banca (revivir con bibliotecas)
                       { href: "/carrito", label: "Carrito" },
                       // { href: "/referidos", label: "Invita y gana" }, // oculto; replantear a los 2.500 libros
                       { href: "/perfil", label: "Perfil" },
