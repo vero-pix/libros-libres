@@ -15,8 +15,12 @@ interface CatalogoMatch {
 export default function RequestForm({
   hasSession = false,
   temas = [],
+  inicial,
 }: {
   hasSession?: boolean;
+  /** Título y autor ya escritos: vienen de la ficha de un libro vendido
+   *  ("Avísame si llega otro"), por /solicitudes?titulo=…&autor=…#pedir. */
+  inicial?: { titulo?: string; autor?: string };
   /** Temas de `categories`. Vacío = solo se puede pedir por título. */
   temas?: { slug: string; nombre: string }[];
 }) {
@@ -28,8 +32,8 @@ export default function RequestForm({
   const [modo, setModo] = useState<"libro" | "tema">("libro");
   const [tema, setTema] = useState("");
   const [matches, setMatches] = useState<CatalogoMatch[]>([]);
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
+  const [title, setTitle] = useState(inicial?.titulo ?? "");
+  const [author, setAuthor] = useState(inicial?.autor ?? "");
   const [notes, setNotes] = useState("");
   // Dos campos separados a propósito: el aviso automático sale por correo, así
   // que el WhatsApp es un extra para que Vero pueda insistir, nunca el único

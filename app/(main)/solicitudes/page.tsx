@@ -22,7 +22,15 @@ interface BookRequest {
   tema: string | null;
 }
 
-export default async function SolicitudesPage() {
+export default async function SolicitudesPage({
+  searchParams,
+}: {
+  searchParams?: { titulo?: string; autor?: string };
+}) {
+  const inicial = {
+    titulo: (searchParams?.titulo ?? "").slice(0, 200),
+    autor: (searchParams?.autor ?? "").slice(0, 120),
+  };
   const supabase = createPublicClient();
   // Dos queries separadas: una sola con .limit(100) traía las 100 más recientes
   // mezclando abiertas y cumplidas, así que las abiertas más viejas se caían de
@@ -89,7 +97,7 @@ export default async function SolicitudesPage() {
 
       <main className="max-w-5xl mx-auto px-6 pb-16 space-y-10">
         {/* FORM */}
-        <section className="bg-white rounded-2xl border border-amber-200 shadow-sm p-6 sm:p-8">
+        <section id="pedir" className="bg-white rounded-2xl border border-amber-200 shadow-sm p-6 sm:p-8 scroll-mt-24">
           <h2 className="font-display text-2xl text-ink mb-2">
             ¿Buscas un libro, o un tema?
           </h2>
@@ -98,7 +106,7 @@ export default async function SolicitudesPage() {
             —poesía, historia, filosofía— y te aviso cada vez que entre algo de
             esos. Tus datos de contacto son privados.
           </p>
-          <RequestForm hasSession={!!user} temas={temas} />
+          <RequestForm hasSession={!!user} temas={temas} inicial={inicial} />
         </section>
 
         {/* OPEN LIST */}

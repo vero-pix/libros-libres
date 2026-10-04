@@ -21,6 +21,7 @@ import { libroUrl } from "@/lib/urls";
 import { trackEvent } from "@/utils/analytics";
 import { translateGenre } from "@/lib/genres";
 import { authorLanding } from "@/lib/authorLandings";
+import { ButtonLink } from "@/components/ui/Button";
 import HacerOfertaButton, { EVENTO_ABRIR_OFERTA } from "@/components/offers/HacerOfertaButton";
 import { vendedorPuedeRecibirOfertas, precioAdmiteOferta, TAG_OFERTA_DESTACADA } from "@/lib/offers";
 import { nombreCortoVendedor } from "@/lib/nombreVendedor";
@@ -743,10 +744,11 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
       {listing.price != null && listing.modality !== "loan" && (
         <div className="border-t border-line px-6 py-5 space-y-3">
           {isSold ? (
-            <div className="text-center py-4">
-              <p className="font-display text-xl font-bold text-[--coral]">Este libro ya fue vendido</p>
-              <p className="text-sm text-ink-muted mt-1">Busca otros similares o contacta al vendedor por si tiene más.</p>
-            </div>
+            <VendidoSalidas
+              titulo={book.title}
+              autor={book.author}
+              otrosEjemplares={otrosEjemplares}
+            />
           ) : reservado && !isOwner ? (
             <div className="space-y-3">
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3 animate-fade-in">
@@ -958,3 +960,56 @@ function DescriptionSection({ listing }: { listing: ListingWithBook }) {
   );
 }
 
+/**
+ * Ficha de un libro ya vendido. Google las sigue mostrando: del 04-09 al
+ * 03-10-2026, 239 fichas vendidas trajeron 186 clics, un tercio de todos los
+ * clics a fichas, y la pantalla decía "busca otros similares" sin un solo
+ * botón. Ahora cada visita tiene adónde ir: otro ejemplar del mismo título si
+ * lo hay, un "Se busca" ya escrito para que avisemos cuando llegue, y el autor.
+ */
+function VendidoSalidas({
+  titulo,
+  autor,
+  otrosEjemplares,
+}: {
+  titulo: string;
+  autor?: string | null;
+  otrosEjemplares: number;
+}) {
+  const busqueda = titulo;
+  const sebusca = `/solicitudes?${new URLSearchParams({ titulo, ...(autor?.trim() ? { autor: autor.trim() } : {}) }).toString()}#pedir`;
+  const landing = authorLanding(autor);
+  const hrefAutor = landing ? landing.slug : autor?.trim() ? `/search?q=${encodeURIComponent(autor.trim())}` : null;
+
+  return (
+    <div className="text-center py-4 space-y-4">
+      <div>
+        <p className="font-display text-xl font-bold text-[--coral]">Este libro ya fue vendido</p>
+        <p className="text-sm text-ink-muted mt-1">
+          {otrosEjemplares > 0
+            ? otrosEjemplares === 1
+              ? "Pero hay otro ejemplar a la venta."
+              : `Pero hay ${otrosEjemplares} ejemplares más a la venta.`
+            : "Si quieres, te aviso cuando alguien publique otro ejemplar."}
+        </p>
+      </div>
+      <div className="flex flex-wrap justify-center gap-3">
+        {otrosEjemplares > 0 ? (
+          <>
+            <ButtonLink href={`/search?q=${encodeURIComponent(busqueda)}`}>
+              {otrosEjemplares === 1 ? "Ver el otro ejemplar" : "Ver los otros ejemplares"}
+            </ButtonLink>
+            <ButtonLink href={sebusca} variant="outline">Avísame si llega otro</ButtonLink>
+          </>
+        ) : (
+          <ButtonLink href={sebusca}>Avísame si llega otro</ButtonLink>
+        )}
+        {hrefAutor && (
+          <ButtonLink href={hrefAutor} variant="outline">
+            Más de {landing?.label ?? autor}
+          </ButtonLink>
+        )}
+      </div>
+    </div>
+  );
+}
