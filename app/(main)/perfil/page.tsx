@@ -7,6 +7,7 @@ import ApiKeyManager from "@/components/ui/ApiKeyManager";
 import ChangePasswordForm from "@/components/ui/ChangePasswordForm";
 import LinkedAccounts from "@/components/ui/LinkedAccounts";
 import DeleteAccount from "@/components/ui/DeleteAccount";
+import DownloadMyData from "@/components/ui/DownloadMyData";
 
 export const metadata = { title: "Mi Perfil — tuslibros.cl", robots: { index: false } };
 
@@ -31,7 +32,8 @@ export default async function PerfilPage() {
   const { count: listingsCount } = await supabase
     .from("listings")
     .select("id", { count: "exact", head: true })
-    .eq("seller_id", user.id);
+    .eq("seller_id", user.id)
+    .in("status", ["active", "paused"]);
 
   const missingPhone = !profile?.phone;
   const missingAddress = profile?.default_latitude == null || profile?.default_longitude == null;
@@ -86,6 +88,7 @@ export default async function PerfilPage() {
         <LinkedAccounts />
         <ApiKeyManager />
         <ChangePasswordForm />
+        <DownloadMyData />
         <DeleteAccount listingsCount={listingsCount ?? 0} />
       </main>
     </div>

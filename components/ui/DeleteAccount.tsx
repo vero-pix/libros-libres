@@ -28,7 +28,7 @@ export default function DeleteAccount({ listingsCount }: { listingsCount: number
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data?.error ?? "No pudimos cerrar la cuenta.");
+        setError(data?.error ?? "No pude cerrar la cuenta.");
         setSoporte(data?.soporte ?? null);
         setLoading(false);
         return;
@@ -36,7 +36,7 @@ export default function DeleteAccount({ listingsCount }: { listingsCount: number
       router.push("/?cuenta=eliminada");
       router.refresh();
     } catch {
-      setError("No pudimos conectar. Intenta de nuevo en un momento.");
+      setError("No hubo conexión. Prueba de nuevo en un momento.");
       setLoading(false);
     }
   }
@@ -59,13 +59,38 @@ export default function DeleteAccount({ listingsCount }: { listingsCount: number
     <div className="mt-8 mb-4 rounded-xl border border-red-200 bg-red-50 p-5">
       <h2 className="text-sm font-semibold text-red-900">Eliminar mi cuenta</h2>
       <p className="mt-2 text-sm text-red-800">
-        Se borran tus datos, tu perfil y{" "}
-        {listingsCount === 0
-          ? "no tienes libros publicados"
-          : listingsCount === 1
-            ? "el libro que tienes publicado"
-            : `los ${listingsCount} libros que tienes publicados`}
-        . No se puede deshacer.
+        Antes de que lo hagas, te cuento qué pasa con cada cosa:
+      </p>
+      <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-red-900">Se borra</p>
+      <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm text-red-800">
+        <li>
+          {listingsCount === 0
+            ? "Tus libros publicados (hoy no tienes ninguno a la venta)"
+            : listingsCount === 1
+              ? "El libro que tienes publicado o pausado, con sus fotos"
+              : `Los ${listingsCount} libros que tienes publicados o pausados, con sus fotos`}
+        </li>
+        <li>Tu nombre, teléfono, dirección, puntos de retiro, bio, Instagram y foto de perfil</li>
+        <li>Tus &quot;Se busca&quot;, tu carrito y la suscripción al newsletter</li>
+        <li>La conexión con MercadoPago y tus llaves de API</li>
+      </ul>
+      <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-red-900">
+        Se guarda, pero sin tu nombre
+      </p>
+      <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm text-red-800">
+        <li>
+          Tus compras y ventas ya hechas: la ley me pide guardarlas por temas tributarios y de
+          derechos del consumidor. Quedan sin tu dirección, y los libros que ya vendiste dejan
+          de aparecer en el buscador.
+        </li>
+        <li>
+          Los mensajes que escribiste: la otra persona sigue viendo la conversación, pero tú
+          apareces como &quot;Usuario eliminado&quot;.
+        </li>
+        <li>Las reseñas y preguntas que dejaste, firmadas como &quot;Usuario eliminado&quot;.</li>
+      </ul>
+      <p className="mt-3 text-sm text-red-800">
+        No se puede deshacer. Si quieres una copia antes, usa &quot;Descargar mis datos&quot; aquí arriba.
       </p>
       <p className="mt-2 text-sm text-red-800">
         Si solo quieres dejar de aparecer un tiempo, puedes{" "}
@@ -108,7 +133,7 @@ export default function DeleteAccount({ listingsCount }: { listingsCount: number
           disabled={loading || texto.trim().toUpperCase() !== "ELIMINAR"}
           className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-40 disabled:hover:bg-red-600 transition-colors"
         >
-          {loading ? "Eliminando…" : "Eliminar definitivamente"}
+          {loading ? "Cerrando tu cuenta…" : "Eliminar definitivamente"}
         </button>
         <button
           type="button"
