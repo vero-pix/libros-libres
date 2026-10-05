@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 export default function ChangePasswordForm() {
   const supabase = createClient();
@@ -51,8 +52,7 @@ export default function ChangePasswordForm() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Nueva contraseña
             </label>
-            <input
-              type="password"
+            <PasswordInput
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -65,8 +65,7 @@ export default function ChangePasswordForm() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Confirmar contraseña
             </label>
-            <input
-              type="password"
+            <PasswordInput
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               required

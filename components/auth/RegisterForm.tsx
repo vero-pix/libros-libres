@@ -8,6 +8,7 @@ import SocialLoginButtons from "./SocialLoginButtons";
 import { nombreSospechoso } from "@/lib/nombreSospechoso";
 import { mensajeErrorClave } from "@/lib/authErrors";
 import Turnstile, { TURNSTILE_SITE_KEY, esErrorDeCaptcha, MENSAJE_CAPTCHA } from "./Turnstile";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 type Ciudad = { id: string; name: string; region: string };
 
@@ -226,8 +227,7 @@ export default function RegisterForm({ ciudades = [] }: { ciudades?: Ciudad[] })
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Contraseña
           </label>
-          <input
-            type="password"
+          <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

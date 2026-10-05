@@ -6,6 +6,7 @@ import Logo from "@/components/ui/Logo";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { mensajeErrorClave } from "@/lib/authErrors";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -159,8 +160,7 @@ function ResetPasswordForm() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nueva contraseña
                 </label>
-                <input
-                  type="password"
+                <PasswordInput
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -177,8 +177,7 @@ function ResetPasswordForm() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Confirmar contraseña
                 </label>
-                <input
-                  type="password"
+                <PasswordInput
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   required

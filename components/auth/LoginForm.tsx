@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import SocialLoginButtons from "./SocialLoginButtons";
 import Turnstile, { TURNSTILE_SITE_KEY, esErrorDeCaptcha, MENSAJE_CAPTCHA } from "./Turnstile";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -66,8 +67,7 @@ export default function LoginForm() {
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Contraseña
         </label>
-        <input
-          type="password"
+        <PasswordInput
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
