@@ -14,10 +14,14 @@ const BookMap = dynamic(() => import("@/components/map/BookMap"), {
 interface Props {
   listings: ListingWithBook[];
   resultsCount: number;
+  /** Cuántos de `resultsCount` están a la venta. La búsqueda muestra también
+   *  los vendidos (con su etiqueta), y sumarlos en un solo número confundía:
+   *  "4882 libros" cuando a la venta había 4.251 (05-10-2026). */
+  aLaVenta?: number;
   children: ReactNode; // grid server-rendered
 }
 
-export default function SearchResultsToggle({ listings, resultsCount, children }: Props) {
+export default function SearchResultsToggle({ listings, resultsCount, aLaVenta, children }: Props) {
   const [view, setView] = useState<"grid" | "map">("grid");
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [flyTo, setFlyTo] = useState<ListingWithBook | null>(null);
@@ -36,7 +40,18 @@ export default function SearchResultsToggle({ listings, resultsCount, children }
     <div>
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm text-ink-muted">
-          {resultsCount} {resultsCount === 1 ? "libro" : "libros"}
+          {aLaVenta == null ? (
+            <>
+              {resultsCount.toLocaleString("es-CL")} {resultsCount === 1 ? "libro" : "libros"}
+            </>
+          ) : (
+            <>
+              {aLaVenta.toLocaleString("es-CL")} a la venta
+              {resultsCount > aLaVenta && (
+                <span className="text-ink-muted/70"> · {(resultsCount - aLaVenta).toLocaleString("es-CL")} {resultsCount - aLaVenta === 1 ? "vendido" : "vendidos"}</span>
+              )}
+            </>
+          )}
           {view === "map" && listingsWithCoords.length !== listings.length && (
             <span className="text-ink-muted/70">
               {" "}

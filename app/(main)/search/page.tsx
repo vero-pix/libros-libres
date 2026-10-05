@@ -270,6 +270,11 @@ export default async function SearchPage({ searchParams }: Props) {
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
+  // Cuántos de esos se pueden comprar: el contador los separa de los vendidos.
+  const { count: aLaVentaCount } = totalCount > 0
+    ? await buildFiltered({ head: true }).eq("status", "active")
+    : { count: 0 };
+
   // Trackear la búsqueda (fire-and-forget, no bloquea render).
   //
   // `results_count` guarda los resultados DEL TÉRMINO, no los de la pantalla.
@@ -379,7 +384,7 @@ export default async function SearchPage({ searchParams }: Props) {
 
             {listings.length > 0 ? (
               <>
-                <SearchResultsToggle listings={listings} resultsCount={totalCount}>
+                <SearchResultsToggle listings={listings} resultsCount={totalCount} aLaVenta={aLaVentaCount ?? undefined}>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
                     {listings.map((listing) => (
                       <ListingCard key={listing.id} listing={listing} />
