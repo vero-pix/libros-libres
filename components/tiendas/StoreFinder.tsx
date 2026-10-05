@@ -54,6 +54,9 @@ export default function StoreFinder({ stores }: { stores: StoreRow[] }) {
   }, [stores, q, region]);
 
   const medal = (i: number) => (i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null);
+  // La columna de la medalla existe solo si en lo que se ve hay alguna; si no,
+  // queda un hueco a la izquierda de cada tienda.
+  const hayMedallas = visibles.some((s) => medal(s.rank) !== null);
 
   return (
     <>
@@ -127,13 +130,14 @@ export default function StoreFinder({ stores }: { stores: StoreRow[] }) {
                 href={`/vendedor/${s.username ?? s.id}`}
                 className="group flex items-center gap-4 bg-white rounded-2xl border border-cream-dark p-4 hover:border-coral/40 hover:shadow-sm transition-all"
               >
-                <div className="w-7 text-center flex-shrink-0">
-                  {medal(s.rank) ? (
-                    <span className="text-xl">{medal(s.rank)}</span>
-                  ) : (
-                    <span className="font-display text-lg font-bold text-ink-muted">{s.rank + 1}</span>
-                  )}
-                </div>
+                {/* Solo las medallas de los 3 primeros de Chile (05-10-2026). El
+                    número del ranking nacional confundía al filtrar por región:
+                    en Maule la lista partía en "70". */}
+                {hayMedallas && (
+                  <div className="w-7 text-center flex-shrink-0">
+                    {medal(s.rank) && <span className="text-xl">{medal(s.rank)}</span>}
+                  </div>
+                )}
                 <div className="w-12 h-12 rounded-full bg-ink text-white flex items-center justify-center text-base font-bold flex-shrink-0 overflow-hidden">
                   {s.avatar_url ? (
                     <Image src={s.avatar_url} alt={s.full_name ?? "Tienda"} width={48} height={48} className="object-cover w-full h-full" />
