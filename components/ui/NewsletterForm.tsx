@@ -32,7 +32,7 @@ export default function NewsletterForm() {
   if (status === "success") {
     return (
       <p className="text-sm text-brand-600 font-medium">
-        Te suscribiste correctamente. Revisa tu correo.
+        Listo, ya estás en la lista. Te escribo cuando haya novedades.
       </p>
     );
   }

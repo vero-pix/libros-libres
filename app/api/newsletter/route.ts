@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { sendEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
-  const { email, full_name, company, origen } = (await req.json()) as {
+  const { email, company, origen } = (await req.json()) as {
     email?: string;
-    full_name?: string;
     company?: string;
     // "registro" cuando viene de RegisterForm: ahí el webhook new-user ya manda
     // su propia bienvenida, y dos correos a la vez se leen como spam.
@@ -48,101 +46,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Error al suscribir" }, { status: 500 });
   }
 
-  // El registro ya recibe la bienvenida del webhook new-user. Acá solo se
-  // suscribe, sin segundo correo.
-  if (origen === "registro") {
-    return NextResponse.json({ ok: true });
-  }
-
-  // Send welcome email (don't fail the request if this errors)
-  const firstName = (full_name ?? "").trim().split(/\s+/)[0];
-  const greeting = firstName ? `Hola ${firstName}` : "Hola";
-
-  // Cifras EN VIVO. Antes decían "3 compradores reales, 11 libros vendidos",
-  // escritos a mano en abril: en julio ya eran 146 vendidos. Un número viejo y
-  // chico desanima justo cuando la persona está decidiendo si vale la pena.
-  const [{ count: activos }, { count: vendidos }] = await Promise.all([
-    supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "active"),
-    supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "completed"),
-  ]);
-  const { data: conStock } = await supabase
-    .from("listings").select("seller_id").eq("status", "active").limit(2000);
-  const vendedores = new Set((conStock ?? []).map((l) => l.seller_id)).size;
-  const miles = (x: number | null) => (x ?? 0).toLocaleString("es-CL");
-
-  try {
-    await sendEmail({
-      to: email.toLowerCase(),
-      subject: "Gracias por registrarte en tuslibros.cl",
-      html: `
-<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#2a1f14;background:#ffffff;">
-
-  <p style="font-size:11px;letter-spacing:3px;color:#a8581e;font-weight:600;margin:0 0 10px;text-transform:uppercase;">tuslibros.cl</p>
-
-  <h1 style="font-family:Georgia,serif;font-size:26px;color:#2a1f14;margin:0 0 18px;line-height:1.25;font-weight:500;">${greeting}, gracias por registrarte 🙏</h1>
-
-  <p style="font-size:15px;line-height:1.65;color:#3a2f24;margin:0 0 16px;">
-    Soy Vero, la fundadora de tuslibros.cl. Te escribo yo, no un "equipo" — por ahora
-    este proyecto lo llevo sola desde Providencia, Santiago.
-  </p>
-
-  <p style="font-size:15px;line-height:1.65;color:#3a2f24;margin:0 0 16px;">
-    tuslibros.cl es un marketplace de libros usados chilenos con pago seguro por
-    MercadoPago: el comprador paga el libro y el envío, y esa plata te llega a ti.
-    Tú despachas por el courier que prefieras. Hoy hay <strong>${miles(activos)} libros
-    publicados por ${vendedores} vendedores</strong>, y van ${miles(vendidos)} vendidos.
-  </p>
-
-  <p style="font-size:15px;line-height:1.65;color:#3a2f24;margin:0 0 16px;">
-    Quiero que esto crezca sobre bases que le convengan a los dos lados.
-    <strong>Publicar es gratis, siempre.</strong> Cobro 8% cuando la venta se cierra
-    acá, con el pago por MercadoPago: la plata le llega directa al vendedor y queda
-    registro de la compra para los dos. Eso es lo que paga la pasarela, el servidor y
-    las horas. Sin versión premium escondida ni letra chica.
-  </p>
-
-  <p style="font-size:15px;line-height:1.65;color:#3a2f24;margin:0 0 20px;">
-    Acá te dejo dos caminos para empezar:
-  </p>
-
-  <div style="margin:0 0 22px;">
-    <a href="https://tuslibros.cl/publish" style="display:block;background:#a8581e;color:#ffffff;text-decoration:none;padding:14px 20px;border-radius:10px;font-weight:600;font-size:15px;text-align:center;margin-bottom:10px;">
-      📚 Publicar un libro que tienes en casa →
-    </a>
-    <a href="https://tuslibros.cl" style="display:block;background:#ffffff;color:#2a1f14;text-decoration:none;padding:14px 20px;border-radius:10px;font-weight:600;font-size:15px;text-align:center;border:1px solid #d4c5a8;">
-      🔍 Explorar el catálogo →
-    </a>
-  </div>
-
-  <p style="font-size:14px;line-height:1.65;color:#3a2f24;margin:0 0 16px;">
-    <strong>Si tienes varios libros</strong> y quieres ahorrarte la pega de subirlos
-    de a uno, no lo hagas a mano: sube una foto de la ruma o un Excel con los títulos
-    en el
-    <a href="https://tuslibros.cl/mis-libros/importar" style="color:#a8581e;font-weight:600;">importador</a>
-    y quedan publicados de una. Si se te enreda, escríbeme desde
-    <a href="https://tuslibros.cl/mensajes" style="color:#a8581e;font-weight:600;">mensajes</a>
-    y lo vemos.
-  </p>
-
-  <p style="font-size:14px;line-height:1.65;color:#3a2f24;margin:0 0 22px;">
-    Y si tienes dudas, críticas, ideas, o simplemente quieres saludarme, respondes este correo o me escribes directo.
-  </p>
-
-  <div style="border-top:1px solid #e8ddc8;padding-top:18px;margin-top:22px;">
-    <p style="font-size:13px;line-height:1.6;color:#7a6649;margin:0 0 6px;">
-      En <a href="https://tuslibros.cl/novedades" style="color:#a8581e;">tuslibros.cl/novedades</a> cuento cada par de días lo que pasa, lo que pruebo, lo que sale mal y lo que sale bien.
-    </p>
-    <p style="font-size:13px;color:#7a6649;margin:8px 0 0;">
-      Gracias por estar acá. — Vero
-    </p>
-  </div>
-
-</div>
-      `,
-    });
-  } catch (emailErr) {
-    console.error("Newsletter welcome email failed:", emailErr);
-  }
+  // Sin correo de bienvenida al suscribirse (05-10-2026). Bots inscribían
+  // correos de personas reales de EE.UU. y Europa (12 de 17 suscripciones ese
+  // día: yahoo, aol, gmx, empresas) y cada inscripción disparaba al tiro un
+  // "Gracias por registrarte" desde hola@: gente que nunca lo pidió, que lo
+  // marca como spam y le baja la reputación al buzón con que se les escribe a
+  // compradores y vendedores. Quien se registra en el sitio recibe su
+  // bienvenida por el webhook new-user; el suscriptor recibe el próximo
+  // newsletter, que ya se envía filtrado con isLikelyBotEmail.
 
   return NextResponse.json({ ok: true });
 }
