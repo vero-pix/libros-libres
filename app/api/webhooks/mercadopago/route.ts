@@ -455,7 +455,7 @@ export async function POST(req: NextRequest) {
                     <h3 style="color:#1a1a1a;font-size:16px">Cómo despachar</h3>
                     <ol style="padding-left:20px;color:#444;font-size:14px;line-height:1.7">
                       <li>Empaca <strong>${itemCount > 1 ? `los ${itemCount} libros juntos` : "el libro"}</strong> en una caja o sobre resistente.</li>
-                      <li>Llévalo a la sucursal del courier que prefieras (Starken, Chilexpress, Blue Express o Correos de Chile) y paga el envío a domicilio para <strong>${buyerName}</strong>, ${buyerAddress}.</li>
+                      <li>Dentro de los próximos <strong>2 días hábiles</strong>, llévalo a la sucursal del courier que prefieras (Starken, Chilexpress, Blue Express o Correos de Chile) y paga el envío a domicilio para <strong>${buyerName}</strong>, ${buyerAddress}.</li>
                       <li>En <a href="${siteUrl}/mis-ventas" style="color:#1a1a1a">Mis Ventas</a> aprieta <strong>Ya lo despaché</strong> y escribe el courier y el número de seguimiento. Con eso le aviso al comprador.</li>
                     </ol>
                     <p style="font-size:14px;color:#444;line-height:1.6">Si tienes cualquier duda, avísame al <strong>${WHATSAPP_SOPORTE_LEGIBLE}</strong>.</p>

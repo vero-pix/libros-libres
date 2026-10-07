@@ -1,4 +1,5 @@
 import { createPublicClient } from "@/lib/supabase/public";
+import { WHATSAPP_SOPORTE_LEGIBLE } from "@/lib/soporte";
 
 export const revalidate = 86400; // 1 día
 
@@ -92,8 +93,8 @@ export async function GET() {
   const texto = `# tuslibros.cl
 
 > Marketplace chileno de libros usados. Compra y vende libros de segunda mano en
-> Chile con envío a todo el país o retiro en mano. Pago con MercadoPago.
-> Publicar es gratis; se cobra 8% de comisión solo cuando el libro se vende.
+> Chile con envío a todo el país o retiro en mano. Pago con MercadoPago o por
+> transferencia. Publicar es gratis; hay un 8% solo cuando se paga con MercadoPago.
 
 ## Catálogo (actualizado el ${hoy})
 
@@ -109,12 +110,16 @@ ${categorias}
 ## Cómo funciona
 
 - Publicar es gratis y sin límite de libros.
-- El comprador paga con MercadoPago (tarjeta de crédito, débito o saldo).
-- El envío va por courier (Starken, Chilexpress) a todo Chile, o se retira en
-  persona coordinando con el vendedor.
-- La comisión es 8% sobre el precio del libro y se cobra cuando la venta se
-  cierra en la plataforma, con el pago por MercadoPago. Publicar es gratis y no
-  hay mensualidad.
+- El comprador paga en el sitio con MercadoPago (tarjeta de crédito, débito o
+  saldo) o, si el vendedor lo acepta, por transferencia directa al vendedor.
+- Despacho a todo Chile con tarifa fija por zona (Santiago, misma región, otra
+  región, zonas extremas): el vendedor lleva el paquete al courier que elija y
+  registra el número de seguimiento. El total con despacho se ve en la ficha
+  antes de comprar. También se puede retirar en persona.
+- La comisión es 8% sobre el precio del libro cuando se paga con MercadoPago:
+  con despacho la paga el comprador como cargo por servicio; en entrega en
+  persona se descuenta al vendedor. Por transferencia no hay comisión. Publicar
+  es gratis y no hay mensualidad.
 - Hay una sección "Se busca" donde un comprador deja el título que necesita y se
   le avisa cuando algún vendedor lo publica.
 
@@ -173,7 +178,7 @@ Por ejemplo: /libros-usados/santiago, /libros-usados/concepcion,
 
 - País: Chile. Sitio en español.
 - Moneda: peso chileno (CLP).
-- Contacto: https://tuslibros.cl/sobre-nosotros
+- Contacto: WhatsApp ${WHATSAPP_SOPORTE_LEGIBLE} (soporte) · https://tuslibros.cl/sobre-nosotros
 `;
 
   return new Response(texto, {

@@ -44,6 +44,17 @@ function viaDominioPropio(url: string | null | undefined): string | null {
  */
 export const FEED_SHIPPING_CLP = 5990;
 
+/**
+ * Envío que se declara para un vendedor en el feed y en el JSON-LD de su ficha
+ * (07-10-2026). Desde que cada vendedor puede poner sus tarifas o apagar el
+ * despacho coordinado (lib/shipping/perfilDespacho.ts), el valor fijo dejaba de
+ * coincidir con lo que se cobra. Regla única: la tarifa a otra región de sus
+ * tarifas efectivas; null = el vendedor no ofrece despacho.
+ */
+export function envioDeclarado(efectivas: { otra_region: number } | null): number | null {
+  return efectivas ? efectivas.otra_region : null;
+}
+
 export type CanalFeed = "merchant" | "meta";
 
 export interface ItemFeed {
@@ -68,7 +79,8 @@ export interface MotivoExclusion {
     | "sin imagen usable"
     | "sin precio"
     | "sin título"
-    | "sin URL amigable";
+    | "sin URL amigable"
+    | "vendedor sin despacho";
 }
 
 /** Fila cruda que espera el generador (lo que devuelve la query de abajo). */
@@ -99,7 +111,13 @@ export interface FilaListing {
  */
 export function construirItems(
   filas: FilaListing[],
-  canal: CanalFeed
+  canal: CanalFeed,
+  /**
+   * Envío declarado por vendedor (`envioDeclarado`), por seller_id. Un vendedor
+   * que no está en el mapa usa FEED_SHIPPING_CLP; uno con null no ofrece
+   * despacho y queda fuera del feed.
+   */
+  envioPorVendedor?: Map<string, number | null>
 ): { items: ItemFeed[]; excluidos: MotivoExclusion[] } {
   const items: ItemFeed[] = [];
   const excluidos: MotivoExclusion[] = [];
@@ -135,11 +153,19 @@ export function construirItems(
       continue;
     }
 
+    const sellerId: string | undefined = (l as any).seller_id;
+    const envio =
+      sellerId && envioPorVendedor?.has(sellerId) ? envioPorVendedor.get(sellerId)! : FEED_SHIPPING_CLP;
+    if (envio === null) {
+      registrar("vendedor sin despacho");
+      continue;
+    }
+
     const autor = l.book?.author?.trim() || "Autor desconocido";
     const promo = calcularEnvioPromo({
-      sellerId: (l as any).seller_id,
+      sellerId,
       totalBookPrice: l.price,
-      fleteCotizado: FEED_SHIPPING_CLP,
+      fleteCotizado: envio,
       esCourier: true,
     });
 
@@ -157,7 +183,7 @@ export function construirItems(
       condition: l.condition === "new" ? "new" : "used",
       brand: l.book?.publisher?.trim() || autor,
       isbn: l.book?.isbn?.trim() || null,
-      shipping: promo.aplica ? 0 : FEED_SHIPPING_CLP,
+      shipping: promo.aplica ? 0 : envio,
     });
   }
 

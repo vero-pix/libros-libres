@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { createPublicClient } from "@/lib/supabase/public";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { tarifasEfectivasPorVendedor } from "@/lib/shipping/perfilDespacho";
 import {
   construirItems,
+  envioDeclarado,
   serializarXml,
   SELECT_FEED,
   type CanalFeed,
@@ -57,7 +60,17 @@ export async function GET(_req: Request, { params }: { params: { canal: string }
     if (!data || data.length < 1000) break;
   }
 
-  const { items, excluidos } = construirItems(filas, canal);
+  // Envío por vendedor (07-10-2026): sus tarifas propias o las del sitio, y
+  // fuera del feed si apagó el despacho. Las columnas del perfil solo las lee
+  // service role (lib/shipping/perfilDespacho.ts).
+  const efectivas = await tarifasEfectivasPorVendedor(
+    createServiceRoleClient(),
+    filas.map((f) => (f as any).seller_id as string)
+  );
+  const envioPorVendedor = new Map<string, number | null>();
+  efectivas.forEach((t, id) => envioPorVendedor.set(id, envioDeclarado(t)));
+
+  const { items, excluidos } = construirItems(filas, canal, envioPorVendedor);
 
   // El detalle de exclusiones vive en `npm run feed:validar`; acá solo el conteo,
   // para poder mirarlo en los logs de Vercel si el feed encoge de golpe.

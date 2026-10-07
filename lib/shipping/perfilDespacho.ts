@@ -80,3 +80,35 @@ export async function tarifasDelVendedor(
   const [sitio, perfil] = await Promise.all([obtenerTarifasCoordinado(admin), leerPerfilDespacho(admin, sellerId)]);
   return { sitio, efectivas: tarifasEfectivas(sitio, perfil) };
 }
+
+/**
+ * Tarifas efectivas de muchos vendedores en dos consultas, para el feed de
+ * producto (07-10-2026). Si las columnas del perfil no existen o la consulta
+ * falla, todos quedan con las tarifas del sitio, como antes del perfil.
+ */
+export async function tarifasEfectivasPorVendedor(
+  admin: Cliente,
+  sellerIds: string[]
+): Promise<Map<string, TarifasCoordinado | null>> {
+  const sitio = await obtenerTarifasCoordinado(admin);
+  const ids = Array.from(new Set(sellerIds.filter(Boolean)));
+  const perfiles = new Map<string, PerfilDespacho>();
+  // De a 200 para no armar una URL gigante con el `in`.
+  for (let i = 0; i < ids.length; i += 200) {
+    try {
+      const { data, error } = await admin
+        .from("users")
+        .select(`id, ${COLUMNAS_PERFIL_DESPACHO}`)
+        .in("id", ids.slice(i, i + 200));
+      if (error) break;
+      for (const fila of (data ?? []) as Record<string, unknown>[]) {
+        perfiles.set(String(fila.id), normalizarPerfilDespacho(fila));
+      }
+    } catch {
+      break;
+    }
+  }
+  const out = new Map<string, TarifasCoordinado | null>();
+  for (const id of ids) out.set(id, tarifasEfectivas(sitio, perfiles.get(id) ?? PERFIL_DESPACHO_VACIO));
+  return out;
+}

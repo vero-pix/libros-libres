@@ -55,7 +55,7 @@ export default function OGImage() {
             }}
           >
             Compra y vende libros usados en Chile. Pago seguro con MercadoPago.
-            Despacho puerta a puerta con Shipit o retiro en mano.
+            Despacho a todo Chile o retiro en mano.
           </div>
           <div
             style={{

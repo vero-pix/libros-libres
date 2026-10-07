@@ -15,7 +15,7 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { resolveAuthorUrl } from "@/lib/authorLink";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
-import { FEED_SHIPPING_CLP } from "@/lib/product-feed";
+import { envioDeclarado } from "@/lib/product-feed";
 import { obtenerComprasMinimas } from "@/lib/compraMinima";
 import { despachoParaFicha } from "@/lib/shipping/coordinado";
 import { tarifasDelVendedor } from "@/lib/shipping/perfilDespacho";
@@ -420,10 +420,10 @@ export default async function LibroPage({ params }: Props) {
   // Las tarifas del vendedor si puso las suyas; sin despacho si lo apagó
   // (lib/shipping/perfilDespacho.ts, 07-10-2026). El perfil se lee con service
   // role: sus columnas no se conceden a la sesión.
-  const despacho = despachoParaFicha(
-    (await tarifasDelVendedor(createServiceRoleClient(), listing.seller_id)).efectivas,
-    comunaDesdeAddress(listing.address)
-  );
+  const tarifasVendedor = (await tarifasDelVendedor(createServiceRoleClient(), listing.seller_id)).efectivas;
+  const despacho = despachoParaFicha(tarifasVendedor, comunaDesdeAddress(listing.address));
+  // Mismo envío que declara el feed para este vendedor (lib/product-feed.ts).
+  const envioJsonLd = envioDeclarado(tarifasVendedor);
   const compraMinima = (await obtenerComprasMinimas(supabase))[listing.seller_id] ?? null;
 
   const canonicalUrl = `https://tuslibros.cl/libro/${params.username}/${params.slug}`;
@@ -494,7 +494,9 @@ export default async function LibroPage({ params }: Props) {
       itemCondition: bookCondition,
       seller: { "@type": "Person", name: listing.seller?.full_name },
       url: canonicalUrl,
-      shippingDetails: {
+      // Sin despacho (el vendedor lo apagó) no se declara envío: el libro solo
+      // se entrega en persona (07-10-2026).
+      ...(envioJsonLd != null ? { shippingDetails: {
         "@type": "OfferShippingDetails",
         shippingRate: {
           "@type": "MonetaryAmount",
@@ -502,7 +504,8 @@ export default async function LibroPage({ params }: Props) {
           // Merchant Center marca discrepancia entre feed y landing. El $3.500
           // fijo que había acá nunca fue cierto: la mediana real de las órdenes
           // con despacho es $5.433. Ver lib/product-feed.ts (25 ago 2026).
-          value: String(FEED_SHIPPING_CLP),
+          // Desde el 07-10-2026 es el del vendedor (`envioDeclarado`).
+          value: String(envioJsonLd),
           currency: "CLP",
         },
         shippingDestination: {
@@ -524,7 +527,7 @@ export default async function LibroPage({ params }: Props) {
             unitCode: "DAY",
           },
         },
-      },
+      } } : {}),
       hasMerchantReturnPolicy: {
         "@type": "MerchantReturnPolicy",
         applicableCountry: "CL",

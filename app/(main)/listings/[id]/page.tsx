@@ -10,6 +10,7 @@ import type { ListingWithBook } from "@/types";
 import { obtenerComprasMinimas } from "@/lib/compraMinima";
 import { despachoParaFicha } from "@/lib/shipping/coordinado";
 import { tarifasDelVendedor } from "@/lib/shipping/perfilDespacho";
+import { envioDeclarado } from "@/lib/product-feed";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { comunaDesdeAddress } from "@/lib/comuna";
 
@@ -138,6 +139,12 @@ export default async function ListingByIdPage({ params }: Props) {
   const bookCondition = listing.condition === "new"
     ? "https://schema.org/NewCondition"
     : "https://schema.org/UsedCondition";
+  // Las tarifas del vendedor si puso las suyas; sin despacho si lo apagó
+  // (lib/shipping/perfilDespacho.ts, 07-10-2026). El perfil se lee con service
+  // role: sus columnas no se conceden a la sesión. Se calculan antes del
+  // JSON-LD para declarar el mismo envío que el feed (antes decía $3.500 fijos).
+  const tarifasVendedor = (await tarifasDelVendedor(createServiceRoleClient(), listing.seller_id)).efectivas;
+  const envioJsonLd = envioDeclarado(tarifasVendedor);
   const bookFormat = (listing.book as any).binding === "hardcover"
     ? "https://schema.org/Hardcover"
     : "https://schema.org/Paperback";
@@ -167,16 +174,16 @@ export default async function ListingByIdPage({ params }: Props) {
       itemCondition: bookCondition,
       seller: { "@type": "Person", name: listing.seller?.full_name },
       url: fallbackUrl,
-      shippingDetails: {
+      ...(envioJsonLd != null ? { shippingDetails: {
         "@type": "OfferShippingDetails",
-        shippingRate: { "@type": "MonetaryAmount", value: "3500", currency: "CLP" },
+        shippingRate: { "@type": "MonetaryAmount", value: String(envioJsonLd), currency: "CLP" },
         shippingDestination: { "@type": "DefinedRegion", addressCountry: "CL" },
         deliveryTime: {
           "@type": "ShippingDeliveryTime",
           handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 2, unitCode: "DAY" },
           transitTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 5, unitCode: "DAY" },
         },
-      },
+      } } : {}),
       hasMerchantReturnPolicy: {
         "@type": "MerchantReturnPolicy",
         applicableCountry: "CL",
@@ -188,13 +195,7 @@ export default async function ListingByIdPage({ params }: Props) {
     },
   };
 
-  // Las tarifas del vendedor si puso las suyas; sin despacho si lo apagó
-  // (lib/shipping/perfilDespacho.ts, 07-10-2026). El perfil se lee con service
-  // role: sus columnas no se conceden a la sesión.
-  const despacho = despachoParaFicha(
-    (await tarifasDelVendedor(createServiceRoleClient(), listing.seller_id)).efectivas,
-    comunaDesdeAddress(listing.address)
-  );
+  const despacho = despachoParaFicha(tarifasVendedor, comunaDesdeAddress(listing.address));
   const compraMinima = (await obtenerComprasMinimas(supabase))[listing.seller_id] ?? null;
 
   const breadcrumbJsonLd = {
