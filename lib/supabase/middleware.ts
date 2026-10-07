@@ -34,7 +34,7 @@ export async function updateSession(request: NextRequest) {
   // OJO: /publish NO está acá a propósito — la página maneja el caso sin sesión
   // mostrando la landing "Publica tu libro · Siempre gratis" con CTA a registrarse
   // (el form y las APIs de publicación siguen exigiendo auth server-side).
-  const protectedPaths = ["/listings/new", "/profile", "/perfil", "/checkout", "/orders", "/mis-pedidos", "/mis-libros", "/mensajes", "/referidos", "/admin"];
+  const protectedPaths = ["/listings/new", "/profile", "/perfil", "/checkout", "/orders", "/mis-pedidos", "/mis-libros", "/mensajes", "/admin"];
   const isProtected = protectedPaths.some((p) =>
     request.nextUrl.pathname.startsWith(p)
   );

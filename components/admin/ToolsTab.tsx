@@ -42,7 +42,6 @@ export default function ToolsTab({ users }: { users: AdminUser[] }) {
     { label: "Mensajes", href: "/mensajes", desc: "Bandeja de mensajería interna" },
     { label: "Perfil", href: "/perfil", desc: "Editar perfil, teléfono, dirección" },
     { label: "Novedades", href: "/novedades", desc: "Changelog público del sitio" },
-    { label: "Referidos", href: "/referidos", desc: "Programa de referidos y código personal" },
     { label: "Alianzas", href: "/alianzas", desc: "Landing para instituciones" },
     { label: "Sobre nosotros", href: "/sobre-nosotros", desc: "Página institucional" },
     { label: "Importar CSV", href: "/mis-libros/importar", desc: "Carga masiva por archivo" },
