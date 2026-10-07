@@ -1,8 +1,8 @@
-# Base de conocimiento TusLibros.cl — Fase 0
+# Base de conocimiento TusLibros.cl
 
-**Fecha de verificación:** 25-07-2026
-**Fuente:** páginas públicas de tuslibros.cl (`/como-funciona`, `/faq`, `/como-despachar`, `/devoluciones`)
-**Uso:** fuente de verdad para el copy del sitio y para el system prompt del asistente. Todo dato fuera de este archivo es supuesto, no hecho.
+**Fecha de verificación:** 07-10-2026 (despacho, pago, comisión y contacto, contra el código). El resto se verificó el 25-07-2026.
+**Fuente:** código del repo (`lib/shipping/coordinado.ts`, `lib/cargo-servicio.ts`, `lib/commissions.ts`, `app/api/orders/route.ts`) y páginas públicas (`/como-funciona`, `/ayuda/*`, `/como-despachar`, `/devoluciones`).
+**Uso:** fuente de verdad para el copy del sitio y para el system prompt del asistente. Todo dato fuera de este archivo es supuesto, no hecho. Si el código y este archivo se contradicen, gana el código y se corrige este archivo.
 
 ---
 
@@ -14,21 +14,23 @@ Se puede navegar sin cuenta. Se requiere cuenta para publicar o para escribirle 
 
 ---
 
-## 2. Las tres vías de transacción — VERIFICADO
+## 2. Cómo se paga — VERIFICADO 07-10-2026
 
-| Vía | Cómo opera | Comisión |
-|---|---|---|
-| **Directa por WhatsApp** | Comprador y vendedor se contactan y coordinan entrega en persona | Cero |
-| **Pago con MercadoPago** | Compra desde la publicación, dinero protegido, vendedor cobra al confirmar entrega | Sí |
-| **Despacho por courier (Shipit)** | Retiro a domicilio, envío a todo Chile | Sí |
+| Vía | Cómo opera | Cargo al comprador | Comisión al vendedor |
+|---|---|---|---|
+| **MercadoPago con despacho** | Compra desde la ficha; el pago se divide al momento (split): libro + despacho al vendedor, 8% a tuslibros | **8% del libro** como "cargo por servicio" | Nada: recibe libro y despacho completos |
+| **MercadoPago con entrega en persona** | Compra desde la ficha; coordinan lugar y hora por mensaje | $0 | **8% del libro**, descontado de su pago |
+| **Transferencia** (solo vendedores que la tienen activada) | El comprador confirma el pedido y el vendedor le manda sus datos por la mensajería del sitio | $0 | Nada |
+| **Trato directo** (solo vendedores sin MercadoPago ni transferencia: se muestra su WhatsApp) | Se ponen de acuerdo fuera del sitio | — | Nada (no hay cómo cobrarla) |
 
-**Regla de comisión (textual del FAQ, actualizada el 25-08-2026):** *"Cobro un 8% del precio del libro, igual para todos, y solo cuando la venta se cierra acá. Publicar no cuesta nada y no hay mensualidad."*
+- **No existe retención del pago hasta la entrega.** Con el split de MercadoPago el vendedor cobra cuando el comprador paga. No escribir "tu plata queda protegida hasta que recibes el libro" ni "el vendedor cobra al confirmar la entrega".
+- El sitio no guarda datos bancarios (desde el 23-09-2026).
+- Con MercadoPago conectado, el WhatsApp del vendedor no se muestra (`lib/whatsapp-policy.ts`).
+- La transferencia no se activa desde el perfil: la activa Vero (`users.acepta_transferencia`).
 
-> ⚠️ La formulación anterior —*"si coordinas todo por WhatsApp y entregas en persona, no pagas nada"*— se retiró de todo el copy el 25-08-2026. Era cierta, pero funcionaba como instructivo para saltarse la caja: en agosto se vendieron 128 libros por $1.720.981 y la comisión del mes fue $800. **No volver a escribirla.** Lo que se cobra sigue siendo lo mismo; lo que cambió es que ya no lo enseñamos como atajo.
->
-> Precisión técnica, por si se redacta copy nuevo: la comisión se cobra cuando **el pago pasa por MercadoPago**, con o sin despacho — el `marketplace_fee` que se le envía a MP es `commission + shippingCost` sin mirar la modalidad de entrega, así que una entrega en persona pagada por MercadoPago **sí** paga comisión. Lo que no se cobra es la venta que nunca pasa por la plataforma, sencillamente porque no hay cómo.
+**Regla de comisión para copy:** *"8% del precio del libro, igual para todos, solo cuando te pagan con MercadoPago. Por transferencia, nada."* Con despacho ese 8% lo paga el comprador como cargo; en persona se descuenta al vendedor.
 
-Las dos vías pagadas son combinables e independientes entre sí.
+> ⚠️ La formulación *"si coordinas todo por WhatsApp y entregas en persona, no pagas nada"* se retiró del copy el 25-08-2026 porque funcionaba como instructivo para saltarse la caja. **No volver a escribirla.**
 
 ---
 
@@ -46,38 +48,38 @@ Estados posibles: **Como nuevo · Buen estado · Estado regular · Con detalles*
 Sin límite de publicaciones. Importador CSV disponible en `/mis-libros/importar`.
 Pausar o eliminar publicaciones desde `/mis-libros`.
 
-Los compradores contactan por WhatsApp al número registrado en `/perfil`, o compran directo con MercadoPago.
+Los compradores compran directo en el sitio (MercadoPago o transferencia) o le escriben al vendedor por la mensajería interna.
 
 ---
 
-## 4. Despacho (Shipit) — VERIFICADO
+## 4. Despacho — VERIFICADO 07-10-2026
 
-- El courier **retira en el domicilio** del vendedor. No hay que ir a sucursal ni hacer fila.
-- **El vendedor no le paga nada al courier.** El envío se factura a la cuenta de tuslibros.cl a fin de mes.
-- Plazo para tener el paquete listo: **2 días hábiles** desde la venta.
-- Corte diario de agendamiento: **11:00 AM**. Pago posterior a esa hora → retiro al día hábil siguiente.
-- Etiqueta: se descarga desde `/mis-ventas` si está disponible. Si no aparece el botón, el courier trae el manifiesto impreso; el vendedor anota código de tracking y nombre del destinatario en el paquete.
-- El vendedor firma un manifiesto de retiro y guarda su copia como respaldo hasta que el comprador confirme recepción.
+**Shipit está apagado desde el 15-09-2026** y ya no opera para tuslibros, tampoco para ventas antiguas. No hay etiqueta automática, no hay retiro a domicilio por courier, no hay cotización automática.
+
+**Despacho coordinado** (`lib/shipping/coordinado.ts`):
+- El comprador paga una **tarifa fija por zona**: Santiago, misma región, otra región o zonas extremas (Arica y Parinacota, Tarapacá, Antofagasta, Aysén, Magallanes). Las tarifas viven en `site_config.envio_coordinado`; **no escribirlas a mano en el copy**.
+- **Cada vendedor puede poner sus propias tarifas o apagar el despacho** en `/perfil` → "Tu despacho" (desde el 07-10-2026). Si lo apaga, sus libros solo se entregan en persona.
+- La ficha muestra el **total con despacho** para la comuna que elige el comprador (libro + despacho + cargo), antes de comprar.
+- Esa plata le llega al vendedor con la venta. El vendedor lleva el paquete a la sucursal del courier que elija (Starken, Chilexpress, Blue Express, Correos de Chile u otro), paga ahí, y registra el courier y el número de seguimiento en `/mis-ventas` → "Ya lo despaché". Con eso se le avisa al comprador por correo.
+- Plazo del vendedor: **2 días hábiles** desde la venta. Plazo informado al comprador: **2 a 5 días hábiles desde que el vendedor despacha**.
+- Varios libros del mismo vendedor en una sola compra pagan **un solo despacho**. Dos compras separadas pagan dos despachos (el "se suma al paquete abierto" existía solo con Shipit).
+- No hay envío gratis: la promo sobre $20.000 terminó el 15-09-2026.
+- En camino (no vigente aún): despacho propio con Blue Express como primer courier (repo `vero-pix/despacho`).
 
 ---
 
-## 5. Devoluciones — VERIFICADO
+## 5. Devoluciones — según `/devoluciones` (pendiente de revisar)
 
-**Aplica solo a compras pagadas con MercadoPago.** Sin orden en la plataforma no hay devolución posible.
+> ⚠️ Pendiente de decisión de Vero (auditoría del 07-10-2026): la página promete una etiqueta de devolución por Chilexpress y no hay integración en el código que la genere; y `/ayuda/comprar` pide avisar dentro de 3 días mientras `/devoluciones` dice 7.
+
+**Aplica solo a compras pagadas en el sitio.**
 
 Causales admitidas:
 - Libro dañado en el transporte
 - Libro distinto al publicado
 - Condición muy distinta a la descrita
 
-Plazo: **7 días desde la recepción.**
-
-Proceso:
-1. Escribir a hola@tuslibros.cl con ID de orden y foto
-2. Validación en **menos de 24 horas**
-3. Si corresponde, se envía etiqueta de devolución
-4. Se gestiona por **Chilexpress** (no Shipit), en sucursal, sin retiro a domicilio
-5. Reembolso del monto del libro a la cuenta de MercadoPago del comprador
+Plazo publicado en `/devoluciones`: **7 días desde la recepción.**
 
 Condiciones:
 - El envío original **no se reembolsa**, salvo libro dañado o equivocado
@@ -103,43 +105,39 @@ Condiciones:
 | Mis libros | `/mis-libros` |
 | Importar CSV | `/mis-libros/importar` |
 | Mis ventas | `/mis-ventas` |
-| Perfil | `/perfil` |
+| Mis compras | `/mis-pedidos` |
+| Perfil (y "Tu despacho") | `/perfil` |
 | Registro | `/register` |
 | Login | `/login` |
 | Recuperar clave | `/forgot-password` |
 | Se busca | `/solicitudes` |
 | Cómo funciona | `/como-funciona` |
+| Ayuda (comprar / vender) | `/ayuda`, `/ayuda/comprar`, `/ayuda/vender` |
 | Cómo despachar | `/como-despachar` |
 | Devoluciones | `/devoluciones` |
-| FAQ | `/faq` |
 | Contacto | `/contacto` |
 | Tiendas | `/tiendas` |
 | Categorías | `/categoria` |
 
-WhatsApp oficial: **+56 9 9458 3067** (`wa.me/56994583067`)
+## Contacto — VERIFICADO 07-10-2026
+
+- **Contacto público: WhatsApp de soporte +56 9 9458 3067** (`wa.me/56994583067`). En código vive solo en `lib/soporte.ts`.
+- Buzón de correo: **hola@tuslibros.cl** (`VERO_INBOX` de `lib/veroInbox.ts`). `vero@tuslibros.cl` no recibe.
 
 ---
 
 ## 8. Inconsistencias detectadas — REQUIEREN DECISIÓN
 
-**8.1 Comisión — RESUELTO el 26-07-2026.**
-La comisión es **8% sobre el precio del libro, para todos**. No hay tramos ni planes: los 202 usuarios tienen `plan = free` y no se van a asignar planes por ahora. Publicada en `/como-funciona` y en el FAQ.
+**8.1 Comisión — RESUELTO el 26-07-2026.** 8% sobre el precio del libro, para todos. Sin tramos ni planes.
 
-**8.2 Cuatro puntos de contacto distintos.**
-`hola@tuslibros.cl` (FAQ, devoluciones) · `vero@tuslibros.cl` (footer) · `/contacto` · `/sobre-nosotros#contacto` · WhatsApp del header.
-El asistente necesita uno solo y canónico para escalar.
+**8.2 Contacto — RESUELTO el 04-09-2026.** El contacto público es el WhatsApp de soporte; el correo es hola@tuslibros.cl.
 
-**8.3 La devolución existe pero no se menciona donde se decide.**
-La protección de 7 días aparece en `/devoluciones`, no en `/como-funciona` — que es donde el comprador elige entre vía directa y MercadoPago. El beneficio más fuerte de la vía pagada está oculto en el pie de página.
+**8.3 Pago en efectivo — PENDIENTE (07-10-2026).** `/ayuda/preguntas` dice que no se puede pagar en efectivo; la ficha y `/libros-usados-baratos` dicen que sí al retirar; los términos dicen que coordinar pagos por fuera es causa de despublicación.
 
-**8.4 El retiro a domicilio sin costo para el vendedor tampoco se comunica.**
-Que el courier pase a buscar y que el vendedor no le pague nada está solo en `/como-despachar`, página a la que se llega **después** de vender.
+**8.4 Devoluciones — PENDIENTE (07-10-2026).** Ver sección 5.
 
 ---
 
 ## 9. Pendientes no verificables desde el sitio público
 
-- Flujos autenticados (`/publish`, checkout, `/mis-ventas`): requieren sesión o acceso al repo
-- Costo del despacho para el comprador y cómo se calcula
-- Cobertura geográfica real de Shipit
 - Horario de atención del soporte humano
