@@ -535,7 +535,7 @@ export default async function LibroPage({ params }: Props) {
           "https://schema.org/MerchantReturnFiniteReturnWindow",
         merchantReturnDays: 7,
         returnMethod: "https://schema.org/ReturnByMail",
-        returnFees: "https://schema.org/FreeReturn",
+        returnFees: "https://schema.org/ReturnFeesCustomerResponsibility", // sin devolución gratis prometida (07-10-2026)
       },
     },
   };

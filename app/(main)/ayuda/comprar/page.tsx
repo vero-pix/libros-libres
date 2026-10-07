@@ -122,7 +122,7 @@ export default function AyudaComprarPage() {
               </li>
               <li>
                 <strong className="text-ink">El libro llegó dañado o no es lo descrito:</strong> escríbenos dentro de
-                3 días con fotos. Ver la <Link href="/devoluciones" className={linkClass}>política de devoluciones</Link>.
+                7 días con fotos. Ver la <Link href="/devoluciones" className={linkClass}>política de devoluciones</Link>.
               </li>
               <li>
                 <strong className="text-ink">El vendedor no responde para la entrega en persona:</strong> escríbenos

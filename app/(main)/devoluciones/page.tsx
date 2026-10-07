@@ -62,6 +62,8 @@ export default function DevolucionesPage() {
         </section>
 
         <section className="bg-white border border-cream-dark/40 rounded-xl p-6 mb-6">
+          {/* Sin etiqueta de Chilexpress desde el 07-10-2026: no había integración que la
+              generara. El comprador devuelve por el courier que quiera (decisión de Vero). */}
           <h2 className="font-semibold text-ink text-lg mb-3">Cómo funciona la devolución</h2>
           <ol className="text-sm text-ink-muted space-y-3 leading-relaxed list-decimal list-inside">
             <li>
@@ -69,24 +71,18 @@ export default function DevolucionesPage() {
               <a href="https://wa.me/56994583067?text=Hola%20Vero%2C%20necesito%20ayuda%20con%20una%20devoluci%C3%B3n" target="_blank" rel="noopener" className="text-brand-600 underline">
                 mi WhatsApp
               </a>{" "}
-              con el ID de tu orden y una foto del libro.
+              con el ID de tu orden y fotos del libro.
             </li>
             <li>
-              Validamos el caso en menos de 24 horas y, si corresponde, te enviamos una etiqueta de
-              devolución.
+              Validamos el caso en menos de 24 horas.
             </li>
             <li>
-              Las devoluciones se gestionan a través de <strong>Chilexpress</strong>, independiente
-              del courier con el que llegó el libro originalmente.
+              Si corresponde, devuelves el libro al vendedor por el courier que prefieras y le mandas
+              el número de seguimiento.
             </li>
             <li>
-              Llevas el paquete con la etiqueta a cualquier sucursal de Chilexpress (no hay retiro
-              en domicilio para devoluciones).
-            </li>
-            <li>
-              Una vez que el vendedor recibe el libro, se procesa el reembolso del monto del libro a
-              tu cuenta de{" "}
-              <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a>.
+              Cuando el vendedor recibe el libro, te reembolsa el monto del libro por el mismo medio con
+              que pagaste.
             </li>
           </ol>
         </section>
