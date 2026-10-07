@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useArchivo, BotonArchivar, ControlesArchivo } from "./VentasArchivables";
+import { claveArchivo } from "@/lib/ventasArchivadas";
 
 interface CartListItem {
   listing_id: string;
@@ -45,8 +47,15 @@ function waLink(phone: string | null, buyerName: string, items: CartListItem[]) 
   return `https://wa.me/${clean}?text=${msg}`;
 }
 
-export default function BuyerCartsSection({ carts }: Props) {
+export default function BuyerCartsSection({ carts: todos }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  // Los carritos archivados con la (x) no se muestran salvo que se pida
+  // (components/sales/VentasArchivables.tsx, 07-10-2026). Sin el contexto,
+  // como antes: todos.
+  const archivo = useArchivo();
+  const carts = archivo
+    ? todos.filter((c) => archivo.visible({ clave: claveArchivo("carrito", c.buyerId), tipo: "carrito" }))
+    : todos;
 
   function toggle(id: string) {
     setExpanded((prev) => {
@@ -58,6 +67,7 @@ export default function BuyerCartsSection({ carts }: Props) {
   }
 
   if (carts.length === 0) {
+    const hayArchivados = todos.length > 0;
     return (
       <section className="mb-10">
         <h2 className="font-display text-lg font-bold text-ink mb-2">
@@ -67,8 +77,11 @@ export default function BuyerCartsSection({ carts }: Props) {
           Compradores que tienen libros tuyos esperando para pagar
         </p>
         <div className="bg-white rounded-xl border border-cream-dark/30 p-10 text-center text-ink-muted text-sm">
-          Ningún comprador tiene tus libros en carrito en este momento.
+          {hayArchivados
+            ? "No hay carritos nuevos. Los que archivaste están abajo."
+            : "Ningún comprador tiene tus libros en carrito en este momento."}
         </div>
+        <ControlesArchivo tipo="carrito" />
       </section>
     );
   }
@@ -95,10 +108,13 @@ export default function BuyerCartsSection({ carts }: Props) {
                   : "border-cream-dark/30"
               }`}
             >
+              {/* La (x) va al lado del encabezado y no adentro: un botón no
+                  puede ir dentro de otro. */}
+              <div className="flex items-center">
               <button
                 type="button"
                 onClick={() => toggle(cart.buyerId)}
-                className="w-full text-left px-5 py-4 flex items-center justify-between gap-3 hover:bg-cream-warm/30 transition-colors"
+                className="flex-1 min-w-0 text-left px-5 py-4 flex items-center justify-between gap-3 hover:bg-cream-warm/30 transition-colors"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-bold shrink-0">
@@ -146,6 +162,8 @@ export default function BuyerCartsSection({ carts }: Props) {
                   </svg>
                 </div>
               </button>
+              <BotonArchivar tipo="carrito" refId={cart.buyerId} className="mr-3 shrink-0" />
+              </div>
 
               {isOpen && (
                 <div className="border-t border-cream-dark/20 px-5 py-4 bg-cream-warm/20 space-y-4">
@@ -226,6 +244,7 @@ export default function BuyerCartsSection({ carts }: Props) {
           );
         })}
       </div>
+      <ControlesArchivo tipo="carrito" />
     </section>
   );
 }

@@ -4,7 +4,6 @@ import OfertasRecibidas from "@/components/offers/OfertasRecibidas";
 import { negociacionesVigentes } from "@/lib/offers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Fragment } from "react";
 import Image from "next/image";
 import { libroUrl } from "@/lib/urls";
 import type { Order, OrderStatus } from "@/types";
@@ -17,6 +16,15 @@ import DatosDespacho from "@/components/sales/DatosDespacho";
 import { nombreCourier } from "@/lib/courier-tracking";
 import { ESTADO_COORDINADO_DESPACHADO, ESTADO_COORDINADO_PENDIENTE } from "@/lib/shipping/coordinado";
 import { extractCommune } from "@/lib/chilexpress";
+import { leerArchivadas, carritoSigueArchivado, claveArchivo, ESTADOS_ARCHIVABLES } from "@/lib/ventasArchivadas";
+import {
+  VentasArchivables,
+  FilaVenta,
+  BotonArchivar,
+  ControlesArchivo,
+  SinVentasVisibles,
+  type FilaRegistrada,
+} from "@/components/sales/VentasArchivables";
 
 export const metadata = {
   title: "Mis Ventas",
@@ -213,6 +221,24 @@ export default async function MisVentasPage() {
   const ordenesVisibles = orders.filter(
     (o: any) => !(o.status === "pending" && o.payment_method !== "transfer")
   );
+  // Lo que el vendedor archivó con la (x) (lib/ventasArchivadas.ts, 07-10-2026).
+  // Sin la tabla `disponible` es false: no hay (x) y todo se ve como antes.
+  const archivo = await leerArchivadas(db, user.id);
+  const archivadasIniciales: string[] = [];
+  const filasArchivo: FilaRegistrada[] = [];
+  for (const o of ordenesVisibles as any[]) {
+    const clave = claveArchivo("orden", o.id);
+    filasArchivo.push({ clave, tipo: "orden", cancelada: o.status === "cancelled" });
+    if (archivo.ordenes.has(o.id)) archivadasIniciales.push(clave);
+  }
+  for (const c of buyerCarts) {
+    const clave = claveArchivo("carrito", c.buyerId);
+    filasArchivo.push({ clave, tipo: "carrito" });
+    // Si el comprador agregó otro libro después de archivarlo, vuelve a la vista.
+    const ultimo = c.items.reduce((max, i) => (i.added_at > max ? i.added_at : max), c.firstAddedAt);
+    if (carritoSigueArchivado(archivo.carritos.get(c.buyerId), ultimo)) archivadasIniciales.push(clave);
+  }
+
   const totalVentas = paidOrders.reduce((sum: number, o: any) => sum + Number(o.book_price), 0);
   const totalComisiones = commissions.reduce((sum, c) => sum + Number(c.commission_amount), 0);
   const gananciaVentas = totalVentas - commissions.filter(c => c.transaction_type === "sale").reduce((sum, c) => sum + Number(c.commission_amount), 0);
@@ -247,6 +273,11 @@ export default async function MisVentasPage() {
           </div>
         )}
 
+        <VentasArchivables
+          disponible={archivo.disponible}
+          archivadasIniciales={archivadasIniciales}
+          filas={filasArchivo}
+        >
         <BuyerCartsSection carts={buyerCarts} />
 
         {/* Stats cards */}
@@ -466,8 +497,12 @@ export default async function MisVentasPage() {
                               </span>
                             );
 
+                      const archivable = (ESTADOS_ARCHIVABLES as readonly string[]).includes(order.status);
                       return (
-                      <Fragment key={order.id}>
+                      <FilaVenta
+                        key={order.id}
+                        fila={{ clave: claveArchivo("orden", order.id), tipo: "orden", cancelada: order.status === "cancelled" }}
+                      >
                       <tr className="hover:bg-cream-warm/30 align-top">
                         <td className="px-3 py-3">
                           <div className="flex items-center gap-3">
@@ -523,7 +558,11 @@ export default async function MisVentasPage() {
                         </td>
                         <td className="px-3 py-3 hidden md:table-cell">{bloqueEnvio}</td>
                         <td className="px-3 py-3 text-ink-muted text-xs">
-                          {new Date(order.created_at).toLocaleDateString("es-CL")}
+                          <div className="flex items-start justify-between gap-1">
+                            <span>{new Date(order.created_at).toLocaleDateString("es-CL")}</span>
+                            {/* Solo lo que ya no tiene nada pendiente (07-10-2026). */}
+                            {archivable && <BotonArchivar tipo="orden" refId={order.id} className="-mt-1 -mr-1 shrink-0" />}
+                          </div>
                         </td>
                       </tr>
                       {/* En celular la columna "Envío" no cabe: el bloque va acá,
@@ -533,9 +572,10 @@ export default async function MisVentasPage() {
                           {bloqueEnvio}
                         </td>
                       </tr>
-                      </Fragment>
+                      </FilaVenta>
                       );
                     })}
+                    <SinVentasVisibles colSpan={5} />
                   </tbody>
                 </table>
               </div>
@@ -543,7 +583,9 @@ export default async function MisVentasPage() {
           ) : (
             <EmptyState text="Aún no tienes ventas" />
           )}
+          <ControlesArchivo tipo="orden" />
         </section>
+        </VentasArchivables>
 
         {/* Commissions log */}
         <section>
