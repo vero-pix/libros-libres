@@ -8,6 +8,9 @@ import ChangePasswordForm from "@/components/ui/ChangePasswordForm";
 import LinkedAccounts from "@/components/ui/LinkedAccounts";
 import DeleteAccount from "@/components/ui/DeleteAccount";
 import DownloadMyData from "@/components/ui/DownloadMyData";
+import DespachoVendedor from "@/components/ui/DespachoVendedor";
+import { obtenerTarifasCoordinado } from "@/lib/shipping/coordinado";
+import { leerPerfilDespachoConEstado } from "@/lib/shipping/perfilDespacho";
 
 export const metadata = { title: "Mi Perfil — tuslibros.cl", robots: { index: false } };
 
@@ -34,6 +37,16 @@ export default async function PerfilPage() {
     .select("id", { count: "exact", head: true })
     .eq("seller_id", user.id)
     .in("status", ["active", "paused"]);
+
+  // Perfil de despacho (07-10-2026): columnas solo para service role. Si la
+  // migración 20261007b no está aplicada, `disponible` es false y la tarjeta
+  // no se muestra: no tendría dónde guardar.
+  const admin = createServiceRoleClient();
+  const [{ perfil: perfilDespacho, disponible: despachoDisponible }, tarifasSitio] = await Promise.all([
+    leerPerfilDespachoConEstado(admin, user.id),
+    obtenerTarifasCoordinado(admin),
+  ]);
+  const esVendedor = (listingsCount ?? 0) > 0 || !!profile?.mercadopago_user_id;
 
   const missingPhone = !profile?.phone;
   const missingAddress = profile?.default_latitude == null || profile?.default_longitude == null;
@@ -79,6 +92,23 @@ export default async function PerfilPage() {
           initialPickupPoints={(profile?.pickup_points as { label: string; comuna?: string | null }[]) ?? []}
           initialDispatchMode={profile?.shipit_dispatch_mode ?? null}
         />
+        {despachoDisponible && esVendedor && (
+          <div className="mt-4">
+            <DespachoVendedor
+              inicial={perfilDespacho}
+              tarifasSitio={
+                tarifasSitio
+                  ? {
+                      santiago: tarifasSitio.santiago,
+                      misma_region: tarifasSitio.misma_region,
+                      otra_region: tarifasSitio.otra_region,
+                      extremos: tarifasSitio.extremos,
+                    }
+                  : null
+              }
+            />
+          </div>
+        )}
         <div className="mt-4">
           <MercadoPagoConnect
             isConnected={!!profile?.mercadopago_user_id}

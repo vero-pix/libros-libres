@@ -12,9 +12,9 @@ import {
   COURIER_COORDINADO,
   SERVICE_CODE_COORDINADO,
   SERVICIO_COORDINADO,
-  obtenerTarifasCoordinado,
   precioCoordinado,
 } from "@/lib/shipping/coordinado";
+import { tarifasDelVendedor } from "@/lib/shipping/perfilDespacho";
 import { extractCommune } from "@/lib/chilexpress";
 import {
   aplicarColchon,
@@ -126,8 +126,11 @@ export async function POST(req: NextRequest) {
 
   // Despacho coordinado por el vendedor (lib/shipping/coordinado.ts). Con
   // `apagar_shipit` en la configuración, Shipit ni siquiera se consulta.
-  const tarifasCoordinado = await obtenerTarifasCoordinado(supabase);
-  const sinShipit = tarifasCoordinado?.apagar_shipit === true;
+  // Desde el 07-10-2026 el precio sale de las tarifas efectivas del vendedor:
+  // las suyas si las puso, ninguna si apagó el coordinado
+  // (lib/shipping/perfilDespacho.ts). `apagar_shipit` sigue siendo del sitio.
+  const { sitio: tarifasSitio, efectivas: tarifasCoordinado } = await tarifasDelVendedor(admin, listing?.seller_id);
+  const sinShipit = tarifasSitio?.apagar_shipit === true;
 
   const shipitApagado: ShipitQuoteResult = { quotes: [], unavailable: true, reason: "Shipit apagado" };
   const [{ quotes: cotizadas, unavailable: shipitSinServicio, reason }, bufferPct] = await Promise.all([

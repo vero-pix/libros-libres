@@ -170,3 +170,82 @@ export async function obtenerTarifasCoordinado(
     return null;
   }
 }
+
+/* ───────────────────────── Perfil de despacho del vendedor ───────────────────────── */
+
+/**
+ * Lo que cada vendedor define de su despacho (07-10-2026, PR 1.3 del plan de
+ * despacho propio, repo vero-pix/despacho). Vive en columnas de `users` que
+ * NO se conceden a anon ni a authenticated: se leen y escriben solo con
+ * service role (lib/shipping/perfilDespacho.ts).
+ *
+ * La forma de entrega (punto/sucursal o retiro) no está acá: ya existía como
+ * `users.shipit_dispatch_mode` y se sigue editando en el perfil.
+ */
+export interface PerfilDespacho {
+  /** Couriers con los que trabaja ("bluexpress", "starken"). Hoy no cambian el checkout. */
+  couriers: string[];
+  /** Días hábiles que necesita para despachar. Hoy solo se guarda. */
+  dias: number;
+  /** Si ofrece despacho coordinado. Apagado, la ficha y el checkout no lo muestran. */
+  coordinadoActivo: boolean;
+  /** Tarifas propias del coordinado. null = las de tuslibros. */
+  tarifasPropias: Pick<TarifasCoordinado, ZonaEnvio> | null;
+}
+
+/** Un vendedor sin perfil: exactamente el comportamiento de antes del 07-10. */
+export const PERFIL_DESPACHO_VACIO: PerfilDespacho = {
+  couriers: [],
+  dias: 2,
+  coordinadoActivo: true,
+  tarifasPropias: null,
+};
+
+/** Couriers que el vendedor puede marcar en su perfil. Chilexpress quedó fuera del arranque. */
+export const COURIERS_PERFIL = [
+  { value: "bluexpress", label: "Blue Express" },
+  { value: "starken", label: "Starken" },
+] as const;
+
+/** Rango aceptado para una tarifa propia. Fuera de esto es un error de tipeo. */
+export const TARIFA_PROPIA_MIN = 1000;
+export const TARIFA_PROPIA_MAX = 50000;
+
+/** Días hábiles aceptados para despachar. */
+export const DIAS_DESPACHO_MIN = 1;
+export const DIAS_DESPACHO_MAX = 15;
+
+export const ZONAS_ENVIO: ZonaEnvio[] = ["santiago", "misma_region", "otra_region", "extremos"];
+
+/** Valida tarifas propias: las cuatro zonas, enteros dentro del rango. Si falla una, null. */
+export function leerTarifasPropias(valor: unknown): Pick<TarifasCoordinado, ZonaEnvio> | null {
+  if (!valor || typeof valor !== "object") return null;
+  const v = valor as Record<string, unknown>;
+  const out = {} as Pick<TarifasCoordinado, ZonaEnvio>;
+  for (const z of ZONAS_ENVIO) {
+    const n = typeof v[z] === "number" ? (v[z] as number) : Number(v[z]);
+    if (!Number.isInteger(n) || n < TARIFA_PROPIA_MIN || n > TARIFA_PROPIA_MAX) return null;
+    out[z] = n;
+  }
+  return out;
+}
+
+/**
+ * Las tarifas del coordinado que se le cobran al comprador de ESTE vendedor.
+ * Una sola regla para la ficha, el checkout, /api/shipping/quote y
+ * POST /api/orders.
+ *
+ * - Sin coordinado en el sitio (`site_config` apagado): null, como siempre.
+ * - El vendedor lo desactivó: null. Quedan el retiro en persona y el WhatsApp.
+ * - Con tarifas propias: las suyas en las cuatro zonas; el resto (plazo,
+ *   `apagar_shipit`) sigue siendo del sitio.
+ */
+export function tarifasEfectivas(
+  sitio: TarifasCoordinado | null,
+  perfil: PerfilDespacho | null
+): TarifasCoordinado | null {
+  if (!sitio) return null;
+  if (perfil && !perfil.coordinadoActivo) return null;
+  if (perfil?.tarifasPropias) return { ...sitio, ...perfil.tarifasPropias };
+  return sitio;
+}

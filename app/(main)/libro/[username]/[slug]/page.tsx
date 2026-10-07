@@ -17,7 +17,9 @@ import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 import { FEED_SHIPPING_CLP } from "@/lib/product-feed";
 import { obtenerComprasMinimas } from "@/lib/compraMinima";
-import { obtenerTarifasCoordinado, despachoParaFicha } from "@/lib/shipping/coordinado";
+import { despachoParaFicha } from "@/lib/shipping/coordinado";
+import { tarifasDelVendedor } from "@/lib/shipping/perfilDespacho";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { comunaDesdeAddress } from "@/lib/comuna";
 
 export const revalidate = 60;
@@ -415,7 +417,13 @@ export default async function LibroPage({ params }: Props) {
 
   // Lo que la ficha promete del despacho sale de las tarifas vigentes, no de
   // un número escrito a mano (lib/shipping/coordinado.ts, 24-09-2026).
-  const despacho = despachoParaFicha(await obtenerTarifasCoordinado(supabase), comunaDesdeAddress(listing.address));
+  // Las tarifas del vendedor si puso las suyas; sin despacho si lo apagó
+  // (lib/shipping/perfilDespacho.ts, 07-10-2026). El perfil se lee con service
+  // role: sus columnas no se conceden a la sesión.
+  const despacho = despachoParaFicha(
+    (await tarifasDelVendedor(createServiceRoleClient(), listing.seller_id)).efectivas,
+    comunaDesdeAddress(listing.address)
+  );
   const compraMinima = (await obtenerComprasMinimas(supabase))[listing.seller_id] ?? null;
 
   const canonicalUrl = `https://tuslibros.cl/libro/${params.username}/${params.slug}`;

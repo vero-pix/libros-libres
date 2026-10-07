@@ -702,8 +702,8 @@ export default function ProfileForm({
               {[
                 {
                   value: "dropoff",
-                  titulo: "Lo dejo yo en la sucursal",
-                  texto: "Imprimes la etiqueta, la pegas y entregas el paquete en el mesón cuando te acomode. No tienes que esperar a nadie.",
+                  titulo: "Lo dejo yo en un punto o sucursal",
+                  texto: "Imprimes la etiqueta, la pegas y entregas el paquete en el punto o sucursal que te acomode. No tienes que esperar a nadie.",
                 },
                 {
                   value: "pickup",

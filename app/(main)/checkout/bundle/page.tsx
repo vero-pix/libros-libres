@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { telefonoDe } from "@/lib/telefonoVendedor";
 import { avisarOrigenFaltante, estadoOrigenVendedor } from "@/lib/shipit-origen";
-import { obtenerTarifasCoordinado } from "@/lib/shipping/coordinado";
+import { tarifasDelVendedor } from "@/lib/shipping/perfilDespacho";
 import { preciosAcordados } from "@/lib/offers";
 import BundleCheckoutForm from "@/components/checkout/BundleCheckoutForm";
 import type { ListingWithBook } from "@/types";
@@ -76,9 +76,11 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
 
   // D1 revisada: fuera de la RM sin origen en Shipit no se ofrece courier.
   const admin = createServiceRoleClient();
-  const [origen, tarifasCoordinado] = await Promise.all([
+  // Tarifas efectivas del vendedor (07-10-2026): null si apagó el despacho
+  // coordinado en su perfil. `apagar_shipit` sigue saliendo del sitio.
+  const [origen, { sitio: tarifasSitio, efectivas: tarifasCoordinado }] = await Promise.all([
     estadoOrigenVendedor(admin, listings[0].seller_id),
-    obtenerTarifasCoordinado(admin),
+    tarifasDelVendedor(admin, listings[0].seller_id),
   ]);
   // Ver checkout/[id]: con despacho coordinado, el origen en Shipit deja de ser requisito.
   // Con MercadoPago o con transferencia: en los dos casos la plata le llega al
@@ -88,7 +90,7 @@ export default async function BundleCheckoutPage({ searchParams }: Props) {
   const coordinadoDisponible =
     !!tarifasCoordinado && (!!(listings[0] as any).seller?.mercadopago_user_id || !!(listings[0] as any).seller?.acepta_transferencia);
   const courierDisponible =
-    (origen.courierDisponible && !tarifasCoordinado?.apagar_shipit) || coordinadoDisponible;
+    (origen.courierDisponible && !tarifasSitio?.apagar_shipit) || coordinadoDisponible;
   if (!origen.courierDisponible && !coordinadoDisponible) {
     avisarOrigenFaltante(admin, listings[0].seller_id, "recibió un intento de compra con courier").catch(() => {});
   }

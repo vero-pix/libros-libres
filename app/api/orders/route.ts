@@ -21,9 +21,9 @@ import {
   COURIER_COORDINADO,
   ESTADO_COORDINADO_PENDIENTE,
   SERVICIO_COORDINADO,
-  obtenerTarifasCoordinado,
   precioCoordinado,
 } from "@/lib/shipping/coordinado";
+import { tarifasDelVendedor } from "@/lib/shipping/perfilDespacho";
 import { obtenerComprasMinimas, faltaParaMinimo } from "@/lib/compraMinima";
 import { preciosAcordados } from "@/lib/offers";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
@@ -321,7 +321,14 @@ export async function POST(req: NextRequest) {
     });
     const precioServidor =
       useSplit || porTransferencia
-        ? precioCoordinado(await obtenerTarifasCoordinado(supabase), origenCoord?.commune, buyer_commune)
+        ? // Las tarifas del vendedor si puso las suyas; null si apagó el
+          // coordinado (lib/shipping/perfilDespacho.ts, 07-10-2026). Misma
+          // función que la cotización y la ficha.
+          precioCoordinado(
+            (await tarifasDelVendedor(createServiceRoleClient(), sellerId)).efectivas,
+            origenCoord?.commune,
+            buyer_commune
+          )
         : null;
     if (!precioServidor || precioServidor !== Math.round(Number(shipping_cost_override))) {
       return NextResponse.json(

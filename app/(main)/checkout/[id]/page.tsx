@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { telefonoDe } from "@/lib/telefonoVendedor";
 import { avisarOrigenFaltante, estadoOrigenVendedor } from "@/lib/shipit-origen";
-import { obtenerTarifasCoordinado } from "@/lib/shipping/coordinado";
+import { tarifasDelVendedor } from "@/lib/shipping/perfilDespacho";
 import { obtenerComprasMinimas, faltaParaMinimo } from "@/lib/compraMinima";
 import { preciosAcordados } from "@/lib/offers";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
@@ -78,9 +78,11 @@ export default async function CheckoutPage({ params }: Props) {
   // El intento de compra es la señal para que Vero cree el origen (gong,
   // máximo uno al día por vendedor).
   const admin = createServiceRoleClient();
-  const [origen, tarifasCoordinado] = await Promise.all([
+  // Tarifas efectivas del vendedor (07-10-2026): null si apagó el despacho
+  // coordinado en su perfil. `apagar_shipit` sigue saliendo del sitio.
+  const [origen, { sitio: tarifasSitio, efectivas: tarifasCoordinado }] = await Promise.all([
     estadoOrigenVendedor(admin, typedListing.seller_id),
-    obtenerTarifasCoordinado(admin),
+    tarifasDelVendedor(admin, typedListing.seller_id),
   ]);
   // Con despacho coordinado activo, un vendedor con MercadoPago puede vender
   // por courier aunque no tenga origen en Shipit (lib/shipping/coordinado.ts).
@@ -91,7 +93,7 @@ export default async function CheckoutPage({ params }: Props) {
   const coordinadoDisponible =
     !!tarifasCoordinado && (!!(typedListing.seller as any)?.mercadopago_user_id || !!(typedListing.seller as any)?.acepta_transferencia);
   const courierDisponible =
-    (origen.courierDisponible && !tarifasCoordinado?.apagar_shipit) || coordinadoDisponible;
+    (origen.courierDisponible && !tarifasSitio?.apagar_shipit) || coordinadoDisponible;
   if (!origen.courierDisponible && !coordinadoDisponible) {
     avisarOrigenFaltante(admin, typedListing.seller_id, "recibió un intento de compra con courier").catch(() => {});
   }

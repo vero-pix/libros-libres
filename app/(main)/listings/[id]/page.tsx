@@ -8,7 +8,9 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import type { Metadata } from "next";
 import type { ListingWithBook } from "@/types";
 import { obtenerComprasMinimas } from "@/lib/compraMinima";
-import { obtenerTarifasCoordinado, despachoParaFicha } from "@/lib/shipping/coordinado";
+import { despachoParaFicha } from "@/lib/shipping/coordinado";
+import { tarifasDelVendedor } from "@/lib/shipping/perfilDespacho";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { comunaDesdeAddress } from "@/lib/comuna";
 
 interface Props {
@@ -186,7 +188,13 @@ export default async function ListingByIdPage({ params }: Props) {
     },
   };
 
-  const despacho = despachoParaFicha(await obtenerTarifasCoordinado(supabase), comunaDesdeAddress(listing.address));
+  // Las tarifas del vendedor si puso las suyas; sin despacho si lo apagó
+  // (lib/shipping/perfilDespacho.ts, 07-10-2026). El perfil se lee con service
+  // role: sus columnas no se conceden a la sesión.
+  const despacho = despachoParaFicha(
+    (await tarifasDelVendedor(createServiceRoleClient(), listing.seller_id)).efectivas,
+    comunaDesdeAddress(listing.address)
+  );
   const compraMinima = (await obtenerComprasMinimas(supabase))[listing.seller_id] ?? null;
 
   const breadcrumbJsonLd = {
