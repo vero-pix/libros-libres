@@ -852,14 +852,16 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
               {ofertaDestacada && ofertaHtml}
               {/* Las tres formas de pagar, dichas en la ficha y no en el checkout:
                   transferencia, efectivo al retirar, y MercadoPago coordinado por
-                  WhatsApp para quien lo prefiera. (16-09-2026, pedido de Vero) */}
+                  WhatsApp para quien lo prefiera. (16-09-2026, pedido de Vero)
+                  En tercera persona desde el 07-10-2026: la caja sale para
+                  cualquier vendedor con transferencia, no solo para Vero. */}
               <div className="flex items-start gap-2 bg-brand-50/60 border border-brand-200 rounded-xl px-3 py-2.5">
                 <span className="text-base leading-none mt-0.5" aria-hidden>🏦</span>
                 <p className="text-xs text-ink leading-snug">
                   <span className="font-semibold">Se paga por transferencia.</span> Confirmas el
-                  pedido, el libro queda reservado a tu nombre y te mando los datos por mensaje.
+                  pedido, el libro queda reservado a tu nombre y el vendedor te manda sus datos por mensaje.
                   {comunaDesdeAddress(listing.address) ? ` También puedes pagar en efectivo al retirar en ${comunaDesdeAddress(listing.address)}.` : " También puedes pagar en efectivo al retirar."}
-                  {" "}¿Prefieres MercadoPago? Escríbeme por WhatsApp y lo coordinamos.
+                  {" "}¿Prefieres MercadoPago? Escríbele al vendedor y lo coordinan.
                 </p>
               </div>
               {listing.seller?.phone && (

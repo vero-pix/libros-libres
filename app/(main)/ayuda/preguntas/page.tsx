@@ -33,7 +33,7 @@ const preguntas: Pregunta[] = [
   },
   {
     q: "¿Puedo pagar en efectivo si retiro en persona?",
-    a: "No. El pago es siempre en línea, también en entregas en persona. Es lo que protege a las dos partes.",
+    a: "Sí, si lo retiras en persona y lo coordinas con el vendedor. Con despacho, el pago es siempre en el sitio, con MercadoPago o por transferencia.",
   },
   {
     q: "¿Quién paga el envío?",
