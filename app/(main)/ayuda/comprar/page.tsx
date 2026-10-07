@@ -5,7 +5,7 @@ import AyudaContacto from "@/components/ayuda/AyudaContacto";
 export const metadata = {
   title: "Guía del comprador — cómo comprar libros usados en tuslibros.cl",
   description:
-    "Pagas en línea con protección de MercadoPago y el libro llega a tu casa o lo retiras en persona. Cómo buscar, pagar, recibir y qué hacer si algo falla.",
+    "Pagas en línea, con MercadoPago o por transferencia, y el libro llega a tu casa o lo retiras en persona. Cómo buscar, pagar, recibir y qué hacer si algo falla.",
   alternates: { canonical: "https://tuslibros.cl/ayuda/comprar" },
 };
 
@@ -33,7 +33,7 @@ export default function AyudaComprarPage() {
         <div className="max-w-3xl mx-auto px-4 py-16 sm:py-20 text-center">
           <h1 className="font-display text-4xl sm:text-5xl font-bold text-ink mb-3">Guía del comprador</h1>
           <p className="text-ink-muted text-lg max-w-xl mx-auto">
-            Pagas en línea con protección de MercadoPago y el libro llega a tu casa o lo retiras en persona.
+            Pagas en línea, con MercadoPago o por transferencia, y el libro llega a tu casa o lo retiras en persona.
           </p>
         </div>
       </div>
@@ -55,8 +55,15 @@ export default function AyudaComprarPage() {
         <Seccion n={2} id="pagar" title="Pagar">
           <Tarjeta>
             <p>
-              El pago es en línea, por MercadoPago (tarjeta, débito o saldo). Tu dinero le llega al vendedor solo
-              cuando la compra se confirma, y tienes la protección de MercadoPago si algo sale mal.
+              El pago es en línea, por MercadoPago (tarjeta, débito o saldo). La compra queda registrada a tu nombre
+              en Mis compras y, si algo sale mal, me escribes y lo resolvemos; con MercadoPago también tienes su
+              proceso de reclamos.
+            </p>
+            {/* El cargo no aparecía en esta guía (auditoría del 07-10-2026). Misma regla que lib/cargo-servicio.ts. */}
+            <p className="mt-4">
+              Si pagas con MercadoPago y pides despacho, se suma un <strong>cargo por servicio del 8%</strong> del
+              precio del libro. Lo ves desglosado en la ficha y en el checkout antes de pagar. Con entrega en persona o
+              por transferencia, no hay cargo.
             </p>
             <p className="mt-4">
               Algunos vendedores cobran por <strong>transferencia</strong> en vez de MercadoPago. Cuando es así, te
@@ -76,19 +83,20 @@ export default function AyudaComprarPage() {
           <Tarjeta>
             <h3 className="font-semibold text-ink text-lg mb-2">Despacho a domicilio</h3>
             <p>
-              El vendedor prepara el paquete y el courier (Starken, Bluexpress, Chilexpress, según tu zona) lo lleva a
-              tu dirección. Verás el número de seguimiento en{" "}
-              <Link href="/mis-pedidos" className={linkClass}>Mis compras</Link> y por correo en cuanto exista. Plazo
-              habitual: 2 a 5 días hábiles desde el retiro.
+              El despacho tiene una tarifa fija por zona y la ves en la ficha antes de comprar: eliges tu comuna y
+              aparece el total. Cuando pagas, el vendedor lleva el paquete al courier que elija (Starken, Blue Express,
+              Chilexpress, Correos u otro) dentro de 2 días hábiles y anota el número de seguimiento: lo verás en{" "}
+              <Link href="/mis-pedidos" className={linkClass}>Mis compras</Link> y por correo. Plazo habitual: 2 a 5
+              días hábiles desde que el vendedor despacha.
             </p>
           </Tarjeta>
           <Tarjeta>
-            <h3 className="font-semibold text-ink text-lg mb-2">Si compras dos veces al mismo vendedor</h3>
+            {/* Hasta el 07-10-2026 decía que una segunda compra al mismo vendedor se sumaba al paquete sin
+                pagar despacho: eso existía con Shipit, no con el despacho coordinado (app/api/orders/route.ts). */}
+            <h3 className="font-semibold text-ink text-lg mb-2">Varios libros del mismo vendedor</h3>
             <p>
-              Mientras él no haya despachado, tus libros nuevos se suman al paquete que ya está armando y{" "}
-              <strong>no pagas despacho de nuevo</strong>: es el mismo viaje. Lo verás en el checkout, donde el envío
-              aparece como &ldquo;ya pagado&rdquo;, y le avisamos a él para que los meta en el mismo bulto. Deja de
-              aplicar cuando el courier ya pasó a buscarlo o cuando el paquete llega a ocho libros.
+              Agrégalos todos al carrito y págalos juntos: <strong>el despacho se cobra una sola vez por
+              vendedor</strong>. Si compras en dos veces, cada compra paga su propio despacho.
             </p>
           </Tarjeta>
           <Tarjeta>

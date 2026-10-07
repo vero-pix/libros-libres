@@ -24,7 +24,7 @@ type Pregunta = {
 const preguntas: Pregunta[] = [
   {
     q: "¿Cuánto cuesta publicar?",
-    a: "Nada. Solo hay comisión cuando vendes con despacho (8% del precio del libro), descontada automáticamente.",
+    a: "Nada. Solo hay un 8% del precio del libro cuando te pagan con MercadoPago: con despacho lo paga el comprador como cargo por servicio, y en entrega en persona se descuenta de tu pago. Por transferencia, nada.",
   },
   {
     q: "¿Por qué no puedo ver el WhatsApp de un vendedor?",

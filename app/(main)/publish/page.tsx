@@ -236,14 +236,14 @@ export default async function PublishPage({ searchParams }: Props) {
               <p className="text-xl mb-1">🚪</p>
               <p className="font-semibold text-ink text-sm mb-1">Retiro en mano</p>
               <p className="text-xs text-ink-muted leading-relaxed">
-                El comprador pasa a buscar tu libro. Coordinan por WhatsApp.
+                El comprador pasa a buscar tu libro. Coordinan lugar y hora por mensaje.
               </p>
             </div>
             <div className="bg-cream-warm border border-cream-dark/40 rounded-xl p-4">
               <p className="text-xl mb-1">📦</p>
               <p className="font-semibold text-ink text-sm mb-1">Envío por courier</p>
               <p className="text-xs text-ink-muted leading-relaxed">
-                Con MercadoPago conectado, el comprador paga el envío y esa plata te llega con la venta. Lo dejas en la sucursal que prefieras y registras el seguimiento.
+                Si te pagan en el sitio, el comprador paga el envío y esa plata te llega con la venta. Lo dejas en la sucursal que prefieras y registras el seguimiento.
               </p>
             </div>
           </div>

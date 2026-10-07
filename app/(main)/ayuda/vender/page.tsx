@@ -73,8 +73,9 @@ export default function AyudaVenderPage() {
 
         <Seccion n={2} id="cobrar" title="Cobrar: conecta MercadoPago">
           <p>
-            Sin MercadoPago conectado solo te pueden comprar en persona. Con MercadoPago te compran desde cualquier
-            región, el pago entra directo a tu cuenta y tuslibros nunca toca tu dinero.
+            Con MercadoPago te compran desde cualquier región, el pago entra directo a tu cuenta y tuslibros nunca
+            toca tu dinero. Sin MercadoPago, te pueden comprar en persona, o por transferencia si la tienes
+            activada: si prefieres cobrar así, escríbeme y la activo.
           </p>
           <Tarjeta>
             <ul className="space-y-3">
@@ -83,8 +84,12 @@ export default function AyudaVenderPage() {
                 no tienes cuenta, la creas en el mismo paso.
               </li>
               <li>
-                La comisión de tuslibros es <strong className="text-ink">8% sobre el precio del libro</strong> cuando
-                la venta va con despacho, y se descuenta automáticamente del pago. Tú no haces ningún pago aparte.
+                {/* Antes decía que el 8% se descuenta en las ventas con despacho: es al revés
+                    (app/api/orders/route.ts, lib/cargo-servicio.ts). Corregido el 07-10-2026. */}
+                Cuando te pagan con MercadoPago hay un <strong className="text-ink">8% sobre el precio del libro</strong>.
+                Si el comprador pide despacho, ese 8% lo paga él como cargo por servicio y a ti te llegan completos el
+                libro y el despacho. Si es entrega en persona, el 8% se descuenta de tu pago. Por transferencia no hay
+                comisión. Tú no haces ningún pago aparte.
               </li>
               <li>
                 Cuando un vendedor puede cobrar por la plataforma, el botón de WhatsApp de su tienda se oculta: la
@@ -110,15 +115,14 @@ export default function AyudaVenderPage() {
                 en un solo paquete.
               </li>
               <li>
-                Descarga la etiqueta desde Mis Ventas (botón{" "}
-                <strong className="text-ink">Descargar etiqueta</strong>) o desde el correo, y pégala en el paquete.
-                Si no tienes impresora, escribe en el paquete, bien claro, el nombre del comprador y el número de
-                seguimiento.
+                {/* Hasta el 07-10-2026 este paso pedía descargar la etiqueta de Shipit, apagado desde el
+                    15-09. Hoy la etiqueta la emite el courier en la sucursal. */}
+                Lleva el paquete a la <strong className="text-ink">sucursal del courier que prefieras</strong> (Starken,
+                Chilexpress, Blue Express o Correos de Chile). Ahí te piden el nombre y la dirección del comprador,
+                que están en Mis Ventas, y te imprimen la etiqueta.
               </li>
               <li>
-                Deja el paquete en la <strong className="text-ink">sucursal del courier que prefieras</strong> (Starken,
-                Chilexpress, Blue Express o Correos de Chile) y paga el envío ahí: esa plata ya te la depositó el
-                comprador junto con el precio del libro.
+                Paga el envío ahí mismo: esa plata ya te la pagó el comprador junto con el precio del libro.
               </li>
               <li>Guarda el comprobante que te dan en la sucursal hasta que el comprador reciba el libro.</li>
             </ol>

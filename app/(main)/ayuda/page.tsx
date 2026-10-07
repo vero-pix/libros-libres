@@ -20,7 +20,7 @@ const caminos = [
     href: "/ayuda/comprar",
     icon: "🛒",
     title: "Quiero comprar",
-    body: "Pagas en línea con protección de MercadoPago y el libro llega a tu casa o lo retiras en persona.",
+    body: "Pagas en línea, con MercadoPago o por transferencia, y el libro llega a tu casa o lo retiras en persona.",
   },
   {
     href: "/ayuda/preguntas",

@@ -154,7 +154,7 @@ export default async function LibrosUsadosBaratosPage() {
     {
       q: "¿El despacho no me encarece el libro?",
       a: tarifas
-        ? `Puede, y por eso conviene mirar el retiro en mano: el mapa te muestra los libros más cerca tuyo. Si necesitas despacho, cuesta ${clp(tarifas.santiago)} dentro de Santiago y ${clp(tarifas.otra_region)} a otra región, y el vendedor lo manda por el courier que elija. Si compras varios libros del mismo vendedor, pagas un solo despacho.`
+        ? `Puede, y por eso conviene mirar el retiro en mano: el mapa te muestra los libros más cerca tuyo. Si necesitas despacho, cuesta ${clp(tarifas.santiago)} dentro de Santiago y ${clp(tarifas.otra_region)} a otra región, y el vendedor lo manda por el courier que elija. Algunos vendedores tienen tarifas propias: el total exacto lo ves en la ficha, eligiendo tu comuna. Si compras varios libros del mismo vendedor en una sola compra, pagas un solo despacho.`
         : "Puede, y por eso conviene mirar el retiro en mano: el mapa te muestra los libros más cerca tuyo. Si compras varios libros del mismo vendedor, coordinas un solo envío.",
     },
     {

@@ -18,7 +18,7 @@ const steps = [
     n: 2,
     icon: "🏪",
     title: "Llévalo a la sucursal que prefieras",
-    body: "Starken, Chilexpress, Blue Express o Correos de Chile: el que te quede más cómodo. Paga el envío a domicilio con los datos del comprador que aparecen en Mis Ventas. La plata del envío ya te llegó: el comprador la pagó en el checkout y MercadoPago te la depositó junto con el precio del libro.",
+    body: "Starken, Chilexpress, Blue Express o Correos de Chile: el que te quede más cómodo. Paga el envío a domicilio con los datos del comprador que aparecen en Mis Ventas. La plata del envío ya te llegó: el comprador la pagó en el checkout, junto con el precio del libro.",
   },
   {
     n: 3,
@@ -30,7 +30,7 @@ const steps = [
     n: 4,
     icon: "✅",
     title: "Guarda el comprobante",
-    body: "Si en la sucursal te dan comprobante, guárdalo hasta que el comprador reciba el libro. Si no te lo dan, no pasa nada: cuando escanean la etiqueta, el envío queda registrado con su número de seguimiento.",
+    body: "Si en la sucursal te dan comprobante, guárdalo hasta que el comprador reciba el libro. Si no te lo dan, no pasa nada: cuando escanean la etiqueta que te imprimen ahí, el envío queda registrado con su número de seguimiento.",
   },
 ];
 
@@ -39,11 +39,6 @@ const contactos = [
     quien: "Vero (tuslibros.cl)",
     detalle: `WhatsApp ${WHATSAPP_SOPORTE_LEGIBLE}. Para cualquier cosa: un paquete que no reciben, un comprador que no responde, un libro que ya vendiste por fuera.`,
     href: waSoporte(),
-  },
-  {
-    quien: "Shipit (solo ventas antiguas con etiqueta)",
-    detalle: "Si tu venta es anterior al 15 de septiembre y trae etiqueta de Shipit: WhatsApp +56 9 3230 2514, lunes a viernes de 9:00 a 18:00, o soporte@shipit.cl.",
-    href: "https://wa.me/56932302514",
   },
 ];
 
@@ -77,13 +72,15 @@ export default function ComoDespacharPage() {
             </h2>
           </div>
           <p className="text-sm sm:text-base text-ink-muted leading-relaxed">
-            Cuando te compran con envío, el comprador paga una tarifa fija según la zona y esa plata te llega
-            con la venta. Llevas el paquete a la sucursal que prefieras, pagas el envío ahí y registras el
+            Cuando te compran con envío, el comprador paga una tarifa fija según la zona (la del sitio, o la tuya
+            si pusiste tus propias tarifas en tu perfil) y esa plata te llega con la venta. Llevas el paquete a la sucursal que prefieras, pagas el envío ahí y registras el
             número de seguimiento en Mis Ventas con el botón <strong>&ldquo;Ya lo despaché&rdquo;</strong>.
           </p>
           <p className="text-xs text-ink-muted leading-relaxed mt-3">
-            ¿Tu venta es anterior al 15 de septiembre y trae etiqueta para descargar? Esa sigue igual: pega la
-            etiqueta y déjala en la sucursal del courier indicado, sin pagar nada.
+            {/* Hasta el 07-10-2026 decía que las etiquetas de Shipit seguían sirviendo: Shipit
+                dejó de operar para tuslibros y esas etiquetas ya no se pueden usar. */}
+            ¿Tu venta es anterior al 15 de septiembre y traía etiqueta de Shipit? Esa etiqueta ya no sirve.
+            Escríbeme antes de despacharla y lo resolvemos.
           </p>
         </section>
 
@@ -127,15 +124,14 @@ export default function ComoDespacharPage() {
             En <Link href="/mis-ventas" className="text-brand-600 font-semibold hover:underline">Mis Ventas</Link>,
             al lado del nombre de cada comprador, hay un botón <strong>&ldquo;Escribir&rdquo;</strong> que abre un chat
             dentro del sitio. Úsalo para avisar que el libro salió, o para coordinar lugar y hora si la
-            venta es con entrega en persona. En ese caso el pago ya está hecho por MercadoPago: no le cobres de nuevo.
+            venta es con entrega en persona. En ese caso el pago ya está hecho: no le cobres de nuevo.
           </p>
         </section>
 
         <section className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
           <h2 className="font-semibold text-red-900 mb-3">🚨 Si algo sale mal</h2>
           <p className="text-sm text-red-800 leading-relaxed mb-4">
-            En la sucursal no reciben el paquete, la etiqueta no llegó, el paquete se devolvió. Estos son los
-            contactos:
+            En la sucursal no reciben el paquete, el comprador no responde, el paquete se devolvió. Escríbeme:
           </p>
           <ul className="space-y-3">
             {contactos.map((c) => (

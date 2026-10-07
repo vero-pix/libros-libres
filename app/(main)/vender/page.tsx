@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   // libros usados" (79, pos. 14,6), "quiero vender libros usados" (57, pos. 14,8).
   title: "Dónde vender libros usados en Chile — publica gratis",
   description:
-    "¿Dónde vender libros usados en Chile? Publica gratis: escanea el código o sácale una foto, pon tu precio y cobra por MercadoPago o transferencia. 8% solo si vendes acá.",
+    "¿Dónde vender libros usados en Chile? Publica gratis: escanea el código o sácale una foto, pon tu precio y cobra por MercadoPago o transferencia. 8% solo si te pagan con MercadoPago.",
   alternates: { canonical: "https://tuslibros.cl/vender" },
   keywords: [
     "venta de libros",
@@ -57,7 +57,7 @@ const benefits = [
     // Sin Shipit desde el 15-09-2026: despacha el vendedor (lib/shipping/coordinado.ts).
     title: "Envío a todo Chile",
     description:
-      "Tú despachas por el courier que quieras. El comprador paga una tarifa fija por zona, que te llega junto con el pago.",
+      "Tú despachas por el courier que quieras. El comprador paga una tarifa fija por zona (la del sitio, o la tuya si la pones en tu perfil), que te llega junto con el pago.",
   },
   {
     emoji: "🏪",
@@ -104,7 +104,7 @@ const faqItems = [
   },
   {
     q: "¿Cuándo se aplican comisiones?",
-    a: "Publicar es gratis y no hay mensualidad. Cobro 8% del precio del libro, igual para todos, y solo cuando la venta se cierra acá. Con eso pago la pasarela, el servidor y las horas.",
+    a: "Publicar es gratis y no hay mensualidad. Cobro 8% del precio del libro, igual para todos, y solo cuando te pagan con MercadoPago; por transferencia, nada. Con eso pago la pasarela, el servidor y las horas.",
   },
   {
     q: "¿Qué libros se venden mejor?",
@@ -208,7 +208,7 @@ export default function VenderPage() {
             Todo lo que necesitas para vender
           </h2>
           <p className="text-ink-muted text-center mb-12 max-w-xl mx-auto">
-            Sin suscripción, sin costos fijos. Solo pagas una pequeña comisión cuando vendes.
+            Sin suscripción, sin costos fijos. Solo hay un 8% cuando te pagan con MercadoPago.
           </p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
