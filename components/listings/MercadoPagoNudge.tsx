@@ -98,11 +98,12 @@ export default function MercadoPagoNudge({ ubicacion, nPublicaciones }: Props) {
   // libros sin enterarse de que nadie podía comprárselos. (08-09-2026)
   // Suavizado el 07-10-2026 a pedido de Vero ("funcionó, pero me parece un poco
   // agresivo"): se mantiene el dato y la consecuencia, sin el "nadie" ni el "la
-  // mayoría no lo hace".
+  // mayoría no lo hace". El título lo redactó Vero: dice qué le falta a ella
+  // (recibir pagos por MercadoPago), no qué le pasa al libro.
   const plural = nPublicaciones !== 1;
   const titulo = plural
-    ? `Tus ${nPublicaciones} libros están publicados, pero todavía no se pueden pagar aquí`
-    : "Tu libro está publicado, pero todavía no se puede pagar aquí";
+    ? `Tus ${nPublicaciones} libros están publicados, pero todavía no puedes recibir pagos directos a través de MercadoPago`
+    : "Tu libro está publicado, pero todavía no puedes recibir pagos directos a través de MercadoPago";
   const cuerpo =
     `Hoy, quien quiere ${plural ? "uno" : "comprarlo"} tiene que escribirte para coordinar, y en ese paso muchas compras se quedan en el camino. ` +
     `Si activas los pagos, te ${plural ? "los" : "lo"} pueden comprar con un clic desde cualquier región, y la plata te llega directo a ti.`;
@@ -113,7 +114,7 @@ export default function MercadoPagoNudge({ ubicacion, nPublicaciones }: Props) {
   if (ubicacion === "ficha_dueno") {
     return (
       <div className="mx-6 sm:mx-8 mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
-        <p className="text-sm font-semibold text-amber-900">Este libro todavía no se puede pagar aquí</p>
+        <p className="text-sm font-semibold text-amber-900">Todavía no puedes recibir pagos directos a través de MercadoPago</p>
         <p className="mt-1 text-xs leading-relaxed text-amber-800">
           Está publicado y se ve, pero quien lo quiera tiene que escribirte para coordinar. Si activas
           los pagos, te lo pueden comprar con un clic desde cualquier región.
