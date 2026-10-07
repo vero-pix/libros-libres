@@ -50,7 +50,7 @@ const faqs = [
   },
   {
     q: "¿Puedo comprar el Álgebra de Baldor y que me llegue a regiones?",
-    a: "Sí. El despacho funciona a todo Chile vía Starken, Chilexpress, Blue Express y 99 Minutos. El vendedor imprime la etiqueta automáticamente cuando recibes el pago. Para un libro del tamaño del Baldor, el costo de envío a Santiago suele estar entre $2.500 y $4.500; a regiones un poco más.",
+    a: "Sí, a todo Chile. El despacho tiene una tarifa fija por zona (Santiago, misma región, otra región o zonas extremas) y la ves en la ficha antes de comprar, eligiendo tu comuna. El vendedor lo lleva al courier que elija y te pasa el número de seguimiento.",
   },
   {
     q: "¿Cuánto cuesta el Álgebra de Baldor usado en Chile?",

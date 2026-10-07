@@ -78,11 +78,11 @@ const faqs = [
   },
   {
     q: "¿Envían libros antiguos a regiones?",
-    a: "A todo Chile por courier (Starken, Chilexpress, Blue Express). Para ejemplares frágiles puedes coordinar retiro en mano con el vendedor, que aparece en la ficha con su comuna.",
+    a: "A todo Chile, con tarifa fija por zona; el vendedor elige el courier y te pasa el seguimiento. Para ejemplares frágiles puedes coordinar retiro en mano con el vendedor, que aparece en la ficha con su comuna.",
   },
   {
     q: "¿Cuánto cobra tuslibros.cl por vender un libro antiguo?",
-    a: "Publicar es gratis. Solo cobro 8% sobre el precio del libro cuando la venta pasa por MercadoPago o por despacho con courier. Si lo vendes en persona, no pago nada.",
+    a: "Publicar es gratis. Solo hay un 8% sobre el precio del libro cuando te pagan en el sitio con MercadoPago. Si te pagan por transferencia, no hay comisión.",
   },
 ];
 
@@ -351,7 +351,7 @@ export default async function LibrosAntiguosPage() {
                 <ul className="space-y-3 text-sm text-ink-muted">
                   <li><strong className="text-ink">Publicar es gratis.</strong> Fotos, descripción del estado y precio. Diez minutos por libro.</li>
                   <li><strong className="text-ink">Sin tasador de por medio.</strong> Nadie te compra el lote a la baja para revenderlo.</li>
-                  <li><strong className="text-ink">Comisión 8% solo si se vende por la plataforma.</strong> Si lo entregas en mano, no cobro nada.</li>
+                  <li><strong className="text-ink">Comisión 8% solo si te pagan con MercadoPago.</strong> Por transferencia, no cobro nada.</li>
                 </ul>
                 <Link href="/vender" className="inline-flex items-center mt-6 text-sm text-brand-600 font-semibold hover:text-brand-700 transition-colors">
                   Cómo vender en tuslibros.cl →

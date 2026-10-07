@@ -67,11 +67,11 @@ const faqs = [
   },
   {
     q: "Tengo los textos del año pasado, ¿los puedo vender?",
-    a: "Sí, y en marzo se venden solos. Publicar es gratis: foto, precio y en qué estado está. Solo cobro 8% cuando la venta pasa por MercadoPago o por despacho con courier; si lo entregas en mano, no pago nada. Un texto que en tu casa ya no sirve, en otra casa ahorra treinta mil pesos.",
+    a: "Sí, y en marzo se venden solos. Publicar es gratis: foto, precio y en qué estado está. Solo hay un 8% cuando te pagan en el sitio con MercadoPago; si te pagan por transferencia, no hay comisión. Un texto que en tu casa ya no sirve, en otra casa ahorra treinta mil pesos.",
   },
   {
     q: "¿Hacen envíos a regiones?",
-    a: "A todo Chile por courier, y sobre $20.000 de compra el envío va gratis. También puedes coordinar retiro en mano: en cada ficha aparece la comuna del vendedor.",
+    a: "A todo Chile, con tarifa fija por zona: en la ficha eliges tu comuna y ves el total antes de comprar. También puedes coordinar retiro en mano: en cada ficha aparece la comuna del vendedor.",
   },
 ];
 

@@ -46,7 +46,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿El pago se le hace al vendedor en la entrega?",
-        a: "No. Todas las compras se pagan antes, por MercadoPago, dentro de la plataforma. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "No. Todas las compras se pagan antes, dentro de la plataforma: con MercadoPago o por transferencia, según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
       {
         q: "¿En qué comunas de Santiago hay más libros disponibles?",
@@ -71,7 +71,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Tengo que pagar en efectivo al juntarnos?",
-        a: "No. Todas las transacciones se hacen antes vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "No. Todas las compras se pagan antes, dentro de la plataforma: con MercadoPago o por transferencia, según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
       {
         q: "Vivo en Providencia pero no tengo tiempo de juntarme, ¿qué hago?",
@@ -96,7 +96,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo sé que el pago es seguro?",
-        a: "Pagas vía MercadoPago dentro de la plataforma. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "Pagas dentro de la plataforma, con MercadoPago o por transferencia según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -117,7 +117,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿El pago es seguro?",
-        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "Pagas dentro de la plataforma, con MercadoPago o por transferencia según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -138,7 +138,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "Pagas dentro de la plataforma, con MercadoPago o por transferencia según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -155,11 +155,11 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Hay despacho a otras ciudades desde Valparaíso?",
-        a: "Sí. Los vendedores despachan a todo Chile por courier (Starken, Blue Express, Chilexpress). El costo se calcula al momento de pagar.",
+        a: "Sí. Los vendedores despachan a todo Chile con el courier que elijan, con tarifa fija por zona. Ves el total con despacho en la ficha, antes de comprar.",
       },
       {
         q: "¿El pago es seguro?",
-        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "Pagas dentro de la plataforma, con MercadoPago o por transferencia según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -180,7 +180,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "Pagas dentro de la plataforma, con MercadoPago o por transferencia según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -201,7 +201,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿El pago es seguro?",
-        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "Pagas dentro de la plataforma, con MercadoPago o por transferencia según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -222,7 +222,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "Pagas dentro de la plataforma, con MercadoPago o por transferencia según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -239,11 +239,11 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cuánto demora el despacho al norte?",
-        a: "Depende del courier y el vendedor, pero el costo y plazo estimado se muestran al momento de pagar.",
+        a: "Es una tarifa fija por zona: si el vendedor está en otra región, Antofagasta se cobra como zona extrema; si está en la misma región, sale más barato. La ves en la ficha antes de comprar, eligiendo tu comuna. Llega en 2 a 5 días hábiles desde que el vendedor despacha.",
       },
       {
         q: "¿El pago es seguro?",
-        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "Pagas dentro de la plataforma, con MercadoPago o por transferencia según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -264,7 +264,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "Pagas dentro de la plataforma, con MercadoPago o por transferencia según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -285,7 +285,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "Pagas dentro de la plataforma, con MercadoPago o por transferencia según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -306,7 +306,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "Pagas dentro de la plataforma, con MercadoPago o por transferencia según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },
@@ -327,7 +327,7 @@ export const CIUDADES: Record<string, Ciudad> = {
       },
       {
         q: "¿Cómo protegen mi pago?",
-        a: "Pagas vía MercadoPago. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
+        a: "Pagas dentro de la plataforma, con MercadoPago o por transferencia según el vendedor. Si compras por courier te llega el número de seguimiento por correo, y si algo sale mal con tu compra, me escribes y lo resolvemos.",
       },
     ],
   },

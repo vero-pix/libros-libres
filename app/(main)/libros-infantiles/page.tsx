@@ -68,11 +68,11 @@ const faqs = [
   },
   {
     q: "¿Hacen envíos a regiones?",
-    a: "A todo Chile por courier. Los libros de niños son livianos, así que el despacho sale barato, y sobre $20.000 de compra el envío va gratis. También puedes coordinar retiro en mano con el vendedor: en cada ficha aparece su comuna.",
+    a: "A todo Chile, con tarifa fija por zona: en la ficha eliges tu comuna y ves el total antes de comprar. También puedes coordinar retiro en mano con el vendedor: en cada ficha aparece su comuna.",
   },
   {
     q: "Tengo los libros que mis hijos ya no leen, ¿los puedo vender?",
-    a: "Sí, y es lo que más me piden. Publicar es gratis: fotos, precio y en qué estado está. Solo cobro 8% cuando la venta pasa por MercadoPago o por despacho con courier; si lo entregas en mano, no pago nada. Una caja de libros que ya nadie abre en tu casa es exactamente lo que otra mamá anda buscando.",
+    a: "Sí, y es lo que más me piden. Publicar es gratis: fotos, precio y en qué estado está. Solo hay un 8% cuando te pagan en el sitio con MercadoPago; si te pagan por transferencia, no hay comisión. Una caja de libros que ya nadie abre en tu casa es exactamente lo que otra mamá anda buscando.",
   },
 ];
 
@@ -297,7 +297,7 @@ export default async function LibrosInfantilesPage() {
                 <ul className="space-y-3 text-sm text-ink-muted">
                   <li><strong className="text-ink">Publicar es gratis.</strong> Foto, precio y en qué estado está. Un libro de niños se publica en cinco minutos.</li>
                   <li><strong className="text-ink">Tú pones el precio.</strong> Nadie te compra la caja entera a la baja para revenderla por unidad.</li>
-                  <li><strong className="text-ink">Comisión 8% solo si se vende por la plataforma.</strong> Si lo entregas en mano, no cobro nada.</li>
+                  <li><strong className="text-ink">Comisión 8% solo si te pagan con MercadoPago.</strong> Por transferencia, no cobro nada.</li>
                 </ul>
                 <Link href="/vender" className="inline-flex items-center mt-6 text-sm text-brand-600 font-semibold hover:text-brand-700 transition-colors">
                   Cómo vender en tuslibros.cl →

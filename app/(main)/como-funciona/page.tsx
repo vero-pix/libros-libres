@@ -20,21 +20,21 @@ const directSteps = [
 const mpSteps = [
   { number: 1, icon: "🔍", title: "Encuentra tu libro", description: "Busca en el catálogo por categoría, precio o cercanía." },
   { number: 2, icon: "💳", title: "Paga con MercadoPago", description: "Compra directo desde la publicación, con tu tarjeta y con registro de los dos lados." },
-  { number: 3, icon: "📦", title: "Elige el despacho", description: "Retiro en persona, o envío por courier cuando esté disponible." },
-  { number: 4, icon: "✅", title: "Recibe y confirma", description: "El vendedor recibe su pago automáticamente al confirmar la entrega." },
+  { number: 3, icon: "📦", title: "Elige el despacho", description: "Retiro en persona gratis, o despacho a todo Chile con tarifa fija por zona. El total lo ves en la ficha antes de comprar." },
+  { number: 4, icon: "✅", title: "Recibe y confirma", description: "El vendedor despacha y te pasa el número de seguimiento. Cuando llega, lo marcas como recibido en Mis compras." },
 ];
 
 const sellerSteps = [
   { number: 1, icon: "📱", title: "Escanea el código de barras", description: "Usa la cámara de tu celular para escanear el ISBN de tu libro." },
   { number: 2, icon: "✏️", title: "Completa precio y condición", description: "Agrega el precio que quieres y selecciona el estado del libro." },
-  { number: 3, icon: "📍", title: "Aparece en el catálogo", description: "Tu libro se publica al instante. Los compradores te contactan por WhatsApp o compran directo con MercadoPago." },
+  { number: 3, icon: "📍", title: "Aparece en el catálogo", description: "Tu libro se publica al instante. Te lo compran directo en el sitio, con MercadoPago o por transferencia, o te escriben por mensaje." },
 ];
 
 const benefits = [
   { icon: "✅", text: "Publicar siempre es gratis" },
-  { icon: "✅", text: "Cero comisión si coordinas por WhatsApp" },
+  { icon: "✅", text: "Sin comisión en ventas por transferencia" },
   { icon: "✅", text: "Pago seguro con MercadoPago (opcional)" },
-  { icon: "✅", text: "Despacho a todo Chile por courier" },
+  { icon: "✅", text: "Despacho a todo Chile con tarifa fija por zona" },
   { icon: "✅", text: "Devolución en 7 días en compras con MercadoPago" },
 ];
 
@@ -102,7 +102,7 @@ export default function ComoFuncionaPage() {
           <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
             Para vendedores
           </h2>
-          <p className="text-ink-muted mb-6">Publicar es gratis y no tiene vuelta. Y el envío no lo pones tú: <strong>el comprador paga una tarifa fija al comprar</strong> y <strong>esa plata te llega a ti</strong> junto con el precio del libro. Tú llevas el paquete a la sucursal que te acomode, dentro de los 2 días hábiles siguientes a la venta, y pagas ahí con esa misma plata. <Link href="/como-despachar" className="text-brand-600 font-semibold hover:underline">Te explico el despacho paso a paso</Link>.</p>
+          <p className="text-ink-muted mb-6">Publicar es gratis y no tiene vuelta. Y el envío no lo pones tú: <strong>el comprador paga una tarifa fija al comprar</strong> y <strong>esa plata te llega a ti</strong> junto con el precio del libro. Tú llevas el paquete al courier y la sucursal que te acomoden, dentro de los 2 días hábiles siguientes a la venta, y pagas ahí con esa misma plata. Si las tarifas del sitio no te cubren, pones las tuyas en tu perfil. <Link href="/como-despachar" className="text-brand-600 font-semibold hover:underline">Te explico el despacho paso a paso</Link>.</p>
           <div className="space-y-5">
             {sellerSteps.map((step) => <StepCard key={step.number} step={step} />)}
           </div>

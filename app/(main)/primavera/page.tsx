@@ -49,7 +49,7 @@ const faqs = [
   },
   {
     q: "¿Cómo los recibo?",
-    a: "Depende del vendedor: retiro en mano si están cerca tuyo, o despacho por courier a todo Chile. Sobre $20.000 el envío va gratis. El pago con MercadoPago queda protegido.",
+    a: "Depende del vendedor: retiro en mano si están cerca tuyo, o despacho por courier a todo Chile. El despacho tiene tarifa fija por zona y ves el total en la ficha antes de comprar.",
   },
   {
     q: "¿Y si el que busco no está?",

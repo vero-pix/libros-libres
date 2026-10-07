@@ -69,15 +69,15 @@ const faqs = [
   },
   {
     q: "¿El pago es seguro?",
-    a: "Sí. Pagas con MercadoPago y tu plata queda protegida: el vendedor recibe su pago recién cuando confirmas que recibiste el libro como esperabas. Si algo sale mal, MercadoPago media la devolución.",
+    a: "Sí. Pagas en el sitio con MercadoPago o por transferencia, y la compra queda registrada con su número de pedido. Si el libro no llega o no es lo que decía la ficha, me escribes y lo resolvemos; con MercadoPago también tienes su proceso de reclamos.",
   },
   {
     q: "¿Puedo retirar el libro en persona en vez de pagar despacho?",
-    a: "Sí, y es gratis. El mapa te muestra los libros más cercanos a ti. Si el vendedor ofrece retiro en mano, coordinan la entrega directa por WhatsApp y te ahorras el courier.",
+    a: "Sí, y es gratis. El mapa te muestra los libros más cercanos a ti. Si el vendedor ofrece entrega en persona, la eliges en el checkout y coordinan el lugar y la hora por mensaje.",
   },
   {
     q: "¿Llega a regiones?",
-    a: "A todo Chile, vía Starken, Chilexpress, Blue Express y 99 Minutos. El costo se calcula automáticamente en el checkout según peso y distancia. Para un libro estándar a regiones suele ir entre $3.000 y $5.500.",
+    a: "A todo Chile. El despacho tiene una tarifa fija por zona (Santiago, misma región, otra región y zonas extremas) y la ves en la ficha antes de comprar: eliges tu comuna y aparece el total. El vendedor lo manda por el courier que elija y te pasa el número de seguimiento.",
   },
   {
     q: "¿Encuentro libros raros o agotados?",
@@ -184,8 +184,8 @@ export default async function ComprarLibrosUsadosPage() {
                 </h3>
                 <p className="text-sm text-ink-muted leading-relaxed">
                   El mapa te muestra el libro más cercano. Retiras en mano gratis o pides
-                  courier. Pagas con MercadoPago y tu plata queda protegida hasta que el
-                  libro llega a tus manos.
+                  despacho, y en la ficha ves el total antes de comprar. Pagas en el sitio
+                  y la compra queda registrada.
                 </p>
               </div>
             </div>

@@ -41,7 +41,7 @@ const faqs = [
   },
   {
     q: "¿A qué ciudades llega el despacho?",
-    a: "A todo Chile vía Starken, Chilexpress, Blue Express y 99 Minutos. Santiago, Valparaíso, Concepción y todas las regiones. El vendedor imprime la etiqueta automáticamente cuando recibe el pago.",
+    a: "A todo Chile: Santiago, Valparaíso, Concepción y todas las regiones. Cuando pagas, el vendedor lleva el paquete al courier que elija (Starken, Blue Express, Chilexpress u otro) dentro de 2 días hábiles y te pasa el número de seguimiento.",
   },
   {
     q: "¿Cómo sé que el libro está en buen estado?",
@@ -53,11 +53,11 @@ const faqs = [
   },
   {
     q: "¿Cuánto cuesta el despacho?",
-    a: "Depende del courier, peso y distancia. Se calcula automáticamente en el checkout. Para un libro estándar a Santiago capital suele estar entre $2.500 y $4.500. A regiones un poco más.",
+    a: "Es una tarifa fija por zona: Santiago, misma región, otra región o zonas extremas. La ves en la ficha antes de comprar: eliges tu comuna y aparece el total con despacho.",
   },
   {
     q: "¿Es gratis publicar mis libros?",
-    a: "Sí, publicar es 100% gratis. Solo cobramos una comisión pequeña cuando se vende (8%). Sin mensualidades ni cargos fijos. Conéctate con MercadoPago y listo.",
+    a: "Sí, publicar es 100% gratis. Solo hay un 8% cuando la venta se paga en el sitio con MercadoPago; por transferencia, nada. Sin mensualidades ni cargos fijos.",
   },
 ];
 
@@ -198,8 +198,8 @@ export default async function LibrosUsadosChilePage() {
               {[
                 { n: "1", title: "Búscalo en el mapa o catálogo", desc: "Filtra por autor, título, género, precio o cercanía." },
                 { n: "2", title: "Paga con MercadoPago", desc: "Tarjeta, débito o cuotas. Te llega el seguimiento por correo." },
-                { n: "3", title: "Retira en mano o pide despacho", desc: "Courier Starken, Chilexpress, Blue Express o 99 Minutos — a todo Chile." },
-                { n: "4", title: "Confirma la entrega", desc: "El vendedor recibe automáticamente su pago cuando el libro llega." },
+                { n: "3", title: "Retira en mano o pide despacho", desc: "Despacho a todo Chile con tarifa fija por zona. El vendedor elige el courier y te pasa el seguimiento." },
+                { n: "4", title: "Confirma la entrega", desc: "Cuando el libro llega, lo marcas como recibido en Mis compras." },
               ].map((s) => (
                 <div key={s.n}>
                   <div className="text-3xl font-display font-bold text-brand-500 mb-2">{s.n}</div>
