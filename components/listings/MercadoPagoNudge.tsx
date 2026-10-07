@@ -96,13 +96,16 @@ export default function MercadoPagoNudge({ ubicacion, nPublicaciones }: Props) {
   // El anterior ("Te falta un paso para que te puedan pagar") hablaba de un
   // trámite pendiente y se leía como opcional: 63 vendedores publicaron 568
   // libros sin enterarse de que nadie podía comprárselos. (08-09-2026)
+  // Suavizado el 07-10-2026 a pedido de Vero ("funcionó, pero me parece un poco
+  // agresivo"): se mantiene el dato y la consecuencia, sin el "nadie" ni el "la
+  // mayoría no lo hace".
   const plural = nPublicaciones !== 1;
   const titulo = plural
-    ? `Tus ${nPublicaciones} libros todavía no se pueden comprar`
-    : "Tu libro todavía no se puede comprar";
+    ? `Tus ${nPublicaciones} libros están publicados, pero todavía no se pueden pagar aquí`
+    : "Tu libro está publicado, pero todavía no se puede pagar aquí";
   const cuerpo =
-    `Están publicados y se ven en la tienda, pero nadie puede pagarlos por el sitio: quien lo quiera tiene que ubicarte y coordinar contigo en persona, y la mayoría no lo hace. ` +
-    `Cuando conectes tu cuenta para cobrar, ${plural ? "se vuelven comprables" : "se vuelve comprable"} en un clic desde cualquier región y la plata te llega directa a ti.`;
+    `Hoy, quien quiere ${plural ? "uno" : "comprarlo"} tiene que escribirte para coordinar, y en ese paso muchas compras se quedan en el camino. ` +
+    `Si activas los pagos, te ${plural ? "los" : "lo"} pueden comprar con un clic desde cualquier región, y la plata te llega directo a ti.`;
 
   // ── Estado en la propia ficha del vendedor ──
   // No se puede cerrar y no dice "conecta MercadoPago" en el título: dice que
@@ -110,11 +113,10 @@ export default function MercadoPagoNudge({ ubicacion, nPublicaciones }: Props) {
   if (ubicacion === "ficha_dueno") {
     return (
       <div className="mx-6 sm:mx-8 mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
-        <p className="text-sm font-semibold text-amber-900">Este libro todavía no se puede comprar</p>
+        <p className="text-sm font-semibold text-amber-900">Este libro todavía no se puede pagar aquí</p>
         <p className="mt-1 text-xs leading-relaxed text-amber-800">
-          Está publicado y visible, pero nadie puede pagarlo por el sitio. Quien lo quiera tiene que
-          ubicarte y coordinar contigo en persona. Conectando tu cuenta para cobrar, se vuelve
-          comprable en un clic desde cualquier región.
+          Está publicado y se ve, pero quien lo quiera tiene que escribirte para coordinar. Si activas
+          los pagos, te lo pueden comprar con un clic desde cualquier región.
         </p>
         <a
           href="/api/auth/mercadopago"
