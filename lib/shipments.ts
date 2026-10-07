@@ -52,6 +52,13 @@ export interface ShipmentRow {
   seller_id: string;
   buyer_id: string;
   status: ShipmentStatus;
+  /**
+   * Proveedor del envío (lib/despacho). Opcional a propósito: la columna llega
+   * con la migración 20261007_shipments_provider.sql, que se aplica a mano, y
+   * mientras no esté `claim_shipments` devuelve la fila sin ella. Ausente o
+   * null = "shipit".
+   */
+  provider?: string | null;
   dispatch_mode: DispatchMode;
   pickup_requested_at: string | null;
   shipit_id: number | null;

@@ -1,18 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { sendGong, escapeHtml } from "@/lib/notifications";
-import {
-  armarBodyShipit,
-  createShipitShipment,
-  estimateBookPackageSize,
-  findCommune,
-  getShipitShipment,
-  leerRetiroShipit,
-  retiroCumplido,
-  DROPOFF_COURIERS,
-  SHIPIT_DEFAULT_ORIGIN_RM,
-  SHIPIT_REGION_RM,
-} from "@/lib/shipit";
+import { adaptadorDe, type EstadoCourier, type ProviderAdapter } from "@/lib/despacho";
 import { extractCommune } from "@/lib/chilexpress";
 import { nombreCourier } from "@/lib/courier-tracking";
 import { foldAccents } from "@/lib/accentSearch";
@@ -74,6 +63,11 @@ export const dynamic = "force-dynamic";
  *                           según el `status` que devuelve Shipit (seguirCourier)
  *
  * Diseño completo: docs/shipit/PROMPT_1.1_diseno_2026-09-07.md
+ *
+ * Desde el 07-10-2026 el worker no llama a lib/shipit.ts directo: pasa por el
+ * adaptador del proveedor de cada fila (lib/despacho, `shipments.provider`,
+ * Shipit por defecto). El comportamiento con Shipit es el mismo de antes; la
+ * capa existe para que el próximo courier entre sin tocar estos pasos.
  */
 
 type Admin = ReturnType<typeof createServiceRoleClient>;
@@ -109,24 +103,27 @@ export async function GET(request: Request) {
   const resumen: ResumenFila[] = [];
   for (const fila of (filas ?? []) as ShipmentRow[]) {
     try {
+      // Dentro del try: un proveedor desconocido entra al backoff como
+      // cualquier otro error, no tumba la corrida.
+      const adaptador = adaptadorDe(fila.provider);
       switch (fila.status) {
         case "pending":
-          resumen.push(await pasoCrear(admin, fila, modo));
+          resumen.push(await pasoCrear(admin, fila, modo, adaptador));
           break;
         case "created":
-          resumen.push(await pasoEtiqueta(admin, fila, modo));
+          resumen.push(await pasoEtiqueta(admin, fila, modo, adaptador));
           break;
         case "label_ready":
-          resumen.push(await pasoNotificar(admin, fila, modo));
+          resumen.push(await pasoNotificar(admin, fila, modo, adaptador));
           break;
         case "notified":
-          resumen.push(await pasoRetiro(admin, fila, modo));
+          resumen.push(await pasoRetiro(admin, fila, modo, adaptador));
           break;
         case "pickup_scheduled":
-          resumen.push(await pasoSeguirRetiro(admin, fila, modo));
+          resumen.push(await pasoSeguirRetiro(admin, fila, modo, adaptador));
           break;
         case "in_transit":
-          resumen.push(await pasoEnCamino(admin, fila, modo));
+          resumen.push(await pasoEnCamino(admin, fila, modo, adaptador));
           break;
         default:
           // Estados de fase 2. Se sueltan para dentro de 6 horas.
@@ -183,7 +180,7 @@ export async function GET(request: Request) {
 
 /* ───────────────────────── pending → created ───────────────────────── */
 
-async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
+async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode, adaptador: ProviderAdapter): Promise<ResumenFila> {
   const [qHead, qVendedor, qComprador, qItems] = await Promise.all([
     admin
       .from("orders")
@@ -224,20 +221,21 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
 
   // D1 revisada: sin origen propio, un vendedor de la RM sale con el origen
   // compartido de tuslibros (dropoff). Fuera de la RM, needs_origin.
-  const comunaOrigen = await findCommune(origen.commune);
-  const enRM = comunaOrigen?.region_id === SHIPIT_REGION_RM;
+  const comunaOrigen = await adaptador.buscarComuna(origen.commune);
+  const enRM = comunaOrigen?.region_id === adaptador.regionRM;
   let originId: number | null = vendedor?.shipit_origin_id ?? null;
   let notaOrigen = "";
-  if (!originId && enRM && fila.dispatch_mode === "dropoff") {
-    originId = SHIPIT_DEFAULT_ORIGIN_RM;
-    notaOrigen = ` · origen compartido ${SHIPIT_DEFAULT_ORIGIN_RM} (RM sin origen propio)`;
+  const origenCompartido = adaptador.origenCompartidoRM();
+  if (!originId && enRM && fila.dispatch_mode === "dropoff" && origenCompartido) {
+    originId = origenCompartido;
+    notaOrigen = ` · origen compartido ${origenCompartido} (RM sin origen propio)`;
   }
 
   // La comuna elegida en el checkout manda sobre la parseada: `extractCommune`
   // adivina desde un string libre y ahí nacían los "Shipit no reconoce la
   // comuna de destino". Las órdenes viejas no la traen y siguen por el parser.
   const destCrudo = head.buyer_commune?.trim() || extractCommune(head.buyer_address);
-  const comunaDestino = await findCommune(destCrudo);
+  const comunaDestino = await adaptador.buscarComuna(destCrudo);
   if (!comunaDestino) throw new Error(`Shipit no reconoce la comuna de destino: ${destCrudo}`);
   const destCommune = comunaDestino.name;
   const destCommuneId = comunaDestino.id;
@@ -253,12 +251,12 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
   const courier = String(head.courier ?? "").toLowerCase();
   const n = Math.max(1, items ?? 1);
 
-  const body = armarBodyShipit({
+  const body = adaptador.armarSolicitud({
     reference: fila.reference,
     originId,
     sandbox: modo === "sandbox",
     items: n,
-    sizes: estimateBookPackageSize(n),
+    sizes: adaptador.medidasPaquete(n),
     courier,
     destiny: {
       street: m?.[1] ?? calle,
@@ -285,7 +283,7 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
   };
 
   // Modalidad dropoff: el courier tiene que aceptar el paquete en sucursal.
-  if (fila.dispatch_mode === "dropoff" && !(DROPOFF_COURIERS as readonly string[]).includes(courier)) {
+  if (fila.dispatch_mode === "dropoff" && !adaptador.couriersDropoff.includes(courier)) {
     throw new Error(`courier "${courier}" no acepta entrega en sucursal (modo dropoff)`);
   }
 
@@ -328,8 +326,8 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    const idPrevio = (previo?.response as any)?.id;
-    if (typeof idPrevio === "number") {
+    const idPrevio = adaptador.idDesdeRespuesta(previo?.response);
+    if (idPrevio !== null) {
       await transicionEnvio(admin, fila.id, "pending", "created", { shipit_id: idPrevio, courier });
       return { ...base, accion: "recuperado", nota: `shipit_id ${idPrevio} de un intento anterior` };
     }
@@ -340,7 +338,7 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
     return { ...base, accion: "ya en created (otro proceso)" };
   }
 
-  const res = await createShipitShipment(body);
+  const res = await adaptador.crearEnvio(body);
   await registrarEventoShipit(admin, {
     shipmentId: fila.id,
     kind: "create",
@@ -348,7 +346,7 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
     request: body,
     response: res.raw,
     httpStatus: res.httpStatus,
-    cost: res.total_price,
+    cost: res.costoClp,
   });
 
   if (res.error || !res.id) {
@@ -369,7 +367,7 @@ async function pasoCrear(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pro
 
   await admin
     .from("shipments")
-    .update({ shipit_id: res.id, courier: res.courier ?? courier, real_cost: res.total_price })
+    .update({ shipit_id: res.id, courier: res.courier ?? courier, real_cost: res.costoClp })
     .eq("id", fila.id);
   await admin
     .from("orders")
@@ -417,20 +415,20 @@ function limpiarComplemento(complemento: string, comuna: string): string {
 /** Bucket privado; path = `shipments/{shipment.id}.pdf`. Sin policies: solo service role. */
 const LABELS_BUCKET = "labels";
 
-async function pasoEtiqueta(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
+async function pasoEtiqueta(admin: Admin, fila: ShipmentRow, modo: ShipitMode, adaptador: ProviderAdapter): Promise<ResumenFila> {
   if (!fila.shipit_id) throw new Error("fila en created sin shipit_id");
-  const s = await getShipitShipment(fila.shipit_id);
+  const s = await adaptador.consultarEnvio(fila.shipit_id);
   await registrarEventoShipit(admin, {
     shipmentId: fila.id,
     kind: "get",
     mode: modo,
     response: s.raw,
     httpStatus: s.httpStatus,
-    cost: s.total_price,
+    cost: s.costoClp,
   });
   if (s.error) throw new Error(`GET /v/shipments/${fila.shipit_id}: ${s.error}`);
 
-  if (!s.tracking_number || !s.pack_pdf) {
+  if (!s.trackingNumber || !s.etiquetaUrl) {
     // Shipit tarda ~20 s en completar. Reintento suave, sin contar como fallo.
     await reprogramarEnvio(admin, fila.id, 5);
     return { reference: fila.reference, estado: "created", accion: "esperando tracking/pack_pdf" };
@@ -441,7 +439,7 @@ async function pasoEtiqueta(admin: Admin, fila: ShipmentRow, modo: ShipitMode): 
   // se baja acá, se guarda en el bucket privado y la URL de Shipit no se
   // persiste ni se manda a nadie (D3).
   const path = `shipments/${fila.id}.pdf`;
-  const pdf = await descargarPdf(s.pack_pdf);
+  const pdf = await descargarPdf(s.etiquetaUrl);
   const { error: upErr } = await admin.storage
     .from(LABELS_BUCKET)
     .upload(path, pdf, { contentType: "application/pdf", upsert: true });
@@ -455,9 +453,9 @@ async function pasoEtiqueta(admin: Admin, fila: ShipmentRow, modo: ShipitMode): 
   });
 
   const ok = await transicionEnvio(admin, fila.id, "created", "label_ready", {
-    tracking_number: s.tracking_number,
+    tracking_number: s.trackingNumber,
     label_path: path,
-    real_cost: s.total_price,
+    real_cost: s.costoClp,
     courier: s.courier ?? fila.courier,
   });
   if (!ok) return { reference: fila.reference, estado: "created", accion: "ya en label_ready (otro proceso)" };
@@ -467,7 +465,7 @@ async function pasoEtiqueta(admin: Admin, fila: ShipmentRow, modo: ShipitMode): 
   await admin
     .from("orders")
     .update({
-      tracking_code: s.tracking_number,
+      tracking_code: s.trackingNumber,
       shipping_status: "label_ready",
       shipping_label_url: null,
       shipping_updated_at: new Date().toISOString(),
@@ -478,7 +476,7 @@ async function pasoEtiqueta(admin: Admin, fila: ShipmentRow, modo: ShipitMode): 
     reference: fila.reference,
     estado: "label_ready",
     accion: "etiqueta guardada",
-    nota: `${s.tracking_number} · ${path}`,
+    nota: `${s.trackingNumber} · ${path}`,
   };
 }
 
@@ -507,7 +505,7 @@ async function descargarPdf(url: string): Promise<Buffer> {
  * no se vuelve a mandar aunque la corrida anterior haya muerto a medias. La
  * transición a notified se hace al final, cuando los dos salieron.
  */
-async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
+async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode, adaptador: ProviderAdapter): Promise<ResumenFila> {
   if (modo === "dry-run") {
     // En dry-run no se escribe a nadie. La fila espera a que el modo cambie.
     await reprogramarEnvio(admin, fila.id, 6 * 60);
@@ -543,8 +541,8 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
     (Array.isArray(head.listing) ? head.listing[0] : head.listing)?.address ??
     null;
   const origen = resolverOrigenEnvio({ listingAddress, sellerDefaultAddress: vendedor.default_address });
-  const comunaDestino = (await findCommune(extractCommune(head.buyer_address ?? "")))?.name ?? extractCommune(head.buyer_address ?? "");
-  const comunaOrigenShipit = origen ? await findCommune(origen.commune) : null;
+  const comunaDestino = (await adaptador.buscarComuna(extractCommune(head.buyer_address ?? "")))?.name ?? extractCommune(head.buyer_address ?? "");
+  const comunaOrigenShipit = origen ? await adaptador.buscarComuna(origen.commune) : null;
 
   // El retiro se mira ANTES de escribir el correo (acá el modo ya no es
   // dry-run). El paso `notified → pickup_scheduled` ya lo consultaba, pero
@@ -555,8 +553,8 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
   let retiroAgendado: { date: string; window: string | null } | null = null;
   if (fila.shipit_id) {
     try {
-      const sPrev = await getShipitShipment(fila.shipit_id);
-      const r = sPrev.error ? null : leerRetiroShipit(sPrev.last_pickup);
+      const sPrev = await adaptador.consultarEnvio(fila.shipit_id);
+      const r = sPrev.error ? null : adaptador.leerRetiro(sPrev.retiroCrudo);
       // Se anuncia TODO retiro vigente, lo haya pedido el vendedor o no.
       //
       // Antes se exigía que él lo hubiera pedido, para que un retiro agendado
@@ -587,7 +585,7 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
     comunaDestino: capitalizar(comunaDestino),
     comunaOrigen: origen?.commune ?? "",
     direccionEntrega: head.buyer_address ?? "",
-    enRM: comunaOrigenShipit?.region_id === SHIPIT_REGION_RM,
+    enRM: comunaOrigenShipit?.region_id === adaptador.regionRM,
   };
 
   // Mientras Google Workspace esté caído, vero@tuslibros.cl no recibe: el
@@ -640,13 +638,13 @@ async function pasoNotificar(admin: Admin, fila: ShipmentRow, modo: ShipitMode):
  * ATRÁS, nunca el mismo día: el chofer tiene hasta el final de su ventana, y
  * un envío no se declara fallido mientras la camioneta todavía puede llegar.
  */
-async function pasoSeguirRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
+async function pasoSeguirRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode, adaptador: ProviderAdapter): Promise<ResumenFila> {
   if (modo === "dry-run" || !fila.shipit_id) {
     await reprogramarEnvio(admin, fila.id, 6 * 60);
     return { reference: fila.reference, estado: "pickup_scheduled", accion: "dry-run: no se sigue el retiro" };
   }
 
-  const s = await getShipitShipment(fila.shipit_id);
+  const s = await adaptador.consultarEnvio(fila.shipit_id);
   await registrarEventoShipit(admin, {
     shipmentId: fila.id,
     kind: "get",
@@ -663,10 +661,10 @@ async function pasoSeguirRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMod
   const avance = await seguirCourier(admin, fila, s, modo);
   if (avance) return avance;
 
-  const retiro = leerRetiroShipit(s.last_pickup);
+  const retiro = adaptador.leerRetiro(s.retiroCrudo);
 
   // El chofer pasó. No hay nada que reagendar ni que avisar.
-  if (retiroCumplido(retiro)) {
+  if (adaptador.retiroCumplido(retiro)) {
     const ok = await transicionEnvio(admin, fila.id, "pickup_scheduled", "in_transit");
     if (ok) {
       await admin
@@ -784,13 +782,13 @@ async function avisarRetiroFallido(admin: Admin, fila: ShipmentRow, motivo: stri
  * retiro puede aparecer después del correo. Con retiro pasa a
  * `pickup_scheduled` con fecha y ventana, que es lo que lee /mis-ventas.
  */
-async function pasoRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
+async function pasoRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode, adaptador: ProviderAdapter): Promise<ResumenFila> {
   if (modo === "dry-run" || !fila.shipit_id) {
     await reprogramarEnvio(admin, fila.id, 6 * 60);
     return { reference: fila.reference, estado: "notified", accion: "dry-run: no se consulta el retiro" };
   }
 
-  const s = await getShipitShipment(fila.shipit_id);
+  const s = await adaptador.consultarEnvio(fila.shipit_id);
   await registrarEventoShipit(admin, {
     shipmentId: fila.id,
     kind: "get",
@@ -812,7 +810,7 @@ async function pasoRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pr
   const avance = await seguirCourier(admin, fila, s, modo);
   if (avance) return avance;
 
-  const retiro = leerRetiroShipit(s.last_pickup);
+  const retiro = adaptador.leerRetiro(s.retiroCrudo);
   if (!retiro) {
     await reprogramarEnvio(admin, fila.id, 6 * 60);
     return { reference: fila.reference, estado: "notified", accion: "sin retiro agendado" };
@@ -893,16 +891,16 @@ async function pasoRetiro(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Pr
  *
  * Estados de Shipit vistos en respuestas reales: created, in_preparation,
  * in_route, delivered, canceled_shipment. `in_transit` viene del webhook.
+ * Desde el 07-10-2026 los traduce el adaptador (`EstadoCourier`): in_route e
+ * in_transit llegan como "in_transit" (lib/despacho/providers/shipit.ts).
  */
-const SHIPIT_EN_CAMINO = ["in_route", "in_transit"];
-
 async function seguirCourier(
   admin: Admin,
   fila: ShipmentRow,
-  s: { status: string | null },
+  s: { estado: EstadoCourier },
   modo: ShipitMode
 ): Promise<ResumenFila | null> {
-  const estado = (s.status ?? "").toLowerCase();
+  const estado = s.estado;
   const ahora = new Date().toISOString();
 
   if (estado === "delivered") {
@@ -922,7 +920,7 @@ async function seguirCourier(
     return { reference: fila.reference, estado: "delivered", accion: "entregado según el courier" };
   }
 
-  if (SHIPIT_EN_CAMINO.includes(estado) && fila.status !== "in_transit") {
+  if (estado === "in_transit" && fila.status !== "in_transit") {
     const ok = await transicionEnvio(admin, fila.id, fila.status, "in_transit");
     if (!ok) return { reference: fila.reference, estado: fila.status, accion: "ya avanzó (otro proceso)" };
     await admin
@@ -937,13 +935,13 @@ async function seguirCourier(
 }
 
 /** in_transit → delivered. Se mira cada 6 horas hasta que el courier lo entregue. */
-async function pasoEnCamino(admin: Admin, fila: ShipmentRow, modo: ShipitMode): Promise<ResumenFila> {
+async function pasoEnCamino(admin: Admin, fila: ShipmentRow, modo: ShipitMode, adaptador: ProviderAdapter): Promise<ResumenFila> {
   if (modo === "dry-run" || !fila.shipit_id) {
     await reprogramarEnvio(admin, fila.id, 6 * 60);
     return { reference: fila.reference, estado: "in_transit", accion: "dry-run: no se sigue el envío" };
   }
 
-  const s = await getShipitShipment(fila.shipit_id);
+  const s = await adaptador.consultarEnvio(fila.shipit_id);
   await registrarEventoShipit(admin, {
     shipmentId: fila.id,
     kind: "get",
@@ -961,7 +959,7 @@ async function pasoEnCamino(admin: Admin, fila: ShipmentRow, modo: ShipitMode): 
   if (avance) return avance;
 
   await reprogramarEnvio(admin, fila.id, 6 * 60);
-  return { reference: fila.reference, estado: "in_transit", accion: "sigue en camino", nota: s.status ?? undefined };
+  return { reference: fila.reference, estado: "in_transit", accion: "sigue en camino", nota: s.estadoCrudo ?? undefined };
 }
 
 function capitalizar(s: string): string {
@@ -1027,8 +1025,11 @@ async function recordarDetenidos(admin: Admin, modo: ShipitMode): Promise<number
     // responde o el paquete ya salió, no se avisa: la próxima corrida del paso
     // `notified` lo avanza.
     if (!fila.shipit_id) continue;
-    const actual = await getShipitShipment(fila.shipit_id);
-    if (actual.error || !["created", "in_preparation"].includes((actual.status ?? "").toLowerCase())) continue;
+    // El select de arriba no pide `provider` para no tumbarse mientras la
+    // migración 20261007 no esté aplicada: todos estos envíos son de Shipit.
+    // Cuando entre otro proveedor, sumar la columna al select y usarla acá.
+    const actual = await adaptadorDe(null).consultarEnvio(fila.shipit_id);
+    if (actual.error || actual.estado !== "created") continue;
 
     const [{ data: vendedor }, { data: head }] = await Promise.all([
       admin.from("users").select("full_name, email").eq("id", fila.seller_id).maybeSingle(),
