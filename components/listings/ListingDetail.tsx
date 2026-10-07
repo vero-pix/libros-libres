@@ -17,6 +17,8 @@ import PriceCompare from "@/components/listings/PriceCompare";
 import { VERO } from "@/lib/contadorVentas";
 import MercadoPagoNudge from "@/components/listings/MercadoPagoNudge";
 import SellerOtherListings from "./SellerOtherListings";
+import TotalConDespacho from "./TotalConDespacho";
+import type { DespachoFicha } from "@/lib/shipping/coordinado";
 import { libroUrl } from "@/lib/urls";
 import { trackEvent } from "@/utils/analytics";
 import { translateGenre } from "@/lib/genres";
@@ -160,7 +162,7 @@ interface Props {
    * Despacho vigente para este vendedor (lib/shipping/coordinado.ts):
    * tarifa más barata y plazo. null = no hay despacho que ofrecer.
    */
-  despacho?: { desde: number; dias: string } | null;
+  despacho?: DespachoFicha | null;
   /** Compra mínima del vendedor en pesos (lib/compraMinima.ts), o null. */
   compraMinima?: number | null;
 }
@@ -586,13 +588,23 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
                   desde $2.900", la tarifa de Shipit, apagado desde el 15-09. Sin
                   cobro en el sitio queda solo el encuentro en persona (P16, 08-09). */}
               {despacho && (!!listing.seller?.mercadopago_user_id || transferenciaDisponible) && (
-                <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-line">
-                  <span className="text-base">📦</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-ink">Despacho a todo Chile</p>
-                    <p className="text-[11px] text-ink-muted">{despacho.dias.charAt(0).toUpperCase() + despacho.dias.slice(1)}</p>
+                <div className="px-3 py-2.5 rounded-xl border border-line">
+                  <div className="flex items-center gap-3">
+                    <span className="text-base">📦</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-ink">Despacho a todo Chile</p>
+                      <p className="text-[11px] text-ink-muted">{despacho.dias.charAt(0).toUpperCase() + despacho.dias.slice(1)}</p>
+                    </div>
+                    <span className="text-[11px] font-semibold text-ink whitespace-nowrap">desde ${despacho.desde.toLocaleString("es-CL")}</span>
                   </div>
-                  <span className="text-[11px] font-semibold text-ink whitespace-nowrap">desde ${despacho.desde.toLocaleString("es-CL")}</span>
+                  {/* El total antes del checkout (07-10-2026): ver TotalConDespacho. */}
+                  {despacho.origen && listing.price != null && !isSold && (
+                    <TotalConDespacho
+                      despacho={despacho}
+                      precioLibro={listing.price}
+                      vendedorConMP={!!listing.seller?.mercadopago_user_id}
+                    />
+                  )}
                 </div>
               )}
             </div>

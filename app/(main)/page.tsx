@@ -10,10 +10,8 @@ import RecentlyViewed from "@/components/listings/RecentlyViewed";
 import Pagination from "@/components/ui/Pagination";
 import HomeShell from "@/components/home/HomeShell";
 import { getCachedCategoryTree, getAvailableTags } from "@/lib/categoryTree";
-import VitrinaDemanda from "@/components/home/VitrinaDemanda";
 import CalugaPieza from "@/components/home/CalugaPieza";
 import { leerPiezaDestacada } from "@/lib/piezaDestacada";
-import { librosMasBuscados } from "@/lib/demandaBusqueda";
 import TrustedStoresSection from "@/components/home/TrustedStoresSection";
 import HeroRequestStrip from "@/components/home/HeroRequestStrip";
 import { ordenarParaGrilla } from "@/lib/sortListings";
@@ -344,25 +342,6 @@ const getCollections = unstable_cache(
 );
 
 /**
- * La vitrina que sale de lo que la gente busca. Una hora de caché: el ranking
- * de búsquedas no se mueve en minutos y la consulta cruza búsquedas con
- * catálogo, que no es gratis.
- */
-const getVitrinaDemanda = unstable_cache(
-  async () => {
-    const supabase = createPublicClient();
-    try {
-      return await librosMasBuscados(supabase, { dias: 30, cuantos: 4 });
-    } catch {
-      // Que la vitrina falle no puede voltear el home: se cae a la fila curada.
-      return [];
-    }
-  },
-  ["home-vitrina-demanda-v1"],
-  { revalidate: 3600 }
-);
-
-/**
  * "La pieza" del sidebar. Media hora de caché: se cambia a mano en
  * `site_config`, no cada minuto. Ver lib/piezaDestacada.ts.
  */
@@ -586,12 +565,11 @@ export default async function HomePage({ searchParams }: Props) {
   const hasFilters = !!(genre || category || subcategory || tag || sort || price_min || price_max || condition || modality || author || binding || publisher || pages_min || pages_max || city_id || collectibleOnly);
 
   // Featured (cacheados — no dependen de filtros ni de sesión)
-  const [featuredListings, trustedStores, totalActiveCount, publicStats, vitrinaDemanda, piezaDestacada] = await Promise.all([
+  const [featuredListings, trustedStores, totalActiveCount, publicStats, piezaDestacada] = await Promise.all([
     getFeaturedListings() as unknown as Promise<ListingWithBook[]>,
     getTrustedStores(),
     getTotalActiveCount(),
     getPublicStats(),
-    getVitrinaDemanda(),
     getPiezaDestacada(),
   ]);
 
@@ -727,7 +705,9 @@ export default async function HomePage({ searchParams }: Props) {
         featuredRow={
           !hasFilters ? (
             <>
-              <VitrinaDemanda libros={vitrinaDemanda} />
+              {/* "Lo que vienen a buscar" (VitrinaDemanda) salió el 07-10-2026: sus
+                  cuatro libros tuvieron cero clics desde la portada en dos semanas.
+                  Quien busca algo usa el buscador. */}
               <TrustedStoresSection
                 casa={trustedStores.casa}
                 semana={trustedStores.semana}

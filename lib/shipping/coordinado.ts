@@ -115,19 +115,41 @@ export function leerTarifasCoordinado(valor: unknown): TarifasCoordinado | null 
  * vendedor: Santiago si despacha desde la RM, misma región si no. Si no se
  * reconoce su comuna, la más baja de las dos.
  */
+export interface DespachoFicha {
+  desde: number;
+  dias: string;
+  /**
+   * Comuna de origen reconocida y tarifas por zona, para que la ficha calcule
+   * el total con despacho a la comuna del comprador (07-10-2026). Sin origen
+   * reconocido no hay total: solo el "desde".
+   */
+  origen: string | null;
+  tarifas: Pick<TarifasCoordinado, ZonaEnvio>;
+}
+
 export function despachoParaFicha(
   tarifas: TarifasCoordinado | null,
   comunaOrigen: string | null | undefined
-): { desde: number; dias: string } | null {
+): DespachoFicha | null {
   if (!tarifas) return null;
   const zona = zonaEnvio(comunaOrigen, comunaOrigen);
   const desde = zona ? tarifas[zona] : Math.min(tarifas.santiago, tarifas.misma_region);
-  return { desde, dias: tarifas.dias };
+  return {
+    desde,
+    dias: tarifas.dias,
+    origen: zona ? comunaCanonica(comunaOrigen) : null,
+    tarifas: {
+      santiago: tarifas.santiago,
+      misma_region: tarifas.misma_region,
+      otra_region: tarifas.otra_region,
+      extremos: tarifas.extremos,
+    },
+  };
 }
 
 /** Precio del despacho coordinado entre dos comunas, o null si no aplica. */
 export function precioCoordinado(
-  tarifas: TarifasCoordinado | null,
+  tarifas: Pick<TarifasCoordinado, ZonaEnvio> | null,
   comunaOrigen: string | null | undefined,
   comunaDestino: string | null | undefined
 ): number | null {
