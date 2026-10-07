@@ -111,7 +111,7 @@ export async function GET(request: Request) {
                   <p>Soy Vero, de tuslibros.cl. Compraste <strong>${escapeHtml(libro)}</strong> hace ${dias} días y quien te lo vende todavía no registra el despacho. Ya le avisé.</p>
                   <p>Tienes dos opciones, y la decisión es tuya:</p>
                   <p><strong>Esperar.</strong> No tienes que hacer nada. Apenas lo despache, te llega el número de seguimiento por correo.</p>
-                  <p><strong>No esperar más.</strong> Respóndeme este correo y te devuelvo la plata completa.</p>
+                  <p><strong>No esperar más.</strong> Respóndeme este correo y te ayudo a recuperar tu plata con el vendedor.</p>
                   <p>Perdón por la demora.</p>
                   <p style="margin-top:28px">Vero<br/><span style="color:#777">tuslibros.cl</span></p>
                 </div>`,

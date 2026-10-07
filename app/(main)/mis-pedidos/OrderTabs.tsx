@@ -28,7 +28,7 @@ const ENVIO_TEXTO: Record<string, string> = {
   coordinado_pendiente: "Este pedido lo despacha el vendedor por su cuenta. Apenas lo deje en el courier te llega el número de seguimiento por correo.",
   pickup_scheduled: "El courier va a buscar tu paquete donde el vendedor. Cuando lo tenga, el seguimiento empieza a moverse.",
   pickup_failed: "El retiro no se concretó y el vendedor está decidiendo cómo despacharlo. Te aviso apenas el paquete salga; no tienes que hacer nada.",
-  canceled: "Esta compra quedó cancelada porque el vendedor no pudo despacharla. Te devuelvo la plata por MercadoPago.",
+  canceled: "Esta compra quedó cancelada porque el vendedor no pudo despacharla. Si ya la habías pagado, escríbeme y te ayudo a recuperar tu plata con el vendedor.",
 };
 
 const STATUS_COLORS: Record<string, string> = {

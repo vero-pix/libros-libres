@@ -54,7 +54,7 @@ const preguntas: Pregunta[] = [
   },
   {
     q: "¿Y si pago y el vendedor nunca despacha?",
-    a: "Te devuelvo tu plata completa y la cuenta del vendedor queda suspendida. Ya me tocó hacerlo. Vale para lo que pagaste en el sitio, no para lo que se acordó por fuera.",
+    a: "Te ayudo a recuperar tu plata con el vendedor y su cuenta queda suspendida. Vale para lo que pagaste en el sitio, no para lo que se acordó por fuera.",
     link: { href: "https://wa.me/56994583067", label: "Escribirme por WhatsApp" },
   },
   {
