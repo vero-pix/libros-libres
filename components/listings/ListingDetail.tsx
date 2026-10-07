@@ -571,7 +571,12 @@ export default function ListingDetail({ listing, images = [], sellerStats = null
                     {(() => {
                       const pts = ((listing.seller as any)?.pickup_points ?? []) as { label: string; comuna?: string | null }[];
                       const valid = pts.filter((p) => p?.label?.trim());
-                      if (valid.length === 0) return "Coordina lugar y hora con el vendedor";
+                      // Sin puntos de retiro, al menos la comuna: que se vea dónde está el
+                      // libro antes del checkout, no recién ahí (07-10-2026).
+                      if (valid.length === 0)
+                        return comuna !== "sin_comuna"
+                          ? `En ${comuna} · coordina lugar y hora con el vendedor`
+                          : "Coordina lugar y hora con el vendedor";
                       return (
                         <>
                           Retira en: {valid.map((p) => p.label + (p.comuna ? ` (${p.comuna})` : "")).join(" · ")}
