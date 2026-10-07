@@ -24,7 +24,7 @@ export default function PaymentAnimation() {
       <div className="max-w-6xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <p className="text-xs font-medium tracking-[0.3em] uppercase text-brand-600 mb-3">
-            Pago protegido
+            Pago seguro
           </p>
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-ink">
             MercadoPago se encarga de todo

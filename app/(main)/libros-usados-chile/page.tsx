@@ -11,7 +11,7 @@ import type { ListingWithBook } from "@/types";
 export const metadata: Metadata = {
   title: "Libros usados en Chile — rarezas, clásicos y escolares",
   description:
-    "Primeras ediciones, agotados y clásicos usados desde $3.000. Busca por cercanía en el mapa, retira en mano o recibe por courier, con pago protegido.",
+    "Primeras ediciones, agotados y clásicos usados desde $3.000. Busca por cercanía en el mapa, retira en mano o recibe por courier, con pago seguro con MercadoPago.",
   alternates: { canonical: "https://tuslibros.cl/libros-usados-chile" },
   keywords: [
     "libros usados Chile",

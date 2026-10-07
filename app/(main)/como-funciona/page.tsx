@@ -73,13 +73,14 @@ export default function ComoFuncionaPage() {
             cuando desde el 25 de agosto el sitio esconde el WhatsApp del
             vendedor que tiene MercadoPago: la página que explica cómo funciona
             el sitio recomendaba el camino que el sitio había cerrado. */}
-        {/* El id es el destino del sello "Pago protegido" del hero: la promesa de
-            la portada tiene que poder comprobarse en una página del sitio. */}
+        {/* El id es el destino del sello "Pago seguro" del hero (se llamaba "Pago
+            protegido" hasta el 07-10-2026; el ancla se mantiene para no romper
+            enlaces): la promesa de la portada tiene que poder comprobarse acá. */}
         <section id="pago-protegido" className="mb-14 scroll-mt-32">
           <h2 className="text-2xl font-bold text-ink mb-2 border-b-2 border-brand-600 pb-2 inline-block">
             Compra con pago seguro
           </h2>
-          <p className="text-ink-muted mb-6"><strong>Es la forma normal de comprar acá.</strong> Pagas con <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a> desde la publicación y el libro te llega por courier — así puedes comprarle a alguien de otra región o de una comuna lejana, sin tener que ir a buscarlo. Pagas con tu tarjeta a través de MercadoPago —no en efectivo a un desconocido— y queda registro de la compra para los dos. Si algo sale mal tienes <Link href="/devoluciones" className="text-brand-600 font-semibold hover:underline">7 días para devolverlo</Link>: si llega dañado, si es un libro distinto al publicado, o si viene en peor estado del que decía la ficha. Por esta vía cobro un 8% del precio del libro, y con eso pago la pasarela, el servidor y las horas.</p>
+          <p className="text-ink-muted mb-6"><strong>Es la forma normal de comprar acá.</strong> Pagas con <a href="https://www.mercadopago.cl" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-semibold hover:underline">MercadoPago</a> desde la publicación y el libro te llega por courier — así puedes comprarle a alguien de otra región o de una comuna lejana, sin tener que ir a buscarlo. Pagas con tu tarjeta a través de MercadoPago —no en efectivo a un desconocido— y queda registro de la compra para los dos. El pago le llega directo al vendedor. Si algo sale mal tienes <Link href="/devoluciones" className="text-brand-600 font-semibold hover:underline">7 días para devolverlo</Link>: si llega dañado, si es un libro distinto al publicado, o si viene en peor estado del que decía la ficha. Por esta vía cobro un 8% del precio del libro, y con eso pago la pasarela, el servidor y las horas.</p>
           <p className="text-ink-muted mb-6">Algunos vendedores —yo entre ellos— además cobran por <strong>transferencia</strong>. Cuando es el caso, confirmas el pedido y el vendedor te manda sus datos por mensaje. Yo no guardo datos bancarios de nadie.</p>
           <div className="space-y-5">
             {mpSteps.map((step) => <StepCard key={step.number} step={step} />)}

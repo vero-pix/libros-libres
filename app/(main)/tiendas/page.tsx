@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   // la trae es "librerías de libros usados en santiago de chile".
   title: "Librerías de libros usados en Chile — compra directo",
   description:
-    "Las librerías y vendedores con más libros usados de Chile: Santiago, Concepción, Talca y más. Explora sus catálogos y compra con pago protegido.",
+    "Las librerías y vendedores con más libros usados de Chile: Santiago, Concepción, Talca y más. Explora sus catálogos y compra con pago seguro con MercadoPago.",
   alternates: { canonical: "https://tuslibros.cl/tiendas" },
 };
 
@@ -86,7 +86,7 @@ export default async function TiendasPage() {
           </h1>
           <p className="text-ink-muted mt-3 max-w-xl mx-auto leading-relaxed">
             {stores.length} tiendas activas publicando libros usados en Chile. Estas son las
-            que más han subido — entra a su catálogo y compra directo con pago protegido.
+            que más han subido — entra a su catálogo y compra directo con pago seguro.
           </p>
         </div>
       </section>

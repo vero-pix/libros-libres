@@ -188,7 +188,7 @@ export default function MessageThread({ conversationId, currentUserId }: Props) 
             role="status"
             className="mt-2 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed"
           >
-            Recuerda: el pago va por la plataforma, así queda protegido para los dos. Más info en{" "}
+            Recuerda: el pago va por la plataforma, así queda registrado para los dos. Más info en{" "}
             <Link href="/ayuda/preguntas" className="font-semibold underline hover:text-amber-700">
               /ayuda/preguntas
             </Link>

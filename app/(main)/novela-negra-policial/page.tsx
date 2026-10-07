@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Novela Negra y Policial Usada en Chile",
     description:
-      "Simenon, Camilleri, Mankell, Christie y toda la novela negra usada. Pago protegido y envío a todo Chile.",
+      "Simenon, Camilleri, Mankell, Christie y toda la novela negra usada. Pago seguro con MercadoPago y envío a todo Chile.",
     url: "https://tuslibros.cl/novela-negra-policial",
     siteName: "tuslibros.cl",
     locale: "es_CL",
@@ -123,7 +123,7 @@ export default async function NovelaNegraPage() {
               El comisario Maigret de Simenon, Montalbano de Camilleri, el frío de Mankell,
               la astucia de Agatha Christie. Toda la novela negra y policial de segunda
               mano, en buen estado y a precio de usado — ideal para completar sagas sin
-              gastar de más. Pago protegido con MercadoPago y envío a todo Chile.
+              gastar de más. Pago seguro con MercadoPago y envío a todo Chile.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink href="/search?q=novela%20negra" className="shadow-sm">

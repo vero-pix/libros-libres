@@ -135,7 +135,7 @@ export default async function LibrosHistoriaChilePage() {
               La Unidad Popular, la dictadura, la Guerra del Pacífico, el mundo mapuche, el
               salitre, la Independencia. Buena parte de los grandes libros de historia de
               Chile ya no se reeditan: solo circulan de segunda mano, entre lectores. Acá
-              los encuentras a precio de usado, con pago protegido por MercadoPago y envío
+              los encuentras a precio de usado, con pago seguro por MercadoPago y envío
               a todo Chile.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">

@@ -69,7 +69,7 @@ export async function generateMetadata({ params }: Props) {
   // Antes prometía "coordinación por WhatsApp" en TODOS los vendedores, incluidos
   // aquellos a los que la política de WhatsApp les esconde el botón por tener
   // MercadoPago: Google mostraba algo que la página no cumplía. (08-09-2026)
-  const description = `Compra libros de ${name}${location}.${bio} Pago protegido con MercadoPago y despacho a todo Chile.`;
+  const description = `Compra libros de ${name}${location}.${bio} Pago seguro con MercadoPago y despacho a todo Chile.`;
   const slug = seller?.username ?? params.id;
   const canonicalUrl = `https://tuslibros.cl/vendedor/${slug}`;
 
@@ -281,7 +281,7 @@ export default async function SellerStorePage({ params, searchParams }: Props) {
               {seller.mercadopago_user_id && (
                 <span
                   className="inline-flex items-center gap-1.5 bg-[#009EE3]/10 text-[#009EE3] px-2.5 py-0.5 rounded-full border border-[#009EE3]/25 font-medium"
-                  title="Este vendedor acepta pagos seguros a través de MercadoPago. Tu compra queda protegida."
+                  title="Este vendedor cobra con MercadoPago: pagas con un medio de pago seguro y la compra queda registrada."
                 >
                   <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="currentColor" aria-hidden="true">
                     <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 14.414L6.586 12 8 10.586l3 3 5-5L17.414 10l-6.414 6.414z" />

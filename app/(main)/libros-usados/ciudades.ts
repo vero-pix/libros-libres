@@ -59,7 +59,7 @@ export const CIUDADES: Record<string, Ciudad> = {
     match: "Providencia",
     heroSub: "A pasos de tu casa o trabajo.",
     intro:
-      "Gran parte del catálogo de tuslibros.cl vive en Providencia. Si vives o trabajas cerca, no necesitas pagar despacho: explora libros de tus vecinos y coordina retiros fáciles en Manuel Montt, Baquedano, Pedro de Valdivia o Los Leones. Pago protegido y entregas seguras.",
+      "Gran parte del catálogo de tuslibros.cl vive en Providencia. Si vives o trabajas cerca, no necesitas pagar despacho: explora libros de tus vecinos y coordina retiros fáciles en Manuel Montt, Baquedano, Pedro de Valdivia o Los Leones. Pago seguro con MercadoPago.",
     faqs: [
       {
         q: "¿Dónde se coordinan los retiros en Providencia?",
@@ -105,7 +105,7 @@ export const CIUDADES: Record<string, Ciudad> = {
     match: "Ñuñoa",
     heroSub: "De Plaza Ñuñoa a tu estante.",
     intro:
-      "Libros usados en Ñuñoa, una de las comunas con más lectores de Santiago. Coordina retiro cerca de Plaza Ñuñoa, Irarrázaval o Estadio Nacional, o recibe el libro por courier. Compra protegida con MercadoPago.",
+      "Libros usados en Ñuñoa, una de las comunas con más lectores de Santiago. Coordina retiro cerca de Plaza Ñuñoa, Irarrázaval o Estadio Nacional, o recibe el libro por courier. Pago seguro con MercadoPago.",
     faqs: [
       {
         q: "¿Dónde se coordinan los retiros en Ñuñoa?",
@@ -168,7 +168,7 @@ export const CIUDADES: Record<string, Ciudad> = {
     match: "Viña",
     heroSub: "Tu próxima lectura, a la orilla del mar.",
     intro:
-      "Libros usados en Viña del Mar y alrededores. Coordina retiro en persona con vendedores de la zona o recibe el libro en tu casa por courier. Pago protegido con MercadoPago y envíos a todo Chile.",
+      "Libros usados en Viña del Mar y alrededores. Coordina retiro en persona con vendedores de la zona o recibe el libro en tu casa por courier. Pago seguro con MercadoPago y envíos a todo Chile.",
     faqs: [
       {
         q: "¿Puedo retirar en persona en Viña del Mar?",
@@ -210,7 +210,7 @@ export const CIUDADES: Record<string, Ciudad> = {
     match: "Temuco",
     heroSub: "Libros usados en la Araucanía.",
     intro:
-      "Libros usados en Temuco y la Araucanía. Catálogo actualizado con envío a todo Chile o retiro directo con el vendedor. Pago protegido con MercadoPago.",
+      "Libros usados en Temuco y la Araucanía. Catálogo actualizado con envío a todo Chile o retiro directo con el vendedor. Pago seguro con MercadoPago.",
     faqs: [
       {
         q: "¿Puedo retirar en persona en Temuco?",
@@ -252,7 +252,7 @@ export const CIUDADES: Record<string, Ciudad> = {
     match: "Serena",
     heroSub: "Libros usados en La Serena y Coquimbo.",
     intro:
-      "Libros usados en La Serena y Coquimbo. Compra con garantía de pago seguro y envío a domicilio, o coordina retiro en persona con vendedores de la zona. Pago protegido con MercadoPago.",
+      "Libros usados en La Serena y Coquimbo. Recibe el libro en tu casa o coordina retiro en persona con vendedores de la zona. Pago seguro con MercadoPago.",
     faqs: [
       {
         q: "¿Puedo retirar en persona en La Serena?",
@@ -273,7 +273,7 @@ export const CIUDADES: Record<string, Ciudad> = {
     match: "Talca",
     heroSub: "Libros usados en el corazón del Maule.",
     intro:
-      "Libros usados en Talca y la Región del Maule. Vendedores locales con retiro en mano y despacho a todo Chile, además de universitarios que liquidan sus textos cada semestre. Pago protegido con MercadoPago.",
+      "Libros usados en Talca y la Región del Maule. Vendedores locales con retiro en mano y despacho a todo Chile, además de universitarios que liquidan sus textos cada semestre. Pago seguro con MercadoPago.",
     faqs: [
       {
         q: "¿Puedo retirar en persona en Talca?",
@@ -294,7 +294,7 @@ export const CIUDADES: Record<string, Ciudad> = {
     match: "Puerto Montt",
     heroSub: "Libros usados en la puerta de la Patagonia.",
     intro:
-      "Libros usados en Puerto Montt y la Región de Los Lagos. Lectores y libreros del sur con catálogo propio, retiro en mano y despacho por courier a todo Chile. Pago protegido con MercadoPago.",
+      "Libros usados en Puerto Montt y la Región de Los Lagos. Lectores y libreros del sur con catálogo propio, retiro en mano y despacho por courier a todo Chile. Pago seguro con MercadoPago.",
     faqs: [
       {
         q: "¿Puedo retirar en persona en Puerto Montt?",
@@ -315,7 +315,7 @@ export const CIUDADES: Record<string, Ciudad> = {
     match: "Coquimbo",
     heroSub: "Libros usados en la bahía.",
     intro:
-      "Libros usados en Coquimbo y la conurbación con La Serena. Retiro en mano entre vecinos y despacho a todo Chile. Pago protegido con MercadoPago.",
+      "Libros usados en Coquimbo y la conurbación con La Serena. Retiro en mano entre vecinos y despacho a todo Chile. Pago seguro con MercadoPago.",
     faqs: [
       {
         q: "¿Puedo retirar en persona en Coquimbo o La Serena?",

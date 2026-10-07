@@ -185,8 +185,8 @@ export default function HeroBar({ heroBooks, primavera = false }: Props) {
             )}
             <p className="mt-6 font-display italic text-lg sm:text-xl text-ink-muted/90 leading-snug max-w-xl">
               {primavera
-                ? "Fantasía, poesía y lo que recién llegó a las estanterías de otros. Cerca de ti, con pago protegido."
-                : "Los que ya leíste, los que te faltan. Compra y vende de estantería a estantería, cerca de ti, con pago protegido."}
+                ? "Fantasía, poesía y lo que recién llegó a las estanterías de otros. Cerca de ti, con pago seguro."
+                : "Los que ya leíste, los que te faltan. Compra y vende de estantería a estantería, cerca de ti, con pago seguro."}
             </p>
 
             {/* CTAs */}
@@ -237,7 +237,7 @@ export default function HeroBar({ heroBooks, primavera = false }: Props) {
                   portada prometía tres cosas sin dónde leerlas. (21-09-2026) */}
               {[
                 { icon: "📍", label: "Cerca de ti", href: "/mapa" },
-                { icon: "🛡️", label: "Pago protegido", href: "/como-funciona#pago-protegido" },
+                { icon: "🛡️", label: "Pago seguro", href: "/como-funciona#pago-protegido" },
                 { icon: "👤", label: "Gente real", href: "/gente-de-confianza" },
               ].map((b, i) => (
                 <span key={b.label} className="flex items-center gap-3">

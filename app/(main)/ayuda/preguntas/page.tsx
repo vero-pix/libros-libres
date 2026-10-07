@@ -28,7 +28,7 @@ const preguntas: Pregunta[] = [
   },
   {
     q: "¿Por qué no puedo ver el WhatsApp de un vendedor?",
-    a: "Cuando el vendedor cobra por la plataforma, la compra va por el sitio. Así el pago queda protegido y el envío queda registrado. Puedes escribirle por Mensajes.",
+    a: "Cuando el vendedor cobra por la plataforma, la compra va por el sitio. Así el pago es seguro y la compra y el envío quedan registrados. Puedes escribirle por Mensajes.",
     link: { href: "/mensajes", label: "Ir a Mensajes" },
   },
   {

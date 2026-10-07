@@ -21,7 +21,7 @@ export default function Footer() {
             <Link href="/gente-de-confianza" className="group p-6 sm:p-7 border-b sm:border-b-0 sm:border-r border-line hover:bg-cream-warm/50 transition-colors">
               <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-coral font-semibold">Gente de confianza</p>
               <h4 className="font-display text-xl text-ink mt-3 mb-2 tracking-[-0.01em]">Vendedores reales</h4>
-              <p className="text-[13px] text-ink-muted leading-relaxed">Personas y librerías de viejo con pago protegido por MercadoPago y reseñas. Sabes a quién le compras.</p>
+              <p className="text-[13px] text-ink-muted leading-relaxed">Personas y librerías de viejo con pago seguro por MercadoPago y reseñas. Sabes a quién le compras.</p>
             </Link>
             */}
             {/* Historia reemplazó a "Libros escolares" (15-09-2026): escolar tenía 9 libros

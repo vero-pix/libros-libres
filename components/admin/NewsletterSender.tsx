@@ -30,7 +30,7 @@ const NEWSLETTER_TEMPLATES = [
   </div>
 
   <p style="font-size: 16px; color: #333; line-height: 1.7;">
-    El pago llega protegido por MercadoPago y el libro viaja con courier a todo Chile, o lo retiras en mano si estamos cerca.
+    El pago es seguro, por MercadoPago, y el libro viaja con courier a todo Chile, o lo retiras en mano si estamos cerca.
   </p>
 
   <p style="font-size: 16px; color: #333; line-height: 1.7; margin-top: 28px;">

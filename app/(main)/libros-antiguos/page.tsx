@@ -152,7 +152,7 @@ export default async function LibrosAntiguosPage() {
     "@type": "CollectionPage",
     name: "Libros antiguos e impresos chilenos en Chile",
     description:
-      "Impresos chilenos antiguos, primeras ediciones, ediciones del siglo XIX y descatalogados a la venta en Chile, con fotos reales y pago protegido.",
+      "Impresos chilenos antiguos, primeras ediciones, ediciones del siglo XIX y descatalogados a la venta en Chile, con fotos reales y pago seguro con MercadoPago.",
     url: URL,
   };
 

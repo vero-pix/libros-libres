@@ -31,7 +31,7 @@ const TEMAS = [
 export const metadata: Metadata = {
   title: "Comprar libros usados en Chile — baratos, raros y cerca de ti",
   description:
-    "Compra libros usados en Chile: clásicos, rarezas y primeras ediciones desde $3.000, hasta 60% bajo el precio nuevo. Pago protegido con MercadoPago, retiro en mano o despacho por courier a todo Chile.",
+    "Compra libros usados en Chile: clásicos, rarezas y primeras ediciones desde $3.000, hasta 60% bajo el precio nuevo. Pago seguro con MercadoPago, retiro en mano o despacho por courier a todo Chile.",
   alternates: { canonical: "https://tuslibros.cl/comprar-libros-usados" },
   keywords: [
     "comprar libros usados",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Comprar libros usados en Chile",
     description:
-      "El libro que buscas probablemente ya lo leyó alguien cerca de ti. Cómpralo usado: más barato, muchas veces agotado en librerías nuevas, y con pago protegido.",
+      "El libro que buscas probablemente ya lo leyó alguien cerca de ti. Cómpralo usado: más barato, muchas veces agotado en librerías nuevas, y con pago seguro con MercadoPago.",
     url: "https://tuslibros.cl/comprar-libros-usados",
     siteName: "tuslibros.cl",
     locale: "es_CL",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
 const faqs = [
   {
     q: "¿Dónde puedo comprar libros usados en Chile por internet?",
-    a: "En tuslibros.cl. Es un marketplace chileno donde personas y librerías de viejo publican sus libros usados. Buscas por título, autor o género, pagas protegido con MercadoPago y eliges retiro en mano o despacho por courier a todo Chile.",
+    a: "En tuslibros.cl. Es un marketplace chileno donde personas y librerías de viejo publican sus libros usados. Buscas por título, autor o género, pagas seguro con MercadoPago y eliges retiro en mano o despacho por courier a todo Chile.",
   },
   {
     q: "¿Cuánto más barato sale comprar usado?",
@@ -131,7 +131,7 @@ export default async function ComprarLibrosUsadosPage() {
               El libro que andas buscando probablemente ya lo leyó alguien cerca de ti.
               En <strong className="text-ink">tuslibros.cl</strong> lo compras usado: entre
               30% y 60% más barato que nuevo, muchas veces agotado en las librerías de
-              siempre, y con el pago protegido por MercadoPago. Retiras en mano o pides
+              siempre, y con pago seguro por MercadoPago. Retiras en mano o pides
               despacho a todo Chile. Sin registrarte para mirar.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">

@@ -137,7 +137,7 @@ export default async function MeganMaxwellPage() {
               La saga Pídeme lo que quieras, Adivina quién soy, Las ranas también se
               enamoran y toda su romántica. Acá las consigues de segunda mano —en muy buen
               estado y a una fracción del precio nuevo— porque las lectoras las van
-              soltando apenas las terminan. Pago protegido con MercadoPago y envío a todo
+              soltando apenas las terminan. Pago seguro con MercadoPago y envío a todo
               Chile.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">

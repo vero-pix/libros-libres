@@ -67,7 +67,7 @@ export function lineaDePrueba(t: TiendaConfianza): string {
     if (d <= 21) return `Sus libros se venden en unas ${Math.round(d / 7)} semanas`;
   }
 
-  return `${t.portadas.length > 0 ? "" : ""}Vende con pago protegido y despacho a todo Chile`;
+  return `${t.portadas.length > 0 ? "" : ""}Vende con pago seguro y despacho a todo Chile`;
 }
 
 function Portadas({ portadas, alto }: { portadas: TiendaConfianza["portadas"]; alto: number }) {
