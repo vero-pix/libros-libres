@@ -16,6 +16,7 @@ import DatosDespacho from "@/components/sales/DatosDespacho";
 import { nombreCourier } from "@/lib/courier-tracking";
 import { ESTADO_COORDINADO_DESPACHADO, ESTADO_COORDINADO_PENDIENTE } from "@/lib/shipping/coordinado";
 import { extractCommune } from "@/lib/chilexpress";
+import { waSoporte } from "@/lib/soporte";
 import { leerArchivadas, carritoSigueArchivado, claveArchivo, ESTADOS_ARCHIVABLES } from "@/lib/ventasArchivadas";
 import {
   VentasArchivables,
@@ -344,22 +345,10 @@ export default async function MisVentasPage() {
                     {ordenesVisibles.map((order: any) => {
                       const isInPerson = order.courier === "Entrega en persona" || order.courier === "Punto de retiro" || !order.courier;
                       const isPaid = order.status === "paid" || order.status === "shipped" || order.status === "delivered";
-                      const ageHours = (Date.now() - new Date(order.created_at).getTime()) / 36e5;
                       const shipment = order.bundle_id ? shipmentByBundle.get(order.bundle_id) : undefined;
-                      // Con fila en `shipments` la alarma vieja no aplica: el
-                      // worker es el que dice en qué está el envío.
                       const esCoordinado =
                         order.shipping_status === ESTADO_COORDINADO_PENDIENTE ||
                         order.shipping_status === ESTADO_COORDINADO_DESPACHADO;
-                      const labelStuck =
-                        isPaid && !isInPerson && !esCoordinado && !order.shipping_label_url && ageHours > 1 && !shipment;
-                      const supportMailto = labelStuck
-                        ? `mailto:soporte@shipit.cl?subject=${encodeURIComponent(
-                            `Ayuda con envío — orden ${order.id.slice(0, 8)}`
-                          )}&body=${encodeURIComponent(
-                            `Hola equipo de Shipit,\n\nMi envío no logra emitir la etiqueta. Necesito que me ayuden a regenerarla.\n\nDetalles:\n- Referencia: TL-${order.id.slice(0, 12)}\n- Courier: ${order.courier ?? "Starken"}\n- Comprador: ${order.buyer?.full_name ?? ""}\n- Dirección: ${order.buyer_address ?? ""}\n- Fecha pedido: ${new Date(order.created_at).toLocaleString("es-CL")}\n\nGracias.`
-                          )}`
-                        : null;
                       // El registro del despacho vivía solo dentro de la celda
                       // "Envío". Con `table-fixed` esa columna mide 25% del ancho:
                       // en un celular son ~90px, y el formulario quedaba aplastado
@@ -452,38 +441,28 @@ export default async function MisVentasPage() {
                                   >
                                     📄 Descargar etiqueta
                                   </a>
-                                ) : labelStuck ? (
+                                ) : (
                                   <div className="space-y-1">
-                                    {/* Antes decía "el courier trae el manifiesto al
-                                        retiro", que en el caso de Melipeuco era falso:
-                                        no había courier asignado ni retiro agendado, y
-                                        el vendedor esperaba a alguien que nunca iba a
-                                        llegar. Mejor decir que está trabado. (5 ago 2026) */}
+                                    {/* Ventas por courier anteriores al 15-09, sin etiqueta. Hasta el
+                                        07-10-2026 ofrecía escribir a Shipit y un mailto a un correo que
+                                        no era el de tuslibros, o "Etiqueta en preparación…" para siempre.
+                                        Shipit ya no opera para tuslibros: la salida es escribirle a Vero,
+                                        que tiene el flete de esa venta y decide cómo se despacha. */}
                                     <span className="text-[11px] text-amber-700 block font-medium">
-                                      Este envío no logró emitir etiqueta.
+                                      Esta venta es de antes del 15 de septiembre y su etiqueta ya no va a salir.
                                     </span>
                                     <span className="text-[11px] text-ink-muted block">
-                                      A veces el courier igual retira con su propio
-                                      manifiesto, pero no lo des por hecho: escríbenos y
-                                      lo resolvemos contigo.
+                                      Escríbeme antes de despacharla y la resolvemos juntos.
                                     </span>
                                     <a
-                                      href={`mailto:vero@economics.cl?subject=${encodeURIComponent(
-                                        `Envío trabado — orden ${order.id.slice(0, 8)}`
-                                      )}`}
+                                      href={waSoporte(`Hola Vero, tengo una venta antigua sin etiqueta: orden ${order.id.slice(0, 8)}.`)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
                                       className="inline-block text-[11px] bg-ink text-cream px-2 py-1 rounded-md hover:bg-ink/90"
                                     >
-                                      Avisarle a Vero
-                                    </a>
-                                    <a
-                                      href={supportMailto!}
-                                      className="inline-block text-[11px] bg-cream-warm text-ink px-2 py-1 rounded-md border border-cream-dark/40 hover:bg-cream-dark/20"
-                                    >
-                                      ¿Algo raro? Escribir a Shipit
+                                      Escribirle a Vero por WhatsApp
                                     </a>
                                   </div>
-                                ) : (
-                                  <span className="text-[11px] text-amber-700">Etiqueta en preparación…</span>
                                 )}
                                 <div className="pt-0.5">
                                   <a href="/como-despachar" className="text-[11px] text-brand-600 hover:underline">

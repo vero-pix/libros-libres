@@ -223,7 +223,7 @@ export default function BundleCheckoutForm({
         // (5 ago 2026)
         if (res.ok && data.unavailable) {
           setQuoteError(
-            "No hay courier que despache este pedido a tu dirección. Puedes coordinar un encuentro en persona con el vendedor."
+            "No hay despacho disponible a esa dirección. Revisa que la comuna esté bien escrita, o coordina un encuentro en persona con el vendedor."
           );
           setShippingUnavailable(true);
           setQuotes([]);
@@ -543,11 +543,11 @@ export default function BundleCheckoutForm({
               disabled={quoting || address.trim().length < 5 || !addressHasNumber}
               className="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white text-sm font-medium rounded-md transition-colors whitespace-nowrap"
             >
-              {quoting ? "Cotizando..." : "Cotizar"}
+              {quoting ? "Calculando..." : "Calcular envío"}
             </button>
           </div>
               <p className="mt-2 text-[11px] text-gray-500">
-                Incluye la <strong>comuna</strong>: es lo que usan los couriers para cotizar el despacho.
+                Incluye la <strong>comuna</strong>: con ella se calcula la tarifa del despacho.
               </p>
 
           {addressIncomplete && (
@@ -583,9 +583,11 @@ export default function BundleCheckoutForm({
             No hay despacho disponible para este pedido
           </h2>
           <p className="text-xs text-amber-800">
-            Ningún courier cubre la ruta entre la comuna del vendedor y tu
-            dirección. Puedes cambiar a <strong>encuentro en persona</strong> y
-            coordinar con el vendedor, o probar con otra dirección.
+            {/* Hasta el 07-10-2026 culpaba a los couriers. Sin Shipit, esto pasa cuando no se
+                reconoce la comuna o el vendedor no ofrece despacho (perfil > Tu despacho). */}
+            Este vendedor no ofrece despacho a esa dirección, o no reconocí la comuna.
+            Revisa que esté bien escrita, o cambia a <strong>encuentro en persona</strong> y
+            coordina con el vendedor.
           </p>
         </div>
       )}

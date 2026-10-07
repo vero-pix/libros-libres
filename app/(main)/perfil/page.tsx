@@ -71,7 +71,7 @@ export default async function PerfilPage() {
                 <li>• <strong>Teléfono</strong> — necesario para coordinar con vendedores y compradores</li>
               )}
               {missingAddress && (
-                <li>• <strong>Dirección / ubicación</strong> — para cercanía y cotización de envíos</li>
+                <li>• <strong>Dirección / ubicación</strong> — para cercanía y para calcular la tarifa del despacho</li>
               )}
             </ul>
           </div>

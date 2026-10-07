@@ -691,11 +691,15 @@ export default function ProfileForm({
             <p className="text-xs text-green-600">✓ Ubicación guardada correctamente.</p>
           )}
 
-          {/* Cómo sale el paquete. Vale para todas sus ventas con despacho. */}
+          {/* Cómo prefiere que salga el paquete (`shipit_dispatch_mode`). Hasta el 07-10-2026
+              describía el flujo de Shipit (etiqueta impresa, retiro del courier), apagado desde el
+              15-09. Hoy todo despacho lo lleva el vendedor a la sucursal; esto queda como su
+              preferencia para cuando conectemos couriers (ver "Tu despacho", más abajo). */}
           <div className="pt-4 mt-2 border-t border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-700">Cuando vendas con despacho</h3>
+            <h3 className="text-sm font-semibold text-gray-700">Cómo prefieres despachar</h3>
             <p className="text-xs text-gray-500 mt-0.5 mb-3">
-              Tú eliges cómo sale el paquete. Lo puedes cambiar cuando quieras.
+              Hoy cada despacho lo llevas tú a la sucursal del courier que elijas. Esto lo vamos a usar cuando
+              conectemos los couriers.
             </p>
 
             <div className="grid gap-2">
@@ -703,12 +707,12 @@ export default function ProfileForm({
                 {
                   value: "dropoff",
                   titulo: "Lo dejo yo en un punto o sucursal",
-                  texto: "Imprimes la etiqueta, la pegas y entregas el paquete en el punto o sucursal que te acomode. No tienes que esperar a nadie.",
+                  texto: "Llevas el paquete al punto o sucursal que te acomode, cuando te acomode. No tienes que esperar a nadie.",
                 },
                 {
                   value: "pickup",
-                  titulo: "Que vengan a buscarlo",
-                  texto: "El courier pasa a tu dirección en una ventana de horario. Tienes que estar ahí para entregarlo.",
+                  titulo: "Prefiero que lo vengan a buscar",
+                  texto: "Todavía no existe: lo vamos a ofrecer cuando conectemos couriers con retiro. Mientras tanto, igual lo llevas tú.",
                 },
               ].map((o) => (
                 <label
@@ -735,11 +739,6 @@ export default function ProfileForm({
                 </label>
               ))}
             </div>
-
-            <p className="text-[11px] text-gray-500 mt-2.5">
-              Si el courier agenda un retiro que tú no pediste, mandamos lo que elegiste acá y te
-              avisamos.
-            </p>
           </div>
 
           {/* Aplicar a lo ya publicado */}
@@ -756,7 +755,7 @@ export default function ProfileForm({
                   <p className="text-xs text-gray-600">
                     Se le va a poner esta dirección a tus {publishedCount}{" "}
                     {publishedCount === 1 ? "publicación" : "publicaciones"} activas y en pausa.
-                    Afecta desde dónde se cotiza el despacho.
+                    Es la comuna de origen con la que se calcula la tarifa del despacho.
                   </p>
                   <div className="flex gap-2">
                     <button

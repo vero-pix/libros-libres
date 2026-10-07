@@ -72,7 +72,9 @@ export default function TotalConDespacho({
           </p>
           <p className="mt-0.5 text-[11px] text-ink-muted tabular-nums">
             Libro {clp(precioLibro)} + despacho {clp(flete)}
-            {cargo > 0 ? ` + cargo por servicio ${clp(cargo)}` : ""}
+            {/* "con MercadoPago": si el vendedor también acepta transferencia, pagando así no hay
+                cargo y el total baja. Aclarado el 07-10-2026 (auditoría de copy). */}
+            {cargo > 0 ? ` + cargo por servicio ${clp(cargo)} (pagando con MercadoPago)` : ""}
           </p>
         </div>
       )}

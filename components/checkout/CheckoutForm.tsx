@@ -235,7 +235,7 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
         // despachar (caso Melipeuco, 5 ago 2026).
         if (res.ok && data.unavailable) {
           setQuoteError(
-            "No hay courier que despache este libro a tu dirección. Puedes coordinar un encuentro en persona con el vendedor."
+            "No hay despacho disponible a esa dirección. Revisa que la comuna esté bien escrita, o coordina un encuentro en persona con el vendedor."
           );
           setShippingUnavailable(true);
           setQuotes([]);
@@ -621,12 +621,12 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                 </button>
               </div>
               <p className="mt-2 text-[11px] text-ink-muted">
-                Incluye la <strong>comuna</strong>: es lo que usan los couriers para cotizar el despacho.
+                Incluye la <strong>comuna</strong>: con ella se calcula la tarifa del despacho.
               </p>
               {quoting && (
                 <div className="mt-3 flex items-center gap-2 text-[10px] text-ink-muted font-bold uppercase tracking-widest animate-pulse">
                   <span className="w-2 h-2 bg-brand-500 rounded-full" />
-                  Cotizando con couriers...
+                  Calculando el despacho...
                 </div>
               )}
               {addressIncomplete && (
@@ -662,9 +662,11 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
                     No hay despacho disponible para este libro
                   </p>
                   <p className="text-xs text-amber-800">
-                    Ningún courier cubre la ruta entre la comuna del vendedor y tu
-                    dirección. Puedes cambiar a <strong>encuentro en persona</strong>{" "}
-                    y coordinar con el vendedor, o probar con otra dirección.
+                    {/* Hasta el 07-10-2026 culpaba a los couriers. Sin Shipit, esto pasa cuando no se
+                        reconoce la comuna o el vendedor no ofrece despacho (perfil > Tu despacho). */}
+                    Este vendedor no ofrece despacho a esa dirección, o no reconocí la comuna.
+                    Revisa que esté bien escrita, o cambia a <strong>encuentro en persona</strong>{" "}
+                    y coordina con el vendedor.
                   </p>
                 </div>
               )}
