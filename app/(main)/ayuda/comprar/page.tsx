@@ -55,9 +55,9 @@ export default function AyudaComprarPage() {
         <Seccion n={2} id="pagar" title="Pagar">
           <Tarjeta>
             <p>
-              El pago es en línea, por MercadoPago (tarjeta, débito o saldo). La compra queda registrada a tu nombre
-              en Mis compras y, si algo sale mal, me escribes y lo resolvemos; con MercadoPago también tienes su
-              proceso de reclamos.
+              El pago es en línea: por MercadoPago (tarjeta, débito o saldo) o por transferencia, según el vendedor.
+              El pago le llega directo a quien te vende. La compra queda registrada a tu nombre en Mis compras y,
+              si algo sale mal, me escribes y te ayudo a resolverlo con el vendedor.
             </p>
             {/* El cargo no aparecía en esta guía (auditoría del 07-10-2026). Misma regla que lib/cargo-servicio.ts. */}
             <p className="mt-4">

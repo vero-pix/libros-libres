@@ -69,7 +69,7 @@ const faqs = [
   },
   {
     q: "¿El pago es seguro?",
-    a: "Sí. Pagas en el sitio con MercadoPago o por transferencia, y la compra queda registrada con su número de pedido. Si el libro no llega o no es lo que decía la ficha, me escribes y lo resolvemos; con MercadoPago también tienes su proceso de reclamos.",
+    a: "Sí. Pagas en el sitio con MercadoPago o por transferencia, y la compra queda registrada con su número de pedido. Si el libro no llega o no es lo que decía la ficha, me escribes y te ayudo a resolverlo con el vendedor.",
   },
   {
     q: "¿Puedo retirar el libro en persona en vez de pagar despacho?",
@@ -222,7 +222,7 @@ export default async function ComprarLibrosUsadosPage() {
               {[
                 { n: "1", title: "Búscalo", desc: "Por título, autor, género o cercanía en el mapa. Mirar no requiere cuenta." },
                 { n: "2", title: "Compara el precio", desc: "Cada ficha muestra el precio nuevo en Buscalibre y MercadoLibre. Decides con datos." },
-                { n: "3", title: "Paga protegido", desc: "Con MercadoPago. Te llega el seguimiento por correo y, si algo sale mal, lo resolvemos contigo." },
+                { n: "3", title: "Paga en el sitio", desc: "Con MercadoPago o por transferencia. Te llega el seguimiento por correo y, si algo sale mal, te ayudo con el vendedor." },
                 { n: "4", title: "Retira o recibe", desc: "Retiro en mano gratis, o despacho por courier a todo Chile. Tú eliges." },
               ].map((s) => (
                 <div key={s.n}>
