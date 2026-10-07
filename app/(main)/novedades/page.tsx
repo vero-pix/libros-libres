@@ -1579,8 +1579,10 @@ export default async function NovedadesPage() {
             Día {cifras.dia} — <em className="text-amber-300 not-italic font-normal italic">ahora los compradores pueden calificar a quien les vendió</em>.
           </h1>
           <p className="text-base md:text-lg text-cream max-w-2xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "120ms" }}>
-            Esta semana el sitio dejó de depender de mí para despachar: la etiqueta se genera sola.
-            Y estrené dos cosas que van juntas, reseñas verificadas y una sección de librerías de
+            {/* Hasta el 07-10-2026 decía "la etiqueta se genera sola": eso era con Shipit,
+                que ya no opera para tuslibros. Las entradas viejas con fecha quedan como historial. */}
+            Despachar quedó más claro: cada vendedor lleva su paquete al courier que prefiere, y tú
+            ves el total con despacho en la ficha antes de comprar. Y estrené dos cosas que van juntas, reseñas verificadas y una sección de librerías de
             confianza en la portada, para que se note quién vende y responde.
           </p>
           {/* Firma con cara: el diario está escrito en primera persona y hasta
@@ -1627,23 +1629,23 @@ export default async function NovedadesPage() {
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 animate-fade-in-up" style={{ animationDelay: "240ms" }}>
           {[
             {
-              fecha: "Lanzamiento · 10 sep",
-              titulo: "Un solo despacho aunque compres en dos veces",
-              texto: "Si le compras de nuevo al mismo vendedor y todavía no despacha, tus libros se suman a ese paquete y no pagas envío otra vez.",
+              fecha: "Lanzamiento · 7 oct",
+              titulo: "Ves el total antes de comprar",
+              texto: "En la ficha eliges tu comuna y te muestro lo que vas a pagar: libro, despacho y cargo. Si llevas varios libros del mismo vendedor en una compra, pagas un solo despacho.",
               href: "/ayuda/comprar#recibir",
               cta: "Cómo funciona",
             },
             {
-              fecha: "Lanzamiento · 10 sep",
-              titulo: "Eliges tú cómo sale tu paquete",
-              texto: "En tu perfil marcas si lo dejas tú en la sucursal o si prefieres que pasen a buscarlo. Lo que elijas manda, aunque el courier agende otra cosa.",
+              fecha: "Lanzamiento · 7 oct",
+              titulo: "Tu despacho, con tus tarifas",
+              texto: "Si vendes, en tu perfil pones tus propias tarifas de despacho por zona, o lo apagas si no te acomoda. Llevas el paquete al courier que prefieras.",
               href: "/perfil",
-              cta: "Elegir cómo despacho",
+              cta: "Ver mi despacho",
             },
             {
               fecha: "Lanzamiento · 8 sep",
               titulo: "Librerías de confianza en la portada",
-              texto: "Una sección con las tiendas que venden por la plataforma, despachan y cobran con pago protegido. Rota, con una tienda destacada por semana.",
+              texto: "Una sección con las tiendas que venden por la plataforma, despachan y cobran con pago seguro. Rota, con una tienda destacada por semana.",
               href: "/#librerias-confianza",
               cta: "Verlas en la portada",
             },
