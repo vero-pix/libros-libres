@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { veTodoElCatalogo } from "@/lib/contadorVentas";
 
 /**
@@ -34,9 +35,14 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     Math.floor((Date.now() - new Date(listing.created_at as string).getTime()) / 86400000)
   );
 
+  // page_views solo la lee un admin y cart_items solo su dueño (RLS): con el
+  // cliente del usuario el KPI marcaba 0 visitas para todos. El permiso ya se
+  // revisó arriba, así que los conteos van con service role (09-10-2026).
+  const admin = createServiceRoleClient();
+
   const [{ count: visitas }, { count: enCarrito }] = await Promise.all([
-    supabase.from("page_views").select("id", { count: "exact", head: true }).eq("listing_id", params.id),
-    supabase.from("cart_items").select("id", { count: "exact", head: true }).eq("listing_id", params.id),
+    admin.from("page_views").select("id", { count: "exact", head: true }).eq("listing_id", params.id),
+    admin.from("cart_items").select("id", { count: "exact", head: true }).eq("listing_id", params.id),
   ]);
 
   // La referencia no es un número inventado: es el ritmo mediano de sus otros
@@ -51,7 +57,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   let mediana = 0;
   if (hermanos && hermanos.length > 1) {
     const ids = hermanos.map((h) => h.id as string);
-    const { data: vistas } = await supabase
+    const { data: vistas } = await admin
       .from("page_views")
       .select("listing_id")
       .in("listing_id", ids)
