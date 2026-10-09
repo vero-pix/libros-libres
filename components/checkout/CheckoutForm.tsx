@@ -806,9 +806,9 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
               </span>
             </div>
             {serviceFee > 0 && (
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-ink-muted font-medium">Cargo por servicio</span>
-                <span className="text-ink font-bold">${serviceFee.toLocaleString("es-CL")}</span>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-ink-muted">Comisión tuslibros</span>
+                <span className="text-ink-muted">${serviceFee.toLocaleString("es-CL")}</span>
               </div>
             )}
             <div className="pt-3 border-t border-cream-dark flex justify-between items-baseline">

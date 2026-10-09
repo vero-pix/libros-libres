@@ -582,7 +582,7 @@ export async function POST(req: NextRequest) {
       },
       {
         id: `fee-${bundleId}`,
-        title: "Cargo por servicio tuslibros.cl",
+        title: "Comisión tuslibros.cl",
         quantity: 1,
         unit_price: Math.round(serviceFee),
         currency_id: "CLP",

@@ -684,9 +684,9 @@ export default function BundleCheckoutForm({
             </span>
           </div>
           {serviceFee > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Cargo por servicio</span>
-              <span className="text-gray-900">${serviceFee.toLocaleString("es-CL")}</span>
+            <div className="flex justify-between text-xs">
+              <span className="text-gray-500">Comisión tuslibros</span>
+              <span className="text-gray-500">${serviceFee.toLocaleString("es-CL")}</span>
             </div>
           )}
           <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between font-bold">
