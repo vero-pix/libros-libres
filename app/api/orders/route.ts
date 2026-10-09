@@ -674,9 +674,23 @@ export async function POST(req: NextRequest) {
         const sellerPref = sellerPreferenceClient(sellerToken);
         preference = await sellerPref.create({ body: splitBody });
       } catch (splitErr) {
-        if (!refreshToken) throw splitErr;
-        const freshToken = await refreshSellerToken(seller.id, refreshToken);
-        if (!freshToken) throw splitErr;
+        const freshToken = refreshToken
+          ? await refreshSellerToken(seller.id, refreshToken)
+          : null;
+        if (!freshToken) {
+          // El permiso de MercadoPago del vendedor no sirve. En vez del error
+          // crudo de MP, se le da al comprador la salida: hablar con el vendedor.
+          console.error("[orders] MP del vendedor sin permiso válido:", seller.id, splitErr);
+          await createServiceRoleClient().from("orders").delete().eq("bundle_id", bundleId);
+          await liberarReserva(createServiceRoleClient(), bundleId);
+          return NextResponse.json(
+            {
+              error:
+                "Este vendedor no puede recibir pagos por MercadoPago en este momento. Vuelve a la ficha del libro y escríbele: ahí aparece su WhatsApp y la mensajería.",
+            },
+            { status: 409 }
+          );
+        }
         sellerToken = freshToken;
         const sellerPref = sellerPreferenceClient(sellerToken);
         preference = await sellerPref.create({ body: splitBody });
@@ -758,8 +772,10 @@ export async function POST(req: NextRequest) {
       total: bundleGrandTotal,
     });
   } catch (err: unknown) {
-    // Rollback: borrar orders del bundle si MP falla
-    await supabase.from("orders").delete().eq("bundle_id", bundleId);
+    // Rollback: borrar orders del bundle si MP falla. Con service role: con el
+    // cliente del comprador el delete no borraba nada y quedaban pedidos
+    // "pendientes" colgando (6 del mismo comprador el 09-10-2026).
+    await createServiceRoleClient().from("orders").delete().eq("bundle_id", bundleId);
     await liberarReserva(createServiceRoleClient(), bundleId);
     const message = err instanceof Error ? err.message : "Error de MercadoPago";
     console.error(

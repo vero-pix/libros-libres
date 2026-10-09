@@ -20,7 +20,24 @@ export async function refreshSellerToken(
   });
 
   if (!res.ok) {
-    console.error("[MP OAuth] refresh failed for seller", sellerId, await res.text());
+    const detalle = await res.text();
+    console.error("[MP OAuth] refresh failed for seller", sellerId, detalle);
+    // invalid_grant = MercadoPago ya no reconoce el permiso (clave cambiada,
+    // acceso revocado). Si el vendedor sigue figurando conectado, el sitio le
+    // esconde el WhatsApp y el botón de pagar falla siempre: el comprador queda
+    // sin salida. Pasó con buhardilla, cimlibros y carlos.sanchez.sotelo hasta
+    // el 09-10-2026. Se le marca desconectado; al reconectar, el callback de
+    // OAuth vuelve a llenar estas columnas.
+    if (detalle.includes("invalid_grant")) {
+      await createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { cookies: { getAll: () => [], setAll: () => {} } }
+      )
+        .from("users")
+        .update({ mercadopago_user_id: null, mercadopago_connected_at: null })
+        .eq("id", sellerId);
+    }
     return null;
   }
 
