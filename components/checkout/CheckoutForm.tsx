@@ -743,46 +743,9 @@ export default function CheckoutForm({ listing, buyerAddress, buyerName, buyerPh
           </div>
 
           <div className="p-6 bg-cream-warm/30 space-y-3">
-            {/* Código de descuento */}
-            <div className="pb-3 border-b border-cream-dark">
-              <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider mb-2">¿Tienes un código de descuento?</p>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={discountInput}
-                  onChange={(e) => setDiscountInput(e.target.value.toUpperCase())}
-                  onKeyDown={(e) => e.key === "Enter" && handleApplyCode()}
-                  placeholder="Ej: MIDESCUENTO"
-                  disabled={!!discountCode}
-                  className="flex-1 px-3 py-2 border border-cream-dark rounded-lg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white disabled:bg-cream disabled:text-ink-muted"
-                />
-                {discountCode ? (
-                  <button
-                    type="button"
-                    onClick={() => { setDiscountCode(null); setDiscountPct(0); setDiscountInput(""); }}
-                    className="px-3 py-2 text-xs font-bold text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
-                  >
-                    Quitar
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleApplyCode}
-                    disabled={validatingCode || !discountInput.trim()}
-                    className="px-3 py-2 text-xs font-bold bg-ink text-white rounded-lg hover:bg-black disabled:opacity-40 transition-colors"
-                  >
-                    {validatingCode ? "..." : "Aplicar"}
-                  </button>
-                )}
-              </div>
-              {discountError && <p className="text-[11px] text-red-600 mt-1">{discountError}</p>}
-              {discountCode && (
-                <p className="text-[11px] text-green-700 font-semibold mt-1">
-                  ✓ {discountCode} — {discountPct}% de descuento aplicado
-                </p>
-              )}
-            </div>
-
+            {/* El campo de código de descuento salió el 09-10-2026: su ejemplo
+                era MIDESCUENTO, un código real del 20%, y no había campaña que lo
+                usara. La validación sigue en /api/orders por si vuelve. */}
             <div className="flex justify-between text-sm">
               <span className="text-ink-muted font-medium">
                 Libro
